@@ -8,6 +8,7 @@ plugins {
     id("maven-publish")
     id("io.freefair.aspectj.post-compile-weaving") version "9.1.0" // AspectJ plugin
     id("com.vanniktech.maven.publish") version "0.30.0"
+    signing
 }
 
 noArg {
@@ -120,6 +121,20 @@ tasks.withType<KotlinCompile> {
             "-Xno-param-assertions",
             "-Xno-call-assertions"
         ))
+    }
+}
+
+signing {
+    val signingKey = System.getenv("SIGNING_KEY")
+    val signingPassword = System.getenv("SIGNING_PASSWORD")
+
+    val isCI = !signingKey.isNullOrEmpty()
+
+    isRequired = isCI
+
+    if (isCI) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications)
     }
 }
 

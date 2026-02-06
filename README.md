@@ -35,7 +35,7 @@ dependencies {
 
 ## Documentation
 
-Full documentation is soon available at: [https://tommasop1804.notion.site/kotlin-utils](https://tommasop1804.notion.site/kotlin-utils)
+Full documentation will be soon available at: [https://tommasop1804.notion.site/kotlin-utils](https://tommasop1804.notion.site/kotlin-utils)
 
 ## Requirements
 
