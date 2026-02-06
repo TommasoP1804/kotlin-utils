@@ -92,11 +92,6 @@ dependencies {
     }
 }*/
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
 kotlin {
     jvmToolchain(21)
     compilerOptions {
