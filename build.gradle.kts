@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.noarg") version "2.3.0"
     id("maven-publish")
     id("io.freefair.aspectj.post-compile-weaving") version "9.1.0" // AspectJ plugin
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
 noArg {
@@ -122,23 +123,36 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/tommasop1804/kotlin-utils")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+mavenPublishing {
+    coordinates("dev.tommasop1804", "kotlin-utils", "1.0.0")
+
+    pom {
+        name.set("Kotlin Utils")
+        description.set("Utility functions")
+        inceptionYear.set("2024")
+        url.set("https://github.com/TommasoP1804")
+
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("repo")
             }
         }
-    }
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
+        developers {
+            developer {
+                id.set("tommasop1804")
+                name.set("Tommaso")
+                url.set("https://tommasop1804.dev")
+            }
+        }
+        scm {
+            url.set("https://github.com/tommasop1804/kotlin-utils")
+            connection.set("scm:git:git://github.com/tommasop1804/kotlin-utils.git")
+            developerConnection.set("scm:git:ssh://git@github.com/tommasop1804/kotlin-utils.git")
         }
     }
+
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
 }
