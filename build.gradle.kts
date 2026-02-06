@@ -26,6 +26,12 @@ repositories {
     maven {
         url = uri("https://repo.osgeo.org/repository/release/")
     }
+    maven {
+        credentials {
+            username = System.getenv("OSSRH_USERNAME")
+            password = System.getenv("OSSRH_PASSWORD")
+        }
+    }
     /*maven {
         url = uri("https://download.osgeo.org/webdav/geotools/")
     }*/
@@ -120,8 +126,8 @@ tasks.withType<KotlinCompile> {
 }
 
 signing {
-    val signingKey = System.getenv("SIGNING_KEY")
-    val signingPassword = System.getenv("SIGNING_PASSWORD")
+    val signingKey = findProperty("signingKey") as String? ?: System.getenv("SIGNING_KEY")
+    val signingPassword = findProperty("signingPassword") as String? ?: System.getenv("SIGNING_PASSWORD")
 
     val isCI = !signingKey.isNullOrEmpty()
 
