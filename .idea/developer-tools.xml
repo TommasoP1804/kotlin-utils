@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="color-picker" pluginVersion="7.1.0">
+    <developerToolsConfigurations>
+      <developerToolConfiguration developerToolId="cron-expression" id="5cc46677-fcfa-41be-a9be-ccac70688809" name="Workbench">
+        <properties>
+          <property key="cronExpression-SPRING53" type="INPUT" value="kotlin.String|0 0 12 * * FRIL" />
+          <property key="cronExpression-QUARTZ" type="INPUT" value="kotlin.String|0 0 12 ? * 3#FRI" />
+          <property key="selectedCronType" type="CONFIGURATION" value="CronExpression-CronType|SPRING53" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="base32-encoder-decoder" id="71bd3551-cdc0-4f35-bff3-7f2455b9ba3d" name="Workbench">
+        <properties>
+          <property key="sourceText" type="INPUT" value="kotlin.String|wefgraijg3=" />
+          <property key="targetText" type="INPUT" value="kotlin.String|O5SWMZ3SMFUWUZZTHU======" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="text-format-converter" id="9cf37070-7fc3-4d20-9286-ba30de6938d5" name="Workbench">
+        <properties>
+          <property key="firstLanguage" type="CONFIGURATION" value="CodeFormattingConverter-Language|XML" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="qr-code-generator" id="26f0d376-37b5-456a-ad26-7d0bd8f830b2" name="Workbench">
+        <properties>
+          <property key="format" type="CONFIGURATION" value="BarcodeGenerator-Format|PDF_417" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="date-time-converter" id="8d148827-8466-4607-bb4e-ff253489366e" name="Workbench">
+        <properties>
+          <property key="formattedStandardFormat" type="CONFIGURATION" value="DatetimeConverter-StandardFormat|ISO_8601" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="color-picker" id="38e5c0c6-0a7a-4dfc-bef1-634d1a6de231" name="Workbench">
+        <properties>
+          <property key="selectedColor" type="INPUT" value="com.intellij.ui.JBColor|-1286" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="ascii-art" id="5e49c163-ca25-4660-b86b-12df3c801b15" name="Workbench">
+        <properties>
+          <property key="textInput" type="INPUT" value="kotlin.String|topma" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="base64-encoder-decoder" id="2399d976-e286-4397-ac48-9b40020cebe0" name="Workbench">
+        <properties>
+          <property key="sourceText" type="INPUT" value="kotlin.String|efefefegirtgj" />
+          <property key="targetText" type="INPUT" value="kotlin.String|ZWZlZmVmZWdpcnRnag==" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="uuid-generator" id="0359e2da-9774-42cf-9788-910c8646d70d" name="Workbench">
+        <properties>
+          <property key="UUIDv5Name" type="CONFIGURATION" value="kotlin.String|sedcSDFRD" />
+          <property key="UUIDv5IndividualNamespace" type="CONFIGURATION" value="kotlin.String|3cac129f-e2fc-4bb0-9d3e-fef7d68d5ca6" />
+          <property key="UUIDv3Name" type="CONFIGURATION" value="kotlin.String|thunder2f" />
+          <property key="version" type="CONFIGURATION" value="UuidVersion|V1" />
+          <property key="UUIDv3PredefinedNamespace" type="CONFIGURATION" value="NamespaceAndNameBasedUuidGenerator-PredefinedNamespace|URL" />
+          <property key="UUIDv5NamespaceMode" type="CONFIGURATION" value="NamespaceAndNameBasedUuidGenerator-NamespaceMode|INDIVIDUAL" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="sql-formatting" id="c702a75e-7ed5-422a-a8a1-f65e03ba4281" name="Workbench">
+        <properties>
+          <property key="dialect" type="CONFIGURATION" value="SqlFormatter-Dialect|PostgreSql" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="hashing-transformer" id="6458c3b8-7ee3-439f-813a-a1f20396654f" name="Workbench">
+        <properties>
+          <property key="sourceText" type="INPUT" value="kotlin.String|Tommaso Pastorelli" />
+          <property key="algorithm" type="CONFIGURATION" value="kotlin.String|2.16.840.1.101.3.4.2.7" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="units-converter" id="16d7d9a9-f9a4-4ee8-9e47-5414dc539d28" name="Workbench">
+        <properties>
+          <property key="lastSelectedUnitConverterIndex" type="CONFIGURATION" value="kotlin.Int|3" />
+          <property key="baseConverter_baseTwoInput" type="INPUT" value="kotlin.String|" />
+          <property key="baseConverter_showOnlyCommonBases" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        </properties>
+      </developerToolConfiguration>
+    </developerToolsConfigurations>
+    <expandedGroupNodeIds />
+  </component>
+</project>

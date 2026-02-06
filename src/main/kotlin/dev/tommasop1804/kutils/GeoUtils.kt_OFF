@@ -1,0 +1,225 @@
+@file:JvmName("GeoUtilsKt")
+@file:Suppress("unused", "kutils_getorthrow_as_invoke")
+@file:Since("1.0.0")
+
+
+package dev.tommasop1804.kutils
+
+import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.classes.geography.GeoCoordinate
+import org.geolatte.geom.Geometry
+import org.geolatte.geom.Position
+import org.geolatte.geom.codec.Wkt
+import org.geolatte.geom.jts.JTS
+import org.geotools.referencing.CRS
+
+/**
+ * Changes the Spatial Reference System Identifier (SRID) of a geometry instance and returns the transformed geometry.
+ *
+ * The method performs geometric transformations to convert the geometry's coordinates
+ * to a new coordinate reference system defined by the specified SRID.
+ *
+ * @param srid The target SRID to which the geometry should be transformed.
+ * @return A `Result` wrapping the transformed geometry with the updated SRID, or an error if the transformation fails.
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.changeSRID(srid: Int): Result<Geometry<T>> = runCatching {
+    val jtsGeometry = JTS.to(this)
+
+    val sourceCRS = CRS.decode("EPSG:${this.srid}", true)
+    val targetCRS = CRS.decode("EPSG:$srid", true)
+
+    val transform = CRS.findMathTransform(sourceCRS, targetCRS, true)
+    val transformedGeometry = org.geotools.geometry.jts.JTS.transform(jtsGeometry, transform)
+    transformedGeometry.srid = srid
+
+    @Suppress("UNCHECKED_CAST")
+    JTS.from(transformedGeometry) as Geometry<T>
+}
+
+/**
+ * Transforms the spatial reference system (SRID) of a given geometry in WKT format to a specified SRID.
+ *
+ * @param wkt the Well-Known Text (WKT) representation of the geometry to be transformed.
+ * @param srid the target Spatial Reference System Identifier (SRID) to transform the geometry to.
+ * @return a Result containing the transformed geometry in WKT format if successful, or an error if the transformation fails.
+ * @since 1.0.0
+ */
+fun changeSRID(wkt: String, srid: Int): Result<String> = runCatching {
+    val jtsGeometry = JTS.to(Wkt.fromWkt(wkt))
+
+    val sourceCRS = CRS.decode("EPSG:${jtsGeometry.srid}", true)
+    val targetCRS = CRS.decode("EPSG:$srid", true)
+
+    val transform = CRS.findMathTransform(sourceCRS, targetCRS, true)
+    val transformedGeometry = org.geotools.geometry.jts.JTS.transform(jtsGeometry, transform)
+    transformedGeometry.srid = srid
+
+    @Suppress("UNCHECKED_CAST")
+    Wkt.toWkt(JTS.from(transformedGeometry))
+}
+
+/**
+ * Calculates the distance between two geometries. If the geometries have different SRIDs (Spatial Reference System Identifiers),
+ * they are transformed to the specified SRID before distance calculation.
+ *
+ * @param other The geometry to which the distance is calculated.
+ * @param srid The Spatial Reference System Identifier (SRID) to which both geometries need
+ *             to be transformed for distance computation. Defaults to WGS 84 (SRID: 4326).
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.distanceTo(other: Geometry<T>, srid: Int = 4326) {
+    val geom1 = if (this.srid != srid) changeSRID(srid).getOrThrow() else this
+    val geom2 = if (other.srid != srid) other.changeSRID(srid).getOrThrow() else other
+
+    val jtsGeom1 = JTS.to(geom1)
+    val jtsGeom2 = JTS.to(geom2)
+
+    jtsGeom1.distance(jtsGeom2)
+}
+
+/**
+ * Checks if the geometry instance is valid according to the underlying JTS library's validation rules.
+ *
+ * A valid geometry typically conforms to the rules of its underlying geometry type,
+ * such as being properly closed, having no self-intersections, or adhering to specific
+ * topological constraints.
+ *
+ * This function converts the geometry to its JTS representation and performs the validity check.
+ *
+ * @return true if the geometry is valid, false otherwise
+ *
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.isValid() = JTS.to(this).isValid
+
+/**
+ * Calculates the centroid of the geometry and returns it as a GeoCoordinate. The centroid is the
+ * geometric center or average position of all the points in the shape.
+ *
+ * @return the centroid of the geometry as a GeoCoordinate.
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.centroid(): GeoCoordinate {
+    val jtsGeometry = JTS.to(this)
+    val centroid = jtsGeometry.centroid
+    centroid.srid = this.srid
+
+    return GeoCoordinate(JTS.from(centroid))
+}
+
+/**
+ * A property that calculates and returns the area of a geometry.
+ * The computation is performed using the JTS library.
+ *
+ * @param T The type of position associated with the geometry.
+ * @return The area of the geometry as a double value.
+ * @since 1.0.0
+ */
+val <T: Position> Geometry<T>.area
+    get() = JTS.to(this).area
+
+/**
+ * Extension property to compute the length of the geometry.
+ *
+ * The `length` property calculates the total length of the geometry represented by this instance.
+ * For linear geometries, it returns the straightforward length, while for other geometries, it can
+ * depend on their specific representation. This property leverages the JTS library functionality
+ * for length computation.
+ *
+ * @receiver The geometry instance of type `Geometry<T>` where `T` is constrained to `Position`.
+ * @return The computed length of the geometry as a double value.
+ * @since 1.0.0
+ */
+val <T: Position> Geometry<T>.length
+    get() = JTS.to(this).length
+
+/**
+ * Checks if the current geometry intersects with another geometry.
+ *
+ * @param other the geometry to check intersection with
+ * @return true if the geometries intersect, false otherwise
+ * @since 1.0.0
+ */
+infix fun <T: Position> Geometry<T>.intersects(other: Geometry<T>): Boolean {
+    val jtsThis = JTS.to(this)
+    val jtsOther = JTS.to(other)
+    return jtsThis.intersects(jtsOther)
+}
+
+/**
+ * Checks whether the given geometry is fully contained within this geometry.
+ *
+ * @param other The geometry to check for containment within this geometry.
+ * @return True if this geometry completely contains the other geometry, false otherwise.
+ * @since 1.0.0
+ */
+operator fun <T: Position> Geometry<T>.contains(other: Geometry<T>): Boolean {
+    val jtsThis = JTS.to(this)
+    val jtsOther = JTS.to(other)
+    return jtsOther in jtsThis
+}
+
+/**
+ * Creates a buffer region around this geometry at a given distance.
+ * The buffer is a region surrounding the geometry with the specified width.
+ *
+ * @param distance The buffer distance, where positive values expand the geometry
+ * and negative values shrink it. Units are consistent with the geometry's coordinate reference system.
+ * @return A [Result] containing the buffered geometry as a [Geometry] object,
+ * or an error if buffering fails.
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.buffer(distance: Double): Result<Geometry<T>> = runCatching {
+    val jtsGeometry = JTS.to(this)
+    val buffered = jtsGeometry.buffer(distance)
+    buffered.srid = this.srid
+
+    @Suppress("UNCHECKED_CAST")
+    JTS.from(buffered) as Geometry<T>
+}
+
+/**
+ * Converts the given geometry to its Well-Known Text (WKT) representation.
+ *
+ * @return A string representing the geometry in WKT format.
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.toWkt(): String = Wkt.toWkt(this)
+
+/**
+ * Parses a geometry object from its Well-Known Text (WKT) representation.
+ * Optionally, a Spatial Reference System Identifier (SRID) can be assigned to the geometry.
+ *
+ * @param wkt The Well-Known Text (WKT) string representing the geometry.
+ * @param srid An optional Spatial Reference System Identifier (SRID) to be assigned to the geometry.
+ * @return A [Result] containing the parsed [Geometry] object or an exception if the parsing fails.
+ * @since 1.0.0
+ */
+fun fromWkt(wkt: String, srid: Int? = null): Result<Geometry<*>> = runCatching {
+    val geometry = Wkt.fromWkt(wkt)
+    srid?.let {
+        val jtsGeom = JTS.to(geometry)
+        jtsGeom.srid = it
+        JTS.from(jtsGeom)
+    } ?: geometry
+}
+
+/**
+ * Computes the envelope of the geometry, which is the minimum bounding
+ * rectangle (MBR) of the geometry.
+ *
+ * The envelope is the smallest rectangle that fully contains the geometry,
+ * aligned with the coordinate axes.
+ *
+ * @return a `Geometry` object representing the envelope of the original geometry
+ * @since 1.0.0
+ */
+fun <T: Position> Geometry<T>.envelope(): Geometry<T> {
+    val jtsGeometry = JTS.to(this)
+    val envelope = jtsGeometry.envelope
+    envelope.srid = this.srid
+
+    @Suppress("UNCHECKED_CAST")
+    return JTS.from(envelope) as Geometry<T>
+}
