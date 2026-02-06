@@ -13,13 +13,7 @@ A comprehensive Kotlin/JVM utility library providing extensions, helpers, and re
 
 ```kotlin
 repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/tommasop1804/kotlin-utils")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
+    mavenCentral()
 }
 
 dependencies {
@@ -31,13 +25,7 @@ dependencies {
 
 ```groovy
 repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/tommasop1804/kotlin-utils")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
+    mavenCentral()
 }
 
 dependencies {
@@ -47,7 +35,7 @@ dependencies {
 
 ## Documentation
 
-Full documentation is available at: [https://tommasop1804.notion.site/kotlin-utils](https://tommasop1804.notion.site/kotlin-utils)
+Full documentation is soon available at: [https://tommasop1804.notion.site/kotlin-utils](https://tommasop1804.notion.site/kotlin-utils)
 
 ## Requirements
 
