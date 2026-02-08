@@ -64,30 +64,6 @@ interface CellInterface<R, C, V> : Serializable {
     val value: V?
 
     /**
-     * Converts the current object into a map representation.
-     *
-     * This method constructs a map with the keys "rowKey", "columnKey", and "value",
-     * assigning their corresponding properties from the object as values.
-     *
-     * @return a map containing the row key, column key, and value of the current object.
-     * @since 1.0.0
-     */
-    @Suppress("functionName")
-    private fun _toMap() = mapOf("rowKey" to rowKey, "columnKey" to columnKey, "value" to value)
-
-    /**
-     * Provides the value associated with the specified property name in the underlying map implementation.
-     * The value is cast to the expected return type.
-     *
-     * @param thisRef the reference to the object for which the property is retrieved. This parameter is not used in this implementation.
-     * @param property the metadata of the property whose associated value is retrieved from the map.
-     * @return the value associated with the property name, cast to the expected type.
-     * @since 1.0.0
-     */
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>): R = _toMap().getValue(property.name) as R
-
-    /**
      * Converts the current object representing a cell into a [Triple] containing the row key, column key,
      * and value of the cell.
      *

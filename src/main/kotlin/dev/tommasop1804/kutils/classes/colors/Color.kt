@@ -43,6 +43,20 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Color.Companion.OldDeserializer::class)
 @Suppress("unused", "localVariableName", "kutils_substring_as_get_intprogression", "kutils_collection_declaration", "kutils_tuple_declaration", "kutils_take_as_int_invoke")
 class Color internal constructor(var red: Int, var green: Int, var blue: Int, var alpha: Percentage = FULL): Serializable, Comparable<Color> {
+    /**
+     * Represents the luminosity component of a color in the HSL color model.
+     *
+     * This property calculates the third component (luminosity) of the HSL
+     * representation by converting the current color to the HSL model.
+     * Luminosity describes the brightness of the color on a scale from 0.0
+     * (black) to 1.0 (white).
+     *
+     * @return A float value representing the luminosity of the color.
+     * @since 1.0.1
+     */
+    val luminosity
+        get() = toHSL().third
+
     companion object {
         /**
          * A unique identifier for serializable classes used to verify compatibility
@@ -1156,9 +1170,9 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * - Second value represents hue.
          * - Third value represents lightness.
          * @return A new instance of Color with the corresponding RGB and alpha values derived from the HSL input.
-         * @since 1.0.0
+         * @since 1.0.1
          */
-        infix fun ofSHL(color: Triple<Double, Percentage, Percentage>) = ofHSL(color.first, color.second, color.third)
+        infix fun ofHSL(color: Triple<Double, Percentage, Percentage>) = ofHSL(color.first, color.second, color.third)
 
         /**
          * Creates a color instance from the given HSLA (hue, saturation, lightness, alpha) values.
@@ -1177,6 +1191,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHSLA(hue: Double, saturation: Percentage, lightness: Percentage, alpha: Percentage): Color {
+            hue.validate("ofHSLA", "hue") { this in 0.0..360.0 }
+            saturation.validate("ofHSLA", "saturation") { isNotOverflowing }
+            lightness.validate("ofHSLA", "lightness") { isNotOverflowing }
+            alpha.validate("ofHSLA", "alpha") { isNotOverflowing }
             val saturation = saturation.toDouble(true)
             val lightness = lightness.toDouble(true)
             val c = (1 - abs(2 * lightness - 1)) * saturation
@@ -1222,6 +1240,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHSV(hue: Double, saturation: Percentage, value: Percentage): Color {
+            hue.validate("ofHSV", "hue") { this in 0.0..360.0 }
+            saturation.validate("ofHSV", "saturation") { isNotOverflowing }
+            value.validate("ofHSV", "value") { isNotOverflowing }
+
             val h = hue % 360
             val s = min(1.0, max(0.0, saturation.toDouble(true)))
             val v = min(1.0, max(0.0, value.toDouble(true)))
@@ -1280,6 +1302,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofHSVA(hue: Double, saturation: Percentage, value: Percentage, alpha: Percentage): Color {
             val color = ofHSV(hue, saturation, value)
+            alpha.validate("ofHSVA", "alpha") { isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1306,6 +1329,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHSB(hue: Double, saturation: Percentage, brightness: Percentage): Color {
+            hue.validate("ofHSB", "hue") { this in 0.0..360.0 }
+            saturation.validate("ofHSB", "saturation") { isNotOverflowing }
+            brightness.validate("ofHSB", "brightness") { isNotOverflowing }
+
             val h = hue / 60.0
             val i = floor(h).toInt()
             val f = h - i
@@ -1350,6 +1377,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofHSBA(hue: Double, saturation: Percentage, brightness: Percentage, alpha: Percentage): Color {
             val color = ofHSB(hue, saturation, brightness)
+            alpha.validate("ofHSBA", "alpha") { isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1373,6 +1401,11 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofCMYK(cyan: Percentage, magenta: Percentage, yellow: Percentage, key: Percentage): Color {
+            cyan.validate("ofCMYK", "cyan") { isNotOverflowing }
+            magenta.validate("ofCMYK", "magenta") { isNotOverflowing }
+            yellow.validate("ofCMYK", "yellow") { isNotOverflowing }
+            key.validate("ofCMYK", "key") { isNotOverflowing }
+
             val c = min(1.0, max(0.0, cyan.toDouble(true)))
             val m = min(1.0, max(0.0, magenta.toDouble(true)))
             val y = min(1.0, max(0.0, yellow.toDouble(true)))
@@ -1385,7 +1418,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
             return Color(r, g, b)
         }
         /**
-         * Converts a CMYK color represented as a quadruple of doubles into its corresponding color format.
+         * Converts a CMYK color represented as a quadruple of percentages into its corresponding color format.
          *
          * - first: Cyan component of the color.
          * - second: Magenta component of the color.
@@ -1411,6 +1444,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofCMYKA(cyan: Percentage, magenta: Percentage, yellow: Percentage, key: Percentage, alpha: Percentage): Color {
             val color = ofCMYK(cyan, magenta, yellow, key)
+            alpha.validate("ofCMYKA", "alpha") { isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1445,6 +1479,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHWB(hue: Double, whiteness: Percentage, blackness: Percentage): Color {
+            hue.validate("ofHWB", "hue") { this in 0.0..360.0 }
+            whiteness.validate("ofHWB", "whiteness") { isNotOverflowing }
+            blackness.validate("ofHWB", "blackness") { isNotOverflowing }
+
             val hue = ((hue % 360) + 360) % 360 / 360.0
 
             val i = floor(hue * 6).toInt()
@@ -1503,6 +1541,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofHWBA(hue: Double, whiteness: Percentage, blackness: Percentage, alpha: Percentage): Color {
             val color = ofHWB(hue, whiteness, blackness)
+            alpha.validate("ofHWBA", "alpha") { isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1530,6 +1569,8 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         @Suppress("localVariableName")
         fun ofLAB(lightness: Percentage, a: Double, b: Double): Color {
+            lightness.validate("ofLAB", "lightness") { isNotOverflowing }
+
             val refX = 95.047
             val refY = 100.0
             val refZ = 108.883
@@ -1732,7 +1773,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @return A list of `Color` objects sorted by their luminosity.
          * @since 1.0.0
          */
-        fun sortByLuminosity(colors: Iterable<Color>): List<Color> = colors.sortedBy { it.getLuminosity() }.toList()
+        infix fun sortByLuminosity(colors: Iterable<Color>): List<Color> = colors.sortedBy { it.luminosity }.toList()
 
         /**
          * Generates a gradient of colors between the specified start and end colors, divided into the given number of steps.
@@ -1744,6 +1785,8 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun generateGradient(startColor: Color, endColor: Color, steps: Int): List<Color> {
+            steps.validate(::generateGradient, "steps") { this >= 2 }
+
             val gradient = mutableListOf<Color>()
             val startRed: Int = startColor.red
             val startGreen: Int = startColor.green
@@ -2235,7 +2278,6 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
      * - `green` - TYPE: `Int`
      * - `blue` - TYPE: `Int`
      * - `alpha` - TYPE: `Percentage`
-     * - `alpha` - TYPE: `Percentage`
      * - `rgb` - TYPE: `Triple<Int, Int, Int>`
      * - `rgba` - TYPE: `Quadruple<Int, Int, Int, Percentage>`
      * - `hex` - TYPE: `Hex`
@@ -2451,16 +2493,6 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
             && abs(green - other.green) <= tollerance
             && abs(blue - other.blue) <= tollerance
             && abs(alpha.toDouble(true) - other.alpha.toDouble(true)) <= tollerance
-
-    /**
-     * Retrieves the luminosity of the color, represented as the lightness (L) component
-     * from the HSL (Hue, Saturation, Lightness) color model.
-     *
-     *
-     * @return The luminosity (lightness) of the color as a percentage value from 0.0 to 100.0.
-     * @since 1.0.0
-     */
-    fun getLuminosity(): Percentage = toHSL().third
 
     /**
      * Adjusts the lightness of the color by the specified amount.

@@ -1,5 +1,8 @@
 package dev.tommasop1804.kutils.classes.collections
 
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.JSON.Companion.asList
 import tools.jackson.core.JsonGenerator
@@ -39,6 +42,8 @@ import tools.jackson.databind.node.ObjectNode
 @Suppress("unused")
 @JsonSerialize(using = ConsList.Companion.Serializer::class)
 @JsonDeserialize(using = ConsList.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ConsList.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ConsList.Companion.OldDeserializer::class)
 value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T> {
     /**
      * Retrieves the first element of the list if it is not empty; otherwise, throws an `IndexOutOfBoundsException`.
@@ -50,7 +55,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      * @return The first element of the list if available.
      * @since 1.0.0
      */
-    val head: T get() = pair?.first ?: throw IndexOutOfBoundsException("List is empty")
+    val head: T get() = (pair ?: throw IndexOutOfBoundsException("List is empty")).first
     /**
      * Retrieves the tail of the current list, which is the remaining part
      * of the list excluding the first element. If the list is empty, attempting
@@ -110,7 +115,9 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
     val lastValue get() = last.head
 
     /**
-     * Retrieves the total number of elements in the ConsList*/
+     * Retrieves the total number of elements in the ConsList.
+     * @since 1.0.0
+     */
     override val size get() = computeSize()
 
     /**
@@ -129,12 +136,12 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      */
     constructor(value: T) : this(Pair(value, null))
     /**
-     * Constructs a new `ConsList` instance by populating it with the elements provided in the `values` vararg parameter.
-     * The elements are added in reversed order, starting from the last element in the `values` array.
+     * A secondary constructor that initializes an instance by constructing a linked list
+     * from the provided vararg elements.
      *
-     * This constructor uses the `compute` utility function to initialize the underlying pair representation of the list.
-     *
-     * @param values*/
+     * @param values The elements to be added to the list, provided as vararg.
+     * @since 1.0.0
+     */
     constructor(vararg values: T) : this(compute {
         var list = ConsList<T>()
         for (i in values.lastIndex downTo 0)
@@ -164,11 +171,11 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
         /**
          * Prepends the current element to the beginning of the given cons list, creating a new cons list.
          *
-         * @param fList The cons list to which the current element should be prepended.
+         * @param consList The cons list to which the current element should be prepended.
          * @return A new cons list with the current element as the head and the provided list as the tail.
          * @since 1.0.0
          */
-        infix fun <T> T.cons(fList: ConsList<T>): ConsList<T> = ConsList(this to fList)
+        infix fun <T> T.cons(consList: ConsList<T>): ConsList<T> = ConsList(this to consList)
         /**
          * Creates a new `ConsList` by adding the specified value to the current element,
          * effectively creating a pair of the current element and the value.
@@ -196,7 +203,6 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
         }
 
         private tailrec fun <T, R> mapRecursive(current: ConsList<T>?, acc: ConsList<R>, transform: Transformer<T, R>): ConsList<R> {
-            println("<>")
             return if (current.isNull() || current.isEmpty()) acc
             else mapRecursive(current.tail, transform(current.head) cons acc, transform)
         }
@@ -229,41 +235,24 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
                 return ConsList(node.asList<Any>())
             }
         }
+
+        class OldSerializer : JsonSerializer<ConsList<*>>() {
+            override fun serialize(value: ConsList<*>, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
+                gen.writeStartArray()
+                value.forEach { gen.writeString(it.toString()) }
+                gen.writeEndArray()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<ConsList<*>>() {
+            override fun deserialize(p: com.fasterxml.jackson.core.JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ConsList<*> {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.node.ObjectNode>(p)
+                return ConsList(node.map { it.asText() })
+            }
+        }
     }
 
-    /**
-     * Checks whether the encapsulated pair is null or consists entirely of null elements.
-     *
-     * This method evaluates if the `pair` field is null, or if both its `first` and `second` components are null.
-     * It is used to determine emptiness or null-related conditions for the pair structure.
-     *
-     * @return `true` if the `pair` is null or both `pair.first` and `pair.second` are null, `false` otherwise.
-     * @since 1.0.0
-     */
-    fun isNullOrEmpty() = pair.isNull() || pair.first.isNull() && pair.second.isNull()
-
-    /**
-     * Checks if the list is neither null nor empty.
-     *
-     * This method evaluates whether the list contains at least one element.
-     * It internally relies on the `isNullOrEmpty()` method to determine
-     * the state of the list.
-     *
-     * @return `true` if the list is not null and has at least one element,
-     *         `false` otherwise.
-     * @since 1.0.0
-     */
-    fun isNotNullOrEmpty() = !isNullOrEmpty()
-
-    /**
-     * Converts the object into its string representation, formatted accordingly.
-     *
-     * @param first Indicates whether the representation should start with an opening bracket.
-     * @return The string representation of the object. If the pair is null, returns "[]".
-     *         Otherwise, constructs the string based on the `first` parameter and pair values.
-     * @since 1.0.0
-     */
-    fun toString(first: Boolean, builder: StringBuilder = StringBuilder(String.EMPTY)): StringBuilder {
+    private fun toString(first: Boolean, builder: StringBuilder = StringBuilder(String.EMPTY)): StringBuilder {
         with(builder) {
             if (pair.isNull())
                 return if (first) append("[]") else {
@@ -337,18 +326,20 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
     override operator fun contains(element: T): Boolean = containsRecursive(this, element)
 
     /**
-     * Checks if the list contains all elements from the*/
+     * Checks if all elements in the specified collection are contained in this collection.
+     *
+     * @param elements the collection of elements to check for containment.
+     * @return `true` if all elements in the specified collection are present in this collection, `false` otherwise.
+     * @since 1.0.0
+     */
     override fun containsAll(elements: Collection<T>): Boolean =
         elements.all { it in this }
 
     /**
-     * Adds an element to the beginning of the current list, creating a new list.
-     *
-     * This function appends the given value to the head of the list, reversing
-     * the current list and reconstructing it with the new value prepended.
+     * Adds an element to the end of the current list, creating a new list.
      *
      * @param value The value to be added to the beginning of the list.
-     * @return A new `ConsList` instance with the specified value prepended
+     * @return A new `ConsList` instance with the specified value appended
      *         to the current list.
      * @since 1.0.0
      */
@@ -551,9 +542,9 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      *        the current list element, and produces the next accumulator value.
      * @return The accumulated result after applying the given operation to all elements of the list, 
      *         starting from the initial value.
-     * @since 1.0.0
+     * @since 1.0.1
      */
-    fun <R> fold(initial: R, operation: BiTransformer<R, T, R>) = foldRecursive(this, initial, operation)
+    fun <R> reduce(initial: R, operation: BiTransformer<R, T, R>) = foldRecursive(this, initial, operation)
 
     /**
      * Returns a new ConsList containing up to the first `n` elements from this list.

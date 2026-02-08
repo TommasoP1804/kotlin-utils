@@ -10,6 +10,7 @@ import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.base.Base36
 import dev.tommasop1804.kutils.classes.coding.JSON
 import dev.tommasop1804.kutils.classes.coding.YAML
+import dev.tommasop1804.kutils.classes.coding.YAMLNode
 import dev.tommasop1804.kutils.classes.collections.MTable
 import dev.tommasop1804.kutils.classes.collections.Table
 import dev.tommasop1804.kutils.classes.colors.Color
@@ -1585,6 +1586,18 @@ typealias Json = JSON
  */
 @Beta
 typealias Yaml = YAML
+
+/**
+ * Defines an alias for the `YAMLNode` type. This alias is intended for use when working with YAML data structures.
+ *
+ * Usage of this type alias should be done with caution as it is marked with the `@Beta` annotation, indicating
+ * it is in the beta stage of development and may still undergo changes before it becomes stable.
+ *
+ * @see YAMLNode
+ * @since 1.0.1
+ */
+@Beta
+typealias YamlNode = YAMLNode
 
 /**
  * Typealias for `Instant` from the kotlinx-datetime library, enabling the use of `Instant` with a shorter name (`KInstant`).

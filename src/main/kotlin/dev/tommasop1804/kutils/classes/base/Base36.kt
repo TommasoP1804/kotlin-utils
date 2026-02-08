@@ -3,15 +3,11 @@ package dev.tommasop1804.kutils.classes.base
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.constants.TextCase
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.exceptions.MalformedInputException
 import dev.tommasop1804.kutils.exceptions.NumberSignException
-import dev.tommasop1804.kutils.isAlphanumeric
-import dev.tommasop1804.kutils.isNegative
-import dev.tommasop1804.kutils.isOdd
-import dev.tommasop1804.kutils.unaryMinus
-import dev.tommasop1804.kutils.unaryPlus
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
 import org.bouncycastle.util.encoders.Hex
@@ -23,7 +19,6 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
-import kotlin.collections.map
 
 /**
  * A class that represents a Base36-encoded value. The Base36 encoding consists of alphanumeric
@@ -394,32 +389,9 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
             override fun deserialize(p: com.fasterxml.jackson.core.JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Base36 = Base36(p.text)
         }
 
-        /**
-         * A JPA attribute converter that manages conversion between the `Base36` and `String` types.
-         *
-         * The converter is annotated with `@jakarta.persistence.Converter` and is automatically applied
-         * to entities where the `Base36` type is used. The primary purpose of the class is to handle
-         * the persistence of `Base36` objects as strings in the database and vice versa.
-         *
-         * @since 1.0.0
-         */
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<Base36?, String?> {
-            /**
-             * Converts a Base36 attribute to its String representation for database storage.
-             *
-             * @param attribute the Base36 object to be converted, or null if no value is present.
-             * @return the String representation of the Base36 object, or null if the input attribute is null.
-             * @since 1.0.0
-             */
             override fun convertToDatabaseColumn(attribute: Base36?): String? = attribute?.value
-            /**
-             * Converts a database column value represented as a String into a Base36 entity attribute.
-             *
-             * @param dbData the String value retrieved from the database column, which may be null
-             * @return a Base36 instance representing the provided dbData, or null if dbData is null
-             * @since 1.0.0
-             */
             override fun convertToEntityAttribute(dbData: String?): Base36? = dbData?.let { Base36(it) }
         }
     }
