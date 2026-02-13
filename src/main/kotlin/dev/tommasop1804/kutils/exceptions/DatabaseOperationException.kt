@@ -1,5 +1,6 @@
 package dev.tommasop1804.kutils.exceptions
 
+import dev.tommasop1804.kutils.before
 import dev.tommasop1804.kutils.classes.coding.SqlQuery
 
 /**
@@ -10,6 +11,9 @@ import dev.tommasop1804.kutils.classes.coding.SqlQuery
  */
 @Suppress("unused")
 open class DatabaseOperationException : RuntimeException {
+    val internalErrorCode: String?
+        get() = message?.before(" @@@ ")?.ifBlank { null }
+
     /**
      * Initializes a new instance of the DatabaseOperationException class with no detail message.
      *
@@ -17,7 +21,7 @@ open class DatabaseOperationException : RuntimeException {
      * with no additional context or specific error details. It can be used to indicate an 
      * unspecified database operation failure.
      *
-     * @since 1.0.0
+     * @since 1.0.2
      */
     constructor() : super()
     /**
@@ -25,9 +29,10 @@ open class DatabaseOperationException : RuntimeException {
      * indicating the query that caused the exception.
      *
      * @param query the SQL query that triggered the exception
-     * @since 1.0.0
+     * @param internalErrorCode the internal error code associated with the exception
+     * @since 1.0.2
      */
-    constructor(query: SqlQuery) : super("Error executing query: $query")
+    constructor(query: SqlQuery, internalErrorCode: String? = null) : super("Error executing query: $query")
     /**
      * Constructs a `DatabaseOperationException` with the specified detail message.
      *
@@ -36,9 +41,10 @@ open class DatabaseOperationException : RuntimeException {
      * or additional error details to help identify the reason for the exception.
      *
      * @param message The detail message associated with the exception, or null if no message is specified.
-     * @since 1.0.0
+     * @param internalErrorCode the internal error code associated with the exception
+     * @since 1.0.2
      */
-    constructor(message: String?) : super(message)
+    constructor(message: String?, internalErrorCode: String? = null) : super(message)
     /**
      * Constructs a `DatabaseOperationException` with the specified detail message and cause.
      *
@@ -49,9 +55,10 @@ open class DatabaseOperationException : RuntimeException {
      *
      * @param message A detailed message describing the database operation error, or null if no specific message is provided.
      * @param cause The underlying cause of this exception, or null if no cause is specified.
-     * @since 1.0.0
+     * @param internalErrorCode the internal error code associated with the exception
+     * @since 1.0.2
      */
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause)
     /**
      * Constructs a `DatabaseOperationException` with the specified cause.
      *
@@ -60,7 +67,8 @@ open class DatabaseOperationException : RuntimeException {
      * related to database operations.
      *
      * @param cause The cause of this exception, or null if no cause is specified.
-     * @since 1.0.0
+     * @param internalErrorCode the internal error code associated with the exception
+     * @since 1.0.2
      */
-    constructor(cause: Throwable?) : super(cause)
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause)
 }

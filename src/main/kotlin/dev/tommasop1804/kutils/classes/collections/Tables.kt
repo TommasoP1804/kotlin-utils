@@ -365,20 +365,6 @@ data class MCell<R, C, V>(override var rowKey: R, override var columnKey: C, ove
          */
         @Serial private const val serialVersionUID = 1L
 
-        /**
-         * Converts the [Triple] instance into a [MCell] object with the first element as the row key,
-         * the second element as the column key, and the third element as the value.
-         *
-         * This method simplifies the creation of a [MCell] from a [Triple], allowing seamless
-         * interoperability between the two structures.
-         *
-         * @receiver the [Triple] object, where the first element represents the row key,
-         * the second element represents the column key, and the third element represents the value.
-         * @return a new [MCell] instance with the row key, column key, and value derived from the [Triple].
-         * @since 1.0.0
-         */
-        fun <R, C, V> Triple<R, C, V>.toMCell() = MCell(first, second, third)
-
         class Serializer : ValueSerializer<MCell<Any, Any, Any?>>() {
             override fun serialize(
                 value: MCell<Any, Any, Any?>,
@@ -436,18 +422,6 @@ data class MCell<R, C, V>(override var rowKey: R, override var columnKey: C, ove
      * @since 1.0.0
      */
     override fun toString(): String = "MCell(rowKey=$rowKey, columnKey=$columnKey, value=$value)"
-
-    /**
-     * Checks if the current cell has the same row key and column key as the specified cell.
-     *
-     * This method is used to compare the keys of two cells to determine if they refer
-     * to the same position in a table or grid structure.
-     *
-     * @param other the cell to compare with the current cell
-     * @return true if both rowKey and columnKey are equal in the two cells, false otherwise
-     * @since 1.0.0
-     */
-    fun sameKeys(other: MCell<R, C, *>) = rowKey == other.rowKey && columnKey == other.columnKey
 
     /**
      * Checks equality between the current object and the specified object.

@@ -505,7 +505,7 @@ enum class Country(
 		 * is found in the system's locale settings. Defaults to null.
 		 * @since 1.0.0
 		 */
-		fun systemDefault(defaultValue: Country? = null) = fromLocale(Locale.getDefault()) ?: (defaultValue ?: IllegalStateException("No default country found."))
+		fun systemDefault(defaultValue: Country? = null) = fromLocale(Locale.getDefault()) ?: (defaultValue ?: throw IllegalStateException("No default country found."))
 
 		/**
 		 * Translates a list of state names using the provided translator.
@@ -556,7 +556,7 @@ enum class Country(
 		"locale" to locale,
 		"timeZones" to timeZones,
 		"phoneCodes" to phoneCodes,
-		"militaryTimeZones" to timeZoneDesignators,
+		"timeZoneDesignators" to timeZoneDesignators,
 		"zoneOffset" to zoneOffsets,
 		"zoneUtcOffsets" to zoneUtcOffsets
 	)
@@ -577,7 +577,7 @@ enum class Country(
 	 * - `locale` - The locale associated with the country. - TYPE: [Locale]
 	 * - `timeZones` - The list of time zones associated with the country. - TYPE: `List<TimeZone>`
 	 * - `phoneCodes` - The list of phone codes associated with the country. - TYPE: [StringList]
-	 * - `militaryTimeZones` - The list of military time zones associated with the country. - TYPE: `List<MilitaryTimeZone>`
+	 * - `timeZoneDesignators` - The list of military time zones associated with the country. - TYPE: `List<TimeZoneDesignator>`
 	 * - `zoneOffsets` - The list of zone offsets associated with the country. - TYPE: `List<ZoneOffset>`
 	 * - `zoneUtcOffsets` - The list of zone UTC offsets associated with the country. - TYPE: [StringList]
 	 *
