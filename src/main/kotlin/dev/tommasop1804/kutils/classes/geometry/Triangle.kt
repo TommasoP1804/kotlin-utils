@@ -37,7 +37,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Triangle.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Triangle.Companion.OldDeserializer::class)
 @Suppress("unused")
-class Triangle (val a: Point = Point(), val b: Point = Point(), val c: Point = Point()) : Serializable, Comparable<Triangle>, Shape2D {
+class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = Point()) : Serializable, Comparable<Triangle>, Shape2D {
     /**
      * Represents the area of the triangle calculated using the coordinates of its vertices.
      * The formula utilizes the determinant method to ensure accuracy and accounts for
@@ -143,6 +143,19 @@ class Triangle (val a: Point = Point(), val b: Point = Point(), val c: Point = P
             return TriangleType.SCALENE
         }
 
+    /**
+     * Computes the centroid of the triangle.
+     *
+     * The centroid is the arithmetic mean position of all the vertices and represents
+     * the center of mass of the triangle. It is calculated using the vertices `a`, `b`, and `c`.
+     * The formula for the coordinates of the centroid is:
+     *
+     * - x-coordinate: `(a.x + b.x + c.x) / 3`
+     * - y-coordinate: `(a.y + b.y + c.y) / 3`
+     *
+     * @return A [Point] representing the centroid of the triangle.
+     * @since 1.0.0
+     */
     val centroid: Point
         get() = Point((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3)
 

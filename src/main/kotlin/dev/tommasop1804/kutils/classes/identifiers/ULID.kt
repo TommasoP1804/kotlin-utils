@@ -43,6 +43,7 @@ import kotlin.CharSequence
 import kotlin.Comparable
 import kotlin.IllegalArgumentException
 import kotlin.IllegalStateException
+import kotlin.IndexOutOfBoundsException
 import kotlin.Int
 import kotlin.Long
 import kotlin.OptIn
@@ -73,7 +74,17 @@ import kotlin.time.ExperimentalTime
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ULID.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ULID.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_temporal_of_as_temporal")
-class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<ULID>, Serializable {
+class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<ULID>, Serializable, CharSequence {
+
+    /**
+     * Length of the ULID string representation.
+     *
+     * This property defines the fixed length of the ULID when represented as a base-32 encoded string.
+     * The standard length ensures consistent formatting and compatibility across systems utilizing ULIDs.
+     *
+     * @since 1.0.3
+     */
+    override val length: Int = 26
 
     /**
      * Represents the point in time derived from the ULID's timestamp.
@@ -383,6 +394,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         const val ULID_CHARS: Int = 26
+
         /**
          * Defines the number of characters used to represent the time component
          * of a ULID (Universally Unique Lexicographically Sortable Identifier).
@@ -393,6 +405,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         const val TIME_CHARS: Int = 10
+
         /**
          * Defines the default length of the random character component used in the ULID generation process.
          * The value represents the standard size for ensuring unique identifiers.
@@ -408,6 +421,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         const val ULID_BYTES: Int = 16
+
         /**
          * Represents the fixed size in bytes allocated for encoding the time component
          * in the ULID (Universally Unique Lexicographically Sortable Identifier) format.
@@ -417,6 +431,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         const val TIME_BYTES: Int = 6
+
         /**
          * Specifies the number of random bytes to be used in the generation process.
          *
@@ -438,6 +453,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         val MIN: ULID = ULID(0x0000000000000000L, 0x0000000000000000L)
+
         /**
          * A constant ULID value representing the maximum possible ULID.
          * It is constructed using the largest possible values for both the
@@ -464,6 +480,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         val ALPHABET_VALUES: ByteArray = ByteArray(256)
+
         /**
          * Represents an array of uppercase alphanumeric characters excluding ambiguous letters
          * such as 'I' and 'O'. This character pool is typically used in contexts requiring
@@ -475,6 +492,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         val ALPHABET_UPPERCASE: CharArray = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".toCharArray()
+
         /**
          * A character array containing the lowercase alphabet along with numeric characters,
          * specifically excluding ambiguous characters like 'i', 'l', 'o', and 'u'.
@@ -567,6 +585,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         private fun generate() = Factory.Holder.INSTANCE.create()
+
         /**
          * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) based on the provided time.
          *
@@ -587,6 +606,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         private fun generateMonotonic() = Factory.MonotonicHolder.INSTANCE.create()
+
         /**
          * Generates a monotonic ULID based on the provided timestamp.
          * This method ensures that ULIDs generated with the same or slightly decreasing timestamps
@@ -607,7 +627,9 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @param string The string input which will be hashed to generate the ULID.
          * @since 1.0.0
          */
-        fun generateHashULID(time: Long, string: String) = generateHashULID(time, string.toByteArray(StandardCharsets.UTF_8))
+        fun generateHashULID(time: Long, string: String) =
+            generateHashULID(time, string.toByteArray(StandardCharsets.UTF_8))
+
         /**
          * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) instance
          * based on a given time and a hashed representation of the provided byte array.
@@ -676,6 +698,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @since 1.0.0
          */
         private fun from(uuid: UUID) = ULID(uuid.mostSignificantBits, uuid.leastSignificantBits)
+
         /**
          * Constructs a ULID from the given byte array.
          *
@@ -938,7 +961,8 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
         }
 
         class OldDeserializer : JsonDeserializer<ULID>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ULID = from(p.text)
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ULID =
+                from(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
@@ -1015,8 +1039,8 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
                 session: SharedSessionContractImplementor?,
                 owner: Any?
             ): ULID? {
-                val bytes = rs?.getBytes(position) ?: return null
-                return ULID(bytes = bytes)
+                val value = rs?.getObject(position, UUID::class.java) ?: return null
+                return from(value)
             }
 
             override fun nullSafeSet(
@@ -1025,15 +1049,14 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
-                if (st == null) throw IllegalArgumentException("Statement cannot be null")
-                if (value != null) {
-                    st.setBytes(index, value.toByteArray())
+                if (value == null) {
+                    st?.setNull(index, SqlTypes.UUID)
                 } else {
-                    st.setNull(index, SqlTypes.VARBINARY)
+                    st?.setObject(index, value.toUUID())
                 }
             }
 
-            override fun deepCopy(value: ULID?): ULID? = value?.let { ULID(it) }
+            override fun deepCopy(value: ULID?): ULID? = value
 
             override fun isMutable(): Boolean = false
 
@@ -1042,9 +1065,59 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ULID? = (cached as? ByteArray)?.let { ULID(bytes = it) }
+            ): ULID? = (cached as? String)?.let { ULID(it) }
 
-            override fun toSqlLiteral(value: ULID?): String? = value?.let { "E'\\\\x${it.toHex()}'" }
+            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it.toUUID()}'" }
+
+            override fun toString(value: ULID?): String? = value?.toString()
+
+            override fun fromStringValue(sequence: CharSequence?): ULID =
+                sequence?.let { ULID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+        }
+
+        class TypeUUID : EnhancedUserType<ULID> {
+            override fun getSqlType(): Int = SqlTypes.UUID
+
+            override fun returnedClass(): Class<ULID> = ULID::class.java
+
+            override fun equals(
+                x: ULID?,
+                y: ULID?
+            ): Boolean = x == y
+
+            override fun hashCode(x: ULID?): Int = x?.hashCode() ?: 0
+
+            override fun nullSafeGet(
+                rs: ResultSet?,
+                position: Int,
+                session: SharedSessionContractImplementor?,
+                owner: Any?
+            ): ULID? {
+                val value = rs?.getString(position) ?: return null
+                return ULID(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement?,
+                value: ULID?,
+                index: Int,
+                session: SharedSessionContractImplementor?
+            ) {
+                st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
+            }
+
+            override fun deepCopy(value: ULID?): ULID? = value?.let { ULID(it) }
+
+            override fun isMutable(): Boolean = false
+
+            override fun disassemble(value: ULID?): Serializable? = deepCopy(value)
+
+            override fun assemble(
+                cached: Serializable?,
+                owner: Any?
+            ): ULID? = cached as? ULID
+
+            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it}'" }
 
             override fun toString(value: ULID?): String? = value?.toString()
 
@@ -1052,6 +1125,28 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
                 sequence?.let { ULID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
         }
     }
+
+    /**
+     * Retrieves the character at the specified index from the string representation of the object.
+     *
+     * @param index The position of the character to be retrieved. Must be a valid index within the bounds of the string.
+     * @return The character at the specified index.
+     * @throws IndexOutOfBoundsException If the index is negative or not within the bounds of the string.
+     * @since 1.0.3
+     */
+    override fun get(index: Int) = toString()[index]
+
+    /**
+     * Returns a new character sequence that is a subsequence of this character sequence.
+     *
+     * The subsequence starts at the specified `startIndex` and ends right before the specified `endIndex`.
+     *
+     * @param startIndex The beginning index, inclusive.
+     * @param endIndex The ending index, exclusive.
+     * @return A character sequence representing the specified subsequence.
+     * @since 1.0.3
+     */
+    override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
 
     /**
      * Converts the current ULID instance to a UUID representation.
@@ -1277,6 +1372,8 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      * @since 1.0.0
      */
     fun toHex() = toByteArray().toHex()
+
+
 
     /**
      * Represents a Factory class for generating ULIDs.

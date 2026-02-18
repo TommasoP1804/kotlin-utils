@@ -35,7 +35,17 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Cone.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Cone.Companion.OldDeserializer::class)
 @Suppress("unused")
-class Cone (var baseCenter: Point = Point(), var radius: Double = 0.0, var height: Double = 0.0) : Serializable, Comparable<Cone>, Shape3D {
+class Cone(
+    var baseCenter: Point = Point(),
+    radius: Double = 0.0,
+    height: Double = 0.0
+) : Serializable, Comparable<Cone>, Shape3D {
+
+    var radius = radius
+        set(value) = if (value >= 0) field = value else throw GeometryException("Radius must be greater than zero")
+    var height = height
+        set(value) = if (value >= 0) field = value else throw GeometryException("Height must be greater than zero")
+
     init {
         radius >= 0 || throw GeometryException("Radius must be greater than zero")
         height >= 0 || throw GeometryException("Height must be greater than zero")

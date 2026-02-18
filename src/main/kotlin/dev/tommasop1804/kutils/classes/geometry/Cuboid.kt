@@ -31,10 +31,13 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Cuboid.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Cuboid.Companion.OldDeserializer::class)
 @Suppress("unused")
-open class Cuboid (var minCorner: Point = Point(), var width: Double = 0.0, var height: Double = 0.0, var depth: Double = 0.0) : Serializable, Comparable<Cuboid>, Shape3D {
-    init {
-        width >= 0 && height >= 0 && depth >= 0 || throw GeometryException("Width, height and depth must be greater than zero")
-    }
+open class Cuboid (var minCorner: Point = Point(), width: Double = 0.0, height: Double = 0.0, depth: Double = 0.0) : Serializable, Comparable<Cuboid>, Shape3D {
+    var width = width
+        set(value) = if (value >= 0) field = value else throw GeometryException("Width must be greater than zero")
+    var height = height
+        set(value) = if (value >= 0) field = value else throw GeometryException("Height must be greater than zero")
+    var depth = depth
+        set(value) = if (value >= 0) field = value else throw GeometryException("Depth must be greater than zero")
 
     /**
      * Represents the total surface area of the cuboid, calculated as the sum of the areas
@@ -66,6 +69,10 @@ open class Cuboid (var minCorner: Point = Point(), var width: Double = 0.0, var 
      */
     val centroid: Point
         get() = Point(minCorner.x + width / 2, minCorner.y + height / 2, minCorner.z + depth / 2)
+
+    init {
+        width >= 0 && height >= 0 && depth >= 0 || throw GeometryException("Width, height and depth must be greater than zero")
+    }
 
     companion object {
         /**
@@ -208,6 +215,22 @@ open class Cuboid (var minCorner: Point = Point(), var width: Double = 0.0, var 
         if (considerPosition && (minCorner != other.minCorner)) return false
 
         return true
+    }
+
+    /**
+     * Computes the hash code for this `Cuboid` instance based on its properties.
+     * The hash code is derived from the `minCorner`, `width`, `height`, and `depth`
+     * fields, ensuring consistent and distinct values for unique cuboids.
+     *
+     * @return An integer representing the hash code of the `Cuboid` instance.
+     * @since 1.0.3
+     */
+    override fun hashCode(): Int {
+        var result = minCorner.hashCode()
+        result = 31 * result + width.hashCode()
+        result = 31 * result + height.hashCode()
+        result = 31 * result + depth.hashCode()
+        return result
     }
 
     /**

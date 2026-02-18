@@ -283,9 +283,9 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
      * 
      * @param other The line to compare against for parallelism.
      * @return `true` if the current line is parallel to the specified line, otherwise `false`.
-     * @since 1.0.0
+     * @since 1.0.3
      */
-    fun isParallel(other: Line): Boolean {
+    infix fun isParallelWith(other: Line): Boolean {
         if (start.z == 0.0 && end.z == 0.0) {
             if (isVertical && other.isVertical) return true
             if (isHorizontal && other.isHorizontal) return true
@@ -324,9 +324,9 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
      * 
      * @param other The other line to check for perpendicularity.
      * @return True if the current line is perpendicular to the given line, false otherwise.
-     * @since 1.0.0
+     * @since 1.0.3
      */
-    fun isPerpendicular(other: Line): Boolean {
+    infix fun isPerpendicularWith(other: Line): Boolean {
         if (start.z == 0.0 && end.z == 0.0) {
             if (isVertical && other.isHorizontal) return true
             if (isHorizontal && other.isVertical) return true
@@ -358,7 +358,7 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
      * @return True if the two lines intersect, false otherwise.
      * @since 1.0.0
      */
-    fun intersects(other: Line): Boolean {
+    infix fun intersects(other: Line): Boolean {
         val d1: Double = direction(other.start, other.end, start)
         val d2: Double = direction(other.start, other.end, end)
         val d3: Double = direction(start, end, other.start)
@@ -391,7 +391,7 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
      * @throws GeometryException If any of the lines are not 2D.
      * @since 1.0.0
      */
-    fun intersection(other: Line): Point? {
+    infix fun intersection(other: Line): Point? {
         if (start.z != 0.0 || end.z != 0.0 || other.start.z != 0.0 || other.end.z != 0.0)
             throw GeometryException("Only for 2D lines")
 
@@ -523,7 +523,7 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
      * @return The angle in radians between the two lines. Returns Double.NaN if either line has zero length.
      * @since 1.0.0
      */
-    fun angleWith(other: Line): Double {
+    infix fun angleWith(other: Line): Double {
         if (start.z == 0.0 || end.z == 0.0 || other.start.z == 0.0 || other.end.z == 0.0) {
             val dx1 = end.x - start.x
             val dy1 = end.y - start.y

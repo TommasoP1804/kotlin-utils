@@ -287,7 +287,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, statusCode: Int?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
+    constructor(serviceName: String?, statusCode: Int?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
     /**
      * Constructs a new ExternalServiceHttpException with the specified service name and error message.
      *
@@ -315,7 +315,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName.isNotNull()) "Error calling service $serviceName" else String.EMPTY) + (if (message.isNotNull()) message else String.EMPTY), cause)
+    constructor(serviceName: String?, message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName.isNotNull()) "Error calling service $serviceName" else String.EMPTY) + (if (message.isNotNull()) ": $message" else String.EMPTY), cause)
     /**
      * Constructs a new ExternalServiceHttpException with the specified service name and cause.
      *

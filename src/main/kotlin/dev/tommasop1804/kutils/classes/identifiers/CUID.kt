@@ -32,8 +32,6 @@ import java.security.SecureRandom
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.Instant
-import java.util.*
-import java.util.stream.IntStream
 import kotlin.math.pow
 import kotlin.text.startsWith
 import kotlin.time.ExperimentalTime
@@ -61,7 +59,7 @@ import kotlin.time.ExperimentalTime
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = CUID.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = CUID.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_take_as_int_invoke")
-class CUID(val value: String, val version: CUIDVersion = identifyVersion(value), private val savedTimestamp: Long? = null) : CharSequence by value, Serializable {
+class CUID private constructor(private val value: String, val version: CUIDVersion = identifyVersion(value), private val savedTimestamp: Long? = null) : CharSequence, Serializable {
     /**
      * Provides the timestamp value associated with this CUID instance.
      *
@@ -99,6 +97,39 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
         get() = Instant(timestamp)
 
     /**
+     * The length of the `value` associated with this instance.
+     *
+     * This property calculates and returns the number of characters in the `value`.
+     * It provides a read-only view of the length, making it useful for determining
+     * the size of the `value` without direct access to its internal structure.
+     *
+     * @return The number of characters in the `value` of this instance.
+     * @since 1.0.3
+     */
+    override val length: Int
+        get() = value.length
+
+    /**
+     * Constructs a new instance of the `CUID` class.
+     *
+     * This constructor initializes the `CUID` object with a given `CharSequence`,
+     * determines the corresponding `CUIDVersion`, and optionally accepts a saved timestamp.
+     * The input `value` is automatically trimmed of whitespace before being assigned.
+     *
+     * @param value The character sequence representing the CUID value.
+     * @param version The version of the CUID, determined by analyzing the given `value`
+     *                if not explicitly specified. Defaults to the result of `identifyVersion(value.toString())`.
+     * @param savedTimestamp An optional timestamp value representing when the CUID was saved.
+     *                       Defaults to `null` if not provided.
+     * @since 1.0.3
+     */
+    constructor(value: CharSequence, version: CUIDVersion = identifyVersion(value.toString()), savedTimestamp: Long? = null) : this(
+        value.toString().trim(),
+        version,
+        savedTimestamp
+    )
+
+    /**
      * Initializes a new instance of the CUID class by constructing a unique identifier
      * using a combination of a predefined letter, timestamp, counter, fingerprint,
      * and random blocks. The generated value is guaranteed to be unique within the
@@ -134,9 +165,9 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
      * @since 1.0.0
      */
     @OptIn(ExperimentalTime::class)
-    constructor(version: CUIDVersion = CUIDVersion.CUIDv1, timestamp: kotlin.time.Instant? = null, lengthForV2: Int = LENGTH_V2) : this(when (version) {
-        CUIDVersion.CUIDv1 -> generateV1(timestamp?.toEpochMilliseconds())
-        CUIDVersion.CUIDv2 -> generateV2(timestamp?.toEpochMilliseconds(), lengthForV2)
+    constructor(version: CUIDVersion = CUIDVersion.CUIDv1, timestamp: kotlin.time.Instant, lengthForV2: Int = LENGTH_V2) : this(when (version) {
+        CUIDVersion.CUIDv1 -> generateV1(timestamp.toEpochMilliseconds())
+        CUIDVersion.CUIDv2 -> generateV2(timestamp.toEpochMilliseconds(), lengthForV2)
     }, version, Instant().toEpochMilli())
 
     init {
@@ -261,17 +292,17 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
          */
         private fun getFingerprint(version: CUIDVersion): String {
             if (version == CUIDVersion.CUIDv1) {
-                val hostInfo = getHostInfo(Date().time.toString())
-                val hostId = hostInfo.split("@")[0]
-                val hostName = hostInfo.split("@")[1]
+                val pid = ProcessHandle.current().pid().toString(BASE)
+                val host = try {
+                    InetAddress.getLocalHost().hostName
+                        .hashCode()
+                        .toUInt()
+                        .toString(BASE)
+                } catch (e: Exception) {
+                    getRandomBlock()
+                }
 
-                var acc = hostName.length + BASE
-                for (i in 0 until hostName.length)
-                    acc += acc + hostName[i].code
-
-                val idBlock = pad(hostId.toLong().toString(BASE), 2)
-                val nameBlock = pad(acc.toString(), 2)
-                return idBlock + nameBlock
+                return (pid + host).take(BLOCK_SIZE).padEnd(BLOCK_SIZE, '0')
             }
 
             val processId = ManagementFactory.getRuntimeMXBean().name
@@ -284,20 +315,6 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
         }
 
         /**
-         * Pads the given string with leading zeros to ensure it reaches the specified length.
-         *
-         * @param str The input string to be padded.
-         * @param len The desired length of the resulting string.
-         * @return A string padded with leading zeros to match the specified length.
-         * @since 1.0.0
-         */
-        private fun pad(str: String, len: Int): String {
-            val repeatedZero = String(CharArray(len)).replace("\u0000", "0")
-            val padded = repeatedZero + str
-            return (-padded.length - len)(padded)
-        }
-
-        /**
          * Generates a random block of characters based on a discrete set of values and a specified base.
          * The result is padded to a uniform block size.
          *
@@ -305,10 +322,8 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
          * @since 1.0.0
          */
         private fun getRandomBlock(): String {
-            return pad(
-                (Math.random() * DISCRETE_VALUES).toLong().toString(BASE),
-                BLOCK_SIZE
-            )
+            val number = RANDOM.nextInt(1679616)
+            return number.toString(BASE).padStart(BLOCK_SIZE, '0')
         }
 
         /**
@@ -345,8 +360,20 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
          * @return A Version 1 CUID string.
          * @since 1.0.0
          */
-        private fun generateV1(ts: Long?) =
-            LETTER + (ts ?: Date().time.toString(BASE)) + pad(safeCounter().toString(BASE), BLOCK_SIZE) + getFingerprint(CUIDVersion.CUIDv1) + getRandomBlock() + getRandomBlock()
+        private fun generateV1(ts: Long?): String {
+            val timestamp = (ts ?: System.currentTimeMillis()).toString(BASE)
+            val counter = safeCounter().toString(BASE).padStart(BLOCK_SIZE, '0')
+            val fingerprint = getFingerprint(CUIDVersion.CUIDv1)
+            val randomBlock1 = getRandomBlock()
+            val randomBlock2 = getRandomBlock()
+
+            return LETTER
+                .plus(timestamp)
+                .plus(counter)
+                .plus(fingerprint)
+                .plus(randomBlock1)
+                .plus(randomBlock2)
+        }
 
         /**
          * Generates a CUID (Collision-resistant Unique Identifier) v2 string.
@@ -418,7 +445,7 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
          * @return true if the CUID is valid; false otherwise
          * @since 1.0.0
          */
-        fun CharSequence.isValidCUID(version: CUIDVersion) = when (version) {
+        fun CharSequence.isValidCUID(version: CUIDVersion = identifyVersion(toString())) = when (version) {
             CUIDVersion.CUIDv1 -> length == LENGTH_V1 && take(1) == LETTER && hasNotSpecialChars()
             CUIDVersion.CUIDv2 -> PATTERN_V2.matcher(this).matches()
         }
@@ -510,6 +537,16 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
     }
 
     /**
+     * Retrieves the character at the specified index from the `value` of this instance.
+     *
+     * @param index The position of the character to be retrieved, where the index is zero-based.
+     * @return The character at the specified index.
+     * @throws IndexOutOfBoundsException If the `index` is out of bounds of the `value`.
+     * @since 1.0.3
+     */
+    override fun get(index: Int) = value[index]
+
+    /**
      * Returns a string representation of the object. This method overrides the default
      * implementation of `toString` to return the `value` associated with the instance.
      *
@@ -519,20 +556,17 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
     override fun toString() = value
 
     /**
-     * Returns a stream of integer values representing the sequence of characters in the `value`.
+     * Returns a new character sequence that is a subsequence of the given range of this value.
      *
-     * @return An `IntStream` of character values from the `value`.
-     * @since 1.0.0
-     */
-    override fun chars(): IntStream = value.chars()
-
-    /**
-     * Returns a stream of Unicode code points associated with the value of this instance.
+     * The subsequence starts from the specified `startIndex` (inclusive) and ends at
+     * `endIndex` (exclusive). It is equivalent to calling `value.subSequence(startIndex, endIndex)`.
      *
-     * @return An `IntStream` representing the sequence of Unicode code points in the value.
-     * @since 1.0.0
+     * @param startIndex The start index of the subsequence, inclusive.
+     * @param endIndex The end index of the subsequence, exclusive.
+     * @return A subsequence of characters within the specified range.
+     * @since 1.0.3
      */
-    override fun codePoints(): IntStream = value.codePoints()
+    override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
     /**
      * Compares this instance with another object to determine equality.
@@ -578,6 +612,7 @@ class CUID(val value: String, val version: CUIDVersion = identifyVersion(value),
  * Each version is tailored for specific use cases and improvements over its predecessor.
  *
  * @since 1.0.0
+ * @author Tommaso Pastorelli
  */
 @Suppress("unused")
 enum class CUIDVersion(val description: String) {

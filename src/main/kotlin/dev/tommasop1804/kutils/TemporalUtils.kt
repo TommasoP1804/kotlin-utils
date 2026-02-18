@@ -18,6 +18,7 @@ package dev.tommasop1804.kutils
 import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.time.*
 import java.time.*
+import java.time.chrono.ChronoLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
@@ -1186,6 +1187,14 @@ fun LocalDate.atEndOfDay(zoneId: ZoneId): ZonedDateTime {
     return ZonedDateTime.of(ldt, zoneId)
 }
 
+/**
+ * Converts this `ChronoLocalDateTime` to an `Instant` based on the specified time zone offset.
+ *
+ * @param offset the `ZoneId` representing the time zone offset to be used for the conversion
+ * @return the `Instant` corresponding to this `ChronoLocalDateTime` with the specified offset applied
+ * @since 1.0.3
+ */
+fun ChronoLocalDateTime<*>.toInstant(offset: ZoneIdent): Instant = toInstant(offset.offset)
 /**
  * Converts an integer to a [Year] instance.
  *
@@ -2783,3 +2792,13 @@ val OffsetMonthDayTime.isUTC get() = offset == ZoneOffset.UTC
  * @since 1.0.0
  */
 val ZonedMonthDayTime.isUTC get() = offset == ZoneOffset.UTC
+/**
+ * Retrieves the number of milliseconds since the epoch of 1970-01-01T00:00:00Z.
+ * This property is a shorthand for converting the current `Instant`
+ * to its epoch millisecond representation using `toEpochMilli()`.
+ *
+ * @receiver The `Instant` object to extract the epoch milliseconds from.
+ * @return The epoch milliseconds as a `Long`.
+ * @since 1.0.3
+ */
+val Instant.epochMillis get() = toEpochMilli()

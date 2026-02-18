@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.Double2
+import dev.tommasop1804.kutils.DoubleList
 import dev.tommasop1804.kutils.StringList
 import dev.tommasop1804.kutils.exceptions.MalformedInputException
 import dev.tommasop1804.kutils.isNull
@@ -46,6 +48,129 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Point.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke", "kutils_substring_as_get_intprogression")
 class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z: Double = 0.0) : Serializable, Comparable<Point> {
+
+    /**
+     * Indicates whether the current point is located at the origin of the coordinate system.
+     * The origin is defined as the point where all coordinates (x, y, z) are equal to zero.
+     *
+     *
+     * @return `true` if the point is on the origin, `false` otherwise.
+     * @since 1.0.0
+     */
+    val isOrigin: Boolean
+        get() = x == 0.0 && y == 0.0 && z == 0.0
+    /**
+     * Indicates whether the point lies on the XY plane.
+     *
+     * The value is `true` if the z-coordinate of the point is `0.0`, indicating it is on the XY plane.
+     * Otherwise, the value is `false`.
+     *
+     *
+     * @return `true` if the point is on the XY plane, `false` otherwise.
+     * @since 1.0.0
+     */
+    val isOnXYPlane: Boolean
+        get() = z == 0.0
+    /**
+     * Indicates whether the point lies on the XZ plane.
+     * A point is considered to be on the XZ plane if its y-coordinate is equal to 0.0.
+     *
+     *
+     * @return `true` if the point lies on the XZ plane; `false` otherwise.
+     * @since 1.0.0
+     */
+    val isOnXZPlane: Boolean
+        get() = y == 0.0
+    /**
+     * Indicates whether the point lies on the YZ plane in a 3D coordinate system.
+     *
+     * The YZ plane is defined as the plane where the x-coordinate is equal to 0.
+     * This property evaluates to `true` if the x-coordinate of the point is 0.0, and `false` otherwise.
+     *
+     *
+     * @return `true` if the point is on the YZ plane, `false` otherwise.
+     * @since 1.0.0
+     */
+    val isOnYZPlane: Boolean
+        get() = x == 0.0
+    /**
+     * Indicates whether the object is positioned on the plane defined by specific conditions.
+     *
+     * This property evaluates to `true` if the x-coordinate equals 0.0 and the y-coordinate equals 0.0,
+     * meaning the object is located at the origin point in the plane.
+     *
+     *
+     * @return `true` if the object is on the plane; otherwise, `false`.
+     * @since 1.0.0
+     */
+    val isOnPlane: Boolean
+        get() = x == 0.0 && y == 0.0
+    /**
+     * A read-only property that determines if the current state represents being
+     * located on a vertex. The condition is true when the x, y, and z coordinates
+     * are equal.
+     *
+     * @return `true` if the coordinates x, y, and z are identical; `false` otherwise.
+     * @since 1.0.0
+     */
+    val isOnVertex: Boolean
+        get() = x == y && y == z
+    /**
+     * Indicates whether the point lies on the X-axis in a 3-dimensional Cartesian coordinate system.
+     * A point is considered to be on the X-axis if both its Y and Z coordinates are equal to zero.
+     *
+     *
+     * @return `true` if the point is on the X-axis, otherwise `false`.
+     * @since 1.0.0
+     */
+    val isOnXAxis: Boolean
+        get() = y == 0.0 && z == 0.0
+    /**
+     * Determines if a point lies on the Y-axis in a 3D coordinate system.
+     * The condition for being on the Y-axis is that both the X and Z coordinates
+     * of the point are equal to zero.
+     *
+     *
+     * @return `true` if the X and Z coordinates are zero, indicating the point is on the Y-axis,
+     *         otherwise `false`.
+     * @since 1.0.0
+     */
+    val isOnYAxis: Boolean
+        get() = x == 0.0 && z == 0.0
+    /**
+     * Indicates whether the current point lies on the Z-axis.
+     *
+     * This property evaluates to `true` if both the x and y coordinates are equal to 0.0,
+     * meaning the point is aligned along the Z-axis. Otherwise, it evaluates to `false`.
+     *
+     *
+     * @return `true` if the X and Y coordinates are zero, indicating the point is on the Z-axis,
+     *         otherwise `false`.
+     * @since 1.0.0
+     */
+    val isOnZAxis: Boolean
+        get() = x == 0.0 && y == 0.0
+
+    /**
+     * Computes the magnitude (or length) of the point vector originating from the origin (0, 0, 0).
+     * The magnitude is calculated as the square root of the sum of the squares of the x, y, and z coordinates.
+     *
+     *
+     * @return The magnitude of the vector.
+     * @since 1.0.3
+     */
+    val magnitude: Double get() = sqrt(x * x + y * y + z * z)
+
+    /**
+     * Normalizes the point by dividing it by its magnitude.
+     * This method assumes the receiver has a non-zero magnitude.
+     *
+     *
+     * @return The normalized point with a magnitude of 1.
+     * @since 1.0.3
+     */
+    val normalized get() = this / magnitude
+
     /**
      * Secondary constructor to initialize a point using a `java.awt.Point` object.
      * Converts the `x` and `y` properties of the `java.awt.Point` to `Double`.
@@ -65,110 +190,6 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @since 1.0.0
      */
     constructor(x: Number = 0.0, y: Number = 0.0, z: Number = 0.0) : this(x.toDouble(), y.toDouble(), z.toDouble())
-
-    /**
-     * Indicates whether the current point is located at the origin of the coordinate system.
-     * The origin is defined as the point where all coordinates (x, y, z) are equal to zero.
-     *
-     * 
-     * @return `true` if the point is on the origin, `false` otherwise.
-     * @since 1.0.0
-     */
-    val isOrigin: Boolean
-        get() = x == 0.0 && y == 0.0 && z == 0.0
-    /**
-     * Indicates whether the point lies on the XY plane.
-     *
-     * The value is `true` if the z-coordinate of the point is `0.0`, indicating it is on the XY plane.
-     * Otherwise, the value is `false`.
-     *
-     * 
-     * @return `true` if the point is on the XY plane, `false` otherwise.
-     * @since 1.0.0
-     */
-    val isOnXYPlane: Boolean
-        get() = z == 0.0
-    /**
-     * Indicates whether the point lies on the XZ plane.
-     * A point is considered to be on the XZ plane if its y-coordinate is equal to 0.0.
-     *
-     * 
-     * @return `true` if the point lies on the XZ plane; `false` otherwise.
-     * @since 1.0.0
-     */
-    val isOnXZPlane: Boolean
-        get() = y == 0.0
-    /**
-     * Indicates whether the point lies on the YZ plane in a 3D coordinate system.
-     *
-     * The YZ plane is defined as the plane where the x-coordinate is equal to 0.
-     * This property evaluates to `true` if the x-coordinate of the point is 0.0, and `false` otherwise.
-     *
-     * 
-     * @return `true` if the point is on the YZ plane, `false` otherwise.
-     * @since 1.0.0
-     */
-    val isOnYZPlane: Boolean
-        get() = x == 0.0
-    /**
-     * Indicates whether the object is positioned on the plane defined by specific conditions.
-     *
-     * This property evaluates to `true` if the x-coordinate equals 0.0 and the y-coordinate equals 0.0,
-     * meaning the object is located at the origin point in the plane.
-     *
-     * 
-     * @return `true` if the object is on the plane; otherwise, `false`.
-     * @since 1.0.0
-     */
-    val isOnPlane: Boolean
-        get() = x == 0.0 && y == 0.0
-    /**
-     * A read-only property that determines if the current state represents being
-     * located on a vertex. The condition is true when the x, y, and z coordinates
-     * are equal.
-     *
-     * 
-     *           an entity with x, y, and z properties.
-     * @return `true` if the coordinates x, y, and z are identical; `false` otherwise.
-     * @since 1.0.0
-     */
-    val isOnVertex: Boolean
-        get() = x == y && y == z
-    /**
-     * Indicates whether the point lies on the X-axis in a 3-dimensional Cartesian coordinate system.
-     * A point is considered to be on the X-axis if both its Y and Z coordinates are equal to zero.
-     *
-     * 
-     * @return `true` if the point is on the X-axis, otherwise `false`.
-     * @since 1.0.0
-     */
-    val isOnXAxis: Boolean
-        get() = y == 0.0 && z == 0.0
-    /**
-     * Determines if a point lies on the Y-axis in a 3D coordinate system.
-     * The condition for being on the Y-axis is that both the X and Z coordinates
-     * of the point are equal to zero.
-     *
-     * 
-     * @return `true` if the X and Z coordinates are zero, indicating the point is on the Y-axis,
-     *         otherwise `false`.
-     * @since 1.0.0
-     */
-    val isOnYAxis: Boolean
-        get() = x == 0.0 && z == 0.0
-    /**
-     * Indicates whether the current point lies on the Z-axis.
-     *
-     * This property evaluates to `true` if both the x and y coordinates are equal to 0.0,
-     * meaning the point is aligned along the Z-axis. Otherwise, it evaluates to `false`.
-     *
-     * 
-     * @return `true` if the X and Y coordinates are zero, indicating the point is on the Z-axis,
-     *         otherwise `false`.
-     * @since 1.0.0
-     */
-    val isOnZAxis: Boolean
-        get() = x == 0.0 && y == 0.0
 
     companion object {
         /**
@@ -194,7 +215,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
          * @throws MalformedInputException If the input string format is invalid or cannot be parsed.
          * @since 1.0.0
          */
-        fun parse(string: String) = runCatching {
+        infix fun parse(string: String) = runCatching {
             val s = string.trim()
             val values: StringList = if (s.startsWith("(") || s.startsWith("[")) s.substring(1, s.length - 1)
                 .split((if ("," in s) "," else (if (";" in s) ";" else "{2}")).toRegex())
@@ -370,32 +391,12 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return The Euclidean distance between the current point and the specified point as a Double.
      * @since 1.0.0
      */
-    fun distanceTo(other: Point): Double {
+    infix fun distanceTo(other: Point): Double {
         val dx = x - other.x
         val dy = y - other.y
         val dz = z - other.z
         return sqrt(dx * dx + dy * dy + dz * dz)
     }
-
-    /**
-     * Computes the magnitude (or length) of the point vector originating from the origin (0, 0, 0).
-     * The magnitude is calculated as the square root of the sum of the squares of the x, y, and z coordinates.
-     *
-     * 
-     * @return The magnitude of the vector.
-     * @since 1.0.0
-     */
-    fun magnitude() = sqrt(x * x + y * y + z * z)
-
-    /**
-     * Normalizes the point by dividing it by its magnitude.
-     * This method assumes the receiver has a non-zero magnitude.
-     *
-     * 
-     * @return The normalized point with a magnitude of 1.
-     * @since 1.0.0
-     */
-    fun normalize() = this / magnitude()
 
     /**
      * Adds the coordinates of the given point to the current point, returning a new point
@@ -478,7 +479,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return A new `Point` instance representing the midpoint between the two points.
      * @since 1.0.0
      */
-    fun midpoint(other: Point) = Point((x + other.x) / 2, (y + other.y) / 2, (z + other.z) / 2)
+    infix fun midpoint(other: Point) = Point((x + other.x) / 2, (y + other.y) / 2, (z + other.z) / 2)
 
     /**
      * Computes the dot product of the current point with another point.
@@ -490,7 +491,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return The scalar value resulting from the dot product calculation.
      * @since 1.0.0
      */
-    fun dotProduct(other: Point) = x * other.x + y * other.y + z * other.z
+    infix fun dotProduct(other: Point) = x * other.x + y * other.y + z * other.z
 
     /**
      * Calculates the cross product of the current point with another point.
@@ -500,7 +501,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return The result of the cross product as a scalar value.
      * @since 1.0.0
      */
-    fun crossProduct(other: Point) = x * other.y - y * other.x + z * other.z
+    infix fun crossProduct(other: Point) = x * other.y - y * other.x + z * other.z
 
     /**
      * Computes a new point by linearly interpolating between the current point and another point.
@@ -525,7 +526,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return The angle in radians between the two points.
      * @since 1.0.0
      */
-    fun angleBetween(other: Point) = acos(dotProduct(other) / (magnitude() * other.magnitude()))
+    infix fun angleBetween(other: Point) = acos(dotProduct(other) / (magnitude * other.magnitude))
 
     /**
      * Converts this point to a `java.awt.Point` object.
@@ -544,7 +545,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return A `Pair` where the first element corresponds to the `x` coordinate and the second element corresponds to the `y` coordinate.
      * @since 1.0.0
      */
-    fun toPair() = Pair(x, y)
+    fun toPair(): Double2 = Pair(x, y)
 
     /**
      * Converts the `Point` instance into a `Triple` containing its x, y, and z coordinates.
@@ -572,7 +573,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return A list containing the x, y, and z coordinates of the point in order.
      * @since 1.0.0
      */
-    fun toList() = listOf(x, y, z)
+    fun toList(): DoubleList = listOf(x, y, z)
 
     /**
      * Converts the properties `x`, `y`, and `z` into a map where the keys

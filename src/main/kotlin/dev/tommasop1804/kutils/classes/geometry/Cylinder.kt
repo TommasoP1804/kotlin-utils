@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.exceptions.GeometryException
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -32,7 +33,12 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Cylinder.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Cylinder.Companion.OldDeserializer::class)
 @Suppress("unused")
-class Cylinder (var baseCenter: Point = Point(), var radius: Double = 0.0, var height: Double = 0.0) : Serializable, Comparable<Cylinder>, Shape3D {
+class Cylinder (var baseCenter: Point = Point(), radius: Double = 0.0, height: Double = 0.0) : Serializable, Comparable<Cylinder>, Shape3D {
+    var radius = radius
+        set(value) = if (value >= 0) field = value else throw GeometryException("Radius must be greater than zero")
+    var height = height
+        set(value) = if (value >= 0) field = value else throw GeometryException("Height must be greater than zero")
+
     /**
      * Represents the geometric center of the Cylinder.
      * The centroid is the midpoint along the height of the cylinder, located directly above the center of its base.
@@ -81,6 +87,11 @@ class Cylinder (var baseCenter: Point = Point(), var radius: Double = 0.0, var h
      */
     override val volume: Double
         get() = PI * radius * radius * height
+
+    init {
+        radius >= 0 || throw GeometryException("Radius must be greater than zero")
+        height >= 0 || throw GeometryException("Height must be greater than zero")
+    }
 
     companion object {
         /**

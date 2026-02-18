@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.coding.JSON
 import dev.tommasop1804.kutils.classes.geometry.Point
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit
 import dev.tommasop1804.kutils.classes.measure.RMeasurement
@@ -493,10 +494,10 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          * @return A [Result] containing a [GeoCoordinate] if parsing and validation are successful; otherwise, an error.
          * @since 1.0.0
          */
-        fun parseGeoJSON(geoJson: String) = runCatching {
+        fun parseGeoJSON(geoJson: CharSequence) = runCatching {
             geoJson.startsWith("{\"type\":\"Point\"") || throw MalformedInputException("Invalid GeoJSON format: $geoJson")
             val parts =
-                geoJson.replace("{\"type\":\"Point\",\"coordinates\":[", "").replace("]}", "").split(",".toRegex())
+                geoJson.toString().replace("{\"type\":\"Point\",\"coordinates\":[", "").replace("]}", "").split(",".toRegex())
                     .dropLastWhile { it.isEmpty() }.toTypedArray()
             GeoCoordinate(parts[1].toDouble(), parts[0].toDouble())
         }
@@ -601,7 +602,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * - `listNumericDM` - TYPE: `List<DoubleArray>`
      * - `utm` - TYPE: `Triple<String, Double, Double>`
      * - `wkt` - TYPE: [String]
-     * - `geoJSON` - TYPE: [String]
+     * - `geoJSON` - TYPE: [JSON]
      * - `postgis` - TYPE: [String]
      * - `geoLatteGeom` - TYPE: [Geometry]
      * - `geoLattePoint` - TYPE: `Point<G2D>`
@@ -1115,7 +1116,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * @return A `String` representing the GeoJSON `Point` format for the given spatial data.
      * @since 1.0.0
      */
-    fun toGeoJSON(): String = "{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]}"
+    fun toGeoJSON(): JSON = JSON("{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]}")
 
     /**
      * Converts the current geographical coordinates into a PostGIS-compatible representation.

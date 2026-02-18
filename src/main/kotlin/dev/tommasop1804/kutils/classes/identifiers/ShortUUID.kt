@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.BigInt
 import dev.tommasop1804.kutils.UUID
 import dev.tommasop1804.kutils.Uuid
+import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.toUUID
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
@@ -24,6 +26,7 @@ import java.sql.ResultSet
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.ln
+import kotlin.repeat
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid
@@ -45,7 +48,19 @@ import kotlin.uuid.toJavaUuid
 @JsonDeserialize(using = ShortUUID.Companion.Deserializer::class)
 @JvmInline
 @Suppress("unused", "kutils_substring_as_get_intprogression", "kutils_take_as_int_invoke")
-value class ShortUUID(val value: String) : Serializable {
+value class ShortUUID(private val value: String) : Serializable, CharSequence {
+
+    /**
+     * Provides the length of the value string associated with the ShortUUID instance.
+     *
+     * This property is computed dynamically and represents the number of characters
+     * in the `value` string.
+     *
+     * @return The length of the value string.
+     * @since 1.0.3
+     */
+    override val length: Int get() = value.length
+
     /**
      * Creates an instance of the [ShortUUID] class using a [UUID].
      *
@@ -182,10 +197,10 @@ value class ShortUUID(val value: String) : Serializable {
          * provides a more concise alternative format for the UUID.
          *
          * @return A [ShortUUID] instance representing the shortened form of the original UUID.
-         * @since 1.0.0
+         * @since 1.0.3
          */
         @OptIn(ExperimentalUuidApi::class)
-        fun Uuid.toShortUuid() = ShortUUID(this)
+        fun Uuid.toShortUUID() = ShortUUID(this)
         /**
          * Converts a [CharSequence] into a `ShortUUID` representation.
          *
@@ -222,12 +237,12 @@ value class ShortUUID(val value: String) : Serializable {
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<ShortUUID?, String?> {
-            override fun convertToDatabaseColumn(attribute: ShortUUID?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): ShortUUID? = dbData?.let { ShortUUID(it) }
+        class Converter : AttributeConverter<ShortUUID?, UUID?> {
+            override fun convertToDatabaseColumn(attribute: ShortUUID?): UUID? = attribute?.value.toUUID()()
+            override fun convertToEntityAttribute(dbData: UUID?): ShortUUID? = dbData?.toShortUUID()
         }
 
-        class Type : EnhancedUserType<ShortUUID> {
+        class TypeVarchar : EnhancedUserType<ShortUUID> {
             override fun getSqlType(): Int = SqlTypes.VARCHAR
 
             override fun returnedClass(): Class<ShortUUID> = ShortUUID::class.java
@@ -276,6 +291,56 @@ value class ShortUUID(val value: String) : Serializable {
             override fun fromStringValue(sequence: CharSequence?): ShortUUID =
                 sequence?.let { ShortUUID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
         }
+
+        class TypeUUID : EnhancedUserType<ShortUUID> {
+            override fun getSqlType(): Int = SqlTypes.UUID
+
+            override fun returnedClass(): Class<ShortUUID> = ShortUUID::class.java
+
+            override fun equals(
+                x: ShortUUID?,
+                y: ShortUUID?
+            ): Boolean = x == y
+
+            override fun hashCode(x: ShortUUID?): Int = x?.hashCode() ?: 0
+
+            override fun nullSafeGet(
+                rs: ResultSet?,
+                position: Int,
+                session: SharedSessionContractImplementor?,
+                owner: Any?
+            ): ShortUUID? {
+                val value = rs?.getString(position) ?: return null
+                return ShortUUID(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement?,
+                value: ShortUUID?,
+                index: Int,
+                session: SharedSessionContractImplementor?
+            ) {
+                st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
+            }
+
+            override fun deepCopy(value: ShortUUID?): ShortUUID? = value?.let { ShortUUID(it.toString()) }
+
+            override fun isMutable(): Boolean = false
+
+            override fun disassemble(value: ShortUUID?): Serializable? = deepCopy(value)
+
+            override fun assemble(
+                cached: Serializable?,
+                owner: Any?
+            ): ShortUUID? = cached as? ShortUUID
+
+            override fun toSqlLiteral(value: ShortUUID?): String? = value?.let { "'${it}'" }
+
+            override fun toString(value: ShortUUID?): String? = value?.toString()
+
+            override fun fromStringValue(sequence: CharSequence?): ShortUUID =
+                sequence?.let { ShortUUID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
+        }
     }
 
     /**
@@ -287,6 +352,27 @@ value class ShortUUID(val value: String) : Serializable {
      * @since 1.0.0
      */
     override fun toString() = value
+
+    /**
+     * Retrieves the character at the specified index from the internal value.
+     *
+     * @param index The position of the character to retrieve. Must be a valid index within the range of the internal value.
+     * @return The character at the specified index.
+     * @throws IndexOutOfBoundsException If the index is out of range.
+     * @since 1.0.3
+     */
+    override fun get(index: Int) = value[index]
+
+    /**
+     * Returns a new character sequence that is a subsequence of the current sequence.
+     * The subsequence starts at the specified [startIndex] and ends right before the specified [endIndex].
+     *
+     * @param startIndex The beginning index, inclusive. Must be non-negative and less than or equal to [endIndex].
+     * @param endIndex The ending index, exclusive. Must be greater than or equal to [startIndex] and less than or equal to the length of the sequence.
+     * @return A new character sequence that is a subsequence of this sequence.
+     * @since 1.0.3
+     */
+    override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
     /**
      * Decodes a given shortened UUID string into its full UUID representation.

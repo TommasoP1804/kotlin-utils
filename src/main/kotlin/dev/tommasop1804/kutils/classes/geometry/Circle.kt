@@ -30,7 +30,14 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Circle.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Circle.Companion.OldDeserializer::class)
 @Suppress("unused")
-class Circle (var radius: Double = 0.0, var center: Point = Point()) : Serializable, Comparable<Circle>, Shape2D {
+class Circle(
+    radius: Double = 0.0,
+    var center: Point = Point()
+) : Serializable, Comparable<Circle>, Shape2D {
+
+    var radius: Double = radius
+        set(value) = if (value >= 0) field = value else throw GeometryException("Radius must be greater than zero")
+
     init {
         radius >= 0 || throw GeometryException("Radius must be greater than zero")
     }
@@ -216,7 +223,7 @@ class Circle (var radius: Double = 0.0, var center: Point = Point()) : Serializa
      * @param other The other circle to check for intersection with the current circle.
      * @since 1.0.0
      */
-    fun intersects(other: Circle) = center.distanceTo(other.center) <= (radius + other.radius)
+    infix fun intersects(other: Circle) = center.distanceTo(other.center) <= (radius + other.radius)
 
     /**
      * Converts the properties of the Circle to a map representation.

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.MonoPair
+import dev.tommasop1804.kutils.exceptions.GeometryException
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -31,7 +32,13 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ellipse.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ellipse.Companion.OldDeserializer::class)
 @Suppress("unused")
-class Ellipse (var center: Point = Point(), var xRadius: Double = 0.0, var yRadius: Double = 0.0) : Serializable, Comparable<Ellipse>, Shape2D {
+class Ellipse (var center: Point = Point(), xRadius: Double = 0.0, yRadius: Double = 0.0) : Serializable, Comparable<Ellipse>, Shape2D {
+
+    var xRadius = xRadius
+        set(value) = if (value >= 0) field = value else throw GeometryException("X radius must be greater than zero")
+    var yRadius = yRadius
+        set(value) = if (value >= 0) field = value else throw GeometryException("Y radius must be greater than zero")
+
     /**
      * Represents the topmost point of the ellipse.
      * The `top` property is a `Point` located above the `center` of the ellipse
@@ -165,6 +172,11 @@ class Ellipse (var center: Point = Point(), var xRadius: Double = 0.0, var yRadi
             }
 
             return Pair(focus1, focus2)
+        }
+
+        init {
+            xRadius >= 0 || throw GeometryException("X radius must be greater than zero")
+            yRadius >= 0 || throw GeometryException("Y radius must be greater than zero")
         }
 
     companion object {

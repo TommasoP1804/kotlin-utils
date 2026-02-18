@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.exceptions.GeometryException
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -31,9 +32,18 @@ import java.io.Serializable
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Square.Companion.OldDeserializer::class)
 @Suppress("unused")
 class Square (topLeft: Point = Point(), sideLength: Double = 0.0) : Rectangle(topLeft, sideLength, sideLength), Serializable, Comparable<Rectangle> {
+
     var sideLength: Double
         get() = super.width
-        set(value) { super.width = value; super.height = value }
+        set(value) {
+            if (value < 0) throw GeometryException("Side length must be greater than zero.")
+            super.width = value
+            super.height = value
+        }
+
+    init {
+        sideLength >= 0 || throw GeometryException("Side length must be greater than zero.")
+    }
 
     companion object {
         /**

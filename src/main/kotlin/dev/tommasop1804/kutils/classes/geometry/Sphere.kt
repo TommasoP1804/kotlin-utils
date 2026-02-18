@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.exceptions.GeometryException
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -33,7 +34,14 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Sphere.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Sphere.Companion.OldDeserializer::class)
 @Suppress("unused")
-class Sphere (var center: Point = Point(), var radius: Double = 0.0) : Serializable, Comparable<Sphere>, Shape3D {
+class Sphere (var center: Point = Point(), radius: Double = 0.0) : Serializable, Comparable<Sphere>, Shape3D {
+    var radius = radius
+        set(value) = if (value >= 0) field = value else throw GeometryException("Radius must be greater than zero.")
+
+    init {
+        radius >= 0 || throw GeometryException("Radius must be greater than zero.")
+    }
+
     /**
      * The surface area of the sphere.
      * It is calculated using the formula 4 * π * radius^2.

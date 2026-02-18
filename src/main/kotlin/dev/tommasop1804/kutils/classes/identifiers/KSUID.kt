@@ -55,12 +55,12 @@ import kotlin.time.toJavaInstant
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = KSUID.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = KSUID.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_null_check")
-class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: ByteArray? = null) : Comparable<KSUID>, Serializable {
+class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: ByteArray? = null) : Comparable<KSUID>, Serializable, CharSequence {
 
     /**
      * Represents the timestamp component of a KSUID (K-Sortable Unique Identifier).
      * The value is stored as a 32-bit unsigned integer representing the number of seconds
-     * since the custom epoch of January 1, 2014, 00:00:00 UTC.
+     * since the custom epoch of May 13, 2014, 16:53:20 UTC.
      *
      * This property is backed by a delegate and must be set before use. It is initialized
      * at object creation and can only be modified within the containing class.
@@ -101,6 +101,18 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
         get() = Instant.ofEpochSecond(timestamp.toLong() + EPOCH)
 
     /**
+     * Retrieves the length of the Base62-encoded string representation of the KSUID.
+     *
+     * This property calculates the length by invoking the `toString` method,
+     * which returns the Base62-encoded representation of the KSUID, and measuring
+     * the length of the resulting string.
+     *
+     * @return The number of characters in the Base62-encoded representation of the KSUID.
+     * @since 1.0.3
+     */
+    override val length: Int = 27
+
+    /**
      * Constructs a KSUID instance by delegating to another constructor
      * with a byte array representation of the provided `ksuid` argument.
      *
@@ -128,12 +140,12 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * This constructor decodes the provided Base62-encoded string into its corresponding byte array representation
      * using the decode function and initializes the KSUID instance with the resulting byte array.
      *
-     * @param string The Base62-encoded string to initialize the KSUID instance.
+     * @param cs The Base62-encoded string to initialize the KSUID instance.
      * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the provided string contains invalid Base62 characters.
      * @since 1.0.0
      */
-    constructor(string: String) : this(ksuidBytes = Base62.decode(string)) {
-        validate(string.length == PAD_TO_LENGTH) { "Invalid Base62 string" }
+    constructor(cs: CharSequence) : this(ksuidBytes = Base62.decode(cs.toString().trim())) {
+        validate(cs.toString().trim().length == PAD_TO_LENGTH) { "Invalid Base62 string" }
     }
     /**
      * Constructs a KSUID instance using the provided timestamp.
@@ -447,8 +459,8 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
     /**
      * Determines whether another object is equal to this KSUID instance.
      *
-     * Two KSUID objects are considered equal if they have the same payload, ksuidBytes,
-     * instant, and timestamp values.
+     * Two KSUID objects are considered equal if they have the same payload, ksuidBytes
+     * and timestamp values.
      *
      * @param other The object to compare for equality with this instance.
      * @return `true` if the specified object is equal to this instance, `false` otherwise.
@@ -462,7 +474,6 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
 
         if (!payload.contentEquals(other.payload)) return false
         if (!ksuidBytes.contentEquals(other.ksuidBytes)) return false
-        if (instant.toEpochMilli() != other.instant.toEpochMilli()) return false
         if (timestamp != other.timestamp) return false
 
         return true
@@ -470,7 +481,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
 
     /**
      * Computes the hash code for the KSUID instance. The hash code is calculated based on the
-     * hash codes of its components, including `payload`, `ksuidBytes`, `instant`, and `timestamp`.
+     * hash codes of its components, including `payload`, `ksuidBytes` and `timestamp`.
      *
      * @return the computed hash code value for the KSUID instance.
      * @since 1.0.0
@@ -478,10 +489,33 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
     override fun hashCode(): Int {
         var result = payload.contentHashCode()
         result = 31 * result + ksuidBytes.contentHashCode()
-        result = 31 * result + instant.hashCode()
         result = 31 * result + timestamp.hashCode()
         return result
     }
+
+    /**
+     * Retrieves the character at the specified index from the string representation of the object.
+     *
+     * @param index The zero-based index of the character to retrieve.
+     * @return The character at the specified index.
+     * @throws IndexOutOfBoundsException If the index is out of bounds of the string length.
+     * @since 1.0.3
+     */
+    override fun get(index: Int) = toString()[index]
+
+    /**
+     * Returns a subsequence of characters from the Base62-encoded string representation of the KSUID.
+     *
+     * This method leverages the string representation of the KSUID, created using its `toString` method,
+     * and extracts a portion of it defined by the specified start and end indices.
+     *
+     * @param startIndex The start index of the subsequence, inclusive. Must be within the bounds of the string.
+     * @param endIndex The end index of the subsequence, exclusive. Must be greater than or equal to startIndex
+     *                 and within the bounds of the string.
+     * @return A character sequence corresponding to the specified range of indices within the string representation.
+     * @since 1.0.3
+     */
+    override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
 
     /**
      * Compares this KSUID instance with another KSUID instance.

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.classes.identifiers.NanoID.Companion.DEFAULT_ALPHABET
 import dev.tommasop1804.kutils.classes.identifiers.NanoID.Companion.DEFAULT_SIZE
-import dev.tommasop1804.kutils.classes.identifiers.NanoID.Companion.VALID_ALPHABET
+import dev.tommasop1804.kutils.exceptions.NumberSignException
 import dev.tommasop1804.kutils.validate
+import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
@@ -42,7 +44,7 @@ import kotlin.math.ln
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = NanoID.Companion.OldDeserializer::class)
 @Suppress("unused")
 @JvmInline
-value class NanoID(val value: String) : CharSequence, Serializable {
+value class NanoID(private val value: String) : CharSequence, Serializable {
 
     /**
      * Represents the length of the NanoId string.
@@ -63,28 +65,18 @@ value class NanoID(val value: String) : CharSequence, Serializable {
      * function to generate a NanoId string based on the provided or default parameters.
      *
      * @param random the source of randomness for generating the NanoId. Defaults to an instance of [java.security.SecureRandom].
-     * @param alphabet the set of characters that can appear in the generated NanoId. Defaults to [VALID_ALPHABET].
+     * @param alphabet the set of characters that can appear in the generated NanoId. Defaults to [DEFAULT_ALPHABET].
      * @param size the length of the NanoId to generate. Defaults to [DEFAULT_SIZE]. Must be a positive value.
      * @since 1.0.0
      */
     constructor(
         random: Random = SecureRandom(),
-        alphabet: CharArray = VALID_ALPHABET,
+        alphabet: CharArray = DEFAULT_ALPHABET,
         size: Int = DEFAULT_SIZE
     ) : this(randomNanoId(random, alphabet, size))
 
-    /**
-     * Constructs a new instance of the NanoID class with a randomly generated identifier.
-     *
-     * The identifier is generated using the `randomNanoId` function with its default parameters, which involve
-     * a secure random generator, a predefined valid alphabet, and a default size.
-     *
-     * @since 1.0.0
-     */
-    constructor() : this(randomNanoId())
-
     init {
-        validate(value.isValidNanoID()) { "The string is not a valid NanoID" }
+        validateInputFormat(value.isNotBlank()) { "The string is not a valid NanoID" }
     }
 
     companion object {
@@ -98,7 +90,7 @@ value class NanoID(val value: String) : CharSequence, Serializable {
          *
          * @since 1.0.0
          */
-        val VALID_ALPHABET = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()
+        val DEFAULT_ALPHABET = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()
 
         /**
          * Represents the default size for a generated NanoID.
@@ -112,25 +104,16 @@ value class NanoID(val value: String) : CharSequence, Serializable {
         const val DEFAULT_SIZE = 21
 
         /**
-         * Validates whether the given string is not blank and consists only of characters
-         * within the valid alphabet defined by the NanoID.
-         *
-         * @return `true` if the string is valid according to the NanoID alphabet and is not blank, otherwise `false`.
-         * @since 1.0.0
-         */
-        fun CharSequence.isValidNanoID() = isNotBlank() && all { it in VALID_ALPHABET }
-
-        /**
          * Converts the current [CharSequence] to a [NanoID] instance, encapsulating this string as its value.
          *
          * This method attempts to create a [NanoID] object from the string representation of the current [CharSequence].
          * The operation is wrapped in a [Result] to handle any exceptions that may occur during instantiation.
          *
          * @receiver the [CharSequence] to be converted into a [NanoID].
-         * @return a [Result] containing the [NanoID] instance if the conversion is successful, or the exception if a failure occurs.
+         * @return a [NanoID] instance if the conversion is successful, or throws an exception if a failure occurs.
          * @since 1.0.0
          */
-        fun CharSequence.toNanoID() = runCatching { NanoID(toString()) }
+        fun CharSequence.toNanoID() = NanoID(toString())
 
         /**
          * Generates a random NanoId string using the specified random generator, character alphabet, and size.
@@ -140,16 +123,16 @@ value class NanoID(val value: String) : CharSequence, Serializable {
          * @param size the length of the NanoId to generate. Defaults to 21. Must be a positive value.
          * @return a randomly generated NanoId string with the specified parameters.
          * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException if the alphabet is empty or contains more than 255 characters.
-         * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException if the size is not positive.
+         * @throws NumberSignException if the size is not positive.
          * @since 1.0.0
          */
         private fun randomNanoId(
             random: Random = SecureRandom(),
-            alphabet: CharArray = VALID_ALPHABET,
+            alphabet: CharArray = DEFAULT_ALPHABET,
             size: Int = DEFAULT_SIZE
         ): String {
-            validate(!(alphabet.isEmpty() || alphabet.size >= 256)) { "alphabet must contain between 1 and 255 symbols." }
-            validate(size > 0) { "size must be greater than zero." }
+            validate(!(alphabet.isEmpty() || alphabet.size >= 256)) { "alphabet must contain between 1 and 255 symbols" }
+            size > 0 || throw NumberSignException("size must be greater than zero")
 
             val mask = (2 shl floor(ln((alphabet.size - 1).toDouble()) / ln(2.0)).toInt()) - 1
             val step = ceil(1.6 * mask * size / alphabet.size).toInt()

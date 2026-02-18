@@ -34,7 +34,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Polygon.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Polygon.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration")
-class Polygon (vertices: MList<Point> = emptyMList()): Serializable, Comparable<Polygon>, Shape2D {
+class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<Polygon>, Shape2D {
     /**
      * Represents a mutable list of points that define the vertices of the polygon.
      *
@@ -52,22 +52,6 @@ class Polygon (vertices: MList<Point> = emptyMList()): Serializable, Comparable<
             value.size >= 3 || throw GeometryException("A polygon must have at least 3 vertices")
             field = value
         }
-
-    init {
-        vertices.size >= 3 || throw GeometryException("A polygon must have at least 3 vertices")
-        this.vertices = vertices
-    }
-
-    /**
-     * Secondary constructor for the [Polygon] class that initializes the polygon
-     * with a variable number of [Point] objects as vertices.
-     *
-     * @param vertices Vararg parameter representing the initial set of vertices for the polygon.
-     * They are converted into a mutable list and passed to the primary constructor.
-     * 
-     * @since 1.0.0
-     */
-    constructor(vararg vertices: Point): this(vertices.toMutableList())
 
     /**
      * The number of vertices in the polygon.
@@ -180,6 +164,22 @@ class Polygon (vertices: MList<Point> = emptyMList()): Serializable, Comparable<
             return lengths.toList()
         }
 
+    /**
+     * Secondary constructor for the [Polygon] class that initializes the polygon
+     * with a variable number of [Point] objects as vertices.
+     *
+     * @param vertices Vararg parameter representing the initial set of vertices for the polygon.
+     * They are converted into a mutable list and passed to the primary constructor.
+     *
+     * @since 1.0.0
+     */
+    constructor(vararg vertices: Point): this(vertices.toMutableList())
+
+    init {
+        vertices.size >= 3 || throw GeometryException("A polygon must have at least 3 vertices")
+        this.vertices = vertices
+    }
+
     companion object {
         /**
          * A unique identifier for serializable classes used to verify compatibility
@@ -273,7 +273,7 @@ class Polygon (vertices: MList<Point> = emptyMList()): Serializable, Comparable<
      * @param vertices A collection of points to be added as vertices to the polygon.
      * @since 1.0.0
      */
-    fun addVertices(vertices: Collection<Point>) = this.vertices.addAll(vertices)
+    fun addVertices(vertices: Iterable<Point>) = this.vertices.addAll(vertices)
 
     /**
      * Adds the specified vertices to the polygon at the given index.
@@ -311,7 +311,7 @@ class Polygon (vertices: MList<Point> = emptyMList()): Serializable, Comparable<
      * @param vertices The collection of vertices to be removed.
      * @since 1.0.0
      */
-    fun removeVertices(vertices: Collection<Point>) = this.vertices.removeAll(vertices)
+    fun removeVertices(vertices: Iterable<Point>) = this.vertices.removeAll(vertices)
 
     /**
      * Removes a specified number of vertices from the polygon starting at the given index.
@@ -454,7 +454,7 @@ class Polygon (vertices: MList<Point> = emptyMList()): Serializable, Comparable<
      *
      * 
      * @return A Rectangle object representing the bounding box of the polygon. If the polygon has no vertices,
-     * returns a rectangle with all coordinates set to NaN.
+     * returns null.
      * @since 1.0.0
      */
     fun boundingBox(): Rectangle? {

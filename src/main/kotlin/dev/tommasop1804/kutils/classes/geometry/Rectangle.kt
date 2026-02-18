@@ -35,24 +35,12 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Rectangle.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Rectangle.Companion.OldDeserializer::class)
 @Suppress("unused")
-open class Rectangle (var topLeft: Point = Point(), var width: Double = 0.0, var height: Double = 0.0) : Serializable, Comparable<Rectangle>, Shape2D {
-    init {
-        !(width < 0 || height < 0) || throw GeometryException("Width and height must be greater than zero.")
-        topLeft.z == 0.0 || throw GeometryException("Top left point z-coordinate must be zero.")
-    }
+open class Rectangle(var topLeft: Point = Point(), width: Double = 0.0, height: Double = 0.0) : Serializable, Comparable<Rectangle>, Shape2D {
+    var width = width
+        set(value) = if (value >= 0) field = value else throw GeometryException("Width must be greater than zero.")
 
-    /**
-     * Constructs a rectangle using two diagonal points: top-left and bottom-right.
-     *
-     * Calculates the rectangle's dimensions using the horizontal distance between the
-     * x-coordinates and the vertical distance between the y-coordinates of the two points.
-     *
-     * 
-     * @param topLeft The top-left vertex of the rectangle.
-     * @param bottomRight The bottom-right vertex of the rectangle.
-     * @since 1.0.0
-     */
-    constructor(topLeft: Point, bottomRight: Point): this(topLeft, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y)
+    var height = height
+        set(value) = if (value >= 0) field = value else throw GeometryException("Height must be greater than zero.")
 
     /**
      * The `topRight` property represents the top-right corner of the rectangle.
@@ -143,6 +131,24 @@ open class Rectangle (var topLeft: Point = Point(), var width: Double = 0.0, var
      */
     override val perimeter: Double
         get() = 2 * (width + height)
+
+    /**
+     * Constructs a rectangle using two diagonal points: top-left and bottom-right.
+     *
+     * Calculates the rectangle's dimensions using the horizontal distance between the
+     * x-coordinates and the vertical distance between the y-coordinates of the two points.
+     *
+     *
+     * @param topLeft The top-left vertex of the rectangle.
+     * @param bottomRight The bottom-right vertex of the rectangle.
+     * @since 1.0.0
+     */
+    constructor(topLeft: Point, bottomRight: Point): this(topLeft, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y)
+
+    init {
+        width >= 0 || throw GeometryException("Width must be greater than zero.")
+        height >= 0 || throw GeometryException("Height must be greater than zero.")
+    }
 
     companion object {
         /**
@@ -242,7 +248,7 @@ open class Rectangle (var topLeft: Point = Point(), var width: Double = 0.0, var
      * @return true if the rectangles intersect, false otherwise
      * @since 1.0.0
      */
-    fun intersects(other: Rectangle): Boolean {
+    infix fun intersects(other: Rectangle): Boolean {
         val x1 = other.topLeft.x
         val y1 = other.topLeft.y
         val x2 = x1 + other.width

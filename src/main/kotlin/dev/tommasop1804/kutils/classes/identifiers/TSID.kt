@@ -52,7 +52,19 @@ import kotlin.math.ln
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TSID.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TSID.Companion.OldDeserializer::class)
 @JvmInline
-value class TSID(val number: Long) : Comparable<TSID>, Serializable {
+value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequence {
+    /**
+     * Provides the length of the string representation of the TSID.
+     *
+     * This property computes the length of the string representation of the TSID object,
+     * encoded in Base32 format. It delegates to the `toString()` method to generate the
+     * string representation, and subsequently returns the length of this string.
+     *
+     * @return The length of the string representation of the TSID.
+     * @since 1.0.3
+     */
+    override val length get() = toString().length
+
     /**
      * Represents the current instant in time, providing a snapshot of the current point on the timeline.
      * Utilizes the `Instant` class to retrieve the current system time.
@@ -651,7 +663,29 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable {
         validate(base in 2..62) { "Invalid base: $base" }
         return BaseN.encode(this, base)
     }
-    
+
+    /**
+     * Retrieves the character at the specified index from the string representation
+     * of the current object.
+     *
+     * @param index The zero-based index of the character to retrieve.
+     * @return The character at the specified index.
+     * @throws IndexOutOfBoundsException if the index is negative or not within the bounds of the string.
+     * @since 1.0.3
+     */
+    override fun get(index: Int) = toString()[index]
+
+    /**
+     * Returns a subsequence of the characters in the string representation of the TSID object.
+     * The subsequence starts at the specified `startIndex` and ends at `endIndex - 1`.
+     *
+     * @param startIndex the starting index of the subsequence, inclusive.
+     * @param endIndex the ending index of the subsequence, exclusive.
+     * @return the specified subsequence as a `CharSequence`.
+     * @since 1.0.3
+     */
+    override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
+
     private object BaseN {
         val MAX: BigInt = BigInt.valueOf(2).pow(64)
         const val ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
