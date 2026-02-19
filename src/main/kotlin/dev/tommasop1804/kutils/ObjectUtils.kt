@@ -244,8 +244,7 @@ infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
  * @return the receiver object after applying the block.
  * @since 1.0.0
  */
-
-infix fun <T> T.apply(block: ReceiverConsumer<T>): T {
+inline infix fun <T> T.apply(block: ReceiverConsumer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -260,7 +259,7 @@ infix fun <T> T.apply(block: ReceiverConsumer<T>): T {
  * @return The result of executing the block on the receiver.
  * @since 1.0.0
  */
-infix fun <T, R> T.then(block: ReceiverTransformer<T, R>): R {
+inline infix fun <T, R> T.then(block: ReceiverTransformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -602,12 +601,12 @@ fun <T> tryOrLog(
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
 ): T? {
-    if (overwriteOnly isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrLog",
         parametersName = listOf("overwriteOnly", "notOverwrite"),
         valuesInConflict = overwriteOnly intersect notOverwrite
     )
-    if (specificCases.keys isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrLog",
         parametersName = listOf("specificCases", "notOverwrite"),
         valuesInConflict = specificCases.keys intersect notOverwrite
@@ -749,12 +748,12 @@ fun <T> tryOr(
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
 ): T {
-    if (overwriteOnly isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("overwriteOnly", "notOverwrite"),
         valuesInConflict = overwriteOnly intersect notOverwrite
     )
-    if (specificCases.keys isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("specificCases", "notOverwrite"),
         valuesInConflict = specificCases.keys intersect notOverwrite
@@ -850,32 +849,31 @@ fun <T> tryOr(
  * It provides mechanisms for defining specific cases, overwriting behavior, or excluding
  * specific exceptions from being handled.
  * 
- * @param T The return type of the block to be executed.
- * @param specificCases A map defining specific exceptions and their associated transformations 
+ * @param specificCases A map defining specific exceptions and their associated transformations
  * to return boolean values. If an exception type from this map is encountered, the corresponding 
  * transformer is applied. Default is an empty map.
  * @param overwriteOnly A set of exception types for which the handling behavior is restricted to overwriting. 
  * Any exceptions not in this set will not be caught. Default is an empty set.
  * @param notOverwrite A set of exception types that are explicitly excluded from being handled.
  * If an exception in this set is encountered, it will be thrown. Default is an empty set.
- * @param block A supplier block of code to execute which potentially throws an exception.
+ * @param block An action block of code to execute which potentially throws an exception.
  * @return True if the block executes successfully without exceptions or if an exception is handled 
  * as true based on the provided rules. False if an exception occurs and is handled as such. 
  * Throws the exception if it does not meet any handling conditions.
  * @since 1.0.0
  */
-fun <T> tryTrueOrFalse(
+fun tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
+    block: Action
 ): Boolean {
-    if (overwriteOnly isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryTrueOrFalse",
         parametersName = listOf("overwriteOnly", "notOverwrite"),
         valuesInConflict = overwriteOnly intersect notOverwrite
     )
-    if (specificCases.keys isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryTrueOrFalse",
         parametersName = listOf("specificCases", "notOverwrite"),
         valuesInConflict = specificCases.keys intersect notOverwrite
@@ -897,30 +895,28 @@ fun <T> tryTrueOrFalse(
  * The behavior on exceptions can be customized through parameters such as specific exception handling, 
  * overwriting, and exclusion rules.
  *
- * @param T The type of the result produced by the provided block of code.
- * @param specificCases A map defining specific exception classes and their corresponding transformer functions 
+ * @param specificCases A map defining specific exception classes and their corresponding transformer functions
  * converting the exception to a Boolean value. These have the highest priority over other parameters.
  * @param overwriteOnly A specific exception class that, if thrown during execution of the block, indicates 
  * whether the exception should be consumed or propagate.
  * @param notOverwrite A set of exception classes that should not be overwritten. Exceptions from this set are 
  * rethrown even if other parameters are specified.
- * @param block A supplier representing the block of code to execute.
+ * @param block An action representing the block of code to execute.
  * @return Boolean True if the block executes successfully or matches the rules to return true, false otherwise.
  * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` share conflicting exception 
  * classes, or if `specificCases` and `notOverwrite` overlap.
  * @since 1.0.0
  */
-fun <T> tryTrueOrFalse(
+fun tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
+    block: Action
 ) = tryTrueOrFalse(specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
 /**
  * Attempts to execute a given block of code and returns true if it succeeds, or handles exceptions
  * based on the provided rules and returns a boolean indicating the result.
  *
- * @param T The type of the result produced by the block.
  * @param specificCases A map specifying custom exception handling rules. It maps throwable classes
  * to transformers that determine how to handle a specific exception. Has the highest priority over
  * `overwriteOnly` and `notOverwrite`.
@@ -929,7 +925,7 @@ fun <T> tryTrueOrFalse(
  * @param notOverwrite A specific set of throwable classes where exceptions should not be caught, and
  * instead rethrown. If an exception class exists in both `overwriteOnly` and `notOverwrite`, it will
  * cause a conflict.
- * @param block The block of code to execute that produces the result of type `T`.
+ * @param block The block of code to execute.
  * @return A boolean indicating whether the block succeeded (returns `true`) or was handled according
  * to the given exception handling logic (returns `false`) without rethrowing.
  * @throws ParametersInConflictException If there are conflicting parameters between `overwriteOnly`,
@@ -941,23 +937,22 @@ fun <T> tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
+    block: Action
 ) = tryTrueOrFalse(specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 /**
  * Executes the provided block and captures any thrown exceptions. Returns a Boolean value based on 
  * specific handling rules configured via the parameters.
  *
- * @param T the return type of the block to be executed.
- * @param specificCases a map associating specific exception types with transformers to handle them. 
+ * @param specificCases a map associating specific exception types with transformers to handle them.
  *                      The transformer converts the exception into a Boolean. This map has the highest priority 
  *                      over `overwriteOnly` and `notOverwrite`.
  * @param overwriteOnly a set of exception types that should be explicitly caught and processed 
  *                      as false unless `notOverwrite` indicates otherwise.
  * @param notOverwrite a single exception type that should not be processed, even if it is in 
  *                     `specificCases` or `overwriteOnly`.
- * @param block a supplier representing the code block to be executed, which may throw an exception. 
+ * @param block an action representing the code block to be executed, which may throw an exception.
  *              If no exception occurs, the method returns true.
- * @return true if the block executed successfully, or a Boolean result based on the specific rules 
+ * @return true if the block executed successfully, or a Boolean result based on the specific rules
  *         defined by the parameters if exceptions occur.
  * @throws ParametersInConflictException if there are contradictions in the configuration, such as overlapping 
  *                                       rules between `overwriteOnly`, `notOverwrite`, and `specificCases`.
@@ -967,7 +962,7 @@ fun <T> tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
+    block: Action
 ) = tryTrueOrFalse(specificCases, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 
 /**
@@ -1004,12 +999,12 @@ fun <T> tryOrThrow(
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
 ): T {
-    if (overwriteOnly isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("overwriteOnly", "notOverwrite"),
         valuesInConflict = overwriteOnly intersect notOverwrite
     )
-    if (specificCases.keys isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("specificCases", "notOverwrite"),
         valuesInConflict = specificCases.keys intersect notOverwrite
@@ -1156,12 +1151,12 @@ fun <T> tryOrThrow(
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
 ): T {
-    if (overwriteOnly isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("overwriteOnly", "notOverwrite"),
         valuesInConflict = overwriteOnly intersect notOverwrite
     )
-    if (specificCases.keys isIntersecting notOverwrite) throw ParametersInConflictException(
+    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("specificCases", "notOverwrite"),
         valuesInConflict = specificCases.keys intersect notOverwrite

@@ -114,7 +114,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @return A boolean value indicating whether all node IDs in the tree are unique.
      * @since 1.0.0
      */
-    fun checkValidIds() = !(flatNodesDFS().mappedTo { it.id }.containsDuplicates)
+    fun checkValidIds() = !(flatNodesDFS().map { it.id }.containsDuplicates)
     /**
      * Verifies if the parent IDs across all nodes in the tree are valid. The validity conditions are:
      * - The first node (typically the root node) must have a null parent ID.
@@ -125,7 +125,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @since 1.0.0
      */
     fun checkValidParentIds(): Boolean {
-        val parentIds: List<UUID?> = flatNodesDFS().mappedTo { it.parentId }.toMutableList()
+        val parentIds: List<UUID?> = flatNodesDFS().map { it.parentId }.toMutableList()
         if (parentIds.isEmpty()) return true
         if (parentIds.first().isNotNull()) return false
         return parentIds.drop(1).none { it.isNull() }

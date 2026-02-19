@@ -6,7 +6,7 @@ import dev.tommasop1804.kutils.classes.time.TimeZoneDesignator
 import dev.tommasop1804.kutils.classes.time.ZoneIdent
 import dev.tommasop1804.kutils.classes.translators.Translator
 import dev.tommasop1804.kutils.equalsIgnoreCase
-import dev.tommasop1804.kutils.mappedTo
+import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.unaryPlus
 import java.time.ZoneOffset
@@ -318,7 +318,7 @@ enum class Country(
 	 * @since 1.0.0
 	 */
 	val zoneOffsets: List<ZoneOffset>
-		get() = timeZones.mappedTo { it.offset }.distinct()
+		get() = timeZones.map { it.offset }.distinct()
 
 	/**
 	 * A list of distinct UTC offsets derived from available time zones.
@@ -333,7 +333,7 @@ enum class Country(
 	 * @since 1.0.0
 	 */
 	val zoneUtcOffsets: StringList
-		get() = timeZones.mappedTo { it.utcOffset }.distinct()
+		get() = timeZones.map { it.utcOffset }.distinct()
 
 
     companion object {
@@ -346,7 +346,7 @@ enum class Country(
 		 * @return A list containing all state names.
 		 * @since 1.0.0
 		 */
-		val countriesNames = entries.mappedTo { it.countryName }
+		val countriesNames = entries.map { it.countryName }
 
 		/**
 		 * Retrieves a list of all official names from the entries.
@@ -357,7 +357,7 @@ enum class Country(
 		 * @return A list of official names extracted from the entries.
 		 * @since 1.0.0
 		 */
-		val officialNames = entries.mappedTo { it.officialName }
+		val officialNames = entries.map { it.officialName }
 
 		/**
 		 * Returns the corresponding country or territory based on the input string.
@@ -463,7 +463,7 @@ enum class Country(
 		 * @return A list of entries that contain the specified time zone.
 		 * @since 1.0.0
 		 */
-		infix fun byTimeZone(timeZone: TimeZone) = entries.filter { it.timeZones.contains(timeZone) }
+		infix fun byTimeZone(timeZone: TimeZone) = entries.filter { timeZone in it.timeZones }
 
 		/**
 		 * Filters and retrieves a list of countries whose phone codes match the specified phone code.
@@ -473,7 +473,7 @@ enum class Country(
 		 * @since 1.0.0
 		 */
 		infix fun byPhoneCode(phoneCode: String): List<Country> {
-			val phoneCode = if (phoneCode.startsWith("+")) phoneCode.substring(1).trim() else phoneCode
+			val phoneCode = if (phoneCode.startsWith("+")) (-1)(phoneCode).trim() else phoneCode
 			return entries.filter { phoneCode in it.phoneCodes }
 		}
 		/**
@@ -514,7 +514,7 @@ enum class Country(
 		 * @param property The property to use as translation key
 		 * @since 1.0.0
 		 */
-		fun translateCountryNamesWith(translator: Translator, property: KProperty1<Country, String> = Country::countryName) = translator.translate(entries mappedTo property)
+		fun translateCountryNamesWith(translator: Translator, property: KProperty1<Country, String> = Country::countryName) = translator.translate(entries.map(property))
     }
 
 	/**

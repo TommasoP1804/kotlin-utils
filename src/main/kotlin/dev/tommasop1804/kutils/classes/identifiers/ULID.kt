@@ -12,7 +12,6 @@ import dev.tommasop1804.kutils.classes.identifiers.ULID.Factory.ByteRandom.Compa
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNull
-import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
@@ -54,6 +53,9 @@ import kotlin.code
 import kotlin.let
 import kotlin.runCatching
 import kotlin.time.ExperimentalTime
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+import kotlin.uuid.toJavaUuid
 
 /**
  * Represents a Universally Unique Lexicographically Sortable Identifier (ULID).
@@ -74,7 +76,7 @@ import kotlin.time.ExperimentalTime
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ULID.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ULID.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_temporal_of_as_temporal")
-class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<ULID>, Serializable, CharSequence {
+class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<ULID>, Serializable, CharSequence {
 
     /**
      * Length of the ULID string representation.
@@ -92,7 +94,8 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      *
      * @since 1.0.0
      */
-    val instant: Instant = Instant.ofEpochMilli(timestamp)
+    val instant: Instant
+        get() = Instant.ofEpochMilli(timestamp)
 
     /**
      * Represents the time component of the ULID, derived by shifting the
@@ -155,8 +158,8 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      *
      * @param time The time component of this ULID. Must fit within 48 bits.
      * @param random The random component of this ULID. Must be exactly 10 bytes in length.
-     * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the `time` does not fit within 48 bits.
-     * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the size of the `random` array is different from 10 bytes.
+     * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException If the `time` does not fit within 48 bits.
+     * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException If the size of the `random` array is different from 10 bytes.
      * @since 1.0.0
      */
     constructor(time: Long, random: ByteArray) : this(
@@ -164,10 +167,10 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
         calculateLeastSignificantBits(random)
     ) {
         // The time component has 48 bits.
-        validate((time and -0x1000000000000L) == 0L) { "Invalid time value" }
+        expect(time and -0x1000000000000L, 0L) { "Invalid time value" }
 
         // The random component has 80 bits (10 bytes).
-        validate(random.size == RANDOM_BYTES) { "Invalid random bytes" }
+        expect(random.size, RANDOM_BYTES) { "Invalid random bytes" }
     }
     /**
      * Constructs a new ULID instance from a string representation.
@@ -233,6 +236,18 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      */
     constructor(uuid: UUID) : this(from(uuid))
     /**
+     * Constructs a ULID instance from the given UUID.
+     *
+     * This constructor utilizes the `from` function to extract the most significant
+     * and least significant bits of the provided `UUID` and initializes a new ULID
+     * instance with the derived values.
+     *
+     * @param uuid The UUID from which the ULID will be constructed.
+     * @since 1.1.0
+     */
+    @OptIn(ExperimentalUuidApi::class)
+    constructor(uuid: Uuid) : this(from(uuid.toJavaUuid()))
+    /**
      * Constructs a ULID instance from the given byte array.
      *
      * This constructor invokes the `from` function to create a ULID instance
@@ -294,6 +309,20 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      * @since 1.0.0
      */
     constructor(time: Instant, bytes: ByteArray) : this(generateHashULID(time.toEpochMilli(), bytes))
+    /**
+     * Constructs a new ULID instance using a specific timestamp and a hashed representation of a byte array.
+     *
+     * This constructor creates the ULID by generating a random component derived from the SHA-256 hash of the provided
+     * byte array. The timestamp and the random component are used to ensure both temporal ordering and uniqueness.
+     *
+     * @param time An `Instant` representing the timestamp portion of the ULID. Must fit within 48 bits.
+     * @param bytes A byte array to be hashed for generating the random component of the ULID.
+     * @throws IllegalArgumentException If the timestamp exceeds 48 bits or if the hash-derived random component is invalid.
+     * @see generateHashULID
+     * @since 1.1.0
+     */
+    @OptIn(ExperimentalTime::class)
+    constructor(time: kotlin.time.Instant, bytes: ByteArray) : this(generateHashULID(time.toEpochMilliseconds(), bytes))
     /**
      * Constructs a new ULID instance by deriving its components from the given ULID and time values.
      *
@@ -479,7 +508,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          *
          * @since 1.0.0
          */
-        val ALPHABET_VALUES: ByteArray = ByteArray(256)
+        private val ALPHABET_VALUES: ByteArray = ByteArray(256)
 
         /**
          * Represents an array of uppercase alphanumeric characters excluding ambiguous letters
@@ -491,7 +520,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          *
          * @since 1.0.0
          */
-        val ALPHABET_UPPERCASE: CharArray = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".toCharArray()
+        private val ALPHABET_UPPERCASE: CharArray = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".toCharArray()
 
         /**
          * A character array containing the lowercase alphabet along with numeric characters,
@@ -501,7 +530,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          *
          * @since 1.0.0
          */
-        val ALPHABET_LOWERCASE: CharArray = "0123456789abcdefghjkmnpqrstvwxyz".toCharArray()
+        private val ALPHABET_LOWERCASE: CharArray = "0123456789abcdefghjkmnpqrstvwxyz".toCharArray()
 
         /**
          * Represents the result of an overflow in a binary increment operation.
@@ -627,7 +656,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @param string The string input which will be hashed to generate the ULID.
          * @since 1.0.0
          */
-        fun generateHashULID(time: Long, string: String) =
+        private fun generateHashULID(time: Long, string: String) =
             generateHashULID(time, string.toByteArray(StandardCharsets.UTF_8))
 
         /**
@@ -642,7 +671,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @throws IllegalArgumentException If the time does not fit in 48 bits or the resulting random component is invalid.
          * @since 1.0.0
          */
-        fun generateHashULID(time: Long, bytes: ByteArray) =
+        private fun generateHashULID(time: Long, bytes: ByteArray) =
             ULID(time, MessageDigest.getInstance("SHA-256").digest(bytes).copyOf(10))
 
         /**
@@ -664,9 +693,9 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          *
          * @param time The time in milliseconds used to calculate the ULID. The lower 16 bits will be set to zero.
          * @return A ULID generated from the given time parameter.
-         * @since 1.0.0
+         * @since 1.1.0
          */
-        infix fun min(time: Long) = ULID((time shl 16) or 0x0000L, 0x0000000000000000L)
+        infix fun minOf(time: Long) = ULID((time shl 16) or 0x0000L, 0x0000000000000000L)
 
         /**
          * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) based on the provided time value.
@@ -674,9 +703,9 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * The generated ULID uses the given time shifted by 16 bits combined with a constant value.
          *
          * @param time The time value used to generate the ULID. This time is expected to be in milliseconds.
-         * @since 1.0.0
+         * @since 1.1.0
          */
-        infix fun max(time: Long) = ULID((time shl 16) or 0xffffL, -0x1L)
+        infix fun maxOf(time: Long) = ULID((time shl 16) or 0xffffL, -0x1L)
 
         /**
          * Converts a [UUID] to a [ULID] representation.
@@ -790,94 +819,6 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
         }
 
         /**
-         * Converts the provided string representation into an Instant based on its encoded timestamp.
-         *
-         * @param string the string representation used to extract the timestamp and convert to an Instant
-         * @return the Instant corresponding to the timestamp encoded in the given string
-         * @since 1.0.0
-         */
-        fun getInstant(string: String): Instant = Instant.ofEpochMilli(getTime(string))
-
-        /**
-         * Converts a given string representation of a ULID to its corresponding timestamp.
-         *
-         * @param string The ULID string to convert. Must be a valid ULID representation.
-         * @return The extracted timestamp as a `Long` value.
-         * @since 1.0.0
-         */
-        fun getTime(string: String): Long {
-            val chars = toCharArray(string)
-
-            var time: Long = 0
-
-            time = time or (ALPHABET_VALUES[chars[0x00].code].toLong() shl 45)
-            time = time or (ALPHABET_VALUES[chars[0x01].code].toLong() shl 40)
-            time = time or (ALPHABET_VALUES[chars[0x02].code].toLong() shl 35)
-            time = time or (ALPHABET_VALUES[chars[0x03].code].toLong() shl 30)
-            time = time or (ALPHABET_VALUES[chars[0x04].code].toLong() shl 25)
-            time = time or (ALPHABET_VALUES[chars[0x05].code].toLong() shl 20)
-            time = time or (ALPHABET_VALUES[chars[0x06].code].toLong() shl 15)
-            time = time or (ALPHABET_VALUES[chars[0x07].code].toLong() shl 10)
-            time = time or (ALPHABET_VALUES[chars[0x08].code].toLong() shl 5)
-            time = time or ALPHABET_VALUES[chars[0x09].code].toLong()
-
-            return time
-        }
-
-        /**
-         * Generates a random component from the provided string and returns it as a byte array.
-         *
-         * This method processes a string to extract specific characters, performs bitwise
-         * operations using predefined alphabet values, and constructs a byte array
-         * representation of the processed random component.
-         *
-         * @param string The input string used to generate the random component. It must be
-         *               valid and fulfill the required format for ULID processing.
-         * @return A byte array representing the random component generated from the input string.
-         * @since 1.0.0
-         */
-        fun getRandomComponent(string: String): ByteArray {
-            val chars = toCharArray(string)
-
-            var random0: Long = 0
-            var random1: Long = 0
-
-            random0 = random0 or (ALPHABET_VALUES[chars[0x0a].code].toLong() shl 35)
-            random0 = random0 or (ALPHABET_VALUES[chars[0x0b].code].toLong() shl 30)
-            random0 = random0 or (ALPHABET_VALUES[chars[0x0c].code].toLong() shl 25)
-            random0 = random0 or (ALPHABET_VALUES[chars[0x0d].code].toLong() shl 20)
-            random0 = random0 or (ALPHABET_VALUES[chars[0x0e].code].toLong() shl 15)
-            random0 = random0 or (ALPHABET_VALUES[chars[0x0f].code].toLong() shl 10)
-            random0 = random0 or (ALPHABET_VALUES[chars[0x10].code].toLong() shl 5)
-            random0 = random0 or ALPHABET_VALUES[chars[0x11].code].toLong()
-
-            random1 = random1 or (ALPHABET_VALUES[chars[0x12].code].toLong() shl 35)
-            random1 = random1 or (ALPHABET_VALUES[chars[0x13].code].toLong() shl 30)
-            random1 = random1 or (ALPHABET_VALUES[chars[0x14].code].toLong() shl 25)
-            random1 = random1 or (ALPHABET_VALUES[chars[0x15].code].toLong() shl 20)
-            random1 = random1 or (ALPHABET_VALUES[chars[0x16].code].toLong() shl 15)
-            random1 = random1 or (ALPHABET_VALUES[chars[0x17].code].toLong() shl 10)
-            random1 = random1 or (ALPHABET_VALUES[chars[0x18].code].toLong() shl 5)
-            random1 = random1 or ALPHABET_VALUES[chars[0x19].code].toLong()
-
-            val bytes = ByteArray(RANDOM_BYTES)
-
-            bytes[0x0] = (random0 ushr 32).toByte()
-            bytes[0x1] = (random0 ushr 24).toByte()
-            bytes[0x2] = (random0 ushr 16).toByte()
-            bytes[0x3] = (random0 ushr 8).toByte()
-            bytes[0x4] = (random0).toByte()
-
-            bytes[0x5] = (random1 ushr 32).toByte()
-            bytes[0x6] = (random1 ushr 24).toByte()
-            bytes[0x7] = (random1 ushr 16).toByte()
-            bytes[0x8] = (random1 ushr 8).toByte()
-            bytes[0x9] = (random1).toByte()
-
-            return bytes
-        }
-
-        /**
          * Converts the provided string into a character array and validates it.
          *
          * @param string The input string to be converted to a character array.
@@ -885,7 +826,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @throws IllegalArgumentException if the generated character array is invalid according to ULID specification.
          * @since 1.0.0
          */
-        fun toCharArray(string: String): CharArray {
+        private fun toCharArray(string: String): CharArray {
             val chars: CharArray = (string.toCharArray())
             validateInputFormat(isValidCharArray(chars)) { String.format("Invalid ULID: \"%s\"", string) }
             return chars
@@ -898,7 +839,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
          * @return `true` if the character array is a valid ULID; `false` otherwise.
          * @since 1.0.0
          */
-        fun isValidCharArray(chars: CharArray): Boolean {
+        private fun isValidCharArray(chars: CharArray): Boolean {
             if (chars.size != ULID_CHARS) return false
 
             // The time component has 48 bits.
@@ -1049,7 +990,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
-                if (value == null) {
+                if (value.isNull()) {
                     st?.setNull(index, SqlTypes.UUID)
                 } else {
                     st?.setObject(index, value.toUUID())
@@ -1214,7 +1155,7 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      * @return A string representation of the ULID using the provided character alphabet.
      * @since 1.0.0
      */
-    fun toString(alphabet: CharArray): String {
+    private fun toString(alphabet: CharArray): String {
         val chars = CharArray(ULID_CHARS)
 
         val time: Long = mostSignificantBits ushr 16
@@ -1264,6 +1205,15 @@ class ULID (val mostSignificantBits: Long, val leastSignificantBits: Long) : Com
      * @since 1.0.0
      */
     fun lowercase() = toString(ALPHABET_LOWERCASE)
+
+    /**
+     * Overloads the unary minus operator to transform the invoking string instance
+     * to its lowercase representation.
+     *
+     * @return A new string where all characters of the original string are converted to lowercase.
+     * @since 1.1.0
+     */
+    operator fun unaryMinus() = lowercase()
 
     /**
      * Converts the current ULID to a format compliant with RFC 4122 version 4.

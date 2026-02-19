@@ -1,6 +1,6 @@
 @file:JvmName("IterableKt")
 @file:Suppress("unused", "kutils_collection_declaration", "kutils_map_declaration", "RedundantSuppression",
-    "kutils_null_check", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "kutils_empty_check"
+    "kutils_null_check", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "kutils_empty_check", "deprecation"
 )
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalContracts::class)
@@ -12,7 +12,6 @@ import Continue
 import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.constants.SortDirection
 import dev.tommasop1804.kutils.classes.numbers.Percentage
-import dev.tommasop1804.kutils.classes.tuple.map
 import dev.tommasop1804.kutils.exceptions.TooFewResultsException
 import dev.tommasop1804.kutils.exceptions.TooManyElementsException
 import dev.tommasop1804.kutils.exceptions.TooManyResultsException
@@ -24,11 +23,59 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.collections.groupBy as kGroupBy
 import kotlin.collections.map as kMap
-import kotlin.collections.mapNotNull as kMapNotNull
 import kotlin.collections.sortBy as kSortBy
 import kotlin.collections.sortByDescending as kSortByDescending
 import kotlin.collections.sortedBy as kSortedBy
 import kotlin.collections.sortedByDescending as kSortedByDescending
+
+/**
+ * Generates a map that represents the cardinality (frequency) of elements in the given iterable.
+ * Each key in the resultant map corresponds to a unique element from the iterable,
+ * and its value represents the number of times that element appears in the iterable.
+ *
+ * If the iterable is null, an empty map is returned.
+ *
+ * @receiver the iterable of elements to be processed; nullable.
+ * @return a map where keys are the elements from the iterable and values are their respective frequencies.
+ * @since 1.0.0
+ */
+val <E> Iterable<E>?.cardinalityMap: Map<E, Int>
+    get() {
+        val count = mutableMapOf<E, Int>()
+        for (element in this ?: emptyList()) {
+            count[element] = count.getOrDefault(element, 0) + 1
+        }
+        return count
+    }
+
+/**
+ * Checks if the iterable contains duplicate elements.
+ *
+ * This function returns `true` if any element in the iterable appears more than once,
+ * otherwise, it returns `false`.
+ *
+ * @return `true` if the iterable contains duplicate elements, `false` otherwise.
+ * @since 1.0.0
+ */
+val <E> Iterable<E>.containsDuplicates
+    get() = cardinalityMap.any { it.value > 1 }
+
+/**
+ * Checks if the collection contains exactly one element.
+ *
+ * @return true if the collection contains exactly one element, false otherwise.
+ * @since 1.0.0
+ */
+val Collection<*>.isSingleElement get() = size == 1
+/**
+ * Checks if the collection does not contain exactly one element.
+ *
+ * This function verifies whether the size of the collection is not equal to one.
+ *
+ * @return `true` if the collection contains zero elements or more than one element, otherwise `false`.
+ * @since 1.0.0
+ */
+val Collection<*>.isNotSingleElement get() = size != 1
 
 /**
  * Merges the current collection with one or more additional collections.
@@ -85,9 +132,9 @@ fun <E> MutableList<E?>.addIfAbsent(element: E?) {
  *
  * @param other The iterable to check for intersection with the current iterable.
  * @return True if there is at least one common element between the two iterables, false otherwise.
- * @since 1.0.0
+ * @since 1.1.0
  */
-infix fun <T> Iterable<T>.isIntersecting(other: Iterable<T>) = (this intersect other.toSet()).isNotEmpty()
+infix fun <T> Iterable<T>.intersects(other: Iterable<T>) = (this intersect other.toSet()).isNotEmpty()
 
 /**
  * Inserts the specified separator element between each element of the list.
@@ -105,26 +152,6 @@ infix fun <T> List<T>.intersperseWith(separator: T): List<T> =
     flatMapIndexed { index, item ->
         if (index == lastIndex) listOf(item)
         else listOf(item, separator)
-    }
-
-/**
- * Generates a map that represents the cardinality (frequency) of elements in the given iterable.
- * Each key in the resultant map corresponds to a unique element from the iterable,
- * and its value represents the number of times that element appears in the iterable.
- *
- * If the iterable is null, an empty map is returned.
- *
- * @receiver the iterable of elements to be processed; nullable.
- * @return a map where keys are the elements from the iterable and values are their respective frequencies.
- * @since 1.0.0
- */
-val <E> Iterable<E>?.cardinalityMap: Map<E, Int>
-    get() {
-        val count = mutableMapOf<E, Int>()
-        for (element in this ?: emptyList()) {
-            count[element] = count.getOrDefault(element, 0) + 1
-        }
-        return count
     }
 
 /**
@@ -153,16 +180,13 @@ fun <E> Iterable<E>.containsAny(vararg elements: E) = any { it in elements }
 fun <E> Iterable<E>.containsNone(vararg elements: E) = none { it in elements }
 
 /**
- * Checks if the iterable contains duplicate elements.
+ * Checks if any element in the iterable satisfies the given predicate.
  *
- * This function returns `true` if any element in the iterable appears more than once,
- * otherwise, it returns `false`.
- *
- * @return `true` if the iterable contains duplicate elements, `false` otherwise.
- * @since 1.0.0
+ * @param predicate A condition that each element will be tested against.
+ * @return `true` if at least one element satisfies the predicate, otherwise `false`.
+ * @since 1.1.0
  */
-val <E> Iterable<E>.containsDuplicates
-    get() = cardinalityMap.any { it.value > 1 }
+operator fun <E> Iterable<E>.contains(predicate: Predicate<E>) = any { predicate(it) }
 
 /**
  * Returns the first element of the iterable if it exists, or throws an exception created
@@ -175,7 +199,6 @@ val <E> Iterable<E>.containsDuplicates
  * @since 1.0.0
  */
 infix fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrNull() ?: throw lazyException()
-
 /**
  * Returns the first element in the iterable that matches the given [predicate].
  * If no such element is found, throws an exception provided by [lazyException].
@@ -208,58 +231,6 @@ infix fun <E> Iterable<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: defau
  * @since 1.0.0
  */
 fun <E> Iterable<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = firstOrNull(predicate) ?: default()
-
-/**
- * Performs the given [action] on each element of the iterable. If a `Break` exception is thrown during
- * the iteration, the result encapsulated within the `Break` is returned. If no `Break` is thrown,
- * the method returns `null`.
- *
- * @param action The action to be performed on each element in the iterable. The action can throw a
- * `Break` to provide a custom result and terminate the iteration early.
- * @return The result enclosed in the `Break` exception if thrown during the iteration, or `null`
- * if the entire iterable is processed without interruption.
- * @since 1.0.0
- */
-@Suppress("UNCHECKED_CAST")
-infix fun <E, R> Iterable<E>.forEachWithReturn(action: ReceiverBiConsumer<LoopContext, E>): R? {
-    with(LoopContext()) {
-        for (element in this@forEachWithReturn) {
-            try {
-                action(element)
-            } catch (b: Break) {
-                return b.result as? R
-            } catch (c: Continue) {
-                continue
-            }
-        }
-    }
-    return null
-}
-/**
- * Iterates through elements of the `Iterable` along with their index, invoking the given `action`
- * for each element, and allowing for a custom result to be returned when a `Break` exception is thrown.
- *
- * @param action A function that is invoked with the index of an element and the element itself
- *               during iteration. Throwing a `Break` exception from this function allows for
- *               interrupting the iteration and returning a result.
- * @return The result passed within the thrown `Break` exception if caught, or `null` if the iteration completes without any `Break` being thrown.
- * @since 1.0.0
- */
-@Suppress("UNCHECKED_CAST")
-infix fun <E, R> Iterable<E>.forEachIndexedWithReturn(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
-    with(LoopContext()) {
-        for ((index, element) in withIndex()) {
-            try {
-                action(index, element)
-            } catch (b: Break) {
-                return b.result as? R
-            } catch (c: Continue) {
-                continue
-            }
-        }
-    }
-    return null
-}
 
 /**
  * Splits the elements of this list into chunks where the consecutive elements in each chunk satisfy the given predicate.
@@ -404,23 +375,6 @@ fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>)
  * @since 1.0.0
  */
 fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else throw lazyException() }
-
-/**
- * Checks if the collection contains exactly one element.
- *
- * @return true if the collection contains exactly one element, false otherwise.
- * @since 1.0.0
- */
-val Collection<*>.isSingleElement get() = size == 1
-/**
- * Checks if the collection does not contain exactly one element.
- *
- * This function verifies whether the size of the collection is not equal to one.
- *
- * @return `true` if the collection contains zero elements or more than one element, otherwise `false`.
- * @since 1.0.0
- */
-val Collection<*>.isNotSingleElement get() = size != 1
 
 /**
  * Checks if the collection is not null and not empty.
@@ -575,7 +529,7 @@ operator fun <E> List<E>.rem(chunkSize: Int): MultiList<E> = chunked(chunkSize)
  * @since 1.0.0
  */
 @JvmName("mutableListDiv")
-operator fun <E> MutableList<E>.rem(chunkSize: Int): MultiMList<E> = chunked(chunkSize).mappedTo { it.toMList() }.toMList()
+operator fun <E> MutableList<E>.rem(chunkSize: Int): MultiMList<E> = chunked(chunkSize).kMap { it.toMList() }.toMList()
 /**
  * Splits the set into a list of lists, each of the specified size.
  * The last list may have fewer elements if the total number of elements in the set
@@ -595,7 +549,7 @@ operator fun <E> Set<E>.rem(chunkSize: Int): MultiList<E> = chunked(chunkSize)
  * @since 1.0.0
  */
 @JvmName("mutableSetDiv")
-operator fun <E> MutableSet<E>.rem(chunkSize: Int): MList<MSet<E>> = chunked(chunkSize).mappedTo { it.toMSet() }.toMList()
+operator fun <E> MutableSet<E>.rem(chunkSize: Int): MList<MSet<E>> = chunked(chunkSize).kMap { it.toMSet() }.toMList()
 /**
  * Divides the elements of this list into chunks based on the specified predicate, using the remainder operator.
  * A new chunk is started when the provided predicate is satisfied.
@@ -617,7 +571,7 @@ operator fun <E> List<E>.rem(predicate: Predicate<E>): MultiList<E> = chunkedWhi
  * @since 1.0.0
  */
 @JvmName("mutableListDiv")
-operator fun <E> MutableList<E>.rem(predicate: Predicate<E>): MultiMList<E> = chunkedWhile(predicate).mappedTo { it.toMList() }.toMList()
+operator fun <E> MutableList<E>.rem(predicate: Predicate<E>): MultiMList<E> = chunkedWhile(predicate).kMap { it.toMList() }.toMList()
 /**
  * Splits the elements of this set into chunks where the consecutive elements in each chunk satisfy the given predicate.
  * A new chunk is started when the predicate is not satisfied.
@@ -626,7 +580,7 @@ operator fun <E> MutableList<E>.rem(predicate: Predicate<E>): MultiMList<E> = ch
  * @return a list of chunks, where each chunk is a list of consecutive elements satisfying the predicate
  * @since 1.0.0
  */
-operator fun <E> Set<E>.rem(predicate: Predicate<E>) = chunkedWhile(predicate).mappedTo { it.toSet() }.toList()
+operator fun <E> Set<E>.rem(predicate: Predicate<E>) = chunkedWhile(predicate).kMap { it.toSet() }.toList()
 /**
  * Divides the elements of this mutable set into chunks based on the provided predicate and returns a list of mutable sets,
  * where each set contains elements from the original set that satisfy the predicate sequentially.
@@ -637,7 +591,7 @@ operator fun <E> Set<E>.rem(predicate: Predicate<E>) = chunkedWhile(predicate).m
  * @since 1.0.0
  */
 @JvmName("mutableSetDiv")
-operator fun <E> MutableSet<E>.rem(predicate: Predicate<E>): MList<MSet<E>> = chunkedWhile(predicate).mappedTo { it.toMSet() }.toMList()
+operator fun <E> MutableSet<E>.rem(predicate: Predicate<E>): MList<MSet<E>> = chunkedWhile(predicate).kMap { it.toMSet() }.toMList()
 
 /**
  * Decrements the MutableList by returning a sublist that excludes the last element.
@@ -1114,34 +1068,196 @@ inline infix fun <E, R> Iterable<E>.filterNull(element: Transformer<E, R>) =
     filter { element(it).isNull() }
 
 /**
- * Applies the given action to each element of the iterable and returns the original iterable.
+ * Iterates through each element in the iterable collection and applies the given block of code to it.
+ * Returns the original iterable collection after the operation.
  *
- * @param action the action to apply to each element of the iterable
- * @since 1.0.0
+ * @param E the type of elements in the iterable collection.
+ * @param block the action to be performed on each element.
+ * @return the original iterable collection after applying the block to each element.
+ * @since 1.1.0
  */
-inline infix fun <I : Iterable<E>, E> I.peek(crossinline action: Consumer<E>) = apply { forEach(action) }
+inline infix fun <E> Iterable<E>.each(block: ReceiverConsumer<E>) = apply { for (element in this@each) element.block() }
+/**
+ * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
+ *
+ * Iterates through each element in the iterable collection and applies the given block of code to it.
+ * Returns the original iterable collection after the operation.
+ *
+ * @param E the type of elements in the iterable collection.
+ * @param block the action to be performed on each element.
+ * @return the original iterable collection after applying the block to each element.
+ * @since 1.1.0
+ */
+inline infix fun <E> Iterable<E>.cEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
+    with(LoopContext()) {
+        for (element in this@cEach) {
+            try {
+                block(element)
+            } catch (b: Break) {
+                break
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+}
+/**
+ * Iterates over the elements of the iterable along with their indices, applying the provided block
+ * of code to each index and corresponding element.
+ *
+ * @param E the type of elements in the iterable.
+ * @param block a lambda function that takes two parameters: the index of the current element and
+ *              the element itself, and performs an operation using them.
+ * @return the same iterable after applying the block to all elements.
+ * @since 1.1.0
+ */
+inline infix fun <E> Iterable<E>.eachIndexed(block: ReceiverBiConsumer<E, Int>) = apply {
+    for ((index, element) in withIndex()) { element.block(index) }
+}
+/**
+ * Stands for `controlledEachIndexed`. You can use [continueLoop] and [breakLoop].
+ *
+ * Iterates over each element in the iterable along with its index, allowing processing within a loop context.
+ *
+ * This method provides a custom loop control mechanism using `LoopContext`. It supports breaking or continuing
+ * the loop execution through the utilization of `Break` and `Continue` exceptions respectively.
+ *
+ * @param E the type of elements in the iterable.
+ * @param block a lambda function that accepts the `LoopContext`, the index of the current element, and the current element itself.
+ *              The `block` is executed for each element in the iterable.
+ */
+inline infix fun <E> Iterable<E>.cEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
+    with(LoopContext()) {
+        for ((index, element) in withIndex()) {
+            try {
+                block(index, element)
+            } catch (b: Break) {
+                break
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+}
 
 /**
- * Transforms each element in the iterable using the provided transformer and returns a new iterable 
+ * Stands for `eachWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Performs the given [action] on each element of the iterable. If a `Break` exception is thrown during
+ * the iteration, the result encapsulated within the `Break` is returned. If no `Break` is thrown,
+ * the method returns `null`.
+ *
+ * @param action The action to be performed on each element in the iterable. The action can throw a
+ * `Break` to provide a custom result and terminate the iteration early.
+ * @return The result enclosed in the `Break` exception if thrown during the iteration, or `null`
+ * if the entire iterable is processed without interruption.
+ * @since 1.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+inline infix fun <E, R> Iterable<E>.rEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
+    with(LoopContext()) {
+        for (element in this@rEach) {
+            try {
+                action(element)
+            } catch (b: Break) {
+                return b.result as? R
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+    return null
+}
+/**
+ * Stands for `eachWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Iterates through elements of the `Iterable` along with their index, invoking the given `action`
+ * for each element, and allowing for a custom result to be returned when a `Break` exception is thrown.
+ *
+ * @param action A function that is invoked with the index of an element and the element itself
+ *               during iteration. Throwing a `Break` exception from this function allows for
+ *               interrupting the iteration and returning a result.
+ * @return The result passed within the thrown `Break` exception if caught, or `null` if the iteration completes without any `Break` being thrown.
+ * @since 1.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+inline infix fun <E, R> Iterable<E>.rEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
+    with(LoopContext()) {
+        for ((index, element) in withIndex()) {
+            try {
+                action(index, element)
+            } catch (b: Break) {
+                return b.result as? R
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+    return null
+}
+
+/**
+ * Transforms each element in the iterable using the provided transformer and returns a new iterable
  * containing the transformed values.
  *
- * @param transformer A function or object implementing the transformation logic which converts 
+ * @param transformer A function or object implementing the transformation logic which converts
  * each element of type E into a result of type R.
- * @since 1.0.0
+ * @since 1.1.0
  */
-inline infix fun <E, R> Iterable<E>.mappedTo(transformer: Transformer<E, R>) = kMap(transformer)
+inline infix fun <E, R> Iterable<E>.thenEach(transformer: ReceiverTransformer<E, R>): List<R> {
+    val capacity = if (this is Collection<*>) this.size else 10
+    val destination = ArrayList<R>(capacity)
+    for (item in this)
+        destination.add(item.transformer())
+    return destination
+}
 /**
- * Applies the given [transformer] function to each element in the iterable and 
- * collects only the non-null results into a new list.
+ * Applies the provided transformer function to each element in the iterable along with its index
+ * and returns a list containing the transformed elements.
  *
- * Elements for which the [transformer] function returns `null` are excluded 
- * from the resulting collection.
- *
- * @param transformer A function that takes an element of type [E] and returns 
- * either a transformed value of type [R] or `null`.
- * @since 1.0.0
+ * @param transformer A function that takes an index and an element of the iterable, and returns the transformed value.
+ * @since 1.1.0
  */
-inline infix fun <E, R> Iterable<E>.mappedToNotNull(transformer: Transformer<E, R?>) = kMapNotNull(transformer)
+inline infix fun <E, R> Iterable<E>.thenEachIndexed(transformer: ReceiverBiTransformer<E, Int, R>): List<R> {
+    val capacity = if (this is Collection<*>) this.size else 10
+    val destination = ArrayList<R>(capacity)
+    for ((index, item) in withIndex())
+        destination.add(item.transformer(index))
+    return destination
+}
+/**
+ * Transforms each element in the iterable using the provided transformer and returns a new iterable
+ * containing the transformed values.
+ *
+ * @param transformer A function or object implementing the transformation logic which converts
+ * each element of type E into a result of type R.
+ * @since 1.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+inline infix fun <E, R> Iterable<E>.thenEachNotNull(transformer: ReceiverTransformer<E, R?>): List<R & Any> {
+    val capacity = if (this is Collection<*>) this.size else 10
+    val destination = ArrayList<R>(capacity)
+    for (item in this)
+        item.transformer()?.let { destination.add(it) }
+    return destination as List<R & Any>
+}
+/**
+ * Applies the provided transformation function to each element of the iterable with its index
+ * and returns a list of non-null results.
+ *
+ * @param transformer A function that takes the index of an element and the element itself,
+ * and returns a nullable transformed result. Only non-null results are included in the output list.
+ * @since 1.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+inline infix fun <E, R> Iterable<E>.thenEachIndexedNotNull(transformer: ReceiverBiTransformer<E, Int, R?>): List<R & Any> {
+    val capacity = if (this is Collection<*>) this.size else 10
+    val destination = ArrayList<R>(capacity)
+    for ((index, item) in withIndex())
+        item.transformer(index)?.let { destination.add(it) }
+    return destination as List<R & Any>
+}
+
 /**
  * Groups elements of the iterable into a MultiMap based on the key selector function.
  *

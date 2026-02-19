@@ -1,6 +1,6 @@
 @file:JvmName("BlockUtilsKt")
 @file:Suppress("unused", "kutils_collection_declaration", "JavaCollectionWithNullableTypeArgument",
-    "kutils_tuple_declaration"
+    "kutils_tuple_declaration", "deprecation"
 )
 @file:Since("1.0.0")
 
@@ -12,8 +12,8 @@ import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.memoization.LRUCache
 import dev.tommasop1804.kutils.classes.memoization.TTLCache
 import dev.tommasop1804.kutils.classes.time.Duration
-import dev.tommasop1804.kutils.classes.tuple.Quadruple
-import dev.tommasop1804.kutils.classes.tuple.Quintuple
+import dev.tommasop1804.kutils.classes.tuples.Quadruple
+import dev.tommasop1804.kutils.classes.tuples.Quintuple
 import dev.tommasop1804.kutils.exceptions.RetryLimitExceededException
 import java.util.concurrent.*
 import kotlin.reflect.KClass
@@ -103,6 +103,26 @@ context(_: LoopContext)
 fun <R> breakLoop(returnValue: R?) {
     throw Break(returnValue)
 }
+/**
+ * Exits a loop.
+ *
+ * @param condition Determines whether the loop should exit. If true, the loop exits.
+ * @since 1.1.0
+ */
+context(_: LoopContext)
+fun breakLoopWhen(condition: Boolean) { if (condition) throw Break() }
+/**
+ * Exits a loop, optionally carrying a result value.
+ *
+ * @param R The type of the result value to be returned from the loop.
+ * @param returnValue The optional value to return when exiting the loop. Defaults to null.
+ * @since 1.1.0
+ */
+context(_: LoopContext)
+fun <R> breakLoopWhen(condition: Boolean, returnValue: R?) {
+    if (condition) throw Break(returnValue)
+}
+
 
 /**
  * Triggers the continuation of a loop by throwing a `Continue` exception.
@@ -117,6 +137,17 @@ fun <R> breakLoop(returnValue: R?) {
  */
 context(_: LoopContext)
 fun continueLoop() { throw Continue() }
+/**
+ * Throws a `Continue` exception to continue the execution of the loop
+ * within the provided `LoopContext`, if the specified condition is true.
+ *
+ * @param condition Determines whether the loop should continue its next iteration.
+ * If true, the `Continue` exception is thrown, signaling the loop to continue.
+ * If false, no action is taken.
+ * @since 1.1.0
+ */
+context(_: LoopContext)
+fun continueLoopWhen(condition: Boolean) { if (condition) throw Continue() }
 
 /**
  * Extension function that transforms a function into a memoized version of itself.

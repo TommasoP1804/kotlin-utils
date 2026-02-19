@@ -28,8 +28,8 @@ import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.TimeZone
 import dev.tommasop1804.kutils.classes.tree.Tree
 import dev.tommasop1804.kutils.classes.tree.TreeNode
-import dev.tommasop1804.kutils.classes.tuple.Quadruple
-import dev.tommasop1804.kutils.classes.tuple.Quintuple
+import dev.tommasop1804.kutils.classes.tuples.Quadruple
+import dev.tommasop1804.kutils.classes.tuples.Quintuple
 import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.unaryPlus
@@ -49,7 +49,7 @@ import kotlin.reflect.KClass
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@Suppress("unused", "OPT_IN_USAGE")
+@Suppress("unused", "OPT_IN_USAGE", "RemoveRedundantQualifierName")
 enum class ObjType(
     val kClass: KClass<*>,
     val macroType: MacroType,
@@ -750,8 +750,6 @@ enum class ObjType(
      * This class acts as a container or descriptor, enabling users to interpret,
      * categorize, or process YAML-related information programmatically.
      *
-     * @param kClass The `KClass` reference that associates the YAML instance with a specific type.
-     * @param macroType Defines the `MacroType` that categorizes the YAML instance for broader use cases.
      * @since 1.0.0
      */
     YAML(dev.tommasop1804.kutils.classes.coding.YAML::class, macroType = MacroType.STRING);
@@ -1060,7 +1058,7 @@ enum class ObjType(
          */
         ARRAY,
         /**
-         * Represents a tuple type within the macro type system.
+         * Represents a tuples type within the macro type system.
          *
          * This enum constant is utilized to define a collection of fixed-size, ordered elements,
          * typically with varying types. It is commonly used in scenarios where data must be grouped

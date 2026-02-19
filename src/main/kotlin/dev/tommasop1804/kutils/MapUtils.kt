@@ -1,6 +1,6 @@
 @file:JvmName("MapUtilsKt")
 @file:Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration", "kutils_map_declaration", "kutils_drop_as_int_invoke",
-    "kutils_null_check", "kutils_empty_check"
+    "kutils_null_check", "kutils_empty_check", "deprecation"
 )
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalContracts::class)
@@ -10,20 +10,78 @@ package dev.tommasop1804.kutils
 import Break
 import Continue
 import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.tuple.toMapEntry
 import dev.tommasop1804.kutils.exceptions.TooFewResultsException
 import dev.tommasop1804.kutils.exceptions.TooManyElementsException
 import dev.tommasop1804.kutils.exceptions.TooManyResultsException
 import java.util.*
 import java.util.stream.Collector
+import kotlin.collections.map
+import kotlin.collections.putAll
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.collections.forEach as kForEach
 import kotlin.collections.groupBy as kGroupBy
 import kotlin.collections.map as kMap
-import kotlin.collections.mapKeys as kMapKeys
-import kotlin.collections.mapNotNull as kMapNotNull
-import kotlin.collections.mapValues as kMapValues
+
+/**
+ * A property extension for a map that filters out entries with null keys.
+ *
+ * Returns a map containing only the entries whose keys are non-null.
+ * The resulting map preserves the type of the original keys and values.
+ *
+ * @receiver A map with keys of nullable type.
+ * @return A new map with all entries having null keys removed.
+ * @since 1.0.0
+ */
+val <T, R> Map<T?, R>.noNullKeys
+    get() = filterKeys { it.isNotNull() } as Map<T, R>
+
+/**
+ * Returns a new map containing only the entries from the original map
+ * where the values are not null.
+ *
+ * This property extension filters out all key-value pairs from the map
+ * where the value is null and returns a new map with non-null values.
+ * The resulting map preserves the original key-value type pair.
+ *
+ * @receiver A map with nullable values.
+ * @return A new map where all values are guaranteed to be non-null.
+ * @since 1.0.0
+ */
+val <T, R> Map<T, R?>.noNullValues
+    get() = filterValues { it.isNotNull() } as Map<T, R>
+
+/**
+ * Extension property for `Map` that filters out all entries with `null` keys or values.
+ * Returns a new map containing only entries where both the key and value are non-null.
+ *
+ * This property ensures type safety by casting the resulting map to one with non-nullable keys and values.
+ *
+ * @receiver Map<T?, R?> A map with nullable keys and/or values.
+ * @return Map<T, R> A new map containing only entries with non-null keys and values.
+ * @since 1.0.0
+ */
+val <T, R> Map<T?, R?>.noNullEntries
+    get() = filter { it.key.isNotNull() && it.value.isNotNull() } as Map<T, R>
+
+/**
+ * Determines if the map contains exactly one entry.
+ *
+ * This property checks whether the map has a single key-value pair by leveraging the `onlyEntryOrNull` function
+ * to determine if the map has exactly one entry, and then validates its non-null status using `isNotNull`.
+ *
+ * @receiver the map being evaluated
+ * @return `true` if the map contains exactly one key-value pair, `false` otherwise
+ * @since 1.1.0
+ */
+val Map<*, *>.isSingleElement: Boolean get() = onlyEntryOrNull().isNotNull()
+/**
+ * Extension property for a Map that checks if the map does not contain exactly one key-value pair.
+ *
+ * @return `true` if the map contains zero or more than one entries, `false` if it contains exactly one entry.
+ * @since 1.1.0
+ */
+val Map<*, *>.isNotSingleElement: Boolean get() = !isSingleElement
 
 /**
  * Adds the specified entry to this map. If the key already exists in the map, 
@@ -40,7 +98,7 @@ operator fun <K, V> MMap<K, V>.plusAssign(entry: Map.Entry<K, V>) { put(entry.ke
  * @param entries An iterable collection of map entries to be added to the current map.
  * @since 1.0.0
  */
-operator fun <K, V> MMap<K, V>.plusAssign(entries: Iterable<Map.Entry<K, V>>) { putAll(entries.mappedTo(Map.Entry<K, V>::toPair)) }
+operator fun <K, V> MMap<K, V>.plusAssign(entries: Iterable<Map.Entry<K, V>>) { putAll(entries.map(Map.Entry<K, V>::toPair)) }
 /**
  * Removes an entry from the map with the specified key and value.
  *
@@ -85,47 +143,6 @@ fun <K, V: Collection<IV>, IV> Map<K, V>.addToMapValue(key: K, vararg valuesToIn
     } else result[key] = valuesToInsert.toMutableList() as V
     return result
 }
-
-/**
- * A property extension for a map that filters out entries with null keys.
- *
- * Returns a map containing only the entries whose keys are non-null.
- * The resulting map preserves the type of the original keys and values.
- *
- * @receiver A map with keys of nullable type.
- * @return A new map with all entries having null keys removed.
- * @since 1.0.0
- */
-val <T, R> Map<T?, R>.noNullKeys
-    get() = filterKeys { it.isNotNull() } as Map<T, R>
-
-/**
- * Returns a new map containing only the entries from the original map
- * where the values are not null.
- *
- * This property extension filters out all key-value pairs from the map
- * where the value is null and returns a new map with non-null values.
- * The resulting map preserves the original key-value type pair.
- *
- * @receiver A map with nullable values.
- * @return A new map where all values are guaranteed to be non-null.
- * @since 1.0.0
- */
-val <T, R> Map<T, R?>.noNullValues
-    get() = filterValues { it.isNotNull() } as Map<T, R>
-
-/**
- * Extension property for `Map` that filters out all entries with `null` keys or values.
- * Returns a new map containing only entries where both the key and value are non-null.
- *
- * This property ensures type safety by casting the resulting map to one with non-nullable keys and values.
- *
- * @receiver Map<T?, R?> A map with nullable keys and/or values.
- * @return Map<T, R> A new map containing only entries with non-null keys and values.
- * @since 1.0.0
- */
-val <T, R> Map<T?, R?>.noNullEntries
-    get() = filter { it.key.isNotNull() && it.value.isNotNull() } as Map<T, R>
 
 /**
  * Merges the values of multiple maps into a single map.
@@ -274,9 +291,9 @@ infix fun <K, V> Map<K, V>.intersect(map: Map<K, V>): Map<K, V> {
  *
  * @param other the other map to compare with the current map
  * @return `true` if the intersection of the two maps is not empty, otherwise `false`
- * @since 1.0.0
+ * @since 1.1.0
  */
-infix fun <K, V> Map<K, V>.isIntersecting(other: Map<K, V>) = (intersect(other)).isNotEmpty()
+infix fun <K, V> Map<K, V>.intersects(other: Map<K, V>) = (intersect(other)).isNotEmpty()
 
 /**
  * Subtracts key-value pairs from the current map based on the provided maps.
@@ -444,6 +461,15 @@ fun <V> Map<*, V>.containsNoneValues(vararg values: V): Boolean {
 }
 
 /**
+ * Checks if any entry in the map satisfies the given predicate.
+ *
+ * @param predicate A predicate function that takes a map entry as a parameter and returns a Boolean.
+ * @return `true` if any entry matches the predicate; otherwise, `false`.
+ * @since 1.1.0
+ */
+operator fun <K, V> Map<K, V>.contains(predicate: Predicate<Map.Entry<K, V>>) = any { predicate(it) }
+
+/**
  * Divides the current map into a list of sub-maps, each containing at most the specified number of entries.
  *
  * The original map is split into chunks based on the `limit` parameter. Each resulting sub-map retains
@@ -520,6 +546,49 @@ operator fun <K, V> Map<K, V>.rem(limit: Int): List<Map<K, V>> = chunked(limit)
 operator fun <K, V> MMap<K, V>.rem(limit: Int): MList<MMap<K, V>> = chunked(limit).kMap { it.toMMap() }.toMList()
 
 /**
+ * Iterates over each entry in the map and applies the specified block to it.
+ *
+ * The map itself remains unmodified, and the original map is returned to allow method chaining.
+ *
+ * @param K the type of keys in the map.
+ * @param V the type of values in the map.
+ * @param block a lambda function that is invoked for each entry in the map.
+ *              Receives a `Map.Entry<K, V>` as its parameter.
+ * @return the original map after applying the block to its entries.
+ * @since 1.1.0
+ */
+inline infix fun <K, V> Map<K, V>.each(block: ReceiverConsumer<Map.Entry<K, V>>) = apply {
+    for (element in this@each) element.block()
+}
+/**
+ * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
+ *
+ * Executes the given block for each entry in the map, passing both the loop context and the map entry
+ * to the block. Supports custom loop control using `Break` and `Continue` exceptions for flow handling.
+ *
+ * @param block a lambda receiving a `LoopContext` and a map entry, which defines the processing logic
+ *              for each entry in the map. The lambda can utilize `Break` to terminate the loop or
+ *              `Continue` to skip to the next iteration.
+ * @return the original map after applying the block to each entry.
+ * @since 1.1.0
+ */
+inline infix fun <K, V> Map<K, V>.cEach(block: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>) = apply {
+    with(LoopContext()) {
+        for (element in this@cEach) {
+            try {
+                block(element)
+            } catch (b: Break) {
+                break
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+}
+
+/**
+ * Stands for `eachWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
  * Iterates through the map and performs the given action on each entry.
  * The iteration can be interrupted by throwing specific exceptions with optional results.
  *
@@ -528,22 +597,72 @@ operator fun <K, V> MMap<K, V>.rem(limit: Int): MList<MMap<K, V>> = chunked(limi
  * @return the result of the operation of type [R], if provided as part of a `Continue` exception;
  *         otherwise, returns `null`. If the iteration is interrupted by a `Break` exception,
  *         the result provided with the `Break` is returned immediately.
- * @since 1.0.0
+ * @since 1.1.0
  */
 @Suppress("UNCHECKED_CAST")
-fun <K, V, R> Map<K, V>.forEachWithReturn(action: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>): R? {
+inline infix fun <K, V, R> Map<K, V>.rEach(action: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>): R? {
     with(LoopContext()) {
-        for (element in this@forEachWithReturn) {
+        for (element in this@rEach) {
             try {
                 action(element)
             } catch (b: Break) {
                 return b.result as? R
             } catch (c: Continue) {
+                continue
             }
         }
     }
     return null
 }
+
+/**
+ * Returns a new map with keys transformed by the specified [transformer], keeping the
+ * same values as the original map.
+ *
+ * The [transformer] is applied to each entry of the original map, and the result is used
+ * as the key in the resulting map. The transformation does not alter the values of the map.
+ *
+ * @param transformer A function that takes a map entry as input and returns the transformed key.
+ * @since 1.1.0
+ */
+inline infix fun <K, V, R> Map<K, V>.thenEachKey(transformer: ReceiverTransformer<Map.Entry<K, V>, R>): Map<R, V> {
+    val destination = LinkedHashMap<R, V>(size)
+    for (element in this) {
+        destination[element.transformer()] = element.value
+    }
+    return destination
+}
+/**
+ * Transforms the values of a map using the provided transformer function, while keeping the keys unchanged.
+ *
+ * @param transformer a function that takes a map entry (key-value pair) and returns a transformed value.
+ * @since 1.1.0
+ */
+inline infix fun <K, V, R> Map<K, V>.thenEachValue(transformer: ReceiverTransformer<Map.Entry<K, V>, R>): Map<K, R> {
+    val destination = LinkedHashMap<K, R>(size)
+    for (element in this) {
+        destination[element.key] = element.transformer()
+    }
+    return destination
+}
+/**
+ * Transforms the entries of a map into a new map with keys and values mapped
+ * using the provided transformation function.
+ *
+ * @param transform A function that takes a map entry (key-value pair) from the
+ * original map and returns a pair of type K2 and V2, representing the new key
+ * and value respectively.
+ * @since 1.1.0
+ */
+inline infix fun <K1, V1, K2, V2> Map<K1, V1>.thenEach(transform: ReceiverTransformer<Map.Entry<K1, V1>, Pair<K2, V2>>) = entries.associate { it.transform() }
+/**
+ * Creates a new map by transforming the keys and values of the original map using the provided mapping functions.
+ *
+ * @param transformKeys A function that takes a map entry and transforms its key into a new key for the resulting map.
+ * @param trasnformValues A function that takes a map entry and transforms its value into a new value for the resulting map.
+ * @since 1.1.0
+ */
+inline fun <K1, V1, K2, V2> Map<K1, V1>.thenEach(transformKeys: ReceiverTransformer<Map.Entry<K1, V1>, K2>, trasnformValues: ReceiverTransformer<Map.Entry<K1, V1>, V2>) = entries.associate { it.transformKeys() to it.trasnformValues() }
 
 /**
  * Returns the first key-value pair of the map as a [Map.Entry] instance.
@@ -830,26 +949,6 @@ infix fun <V> Map<String, V>.filterByKeyPrefix(prefix: String): Map<String, V> =
 fun <K, V> Map<K, V>.groupByValue(): MultiMap<V, K> = entries.kGroupBy({ it.value }, { it.key })
 
 /**
- * Transforms the entries of a map into a new map with keys and values mapped
- * using the provided transformation function.
- *
- * @param transform A function that takes a map entry (key-value pair) from the
- * original map and returns a pair of type K2 and V2, representing the new key
- * and value respectively.
- * @since 1.0.0
- */
-inline infix fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transform: Transformer<Map.Entry<K1, V1>, Pair<K2, V2>>) = entries.associate { transform(it) }
-
-/**
- * Creates a new map by transforming the keys and values of the original map using the provided mapping functions.
- *
- * @param transformKeys A function that takes a map entry and transforms its key into a new key for the resulting map.
- * @param trasnformValues A function that takes a map entry and transforms its value into a new value for the resulting map.
- * @since 1.0.0
- */
-inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transformKeys: Transformer<Map.Entry<K1, V1>, K2>, trasnformValues: Transformer<Map.Entry<K1, V1>, V2>) = entries.associate { transformKeys(it) to trasnformValues(it) }
-
-/**
  * Finds the first entry in the map that matches the given predicate.
  *
  * Iterates through the map entries and applies the specified predicate
@@ -861,45 +960,6 @@ inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transformKeys: Transformer<Map.
  * @since 1.0.0
  */
 inline fun <K, V> Map<K, V>.find(predicate: Predicate<Map.Entry<K, V>>) = entries.find { predicate(it) }
-
-/**
- * Applies a transformation function to each entry in the map and returns the result.
- *
- * @param transformer A function that takes a map entry as input and returns a transformed value of type R.
- * @return A collection of transformed values resulting from applying the transformer to each entry in the map.
- * @since 1.0.0
- */
-inline infix fun <K, V, R> Map<K, V>.mappedTo(transformer: Transformer<Map.Entry<K, V>, R>) = kMap(transformer)
-
-/**
- * Returns a new map with keys transformed by the specified [transformer], keeping the
- * same values as the original map.
- *
- * The [transformer] is applied to each entry of the original map, and the result is used
- * as the key in the resulting map. The transformation does not alter the values of the map.
- *
- * @param transformer A function that takes a map entry as input and returns the transformed key.
- * @since 1.0.0
- */
-inline infix fun <K, V, R> Map<K, V>.keysMappedTo(transformer: Transformer<Map.Entry<K, V>, R>) = kMapKeys(transformer)
-
-/**
- * Transforms the values of a map using the provided transformer function, while keeping the keys unchanged.
- *
- * @param transformer a function that takes a map entry (key-value pair) and returns a transformed value.
- * @since 1.0.0
- */
-inline infix fun <K, V, R> Map<K, V>.valuesMappedTo(transformer: Transformer<Map.Entry<K, V>, R>) = kMapValues(transformer)
-
-/**
- * Applies the given transformer function to each entry in the Map and returns a new map containing
- * only the non-null results of the transformation.
- *
- * @param transformer A function that takes a map entry (key-value pair) as input and returns a transformed result,
- * which may be null. Non-null results are included in the resulting map.
- * @since 1.0.0
- */
-inline infix fun <K, V, R> Map<K, V>.mappedToNotNull(transformer: Transformer<Map.Entry<K, V>, R?>) = kMapNotNull(transformer)
 
 /**
  * Checks if a nullable map is neither null nor empty.

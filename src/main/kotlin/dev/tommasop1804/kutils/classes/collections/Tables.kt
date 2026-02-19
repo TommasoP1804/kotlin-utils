@@ -1,5 +1,7 @@
 @file:JvmName("TablesKt")
-@file:Suppress("unused", "localVariableName", "kutils_collection_declaration", "kutils_map_declaration")
+@file:Suppress("unused", "localVariableName", "kutils_collection_declaration", "kutils_map_declaration",
+    "RETURN_VALUE_NOT_USED_COERCION"
+)
 @file:Since("1.0.0")
 
 package dev.tommasop1804.kutils.classes.collections
@@ -501,11 +503,10 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * A collection of distinct row keys present in the table, representing all unique rows defined by the cells.
      * The row keys are derived from the `rowKey` property of each cell in the table.
      *
-     * @property rowKeys A list containing the distinct row keys of the table.
      * @since 1.0.0
      */
     val rowKeys: List<R>
-        get() = cells.mappedTo { it.rowKey }.distinct()
+        get() = cells.map { it.rowKey }.distinct()
     /**
      * A list of distinct column keys present in the table.
      * The column keys are extracted from the cells of the table
@@ -519,7 +520,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     val columnKeys: List<C>
-        get() = cells.mappedTo { it.columnKey }.distinct()
+        get() = cells.map { it.columnKey }.distinct()
     /**
      * Retrieves a list of distinct nullable values of type `V` from the `cells` collection by mapping
      * each element's `value` property.
@@ -531,7 +532,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     val values: List<V?>
-        get() = cells.mappedTo { it.value }.distinct()
+        get() = cells.map { it.value }.distinct()
     /**
      * A read-only property that returns a list of non-null elements from the `values` collection.
      * Filters the `values` and excludes any elements that are null, ensuring the returned list
@@ -551,7 +552,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     val valuesByRows: MultiMap<R, V?>
-        get() = rows.mapValues { it.value.mappedTo { cell -> cell.value } }
+        get() = rows.mapValues { it.value.map { cell -> cell.value } }
     /**
      * Represents a derived map that provides the values of the table grouped by their respective columns.
      * The keys in the map correspond to the column identifiers, while the values are lists containing
@@ -567,7 +568,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     val valuesByColumns: MultiMap<C, V?>
-        get() = columns.mapValues { it.value.mappedTo { cell -> cell.value } }
+        get() = columns.mapValues { it.value.map { cell -> cell.value } }
     /**
      * A list of all cells in a `Table`. Each cell contains a combination of
      * a row key, column key, and optionally a value.
@@ -943,7 +944,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         val _entries2 = entries.toMutableList()
         val alreadyTaken = mutableListOf<Cell<R, C, V?>>()
         _entries2.forEach { cell ->
-            val old: Cell<R, C, V?>? = alreadyTaken.forEachWithReturn { if (it.sameKeys(cell)) breakLoop(it) }
+            val old: Cell<R, C, V?>? = alreadyTaken.rEach { if (it.sameKeys(cell)) breakLoop(it) }
             if (old.isNotNull()) _entries.remove(old)
             alreadyTaken.add(cell)
         }
@@ -957,7 +958,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         val allColumnsKeys = _entries.groupedBy { it.columnKey }.keys
         allColumnsKeys.forEach { columnKey ->
             groupedByRow.forEach { (rowKey, cells) ->
-                val isPresent: Boolean = cells.forEachWithReturn { if (it.columnKey == columnKey) breakLoop(true) } ?: false
+                val isPresent: Boolean = cells.rEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
                 if (!isPresent) _entries.add(Cell(rowKey, columnKey, null))
             }
         }
@@ -981,7 +982,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @return A new instance of MutableTable containing all cells from the provided table.
      * @since 1.0.0
      */
-    fun mutableCopyOf(table: Table<R, C, V?>): MTable<R, C, V?> = MTable(table.cells.mappedTo { it.toMCell() })
+    fun mutableCopyOf(table: Table<R, C, V?>): MTable<R, C, V?> = MTable(table.cells.map { it.toMCell() })
 
     /**
      * Checks if the table is empty.
@@ -1228,21 +1229,21 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         return buildString {
             append(ANSI.RESET + " ")
             append(" ".repeat(keyWidth)).append("┏")
-            for (col in columnKeys.mappedTo { it.toString() })
+            for (col in columnKeys.map { it.toString() })
                 append("━".repeat(width[col]!!)).append("┯")
             setLength(length - 1)
             append("┓")
             appendLine()
             append(" ")
             append(" ".repeat(keyWidth)).append("┃")
-            for (col in columnKeys.mappedTo { it.toString() })
+            for (col in columnKeys.map { it.toString() })
                 append(ANSI.BOLD + col.center(width[col]!!) + ANSI.RESET).append("│")
             setLength(length - 1)
             append("┃")
             appendLine()
             append("┏")
             append("━".repeat(keyWidth)).append("╋")
-            for (col in columnKeys.mappedTo { it.toString() })
+            for (col in columnKeys.map { it.toString() })
                 append("╍".repeat(width[col]!!)).append("┿")
             setLength(length - 1)
             append("┫")
@@ -1260,7 +1261,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
                     appendLine()
                     append("┃")
                     append("─".repeat(keyWidth)).append("╂")
-                    for (col in columnKeys.mappedTo { it.toString() })
+                    for (col in columnKeys.map { it.toString() })
                         append("─".repeat(width[col]!!)).append("┼")
                     setLength(length - 1)
                     append("┨")
@@ -1269,7 +1270,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             appendLine()
             append("┗")
             append("━".repeat(keyWidth)).append("┻")
-            for (col in columnKeys.mappedTo { it.toString() })
+            for (col in columnKeys.map { it.toString() })
                 append("━".repeat(width[col]!!)).append("┷")
             setLength(length - 1)
             append("┛")
@@ -1309,7 +1310,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @return a new MutableTable containing mutable cells with the same data as the original.
      * @since 1.0.0
      */
-    fun toMTable(): MTable<R, C, V?> = MTable(cells.mappedTo { it.toMCell() })
+    fun toMTable(): MTable<R, C, V?> = MTable(cells.map { it.toMCell() })
 }
 
 /**
@@ -1357,7 +1358,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val rowKeys: List<R>
-        get() = cells.mappedTo { it.rowKey }.distinct()
+        get() = cells.map { it.rowKey }.distinct()
     /**
      * A property that retrieves a distinct list of column keys from the table's cells.
      * Each column key represents a unique identifier for a column in the table.
@@ -1368,7 +1369,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val columnKeys: List<C>
-        get() = cells.mappedTo { it.columnKey }.distinct()
+        get() = cells.map { it.columnKey }.distinct()
     /**
      * Provides a list of distinct values contained in the table's cells.
      * The values are extracted from all cells and filtered to ensure uniqueness.
@@ -1378,7 +1379,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val values: List<V?>
-        get() = cells.mappedTo { it.value }.distinct()
+        get() = cells.map { it.value }.distinct()
     /**
      * Provides a filtered list of non-null values from the table.
      *
@@ -1402,7 +1403,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val valuesByRows: MultiMap<R, V?>
-        get() = rows.mapValues { it.value.mappedTo { cell -> cell.value } }
+        get() = rows.mapValues { it.value.map { cell -> cell.value } }
     /**
      * Provides a mapping of column keys to their respective lists of cell values, where each list
      * contains the values of all cells in the corresponding column. The values can be nullable.
@@ -1415,7 +1416,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val valuesByColumns: MultiMap<C, V?>
-        get() = columns.mapValues { it.value.mappedTo { cell -> cell.value } }
+        get() = columns.mapValues { it.value.map { cell -> cell.value } }
     /**
      * The collection of mutable cells representing the data within the mutable table. Each cell corresponds to
      * a specific row and column pair, along with the associated value which may be `null`.
@@ -1423,8 +1424,6 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * This list allows you to access or manipulate the table's structure by directly interacting with its cells.
      * Though this property is private for setting purposes, it can still be utilized to iterate through or review the table's state.
      *
-     * @property cells The mutable list containing the table's cells, with each entry being a [MCell] that encapsulates
-     * the row, column, and value.
      * @since 1.0.0
      */
     var cells: MutableList<MCell<R, C, V?>>
@@ -1782,7 +1781,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
         val _entries2 = entries.toMutableList()
         val alreadyTaken = mutableListOf<MCell<R, C, V?>>()
         _entries2.forEach { cell ->
-            val old: MCell<R, C, V?>? = alreadyTaken.forEachWithReturn { if (it.sameKeys(cell)) breakLoop(it) }
+            val old: MCell<R, C, V?>? = alreadyTaken.rEach { if (it.sameKeys(cell)) breakLoop(it) }
             if (old.isNotNull()) _entries.remove(old)
             alreadyTaken.add(cell)
         }
@@ -1796,7 +1795,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
         val allColumnsKeys = _entries.groupedBy { it.columnKey }.keys
         allColumnsKeys.forEach { columnKey ->
             groupedByRow.forEach { (rowKey, cells) ->
-                val isPresent: Boolean = cells.forEachWithReturn { if (it.columnKey == columnKey) breakLoop(true) } ?: false
+                val isPresent: Boolean = cells.rEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
                 if (!isPresent) _entries.add(MCell(rowKey, columnKey, null))
             }
         }
@@ -1814,7 +1813,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @return an immutable table containing the same data as the input table
      * @since 1.0.0
      */
-    fun copyOf(table: MTable<R, C, V?>): Table<R, C, V?> = Table(table.cells.mappedTo { it.toCell() })
+    fun copyOf(table: MTable<R, C, V?>): Table<R, C, V?> = Table(table.cells.thenEach { toCell() })
 
     /**
      * Creates a mutable copy of the provided table.
@@ -2347,7 +2346,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @return A `Table` containing the rows (`R`), columns (`C`), and nullable values (`V?`) mapped from the provided cells.
      * @since 1.0.0
      */
-    fun toTable(): Table<R, C, V?> = Table(cells.mappedTo { it.toCell() })
+    fun toTable(): Table<R, C, V?> = Table(cells.map { it.toCell() })
 }
 
 /**
@@ -2371,7 +2370,7 @@ fun <R, C, V> tableOf(): Table<R, C, V?> = Table(emptyList<Cell<R, C, V?>>())
  * @return A `Table` containing the provided cell entries.
  * @since 1.0.0
  */
-fun <R, C, V> tableOf(vararg entries: CellInterface<R, C, V?>): Table<R, C, V?> = Table(entries.toList().mappedTo { it.toCell() })
+fun <R, C, V> tableOf(vararg entries: CellInterface<R, C, V?>): Table<R, C, V?> = Table(entries.toList().map { it.toCell() })
 /**
  * Creates a table from the provided iterable of CellInterface instances.
  *
@@ -2382,7 +2381,7 @@ fun <R, C, V> tableOf(vararg entries: CellInterface<R, C, V?>): Table<R, C, V?> 
  * @return a Table object constructed from the given entries.
  * @since 1.0.0
  */
-fun <R, C, V> tableOf(entries: Iterable<CellInterface<R, C, V?>>): Table<R, C, V?> = Table(entries.toList().mappedTo { it.toCell() })
+fun <R, C, V> tableOf(entries: Iterable<CellInterface<R, C, V?>>): Table<R, C, V?> = Table(entries.toList().map { it.toCell() })
 
 /**
  * Creates and returns an empty mutable table.
@@ -2403,7 +2402,7 @@ fun <R, C, V> mTableOf(): MTable<R, C, V?> = MTable(emptyList<MCell<R, C, V?>>()
  * @return A new instance of [MTable] containing the given entries, where each cell is mutable.
  * @since 1.0.0
  */
-fun <R, C, V> mTableOf(vararg entries: CellInterface<R, C, V?>): MTable<R, C, V?> = MTable(entries.toList().mappedTo { it.toMCell() })
+fun <R, C, V> mTableOf(vararg entries: CellInterface<R, C, V?>): MTable<R, C, V?> = MTable(entries.toList().map { it.toMCell() })
 /**
  * Creates a new instance of a mutable table using the specified iterable collection of cell entries.
  *
@@ -2415,7 +2414,7 @@ fun <R, C, V> mTableOf(vararg entries: CellInterface<R, C, V?>): MTable<R, C, V?
  * @return a mutable table (`MutableTable`) containing the provided cells as mutable entries.
  * @since 1.0.0
  */
-fun <R, C, V> mTableOf(entries: Iterable<CellInterface<R, C, V?>>): MTable<R, C, V?> = MTable(entries.toList().mappedTo { it.toMCell() })
+fun <R, C, V> mTableOf(entries: Iterable<CellInterface<R, C, V?>>): MTable<R, C, V?> = MTable(entries.toList().map { it.toMCell() })
 
 /**
  * Converts a nested map structure into a `Table` representation.
@@ -2655,7 +2654,7 @@ fun <R, C, V> MTable<R, C, V?>?.orEmpty() = this ?: emptyMTable()
 inline fun <reified T : Any, R> Collection<T>.toTable(rowProperty: KProperty<R>): Table<R, String, Any?> {
     val properties = T::class.memberProperties
         .filter { it.visibility == KVisibility.PUBLIC }
-        .mappedTo { it as KProperty<T> }
+        .map { it as KProperty<T> }
 
     properties.any { it == rowProperty } || throw NoSuchPropertyException()
 

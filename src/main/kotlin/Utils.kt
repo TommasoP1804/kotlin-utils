@@ -4,5 +4,7 @@
 
 import dev.tommasop1804.kutils.annotations.Since
 
-internal class Break(val result: Any? = null) : Throwable()
-internal class Continue : Throwable()
+@Deprecated("Use breakLoop() instead", ReplaceWith("breakLoop()", "dev.tommasop1804.kutils.breakLoop"))
+class Break(val result: Any? = null) : Throwable()
+@Deprecated("Use continueLoop() instead", ReplaceWith("continueLoop()", "dev.tommasop1804.kutils.breakLoop"))
+class Continue : Throwable()

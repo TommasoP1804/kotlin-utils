@@ -8,7 +8,6 @@ package dev.tommasop1804.kutils
 import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.identifiers.ShortUUID
 import dev.tommasop1804.kutils.classes.identifiers.ULID
-import dev.tommasop1804.kutils.classes.tuple.map
 import dev.tommasop1804.kutils.exceptions.RequiredParameterException
 import java.net.NetworkInterface
 import java.nio.ByteBuffer
@@ -80,7 +79,6 @@ enum class UUIDVersion(val description: String) {
      * a 60-bit timestamp with 100-nanosecond precision and the 48-bit MAC address of the generating device.
      * A clock sequence is incorporated to resolve potential conflicts caused by adjustments to the system clock.
      *
-     * @property description A detailed description of how this UUID version operates.
      * @since 1.0.0
      */
     UUIDv6("This version generates a UUID using a 60-bit timestamp (with 100-nanosecond precision) and the 48-bit MAC address of the generating computer. A clock sequence is used to handle cases where the system clock is adjusted."),
@@ -90,15 +88,12 @@ enum class UUIDVersion(val description: String) {
      * UUIDv7 combines a 64-bit timestamp with 100-nanosecond precision and a 48-bit node identifier.
      * It incorporates a random number to mitigate cases where the node identifier is unavailable.
      *
-     * @property description A detailed description of the UUIDv7 generation algorithm.
      * @since 1.0.0
      */
     UUIDv7("This version generates a UUID using a 64-bit timestamp (with 100-nanosecond precision) and 48-bit node identifier. A random number is used to handle cases where the node identifier is not available."),
     /**
      * Represents a custom implementation of UUID (Universally Unique Identifier) version 8.
      * This class contains a description associated with this specific version of UUID.
-     *
-     * @property description A textual representation or explanation for this UUID version.
      *
      * @since 1.0.0
      */
@@ -196,9 +191,6 @@ enum class UUIDNamespace(val predefinedNamespace: UUID) {
      *
      * This namespace is used for generating UUIDs based on domain names.
      *
-     * @param predefinedNamespace The predefined UUID associated with the DNS namespace:
-     * UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8").
-     *
      * @since 1.0.0
      */
     DNS(UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8")),
@@ -207,7 +199,6 @@ enum class UUIDNamespace(val predefinedNamespace: UUID) {
      *
      * This namespace is used to create name-based UUIDs derived from URL strings.
      *
-     * @property predefinedNamespace The UUID value associated with the URL namespace.
      * @since 1.0.0
      */
     URL(UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8")),
@@ -215,7 +206,6 @@ enum class UUIDNamespace(val predefinedNamespace: UUID) {
      * Represents the UUID namespace associated with Object Identifiers (OID).
      * This predefined namespace UUID is used for generating names based on the OID format.
      *
-     * @property predefinedNamespace The UUID value corresponding to the OID namespace.
      * @see UUIDNamespace for other predefined namespaces.
      * @since 1.0.0
      */

@@ -61,7 +61,6 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * This lazily computed property formats the JSON in a human-readable way
      * with appropriate indentation and spacing.
      *
-     * @property pretty The prettified JSON output based on the current value.
      * @receiver The object containing the raw JSON value to be prettified.
      * @since 1.0.0
      */
@@ -116,7 +115,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @since 1.0.0
      */
     val fields
-        get() = MAPPER.readTree(value).properties().toList().mappedTo { it.key.toString() to it.value!! }
+        get() = MAPPER.readTree(value).properties().toList().map { it.key.toString() to it.value!! }
 
     /**
      * A property that generates a JSON string representation of the map after
@@ -325,7 +324,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
         @JvmName("yamlToPrettyJson")
         @OptIn(Beta::class)
         fun YAML.toPrettyJSON(): JSON {
-            if (isBlank()) return JSON.EMPTY_JSON
+            if (isBlank()) return EMPTY_JSON
             val obj = toObject<Any>()
             return obj.toJSON().pretty
         }
@@ -1165,7 +1164,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @since 1.0.0
      */
     private fun DataMap.removeNullsRecursively(): DataMap {
-        return mappedToNotNull { (key, value) ->
+        return mapNotNull { (key, value) ->
             when (value) {
                 null -> null
                 is Map<*, *> -> {

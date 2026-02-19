@@ -1050,7 +1050,7 @@ fun String.join(delimiter: Char? = ' ', elements: Iterable<*>): String {
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.splitAndTrim(regex: Regex, limit: Int = 0): StringList = split(regex, limit).mappedTo { it.trim() }
+fun String.splitAndTrim(regex: Regex, limit: Int = 0): StringList = split(regex, limit).map { it.trim() }
 
 /**
  * Splits the nullable string using the provided `Pattern` and trims each resulting substring.
@@ -1082,7 +1082,7 @@ fun String.splitAndTrim(regex: Pattern, limit: Int = 0): StringList =
  * @since 1.0.0
  */
 fun String.splitAndTrim(vararg delimiters: String, ignoreCase: Boolean = false, limit: Int = 0): StringList =
-    split(delimiters = delimiters, ignoreCase, limit).mappedTo { it.trim() }
+    split(delimiters = delimiters, ignoreCase, limit).map { it.trim() }
 
 /**
  * Splits the string into substrings using the specified delimiters and trims all resulting substrings.
@@ -1095,7 +1095,7 @@ fun String.splitAndTrim(vararg delimiters: String, ignoreCase: Boolean = false, 
  * @since 1.0.0
  */
 fun String.splitAndTrim(vararg delimiters: Char, ignoreCase: Boolean = false, limit: Int = 0): StringList =
-    split(delimiters = delimiters, ignoreCase, limit).mappedTo { it.trim() }
+    split(delimiters = delimiters, ignoreCase, limit).map { it.trim() }
 
 /**
  * Converts the string to sentence case where the first character is uppercase
@@ -1402,9 +1402,44 @@ fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * retrieves the original string.
  *
  * @param action the action to apply to each character of the string
- * @since 1.0.0
+ * @since 1.1.0
  */
-fun String.peek(action: Consumer<Char>) = toList().peek(action).joinToString(String.EMPTY)
+fun String.each(action: ReceiverConsumer<Char>) = toList().each(action).joinToString(String.EMPTY)
+/**
+ * Iterates over each character of the string along with its index, applying the provided action to
+ * each character and its corresponding index. Returns a new string that is the result of joining
+ * the characters after processing.
+ *
+ * @param action a function that takes two parameters: the character of the string at the current
+ *               index and the index itself, and performs an operation on them.
+ * @since 1.1.0
+ */
+fun String.eachIndexed(action: ReceiverBiConsumer<Char, Int>) = toList().eachIndexed(action).joinToString(String.EMPTY)
+/**
+ * Stands for `controlledEach`. You can use [breakLoop] and [continueLoop].
+ *
+ * Applies the given action to each character of the string and
+ * retrieves the original string.
+ *
+ * @param action the action to apply to each character of the string
+ * @since 1.1.0
+ */
+fun String.cEach(action: ReceiverBiConsumer<LoopContext, Char>) = toList().cEach(action).joinToString(String.EMPTY)
+/**
+ * Stands for `controlledEach`. You can use [breakLoop] and [continueLoop].
+ *
+ * Executes a controlled iteration over each character in the `String` along with its index, allowing loop control
+ * mechanisms such as continuing or breaking within the iteration.
+ *
+ * Iterates over the characters in the string using a loop context (`LoopContext`) and applies the provided action
+ * with each character's index and value.
+ *
+ * @param action a lambda function that takes a `LoopContext`, the index of the character, and the character itself.
+ *               The `action` is executed for each character in the string.
+ * @return a new `String` formed by joining the processed characters.
+ * @since 1.1.0
+ */
+fun String.cEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, Char>) = toList().cEachIndexed(action).joinToString(String.EMPTY)
 
 /**
  * Returns the current `CharSequence` if it is not null or empty, otherwise invokes the provided `defaultValue`

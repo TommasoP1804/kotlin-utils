@@ -156,7 +156,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * @param base32 A boolean flag indicating whether the string should be parsed as a Base32 TSID.
      * Defaults to `true`.
      * 
-     * @throws IllegalArgumentException If the string is not a valid Base32 encoded TSID and `base32` is `true`.
+     * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the string is not a valid Base32 encoded TSID and `base32` is `true`.
      * The validation checks ensure the string adheres to the expected TSID format, including length and character set.
      * 
      * @since 1.0.0
@@ -246,7 +246,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * Security-sensitive applications that require a cryptographically secure
      * pseudo-random generator **should** use [Factory.getTSID]}.
 
-     * System property "tsidcreator.node" and environment variable
+     * System property "tsid.node" and environment variable
      * "TSID_NODE" are ignored by this method. Therefore, there will be
      * collisions if more than one process is generating TSIDs using this method. In
      * that case, [Factory.getTSID] **should** be used in conjunction
@@ -287,7 +287,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @since 1.0.0
          */
-        const val TSID_EPOCH = 1577836800000 // 2020-01-01T00:00:00Z epoch millis
+        const val TSID_EPOCH = 1577836800000L // 2020-01-01T00:00:00Z epoch millis
         /**
          * Represents the number of random bits used in the generation of a TSID.
          *
@@ -324,7 +324,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @since 1.0.0
          */
-        val ALPHABET = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z')
+        private val ALPHABET = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z')
         /**
          * A predefined array of size 128 initialized to -1, intended for mapping or storing 
          * specific values associated with ASCII characters or other inputs.
@@ -337,7 +337,8 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @since 1.0.0
          */
-        val ALPHABET_VALUES = LongArray(128) { -1 }
+        private val ALPHABET_VALUES = LongArray(128) { -1 }
+
         init {
             ALPHABET_VALUES['0'.code] = 0x00
             ALPHABET_VALUES['1'.code] = 0x01
@@ -420,7 +421,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * @return `true` if the string is a valid Base32 TSID, otherwise `false`.
          * @since 1.0.0
          */
-        fun String.isValidBase32TSID() = toCharArray().isValidCharArray()
+        fun CharSequence.isValidBase32TSID() = toString().toCharArray().isValidCharArray()
         /**
          * Validates whether the `CharArray` represents a valid character sequence
          * based on predefined constraints. The validation checks include ensuring
@@ -433,7 +434,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          */
         private fun CharArray.isValidCharArray(): Boolean {
             if (size != TSID_CHARS || ALPHABET_VALUES[get(0).code] and 0b10000 != 0L) return false
-            for (i in 0 until size)
+            for (i in indices)
                 if (ALPHABET_VALUES[get(i).code] == -1L) return false
             return true
         }
@@ -449,7 +450,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @since 1.0.0
          */
-        fun String.toTSID(base32: Boolean = true) = runCatching { TSID(this, base32) }
+        fun CharSequence.toTSID(base32: Boolean = true) = runCatching { TSID(toString(), base32) }
         /**
          * Converts a `Long` value to a `TSID` instance.
          *
@@ -471,13 +472,13 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @param base The numeric base to use for decoding. Must be between 2 and 62 (inclusive).
          * @return The decoded TSID instance.
-         * @throws IllegalArgumentException If the base is outside the valid range or if the string 
+         * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the base is outside the valid range or if the string
          * does not conform to the expected format for the specified base.
          * @since 1.0.0
          */
-        fun String.decodeToTSID(base: Int): TSID {
+        fun CharSequence.decodeToTSID(base: Int): TSID {
             validate(base in 2..62) { "Invalid base: $base" }
-            return BaseN.decode(this, base)
+            return BaseN.decode(toString(), base)
         }
 
         class Serializer : ValueSerializer<TSID>() {
@@ -752,6 +753,8 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * Each enum value corresponds to a specific configuration of nodes, 
      * which determine the scalability and uniqueness of ID generation.
      *
+     * @author Tommaso Pastoreli
+     *
      * @since 1.0.0
      */
     enum class FactoryType {
@@ -795,14 +798,14 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * You can use this class to generate a Tsid or to make some customizations,
      * for example changing the default [SecureRandom] random generator to a faster pseudo-random generator.
      *
-     * If a system property "tsidcreator.node" or environment variable
+     * If a system property "tsid.node" or environment variable
      * "TSID_NODE" is defined, its value is utilized as node identifier. One
      * of them **should** be defined to embed a machine ID in the generated TSID
      * in order to avoid TSID collisions. Using that property or variable is
      * **highly recommended**. If no property or variable is defined, a random
      * node ID is generated at initialization.
      *
-     * If a system property "tsidcreator.node.count" or environment variable
+     * If a system property "tsid.node.count" or environment variable
      * "TSID_NODE_COUNT" is defined, its value is utilized by the
      * constructors of this class to adjust the amount of bits needed to embed the
      * node ID. For example, if the number 50 is given, the node bit amount is
@@ -813,6 +816,8 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * This class **should** be used as a singleton. Make sure that you create
      * and reuse a single instance of [Factory] per node in your
      * distributed system.
+     *
+     * @author Tommaso Pastorelli
      * @since 1.0.0
      */
     class Factory(builder: Builder) {
@@ -1413,8 +1418,8 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
         }
 
         private object Settings {
-            const val NODE = "tsid.node"
-            const val NODE_COUNT = "tsid.node.count"
+            const val NODE = "kotlin-utils.tsid.node"
+            const val NODE_COUNT = "kotlin-utils.tsid.node.count"
 
             fun getNode(): Int? = getPropertyAsInteger(NODE)
 

@@ -13,8 +13,8 @@ import dev.tommasop1804.kutils.classes.numbers.Hex
 import dev.tommasop1804.kutils.classes.numbers.Percentage
 import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.FULL
 import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.ZERO_PERCENT
-import dev.tommasop1804.kutils.classes.tuple.Quadruple
-import dev.tommasop1804.kutils.classes.tuple.Quintuple
+import dev.tommasop1804.kutils.classes.tuples.Quadruple
+import dev.tommasop1804.kutils.classes.tuples.Quintuple
 import dev.tommasop1804.kutils.exceptions.NoMatchingFormatException
 import dev.tommasop1804.kutils.exceptions.ValidationFailedException
 import jakarta.persistence.AttributeConverter
@@ -1611,10 +1611,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
         }
         /**
          * Creates a color representation in the LAB color space using the provided color components.
-         * This method utilizes the `Double3` tuple to define the LAB values and passes them
+         * This method utilizes the `Double3` tuples to define the LAB values and passes them
          * for further processing.
          *
-         * @param color A `Double3` tuple where `first`, `second`, and `third` represent the
+         * @param color A `Double3` tuples where `first`, `second`, and `third` represent the
          * lightness (L*), a*, and b* components of the LAB color model, respectively.
          * @since 1.0.0
          */

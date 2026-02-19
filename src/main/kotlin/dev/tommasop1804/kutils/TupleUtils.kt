@@ -1,10 +1,12 @@
-@file:JvmName("OtherTuplesKt")
+@file:JvmName("TupleUtilsKt")
+@file:Since("1.1.0")
 @file:Suppress("unused")
 
-package dev.tommasop1804.kutils.classes.tuple
+package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.*
-import java.io.Serializable
+import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.classes.tuples.Quadruple
+import dev.tommasop1804.kutils.classes.tuples.Quintuple
 import kotlin.reflect.KProperty
 
 /**
@@ -462,59 +464,6 @@ fun <E> Array<E>.toTriple(): MonoTriple<E?> = Triple(getOrNull(0), getOrNull(1),
 fun <E> List<E>.toTriple(): MonoTriple<E?> = Triple(getOrNull(0), getOrNull(1), getOrNull(2))
 
 /**
- * A data class representing a tuple of four elements.
- *
- * This can be useful for grouping four related values together and passing them
- * as a single object. The class provides component functions to destructure
- * the elements and is also Serializable.
- *
- * @param A the type of the first element
- * @param B the type of the second element
- * @param C the type of the third element
- * @param D the type of the fourth element
- * @property first the first element of the quadruple
- * @property second the second element of the quadruple
- * @property third the third element of the quadruple
- * @property fourth the fourth element of the quadruple
- * @since 1.0.0
- * @author Tommaso Pastorelli
- */
-data class Quadruple<out A, out B, out C, out D> (val first: A, val second: B, val third: C, val fourth: D) : Serializable {
-    /**
-     * Returns a string representation of the quadruple in the format (first, second, third, fourth).
-     *
-     * @return a string representation of the quadruple
-     * @since 1.0.0
-     */
-    override fun toString(): String = "($first, $second, $third, $fourth)"
-
-    /**
-     * Retrieves an element of the quadruple by its index.
-     *
-     * Valid indices are:
-     * - 0 for the first element
-     * - 1 for the second element
-     * - 2 for the third element
-     * - 3 for the fourth element
-     *
-     * Throws an [IndexOutOfBoundsException] if the provided index is out of range.
-     *
-     * @param index the index of the element to retrieve
-     * @return the element at the specified index
-     * @throws IndexOutOfBoundsException if the index is not in the range 0..3
-     * @since 1.0.0
-     */
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R> get(index: Int) = when(index) {
-        0 -> first as R
-        1 -> second as R
-        2 -> third as R
-        3 -> fourth as R
-        else -> throw IndexOutOfBoundsException("Invalid index $index, valid range is 0..3")
-    }
-}
-
-/**
  * Checks if the `Quadruple` contains any `null` values in any of its elements.
  *
  * This function evaluates each element of the `Quadruple` in order and
@@ -767,61 +716,6 @@ operator fun <A, B, C, D, RA, RB, RC> Quadruple<A, B, C, D>.minus(index: Int) = 
  * @since 1.0.0
  */
 operator fun <A, B, C, D> Quadruple<A, B, C, D>.not() = Quadruple(fourth, third, second, first)
-
-/**
- * A data class representing a tuple of five elements.
- *
- * This can be useful for grouping five related values together and passing them
- * as a single object. The class provides component functions to destructure
- * the elements and is also Serializable.
- *
- * @param A the type of the first element
- * @param B the type of the second element
- * @param C the type of the third element
- * @param D the type of the fourth element
- * @param E the type of the fifth element
- * @property first the first element of the quintuple
- * @property second the second element of the quintuple
- * @property third the third element of the quintuple
- * @property fourth the fourth element of the quintuple
- * @property fifth the fifth element of the quintuple
- * @author Tommaso Pastorelli
- * @since 1.0.0
- */
-data class Quintuple<out A, out B, out C, out D, out E> (val first: A, val second: B, val third: C, val fourth: D, val fifth: E) : Serializable {
-    /**
-     * Returns a string representation of the quintuple in the format (first, second, third, fourth, fifth).
-     *
-     * @return a string representation of the quintuple
-     * @since 1.0.0
-     */
-    override fun toString(): String = "($first, $second, $third, $fourth, $fifth)"
-
-    /**
-     * Retrieves the element at the specified index from the quintuple.
-     *
-     * The valid index range is 0 to 4 inclusive:
-     * - 0 corresponds to the first element.
-     * - 1 corresponds to the second element.
-     * - 2 corresponds to the third element.
-     * - 3 corresponds to the fourth element.
-     * - 4 corresponds to the fifth element.
-     *
-     * @param index the index of the element to retrieve
-     * @return the element at the specified index
-     * @throws IndexOutOfBoundsException if the index is outside the range 0..4
-     * @since 1.0.0
-     */
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R> get(index: Int): R = when(index) {
-        0 -> first as R
-        1 -> second as R
-        2 -> third as R
-        3 -> fourth as R
-        4 -> fifth as R
-        else -> throw IndexOutOfBoundsException("Invalid index $index, valid range is 0..4")
-    }
-}
 
 /**
  * Indicates whether any of the elements in the quintuple are `null`.

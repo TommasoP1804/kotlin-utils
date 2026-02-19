@@ -113,7 +113,7 @@ data class Chunked<T>(
             if (generalFilterString.isNotNull()) {
                 val generalFilter = FilterOption.parse(generalFilterString).onlyElement()
                 generalFilter.operator.validate(
-                    lazyMessage = { "General filter operator in ${((FilterOperator byCategory STRING) + (FilterOperator byCategory EQUALITY)).mappedTo(FilterOperator::operator)}" },
+                    lazyMessage = { "General filter operator in ${((FilterOperator byCategory STRING) + (FilterOperator byCategory EQUALITY)).map(FilterOperator::operator)}" },
                     causeOf = exceptionForInvalid("General filter operator is invalid")
                 ) { isNull() || category in arrayOf(STRING, EQUALITY) }
 
@@ -123,7 +123,7 @@ data class Chunked<T>(
                 ) }
                 val generalFiltrable = dbDictionary.keys
                     .filter { it !in availGeneralFilteringFields }
-                    .mappedTo { dbDictionary[it]!! }
+                    .map { dbDictionary[it]!! }
                     .joinToString(transform = getCondition, separator = " OR ")
 
                 initialQuery.where("($generalFiltrable)")
@@ -170,7 +170,7 @@ data class Chunked<T>(
             }
 
             if (sorting.isNotEmpty()) {
-                initialQuery.orderBy(*sorting.mappedTo {
+                initialQuery.orderBy(*sorting.map {
                     val splitted = it / separatorSymbol
                     (dbDictionary[splitted.first()] ?: splitted.first()) to ((SortDirection ofOperator splitted[1])
                         ?: throw exceptionForInvalid("Invalid sorting direction"))
@@ -192,7 +192,7 @@ data class Chunked<T>(
 
             logger.debug("<> Query from ${ANSI.ITALIC}${this::class.simpleName}${ANSI.RESET}: {}", query.value)
 
-            val filtered = entityManager then { query.executeSelectMultipleResult<M>().mappedTo(dtoMapper) }
+            val filtered = entityManager then { query.executeSelectMultipleResult<M>().map(dtoMapper) }
             return Chunked(
                 totalElements = totalElements ?: filtered.size,
                 totalPages = if (limit == -1) 1 else ceil((totalElements ?: filtered.size).toDouble() / limit).toInt(),
@@ -262,7 +262,7 @@ data class Chunked<T>(
                 causeOf = exceptionForInvalid("Limit must be greater than 0 or equal to -1")
             ) { this > 0 || this == -1 }
 
-            var decomponedFilters = filter mappedTo {
+            var decomponedFilters = filter.map {
                 val decomponed = it / separatorSymbol
                 FilterOption(decomponed[0], decomponed[1], decomponed[2])
             }
@@ -323,7 +323,7 @@ data class Chunked<T>(
                 totalPages = if (limit == -1) 1 else ceil(totalElements.toDouble() / limit).toInt(),
                 pageIndex = offset,
                 limit = limit whenFalse (limit == -1),
-                appliedFilters = decomponedFilters.mappedTo { it.copy(field = "${T::class.simpleName}$${it.field}") } + generalFilter?.copy(field = null)?.asSingleList().orEmpty(),
+                appliedFilters = decomponedFilters.map { it.copy(field = "${T::class.simpleName}$${it.field}") } + generalFilter?.copy(field = null)?.asSingleList().orEmpty(),
                 sort = sorting,
                 data = goodCollection
             )

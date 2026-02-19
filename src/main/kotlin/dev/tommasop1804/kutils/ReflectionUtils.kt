@@ -174,7 +174,7 @@ inline fun <reified T : Any> T.toReflectionMapSnakeCase(vararg excludeProperties
  * @since 1.0.0
  */
 @Suppress("unchecked_cast")
-infix inline fun <reified T : Any, R> T.getPropertyValue(propertyName: String) =
+inline infix fun <reified T : Any, R> T.getPropertyValue(propertyName: String) =
     T::class.memberProperties
         .find { it.name == propertyName }
         .requireNotNullOrThrow { PropertyNotFoundException(propertyName, T::class) }
@@ -211,7 +211,7 @@ inline infix fun <reified T : Any> KClass<T>.hasProperty(propertyName: String): 
 inline fun <reified T : Any> T.getPropertyNames(): StringSet =
     T::class.memberProperties
         .filter { it.visibility == KVisibility.PUBLIC }
-        .mappedTo { it.name }
+        .map { it.name }
         .toSet()
 
 /**
@@ -223,7 +223,7 @@ inline fun <reified T : Any> T.getPropertyNames(): StringSet =
 inline fun <reified T : Any> KClass<T>.getPropertyNames(): StringSet =
     memberProperties
         .filter { it.visibility == KVisibility.PUBLIC }
-        .mappedTo { it.name }
+        .map { it.name }
         .toSet()
 
 /**
@@ -264,7 +264,7 @@ inline infix fun <reified T: Any> KClass<T>.getPropertyByName(name: String) =
 @Suppress("unchecked_cast")
 inline infix fun <reified T : Any> T.getPropertiesWhere(predicate: Predicate<KProperty<T>>) =
     T::class.memberProperties
-        .mappedTo { it as KProperty<T> }
+        .map { it as KProperty<T> }
         .filter(predicate)
 
 /**
@@ -278,7 +278,7 @@ inline infix fun <reified T : Any> T.getPropertiesWhere(predicate: Predicate<KPr
 @Suppress("unchecked_cast")
 inline infix fun <reified T : Any> KClass<T>.getPropertiesWhere(predicate: Predicate<KProperty<T>>) =
     memberProperties
-        .mappedTo { it as KProperty<T> }
+        .map { it as KProperty<T> }
         .filter(predicate)
 
 /**
@@ -291,7 +291,7 @@ inline infix fun <reified T : Any> KClass<T>.getPropertiesWhere(predicate: Predi
 inline infix fun <reified T : Any> T.getPropertiesOfType(type: KType) =
         T::class.memberProperties
             .filter { it.returnType == type }
-            .mappedTo { it as KProperty<T> }
+            .map { it as KProperty<T> }
 
 /**
  * Retrieves all publicly visible properties of a class instance that match the specified type.
@@ -303,7 +303,7 @@ inline infix fun <reified T : Any> T.getPropertiesOfType(type: KType) =
 inline infix fun <reified T : Any> KClass<T>.getPropertiesOfType(type: KType) =
     memberProperties
         .filter { it.returnType == type }
-        .mappedTo { it as KProperty<T> }
+        .map { it as KProperty<T> }
 
 /**
  * Retrieves a specific parameter of the function by its name.

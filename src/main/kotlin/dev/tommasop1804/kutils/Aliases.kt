@@ -19,8 +19,8 @@ import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit
 import dev.tommasop1804.kutils.classes.measure.RMeasurement
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator
-import dev.tommasop1804.kutils.classes.tuple.Quadruple
-import dev.tommasop1804.kutils.classes.tuple.Quintuple
+import dev.tommasop1804.kutils.classes.tuples.Quadruple
+import dev.tommasop1804.kutils.classes.tuples.Quintuple
 import dev.tommasop1804.kutils.exceptions.UnsupportedJSONTypeException
 import dev.tommasop1804.kutils.exceptions.UnsupportedYAMLTypeException
 import java.math.BigInteger
@@ -966,7 +966,7 @@ typealias NullableInt2 = Pair<Int?, Int?>
 
 /**
  * A typealias for a Pair consisting of two Long values.
- * This can be used to represent a tuple or pair of Longs,
+ * This can be used to represent a tuples or pair of Longs,
  * providing better readability and type safety in certain contexts.
  *
  * @since 1.0.0
@@ -1010,7 +1010,7 @@ typealias NullableDouble2 = Pair<Double?, Double?>
  * A typealias for a Pair of Booleans.
  *
  * This alias is used to represent a pair of Boolean values
- * for situations where working with a tuple structure of
+ * for situations where working with a tuples structure of
  * Boolean data is necessary.
  *
  * @since 1.0.0
@@ -1067,7 +1067,7 @@ typealias MonoPair<T> = Pair<T, T>
  * This is a shorthand to use instead of explicitly declaring
  * `Triple<Any, Any, Any>` in your code.
  *
- * Use this type alias to work with a tuple of three values of any type.
+ * Use this type alias to work with a tuples of three values of any type.
  *
  * @since 1.0.0
  * @see Triple
@@ -1108,7 +1108,7 @@ typealias NullableInt3 = Triple<Int?, Int?, Int?>
 
 /**
  * A typealias for a `Triple` of `Long` values.
- * It represents a tuple containing three `Long` data types.
+ * It represents a tuples containing three `Long` data types.
  *
  * @since 1.0.0
  * @see Triple
@@ -1188,7 +1188,7 @@ typealias String3 = Triple<String, String, String>
 typealias NullableString3 = Triple<String?, String?, String?>
 
 /**
- * Defines a type alias `FilterTriple` that represents a tuple of a string (e.g. name of the field), a filter operator,
+ * Defines a type alias `FilterTriple` that represents a tuples of a string (e.g. name of the field), a filter operator,
  * and a value used for filtering or querying operations.
  *
  * This alias is utilized to associate a property, the desired filtering logic (using a
@@ -1217,7 +1217,7 @@ typealias MonoTriple<T> = Triple<T, T, T>
 /**
  * Type alias for a `Quadruple` where all four elements are of type `Any`.
  *
- * This alias can be used to represent a generic tuple of four values without
+ * This alias can be used to represent a generic tuples of four values without
  * specific type constraints.
  *
  * @since 1.0.0
@@ -1249,7 +1249,7 @@ typealias NullableAny4 = Quadruple<Any?, Any?, Any?, Any?>
  */
 typealias Int4 = Quadruple<Int, Int, Int, Int>
 /**
- * A type alias for a nullable tuple containing four elements of type [Int].
+ * A type alias for a nullable tuples containing four elements of type [Int].
  *
  * This alias is used for representing a [Quadruple] where each element can either
  * be an [Int] or null.
@@ -1274,7 +1274,7 @@ typealias Long4 = Quadruple<Long, Long, Long, Long>
 /**
  * A type alias representing a `Quadruple` with all elements being nullable `Long` types.
  *
- * This can be used for cases where you need to represent a tuple of four values,
+ * This can be used for cases where you need to represent a tuples of four values,
  * where each value can either hold a `Long` or be `null`.
  *
  * @since 1.0.0
@@ -1382,7 +1382,7 @@ typealias Any5 = Quintuple<Any, Any, Any, Any, Any>
 /**
  * A type alias for a quintuple containing nullable values of any type.
  *
- * This type represents a tuple of five elements where each element can either hold a value
+ * This type represents a tuples of five elements where each element can either hold a value
  * of any type or be null. It uses the `Quintuple` class to group the elements together.
  *
  * @since 1.0.0
@@ -1417,7 +1417,7 @@ typealias NullableInt5 = Quintuple<Int?, Int?, Int?, Int?, Int?>
 /**
  * A typealias for a Quintuple where all five elements are of type Long.
  *
- * This is a shorthand for representing a tuple containing exactly five Long values.
+ * This is a shorthand for representing a tuples containing exactly five Long values.
  *
  * @since 1.0.0
  * @see Quintuple
@@ -1428,7 +1428,7 @@ typealias Long5 = Quintuple<Long, Long, Long, Long, Long>
  * A type alias for a quintuple where all five elements are nullable `Long` values.
  *
  * This type alias can be used to represent a group of five nullable `Long` values,
- * leveraging the `Quintuple` class for tuple-like use cases.
+ * leveraging the `Quintuple` class for tuples-like use cases.
  *
  * @since 1.0.0
  * @see Quintuple
@@ -1439,7 +1439,7 @@ typealias NullableLong5 = Quintuple<Long?, Long?, Long?, Long?, Long?>
 /**
  * A typealias for `Quintuple` where all five elements are of type `Double`.
  *
- * This is useful when working with a tuple that specifically requires
+ * This is useful when working with a tuples that specifically requires
  * five `Double` elements, providing a shorthand notation for improved readability.
  *
  * @since 1.0.0
@@ -1471,7 +1471,7 @@ typealias NullableDouble5 = Quintuple<Double?, Double?, Double?, Double?, Double
  */
 typealias Boolean5 = Quintuple<Boolean, Boolean, Boolean, Boolean, Boolean>
 /**
- * A typealias representing a tuple of five nullable Boolean values.
+ * A typealias representing a tuples of five nullable Boolean values.
  *
  * This typealias provides a more readable and concise way to define and work
  * with a grouping of five nullable Boolean values, using the `Quintuple` class.
@@ -1558,6 +1558,15 @@ typealias NanoId = NanoID
  * @see ShortUUID
  */
 typealias ShortUuid = ShortUUID
+
+/**
+ * Defines a type alias for the TSID class.
+ *
+ * This alias can be used to simplify and improve the readability
+ * of code where the TSID type is frequently referenced.
+ * @since 1.1.0
+ */
+typealias Tsid = TSID
 
 /**
  * Represents a type alias for the ULID (Universally Unique Lexicographically Sortable Identifier) type.
