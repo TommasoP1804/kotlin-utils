@@ -266,20 +266,20 @@ data class Chunked<T>(
                 val decomponed = it / separatorSymbol
                 FilterOption(decomponed[0], decomponed[1], decomponed[2])
             }
-            val generalFilter = decomponedFilters[{ it.field == generalFilterSymbol }]
+            val generalFilter = decomponedFilters[{ field == generalFilterSymbol }]
             if (generalFilter.isNotNull()) decomponedFilters = decomponedFilters - generalFilter
 
             var baseCollection = baseCollection.toList()
             val sorting = SortOption.parse(sorting, separatorSymbol = separatorSymbol)
             sorting.all { it.field in availSortingFields } || throw exceptionForInvalid("Sorting field not supported")
             if (sorting.isNotEmpty() && baseCollection.isNotEmpty()) {
-                val property = baseCollection.first()::class.memberProperties[{ it.name == sorting.first().field }] ?: throw NoSuchPropertyException()
+                val property = baseCollection.first()::class.memberProperties[{ name == sorting.first().field }] ?: throw NoSuchPropertyException()
                 var comparator = if (sorting.first().direction == SortDirection.DESCENDING)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
                 for (sortOption in (-1)(sorting)) {
                     println(sortOption)
-                    val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.field }] ?: throw NoSuchPropertyException()
+                    val property = baseCollection.first()::class.memberProperties[{ name == sortOption.field }] ?: throw NoSuchPropertyException()
                     comparator = if (sortOption.direction == SortDirection.DESCENDING)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
                     else comparator.thenBy { property.call(it) as Comparable<*>? }
@@ -303,7 +303,7 @@ data class Chunked<T>(
                 if (flag == false) continue@element
                 for (property in properties) {
                     if (decomponedFilters.isNotEmpty() && property.name in availFilteringFields)
-                        decomponedFilters { it.field == property.name }.forEach {
+                        decomponedFilters { field == property.name }.forEach {
                             it.field in availFilteringFields || throw exceptionForInvalid("Filtering field not supported")
                             if (!filter(property.call(element).toString(), it, exceptionForInvalid)) {
                                 println("check for ${it.field} failed")
