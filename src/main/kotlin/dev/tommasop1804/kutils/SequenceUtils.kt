@@ -77,6 +77,46 @@ operator fun <T> Int.invoke(sequence: Sequence<T>): Sequence<T> {
     return if (this > 0) sequence.take(this)
     else sequence.drop(-this)
 }
+/**
+ * Applies the given predicate function to filter the elements of the sequence.
+ *
+ * This operator function allows applying a custom filtering logic encapsulated in the `ReceiverPredicate`.
+ *
+ * @param filter A predicate function that determines whether an element should be included in the resulting sequence.
+ * @return A sequence containing only the elements that match the provided predicate.
+ * @since 1.1.1
+ */
+inline operator fun <E> Sequence<E>.invoke(crossinline filter: ReceiverPredicate<E>): Sequence<E> = filter { it.filter() }
+
+/**
+ * Extension operator function for `Sequence` that retrieves the first element satisfying the provided predicate.
+ *
+ * @param find A lambda function or predicate that is applied to each element of the sequence to determine the desired element.
+ * @return The first element that matches the predicate, or `null` if no such element is found.
+ * @since 1.1.1
+ */
+inline operator fun <E> Sequence<E>.get(find: ReceiverPredicate<E>): E? = find { it.find() }
+/**
+ * Finds the first element in a sequence that satisfies the given predicate, or throws a provided exception if no such element is found.
+ *
+ * @param find a predicate that evaluates each element of the sequence to determine if it matches the condition.
+ * @param lazyException a supplier for the exception to be thrown if no element satisfies the given predicate.
+ * @return the first element in the sequence that satisfies the predicate.
+ * @since 1.1.1
+ */
+inline operator fun <E> Sequence<E>.get(find: ReceiverPredicate<E>, lazyException: ThrowableSupplier): E = find { it.find() } ?: throw lazyException()
+
+/**
+ * Returns the first element in the sequence that matches the given [predicate] or throws an exception
+ * provided by the [lazyException] supplier if no such element is found.
+ *
+ * @param lazyException a supplier that provides the exception to be thrown if no matching element is found
+ * @param predicate a condition to evaluate on elements of the sequence
+ * @return the first element in the sequence that satisfies the [predicate]
+ * @throws Throwable the exception provided by the [lazyException] supplier if no element matches the [predicate]
+ * @since 1.1.1
+ */
+inline fun <E> Sequence<E>.findOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E = find(predicate) ?: throw lazyException()
 
 /**
  * Merges the current sequence with additional sequences and returns the resulting sequence.
@@ -774,15 +814,3 @@ infix fun <E, R> Sequence<E>.filterNotNull(element: Transformer<E, R>) =
  */
 infix fun <E, R> Sequence<E>.filterNull(element: Transformer<E, R>) =
     filter { element(it).isNull() }
-
-/**
- * Allows performing the specified [action] on each element of the sequence without 
- * modifying the sequence itself. This is useful for actions such as logging or debugging.
- *
- * The operation is intermediate and does not consume the sequence.
- *
- * @param action the action to be performed on each element of the sequence.
- * @return the original sequence after applying the action to each element.
- * @since 1.0.0
- */
-infix fun <I : Sequence<E>, E> I.peek(action: Consumer<E>) = apply { forEach(action) }

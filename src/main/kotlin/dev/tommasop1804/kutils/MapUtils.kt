@@ -868,16 +868,6 @@ fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier, predicat
 fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Map.Entry<K, V>>) = filter(predicate).entries.run { if (size == 1) first() else throw lazyException() }
 
 /**
- * Iterates over all the entries of the map and performs the given action on each entry.
- * This method enables performing a certain operation on the map without modifying it,
- * returning the original map after the operation.
- *
- * @param action a consumer function that will be applied to each entry in the map
- * @since 1.0.0
- */
-infix fun <M : Map<K, V>, K, V> M.peek(action: Consumer<Map.Entry<K, V>>) = apply { entries.forEach(action) }
-
-/**
  * Collects the entries of the map using the provided [Collector].
  *
  * This method allows for processing and transforming the entries of the map
@@ -1016,7 +1006,7 @@ infix fun <M : Map<K, V>, K, V> M?.ifNullOrEmpty(block: Supplier<M>): M = if (is
  *             to each entry in the map to evaluate if it matches the desired condition.
  * @since 1.0.0
  */
-operator fun <K, V> Map<K, V>.get(find: Predicate<Map.Entry<K, V>>) = find(find)
+inline operator fun <K, V> Map<K, V>.get(find: ReceiverPredicate<Map.Entry<K, V>>): Map.Entry<K, V>? = entries[find]
 /**
  * Retrieves the first entry in the map that satisfies the given predicate.
  *
@@ -1029,7 +1019,7 @@ operator fun <K, V> Map<K, V>.get(find: Predicate<Map.Entry<K, V>>) = find(find)
  * @param lazyException A supplier for the exception to be thrown if no element is found.
  * @since 1.0.0
  */
-operator fun <K, V> Map<K, V>.get(find: Predicate<Map.Entry<K, V>>, lazyException: ThrowableSupplier) = find(find) ?: throw lazyException()
+inline operator fun <K, V> Map<K, V>.get(find: ReceiverPredicate<Map.Entry<K, V>>, lazyException: ThrowableSupplier) = get(find) ?: throw lazyException()
 
 /**
  * Applies the given predicate to filter the entries of the map and returns the filtered result.
@@ -1038,7 +1028,15 @@ operator fun <K, V> Map<K, V>.get(find: Predicate<Map.Entry<K, V>>, lazyExceptio
  *               to filter the entries of the map.
  * @since 1.0.0
  */
-operator fun <K, V> Map<K, V>.invoke(filter: Predicate<Map.Entry<K, V>>) = filter(filter)
+inline operator fun <K, V> Map<K, V>.invoke(filter: ReceiverPredicate<Map.Entry<K, V>>): Map<K, V> {
+    val destination = LinkedHashMap<K, V>()
+    for (element in this) {
+        if (element.filter()) {
+            destination[element.key] = element.value
+        }
+    }
+    return destination
+}
 
 /**
  * Creates and returns a new empty mutable map.

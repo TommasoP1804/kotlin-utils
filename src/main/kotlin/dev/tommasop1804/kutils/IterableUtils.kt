@@ -702,7 +702,11 @@ operator fun <E> List<E>.invoke(circularIndex: Int): E {
  * @param filter the predicate used to test each element in the iterable. Only elements that satisfy the predicate will be included in the resulting collection.
  * @since 1.0.0
  */
-operator fun <E> Iterable<E>.invoke(filter: Predicate<E>) = filter(filter)
+inline operator fun <E> Iterable<E>.invoke(filter: ReceiverPredicate<E>): List<E> {
+    val destination = ArrayList<E>()
+    for (element in this) if (element.filter()) destination.add(element)
+    return destination
+}
 
 /**
  * Retrieves the first element in the iterable that matches the given predicate.
@@ -712,7 +716,10 @@ operator fun <E> Iterable<E>.invoke(filter: Predicate<E>) = filter(filter)
  * @return The first element that satisfies the predicate.
  * @since 1.0.0
  */
-operator fun <E> Iterable<E>.get(find: Predicate<E>) = find(find)
+inline operator fun <E> Iterable<E>.get(find: ReceiverPredicate<E>): E? {
+    for (element in this) if (element.find()) return element
+    return null
+}
 /**
  * Retrieves the first element in the iterable that matches the given predicate.
  *
@@ -722,7 +729,7 @@ operator fun <E> Iterable<E>.get(find: Predicate<E>) = find(find)
  * @return The first element that satisfies the predicate.
  * @since 1.0.0
  */
-operator fun <E> Iterable<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier) = find(find) ?: throw lazyException()
+operator fun <E> Iterable<E>.get(find: ReceiverPredicate<E>, lazyException: ThrowableSupplier) = find(find) ?: throw lazyException()
 
 /**
  * Searches for the first element in the iterable that matches the specified predicate and returns it.
