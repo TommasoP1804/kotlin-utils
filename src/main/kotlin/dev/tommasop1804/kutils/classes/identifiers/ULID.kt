@@ -1007,9 +1007,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ULID? = (cached as? String)?.let { ULID(it) }
+            ): ULID? = (cached as? ByteArray)?.let { ULID(it) }
 
-            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it.toUUID()}'" }
+            override fun toSqlLiteral(value: ULID?): String? = value?.let { "E'\\\\x${it.toHex()}'" }
 
             override fun toString(value: ULID?): String? = value?.toString()
 
