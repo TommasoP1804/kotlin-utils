@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Supplier
 import dev.tommasop1804.kutils.Transformer
+import dev.tommasop1804.kutils.UUID
 import dev.tommasop1804.kutils.classes.identifiers.ULID.Companion.generateHashULID
 import dev.tommasop1804.kutils.classes.identifiers.ULID.Factory.ByteRandom.Companion.newRandomFunction
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
@@ -980,8 +981,8 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 session: SharedSessionContractImplementor?,
                 owner: Any?
             ): ULID? {
-                val value = rs?.getObject(position, UUID::class.java) ?: return null
-                return from(value)
+                val bytes = rs?.getBytes(position) ?: return null
+                return ULID(bytes = bytes)
             }
 
             override fun nullSafeSet(
@@ -991,9 +992,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 session: SharedSessionContractImplementor?
             ) {
                 if (value.isNull()) {
-                    st?.setNull(index, SqlTypes.UUID)
+                    st?.setNull(index, SqlTypes.VARBINARY)
                 } else {
-                    st?.setObject(index, value.toUUID())
+                    st?.setBytes(index, value.toByteArray())
                 }
             }
 
@@ -1035,7 +1036,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 owner: Any?
             ): ULID? {
                 val value = rs?.getString(position) ?: return null
-                return ULID(value)
+                return ULID(UUID(value))
             }
 
             override fun nullSafeSet(
@@ -1044,10 +1045,14 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
-                st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
+                if (value.isNull()) {
+                    st?.setNull(index, SqlTypes.UUID)
+                } else {
+                    st?.setString(index, value.toUUID().toString())
+                }
             }
 
-            override fun deepCopy(value: ULID?): ULID? = value?.let { ULID(it) }
+            override fun deepCopy(value: ULID?): ULID? = value?.let { ULID(it.toUUID()) }
 
             override fun isMutable(): Boolean = false
 
@@ -1058,12 +1063,12 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 owner: Any?
             ): ULID? = cached as? ULID
 
-            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it}'" }
+            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it.toUUID()}'" }
 
-            override fun toString(value: ULID?): String? = value?.toString()
+            override fun toString(value: ULID?): String? = value?.toUUID()?.toString()
 
             override fun fromStringValue(sequence: CharSequence?): ULID =
-                sequence?.let { ULID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+                sequence?.let { ULID(UUID(it.toString())) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
         }
     }
 

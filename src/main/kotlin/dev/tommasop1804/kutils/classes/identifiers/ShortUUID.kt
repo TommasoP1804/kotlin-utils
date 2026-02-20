@@ -9,6 +9,7 @@ import dev.tommasop1804.kutils.BigInt
 import dev.tommasop1804.kutils.UUID
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.toUUID
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
@@ -311,7 +312,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
                 owner: Any?
             ): ShortUUID? {
                 val value = rs?.getString(position) ?: return null
-                return ShortUUID(value)
+                return ShortUUID(UUID(value))
             }
 
             override fun nullSafeSet(
@@ -320,10 +321,14 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
-                st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
+                if (value.isNull()) {
+                    st?.setNull(index, SqlTypes.UUID)
+                } else {
+                    st?.setString(index, value.toUUID().toString())
+                }
             }
 
-            override fun deepCopy(value: ShortUUID?): ShortUUID? = value?.let { ShortUUID(it.toString()) }
+            override fun deepCopy(value: ShortUUID?): ShortUUID? = value?.let { ShortUUID(it.toUUID()) }
 
             override fun isMutable(): Boolean = false
 
@@ -334,12 +339,12 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
                 owner: Any?
             ): ShortUUID? = cached as? ShortUUID
 
-            override fun toSqlLiteral(value: ShortUUID?): String? = value?.let { "'${it}'" }
+            override fun toSqlLiteral(value: ShortUUID?): String? = value?.let { "'${it.toUUID()}'" }
 
             override fun toString(value: ShortUUID?): String? = value?.toString()
 
             override fun fromStringValue(sequence: CharSequence?): ShortUUID =
-                sequence?.let { ShortUUID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
+                sequence?.let { ShortUUID(it.toUUID()().toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
         }
     }
 
