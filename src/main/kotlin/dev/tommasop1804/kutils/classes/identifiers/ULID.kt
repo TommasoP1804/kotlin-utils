@@ -1035,8 +1035,8 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 session: SharedSessionContractImplementor?,
                 owner: Any?
             ): ULID? {
-                val value = rs?.getString(position) ?: return null
-                return ULID(UUID(value))
+                val value = rs?.getObject(position, UUID::class.java) ?: return null
+                return ULID(value)
             }
 
             override fun nullSafeSet(
@@ -1048,7 +1048,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 if (value.isNull()) {
                     st?.setNull(index, SqlTypes.UUID)
                 } else {
-                    st?.setString(index, value.toUUID().toString())
+                    st?.setObject(index, value.toUUID())
                 }
             }
 

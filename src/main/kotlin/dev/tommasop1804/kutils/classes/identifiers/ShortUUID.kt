@@ -311,8 +311,8 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
                 session: SharedSessionContractImplementor?,
                 owner: Any?
             ): ShortUUID? {
-                val value = rs?.getString(position) ?: return null
-                return ShortUUID(UUID(value))
+                val value = rs?.getObject(position, UUID::class.java) ?: return null
+                return ShortUUID(value)
             }
 
             override fun nullSafeSet(
@@ -324,7 +324,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
                 if (value.isNull()) {
                     st?.setNull(index, SqlTypes.UUID)
                 } else {
-                    st?.setString(index, value.toUUID().toString())
+                    st?.setObject(index, value.toUUID())
                 }
             }
 
