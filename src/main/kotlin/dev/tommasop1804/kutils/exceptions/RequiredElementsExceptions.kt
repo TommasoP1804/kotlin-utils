@@ -163,7 +163,7 @@ open class RequiredParameterException : ValidationFailedException {
      * @param message the detail message, or null if none.
      * @since 1.0.0
      */
-    constructor(message: String?, internalErrorCode: String? = null) : super(message)
+    constructor(message: String?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + message)
     /**
      * Constructs an instance of `RequiredParameterException` with a formatted message
      * describing the parameter of the given callable function that caused the exception.
@@ -288,6 +288,11 @@ open class RequiredHeaderException : ValidationFailedException {
     val internalErrorCode: String?
         get() = message?.before(" @@@ ")?.ifBlank { null }
 
+    /**
+     * Constructs an instance of RequiredHeaderException by invoking the base class constructor.
+     * @since 1.1.5
+     */
+    constructor() : super()
     /**
      * Constructs an instance of RequiredHeaderException with a specified detail message
      * and an optional internal error code.
