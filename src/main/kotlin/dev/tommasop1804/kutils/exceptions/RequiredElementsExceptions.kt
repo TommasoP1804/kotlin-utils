@@ -302,7 +302,7 @@ open class RequiredHeaderException : ValidationFailedException {
      *        context about the error, may be null.
      * @since 1.1.5
      */
-    constructor(message: String?, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY + message)
+    constructor(message: String?, internalErrorCode: String? = null) : super((if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY) + message)
     /**
      * Creates an instance of the RequiredHeaderException with a specified cause.
      *
@@ -319,7 +319,7 @@ open class RequiredHeaderException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code that provides additional context for this exception.
      * @since 1.1.5
      */
-    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY + message, cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY) + message, cause)
     /**
      * Constructs a `RequiredHeaderException` with a specific header name, header type, and an optional internal error code.
      *
