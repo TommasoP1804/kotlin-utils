@@ -203,7 +203,7 @@ open class ValidationFailedException : RuntimeException {
 }
 
 /**
- * A specific type of `InputMismatchException` that indicates
+ * A specific type of `ValidationFailedException` that indicates
  * an input is malformed or does not conform to the expected format or structure.
  *
  * This exception can be thrown to signal an input parsing or validation failure
@@ -213,7 +213,10 @@ open class ValidationFailedException : RuntimeException {
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-open class MalformedInputException : IllegalArgumentException {
+open class MalformedInputException : ValidationFailedException {
+    val internalErrorCode: String?
+        get() = message?.before(" @@@ ")?.ifBlank { null }
+
     /**
      * Constructs a MalformedInputException with no detail message.
      *
@@ -226,25 +229,28 @@ open class MalformedInputException : IllegalArgumentException {
      * Constructs a new `MalformedInputException` with the specified detail message.
      *
      * @param message the detail message saved for later retrieval by the `Throwable.message` property.
-     * @since 1.0.0
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
      */
-    constructor(message: String?) : super(message)
+    constructor(message: String?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ $message")
     /**
      * Constructs a `MalformedInputException` with a message indicating that the input
      * should be formatted like the specified type.
      *
      * @param type the expected type used to build the detail message, may be null.
-     * @since 1.0.0
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
      */
-    constructor(type: KType?) : super("Verify that the input is settable as $type")
+    constructor(type: KType?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ Input is not settable as a $type")
     /**
      * Constructs a new `MalformedInputException` with a detail message indicating
      * that the input should be castable as an instance of the specified class.
      *
      * @param `class` the KClass object representing the type that the input is expected to be castable to.
-     * @since 1.0.0
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
      */
-    constructor(`class`: KClass<*>?) : super("Verify that the input is settable as ${`class`?.qualifiedName}")
+    constructor(`class`: KClass<*>?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ Input is not settable as a ${`class`?.qualifiedName}")
     /**
      * Constructs a new `MalformedInputException` with the specified detail message and cause.
      *
@@ -254,9 +260,10 @@ open class MalformedInputException : IllegalArgumentException {
      *
      * @param message A detailed message describing the malformed input error, or null if no specific message is provided.
      * @param cause The cause of this exception, or null if no specific cause is provided.
-     * @since 1.0.0
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
      */
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ $message", cause)
     /**
      * Constructs a `MalformedInputException` with the specified cause.
      *
@@ -266,9 +273,134 @@ open class MalformedInputException : IllegalArgumentException {
      * with another throwable cause.
      *
      * @param cause The cause of this exception, or null if no specific cause is provided.
-     * @since 1.0.0
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
      */
-    constructor(cause: Throwable?) : super(cause)
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ ", cause)
+}
+
+/**
+ * A specific type of `MalformedInputException` that indicates a parameter provided
+ * to a method or function is malformed or does not conform to the expected format, type, or structure.
+ *
+ * This exception can be used to signal validation errors for method or function parameters
+ * where the provided argument does not meet the expected requirements.
+ *
+ * @since 1.1.5
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class MalformedParameterException : MalformedInputException {
+    constructor() : super()
+    /**
+     * Constructs a new MalformedParameterException with the specified detail message.
+     *
+     * @param message The detail message saved for later retrieval by the `message` property.
+     * @since 1.1.5
+     */
+    constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode)
+    /**
+     * Constructs a new instance of `MalformedParameterException` with a formatted message indicating
+     * that a parameter with the specified name is not valid for the given type.
+     *
+     * @param name The name of the parameter that caused this exception.
+     * @param type The expected type of the parameter, or null if unspecified.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(name: String, type: KType?, internalErrorCode: String? = null) : super("Parameter `$name` is not a valid `$type`", internalErrorCode)
+    /**
+     * Constructs a MalformedParameterException with a message indicating that the specified parameter is not valid.
+     *
+     * @param name The name of the parameter that is invalid.
+     * @param `class` The KClass representing the expected valid type of the parameter. Can be null.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(name: String, `class`: KClass<*>?, internalErrorCode: String? = null) : super("Parameter `$name` is not a valid ${`class`?.qualifiedName}", internalErrorCode)
+    /**
+     * Constructs a new `MalformedParameterException` with the specified message and cause.
+     *
+     * @param message The detail message providing more context about the exception.
+     * @param cause The underlying cause of the exception.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode)
+    /**
+     * Constructs a new MalformedParameterException with the specified cause.
+     *
+     * @param cause the underlying cause of this exception, or null if no cause is specified.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode)
+}
+
+/**
+ * A specific type of `MalformedInputException` that indicates a header is malformed
+ * or does not conform to the expected format or structure.
+ *
+ * This exception can be thrown to signal issues related to header parsing or validation
+ * where the provided header cannot be processed appropriately.
+ *
+ * @since 1.1.5
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class MalformedHeaderException : MalformedInputException {
+    /**
+     * Default constructor for the MalformedHeaderrException class.
+     * Initializes the exception with no additional message or cause provided.
+     * @since 1.1.5
+     */
+    constructor() : super()
+    /**
+     * Constructs a new instance of MalformedHeaderrException with the specified detail message.
+     *
+     * @param message The detail message to provide additional context about the exception.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode)
+    /**
+     * Constructs a MalformedHeaderrException with a message indicating
+     * that a header with the specified [name] is not a valid instance
+     * of the given [type].
+     *
+     * @param name The name of the header that caused the exception.
+     * @param type The expected type of the header that was found to be invalid.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(name: String, type: KType?, internalErrorCode: String? = null) : super("Header `$name` is not a valid `$type`", internalErrorCode)
+    /**
+     * Constructs a new exception indicating that a header is not valid for the specified class type.
+     *
+     * @param name The name of the invalid header.
+     * @param `class` The class type that the header is not valid for. Can be null.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(name: String, `class`: KClass<*>?, internalErrorCode: String? = null) : super("Header `$name` is not a valid ${`class`?.qualifiedName}", internalErrorCode)
+    /**
+     * Constructs a new instance with a specified detail message and cause.
+     *
+     * @param message The detail message to describe the exception, or null if no message is provided.
+     * @param cause The cause of the exception, or null if the cause is not specified.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode)
+    /**
+     * Constructs a new MalformedHeaderrException with the specified cause.
+     *
+     * @param cause The cause of the exception, which can be retrieved later using the [Throwable.cause] property.
+     *              A null value is permitted and indicates that the cause is nonexistent or unknown.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode)
 }
 
 /**

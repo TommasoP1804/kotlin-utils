@@ -1,6 +1,7 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.*
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
@@ -270,4 +271,65 @@ open class RequiredParameterException : ValidationFailedException {
      * @since 1.0.0
      */
     constructor(callableName: String?, parameter: KParameter?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`", cause)
+}
+
+/**
+ * Exception thrown to indicate that a required header is missing or invalid in a request.
+ *
+ * This exception provides constructors to handle various scenarios, such as missing headers,
+ * invalid header types, or underlying causes of validation failures.
+ *
+ * The exception message typically includes details about the specific header that caused the error
+ * for easier debugging and resolution.
+ * @since 1.1.5
+ */
+@Suppress("unused")
+open class RequiredHeaderException : ValidationFailedException {
+    val internalErrorCode: String?
+        get() = message?.before(" @@@ ")?.ifBlank { null }
+
+    /**
+     * Constructs an instance of RequiredHeaderException with a specified detail message
+     * and an optional internal error code.
+     *
+     * @param message the detail message of the exception, may be null.
+     * @param internalErrorCode an optional internal error code providing additional
+     *        context about the error, may be null.
+     * @since 1.1.5
+     */
+    constructor(message: String?, internalErrorCode: String? = null) : super(message)
+    /**
+     * Creates an instance of the RequiredHeaderException with a specified cause.
+     *
+     * @param cause The exception that caused this exception to be thrown. This can be null.
+     * @param internalErrorCode An optional internal error code providing additional context for the error. Defaults to null.
+     * @since 1.1.5
+     */
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause)
+    /**
+     * Constructs a new RequiredHeaderException with the specified message, cause, and internal error code.
+     *
+     * @param message The detail message, which can be null.
+     * @param cause The cause of the exception, which can be null.
+     * @param internalErrorCode An optional internal error code that provides additional context for this exception.
+     * @since 1.1.5
+     */
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause)
+    /**
+     * Constructs a `RequiredHeaderException` with a specific header name, header type, and an optional internal error code.
+     *
+     * @param headerName The name of the required header that caused the exception. Can be null.
+     * @param headerClass The class of the required header, indicating its expected type.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(headerName: String?, headerClass: KClass<*>, internalErrorCode: String? = null) : super("Header `$${headerName}` of type `$${headerClass.simpleName}` is required", internalErrorCode)
+    /**
+     * Creates an instance of RequiredHeaderException with an optional internal error code.
+     *
+     * @param internalErrorCode An optional string representing an internal error code, which can provide
+     * additional context for debugging or error tracking.
+     * @since 1.1.5
+     */
+    constructor(internalErrorCode: String? = null) : super()
 }

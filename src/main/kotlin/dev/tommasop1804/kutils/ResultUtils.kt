@@ -44,7 +44,7 @@ operator fun <T> Result<T>.invoke() = getOrThrow()
  * if the `Result` is a failure.
  * @since 1.0.0
  */
-operator fun <T> Result<T>.invoke(exception: ThrowableSupplier) = getOrThrow(exception)
+operator fun <T> Result<T>.invoke(exception: ThrowableSupplier) = getOrThrow(lazyException = exception)
 
 /**
  * Negates the result of the current operation, providing a boolean value that
@@ -68,14 +68,14 @@ operator fun Result<*>.not() = isFailure
  * should be included as the cause for the new exception. If set to `true`, the cause is included (if present),
  * otherwise, it is omitted.
  *
- * @param lazyException A lambda that produces a [Throwable] used as the new exception to be thrown
- * if the [Result] instance contains a failure.
  * @param includeCause A boolean that indicates whether the cause of the original exception should be included
  * in the new exception. Default is `true`.
+ * @param lazyException A lambda that produces a [Throwable] used as the new exception to be thrown
+ * if the [Result] instance contains a failure.
  * @throws Throwable If the [Result] contains a failure, the provided [lazyException] or its modified version is thrown.
  * @since 1.0.0
  */
-inline fun <T> Result<T>.getOrThrow(lazyException: ThrowableSupplier, includeCause: Boolean = true) = getOrElse {
+inline fun <T> Result<T>.getOrThrow(includeCause: Boolean = true, lazyException: ThrowableSupplier) = getOrElse {
     val exception = lazyException()
     throw if (exception.cause.isNotNull() || !includeCause) exception else (exception causedBy exceptionOrNull())
 }
