@@ -297,7 +297,7 @@ open class RequiredHeaderException : ValidationFailedException {
      *        context about the error, may be null.
      * @since 1.1.5
      */
-    constructor(message: String?, internalErrorCode: String? = null) : super(message)
+    constructor(message: String?, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY + message)
     /**
      * Creates an instance of the RequiredHeaderException with a specified cause.
      *
@@ -314,7 +314,7 @@ open class RequiredHeaderException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code that provides additional context for this exception.
      * @since 1.1.5
      */
-    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY + message, cause)
     /**
      * Constructs a `RequiredHeaderException` with a specific header name, header type, and an optional internal error code.
      *
@@ -323,7 +323,17 @@ open class RequiredHeaderException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(headerName: String?, headerClass: KClass<*>, internalErrorCode: String? = null) : super("Header `$${headerName}` of type `$${headerClass.simpleName}` is required", internalErrorCode)
+    constructor(headerName: String?, headerClass: KClass<*>, internalErrorCode: String? = null) : super(message = "${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Header `$${headerName}` of type `$${headerClass.simpleName}` is required")
+    /**
+     * Constructs a `RequiredHeaderException` with a specific header name, header type, and an optional internal error code.
+     *
+     * @param headerName The name of the required header that caused the exception. Can be null.
+     * @param headerClass The class of the required header, indicating its expected type.
+     * @param cause The cause of the exception, which can be another exception or null.
+     * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
+     * @since 1.1.5
+     */
+    constructor(headerName: String?, headerClass: KClass<*>, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Header `$${headerName}` of type `$${headerClass.simpleName}` is required", cause)
     /**
      * Creates an instance of RequiredHeaderException with an optional internal error code.
      *
@@ -331,5 +341,5 @@ open class RequiredHeaderException : ValidationFailedException {
      * additional context for debugging or error tracking.
      * @since 1.1.5
      */
-    constructor(internalErrorCode: String? = null) : super()
+    constructor(internalErrorCode: String? = null) : super(message = "${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Header is required.")
 }

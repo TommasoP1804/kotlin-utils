@@ -232,7 +232,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(message: String?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ $message")
+    constructor(message: String?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message")
     /**
      * Constructs a `MalformedInputException` with a message indicating that the input
      * should be formatted like the specified type.
@@ -241,7 +241,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(type: KType?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ Input is not settable as a $type")
+    constructor(type: KType?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Input is not settable as a $type")
     /**
      * Constructs a new `MalformedInputException` with a detail message indicating
      * that the input should be castable as an instance of the specified class.
@@ -250,7 +250,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(`class`: KClass<*>?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ Input is not settable as a ${`class`?.qualifiedName}")
+    constructor(`class`: KClass<*>?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Input is not settable as a ${`class`?.qualifiedName}")
     /**
      * Constructs a new `MalformedInputException` with the specified detail message and cause.
      *
@@ -263,7 +263,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ $message", cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
     /**
      * Constructs a `MalformedInputException` with the specified cause.
      *
@@ -276,7 +276,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(cause: Throwable?, internalErrorCode: String? = null) : super("$internalErrorCode @@@ ", cause)
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY, cause)
 }
 
 /**

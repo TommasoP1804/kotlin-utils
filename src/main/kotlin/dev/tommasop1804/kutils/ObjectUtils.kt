@@ -169,7 +169,7 @@ inline fun <T1, reified T2> T1?.safeCastOr(transform: ReceiverTransformer<T1?, T
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = runCatching { this as T }.getOrThrow(lazyException)
+inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = runCatching { this as T }.getOrThrow(lazyException = lazyException)
 
 /**
  * Returns the receiver object if the specified condition is true, otherwise returns null.
