@@ -16,7 +16,7 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "1.1.5"
+version = "1.1.6"
 // Kotlin-Utils
 // Tommaso Pastorelli
 // Last update: Tommaso Pastorelli | 20260223T095826Z
@@ -120,7 +120,7 @@ tasks.withType<KotlinCompile> {
 }
 
 mavenPublishing {
-    coordinates("dev.tommasop1804", "kotlin-utils", "1.1.5")
+    coordinates("dev.tommasop1804", "kotlin-utils", "1.1.6")
 
     pom {
         name.set("Kotlin Utils")

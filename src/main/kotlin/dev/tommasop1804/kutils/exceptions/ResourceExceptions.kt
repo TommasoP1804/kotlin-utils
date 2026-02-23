@@ -13,7 +13,6 @@ import kotlin.uuid.ExperimentalUuidApi
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@OptIn(ExperimentalUuidApi::class)
 abstract class ResourceException : RuntimeException {
     val internalErrorCode: String?
         get() = message?.before(" @@@ ")?.ifBlank { null }
@@ -25,11 +24,25 @@ abstract class ResourceException : RuntimeException {
 }
 
 /**
+ * Exception thrown when a requested resource has been deleted.
+ *
+ * @author Tommaso Pastorelli
+ * @since 1.1.6
+ */
+open class ResourceDeletedException : ResourceException {
+    constructor() : super()
+    constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` has been deleted.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` has been deleted.", internalErrorCode = internalErrorCode)
+    constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
+}
+
+/**
  * Represents an exception that is thrown when a resource is not found.
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@OptIn(ExperimentalUuidApi::class)
 open class ResourceNotFoundException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` not found.", internalErrorCode = internalErrorCode)
@@ -44,7 +57,6 @@ open class ResourceNotFoundException : ResourceException {
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@OptIn(ExperimentalUuidApi::class)
 open class ResourceAlreadyExistsException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` already exists.", internalErrorCode = internalErrorCode)
@@ -60,7 +72,6 @@ open class ResourceAlreadyExistsException : ResourceException {
  * @since 1.0.0
  * @author
  */
-@OptIn(ExperimentalUuidApi::class)
 open class ResourceLockedException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is locked.", internalErrorCode = internalErrorCode)
@@ -75,7 +86,6 @@ open class ResourceLockedException : ResourceException {
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@OptIn(ExperimentalUuidApi::class)
 open class ResourceUnaccessibleException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is unaccessible.", internalErrorCode = internalErrorCode)
@@ -105,7 +115,6 @@ open class ResourceNotAcceptableException : ResourceException {
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@OptIn(ExperimentalUuidApi::class)
 open class ResourceConflictException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Conflict with actual state of the resource `${type.simpleName}`.", internalErrorCode = internalErrorCode)
