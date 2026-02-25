@@ -93,7 +93,7 @@ fun Any?.isNull(): Boolean {
  * @param action The action to perform on the non-null receiver of type [T].
  * @since 1.0.0
  */
-infix fun <T> T?.ifNotNull(action: ReceiverConsumer<T>) {
+inline infix fun <T> T?.ifNotNull(action: ReceiverConsumer<T>) {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (this@ifNotNull != null) holdsIn action
@@ -281,8 +281,8 @@ fun <T> T.thenWhen(predicate: ReceiverPredicate<T>, block: ReceiverTransformer<T
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    if (predicate(this)) {
-        return block(this)
+    if (this.predicate()) {
+        return this.block()
     }
     return this
 }
