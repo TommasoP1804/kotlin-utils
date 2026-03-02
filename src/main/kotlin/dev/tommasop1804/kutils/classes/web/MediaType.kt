@@ -66,19 +66,6 @@ data class MediaType(
     override val length get() = toString().length
 
     /**
-     * Secondary constructor for creating a `MediaType` instance.
-     *
-     * This constructor allows the creation of a `MediaType` object by specifying a MIME type as a string
-     * and an optional map of parameters. The provided MIME type string is parsed into its components
-     * (type and subtype), which are then used to construct the `MediaType` instance.
-     *
-     * @param mimeType The MIME type string (e.g., "application/json").
-     * @param parameters A map of parameters to be associated with the `MediaType` instance.
-     * @since 2.0.0
-     */
-    @JvmName("MediaTypeConstructorStringAsMimeType")
-    constructor(mimeType: String, parameters: StringMap = emptyMap()) : this(MimeType(mimeType), parameters)
-    /**
      * Constructs a new MediaType instance using the provided type, subtype, and optional parameters.
      *
      * @param type The primary type of the media type (e.g., "application", "text").
