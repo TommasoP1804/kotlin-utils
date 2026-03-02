@@ -76,6 +76,7 @@ data class MediaType(
      * @param parameters A map of parameters to be associated with the `MediaType` instance.
      * @since 2.0.0
      */
+    @JvmName("MediaTypeConstructorStringAsMimeType")
     constructor(mimeType: String, parameters: StringMap = emptyMap()) : this(MimeType(mimeType), parameters)
     /**
      * Constructs a new MediaType instance using the provided type, subtype, and optional parameters.
