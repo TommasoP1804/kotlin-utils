@@ -502,4 +502,41 @@ data class MediaType(
      * @since 2.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = this.substring(startIndex, endIndex)
+
+    /**
+     * Compares this MediaType instance with another object for equality.
+     *
+     * Two MediaType instances are considered equal if:
+     * - They reference the same object in memory, or
+     * - They have the same MIME type and parameters.
+     *
+     * @param other The object to compare with this MediaType instance.
+     * @return `true` if the objects are equal, `false` otherwise.
+     * @since 2.0.0
+     */
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is MediaType) return false
+        if (mimeType != other.mimeType) return false
+        if (parameters != other.parameters) return false
+        return true
+    }
+
+    /**
+     * Computes the hash code for this MediaType instance.
+     *
+     * The hash code is calculated based on the `mimeType`, `parameters`, `type`, `subtype`, `charset`, and `length` properties.
+     * It ensures that equal instances of MediaType generate the same hash code, conforming to the contract of `hashCode` in Kotlin.
+     *
+     * @return The computed hash code as an integer.
+     */
+    override fun hashCode(): Int {
+        var result = mimeType.hashCode()
+        result = 31 * result + parameters.hashCode()
+        result = 31 * result + length
+        result = 31 * result + type.hashCode()
+        result = 31 * result + subtype.hashCode()
+        result = 31 * result + (charset?.hashCode() ?: 0)
+        return result
+    }
 }
