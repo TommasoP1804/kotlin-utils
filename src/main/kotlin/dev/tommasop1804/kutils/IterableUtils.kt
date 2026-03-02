@@ -17,16 +17,13 @@ import dev.tommasop1804.kutils.exceptions.TooManyElementsException
 import dev.tommasop1804.kutils.exceptions.TooManyResultsException
 import java.util.*
 import java.util.stream.Collector
-import kotlin.collections.sortedByDescending
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.collections.groupBy as kGroupBy
 import kotlin.collections.map as kMap
 import kotlin.collections.sortBy as kSortBy
 import kotlin.collections.sortByDescending as kSortByDescending
 import kotlin.collections.sortedBy as kSortedBy
-import kotlin.collections.sortedByDescending as kSortedByDescending
 
 /**
  * Generates a map that represents the cardinality (frequency) of elements in the given iterable.
@@ -39,7 +36,7 @@ import kotlin.collections.sortedByDescending as kSortedByDescending
  * @return a map where keys are the elements from the iterable and values are their respective frequencies.
  * @since 1.0.0
  */
-val <E> Iterable<E>?.cardinalityMap: Map<E, Int>
+val <E> Iterable<E>?.cardinalityMap: CountMap<E>
     get() {
         val count = mutableMapOf<E, Int>()
         for (element in this ?: emptyList()) {
@@ -338,7 +335,7 @@ infix fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier) =
  * @since 1.0.0
  */
 infix fun <E> Iterable<E>.onlyElement(predicate: Predicate<E>) = toList()
-    .requireOrThrow({ NoSuchElementException() }, { isNotEmpty() })
+    .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter(predicate).run {
         if (size == 1) first()
         else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
@@ -702,9 +699,9 @@ operator fun <E> List<E>.invoke(circularIndex: Int): E {
  * @param filter the predicate used to test each element in the iterable. Only elements that satisfy the predicate will be included in the resulting collection.
  * @since 1.0.0
  */
-inline operator fun <E> Iterable<E>.invoke(filter: ReceiverPredicate<E>): List<E> {
+inline operator fun <E> Iterable<E>.invoke(filter: Predicate<E>): List<E> {
     val destination = ArrayList<E>()
-    for (element in this) if (element.filter()) destination.add(element)
+    for (element in this) if (filter(element)) destination.add(element)
     return destination
 }
 
@@ -716,8 +713,8 @@ inline operator fun <E> Iterable<E>.invoke(filter: ReceiverPredicate<E>): List<E
  * @return The first element that satisfies the predicate.
  * @since 1.0.0
  */
-inline operator fun <E> Iterable<E>.get(find: ReceiverPredicate<E>): E? {
-    for (element in this) if (element.find()) return element
+inline operator fun <E> Iterable<E>.get(find: Predicate<E>): E? {
+    for (element in this) if (find(element)) return element
     return null
 }
 /**
@@ -729,7 +726,7 @@ inline operator fun <E> Iterable<E>.get(find: ReceiverPredicate<E>): E? {
  * @return The first element that satisfies the predicate.
  * @since 1.0.0
  */
-operator fun <E> Iterable<E>.get(find: ReceiverPredicate<E>, lazyException: ThrowableSupplier) = find(find) ?: throw lazyException()
+operator fun <E> Iterable<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier) = find(find) ?: throw lazyException()
 
 /**
  * Searches for the first element in the iterable that matches the specified predicate and returns it.
@@ -782,43 +779,6 @@ operator fun <E> MutableList<E>.get(range: IntProgression) = subList(range)
  */
 operator fun <E> List<E>.get(index: Int, lazyException: ThrowableSupplier = { NoSuchElementException("Index $index not present") }): E =
     getOrNull(index) ?: throw lazyException()
-
-/**
- * Sorts the elements of the list in ascending order based on the provided selector function.
- *
- * @param selector A function that maps an element of the list to a comparable value used for sorting.
- * @since 1.0.0
- */
-infix fun <E, R : Comparable<R>> MList<E>.sortBy(selector: (E) -> R) = kSortBy(selector)
-
-/**
- * Sorts the elements of the list in descending order based on the value returned by the given [selector] function.
- *
- * This function uses the specified selector to extract a comparable property from each element
- * in the list, and sorts the list in-place in descending order according to these extracted values.
- *
- * @param selector A function that maps each element of the list to a [Comparable] value, which is used for sorting.
- * @since 1.0.0
- */
-infix fun <E, R : Comparable<R>> MList<E>.sortByDescending(selector: (E) -> R) = kSortByDescending(selector)
-
-/**
- * Sorts the elements of the MList based on the natural order of the values returned by the given [selector] function.
- *
- * @param selector A function that maps each element of the list to a value of type [R], which is used for sorting. 
- * @since 1.0.0
- */
-infix fun <E, R : Comparable<R>> Iterable<E>.sortedBy(selector: (E) -> R) = kSortedBy(selector)
-
-/**
- * Returns a new list with elements sorted in descending order according to the value
- * obtained by applying the provided [selector] function to each element.
- *
- * @param selector A function that maps an element to a comparable value
- *                 used for sorting the list in descending order.
- * @since 1.0.0
- */
-infix fun <E, R : Comparable<R>> Iterable<E>.sortedByDescending(selector: (E) -> R) = kSortedByDescending(selector)
 
 /**
  * Sorts the list based on the specified sorting direction and a selector function.
@@ -1081,9 +1041,9 @@ inline infix fun <E, R> Iterable<E>.filterNull(element: Transformer<E, R>) =
  * @param E the type of elements in the iterable collection.
  * @param block the action to be performed on each element.
  * @return the original iterable collection after applying the block to each element.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <E> Iterable<E>.each(block: ReceiverConsumer<E>) = apply { for (element in this@each) element.block() }
+inline fun <E> Iterable<E>.peek(block: Consumer<E>) = apply { for (element in this) block(element) }
 /**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
@@ -1093,11 +1053,11 @@ inline infix fun <E> Iterable<E>.each(block: ReceiverConsumer<E>) = apply { for 
  * @param E the type of elements in the iterable collection.
  * @param block the action to be performed on each element.
  * @return the original iterable collection after applying the block to each element.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <E> Iterable<E>.cEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
+inline fun <E> Iterable<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
     with(LoopContext()) {
-        for (element in this@cEach) {
+        for (element in this@cForEach) {
             try {
                 block(element)
             } catch (b: Break) {
@@ -1107,19 +1067,6 @@ inline infix fun <E> Iterable<E>.cEach(block: ReceiverBiConsumer<LoopContext, E>
             }
         }
     }
-}
-/**
- * Iterates over the elements of the iterable along with their indices, applying the provided block
- * of code to each index and corresponding element.
- *
- * @param E the type of elements in the iterable.
- * @param block a lambda function that takes two parameters: the index of the current element and
- *              the element itself, and performs an operation using them.
- * @return the same iterable after applying the block to all elements.
- * @since 1.1.0
- */
-inline infix fun <E> Iterable<E>.eachIndexed(block: ReceiverBiConsumer<E, Int>) = apply {
-    for ((index, element) in withIndex()) { element.block(index) }
 }
 /**
  * Stands for `controlledEachIndexed`. You can use [continueLoop] and [breakLoop].
@@ -1132,8 +1079,9 @@ inline infix fun <E> Iterable<E>.eachIndexed(block: ReceiverBiConsumer<E, Int>) 
  * @param E the type of elements in the iterable.
  * @param block a lambda function that accepts the `LoopContext`, the index of the current element, and the current element itself.
  *              The `block` is executed for each element in the iterable.
+ * @since 2.0.0
  */
-inline infix fun <E> Iterable<E>.cEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
+inline fun <E> Iterable<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
     with(LoopContext()) {
         for ((index, element) in withIndex()) {
             try {
@@ -1158,12 +1106,12 @@ inline infix fun <E> Iterable<E>.cEachIndexed(block: ReceiverTriConsumer<LoopCon
  * `Break` to provide a custom result and terminate the iteration early.
  * @return The result enclosed in the `Break` exception if thrown during the iteration, or `null`
  * if the entire iterable is processed without interruption.
- * @since 1.1.0
+ * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline infix fun <E, R> Iterable<E>.rEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
+inline fun <E, R> Iterable<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
     with(LoopContext()) {
-        for (element in this@rEach) {
+        for (element in this@rForEach) {
             try {
                 action(element)
             } catch (b: Break) {
@@ -1185,10 +1133,10 @@ inline infix fun <E, R> Iterable<E>.rEach(action: ReceiverBiConsumer<LoopContext
  *               during iteration. Throwing a `Break` exception from this function allows for
  *               interrupting the iteration and returning a result.
  * @return The result passed within the thrown `Break` exception if caught, or `null` if the iteration completes without any `Break` being thrown.
- * @since 1.1.0
+ * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline infix fun <E, R> Iterable<E>.rEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
+inline fun <E, R> Iterable<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
     with(LoopContext()) {
         for ((index, element) in withIndex()) {
             try {
@@ -1202,77 +1150,6 @@ inline infix fun <E, R> Iterable<E>.rEachIndexed(action: ReceiverTriConsumer<Loo
     }
     return null
 }
-
-/**
- * Transforms each element in the iterable using the provided transformer and returns a new iterable
- * containing the transformed values.
- *
- * @param transformer A function or object implementing the transformation logic which converts
- * each element of type E into a result of type R.
- * @since 1.1.0
- */
-inline infix fun <E, R> Iterable<E>.thenEach(transformer: ReceiverTransformer<E, R>): List<R> {
-    val capacity = if (this is Collection<*>) this.size else 10
-    val destination = ArrayList<R>(capacity)
-    for (item in this)
-        destination.add(item.transformer())
-    return destination
-}
-/**
- * Applies the provided transformer function to each element in the iterable along with its index
- * and returns a list containing the transformed elements.
- *
- * @param transformer A function that takes an index and an element of the iterable, and returns the transformed value.
- * @since 1.1.0
- */
-inline infix fun <E, R> Iterable<E>.thenEachIndexed(transformer: ReceiverBiTransformer<E, Int, R>): List<R> {
-    val capacity = if (this is Collection<*>) this.size else 10
-    val destination = ArrayList<R>(capacity)
-    for ((index, item) in withIndex())
-        destination.add(item.transformer(index))
-    return destination
-}
-/**
- * Transforms each element in the iterable using the provided transformer and returns a new iterable
- * containing the transformed values.
- *
- * @param transformer A function or object implementing the transformation logic which converts
- * each element of type E into a result of type R.
- * @since 1.1.0
- */
-@Suppress("UNCHECKED_CAST")
-inline infix fun <E, R> Iterable<E>.thenEachNotNull(transformer: ReceiverTransformer<E, R?>): List<R & Any> {
-    val capacity = if (this is Collection<*>) this.size else 10
-    val destination = ArrayList<R>(capacity)
-    for (item in this)
-        item.transformer()?.let { destination.add(it) }
-    return destination as List<R & Any>
-}
-/**
- * Applies the provided transformation function to each element of the iterable with its index
- * and returns a list of non-null results.
- *
- * @param transformer A function that takes the index of an element and the element itself,
- * and returns a nullable transformed result. Only non-null results are included in the output list.
- * @since 1.1.0
- */
-@Suppress("UNCHECKED_CAST")
-inline infix fun <E, R> Iterable<E>.thenEachIndexedNotNull(transformer: ReceiverBiTransformer<E, Int, R?>): List<R & Any> {
-    val capacity = if (this is Collection<*>) this.size else 10
-    val destination = ArrayList<R>(capacity)
-    for ((index, item) in withIndex())
-        item.transformer(index)?.let { destination.add(it) }
-    return destination as List<R & Any>
-}
-
-/**
- * Groups elements of the iterable into a MultiMap based on the key selector function.
- *
- * @param keySelector A function that determines the key for each element in the iterable.
- * @return A MultiMap where keys are produced by the key selector and values are lists of elements corresponding to each key.
- * @since 1.0.0
- */
-inline infix fun <E, K> Iterable<E>.groupedBy(keySelector: Transformer<E, K>): MultiMap<K, E> = kGroupBy(keySelector)
 
 /**
  * Invokes the integer operator on a given collection to either take or drop a specific number of elements

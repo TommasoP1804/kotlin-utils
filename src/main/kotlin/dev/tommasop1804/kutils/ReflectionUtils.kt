@@ -178,7 +178,7 @@ inline infix fun <reified T : Any, R> T.getPropertyValue(propertyName: String) =
     T::class.memberProperties
         .find { it.name == propertyName }
         .requireNotNullOrThrow { PropertyNotFoundException(propertyName, T::class) }
-        .requireOrThrow({ PropertyNotAccessibleException(this) }) { visibility == KVisibility.PUBLIC }
+        .requireOrThrow({ PropertyNotAccessibleException(this) }) { it.visibility == KVisibility.PUBLIC }
         .get(this) as R
 
 /**

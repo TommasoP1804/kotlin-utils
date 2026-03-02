@@ -39,7 +39,6 @@ import dev.tommasop1804.kutils.minus
 import dev.tommasop1804.kutils.sentenceCase
 import dev.tommasop1804.kutils.serialize
 import dev.tommasop1804.kutils.startsWith
-import dev.tommasop1804.kutils.then
 import dev.tommasop1804.kutils.toMList
 import dev.tommasop1804.kutils.toMSet
 import dev.tommasop1804.kutils.tryOr
@@ -936,7 +935,7 @@ class YAMLNode(val rawValue: Any?) {
      * @return the LocalDate representation of the node's value.
      * @since 1.0.0
      */
-    fun asDate() = asString()?.then(::LocalDate)?.getOrThrow()
+    fun asDate() = asString()?.let(::LocalDate)?.getOrThrow()
     /**
      * Converts the current YAMLNode to an OffsetDateTime representation.
      *
@@ -947,7 +946,7 @@ class YAMLNode(val rawValue: Any?) {
      * @return an OffsetDateTime object parsed from the node's value.
      * @since 1.0.0
      */
-    fun asDateTime(): OffsetDateTime? = asString()?.then(::OffsetDateTime)?.getOrThrow()
+    fun asDateTime(): OffsetDateTime? = asString()?.let(::OffsetDateTime)?.getOrThrow()
     /**
      * Converts the current node to an [Instant] if possible.
      *
@@ -958,7 +957,7 @@ class YAMLNode(val rawValue: Any?) {
      * @return The parsed [Instant] instance representing the node's value.
      * @since 1.0.0
      */
-    fun asInstant(): Instant? = asString()?.then(::Instant)?.getOrThrow()
+    fun asInstant(): Instant? = asString()?.let(::Instant)?.getOrThrow()
 
     /**
      * Returns a string representation of the YAMLNode object.

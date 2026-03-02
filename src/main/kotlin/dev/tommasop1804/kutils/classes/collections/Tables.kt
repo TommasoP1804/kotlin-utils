@@ -944,7 +944,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         val _entries2 = entries.toMutableList()
         val alreadyTaken = mutableListOf<Cell<R, C, V?>>()
         _entries2.forEach { cell ->
-            val old: Cell<R, C, V?>? = alreadyTaken.rEach { if (it.sameKeys(cell)) breakLoop(it) }
+            val old: Cell<R, C, V?>? = alreadyTaken.rForEach { if (it.sameKeys(cell)) breakLoop(it) }
             if (old.isNotNull()) _entries.remove(old)
             alreadyTaken.add(cell)
         }
@@ -954,11 +954,11 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         )
         _entries.clear()
         _entries.addAll(sortedEntries)
-        val groupedByRow = _entries.groupedBy { it.rowKey }
-        val allColumnsKeys = _entries.groupedBy { it.columnKey }.keys
+        val groupedByRow = _entries.groupBy { it.rowKey }
+        val allColumnsKeys = _entries.groupBy { it.columnKey }.keys
         allColumnsKeys.forEach { columnKey ->
             groupedByRow.forEach { (rowKey, cells) ->
-                val isPresent: Boolean = cells.rEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
+                val isPresent: Boolean = cells.rForEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
                 if (!isPresent) _entries.add(Cell(rowKey, columnKey, null))
             }
         }
@@ -1781,7 +1781,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
         val _entries2 = entries.toMutableList()
         val alreadyTaken = mutableListOf<MCell<R, C, V?>>()
         _entries2.forEach { cell ->
-            val old: MCell<R, C, V?>? = alreadyTaken.rEach { if (it.sameKeys(cell)) breakLoop(it) }
+            val old: MCell<R, C, V?>? = alreadyTaken.rForEach { if (it.sameKeys(cell)) breakLoop(it) }
             if (old.isNotNull()) _entries.remove(old)
             alreadyTaken.add(cell)
         }
@@ -1791,11 +1791,11 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
         )
         _entries.clear()
         _entries.addAll(sortedEntries)
-        val groupedByRow = _entries.groupedBy { it.rowKey }
-        val allColumnsKeys = _entries.groupedBy { it.columnKey }.keys
+        val groupedByRow = _entries.groupBy { it.rowKey }
+        val allColumnsKeys = _entries.groupBy { it.columnKey }.keys
         allColumnsKeys.forEach { columnKey ->
             groupedByRow.forEach { (rowKey, cells) ->
-                val isPresent: Boolean = cells.rEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
+                val isPresent: Boolean = cells.rForEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
                 if (!isPresent) _entries.add(MCell(rowKey, columnKey, null))
             }
         }
@@ -1813,7 +1813,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @return an immutable table containing the same data as the input table
      * @since 1.0.0
      */
-    fun copyOf(table: MTable<R, C, V?>): Table<R, C, V?> = Table(table.cells.thenEach { toCell() })
+    fun copyOf(table: MTable<R, C, V?>): Table<R, C, V?> = Table(table.cells.map { it.toCell() })
 
     /**
      * Creates a mutable copy of the provided table.

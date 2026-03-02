@@ -80,13 +80,13 @@ operator fun <T> Int.invoke(sequence: Sequence<T>): Sequence<T> {
 /**
  * Applies the given predicate function to filter the elements of the sequence.
  *
- * This operator function allows applying a custom filtering logic encapsulated in the `ReceiverPredicate`.
+ * This operator function allows applying a custom filtering logic encapsulated in the `Predicate`.
  *
  * @param filter A predicate function that determines whether an element should be included in the resulting sequence.
  * @return A sequence containing only the elements that match the provided predicate.
  * @since 1.1.1
  */
-inline operator fun <E> Sequence<E>.invoke(crossinline filter: ReceiverPredicate<E>): Sequence<E> = filter { it.filter() }
+inline operator fun <E> Sequence<E>.invoke(crossinline filter: Predicate<E>): Sequence<E> = filter { filter(it) }
 
 /**
  * Extension operator function for `Sequence` that retrieves the first element satisfying the provided predicate.
@@ -95,7 +95,7 @@ inline operator fun <E> Sequence<E>.invoke(crossinline filter: ReceiverPredicate
  * @return The first element that matches the predicate, or `null` if no such element is found.
  * @since 1.1.1
  */
-inline operator fun <E> Sequence<E>.get(find: ReceiverPredicate<E>): E? = find { it.find() }
+inline operator fun <E> Sequence<E>.get(find: Predicate<E>): E? = find { find(it) }
 /**
  * Finds the first element in a sequence that satisfies the given predicate, or throws a provided exception if no such element is found.
  *
@@ -104,7 +104,7 @@ inline operator fun <E> Sequence<E>.get(find: ReceiverPredicate<E>): E? = find {
  * @return the first element in the sequence that satisfies the predicate.
  * @since 1.1.1
  */
-inline operator fun <E> Sequence<E>.get(find: ReceiverPredicate<E>, lazyException: ThrowableSupplier): E = find { it.find() } ?: throw lazyException()
+inline operator fun <E> Sequence<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier): E = find { find(it) } ?: throw lazyException()
 
 /**
  * Returns the first element in the sequence that matches the given [predicate] or throws an exception
@@ -216,11 +216,12 @@ fun <E> Sequence<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = fir
  * @param E the type of elements in the sequence.
  * @param block a lambda function that takes an element of the sequence as a parameter
  * and performs an operation on it.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <E> Sequence<E>.each(block: ReceiverConsumer<E>) = apply {
-    for (element in this@each) element.block()
+inline fun <E> Sequence<E>.peek(block: Consumer<E>) = apply {
+    for (element in this@peek) block(element)
 }
+
 /**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
@@ -228,11 +229,11 @@ inline infix fun <E> Sequence<E>.each(block: ReceiverConsumer<E>) = apply {
  * The block operation can control the flow using `Break` and `Continue` exceptions.
  *
  * @param block A callback function that takes a `LoopContext` and the current element of the sequence.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <E> Sequence<E>.cEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
+inline fun <E> Sequence<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
     with(LoopContext()) {
-        for (element in this@cEach) {
+        for (element in this@cForEach) {
             try {
                 block(element)
             } catch (b: Break) {
@@ -245,20 +246,6 @@ inline infix fun <E> Sequence<E>.cEach(block: ReceiverBiConsumer<LoopContext, E>
 }
 
 /**
- * Iterates through each element in the sequence along with its index and applies
- * the given block of code to them. The sequence itself remains unchanged.
- *
- * @param E the type of elements in the sequence.
- * @param block a function that takes two parameters: the index of the current element
- * and the element itself. The function is applied to each element of the sequence.
- * @since 1.1.0
- */
-inline infix fun <E> Sequence<E>.eachIndexed(block: ReceiverBiConsumer<E, Int>) = apply {
-    for ((index, element) in withIndex()) {
-        element.block(index)
-    }
-}
-/**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
  * Iterates over the elements of the sequence along with their indices and allows the execution of a block
@@ -267,9 +254,9 @@ inline infix fun <E> Sequence<E>.eachIndexed(block: ReceiverBiConsumer<E, Int>) 
  * @param E The type of elements contained in the sequence.
  * @param block A lambda function that takes three parameters: the current loop context, the index of the current
  * element, and the current element itself. Executed for each element in the sequence.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <E> Sequence<E>.cEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
+inline fun <E> Sequence<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
     with(LoopContext()) {
         for ((index, element) in withIndex()) {
             try {
@@ -291,12 +278,12 @@ inline infix fun <E> Sequence<E>.cEachIndexed(block: ReceiverTriConsumer<LoopCon
  *
  * @param action A lambda function accepting a `LoopContext` and an element of the sequence, where the action to be performed is defined.
  * @return The result carried by a `Break` instance if it is thrown during iteration, or `null` if the loop completes normally.
- * @since 1.1.0
+ * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline infix fun <E, R> Sequence<E>.rEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
+inline fun <E, R> Sequence<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
     with(LoopContext()) {
-        for (element in this@rEach) {
+        for (element in this@rForEach) {
             try {
                 action(element)
             } catch (b: Break) {
@@ -319,10 +306,10 @@ inline infix fun <E, R> Sequence<E>.rEach(action: ReceiverBiConsumer<LoopContext
  * and the element itself. The lambda may throw a `Break` exception to stop the loop and return a result,
  * or a `Continue` exception to skip to the next iteration.
  * @return The result specified in the `Break` exception if thrown, or `null` if the loop completes normally.
- * @since 1.1.0
+ * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline infix fun <E, R> Sequence<E>.rEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
+inline fun <E, R> Sequence<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
     with(LoopContext()) {
         for ((index, element) in withIndex()) {
             try {
@@ -336,45 +323,6 @@ inline infix fun <E, R> Sequence<E>.rEachIndexed(action: ReceiverTriConsumer<Loo
     }
     return null
 }
-
-/**
- * Applies the provided transformer to each element of the sequence and returns
- * a sequence containing the results of the transformation.
- *
- * @param transformer A function that transforms each element of the sequence
- *                    into a new value of type R.
- * @return A sequence containing the results of applying the transformer to
- *         each element of the original sequence.
- * @since 1.1.0
- */
-infix fun <E, R> Sequence<E>.thenEach(transformer: ReceiverTransformer<E, R>) = map { it.transformer() }
-/**
- * Maps each element of the sequence to a value produced by applying the given [transformer],
- * which takes the index of an element and the element itself as parameters.
- *
- * @param transformer A function that takes the index of the element and the element itself,
- * and returns a transformed value.
- * @since 1.1.0
- */
-infix fun <E, R> Sequence<E>.thenEachIndexed(transformer: ReceiverBiTransformer<E, Int, R>) = mapIndexed { index, e -> e.transformer(index) }
-/**
- * Applies the given transformer function to each element of the sequence and
- * returns a new sequence containing only the non-null results.
- *
- * @param transformer A function that takes an element of the sequence as input
- * and produces a nullable result. Only non-null results are included in the resulting sequence.
- * @since 1.1.0
- */
-infix fun <E, R> Sequence<E>.thenEachNotNull(transformer: ReceiverTransformer<E, R?>) = mapNotNull { it.transformer() }
-/**
- * Applies a given transformation function that operates on the index and element of the sequence to each element of the sequence.
- * Filters out any `null` results from the transformation, returning a new sequence of non-null transformed values.
- *
- * @param transformer A function that takes the index of an element, the element itself, and returns a nullable transformed value.
- * @return A sequence containing only the non-null transformed results.
- * @since 1.1.0
- */
-infix fun <E, R> Sequence<E>.thenEachIndexedNotNull(transformer: ReceiverBiTransformer<E, Int, R?>) = mapIndexedNotNull { index, e -> e.transformer(index) }
 
 /**
  * Splits a sequence into chunks where each chunk ends when the given predicate evaluates to true for an element.

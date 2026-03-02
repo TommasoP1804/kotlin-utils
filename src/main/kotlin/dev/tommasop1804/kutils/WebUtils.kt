@@ -7,9 +7,34 @@ package dev.tommasop1804.kutils
 import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.time.Duration
 import dev.tommasop1804.kutils.classes.web.HttpMethod
+import dev.tommasop1804.kutils.classes.web.HttpStatus.Companion.toHttpStatus
 import java.net.URI
 import java.net.URL
 import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+
+/**
+ * Retrieves the HTTP status of the response as an `HttpStatus` instance.
+ *
+ * This property transforms the raw integer HTTP status code of the response into a more descriptive
+ * `HttpStatus` object using the `toHttpStatus` extension function.
+ *
+ * @receiver The HTTP response whose status code is to be accessed.
+ * @return An `HttpStatus` representation of the response's status code.
+ * @since 2.0.0
+ */
+val HttpResponse<Any>.status get() = statusCode().toHttpStatus()
+/**
+ * Gets the HTTP response status as an instance of `HttpStatus`.
+ *
+ * This read-only property retrieves the integer HTTP status code via `statusCode()`
+ * and converts it into its corresponding `HttpStatus` representation using `toHttpStatus()`.
+ *
+ * @receiver The `HttpResponse.ResponseInfo` instance from which the status is retrieved.
+ * @return A `HttpStatus` instance representing the HTTP response status.
+ * @since 2.0.0
+ */
+val HttpResponse.ResponseInfo.status get() = statusCode().toHttpStatus()
 
 /**
  * Adds multiple header key-value pairs to the `HttpRequest.Builder`.

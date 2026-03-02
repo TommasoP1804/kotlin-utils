@@ -181,19 +181,19 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @since 1.0.0
      */
-    val pl_expiration get() = (payload["exp"] as? Number)?.toString()?.then { if (length == 10) Instant(epochSeconds = toLong()) else Instant(epochMilliseconds = toLong()) }
+    val pl_expiration get() = (payload["exp"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [RFC 7519#4.1.5](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5)
      *
      * @since 1.0.0
      */
-    val pl_notBefore get() = (payload["nbf"] as? Number)?.toString()?.then { if (length == 10) Instant(epochSeconds = toLong()) else Instant(epochMilliseconds = toLong()) }
+    val pl_notBefore get() = (payload["nbf"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [RFC 7519#4.1.6](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6)
      *
      * @since 1.0.0
      */
-    val pl_issuedAt get() = (payload["iat"] as? Number)?.toString()?.then { if (length == 10) Instant(epochSeconds = toLong()) else Instant(epochMilliseconds = toLong()) }
+    val pl_issuedAt get() = (payload["iat"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [RFC 7519#4.1.7](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7)
      *
@@ -206,7 +206,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @since 1.0.0
      */
-    val pl_authTime get() = (payload["auth_time"] as? Number)?.toString()?.then { if (length == 10) Instant(epochSeconds = toLong()) else Instant(epochMilliseconds = toLong()) }
+    val pl_authTime get() = (payload["auth_time"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [OPENID Connect Core 1.0#2](https://openid.net/specs/openid-connect-core-1_0-final.html#IDToken)
      *
@@ -453,7 +453,7 @@ class JWT private constructor(private val value: String) : CharSequence {
                     else -> throw IllegalArgumentException("Not a valid claim format.")
                 }
             }
-            expiresTime?.then { builder.withExpiresAt(Date(System.currentTimeMillis() + toMillis().toLong())) }
+            expiresTime?.let { builder.withExpiresAt(Date(System.currentTimeMillis() + it.toMillis().toLong())) }
 
             return builder
         }

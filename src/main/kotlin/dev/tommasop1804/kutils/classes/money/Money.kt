@@ -323,9 +323,9 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
                     .uri("https://api.frankfurter.dev/v1/latest?base=${this.currency.currencyCode}&symbols=${currency.currencyCode}&amount=${amount}".toURI()())
                     .build(),
                 HttpResponse.BodyHandlers.ofString()
-            ).requireOrThrow({ CurrencyConversionException("Unable to convert money to currency ${currency.currencyCode}") }) { statusCode() in 200..299 }
+            ).requireOrThrow({ CurrencyConversionException("Unable to convert money to currency ${currency.currencyCode}") }) { it.statusCode() in 200..299 }
             .body()
-            .then(::JSON)
+            .let(::JSON)
 
         return Pair(
             Money(response["rates"]!![currency.currencyCode].asDecimal().toBigDecimal(), currency),

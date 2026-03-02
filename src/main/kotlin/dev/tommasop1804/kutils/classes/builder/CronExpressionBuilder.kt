@@ -76,11 +76,6 @@ class CronExpressionBuilder(private val type: Type) {
      * This variable stores the internal representation of the days of a month
      * and is utilized by the `Builder` class to construct the desired configuration.
      *
-     * @property daysOfMonth A string describing days of a month, supporting
-     * patterns such as specific days, ranges, and stepped intervals.
-     * The actual pattern format is defined by the `Builder` implementation.
-     *
-     * @receiver Builder context for constructing time-related configurations.
      * @since 1.0.0
      */
     private var daysOfMonth = ""
@@ -126,7 +121,7 @@ class CronExpressionBuilder(private val type: Type) {
     fun second(vararg values: Int): CronExpressionBuilder {
         if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
 
-        values.forEach { it.validate(lazyMessage = { "Invalid range of second" }) { this in 0..59 } }
+        values.forEach { value -> value.validate(lazyMessage = { "Invalid range of second" }) { it in 0..59 } }
 
         seconds = when (seconds) {
             "" -> values.joinToString(",")
@@ -155,9 +150,9 @@ class CronExpressionBuilder(private val type: Type) {
     fun second(vararg rangeAndStep: Pair<IntRange, Int>): CronExpressionBuilder {
         if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
 
-        rangeAndStep.forEach {
-            it.validate(lazyMessage = { "Invalid range of second" }) { first.first in 0..59 && first.last in 0..59 }
-            it.validate(lazyMessage = { "Invalid range of step" }) { second in 1..59 }
+        rangeAndStep.forEach { pair ->
+            pair.validate(lazyMessage = { "Invalid range of second" }) { it.first.first in 0..59 && it.first.last in 0..59 }
+            pair.validate(lazyMessage = { "Invalid range of step" }) { it.second in 1..59 }
         }
 
         seconds = when (seconds) {
@@ -180,8 +175,8 @@ class CronExpressionBuilder(private val type: Type) {
     fun second(vararg range: IntRange): CronExpressionBuilder {
         if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
 
-        range.forEach {
-            it.validate(lazyMessage = { "Invalid range of second" }) { first in 0..59 && last in 0..59 }
+        range.forEach { range ->
+            range.validate(lazyMessage = { "Invalid range of second" }) { it.first in 0..59 && it.last in 0..59 }
         }
 
         seconds = when (seconds) {
@@ -207,7 +202,7 @@ class CronExpressionBuilder(private val type: Type) {
     fun second(vararg secondAndStep: Int2): CronExpressionBuilder {
         if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
 
-        secondAndStep.forEach { it.validate(lazyMessage = { "Invalid second" }) { first in 0..59 && second in 1..59 } }
+        secondAndStep.forEach { pair -> pair.validate(lazyMessage = { "Invalid second" }) { it.first in 0..59 && it.second in 1..59 } }
 
         seconds = when (seconds) {
             "" -> secondAndStep.joinToString(",") { "${it.first}/${it.second}" }
@@ -227,7 +222,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     fun allSeconds(step: Int = 1): CronExpressionBuilder {
         if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
-        step.validate(lazyMessage = { "Invalid range of step" }) { this in 1..59 }
+        step.validate(lazyMessage = { "Invalid range of step" }) { it in 1..59 }
 
         seconds = "*" + if (step > 1) "/$step" else ""
         return this
@@ -243,7 +238,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun minute(vararg values: Int): CronExpressionBuilder {
-        values.forEach { it.validate(lazyMessage = { "Invalid range of minutes" }) { this in 0..59 } }
+        values.forEach { value -> value.validate(lazyMessage = { "Invalid range of minutes" }) { it in 0..59 } }
 
         minutes = when (minutes) {
             "" -> values.joinToString(",")
@@ -264,9 +259,9 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("minuteIntRangeStep")
     fun minute(vararg rangeAndStep: Pair<IntRange, Int>): CronExpressionBuilder {
-        rangeAndStep.forEach {
-            it.validate(lazyMessage = { "Invalid range of minutes" }) { first.first in 0..59 && first.last in 0..59 }
-            it.validate(lazyMessage = { "Invalid range of step" }) { second in 1..59 }
+        rangeAndStep.forEach { pair ->
+            pair.validate(lazyMessage = { "Invalid range of minutes" }) { it.first.first in 0..59 && it.first.last in 0..59 }
+            pair.validate(lazyMessage = { "Invalid range of step" }) { it.second in 1..59 }
         }
 
         minutes = when (minutes) {
@@ -286,8 +281,8 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun minute(vararg range: IntRange): CronExpressionBuilder {
-        range.forEach {
-            it.validate(lazyMessage = { "Invalid range of minutes" }) { first in 0..59 && last in 0..59 }
+        range.forEach { range ->
+            range.validate(lazyMessage = { "Invalid range of minutes" }) { it.first in 0..59 && it.last in 0..59 }
         }
 
         minutes = when (minutes) {
@@ -310,8 +305,8 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("minuteIntStep")
     fun minute(vararg minuteAndStep: Int2): CronExpressionBuilder {
-        minuteAndStep.forEach {
-            it.validate(lazyMessage = { "Invalid minutes" }) { first in 0..59 && second in 1..59 }
+        minuteAndStep.forEach { pair ->
+            pair.validate(lazyMessage = { "Invalid minutes" }) { it.first in 0..59 && it.second in 1..59 }
         }
 
         minutes = when (minutes) {
@@ -329,7 +324,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allMinutes(step: Int = 1): CronExpressionBuilder {
-        step.validate(lazyMessage = { "Invalid range of step" }) { this in 1..59 }
+        step.validate(lazyMessage = { "Invalid range of step" }) { it in 1..59 }
 
         minutes = "*" + if (step > 1) "/$step" else ""
         return this
@@ -345,7 +340,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun hour(vararg values: Int): CronExpressionBuilder {
-        values.forEach { it.validate(lazyMessage = { "Invalid range of hours" }) { this in 0..23 } }
+        values.forEach { value -> value.validate(lazyMessage = { "Invalid range of hours" }) { it in 0..23 } }
 
         hours = when (hours) {
             "" -> values.joinToString(",")
@@ -367,9 +362,9 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("hourIntStep")
     fun hour(vararg rangeAndStep: Pair<IntRange, Int>): CronExpressionBuilder {
-        rangeAndStep.forEach {
-            it.validate(lazyMessage = { "Invalid range of hours" }) { first.first in 0..23 && first.last in 0..23 }
-            it.validate(lazyMessage = { "Invalid range of steps" }) { second in 1..23 }
+        rangeAndStep.forEach { pair ->
+            pair.validate(lazyMessage = { "Invalid range of hours" }) { it.first.first in 0..23 && it.first.last in 0..23 }
+            pair.validate(lazyMessage = { "Invalid range of steps" }) { it.second in 1..23 }
         }
 
         hours = when (hours) {
@@ -389,8 +384,8 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun hour(vararg range: IntRange): CronExpressionBuilder {
-        range.forEach {
-            it.validate(lazyMessage = { "Invalid range of hours" }) { first in 0..23 && last in 0..23 }
+        range.forEach { range ->
+            range.validate(lazyMessage = { "Invalid range of hours" }) { it.first in 0..23 && it.last in 0..23 }
         }
 
         hours = when (hours) {
@@ -414,8 +409,8 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("hourIntRangeStep")
     fun hour(vararg hourAndStep: Int2): CronExpressionBuilder {
-        hourAndStep.forEach {
-            it.validate(lazyMessage = { "Invalid hours" }) { first in 0..23 && second in 1..23 }
+        hourAndStep.forEach { pair ->
+            pair.validate(lazyMessage = { "Invalid hours" }) { it.first in 0..23 && it.second in 1..23 }
         }
 
         hours = when (hours) {
@@ -433,7 +428,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allHours(step: Int = 1): CronExpressionBuilder {
-        step.validate(lazyMessage = { "Invalid range of step" }) { this in 1..23 }
+        step.validate(lazyMessage = { "Invalid range of step" }) { it in 1..23 }
 
         hours = "*" + if (step > 1) "/$step" else ""
         return this
@@ -450,7 +445,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun dayOfMonth(vararg values: Int): CronExpressionBuilder {
-        values.forEach { it.validate(lazyMessage = { "Invalid range of days of month" }) { this in 1..31 } }
+        values.forEach { value -> value.validate(lazyMessage = { "Invalid range of days of month" }) { it in 1..31 } }
 
         daysOfMonth = when (daysOfMonth) {
             "" -> values.joinToString(",")
@@ -470,9 +465,9 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("dayOfMonthIntRangeStep")
     fun dayOfMonth(vararg rangeAndStep: Pair<IntRange, Int>): CronExpressionBuilder {
-        rangeAndStep.forEach {
-            it.validate(lazyMessage = { "Invalid range of days of month" }) { first.first in 1..31 && first.last in 1..31 }
-            it.validate(lazyMessage = { "Invalid range of steps" }) { second in 1..31 }
+        rangeAndStep.forEach { pair ->
+            pair.validate(lazyMessage = { "Invalid range of days of month" }) { it.first.first in 1..31 && it.first.last in 1..31 }
+            pair.validate(lazyMessage = { "Invalid range of steps" }) { it.second in 1..31 }
         }
 
         daysOfMonth = when (daysOfMonth) {
@@ -492,8 +487,8 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun dayOfMonth(vararg range: IntRange): CronExpressionBuilder {
-        range.forEach {
-            it.validate(lazyMessage = { "Invalid range of days of month" }) { first in 1..31 && last in 0..31 }
+        range.forEach { range ->
+            range.validate(lazyMessage = { "Invalid range of days of month" }) { it.first in 1..31 && it.last in 0..31 }
         }
 
         daysOfMonth = when (daysOfMonth) {
@@ -518,7 +513,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("dayOfMonthIntStep")
     fun dayOfMonth(vararg dayAndStep: Int2): CronExpressionBuilder {
-        dayAndStep.forEach { it.validate(lazyMessage = { "Invalid days of month" }) { first in 1..31 && second in 1..31 } }
+        dayAndStep.forEach { pair -> pair.validate(lazyMessage = { "Invalid days of month" }) { it.first in 1..31 && it.second in 1..31 } }
 
         daysOfMonth = when (daysOfMonth) {
             "" -> dayAndStep.joinToString(",")  { "${it.first}/${it.second}" }
@@ -536,7 +531,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allDaysOfMonth(step: Int = 1): CronExpressionBuilder {
-        step.validate(lazyMessage = { "Invalid range of step" }) { this in 1..31 }
+        step.validate(lazyMessage = { "Invalid range of step" }) { it in 1..31 }
 
         daysOfMonth = "*" + if (step > 1) "/$step" else ""
         return this
@@ -632,7 +627,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("monthClosedRangeStep")
     fun month(vararg rangeAndStep: Pair<ClosedRange<Month>, Int>): CronExpressionBuilder {
-        rangeAndStep.validate(lazyMessage = { "Invalid range of month step" }) { all { it.second in 1..12 } }
+        rangeAndStep.validate(lazyMessage = { "Invalid range of month step" }) { array -> array.all { it.second in 1..12 } }
 
         months = when (months) {
             "" -> rangeAndStep.joinToString(",") { "${it.first.start.value}-${it.first.endInclusive.value}" + if (it.second > 1) "/${it.second}" else "" }
@@ -672,7 +667,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("monthStepOpenEndRange")
     fun month(vararg rangeAndStep: Pair<OpenEndRange<Month>, Int>): CronExpressionBuilder {
-        rangeAndStep.validate(lazyMessage = { "Invalid range of month step" }) { all { it.second in 1..12 } }
+        rangeAndStep.validate(lazyMessage = { "Invalid range of month step" }) { array -> array.all { it.second in 1..12 } }
 
         months = when (months) {
             "" -> rangeAndStep.joinToString(",") { "${it.first.start.value}-${it.first.endExclusive.value - 1}" + if (it.second > 1) "/${it.second}" else "" }
@@ -705,7 +700,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If any step value is outside the range of 1 to 12.
      */
     fun month(vararg monthAndStep: Pair<Month, Int>): CronExpressionBuilder {
-        monthAndStep.validate(lazyMessage = { "Invalid range of month step" }) { all { it.second in 1..12 } }
+        monthAndStep.validate(lazyMessage = { "Invalid range of month step" }) { array -> array.all { it.second in 1..12 } }
 
         months = when (months) {
             "" -> monthAndStep.joinToString(",") { "${it.first.value}/${it.second}" }
@@ -722,7 +717,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allMonths(step: Int = 1): CronExpressionBuilder {
-        step.validate(lazyMessage = { "Invalid range of month step" }) { this in 1..12 }
+        step.validate(lazyMessage = { "Invalid range of month step" }) { it in 1..12 }
 
         months = "*" + if (step > 1) "/$step" else ""
         return this
@@ -753,7 +748,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("dayOfWeekWithStepClosedRange")
     fun dayOfWeek(vararg rangeAndStep: Pair<ClosedRange<DayOfWeek>, Int>): CronExpressionBuilder {
-        rangeAndStep.validate(lazyMessage = { "Invalid range of day of week step" }) { all { it.second in 1..7 } }
+        rangeAndStep.validate(lazyMessage = { "Invalid range of day of week step" }) { array -> array.all { it.second in 1..7 } }
 
         daysOfWeek = when (daysOfWeek) {
             "" -> rangeAndStep.joinToString(",") { "${+it.first.start.name.take(3)}-${+it.first.endInclusive.name.take(3)}" + if (it.second > 1) "/${it.second}" else "" }
@@ -790,7 +785,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("dayOfWeekWithStepOpenEndRange")
     fun dayOfWeek(vararg rangeAndStep: Pair<OpenEndRange<DayOfWeek>, Int>): CronExpressionBuilder {
-        rangeAndStep.validate(lazyMessage = { "Invalid range of day of week step" }) { all { it.second in 1..7 } }
+        rangeAndStep.validate(lazyMessage = { "Invalid range of day of week step" }) { array -> array.all { it.second in 1..7 } }
 
         daysOfWeek = when (daysOfWeek) {
             "" -> rangeAndStep.joinToString(",") { "${+it.first.start.name.take(3)}-${+DayOfWeek.entries[it.first.endExclusive.ordinal - 1].name.take(3)}" + if (it.second > 1) "/${it.second}" else "" }
@@ -828,7 +823,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun dayOfWeek(vararg monthAndStep: Pair<DayOfWeek, Int>): CronExpressionBuilder {
-        monthAndStep.validate(lazyMessage = { "Invalid range of day of week step" }) { all { it.second in 1..7 } }
+        monthAndStep.validate(lazyMessage = { "Invalid range of day of week step" }) { array -> array.all { it.second in 1..7 } }
 
         daysOfWeek = when (daysOfWeek) {
             "" -> monthAndStep.joinToString(",") { "${+it.first.name.take(3)}/${it.second}" }
@@ -846,7 +841,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allDaysOfWeek(step: Int = 1): CronExpressionBuilder {
-        step.validate(lazyMessage = { "Invalid range of day of week step" }) { this in 1..7 }
+        step.validate(lazyMessage = { "Invalid range of day of week step" }) { it in 1..7 }
 
         daysOfWeek = "*" + if (step > 1) "/$step" else ""
         return this
@@ -881,7 +876,7 @@ class CronExpressionBuilder(private val type: Type) {
         type == Type.QUARTZ || type == Type.SPRING_BEFORE_5_3 || type == Type.SPRING || throw UnsupportedOperationException(
             "Nth occurence of day of week is not supported by $type"
         )
-        n.validate(lazyMessage = { "Invalid nth occurrence of day of week" }) { this in 1..5 }
+        n.validate(lazyMessage = { "Invalid nth occurrence of day of week" }) { it in 1..5 }
         daysOfWeek = "${+dayOfWeek.name.take(3)}#$n"
         return this
     }
@@ -918,7 +913,7 @@ class CronExpressionBuilder(private val type: Type) {
     fun year(vararg values: Int): CronExpressionBuilder {
         type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
 
-        values.forEach { it.validate(lazyMessage = { "Invalid range of years" }) { this in 1970..2099 } }
+        values.forEach { value -> value.validate(lazyMessage = { "Invalid range of years" }) { it in 1970..2099 } }
 
         years = when (years) {
             "" -> values.joinToString(",")
@@ -940,9 +935,9 @@ class CronExpressionBuilder(private val type: Type) {
     fun year(vararg values: Pair<IntRange, Int>): CronExpressionBuilder {
         type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
 
-        values.forEach {
-            it.validate(lazyMessage = { "Invalid range of years" }) { first.first in 1970..2099 && first.last in 1970..2099 }
-            it.second.validate(lazyMessage = { "Invalid range of steps" }) { this in 1..130 }
+        values.forEach { value ->
+            value.validate(lazyMessage = { "Invalid range of years" }) { it.first.first in 1970..2099 && it.first.last in 1970..2099 }
+            value.second.validate(lazyMessage = { "Invalid range of steps" }) { it in 1..130 }
         }
 
         years = when (years) {
@@ -966,7 +961,9 @@ class CronExpressionBuilder(private val type: Type) {
     fun year(vararg values: IntRange): CronExpressionBuilder {
         type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
 
-        values.forEach { it.validate(lazyMessage = { "Invalid range of years" }) { first in 1970..2099 && last in 1970..2099 } }
+        values.forEach { value ->
+            value.validate(lazyMessage = { "Invalid range of years" }) { it.first in 1970..2099 && it.last in 1970..2099 }
+        }
 
         years = when (years) {
             "" -> values.joinToString(",") { "${it.first}-${it.last}" }
@@ -993,7 +990,7 @@ class CronExpressionBuilder(private val type: Type) {
     fun year(vararg yearAndStep: Int2): CronExpressionBuilder {
         type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
 
-        yearAndStep.forEach { it.validate(lazyMessage = { "Invalid years" }) { first in 1970..2099 && second in 1..130 } }
+        yearAndStep.forEach { pair -> pair.validate(lazyMessage = { "Invalid years" }) { it.first in 1970..2099 && it.second in 1..130 } }
 
         years = when (years) {
             "" -> yearAndStep.joinToString(",") { "${it.first}/${it.second}" }
@@ -1019,7 +1016,7 @@ class CronExpressionBuilder(private val type: Type) {
     fun allYears(step: Int = 1): CronExpressionBuilder {
         type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
 
-        step.validate(lazyMessage = { "Invalid range of years" }) { this in 1..130 }
+        step.validate(lazyMessage = { "Invalid range of years" }) { it in 1..130 }
 
         years = "*" + if (step > 1) "/$step" else ""
         return this

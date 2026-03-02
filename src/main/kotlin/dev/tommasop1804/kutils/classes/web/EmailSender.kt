@@ -78,9 +78,9 @@ class SMTPEmailSender(
     private val session: Session
 
     init {
-        if (tokenProvider.isNull() && password.isNull()) throw RequiredParameterException("You must provide a tokenProvider and a password")
+        if (tokenProvider.isNull() && password.isNull()) throw RequiredParameterException("You must provide a tokenProvider or a password")
 
-        val props = Properties() apply {
+        val props = Properties().apply {
             put("mail.smtp.auth", "true")
             put("mail.smtp.starttls.enable", useTLS.toString())
             put("mail.smtp.host", host)

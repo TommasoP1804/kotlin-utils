@@ -1191,10 +1191,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHSLA(hue: Double, saturation: Percentage, lightness: Percentage, alpha: Percentage): Color {
-            hue.validate("ofHSLA", "hue") { this in 0.0..360.0 }
-            saturation.validate("ofHSLA", "saturation") { isNotOverflowing }
-            lightness.validate("ofHSLA", "lightness") { isNotOverflowing }
-            alpha.validate("ofHSLA", "alpha") { isNotOverflowing }
+            hue.validate("ofHSLA", "hue") { it in 0.0..360.0 }
+            saturation.validate("ofHSLA", "saturation") { it.isNotOverflowing }
+            lightness.validate("ofHSLA", "lightness") { it.isNotOverflowing }
+            alpha.validate("ofHSLA", "alpha") { it.isNotOverflowing }
             val saturation = saturation.toDouble(true)
             val lightness = lightness.toDouble(true)
             val c = (1 - abs(2 * lightness - 1)) * saturation
@@ -1240,9 +1240,9 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHSV(hue: Double, saturation: Percentage, value: Percentage): Color {
-            hue.validate("ofHSV", "hue") { this in 0.0..360.0 }
-            saturation.validate("ofHSV", "saturation") { isNotOverflowing }
-            value.validate("ofHSV", "value") { isNotOverflowing }
+            hue.validate("ofHSV", "hue") { it in 0.0..360.0 }
+            saturation.validate("ofHSV", "saturation") { it.isNotOverflowing }
+            value.validate("ofHSV", "value") { it.isNotOverflowing }
 
             val h = hue % 360
             val s = min(1.0, max(0.0, saturation.toDouble(true)))
@@ -1302,7 +1302,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofHSVA(hue: Double, saturation: Percentage, value: Percentage, alpha: Percentage): Color {
             val color = ofHSV(hue, saturation, value)
-            alpha.validate("ofHSVA", "alpha") { isNotOverflowing }
+            alpha.validate("ofHSVA", "alpha") { it.isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1329,9 +1329,9 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHSB(hue: Double, saturation: Percentage, brightness: Percentage): Color {
-            hue.validate("ofHSB", "hue") { this in 0.0..360.0 }
-            saturation.validate("ofHSB", "saturation") { isNotOverflowing }
-            brightness.validate("ofHSB", "brightness") { isNotOverflowing }
+            hue.validate("ofHSB", "hue") { it in 0.0..360.0 }
+            saturation.validate("ofHSB", "saturation") { it.isNotOverflowing }
+            brightness.validate("ofHSB", "brightness") { it.isNotOverflowing }
 
             val h = hue / 60.0
             val i = floor(h).toInt()
@@ -1377,7 +1377,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofHSBA(hue: Double, saturation: Percentage, brightness: Percentage, alpha: Percentage): Color {
             val color = ofHSB(hue, saturation, brightness)
-            alpha.validate("ofHSBA", "alpha") { isNotOverflowing }
+            alpha.validate("ofHSBA", "alpha") { it.isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1401,10 +1401,10 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofCMYK(cyan: Percentage, magenta: Percentage, yellow: Percentage, key: Percentage): Color {
-            cyan.validate("ofCMYK", "cyan") { isNotOverflowing }
-            magenta.validate("ofCMYK", "magenta") { isNotOverflowing }
-            yellow.validate("ofCMYK", "yellow") { isNotOverflowing }
-            key.validate("ofCMYK", "key") { isNotOverflowing }
+            cyan.validate("ofCMYK", "cyan") { it.isNotOverflowing }
+            magenta.validate("ofCMYK", "magenta") { it.isNotOverflowing }
+            yellow.validate("ofCMYK", "yellow") { it.isNotOverflowing }
+            key.validate("ofCMYK", "key") { it.isNotOverflowing }
 
             val c = min(1.0, max(0.0, cyan.toDouble(true)))
             val m = min(1.0, max(0.0, magenta.toDouble(true)))
@@ -1444,7 +1444,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofCMYKA(cyan: Percentage, magenta: Percentage, yellow: Percentage, key: Percentage, alpha: Percentage): Color {
             val color = ofCMYK(cyan, magenta, yellow, key)
-            alpha.validate("ofCMYKA", "alpha") { isNotOverflowing }
+            alpha.validate("ofCMYKA", "alpha") { it.isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1479,9 +1479,9 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun ofHWB(hue: Double, whiteness: Percentage, blackness: Percentage): Color {
-            hue.validate("ofHWB", "hue") { this in 0.0..360.0 }
-            whiteness.validate("ofHWB", "whiteness") { isNotOverflowing }
-            blackness.validate("ofHWB", "blackness") { isNotOverflowing }
+            hue.validate("ofHWB", "hue") { it in 0.0..360.0 }
+            whiteness.validate("ofHWB", "whiteness") { it.isNotOverflowing }
+            blackness.validate("ofHWB", "blackness") { it.isNotOverflowing }
 
             val hue = ((hue % 360) + 360) % 360 / 360.0
 
@@ -1541,7 +1541,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofHWBA(hue: Double, whiteness: Percentage, blackness: Percentage, alpha: Percentage): Color {
             val color = ofHWB(hue, whiteness, blackness)
-            alpha.validate("ofHWBA", "alpha") { isNotOverflowing }
+            alpha.validate("ofHWBA", "alpha") { it.isNotOverflowing }
             return Color(color.red, color.green, color.blue, alpha)
         }
         /**
@@ -1569,7 +1569,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         @Suppress("localVariableName")
         fun ofLAB(lightness: Percentage, a: Double, b: Double): Color {
-            lightness.validate("ofLAB", "lightness") { isNotOverflowing }
+            lightness.validate("ofLAB", "lightness") { it.isNotOverflowing }
 
             val refX = 95.047
             val refY = 100.0
@@ -1785,7 +1785,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         fun generateGradient(startColor: Color, endColor: Color, steps: Int): List<Color> {
-            steps.validate(::generateGradient, "steps") { this >= 2 }
+            steps.validate(::generateGradient, "steps") { it >= 2 }
 
             val gradient = mutableListOf<Color>()
             val startRed: Int = startColor.red

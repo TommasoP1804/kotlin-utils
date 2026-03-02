@@ -84,6 +84,16 @@ val Map<*, *>.isSingleElement: Boolean get() = onlyEntryOrNull().isNotNull()
 val Map<*, *>.isNotSingleElement: Boolean get() = !isSingleElement
 
 /**
+ * Determines the most frequent value in the map's values. If there are multiple values
+ * with the same highest frequency, one of them is returned arbitrarily. If the map is empty,
+ * the result is null.
+ *
+ * @return the most frequent value in the map's values, or null if the map is empty.
+ * @since 2.0.0
+ */
+val <V> Map<*, V>.valuesMode get() = values.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+
+/**
  * Adds the specified entry to this map. If the key already exists in the map, 
  * the value associated with the key will be updated with the value from the provided entry.
  *
@@ -555,11 +565,12 @@ operator fun <K, V> MMap<K, V>.rem(limit: Int): MList<MMap<K, V>> = chunked(limi
  * @param block a lambda function that is invoked for each entry in the map.
  *              Receives a `Map.Entry<K, V>` as its parameter.
  * @return the original map after applying the block to its entries.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <K, V> Map<K, V>.each(block: ReceiverConsumer<Map.Entry<K, V>>) = apply {
-    for (element in this@each) element.block()
+inline fun <K, V> Map<K, V>.peek(block: ReceiverConsumer<Map.Entry<K, V>>) = apply {
+    for (element in this@peek) block(element)
 }
+
 /**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
@@ -570,11 +581,11 @@ inline infix fun <K, V> Map<K, V>.each(block: ReceiverConsumer<Map.Entry<K, V>>)
  *              for each entry in the map. The lambda can utilize `Break` to terminate the loop or
  *              `Continue` to skip to the next iteration.
  * @return the original map after applying the block to each entry.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <K, V> Map<K, V>.cEach(block: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>) = apply {
+inline fun <K, V> Map<K, V>.cForEach(block: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>) = apply {
     with(LoopContext()) {
-        for (element in this@cEach) {
+        for (element in this@cForEach) {
             try {
                 block(element)
             } catch (b: Break) {
@@ -597,12 +608,12 @@ inline infix fun <K, V> Map<K, V>.cEach(block: ReceiverBiConsumer<LoopContext, M
  * @return the result of the operation of type [R], if provided as part of a `Continue` exception;
  *         otherwise, returns `null`. If the iteration is interrupted by a `Break` exception,
  *         the result provided with the `Break` is returned immediately.
- * @since 1.1.0
+ * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline infix fun <K, V, R> Map<K, V>.rEach(action: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>): R? {
+inline fun <K, V, R> Map<K, V>.rForEach(action: ReceiverBiConsumer<LoopContext, Map.Entry<K, V>>): R? {
     with(LoopContext()) {
-        for (element in this@rEach) {
+        for (element in this@rForEach) {
             try {
                 action(element)
             } catch (b: Break) {
@@ -616,53 +627,23 @@ inline infix fun <K, V, R> Map<K, V>.rEach(action: ReceiverBiConsumer<LoopContex
 }
 
 /**
- * Returns a new map with keys transformed by the specified [transformer], keeping the
- * same values as the original map.
- *
- * The [transformer] is applied to each entry of the original map, and the result is used
- * as the key in the resulting map. The transformation does not alter the values of the map.
- *
- * @param transformer A function that takes a map entry as input and returns the transformed key.
- * @since 1.1.0
- */
-inline infix fun <K, V, R> Map<K, V>.thenEachKey(transformer: ReceiverTransformer<Map.Entry<K, V>, R>): Map<R, V> {
-    val destination = LinkedHashMap<R, V>(size)
-    for (element in this) {
-        destination[element.transformer()] = element.value
-    }
-    return destination
-}
-/**
- * Transforms the values of a map using the provided transformer function, while keeping the keys unchanged.
- *
- * @param transformer a function that takes a map entry (key-value pair) and returns a transformed value.
- * @since 1.1.0
- */
-inline infix fun <K, V, R> Map<K, V>.thenEachValue(transformer: ReceiverTransformer<Map.Entry<K, V>, R>): Map<K, R> {
-    val destination = LinkedHashMap<K, R>(size)
-    for (element in this) {
-        destination[element.key] = element.transformer()
-    }
-    return destination
-}
-/**
  * Transforms the entries of a map into a new map with keys and values mapped
  * using the provided transformation function.
  *
  * @param transform A function that takes a map entry (key-value pair) from the
  * original map and returns a pair of type K2 and V2, representing the new key
  * and value respectively.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline infix fun <K1, V1, K2, V2> Map<K1, V1>.thenEach(transform: ReceiverTransformer<Map.Entry<K1, V1>, Pair<K2, V2>>) = entries.associate { it.transform() }
+inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transform: Transformer<Map.Entry<K1, V1>, Pair<K2, V2>>) = entries.associate { transform(it) }
 /**
  * Creates a new map by transforming the keys and values of the original map using the provided mapping functions.
  *
  * @param transformKeys A function that takes a map entry and transforms its key into a new key for the resulting map.
  * @param trasnformValues A function that takes a map entry and transforms its value into a new value for the resulting map.
- * @since 1.1.0
+ * @since 2.0.0
  */
-inline fun <K1, V1, K2, V2> Map<K1, V1>.thenEach(transformKeys: ReceiverTransformer<Map.Entry<K1, V1>, K2>, trasnformValues: ReceiverTransformer<Map.Entry<K1, V1>, V2>) = entries.associate { it.transformKeys() to it.trasnformValues() }
+inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transformKeys: Transformer<Map.Entry<K1, V1>, K2>, trasnformValues: Transformer<Map.Entry<K1, V1>, V2>) = entries.associate { transformKeys(it) to trasnformValues(it) }
 
 /**
  * Returns the first key-value pair of the map as a [Map.Entry] instance.
@@ -712,16 +693,6 @@ fun <K, V> Map<K, V>.firstOr(default: Supplier<Pair<K, V>>, predicate: Predicate
  * @since 1.0.0
  */
 fun <K, V> Map<K, V>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Map.Entry<K, V>>) = entries.firstOrThrow(lazyException)
-
-/**
- * Determines the most frequent value in the map's values. If there are multiple values
- * with the same highest frequency, one of them is returned arbitrarily. If the map is empty,
- * the result is null.
- *
- * @return the most frequent value in the map's values, or null if the map is empty.
- * @since 1.0.0
- */
-fun <V> Map<*, V>.valuesMode(): V? = values.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
 
 /**
  * Returns the single entry present in the map or throws an exception if the map does not
@@ -1006,7 +977,7 @@ infix fun <M : Map<K, V>, K, V> M?.ifNullOrEmpty(block: Supplier<M>): M = if (is
  *             to each entry in the map to evaluate if it matches the desired condition.
  * @since 1.0.0
  */
-inline operator fun <K, V> Map<K, V>.get(find: ReceiverPredicate<Map.Entry<K, V>>): Map.Entry<K, V>? = entries[find]
+inline operator fun <K, V> Map<K, V>.get(find: Predicate<Map.Entry<K, V>>): Map.Entry<K, V>? = entries[find]
 /**
  * Retrieves the first entry in the map that satisfies the given predicate.
  *
@@ -1019,7 +990,7 @@ inline operator fun <K, V> Map<K, V>.get(find: ReceiverPredicate<Map.Entry<K, V>
  * @param lazyException A supplier for the exception to be thrown if no element is found.
  * @since 1.0.0
  */
-inline operator fun <K, V> Map<K, V>.get(find: ReceiverPredicate<Map.Entry<K, V>>, lazyException: ThrowableSupplier) = get(find) ?: throw lazyException()
+inline operator fun <K, V> Map<K, V>.get(find: Predicate<Map.Entry<K, V>>, lazyException: ThrowableSupplier) = get(find) ?: throw lazyException()
 
 /**
  * Applies the given predicate to filter the entries of the map and returns the filtered result.
@@ -1028,10 +999,10 @@ inline operator fun <K, V> Map<K, V>.get(find: ReceiverPredicate<Map.Entry<K, V>
  *               to filter the entries of the map.
  * @since 1.0.0
  */
-inline operator fun <K, V> Map<K, V>.invoke(filter: ReceiverPredicate<Map.Entry<K, V>>): Map<K, V> {
+inline operator fun <K, V> Map<K, V>.invoke(filter: Predicate<Map.Entry<K, V>>): Map<K, V> {
     val destination = LinkedHashMap<K, V>()
     for (element in this) {
-        if (element.filter()) {
+        if (filter(element)) {
             destination[element.key] = element.value
         }
     }

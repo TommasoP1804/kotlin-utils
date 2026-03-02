@@ -1402,19 +1402,9 @@ fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * retrieves the original string.
  *
  * @param action the action to apply to each character of the string
- * @since 1.1.0
+ * @since 2.0.0
  */
-fun String.each(action: ReceiverConsumer<Char>) = toList().each(action).joinToString(String.EMPTY)
-/**
- * Iterates over each character of the string along with its index, applying the provided action to
- * each character and its corresponding index. Returns a new string that is the result of joining
- * the characters after processing.
- *
- * @param action a function that takes two parameters: the character of the string at the current
- *               index and the index itself, and performs an operation on them.
- * @since 1.1.0
- */
-fun String.eachIndexed(action: ReceiverBiConsumer<Char, Int>) = toList().eachIndexed(action).joinToString(String.EMPTY)
+fun String.peek(action: Consumer<Char>) = toList().peek(action).joinToString(String.EMPTY)
 /**
  * Stands for `controlledEach`. You can use [breakLoop] and [continueLoop].
  *
@@ -1422,9 +1412,9 @@ fun String.eachIndexed(action: ReceiverBiConsumer<Char, Int>) = toList().eachInd
  * retrieves the original string.
  *
  * @param action the action to apply to each character of the string
- * @since 1.1.0
+ * @since 2.0.0
  */
-fun String.cEach(action: ReceiverBiConsumer<LoopContext, Char>) = toList().cEach(action).joinToString(String.EMPTY)
+fun String.cForEach(action: ReceiverBiConsumer<LoopContext, Char>) = toList().cForEach(action).joinToString(String.EMPTY)
 /**
  * Stands for `controlledEach`. You can use [breakLoop] and [continueLoop].
  *
@@ -1437,9 +1427,9 @@ fun String.cEach(action: ReceiverBiConsumer<LoopContext, Char>) = toList().cEach
  * @param action a lambda function that takes a `LoopContext`, the index of the character, and the character itself.
  *               The `action` is executed for each character in the string.
  * @return a new `String` formed by joining the processed characters.
- * @since 1.1.0
+ * @since 2.0.0
  */
-fun String.cEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, Char>) = toList().cEachIndexed(action).joinToString(String.EMPTY)
+fun String.cForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, Char>) = toList().cForEachIndexed(action).joinToString(String.EMPTY)
 
 /**
  * Returns the current `CharSequence` if it is not null or empty, otherwise invokes the provided `defaultValue`

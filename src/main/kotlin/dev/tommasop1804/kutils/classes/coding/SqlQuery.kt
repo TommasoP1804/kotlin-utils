@@ -14,7 +14,6 @@ import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.minus
 import dev.tommasop1804.kutils.startsWith
 import dev.tommasop1804.kutils.startsWithIgnoreCase
-import dev.tommasop1804.kutils.then
 import dev.tommasop1804.kutils.tryOrThrow
 import dev.tommasop1804.kutils.tryTrueOrFalse
 import dev.tommasop1804.kutils.validate
@@ -334,7 +333,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
             .replace(" LEFT JOIN ", "\nLEFT JOIN ")
             .replace(" RIGHT JOIN ", "\nRIGHT JOIN ")
             .replace(" INNER JOIN ", "\nINNER JOIN ")
-            .trim() then ::SqlQuery
+            .trim()
+            .let(::SqlQuery)
 
     /**
      * Constructs a new instance of SqlQuery by converting the provided Code instance

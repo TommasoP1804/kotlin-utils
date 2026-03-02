@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Instant
 import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.isNull
-import dev.tommasop1804.kutils.then
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -45,13 +44,13 @@ import kotlin.reflect.KProperty
 @Suppress("unused")
 class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Serializable, Comparable<Duration>, TemporalAmount {
     var start: Instant?
-        get() = startTime?.then { Instant(this) }
+        get() = startTime?.let { Instant(it) }
         set(value) {
             startTime = value?.toEpochMilli()
         }
 
     var end: Instant?
-        get() = endTime?.then { Instant(this) }
+        get() = endTime?.let { Instant(it) }
         set(value) {
             endTime = value?.toEpochMilli()
         }

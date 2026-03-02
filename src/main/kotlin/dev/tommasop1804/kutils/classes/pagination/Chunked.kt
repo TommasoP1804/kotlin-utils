@@ -13,7 +13,6 @@ import jakarta.persistence.EntityManager
 import net.sf.jsqlparser.parser.feature.Feature
 import org.slf4j.Logger
 import kotlin.math.ceil
-import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.NoSuchPropertyException
 import kotlin.reflect.full.memberProperties
@@ -71,8 +70,8 @@ data class Chunked<T>(
         @OptIn(ConditionNotPreventingExceptions::class)
         @Suppress("SqlNoDataSourceInspection")
         inline fun <reified M : Any, T> generateFromQuery(
-            callable: KFunction<*>,
-            logger: Logger,
+            callableName: String? = null,
+            logger: Logger = Logger(),
             entityManager: EntityManager,
             initialQuery: SqlQueryBuilder,
             offset: Int = 0,
@@ -96,7 +95,7 @@ data class Chunked<T>(
                 "offset",
                 message = "Offset must be greater than or equal to 0",
                 causeOf = exceptionForInvalid("Offset must be greater than or equal to 0")
-            ) { this >= 0 }
+            ) { it >= 0 }
 
             val limit = limit ?: -1
             limit.validate(
@@ -104,7 +103,7 @@ data class Chunked<T>(
                 "limit",
                 message = "Limit must be greater than 0 or equal to -1",
                 causeOf = exceptionForInvalid("Limit must be greater than 0 or equal to -1")
-            ) { this > 0 || this == -1 }
+            ) { it > 0 || it == -1 }
 
             val generalFilterString = filter.find { (it / separatorSymbol).first() == generalFilterSymbol }
             val otherFilters = generalFilterString?.run { filter - this } ?: filter
@@ -115,7 +114,7 @@ data class Chunked<T>(
                 generalFilter.operator.validate(
                     lazyMessage = { "General filter operator in ${((FilterOperator byCategory STRING) + (FilterOperator byCategory EQUALITY)).map(FilterOperator::operator)}" },
                     causeOf = exceptionForInvalid("General filter operator is invalid")
-                ) { isNull() || category in arrayOf(STRING, EQUALITY) }
+                ) { it.category in arrayOf(STRING, EQUALITY) }
 
                 val getCondition = { it: String -> generalFilter.operator.sql(
                     "LOWER(CAST($it AS TEXT))",
@@ -131,12 +130,12 @@ data class Chunked<T>(
 
             // OTHERS
             val parsedFilters = FilterOption.parse(otherFilters, separatorSymbol = separatorSymbol)
-            parsedFilters.groupedBy(FilterOption::field).forEach { parsedFilter ->
+            parsedFilters.groupBy(FilterOption::field).forEach { parsedFilter ->
                 val orFilters = emptyMList<String>()
                 parsedFilter.value.forEach {
                     it.field.validate(
                         predicate = availFilteringFields::contains,
-                        callable = callable,
+                        callableName = callableName,
                         parameterName = "sorting",
                         message = "in $availFilteringFields",
                         causeOf = exceptionForInvalid("The sorting field $sorting is not supported.")
@@ -181,7 +180,7 @@ data class Chunked<T>(
                 .build()
 
             val totalElements = (limit == -1)(onTrue = {
-                entityManager then {
+                with(entityManager) {
                     SqlQueryBuilder()
                         .selectCount()
                         .from("(${query.value.replaceAfter("LIMIT", String.EMPTY) - "LIMIT".length})")
@@ -192,7 +191,7 @@ data class Chunked<T>(
 
             logger.debug("<> Query from ${ANSI.ITALIC}${this::class.simpleName}${ANSI.RESET}: {}", query.value)
 
-            val filtered = entityManager then { query.executeSelectMultipleResult<M>().map(dtoMapper) }
+            val filtered = with(entityManager) { query.executeSelectMultipleResult<M>().map(dtoMapper) }
             return Chunked(
                 totalElements = totalElements ?: filtered.size,
                 totalPages = if (limit == -1) 1 else ceil((totalElements ?: filtered.size).toDouble() / limit).toInt(),
@@ -252,7 +251,7 @@ data class Chunked<T>(
                 "offset",
                 message = "Offset must be greater than or equal to 0",
                 causeOf = exceptionForInvalid("Offset must be greater than or equal to 0")
-            ) { this >= 0 }
+            ) { it >= 0 }
 
             val limit = limit ?: -1
             limit.validate(
@@ -260,26 +259,26 @@ data class Chunked<T>(
                 "limit",
                 message = "Limit must be greater than 0 or equal to -1",
                 causeOf = exceptionForInvalid("Limit must be greater than 0 or equal to -1")
-            ) { this > 0 || this == -1 }
+            ) { it > 0 || it == -1 }
 
             var decomponedFilters = filter.map {
                 val decomponed = it / separatorSymbol
                 FilterOption(decomponed[0], decomponed[1], decomponed[2])
             }
-            val generalFilter = decomponedFilters[{ field == generalFilterSymbol }]
+            val generalFilter = decomponedFilters[{ it.field == generalFilterSymbol }]
             if (generalFilter.isNotNull()) decomponedFilters = decomponedFilters - generalFilter
 
             var baseCollection = baseCollection.toList()
             val sorting = SortOption.parse(sorting, separatorSymbol = separatorSymbol)
             sorting.all { it.field in availSortingFields } || throw exceptionForInvalid("Sorting field not supported")
             if (sorting.isNotEmpty() && baseCollection.isNotEmpty()) {
-                val property = baseCollection.first()::class.memberProperties[{ name == sorting.first().field }] ?: throw NoSuchPropertyException()
+                val property = baseCollection.first()::class.memberProperties[{ it.name == sorting.first().field }] ?: throw NoSuchPropertyException()
                 var comparator = if (sorting.first().direction == SortDirection.DESCENDING)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
                 for (sortOption in (-1)(sorting)) {
                     println(sortOption)
-                    val property = baseCollection.first()::class.memberProperties[{ name == sortOption.field }] ?: throw NoSuchPropertyException()
+                    val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.field }] ?: throw NoSuchPropertyException()
                     comparator = if (sortOption.direction == SortDirection.DESCENDING)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
                     else comparator.thenBy { property.call(it) as Comparable<*>? }
@@ -303,7 +302,7 @@ data class Chunked<T>(
                 if (flag == false) continue@element
                 for (property in properties) {
                     if (decomponedFilters.isNotEmpty() && property.name in availFilteringFields)
-                        decomponedFilters { field == property.name }.forEach {
+                        decomponedFilters { it.field == property.name }.forEach {
                             it.field in availFilteringFields || throw exceptionForInvalid("Filtering field not supported")
                             if (!filter(property.call(element).toString(), it, exceptionForInvalid)) {
                                 println("check for ${it.field} failed")

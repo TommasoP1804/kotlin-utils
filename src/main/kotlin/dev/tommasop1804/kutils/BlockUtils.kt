@@ -46,7 +46,7 @@ fun <T> compute(supplier: Supplier<T>) = supplier()
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-fun loop(action: ReceiverConsumer<LoopContext>) {
+inline fun loop(action: ReceiverConsumer<LoopContext>) {
     with(LoopContext()) {
         while (true) {
             try {
@@ -60,6 +60,8 @@ fun loop(action: ReceiverConsumer<LoopContext>) {
     }
 }
 /**
+ * Stands for `loopWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
  * Executes the given action within a loop that can be controlled using
  * `breakLoop()` or `continueLoop()` methods. The loop continues indefinitely,
  * unless interrupted by a `breakLoop()` method, which ends the loop.
@@ -71,7 +73,7 @@ fun loop(action: ReceiverConsumer<LoopContext>) {
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-fun <R> loopWithReturn(action: ReceiverConsumer<LoopContext>): R? {
+inline fun <R> rLoop(action: ReceiverConsumer<LoopContext>): R? {
     with(LoopContext()) {
         while (true) {
             try {

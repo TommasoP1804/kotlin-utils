@@ -154,7 +154,7 @@ inline fun <reified T> Any?.safeCastOrNull(): T? = runCatching { this as T }.get
  * @param transform A transformation function that will be applied if the cast fails.
  * @since 1.0.0
  */
-inline fun <T1, reified T2> T1?.safeCastOr(transform: ReceiverTransformer<T1?, T2>) = runCatching { this as T2 }.getOrNull() ?: this.transform()
+inline fun <T1, reified T2> T1?.safeCastOr(transform: Transformer<T1?, T2>) = runCatching { this as T2 }.getOrNull() ?: transform(this)
 /**
  * Attempts to cast the calling object to the specified type [T]. If the cast fails, the provided exception
  * supplied by [lazyException] is thrown.
@@ -189,7 +189,7 @@ infix fun <T> Supplier<T>.whenTrue(condition: Boolean) = if (condition) this() e
  */
 @JvmName("whenTrueGeneric")
 @ConditionNotPreventingExceptions
-inline infix fun <T> T.whenTrue(predicate: ReceiverPredicate<T>) = if (this.predicate()) this else null
+inline infix fun <T> T.whenTrue(predicate: Predicate<T>) = if (predicate(this)) this else null
 /**
  * Returns the receiver object if the specified condition is true, otherwise returns null.
  *
@@ -220,7 +220,7 @@ infix fun <T> Supplier<T>.whenFalse(condition: Boolean) = if (!condition) this()
  */
 @JvmName("whenFalseGeneric")
 @ConditionNotPreventingExceptions
-inline infix fun <T> T.whenFalse(predicate: ReceiverPredicate<T>) = if (!this.predicate()) this else null
+inline infix fun <T> T.whenFalse(predicate: Predicate<T>) = if (!predicate(this)) this else null
 /**
  * Returns the receiver object if the given condition is false; otherwise, returns null.
  *
@@ -235,37 +235,6 @@ inline infix fun <T> T.whenFalse(predicate: ReceiverPredicate<T>) = if (!this.pr
 infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
 
 /**
- * Applies the provided block of code to the receiver object and returns the receiver object.
- *
- * Allows scoped execution of the block where the receiver object is accessible as `this`.
- *
- * @param T the type of the receiver object.
- * @param block the block of code to be executed with the receiver object as its context.
- * @return the receiver object after applying the block.
- * @since 1.0.0
- */
-inline infix fun <T> T.apply(block: ReceiverConsumer<T>): T {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    block()
-    return this
-}
-
-/**
- * Runs the given block of code on the receiver object and returns its result.
- *
- * @param block A function that takes the receiver as a parameter and returns a result of type R.
- * @return The result of executing the block on the receiver.
- * @since 1.0.0
- */
-inline infix fun <T, R> T.then(block: ReceiverTransformer<T, R>): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return this.block()
-}
-/**
  * Conditionally applies a transformation to this value based on a predicate.
  *
  * If the predicate evaluates to true when applied to this value, the transformation block is executed
@@ -275,14 +244,14 @@ inline infix fun <T, R> T.then(block: ReceiverTransformer<T, R>): R {
  * @param predicate a function that takes this value as receiver and returns a Boolean indicating whether to apply the transformation
  * @param block a transformation function that takes this value as receiver and returns a transformed value of the same type
  * @return the transformed value if the predicate is true, otherwise this value unchanged
- * @since 1.0.0
+ * @since 2.0.0
  */
-fun <T> T.thenWhen(predicate: ReceiverPredicate<T>, block: ReceiverTransformer<T, T>): T {
+fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    if (this.predicate()) {
-        return this.block()
+    if (predicate(this)) {
+        return block(this)
     }
     return this
 }
@@ -292,13 +261,13 @@ fun <T> T.thenWhen(predicate: ReceiverPredicate<T>, block: ReceiverTransformer<T
  * @param predicate A predicate function to test the receiver.
  * @param block A transformation function applied to the receiver when the predicate evaluates to true.
  * @return The transformed value of type [R] if the predicate returns true, otherwise null.
- * @since 1.0.0
+ * @since 2.0.0
  */
-fun <T, R> T.thenWhenOrNull(predicate: ReceiverPredicate<T>, block: ReceiverTransformer<T, R>): R? {
+fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return if (this.predicate()) this.block() else null
+    return if (predicate(this)) block(this) else null
 }
 /**
  * Evaluates a predicate on the receiver object and, if it returns true, applies the transformation block with 
@@ -310,13 +279,13 @@ fun <T, R> T.thenWhenOrNull(predicate: ReceiverPredicate<T>, block: ReceiverTran
  * @param default a supplier function that provides the default result to be returned if the predicate evaluates to false
  * @param block a transformation function that takes the receiver object and returns the result of type R when the predicate evaluates to true
  * @return the result of applying the transformation block when the predicate evaluates to true, or the result of the default supplier when the predicate evaluates to false
- * @since 1.0.0
+ * @since 2.0.0
  */
-fun <T, R> T.thenWhenOr(predicate: ReceiverPredicate<T>, default: Supplier<R>, block: ReceiverTransformer<T, R>): R {
+fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return if (this.predicate()) this.block() else default()
+    return if (predicate(this)) block(this) else default()
 }
 /**
  * Conditionally applies a transformation to the receiver if the specified condition is true.
@@ -329,14 +298,14 @@ fun <T, R> T.thenWhenOr(predicate: ReceiverPredicate<T>, default: Supplier<R>, b
  * @param condition the boolean condition that determines whether the transformation should be applied
  * @param block the transformation function to apply to the receiver when the condition is true
  * @return the transformed receiver if condition is true, otherwise the original receiver unchanged
- * @since 1.0.0
+ * @since 2.0.0
  */
-inline fun <T> T.thenWhen(condition: Boolean, block: ReceiverTransformer<T, T>): T {
+inline fun <T> T.letWhen(condition: Boolean, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block
     }
-    return if (condition) this.block() else this
+    return if (condition) block(this) else this
 }
 /**
  * Executes the given block of code with the receiver if the specified condition is true.
@@ -345,15 +314,15 @@ inline fun <T> T.thenWhen(condition: Boolean, block: ReceiverTransformer<T, T>):
  * @param condition A Boolean value determining whether the block should be invoked.
  * @param block A transformation block that is executed with the receiver as its input.
  * @return The result of the block if the condition is true, otherwise null.
- * @since 1.0.0
+ * @since 2.0.0
  */
-inline fun <T, R> T.thenWhenOrNull(condition: Boolean, block: ReceiverTransformer<T, R>): R? {
+inline fun <T, R> T.letWhenOrNull(condition: Boolean, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block
         returnsNotNull() implies (condition)
     }
-    return if (condition) this.block() else null
+    return if (condition) block(this) else null
 }
 /**
  * Executes a transformation block on the receiver when the provided condition is true, otherwise returns 
@@ -365,16 +334,16 @@ inline fun <T, R> T.thenWhenOrNull(condition: Boolean, block: ReceiverTransforme
  * @param block A transformation function applied to the receiver when the condition is true.
  * @return The result of the transformation block if the condition is true, the result of the default supplier if the condition is false, or null in certain cases as per the contracts
  * .
- * @since 1.0.0
+ * @since 2.0.0
  */
 
-inline fun <T, R> T.thenWhenOr(condition: Boolean, default: Supplier<R>, block: ReceiverTransformer<T, R>): R {
+inline fun <T, R> T.letWhenOr(condition: Boolean, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block
         !condition holdsIn default
     }
-    return if (condition) this.block() else default()
+    return if (condition) block(this) else default()
 }
 /**
  * Conditionally transforms this value using the provided block if the predicate returns false.
@@ -382,19 +351,19 @@ inline fun <T, R> T.thenWhenOr(condition: Boolean, default: Supplier<R>, block: 
  * If the predicate evaluates to false, applies the transformation block to this value and returns the result.
  * Otherwise, returns this value unchanged.
  *
- * This is the inverse of a conditional "then" operation - the transformation is applied unless the condition is met.
+ * This is the inverse of a conditional "letWhen" operation - the transformation is applied unless the condition is met.
  *
  * @param T the type of the receiver value
  * @param predicate a function that takes this value as a receiver and returns a boolean condition
  * @param block a transformation function that takes this value as a receiver and returns a transformed value, invoked only when the predicate returns false
  * @return the transformed value if predicate returns false, or this value unchanged if predicate returns true
- * @since 1.0.0
+ * @since 2.0.0
  */
-fun <T> T.thenUnless(predicate: ReceiverPredicate<T>, block: ReceiverTransformer<T, T>): T {
+fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return if (!this.predicate()) this.block() else this
+    return if (!predicate(this)) block(this) else this
 }
 /**
  * Executes the given [block] if the result of the [predicate] is false. Returns the result of the [block]
@@ -405,13 +374,13 @@ fun <T> T.thenUnless(predicate: ReceiverPredicate<T>, block: ReceiverTransformer
  * @param block A lambda function that takes the receiver object [T] and returns a value of type [R],
  *              executed only if the predicate evaluates to false.
  * @return The result of the [block] if the [predicate] evaluates to false, or null otherwise.
- * @since 1.0.0
+ * @since 2.0.0
  */
-fun <T, R> T.thenUnlessOrNull(predicate: ReceiverPredicate<T>, block: ReceiverTransformer<T, R>): R? {
+fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return if (!this.predicate()) this.block() else null
+    return if (!predicate(this)) block(this) else null
 }
 /**
  * Executes the provided [block] if the given [predicate] evaluates to false for the receiver object.
@@ -425,13 +394,13 @@ fun <T, R> T.thenUnlessOrNull(predicate: ReceiverPredicate<T>, block: ReceiverTr
  * @param block a transformation function applied to the receiver object when the [predicate] evaluates to false.
  * @return the result of applying the [block] to the receiver object if the [predicate] evaluates to false, 
  *         or the result of the [default] supplier if the [predicate] evaluates to true. Returns `null` if neither function is executed.
- * @since 1.0.0
+ * @since 2.0.0
  */
-fun <T, R> T.thenUnlessOr(predicate: ReceiverPredicate<T>, default: Supplier<R>, block: ReceiverTransformer<T, R>): R {
+fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return if (!this.predicate()) this.block() else default()
+    return if (!predicate(this)) block(this) else default()
 }
 /**
  * Conditionally applies a transformation to the receiver unless the specified condition is true.
@@ -444,14 +413,14 @@ fun <T, R> T.thenUnlessOr(predicate: ReceiverPredicate<T>, default: Supplier<R>,
  * @param condition the boolean condition to evaluate; when false, the block is executed
  * @param block the transformation function to apply to the receiver when the condition is false
  * @return the transformed receiver if the condition is false, otherwise the original receiver unchanged
- * @since 1.0.0
+ * @since 2.0.0
  */
-inline fun <T, R> T.thenUnless(condition: Boolean, block: ReceiverTransformer<T, T>): T {
+inline fun <T, R> T.letUnless(condition: Boolean, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         !condition holdsIn block
     }
-    return if (!condition) this.block() else this
+    return if (!condition) block(this) else this
 }
 /**
  * Executes the given [block] on the receiver if the [condition] is `false`. 
@@ -464,15 +433,15 @@ inline fun <T, R> T.thenUnless(condition: Boolean, block: ReceiverTransformer<T,
  *                    If `false`, the block is executed, and its result is returned.
  * @param block A [ReceiverTransformer] lambda that operates on the receiver and produces a result of type [R].
  * @return Returns the result of the [block] if [condition] is `false`. Returns `null` otherwise.
- * @since 1.0.0
+ * @since 2.0.0
  */
-inline fun <T, R> T.thenUnlessOrNull(condition: Boolean, block: ReceiverTransformer<T, R>): R? {
+inline fun <T, R> T.letUnlessOrNull(condition: Boolean, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         !condition holdsIn block
         returnsNotNull() implies (!condition)
     }
-    return if (!condition) this.block() else null
+    return if (!condition) block(this) else null
 }
 /**
  * Executes the given [block] if the [condition] is false. If the [condition] is true, it executes the [default] 
@@ -485,15 +454,15 @@ inline fun <T, R> T.thenUnlessOrNull(condition: Boolean, block: ReceiverTransfor
  * @param default a supplier function providing the default value when the [condition] is true.
  * @param block a transformer that is applied to the receiver to calculate a result when the [condition] is false.
  * @return the result of the [block] when the [condition] is false or the result of [default] when the [condition] is true.
- * @since 1.0.0
+ * @since 2.0.0
  */
-inline fun <T, R> T.thenUnlessOr(condition: Boolean, default: Supplier<R>, block: ReceiverTransformer<T, R>): R {
+inline fun <T, R> T.letUnlessOr(condition: Boolean, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         !condition holdsIn block
         condition holdsIn default
     }
-    return if (!condition) this.block() else default()
+    return if (!condition) block(this) else default()
 }
 
 /**
@@ -1347,8 +1316,8 @@ fun Any?.toSafeString(): String = when (this) {
  * @since 1.0.0
  */
 @JvmName("receiverRequire")
-fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause))
+fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause))
     return this
 }
 /**
@@ -1365,8 +1334,8 @@ fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicat
  * @since 1.0.0
  */
 @JvmName("receiverRequire")
-fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
+fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
     return this
 }
 
@@ -1383,8 +1352,8 @@ fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMess
  * @since 1.0.0
  */
 @JvmName("receiverRequireOrThrow")
-fun <T> T.requireOrThrow(lazyException: ReceiverTransformer<T, Throwable>, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw this.lazyException()
+fun <T> T.requireOrThrow(lazyException: ReceiverTransformer<T, Throwable>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw lazyException(this)
     return this
 }
 
@@ -1506,8 +1475,8 @@ fun <T> T?.requireNotNullOrThrow(lazyException: ThrowableSupplier): T {
  * @since 1.0.0
  */
 @JvmName("receiverCheck")
-fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause))
+fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause))
     return this
 }
 /**
@@ -1524,8 +1493,8 @@ fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate:
  * @since 1.0.0
  */
 @JvmName("receiverCheck")
-fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
+fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
     return this
 }
 /**
@@ -1542,7 +1511,6 @@ fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessag
  * @since 1.0.0
  */
 @JvmName("receiverCheckNull")
-
 fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@checkNull == null)
@@ -1562,7 +1530,6 @@ fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
  * @since 1.0.0
  */
 @JvmName("receiverCheckNull")
-
 fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@checkNull == null)
@@ -1583,7 +1550,6 @@ fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyM
  * @since 1.0.0
  */
 @JvmName("receiverCheckNotNull")
-
 fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@checkNotNull != null)
@@ -1603,7 +1569,6 @@ fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T
  * @since 1.0.0
  */
 @JvmName("receiverCheckNotNull")
-
 fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@checkNotNull != null)
@@ -1628,8 +1593,8 @@ fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @since 1.0.0
  */
 @JvmName("receiverValidate")
-fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause) else causeOf.initCause(ValidationFailedException("Validation failed.", cause))
+fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause) else causeOf.initCause(ValidationFailedException("Validation failed.", cause))
     return this
 }
 /**
@@ -1648,8 +1613,8 @@ fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predica
  * @since 1.0.0
  */
 @JvmName("receiverValidate")
-fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
+fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
     return this
 }
 /**
@@ -1666,8 +1631,8 @@ fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMes
  * @throws ValidationFailedException If the predicate returns false, with the provided details.
  * @since 1.0.0
  */
-fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause) else causeOf.initCause(ValidationFailedException(property, variableName, message, cause))
+fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause) else causeOf.initCause(ValidationFailedException(property, variableName, message, cause))
     return this
 }
 /**
@@ -1684,8 +1649,8 @@ fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, messag
  * @throws ValidationFailedException if the predicate evaluates to false
  * @since 1.0.0
  */
-fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause) else causeOf.initCause(ValidationFailedException(property, variable, message, cause))
+fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause) else causeOf.initCause(ValidationFailedException(property, variable, message, cause))
     return this
 }
 /**
@@ -1702,8 +1667,8 @@ fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: St
  * @throws ValidationFailedException if the predicate returns `false` and no `causeOf` is provided.
  * @since 1.0.0
  */
-fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message, cause))
+fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message, cause))
     return this
 }
 /**
@@ -1721,8 +1686,8 @@ fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, messa
  * @throws ValidationFailedException if the predicate evaluates to `false`
  * @since 1.0.0
  */
-fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message, cause))
+fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message, cause))
     return this
 }
 /**
@@ -1738,8 +1703,8 @@ fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: Str
  * @return the receiver object if validation passes
  * @since 1.0.0
  */
-fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message, cause))
+fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message, cause))
     return this
 }
 /**
@@ -1757,8 +1722,8 @@ fun <T> T.validate(callableName: String?, parameterName: String? = null, message
  * @return The validated object if the predicate function returns true.
  * @since 1.0.0
  */
-fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message, cause))
+fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message, cause))
     return this
 }
 
@@ -1776,7 +1741,6 @@ fun <T> T.validate(callableName: String?, parameter: KParameter?, message: Strin
  * @since 1.0.0
  */
 @JvmName("receiverValidateNull")
-
 fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1800,7 +1764,6 @@ fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null): T
  * @since 1.0.0
  */
 @JvmName("receiverValidateNull")
-
 fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1949,7 +1912,6 @@ fun <T> T.validateNull(callableName: String?, parameter: KParameter?, message: S
  * @since 1.0.0
  */
 @JvmName("receiverValidateNotNull")
-
 fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -1973,7 +1935,6 @@ fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null)
  * @since 1.0.0
  */
 @JvmName("receiverValidateNotNull")
-
 fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2041,7 +2002,6 @@ fun <T> T.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, mess
  * @throws ValidationFailedException If the receiver is null, an exception with detailed context is thrown.
  * @since 1.0.0
  */
-
 fun <T> T.validateNotNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2063,7 +2023,6 @@ fun <T> T.validateNotNull(callable: KFunction<*>?, parameterName: String? = null
  * @throws ValidationFailedException if the receiver is null
  * @since 1.0.0
  */
-
 fun <T> T.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2082,7 +2041,6 @@ fun <T> T.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, messa
  * @return The receiver, if it is not null.
  * @since 1.0.0
  */
-
 fun <T> T.validateNotNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2105,7 +2063,6 @@ fun <T> T.validateNotNull(callableName: String?, parameterName: String? = null, 
  * @return The current receiver (`this`) if the validation passes.
  * @since 1.0.0
  */
-
 fun <T> T.validateNotNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2124,8 +2081,8 @@ fun <T> T.validateNotNull(callableName: String?, parameter: KParameter?, message
  * @return the original input object if validation passes.
  * @since 1.0.0
  */
-fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) MalformedInputException(message) else causeOf.initCause(MalformedInputException(message))
+fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf.initCause(MalformedInputException(message))
     return this
 }
 /**
@@ -2138,8 +2095,8 @@ fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = nul
  * @return the receiver object if validation passes.
  * @since 1.0.0
  */
-fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) MalformedInputException(`class`) else causeOf.initCause(MalformedInputException(`class`))
+fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf.initCause(MalformedInputException(`class`))
     return this
 }
 /**
@@ -2153,8 +2110,8 @@ fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = 
  * @throws MalformedInputException if the input is null or its format does not meet the expected criteria.
  * @since 1.0.0
  */
-fun <T> T.validateInputFormat(type: KType? = null, causeOf: Throwable? = null, predicate: ReceiverPredicate<T>): T {
-    if (!this.predicate()) throw if (causeOf == null) MalformedInputException(type) else causeOf.initCause(MalformedInputException(type))
+fun <T> T.validateInputFormat(type: KType? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf.initCause(MalformedInputException(type))
     return this
 }
 /**

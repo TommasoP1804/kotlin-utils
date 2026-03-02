@@ -112,7 +112,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
          */
         fun computeCheckDigit(code: String): Char {
             code.afterLast(')').validateInputFormat(EAN13::class) {
-                matches(Regex("[0-9]+")) && length == 12
+                it matches Regex("[0-9]+") && it.length == 12
             }
             val sum = code.mapIndexed { index, ch -> if (index.isEven) ch.digitToInt() else ch.digitToInt() * 3 }.sum()
             if (sum % 10 == 0) return '0'
