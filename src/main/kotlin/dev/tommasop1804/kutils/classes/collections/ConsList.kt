@@ -542,9 +542,9 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      *        the current list element, and produces the next accumulator value.
      * @return The accumulated result after applying the given operation to all elements of the list, 
      *         starting from the initial value.
-     * @since 1.0.1
+     * @since 2.0.1
      */
-    fun <R> reduce(initial: R, operation: BiTransformer<R, T, R>) = foldRecursive(this, initial, operation)
+    fun <R> fold(initial: R, operation: BiTransformer<R, T, R>) = foldRecursive(this, initial, operation)
 
     /**
      * Returns a new ConsList containing up to the first `n` elements from this list.

@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.SLASH
+import dev.tommasop1804.kutils.STAR
+import dev.tommasop1804.kutils.classes.builder.buildRegex
+import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
@@ -43,7 +47,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = MimeType.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = MimeType.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = MimeType.Companion.OldDeserializer::class)
-value class MimeType(val value: String) : CharSequence {
+value class MimeType private constructor(val value: String) : CharSequence {
 
     /**
      * A computed property that extracts and returns the substring
@@ -76,13 +80,64 @@ value class MimeType(val value: String) : CharSequence {
      */
     override val length: Int get() = value.length
 
+    /**
+     * Secondary constructor for the MimeType class that initializes the instance
+     * using a given character sequence. The provided character sequence is transformed
+     * into a lowercase string using a custom unary minus operator and then passed to the
+     * primary constructor.
+     *
+     * @param value A character sequence representing the initial value for the MimeType.
+     * @since 2.0.1
+     */
+    constructor(value: CharSequence) : this(-value.toString())
+    /**
+     * Constructs a MimeType instance using the specified `type` and `subtype`.
+     *
+     * This constructor internally combines the provided `type` and `subtype` into a single
+     * MIME type string representation using the `of` method. The resulting string is
+     * used to initialize the corresponding properties of the MimeType instance.
+     *
+     * @param type The primary type of the MIME type (e.g., "text", "application").
+     * @param subtype The subtype of the MIME type (e.g., "plain", "json").
+     * @throws IllegalArgumentException If either `type` or `subtype` is empty.
+     * @since 2.0.0
+     */
     constructor(type: String, subtype: String) : this(of(type, subtype))
 
     init {
-        validateInputFormat('/' in value) { "Invalid MIME type: $value" }
+        value.validateInputFormat(buildRegex {
+            startOfGroup()
+            literal("application").or()
+            literal("audio").or()
+            literal("example").or()
+            literal("font").or()
+            literal("haptics").or()
+            literal("image").or()
+            literal("message").or()
+            literal("model").or()
+            literal("multipart").or()
+            literal("text").or()
+            literal("video").or()
+            char(Char.STAR)
+            endOfGroup()
+            char(Char.SLASH)
+            anyChar().oneOrMore()
+        }, MimeType::class)
     }
 
     companion object {
+        /**
+         * A predefined [MimeType] instance representing the "application/cbor" media type.
+         *
+         * CBOR (Concise Binary Object Representation) is a binary data serialization format designed
+         * for small code size and small message size, making it suitable for constrained or
+         * resource-limited environments.
+         *
+         * This constant provides a convenient way to reference the standard "application/cbor"
+         * MIME type in applications that handle CBOR-encoded data.
+         *
+         * @since 2.0.0
+         */
         val APPLICATION_CBOR = MimeType("application/cbor")
         /**
          * Represents the `application/json` MIME type.

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.StringMap
 import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.mapToMap
+import dev.tommasop1804.kutils.unaryMinus
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -13,6 +15,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import java.nio.charset.Charset
 
 /**
  * Represents a media type, which consists of a MIME type and optional parameters.
@@ -122,7 +125,7 @@ data class MediaType(
          * `APPLICATION_JSON` media type to include the `charset=UTF-8` parameter.
          * @since 2.0.0
          */
-        val APPLICATION_JSON_UTF8 = APPLICATION_JSON.withCharset("UTF-8")
+        val APPLICATION_JSON_UTF8 = APPLICATION_JSON.withCharset("utf-8")
         /**
          * Represents the media type `application/problem+json` as defined by RFC 7807.
          *
@@ -446,6 +449,18 @@ data class MediaType(
      */
     infix fun withCharset(charset: String): MediaType =
         copy(parameters = parameters + ("charset" to charset))
+    /**
+     * Adds or updates the charset parameter to the MediaType instance.
+     *
+     * This method creates a new MediaType instance with the specified
+     * charset parameter included or updated.
+     *
+     * @param charset The Charset to be associated with the MediaType instance.
+     * @return A new MediaType instance with the specified charset parameter.
+     * @since 2.0.1
+     */
+    infix fun withCharset(charset: Charset): MediaType =
+        copy(parameters = parameters + ("charset" to -charset.name()))
 
     /**
      * Adds a parameter to the current MediaType instance and returns a new MediaType instance with the updated parameters.
@@ -518,7 +533,23 @@ data class MediaType(
         if (this === other) return true
         if (other !is MediaType) return false
         if (mimeType != other.mimeType) return false
-        if (parameters != other.parameters) return false
+        if (!equalsParameters(other)) return false
+        return true
+    }
+
+    /**
+     * Compares the parameters of this MediaType instance with those of another MediaType instance.
+     *
+     * The method checks for equality in the parameters of the two MediaType instances.
+     * Parameters are compared in a case-insensitive manner for both keys and values.
+     *
+     * @param other The MediaType instance whose parameters are to be compared with this instance.
+     * @return `true` if the parameters of both MediaType instances are equal, `false` otherwise.
+     * @since 2.0.1
+     */
+    fun equalsParameters(other: MediaType): Boolean {
+        if (this === other) return true
+        if (parameters.mapToMap { -it.key to -it.value } != other.parameters.mapToMap { -it.key to -it.value }) return false
         return true
     }
 
