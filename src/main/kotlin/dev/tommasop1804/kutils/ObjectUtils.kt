@@ -1352,7 +1352,7 @@ fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMess
  * @since 1.0.0
  */
 @JvmName("receiverRequireOrThrow")
-fun <T> T.requireOrThrow(lazyException: ReceiverTransformer<T, Throwable>, predicate: Predicate<T>): T {
+fun <T> T.requireOrThrow(lazyException: Transformer<T, Throwable>, predicate: Predicate<T>): T {
     if (!predicate(this)) throw lazyException(this)
     return this
 }
