@@ -1361,7 +1361,7 @@ fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier) = toList().ru
  * @since 1.0.0
  */
 fun CharSequence.onlyChar(predicate: Predicate<Char>) = toList()
-    .requireOrThrow({ NoSuchElementException() }, { isNotEmpty() })
+    .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter(predicate).run {
         if (size == 1) first()
         else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)

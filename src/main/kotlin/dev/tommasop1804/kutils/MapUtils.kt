@@ -752,7 +752,7 @@ infix fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier) = 
  * @since 1.0.0
  */
 infix fun <K, V> Map<K, V>.onlyEntry(predicate: BiPredicate<K, V>) = entries
-    .requireOrThrow({ NoSuchElementException() }, { isNotEmpty() })
+    .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter { (k, v) -> predicate(k, v) }.run {
         if (size == 1) first()
         else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
@@ -772,7 +772,7 @@ infix fun <K, V> Map<K, V>.onlyEntry(predicate: BiPredicate<K, V>) = entries
  * @since 1.0.0
  */
 infix fun <K, V> Map<K, V>.onlyEntry(predicate: Predicate<Map.Entry<K, V>>) = entries
-    .requireOrThrow({ NoSuchElementException() }, { isNotEmpty() })
+    .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter(predicate).run {
         if (size == 1) first()
         else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
