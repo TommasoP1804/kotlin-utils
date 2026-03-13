@@ -120,7 +120,7 @@ tasks.withType<KotlinCompile> {
 }
 
 mavenPublishing {
-    coordinates("dev.tommasop1804", "kotlin-utils", "2.0.2")
+    coordinates("dev.tommasop1804", "kotlin-utils", "2.1.0")
 
     pom {
         name.set("Kotlin Utils")
