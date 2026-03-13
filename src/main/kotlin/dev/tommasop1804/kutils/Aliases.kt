@@ -396,6 +396,16 @@ typealias MultiSet<E> = Set<Set<E>>
 typealias MultiMSet<E> = MSet<MSet<E>>
 
 /**
+ * A typealias representing a mutable collection of elements.
+ *
+ * This type alias simplifies the usage of `MutableCollection` and can be used interchangeably.
+ *
+ * @param E the type of elements contained in the mutable collection
+ * @since 2.1.0
+ */
+typealias MCollection<E> = MutableCollection<E>
+
+/**
  * A type alias for `Table<String, String, V>` where the row and column keys are both of type `String`.
  *
  * This alias simplifies the usage of Guava's Table interface when working with string-based row and column keys.
@@ -626,6 +636,23 @@ typealias MultiMap<K, V> = Map<K, List<V>>
 typealias MultiMMap<K, V> = MutableMap<K, MutableList<V>>
 
 /**
+ * A type alias for a map where the keys are of type String, and the values are lists of Strings.
+ *
+ * This can be used to represent mappings where a single key corresponds to multiple string values.
+ *
+ * @since 2.1.0
+ */
+typealias MultiStringMap = Map<String, List<String>>
+/**
+ * A type alias representing a mutable map where the keys are strings and
+ * the values are mutable lists of strings.
+ * This can be used to associate a string key with multiple string values stored in a list.
+ *
+ * @since 2.1.0
+ */
+typealias MultiStringMMap = MutableMap<String, MutableList<String>>
+
+/**
  * A type alias for the generic `Map<K, V>` interface, allowing for more concise and readable code.
  *
  * @param K the type of keys in the map.
@@ -634,6 +661,25 @@ typealias MultiMMap<K, V> = MutableMap<K, MutableList<V>>
  * @see MutableMap
  */
 typealias MMap<K, V> = MutableMap<K, V>
+
+/**
+ * Type alias for the `Map.Entry` interface, which represents a key-value pair within a map.
+ *
+ * @param K the type of keys maintained by the map.
+ * @param V the type of mapped values.
+ * @since 2.1.0
+ */
+typealias MapEntry<K, V> = Map.Entry<K, V>
+/**
+ * A type alias representing a mutable map entry, which is equivalent to
+ * `MutableMap.MutableEntry<K, V>`. It defines a key-value pair that can
+ * be modified within a mutable map.
+ *
+ * @param K the type of keys maintained by this map entry.
+ * @param V the type of mapped values.
+ * @since 2.1.0
+ */
+typealias MMapEntry<K, V> = MutableMap.MutableEntry<K, V>
 
 /**
  * A typealias for a sequence containing elements of any type.

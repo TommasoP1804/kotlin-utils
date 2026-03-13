@@ -24,7 +24,9 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.format.SignStyle
 import java.time.temporal.ChronoField
+import java.time.temporal.TemporalAccessor
 import java.time.zone.ZoneRules
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
@@ -197,6 +199,31 @@ val ISO_PERIOD_PATTERN: Pattern = Pattern.compile(ISO_PERIOD_REGEX.pattern)
  * @since 1.0.0
  */
 val ISO_PERIOD_VALIDATOR = { s: String -> ISO_PERIOD_REGEX.matches(s) }
+
+/**
+ * A pre-configured `DateTimeFormatter` for formatting and parsing date-time values
+ * according to the specifications of RFC 7231. This formatter is particularly used
+ * for HTTP headers where dates are expected to adhere to the format defined in the standard.
+ *
+ * The formatter:
+ * - Uses the pattern "EEE, dd MMM yyyy HH:mm:ss zzz", where:
+ *   - `EEE` corresponds to the day of the week as a short abbreviation.
+ *   - `dd` is the day of the month.
+ *   - `MMM` is the month as a short abbreviation.
+ *   - `yyyy` is the year in four digits.
+ *   - `HH:mm:ss` is the time in 24-hour format.
+ *   - `zzz` is the time zone abbreviation.
+ * - Uses `Locale.US` for consistent interpretation of textual elements (e.g., month and day abbreviations).
+ * - Is fixed to the "GMT" time zone as required by RFC 7231.
+ *
+ * This formatter ensures that date-time values adhere strictly to the necessary standard
+ * for compatibility with HTTP protocols and related implementations.
+ *
+ * @since 2.1.0
+ */
+val RFC_7231_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter
+    .ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US)
+    .withZone(ZoneId.of("GMT"))
 
 /**
  * Parses the current [CharSequence] to a [LocalDateTime] object.
@@ -1275,6 +1302,34 @@ fun Instant.toLocalDateTime() = LocalDateTime(this, TimeZoneDesignator.Z)
  * @since 1.0.0
  */
 fun Instant.toOffsetDateTime() = OffsetDateTime(this, TimeZoneDesignator.Z)
+
+/**
+ * Returns a copy of this DateTimeFormatter with the specified time zone.
+ * This formatter will use the given time zone to format or parse dates and times.
+ *
+ * @param zone the ZoneIdent representing the time zone to use
+ * @return a new DateTimeFormatter with the specified time zone applied
+ * @since 2.1.0
+ */
+fun DateTimeFormatter.withZone(zone: ZoneIdent): DateTimeFormatter = withZone(zone.zoneId)
+
+/**
+ * Formats the given [TemporalAccessor] using this [DateTimeFormatter].
+ *
+ * @param temporalAccessor the temporal object to be formatted; must not be null
+ * @return a formatted string representation of the given temporal object
+ * @since 2.1.0
+ */
+operator fun DateTimeFormatter.invoke(temporalAccessor: TemporalAccessor): String = format(temporalAccessor)
+/**
+ * Invokes the DateTimeFormatter to format the current instant into a string representation.
+ *
+ * This operator function provides a shorthand way to apply the formatter to the current instant.
+ *
+ * @return A string representation of the current instant formatted using the specified DateTimeFormatter.
+ * @since 2.1.0
+ */
+operator fun DateTimeFormatter.invoke(): String = format(Instant())
 
 /**
  * Constructs an instance of `LocalDate` with the specified year, month, and day.

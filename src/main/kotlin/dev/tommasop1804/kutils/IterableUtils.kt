@@ -85,7 +85,7 @@ val Collection<*>.isNotSingleElement get() = size != 1
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Collection<E>, E> T?.merge(vararg collections: Collection<E>): T {
+fun <T : Collection<E>, E> T?.merge(vararg collections: Collection<E>): T {
     val isList = this is List<*>
     if (isNullOrEmpty()) {
         if (collections.isEmpty()) return (if (isList) emptyList() else emptySet<E>()) as T
@@ -131,7 +131,7 @@ fun <E> MutableList<E?>.addIfAbsent(element: E?) {
  * @return True if there is at least one common element between the two iterables, false otherwise.
  * @since 1.1.0
  */
-infix fun <T> Iterable<T>.intersects(other: Iterable<T>) = (this intersect other.toSet()).isNotEmpty()
+infix fun <E> Iterable<E>.intersects(other: Iterable<E>) = (this intersect other.toSet()).isNotEmpty()
 
 /**
  * Inserts the specified separator element between each element of the list.
@@ -145,7 +145,7 @@ infix fun <T> Iterable<T>.intersects(other: Iterable<T>) = (this intersect other
  *         inserted between each element.
  * @since 1.0.0
  */
-infix fun <T> List<T>.intersperseWith(separator: T): List<T> =
+infix fun <E> List<E>.intersperseWith(separator: E): List<E> =
     flatMapIndexed { index, item ->
         if (index == lastIndex) listOf(item)
         else listOf(item, separator)
@@ -195,7 +195,7 @@ operator fun <E> Iterable<E>.contains(predicate: Predicate<E>) = any { predicate
  * @return the first element of the iterable
  * @since 1.0.0
  */
-infix fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrNull() ?: throw lazyException()
+fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrNull() ?: throw lazyException()
 /**
  * Returns the first element in the iterable that matches the given [predicate].
  * If no such element is found, throws an exception provided by [lazyException].
@@ -207,7 +207,6 @@ infix fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E = fi
  * @since 1.0.0
  */
 fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E = firstOrNull(predicate) ?: throw lazyException()
-
 /**
  * Returns the first element of the iterable if it exists, otherwise returns the value produced by the provided [default] function.
  *
@@ -216,7 +215,7 @@ fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * @return the first element of the iterable or the value produced by the [default] function
  * @since 1.0.0
  */
-infix fun <E> Iterable<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default()
+fun <E> Iterable<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default()
 /**
  * Returns the first element matching the given [predicate], or the result of the [default] function
  * if no such element is found.
@@ -228,6 +227,171 @@ infix fun <E> Iterable<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: defau
  * @since 1.0.0
  */
 fun <E> Iterable<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = firstOrNull(predicate) ?: default()
+
+/**
+ * Returns the second element of the list.
+ *
+ * @receiver The list from which the second element is to be accessed.
+ * @return The second element of the list.
+ * @throws NoSuchElementException If the list contains fewer than two elements.
+ * @since 2.1.0
+ */
+fun <E> List<E>.second() = if (size < 2) throw NoSuchElementException("List size $size doesn't allow to get second element.") else this[1]
+/**
+ * Returns the second element of a list that matches the given predicate.
+ *
+ * Filters the list based on the provided predicate and retrieves the second element
+ * from the filtered list. If there are fewer than two elements matching the predicate,
+ * this function will throw an exception or result in a runtime error depending on
+ * underlying implementations.
+ *
+ * @param predicate a condition to filter the elements in the list.
+ * @return the second element that matches the predicate.
+ * @throws NoSuchElementException if there are fewer than two elements matching the predicate.
+ * @since 2.1.0
+ */
+fun <E> List<E>.second(predicate: Predicate<E>) = filter(predicate).second()
+/**
+ * Returns the second element of the list or `null` if the list contains
+ * fewer than two elements.
+ *
+ * This function is a safe way to access the second element of a list
+ * without causing an `IndexOutOfBoundsException`. If the list is empty
+ * or contains only one element, it will return `null`.
+ *
+ * @receiver The list from which the second element is to be accessed.
+ * @return The second element of the list, or `null` if the list contains
+ * fewer than two elements.
+ * @since 2.1.0
+ */
+fun <E> List<E>.secondOrNull() = if (size < 2) null else this[1]
+/**
+ * Returns the second element in the list that matches the specified [predicate],
+ * or `null` if no such element is found or if there are fewer than two matching elements.
+ *
+ * @param predicate a function that defines the condition to filter the elements of the list.
+ * @return the second element satisfying the given predicate, or `null` if no such element exists.
+ * @since 2.1.0
+ */
+fun <E> List<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+/**
+ * Returns the second element of the list if it exists, or throws the exception provided by the
+ * given `lazyException` supplier if the list contains fewer than two elements.
+ *
+ * @param lazyException A supplier function that produces the exception to be thrown if the list has fewer than two elements.
+ * @since 2.1.0
+ */
+fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier) = if (size < 2) throw lazyException() else this[1]
+/**
+ * Returns the second element in the list that matches the given predicate or throws an exception
+ * provided by the given `lazyException` supplier if no such element exists.
+ *
+ * @param lazyException a supplier for the exception to throw if there are not enough matching elements
+ * @param predicate a condition to filter elements of the list
+ * @since 2.1.0
+ */
+fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+/**
+ * Returns the second element of the list if it exists; otherwise, returns the value supplied by the given default supplier.
+ *
+ * @param default A supplier function that provides a default value when the list does not contain at least two elements.
+ * @return The second element of the list, or the result of invoking the default supplier if the list has less than two elements.
+ * @since 2.1.0
+ */
+fun <E> List<E>.secondOr(default: Supplier<E>) = if (size < 2) default() else this[1]
+/**
+ * Returns the second element in the list that matches the given predicate, or the value provided by
+ * the default supplier if no such element exists or there are less than two elements.
+ *
+ * @param default A supplier function that provides a default value if the list does not contain
+ *                a valid second element matching the predicate.
+ * @param predicate A function that determines whether a given element in the list matches the criteria.
+ * @since 2.1.0
+ */
+fun <E> List<E>.secondOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+
+/**
+ * Returns the third element of the list.
+ *
+ * This function retrieves the element at index 2 of the list if the list
+ * contains at least three elements. If the size of the list is less than
+ * three, a [NoSuchElementException] is thrown.
+ *
+ * @throws NoSuchElementException if the list contains fewer than three elements.
+ * @return the third element of the list.
+ * @since 2.1.0
+ */
+fun <E> List<E>.third() = if (size < 3) throw NoSuchElementException("List size $size doesn't allow to get third element.") else this[2]
+/**
+ * Returns the third element in the list matching the given predicate after filtering.
+ *
+ * The method first filters the elements of the list using the provided predicate and
+ * then attempts to retrieve the third element from the filtered result. If the filtered
+ * list has less than three elements, this method will result in an exception.
+ *
+ * @param predicate A predicate to filter the elements of the list.
+ * @since 2.1.0
+ */
+fun <E> List<E>.third(predicate: Predicate<E>) = filter(predicate).second()
+/**
+ * Returns the third element of the list if the list contains at least three elements, or `null` otherwise.
+ *
+ * This function is a safe way to access the third element without risking an `IndexOutOfBoundsException`.
+ *
+ * @receiver The list from which the third element is accessed.
+ * @return The third element of the list, or `null` if the list has fewer than three elements.
+ * @since 2.1.0
+ */
+fun <E> List<E>.thirdOrNull() = if (size < 3) null else this[2]
+/**
+ * Returns the third element that matches the given [predicate], or `null` if no such element exists.
+ *
+ * The search for the matching element is performed by filtering the list based on the given [predicate].
+ *
+ * @param predicate the condition used to filter the elements of the list.
+ * @return the third element matching the [predicate], or `null` if there are less than three matching elements.
+ * @since 2.1.0
+ */
+fun <E> List<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+/**
+ * Returns the third element of the list if it exists, otherwise throws an exception provided by the given supplier.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if the list has fewer than three elements.
+ * @throws Throwable The exception provided by the supplier if the list size is less than three.
+ * @return The third element of the list.
+ * @since 2.1.0
+ */
+fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier) = if (size < 3) throw lazyException() else this[2]
+/**
+ * Returns the third element in the list that matches the given predicate or throws an exception
+ * provided by the lazyException supplier if there are less than three matching elements.
+ *
+ * @param lazyException a supplier that provides the exception to be thrown if the conditions are not met
+ * @param predicate a condition to filter elements in the list
+ * @since 2.1.0
+ */
+fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+/**
+ * Returns the third element of the list if it exists; otherwise, evaluates and returns the
+ * result of the provided default supplier.
+ *
+ * @param default A supplier function that provides a default value to return if the list
+ * has fewer than three elements.
+ * @return The third element of the list if present, or the default value provided by the
+ * supplier.
+ * @since 2.1.0
+ */
+fun <E> List<E>.thirdOr(default: Supplier<E>) = if (size < 3) default() else this[2]
+/**
+ * Returns the third element of the list that matches the given predicate if it exists; otherwise, returns the value supplied by the provided default supplier.
+ * The matching elements are determined by filtering the list based on the given predicate.
+ *
+ * @param default A supplier function that provides a default value when the list does not contain at least three elements
+ *                matching the given predicate.
+ * @param predicate A predicate function used to filter the list.
+ * @since 2.1.0
+ */
+fun <E> List<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
 
 /**
  * Splits the elements of this list into chunks where the consecutive elements in each chunk satisfy the given predicate.
@@ -406,7 +570,7 @@ fun <E> Collection<E>?.isNotNullOrEmpty(): Boolean {
  * @since 1.0.0
  */
 @OptIn(ExperimentalContracts::class)
-inline infix fun <C : Collection<E>, E> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C {
+inline fun <C : Collection<E>, E> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }

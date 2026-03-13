@@ -739,6 +739,19 @@ val String.isEmail get() = EMAIL_REGEX.matches(this)
 val String.isURL get() = matches(Regex("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"))
 
 /**
+ * Indicates whether all characters in the string belong to the ASCII character set.
+ *
+ * The ASCII character set includes characters with codes in the range `0..127`. This property
+ * evaluates to `true` if every character in the string has a Unicode code point less than 128,
+ * and `false` otherwise.
+ *
+ * @receiver The string to be checked.
+ * @return `true` if all characters are ASCII, `false` otherwise.
+ * @since 2.1.0
+ */
+val String.isAscii get() = all { it.code < 128 }
+
+/**
  * Checks if the string contains all the specified substrings.
  *
  * @param substrings The substrings to check for in the string.

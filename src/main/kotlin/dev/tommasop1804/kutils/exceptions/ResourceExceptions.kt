@@ -123,3 +123,23 @@ open class ResourceConflictException : ResourceException {
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
 }
+
+/**
+ * Exception thrown when an operation attempts to manipulate or access a resource
+ * that is currently in use.
+ *
+ * This exception provides various constructors to allow specifying details
+ * about the resource type, its identifier, or additional context via messages
+ * or causes. It inherits from the `ResourceException` base class.
+ *
+ * @since 2.1.0
+ * @author Tommaso Pastorelli
+ */
+open class ResourceInUseException : ResourceException {
+    constructor() : super()
+    constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is in use.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is in use.", internalErrorCode = internalErrorCode)
+    constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
+}
