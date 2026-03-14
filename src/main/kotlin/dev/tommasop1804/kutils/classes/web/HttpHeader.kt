@@ -638,7 +638,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
 @JsonDeserialize(using = HttpHeaders.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = HttpHeaders.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = HttpHeaders.Companion.OldDeserializer::class)
-class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<HttpHeader> by headers {
+class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
     /**
      * Represents the size of the collection based on the number of elements 
      * within the `headers` object.
@@ -682,6 +682,26 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      */
     override val entries: Set<Map.Entry<String, StringList>>
         get() = headers.map(HttpHeader::toMapEntry).toSet()
+
+    /**
+     * Checks if the collection of headers is empty.
+     *
+     * This method determines whether the headers collection contains no elements.
+     *
+     * @return `true` if the headers collection is empty, otherwise `false`.
+     * @since 2.2.1
+     */
+    override fun isEmpty() = headers.isEmpty()
+
+    /**
+     * Checks whether the collection of headers is not empty.
+     *
+     * This method verifies if there is at least one element present in the `headers` collection.
+     *
+     * @return `true` if the `headers` collection contains one or more elements, `false` otherwise.
+     * @since 2.2.1
+     */
+    fun isNotEmpty() = headers.isNotEmpty()
 
     /**
      * Constructs an `HttpHeaders` instance containing the provided HTTP headers.
@@ -889,7 +909,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Exception If the header cannot be found or if deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTyped(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()
+    inline fun <reified T> getFirstTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()
     /**
      * Retrieves and deserializes the first value associated with the specified header key,
      * casting it to the desired type. This method is considered unsafe as it does not perform
@@ -901,7 +921,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws NoSuchElementException If no header with the specified key exists.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafe(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()()
+    inline fun <reified T> getFirstTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()()
 
     /**
      * Retrieves the first value associated with the given key from the headers or returns null if no match is found.
@@ -922,7 +942,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The first value deserialized into the specified type, or null if the key is not found or deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.firstOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getFirstTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.firstOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
     /**
      * Retrieves the first value associated with the given key from the headers, deserializes it into the specified type,
      * and returns it if available. This method uses an unsafe approach to type casting and may throw runtime exceptions
@@ -933,7 +953,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The deserialized value of type T if found, or null if no value is available.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafeOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.firstOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getFirstTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.firstOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
 
     /**
      * Retrieves the first value associated with the given key from the headers or throws an exception
@@ -955,7 +975,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      *                      if the key or value is not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getFirstTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the first value associated with the specified key from the headers and deserializes it into the specified type.
      * Throws a lazily-supplied exception if the value is not found or cannot be deserialized.
@@ -967,7 +987,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Throwable The lazily-supplied exception if the key is not found or if deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getFirstTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the first value associated with the specified key from the headers. 
@@ -987,7 +1007,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @param default A supplier providing a default value of type `T` if the key is not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getFirstTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the first value associated with the specified key from the headers, attempting to cast it
      * to the provided type `T`. If no value is found, it uses the provided default supplier.
@@ -999,7 +1019,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The first value associated with the key, cast to the specified type `T`, or the default value if not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafeOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getFirstTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the second value associated with the specified key from the headers.
@@ -1023,7 +1043,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The second value associated with the key, deserialized into the specified type.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTyped(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()
+    inline fun <reified T> getSecondTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()
     /**
      * Retrieves the second value associated with the given key from the `headers`,
      * performs serialization and deserialization, and returns the result as the specified type [T].
@@ -1036,7 +1056,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws NoSuchElementException If the key is not found or there is no second value.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedUnsafe(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()()
+    inline fun <reified T> getSecondTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()()
 
     /**
      * Retrieves the second value associated with the specified key from the headers.
@@ -1060,7 +1080,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The second value associated with the key, deserialized to type [T], or null if not found or deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.secondOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getSecondTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.secondOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
     /**
      * Retrieves the second value associated with the given key from the headers,
      * attempts to deserialize it into the specified type, and returns it.
@@ -1074,7 +1094,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The second value associated with the specified key, deserialized to the type `T`,
      *         or `null` if no such value exists or deserialization fails.
      **/
-    inline fun <reified T> getSecondTypedUnsafeOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.secondOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getSecondTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.secondOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
 
     /**
      * Retrieves the second value associated with the specified key or throws an exception if not found.
@@ -1098,7 +1118,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Throwable The exception provided by the supplier if the key or second value is not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getSecondTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the second value associated with a specific header key, performs serialization and 
      * deserialization, and returns it as a typed object. If the second value is not found, an exception is thrown.
@@ -1113,7 +1133,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Throwable If the second value is not found or if deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getSecondTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the second value associated with the specified header key, or falls back to the default value if no such value exists.
@@ -1134,7 +1154,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The second value associated with the key, converted to the type `T`, or the provided default value.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getSecondTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the second value associated with a specified key from a headers collection, or a default value
      * of the specified type if the second value does not exist. The type is determined at runtime and deserialized
@@ -1146,7 +1166,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws NoSuchElementException if the key is not found in the headers collection.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedUnsafeOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getSecondTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the third value corresponding to a specified key from the headers.
@@ -1169,7 +1189,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws NoSuchElementException If the header with the provided key is not found.
      * @since 2.2.0
      */
-    inline fun <reified T> getThirdTyped(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()
+    inline fun <reified T> getThirdTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()
     /**
      * Retrieves the third value associated with the specified key, attempts to serialize and 
      * deserialize it into the provided type [T], and returns it. This method is considered unsafe 
@@ -1181,7 +1201,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      *
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafe(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()()
+    inline fun <reified T> getThirdTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()()
 
     /**
      * Retrieves the third value associated with the specified key from the headers, or null if either the key is not found
@@ -1200,7 +1220,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The third element deserialized to the specified type, or null if the element is not found or deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.thirdOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getThirdTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.thirdOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
     /**
      * Retrieves the third item from the values associated with the specified key, deserialized into the requested type `T`.
      * If the third item does not exist or deserialization fails, it returns null.
@@ -1210,7 +1230,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The third value deserialized into type `T`, or null if the third value is not present or deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafeOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.thirdOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getThirdTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.thirdOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
 
     /**
      * Retrieves the third element associated with the specified key from the headers.
@@ -1238,7 +1258,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      *                   cannot be found or deserialized.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getThirdTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the third value associated with the given key from the headers, performs type deserialization, 
      * and throws a lazily supplied exception if the key or value cannot be resolved.
@@ -1254,7 +1274,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Throwable The lazily supplied exception if the key or third value does not exist or deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getThirdTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the third value associated with the given key from the headers.
@@ -1277,7 +1297,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The third value associated with the key, deserialized to type T.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getThirdTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the third value associated with the specified key from the headers, or a default value if the key does not exist,
      * and attempts to deserialize it into the specified type. The operation is performed unsafely, and type mismatches may result in runtime exceptions.
@@ -1289,7 +1309,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws RuntimeException If the deserialization process fails due to a type mismatch or other errors.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafeOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getThirdTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the only element associated with the specified key from the headers.
@@ -1317,7 +1337,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * 
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTyped(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()
+    inline fun <reified T> getOnlyElementTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()
     /**
      * Retrieves the only element of type [T] from the specified header key. This method assumes
      * that the provided key exists, the header contains exactly one value, and it can be safely
@@ -1330,7 +1350,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * elements.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafe(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()()
+    inline fun <reified T> getOnlyElementTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()()
 
     /**
      * Retrieves the only element associated with the specified key if it exists, or returns null
@@ -1350,7 +1370,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return The single element of type [T] if found, or null if not found or multiple elements are present.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.onlyElementOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getOnlyElementTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.onlyElementOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
     /**
      * Retrieves the only element matching the specified key from headers as a deserialized object of the specified type,
      * or returns null if no matching element is found, there are multiple elements, or deserialization fails.
@@ -1363,7 +1383,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * or null otherwise.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafeOrNull(key: String): T? = headers.find { it.nameEquals(key) }?.values?.onlyElementOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
+    inline fun <reified T> getOnlyElementTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.onlyElementOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
 
     /**
      * Retrieves the only element matching the provided key from a collection. 
@@ -1386,7 +1406,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Exception Thrown with the exception supplied by lazyException if the single element retrieval fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getOnlyElementTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the only element of a given type from the headers associated with the specified key, or throws 
      * an exception if the conditions are not met.
@@ -1402,7 +1422,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @param lazyException A supplier of a throwable exception, used in case of errors during searching or deserialization.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getOnlyElementTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the only occurrence of a value associated with the specified key. If no such element
@@ -1425,7 +1445,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws IllegalStateException If there are multiple elements associated with the key.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getOnlyElementTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the only element associated with the provided key as a deserialized type-safe object.
      * 
@@ -1441,7 +1461,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @param default A supplier function to provide a default value if the key is not present or no value exists.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafeOr(key: String, noinline default: Supplier<T>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getOnlyElementTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the value associated with the specified key from the headers
@@ -1473,7 +1493,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return A list of deserialized objects of type [T], or null if no matching header is found.
      * @since 2.1.0
      */
-    inline fun <reified T> getTyped(key: String) = headers.find { it.nameEquals(key) }?.typedValues<T>()
+    inline fun <reified T> getTyped(key: String) = toList().find { it.nameEquals(key) }?.typedValues<T>()
     /**
      * Retrieves the values of an HTTP header with the specified name and deserializes
      * them to the specified type [T]. This method performs an unsafe operation where
@@ -1486,7 +1506,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @throws Throwable If the deserialization of any header value fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getTypedUnsafe(key: String) = headers.find { it.nameEquals(key) }?.unsafeTypedValues<T>()
+    inline fun <reified T> getTypedUnsafe(key: String) = toList().find { it.nameEquals(key) }?.unsafeTypedValues<T>()
 
     /**
      * Sets a header with the given key and values. If a header with the same key already exists, it is removed before adding the new header.
@@ -1551,7 +1571,7 @@ class HttpHeaders(val headers: MSet<HttpHeader>) : MultiStringMap, Collection<Ht
      * @return A multiset representation of the `headers` collection.
      * @since 2.1.0
      */
-    fun toMSet() = headers.toMSet()
+    fun toMSet() = headers
     /**
      * Converts the collection of HTTP headers into an array representation.
      *
