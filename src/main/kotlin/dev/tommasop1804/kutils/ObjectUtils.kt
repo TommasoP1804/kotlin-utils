@@ -3440,12 +3440,12 @@ inline infix fun <reified T : Enum<T>> String.like(enumClass: KClass<T>): T? = t
  *
  * @receiver The string to be converted
  * @return The enum value if successful
- * @throws EntryNotFoundException if the string does not match any enum value.
+ * @throws NoSuchEntryException if the string does not match any enum value.
  * @since 1.0.0
  */
 inline fun <reified T : Enum<T>> String.toEnumConst(): T = try {
     java.lang.Enum.valueOf(T::class.java, convertCase(to = TextCase.UPPER_SNAKE_CASE))
-} catch (e: IllegalArgumentException) { throw EntryNotFoundException(T::class, this) }
+} catch (e: IllegalArgumentException) { throw NoSuchEntryException(T::class, this) }
 
 /**
  * Wraps the given value into a singleton list.
