@@ -148,19 +148,19 @@ class MeasureUnit internal constructor(override val measure: String, override va
          */
         val knownUnitsConsts: Set<ScalarUnit>
             get() = TimeUnit.knownSymbol
-            .plus(LengthUnit.knownSymbol)
-            .plus(MassUnit.knownSymbol)
-            .plus(TemperatureUnit.knownSymbol)
-            .plus(PlaneAngleUnit.knownSymbol)
-            .plus(PressureUnit.knownSymbol)
-            .plus(EnergyUnit.knownSymbol)
-            .plus(PowerUnit.knownSymbol)
-            .plus(AreaUnit.knownSymbol)
-            .plus(VolumeUnit.knownSymbol)
-            .plus(SpeedUnit.knownSymbol)
-            .plus(AccelerationUnit.knownSymbol)
-            .plus(DensityUnit.knownSymbol)
-            .plus(DataSizeUnit.knownSymbol)
+                .plus(LengthUnit.knownSymbol)
+                .plus(MassUnit.knownSymbol)
+                .plus(TemperatureUnit.knownSymbol)
+                .plus(PlaneAngleUnit.knownSymbol)
+                .plus(PressureUnit.knownSymbol)
+                .plus(EnergyUnit.knownSymbol)
+                .plus(PowerUnit.knownSymbol)
+                .plus(AreaUnit.knownSymbol)
+                .plus(VolumeUnit.knownSymbol)
+                .plus(SpeedUnit.knownSymbol)
+                .plus(AccelerationUnit.knownSymbol)
+                .plus(DensityUnit.knownSymbol)
+                .plus(DataSizeUnit.knownSymbol)
 
         /**
          * A computed property that provides a unique set of all known `MeasureUnit` instances.

@@ -1,3 +1,5 @@
+@file:Suppress("unused", "localVariableName", "kutils_substring_as_get_intprogression", "kutils_collection_declaration", "kutils_tuple_declaration", "kutils_take_as_int_invoke")
+
 package dev.tommasop1804.kutils.classes.colors
 
 import com.fasterxml.jackson.core.JsonGenerator
@@ -41,7 +43,6 @@ import kotlin.reflect.KProperty
 @JsonDeserialize(using = Color.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Color.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Color.Companion.OldDeserializer::class)
-@Suppress("unused", "localVariableName", "kutils_substring_as_get_intprogression", "kutils_collection_declaration", "kutils_tuple_declaration", "kutils_take_as_int_invoke")
 class Color internal constructor(var red: Int, var green: Int, var blue: Int, var alpha: Percentage = FULL): Serializable, Comparable<Color> {
     /**
      * Represents the luminosity component of a color in the HSL color model.
@@ -2839,3 +2840,12 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
         HSBA
     }
 }
+
+/**
+ * Type alias for the `Color` class, allowing the use of the alternative name `Colour`.
+ *
+ * This can be used interchangeably with `Color` throughout the codebase.
+ *
+ * @since 3.0.0
+ */
+typealias Colour = Color

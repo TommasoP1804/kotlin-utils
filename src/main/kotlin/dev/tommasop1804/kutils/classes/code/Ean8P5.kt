@@ -29,22 +29,22 @@ import tools.jackson.databind.annotation.JsonSerialize
  * @property value
  * The string representation of the EAN-8P5 barcode.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @JvmInline
 @Suppress("unused", "functionName", "ClassName")
-@JsonSerialize(using = EAN8_P5.Companion.Serializer::class)
-@JsonDeserialize(using = EAN8_P5.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = EAN8_P5.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = EAN8_P5.Companion.OldDeserializer::class)
-value class EAN8_P5 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.EAN {
+@JsonSerialize(using = Ean8P5.Companion.Serializer::class)
+@JsonDeserialize(using = Ean8P5.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean8P5.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean8P5.Companion.OldDeserializer::class)
+value class Ean8P5 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean {
     /**
      * Represents the length of the `value` string in the `EAN8P5` value class.
      * This property provides the character count of the encapsulated string.
      *
      * @return The length of the `value` string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -55,12 +55,12 @@ value class EAN8_P5 private constructor(override val value: String) : CharSequen
      * before being passed to the primary constructor.
      *
      * @param value The character sequence to initialize the EAN8P5 instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim() - Char.SPACE)
 
     init {
-        validateInputFormat(value.isValidEAN8_P5())
+        validateInputFormat(value.isValidEan8P5())
     }
 
     companion object {
@@ -77,9 +77,9 @@ value class EAN8_P5 private constructor(override val value: String) : CharSequen
          *
          * @receiver The string to validate as an EAN-8 with a 5-digit add-on barcode.
          * @return `true` if the input string is a valid EAN-8 with a 5-digit add-on, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidEAN8_P5() = matches(Regex("[0-9]{8} ?[0-9]{5}")) && filter { it.isDigit() }.run { EAN8.computeCheckDigit(toString() - 6) == this[7] }
+        fun CharSequence.isValidEan8P5() = matches(Regex("[0-9]{8} ?[0-9]{5}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 6) == this[7] }
 
         /**
          * Converts the string to an instance of the EAN8P5 class.
@@ -92,33 +92,33 @@ value class EAN8_P5 private constructor(override val value: String) : CharSequen
          * @receiver The string to be converted.
          * @return A [Result] containing the EAN8P5 instance if successful,
          * or an exception otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toEAN8_P5() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { EAN8_P5(this) } }
+        fun CharSequence.toEan8P5() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { Ean8P5(this) } }
 
-        class Serializer : ValueSerializer<EAN8_P5>() {
-            override fun serialize(value: EAN8_P5, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ean8P5>() {
+            override fun serialize(value: Ean8P5, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<EAN8_P5>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = EAN8_P5(p.string)
+        class Deserializer : ValueDeserializer<Ean8P5>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Ean8P5(p.string)
         }
 
-        class OldSerializer : JsonSerializer<EAN8_P5>() {
-            override fun serialize(value: EAN8_P5, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ean8P5>() {
+            override fun serialize(value: Ean8P5, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<EAN8_P5>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): EAN8_P5 = EAN8_P5(p.text)
+        class OldDeserializer : JsonDeserializer<Ean8P5>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ean8P5 = Ean8P5(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<EAN8_P5?, String?> {
-            override fun convertToDatabaseColumn(attribute: EAN8_P5?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): EAN8_P5? = dbData?.let { EAN8_P5(it) }
+        class Converter : AttributeConverter<Ean8P5?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ean8P5?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Ean8P5? = dbData?.let { Ean8P5(it) }
         }
     }
 
@@ -128,7 +128,7 @@ value class EAN8_P5 private constructor(override val value: String) : CharSequen
      * @param index The position of the character to return. Must be in the range from `0` to `length - 1`.
      * @return The character at the specified [index].
      * @throws IndexOutOfBoundsException If the [index] is out of range.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -138,7 +138,7 @@ value class EAN8_P5 private constructor(override val value: String) : CharSequen
      * @param startIndex the start index (inclusive) of the subsequence.
      * @param endIndex the end index (exclusive) of the subsequence.
      * @return the specified subsequence from the string value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -149,7 +149,7 @@ value class EAN8_P5 private constructor(override val value: String) : CharSequen
      * serving as a plain representation of the encoded product code.
      *
      * @return the raw string value of the EAN8P5.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value.insert(8, Char.SPACE)
 }

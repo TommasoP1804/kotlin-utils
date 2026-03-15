@@ -5,18 +5,18 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.classes.code.EAN13.Companion.isValidEAN13
-import dev.tommasop1804.kutils.classes.code.EAN13_P2.Companion.isValidEAN13_P2
-import dev.tommasop1804.kutils.classes.code.EAN13_P5.Companion.isValidEAN13_P5
-import dev.tommasop1804.kutils.classes.code.EAN14.Companion.isValidEAN14
-import dev.tommasop1804.kutils.classes.code.EAN8.Companion.isValidEAN8
-import dev.tommasop1804.kutils.classes.code.EAN8_P2.Companion.isValidEAN8_P2
-import dev.tommasop1804.kutils.classes.code.EAN8_P5.Companion.isValidEAN8_P5
-import dev.tommasop1804.kutils.classes.code.ProductCode.EAN.Companion.isValidEAN
-import dev.tommasop1804.kutils.classes.code.ProductCode.EAN.Companion.toEAN
-import dev.tommasop1804.kutils.classes.code.ProductCode.UPC.Companion.toUPC
-import dev.tommasop1804.kutils.classes.code.UPC_A.Companion.isValidUPC_A
-import dev.tommasop1804.kutils.classes.code.UPC_E.Companion.isValidUPC_E
+import dev.tommasop1804.kutils.classes.code.Ean13.Companion.isValidEan13
+import dev.tommasop1804.kutils.classes.code.Ean13P2.Companion.isValidEan13P2
+import dev.tommasop1804.kutils.classes.code.Ean13P5.Companion.isValidEan13P5
+import dev.tommasop1804.kutils.classes.code.Ean14.Companion.isValidEan14
+import dev.tommasop1804.kutils.classes.code.Ean8.Companion.isValidEan8
+import dev.tommasop1804.kutils.classes.code.Ean8P2.Companion.isValidEan8P2
+import dev.tommasop1804.kutils.classes.code.Ean8P5.Companion.isValidEan8P5
+import dev.tommasop1804.kutils.classes.code.ProductCode.Ean.Companion.isValidEan
+import dev.tommasop1804.kutils.classes.code.ProductCode.Ean.Companion.toEan
+import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.toUpc
+import dev.tommasop1804.kutils.classes.code.UpcA.Companion.isValidUpcA
+import dev.tommasop1804.kutils.classes.code.UpcE.Companion.isValidUpcE
 import dev.tommasop1804.kutils.classes.geography.Country
 import dev.tommasop1804.kutils.classes.geography.Country.*
 import dev.tommasop1804.kutils.exceptions.NoMatchingFormatException
@@ -73,7 +73,7 @@ interface ProductCode {
      */
     val country: Set<Country>
         get() {
-            if (this is UPC) return setOf(UNITED_STATES, CANADA)
+            if (this is Upc) return setOf(UNITED_STATES, CANADA)
             return when {
                 3(value).toInt() in 300..379 -> setOf(FRANCE)
                 3(value).toInt() == 380 -> setOf(BULGARIA)
@@ -230,14 +230,14 @@ interface ProductCode {
      *
      * The interface provides utility methods for format validation and control digit computation.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      * @author Tommaso Pastorelli
      */
-    @JsonSerialize(using = EAN.Companion.Serializer::class)
-    @JsonDeserialize(using = EAN.Companion.Deserializer::class)
-    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = EAN.Companion.OldSerializer::class)
-    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = EAN.Companion.OldDeserializer::class)
-    interface EAN : ProductCode {
+    @JsonSerialize(using = Ean.Companion.Serializer::class)
+    @JsonDeserialize(using = Ean.Companion.Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean.Companion.OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean.Companion.OldDeserializer::class)
+    interface Ean : ProductCode {
         companion object {
             /**
              * Determines whether the string represents a valid EAN code by checking against various EAN standards.
@@ -255,15 +255,15 @@ interface ProductCode {
              *
              * @receiver The string to evaluate as a potential EAN barcode.
              * @return `true` if the string is valid according to any of the specified EAN formats, `false` otherwise.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun CharSequence.isValidEAN() = isValidEAN13() ||
-                    isValidEAN8() ||
-                    isValidEAN13_P5() ||
-                    isValidEAN13_P2() ||
-                    isValidEAN8_P2() ||
-                    isValidEAN8_P5() ||
-                    isValidEAN14()
+            fun CharSequence.isValidEan() = isValidEan13() ||
+                    isValidEan8() ||
+                    isValidEan13P5() ||
+                    isValidEan13P2() ||
+                    isValidEan8P2() ||
+                    isValidEan8P5() ||
+                    isValidEan14()
 
             /**
              * Converts the string into an `EAN` object by validating its format and determining the appropriate EAN standard.
@@ -275,60 +275,60 @@ interface ProductCode {
              * @receiver The string to be converted to an EAN object.
              * @return A `Result` containing the corresponding `EAN` object if the conversion is successful,
              *         or an exception if the string does not match a valid EAN format.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun CharSequence.toEAN(): Result<EAN> = runCatching {
-                validateInputFormat(EAN::class) { matches(Regex("[0-9 ]+")) && length in 8..19 }
+            fun CharSequence.toEan(): Result<Ean> = runCatching {
+                validateInputFormat(Ean::class) { matches(Regex("[0-9 ]+")) && length in 8..19 }
 
                 when {
-                    isValidEAN13() -> EAN13(this)
-                    isValidEAN8() -> EAN8(this)
-                    isValidEAN13_P5() -> EAN13_P5(this)
-                    isValidEAN13_P2() -> EAN13_P2(this)
-                    isValidEAN8_P2() -> EAN8_P2(this)
-                    isValidEAN8_P5() -> EAN8_P5(this)
-                    isValidEAN14() -> EAN14(this)
+                    isValidEan13() -> Ean13(this)
+                    isValidEan8() -> Ean8(this)
+                    isValidEan13P5() -> Ean13P5(this)
+                    isValidEan13P2() -> Ean13P2(this)
+                    isValidEan8P2() -> Ean8P2(this)
+                    isValidEan8P5() -> Ean8P5(this)
+                    isValidEan14() -> Ean14(this)
                     else -> throw NoMatchingFormatException("No valid EAN format found.")
                 }
             }
 
-            class Serializer : ValueSerializer<EAN>() {
-                override fun serialize(value: EAN, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+            class Serializer : ValueSerializer<Ean>() {
+                override fun serialize(value: Ean, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                     gen.writeString(value.value)
                 }
             }
 
-            class Deserializer : ValueDeserializer<EAN>() {
-                override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = p.string.toEAN()()
+            class Deserializer : ValueDeserializer<Ean>() {
+                override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = p.string.toEan()()
             }
 
-            class OldSerializer : JsonSerializer<EAN>() {
-                override fun serialize(value: EAN, gen: JsonGenerator, serializers: SerializerProvider) =
+            class OldSerializer : JsonSerializer<Ean>() {
+                override fun serialize(value: Ean, gen: JsonGenerator, serializers: SerializerProvider) =
                     gen.writeString(value.value)
             }
 
-            class OldDeserializer : JsonDeserializer<EAN>() {
-                override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): EAN = p.text.toEAN()()
+            class OldDeserializer : JsonDeserializer<Ean>() {
+                override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ean = p.text.toEan()()
             }
 
             @jakarta.persistence.Converter(autoApply = true)
-            class Converter : AttributeConverter<EAN?, String?> {
-                override fun convertToDatabaseColumn(attribute: EAN?): String? = attribute?.value
-                override fun convertToEntityAttribute(dbData: String?): EAN? = dbData?.let { it.toEAN()() }
+            class Converter : AttributeConverter<Ean?, String?> {
+                override fun convertToDatabaseColumn(attribute: Ean?): String? = attribute?.value
+                override fun convertToEntityAttribute(dbData: String?): Ean? = dbData?.let { it.toEan()() }
             }
         }
     }
     /**
      * Represents a Universal Product Code (UPC), a standardized barcode system for product identification.
      * This interface serves as a common type for all UPC-related implementations and functionality.
-     * @since 1.0.0
+     * @since 3.0.0
      * @author Tommaso Pastorelli
      */
-    @JsonSerialize(using = UPC.Companion.Serializer::class)
-    @JsonDeserialize(using = UPC.Companion.Deserializer::class)
-    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UPC.Companion.OldSerializer::class)
-    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UPC.Companion.OldDeserializer::class)
-    interface UPC : ProductCode {
+    @JsonSerialize(using = Upc.Companion.Serializer::class)
+    @JsonDeserialize(using = Upc.Companion.Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Upc.Companion.OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Upc.Companion.OldDeserializer::class)
+    interface Upc : ProductCode {
         companion object {
             /**
              * Determines whether the string is a valid UPC code, supporting both UPC-A and UPC-E formats.
@@ -338,9 +338,9 @@ interface ProductCode {
              *
              * @receiver The string to be validated as a UPC code.
              * @return `true` if the string is a valid UPC-A or UPC-E code, `false` otherwise.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun CharSequence.isValidUPC() = isValidUPC_A() || isValidUPC_E()
+            fun CharSequence.isValidUpc() = isValidUpcA() || isValidUpcE()
 
             /**
              * Converts the current string into a `UPC` instance, representing either `UPC_A` or `UPC_E` formats,
@@ -353,14 +353,14 @@ interface ProductCode {
              *
              * @receiver The string to be converted into a `UPC` instance.
              * @return A `Result` wrapping a `UPC` instance if conversion is successful, or an error if validation or format matching fails.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun CharSequence.toUPC(): Result<UPC> = runCatching {
-                validateInputFormat(UPC::class) { matches(Regex("[0-9]+")) && length in setOf(8, 12) }
+            fun CharSequence.toUpc(): Result<Upc> = runCatching {
+                validateInputFormat(Upc::class) { matches(Regex("[0-9]+")) && length in setOf(8, 12) }
 
                 when {
-                    isValidUPC_A() -> UPC_A(this)
-                    isValidUPC_E() -> UPC_E(this)
+                    isValidUpcA() -> UpcA(this)
+                    isValidUpcE() -> UpcE(this)
                     else -> throw NoMatchingFormatException("No valid UPC format found.")
                 }
             }
@@ -376,7 +376,7 @@ interface ProductCode {
              * @param code the numeric string for which the check digit should be computed. Assumes the input
              *             consists only of numeric characters.
              * @return the computed check digit as a character.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun computeCheckDigit(code: String): Char {
                 val value = code.mapIndexed { index, ch -> if (index.isEven) ch.digitToInt() * 3 else ch.digitToInt() }.sum()
@@ -384,29 +384,29 @@ interface ProductCode {
                 return (10 - (value % 10)).digitToChar()
             }
 
-            class Serializer : ValueSerializer<UPC>() {
-                override fun serialize(value: UPC, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+            class Serializer : ValueSerializer<Upc>() {
+                override fun serialize(value: Upc, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                     gen.writeString(value.value)
                 }
             }
 
-            class Deserializer : ValueDeserializer<UPC>() {
-                override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = p.string.toUPC()()
+            class Deserializer : ValueDeserializer<Upc>() {
+                override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = p.string.toUpc()()
             }
 
-            class OldSerializer : JsonSerializer<UPC>() {
-                override fun serialize(value: UPC, gen: JsonGenerator, serializers: SerializerProvider) =
+            class OldSerializer : JsonSerializer<Upc>() {
+                override fun serialize(value: Upc, gen: JsonGenerator, serializers: SerializerProvider) =
                     gen.writeString(value.value)
             }
 
-            class OldDeserializer : JsonDeserializer<UPC>() {
-                override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): UPC = p.text.toUPC()()
+            class OldDeserializer : JsonDeserializer<Upc>() {
+                override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Upc = p.text.toUpc()()
             }
 
             @jakarta.persistence.Converter(autoApply = true)
-            class Converter : AttributeConverter<UPC?, String?> {
-                override fun convertToDatabaseColumn(attribute: UPC?): String? = attribute?.value
-                override fun convertToEntityAttribute(dbData: String?): UPC? = dbData?.let { it.toUPC()() }
+            class Converter : AttributeConverter<Upc?, String?> {
+                override fun convertToDatabaseColumn(attribute: Upc?): String? = attribute?.value
+                override fun convertToEntityAttribute(dbData: String?): Upc? = dbData?.let { it.toUpc()() }
             }
         }
     }
@@ -428,4 +428,4 @@ interface ProductCode {
  *         Throws an exception if the input string does not conform to any valid format.
  * @since 1.0.0
  */
-fun ProductCode(code: String) = if (code.isValidEAN()) code.toEAN()() else code.toUPC()()
+fun ProductCode(code: String) = if (code.isValidEan()) code.toEan()() else code.toUpc()()

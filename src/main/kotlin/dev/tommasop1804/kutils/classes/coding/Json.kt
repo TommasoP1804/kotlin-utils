@@ -9,7 +9,7 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.Beta
 import dev.tommasop1804.kutils.classes.constants.SortDirection
 import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.UnsupportedJSONTypeException
+import dev.tommasop1804.kutils.exceptions.UnsupportedJsonTypeException
 import org.intellij.lang.annotations.Language
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
@@ -35,15 +35,15 @@ import java.nio.file.Path
  * @property isObject Indicates whether the JSON represents a JSON object.
  * @property fieldsNames A list of field names, if the JSON represents an object.
  * @property fields The key-value pairs of the JSON object, if applicable.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = JSON.Companion.Serializer::class)
-@JsonDeserialize(using = JSON.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = JSON.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = JSON.Companion.OldDeserializer::class)
+@JsonSerialize(using = Json.Companion.Serializer::class)
+@JsonDeserialize(using = Json.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Json.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Json.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration", "kutils_getorthrow_as_invoke", "RedundantSuppression")
-class JSON private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.JSON) {
+class Json private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.JSON) {
 
     /**
      * Represents the length of the underlying string value.
@@ -51,7 +51,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Provides the total number of characters in the string encapsulated by this class.
      *
      * @return the total number of characters in the string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length: Int
         get() = value.length
@@ -62,17 +62,17 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * with appropriate indentation and spacing.
      *
      * @receiver The object containing the raw JSON value to be prettified.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    val pretty: JSON
-        get() = JSON(prettify(value))
+    val pretty: Json
+        get() = Json(prettify(value))
 
     /**
      * Indicates whether the provided JSON value represents an array.
      * This property validates the JSON structure and determines whether it is an array type.
      *
      * @return `true` if the JSON value is an array, `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isArray: Boolean
         get() = MAPPER.readTree(value).isArray
@@ -85,7 +85,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * an object, otherwise `false`.
      *
      * @return `true` if the JSON value is an object, `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isObject: Boolean
         get() = MAPPER.readTree(value).isObject
@@ -97,7 +97,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * This property uses lazy evaluation to read and extract the field names as a set.
      *
      * @return A set of strings representing the field names in the parsed JSON.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val fieldsNames: StringSet
         get() = MAPPER.readTree(value).propertyNames().toSet()
@@ -112,7 +112,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @return A list of pairs where each pair consists of a field name (key) and its associated
      * JSON value as a Jackson `JsonNode`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val fields
         get() = MAPPER.readTree(value).properties().toList().map { it.key.toString() to it.value!! }
@@ -128,10 +128,10 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * - Converts the filtered map into a JSON string.
      *
      * @return A JSON string representation of the non-null entries in the map.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val withoutNulls
-        get() = toMap<Any?>().getOrThrow().removeNullsRecursively().toJSON()
+        get() = toMap<Any?>().getOrThrow().removeNullsRecursively().toJson()
 
     /**
      * Secondary constructor that initializes an instance using a `Code` object.
@@ -141,7 +141,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException if the `Code` object does not have a language equal to `Language.JSON`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(code: Code) : this(code.value) {
         code.length.expect(dev.tommasop1804.kutils.classes.coding.Language.JSON)
@@ -156,10 +156,10 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @throws MalformedInputException If the provided JSON input is invalid or malformed.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(@Language("json") json: CharSequence) : this(
-        tryOrThrow({ -> MalformedInputException(JSON::class) }) {
+        tryOrThrow({ -> MalformedInputException(Json::class) }) {
             MAPPER.writeValueAsString(MAPPER.readTree(json.toString()))
     })
 
@@ -168,7 +168,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * parameter to the primary constructor.
      *
      * @param file The file whose content will be read and used to initialize the instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(file: File) : this(file.readText())
     /**
@@ -176,12 +176,12 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * parameter to the primary constructor.
      *
      * @param path The path of the file whose content will be read and used to initialize the instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(path: Path) : this(path.toFile().readText())
 
     init {
-        tryOrThrow({ -> MalformedInputException(JSON::class) }) {
+        tryOrThrow({ -> MalformedInputException(Json::class) }) {
             MAPPER.readTree(value)
         }
     }
@@ -206,25 +206,25 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * Can be used as a placeholder or default value in contexts where an empty JSON
          * representation is required.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        val EMPTY_JSON = JSON("{}")
+        val EMPTY_JSON = Json("{}")
         /**
          * An immutable representation of an empty JSON array.
          *
          * This constant provides a string representation of an empty JSON array ("[]").
          * It can be used wherever an empty JSON array placeholder is needed.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        val EMPTY_JSON_ARRAY = JSON("[]")
+        val EMPTY_JSON_ARRAY = Json("[]")
         /**
          * A regular expression used as the default separator for splitting strings.
          *
          * This regex matches a single period (`.`), often used to split strings
          * based on a dot delimiter.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         val DEFAULT_SEPARATOR = Regex("\\.")
 
@@ -236,7 +236,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @receiver The string to be checked for validity as JSON.
          * @return `true` if the string is a valid JSON object or array, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         fun String.isValidJSON() =  try {
             val node = MAPPER.readTree(this)
@@ -250,7 +250,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @param json The JSON string to be pretty-printed. It must be a valid JSON string.
          * @return A formatted JSON string with indentation and line breaks to improve readability.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         fun prettify(@Language("json") json: String) = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(MAPPER.readTree(json))!!
 
@@ -262,9 +262,9 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @receiver The string to be converted into a JSON object.
          * @return A `Result` containing the parsed JSON object or an exception if parsing fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun String.toJSON() = runCatching { JSON(this) }
+        fun String.toJson() = runCatching { Json(this) }
         /**
          * Converts a YAML object to its JSON representation.
          *
@@ -275,16 +275,16 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * @receiver The YAML object to be converted to JSON.
          * @return A [Result] containing the JSON representation if the conversion succeeds,
          *         or encapsulating the exception if it fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("yamlToJson")
         @OptIn(Beta::class)
-        fun YAML.toJSON(): JSON {
+        fun Yaml.toJson(): Json {
             if (isBlank()) return EMPTY_JSON
-            if (isObject) return toDataMap()().toJSON()
-            if (isArray) return toList<Any>()().toJSON()
+            if (isObject) return toDataMap()().toJson()
+            if (isArray) return toList<Any>()().toJson()
             val obj = toObject<Any>()()
-            return obj.toJSON()
+            return obj.toJson()
         }
         /**
          * Converts the given object to a JSON representation using a predefined object mapper.
@@ -293,10 +293,10 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @receiver The object to be converted into JSON
          * @return A `JSON` instance containing the serialized JSON string.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("anyToJson")
-        fun Any.toJSON() = JSON(MAPPER.writeValueAsString(this))
+        fun Any.toJson() = Json(MAPPER.writeValueAsString(this))
 
         /**
          * Converts a JSON string into a formatted, pretty-printed JSON string.
@@ -309,9 +309,9 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * @receiver A string representation of a JSON object or array.
          * @return A [Result] containing the pretty-printed JSON string, or an error
          * if the input string is not a valid JSON.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun String.toPrettyJSON() = runCatching { JSON(this).pretty }
+        fun String.toPrettyJson() = runCatching { Json(this).pretty }
         /**
          * Converts a YAML object to its JSON representation.
          *
@@ -319,14 +319,14 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @receiver The YAML object to be converted to JSON.
          * @return JSON representation
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("yamlToPrettyJson")
         @OptIn(Beta::class)
-        fun YAML.toPrettyJSON(): JSON {
+        fun Yaml.toPrettyJson(): Json {
             if (isBlank()) return EMPTY_JSON
             val obj = toObject<Any>()
-            return obj.toJSON().pretty
+            return obj.toJson().pretty
         }
         /**
          * Converts the given object to a JSON string formatted with indentation for better readability.
@@ -335,10 +335,10 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * @receiver The object to be serialized into a pretty-printed JSON string. If the receiver is null,
          *           the resulting JSON representation will handle it appropriately.
          * @return A formatted JSON string representation of the object.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("anyToPrettyJson")
-        fun Any.toPrettyJSON() = JSON(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(this))
+        fun Any.toPrettyJson() = Json(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(this))
 
         /**
          * Reads a JSON file from the specified file path and maps its content to an object of the specified type.
@@ -348,7 +348,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * @param T The type of the object to map the JSON content to.
          * @param file The file containing the JSON data.
          * @return An object of type [T] representing the deserialized JSON data, wrapped in a [Result].
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> readFromFile(file: File): Result<T> =
             runCatching { MAPPER.readValue(file, T::class.java) }
@@ -359,7 +359,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @param file The JSON file to be read.
          * @return A list of objects of the specified type deserialized from the JSON file, wrapped in a [Result].
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> readArrayFromFile(file: File): Result<Array<T>> = runCatching {
             readListFromFile<T>(file).getOrThrow().toTypedArray()
@@ -371,7 +371,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @param file The JSON file to be read.
          * @return A list of objects of the specified type deserialized from the JSON file, wrapped in a [Result].
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> readListFromFile(file: File): Result<List<T>> = runCatching {
             MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java))
@@ -383,7 +383,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @param file The JSON file to be read.
          * @return A set of objects of the specified type deserialized from the JSON file, wrapped in a [Result].
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> readSetFromFile(file: File): Result<Set<T>> = runCatching {
             MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java))
@@ -394,7 +394,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *
          * @param file The JSON file to be read
          * @return a map containing keys as `String` and values as the generic type `T` parsed from the JSON file, wrapped in a [Result]
-         * @since 1.0.0
+         * @since 3.0.0
          */
         fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching {
             MAPPER.readValue(file, object : TypeReference<Map<String, T>>() {})
@@ -410,7 +410,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *              Defaults to `false`.
          * @return a [Result] containing the list of elements of type [T] if conversion is successful,
          *         or a failure if an error occurs.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> JsonNode.asList(force: Boolean = false): Result<List<T>> = runCatching {
             val list = emptyMList<T>()
@@ -424,7 +424,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
                         String::class -> list.add(node.asString() as T)
                         JsonNode::class -> list.add(node as T)
                         else -> if (force) list.add(MAPPER.treeToValue(node, T::class.java))
-                            else throw UnsupportedJSONTypeException(T::class.simpleName)
+                            else throw UnsupportedJsonTypeException(T::class.simpleName)
                     }
                 }
             }
@@ -441,7 +441,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          *              Defaults to `false`.
          * @return a Result containing a Set of elements of type T if the conversion is successful.
          *         If an error occurs during the conversion process, the Result contains the exception.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> JsonNode.asSet(force: Boolean = false): Result<Set<T>> = runCatching {
             val set = emptyMSet<T>()
@@ -454,7 +454,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
                         Boolean::class -> set.add(node.asBoolean() as T)
                         String::class -> set.add(node.asString() as T)
                         else -> if (force) set.add(MAPPER.treeToValue(node, T::class.java))
-                            else throw UnsupportedJSONTypeException(T::class.simpleName)
+                            else throw UnsupportedJsonTypeException(T::class.simpleName)
                     }
                 }
             }
@@ -466,20 +466,20 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * into its string representation.
          *
          * @return a Result wrapping the JSON object, or an exception if the conversion fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun JsonNode.asJSON(): Result<JSON> = runCatching {
-            JSON(MAPPER.writeValueAsString(this))
+        fun JsonNode.asJson(): Result<Json> = runCatching {
+            Json(MAPPER.writeValueAsString(this))
         }
         /**
          * Converts the current JsonNode into a JSON object by serializing it
          * into its string representation.
          *
          * @return a Result wrapping the JSON object, or an exception if the conversion fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun JsonNode.asPrettyJSON(): Result<JSON> = runCatching {
-            JSON(MAPPER.writeValueAsString(this)).pretty
+        fun JsonNode.asPrettyJson(): Result<Json> = runCatching {
+            Json(MAPPER.writeValueAsString(this)).pretty
         }
 
         /**
@@ -489,7 +489,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * @param target The ObjectNode where the field will be copied to.
          * @param fieldNames An array of strings representing the field path to navigate and copy.
          * @param index The current index in the fieldNames array being processed.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @Suppress("kutils_null_check")
         internal fun JsonNode.copyField(target: ObjectNode, fieldNames: Array<String>, index: Int) {
@@ -519,7 +519,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
          * @param fieldPath The string representing the path of fields to look for in the JSON node, delimited by the separator.
          * @param regexSeparator The optional regular expression to split the field path. Defaults to `DEFAULT_SEPARATOR`.
          * @return True if the JSON node contains all the fields in the specified path, false otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         operator fun JsonNode.invoke(fieldPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR): Boolean {
             val fields = fieldPath.split(regexSeparator)
@@ -533,8 +533,8 @@ class JSON private constructor(@param:Language("json") override val value: Strin
             return true
         }
 
-        class Serializer : ValueSerializer<JSON>() {
-            override fun serialize(value: JSON, gen: JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Json>() {
+            override fun serialize(value: Json, gen: JsonGenerator, ctxt: SerializationContext) {
                 val node = MAPPER.readTree(value.value)
                 when {
                     node.isArray -> {
@@ -550,12 +550,13 @@ class JSON private constructor(@param:Language("json") override val value: Strin
             }
         }
 
-        class Deserializer : ValueDeserializer<JSON>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext) = JSON(p.objectReadContext().readTree<JsonNode>(p).toString())
+        class Deserializer : ValueDeserializer<Json>() {
+            override fun deserialize(p: JsonParser, ctxt: DeserializationContext) =
+                Json(p.objectReadContext().readTree<JsonNode>(p).toString())
         }
 
-        class OldSerializer : JsonSerializer<JSON>() {
-            override fun serialize(value: JSON, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
+        class OldSerializer : JsonSerializer<Json>() {
+            override fun serialize(value: Json, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
                 val node = MAPPER.readTree(value.value)
                 when {
                     node.isArray -> {
@@ -571,8 +572,9 @@ class JSON private constructor(@param:Language("json") override val value: Strin
             }
         }
 
-        class OldDeserializer : JsonDeserializer<JSON>() {
-            override fun deserialize(p: com.fasterxml.jackson.core.JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): JSON = JSON(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString())
+        class OldDeserializer : JsonDeserializer<Json>() {
+            override fun deserialize(p: com.fasterxml.jackson.core.JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Json =
+                Json(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString())
         }
     }
 
@@ -582,7 +584,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param index The position of the element to retrieve. Must be a valid index within the collection.
      * @return The element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index >= size).
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override operator fun get(index: Int) = value[index]
 
@@ -593,7 +595,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param endIndex the end index of the subsequence (exclusive).
      * @return a new character sequence that represents the specified subsequence.
      * @throws IndexOutOfBoundsException if the start or end index is out of bounds of the character sequence.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -602,7 +604,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * This implementation provides a representation of the internal `value`.
      *
      * @return the string representation of the object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -616,7 +618,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @return a [Result] containing the deserialized object of type [T] if
      * successful, or an exception if an error occurs.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toObject() = runCatching { MAPPER.readValue(value, T::class.java) as T }
 
@@ -628,7 +630,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * it is wrapped and returned as a `Result` object.
      *
      * @return a `Result` containing the typed array of type [T], or the exception if an error occurs.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toArray() = runCatching { toList<T>().getOrThrow().toTypedArray() }
 
@@ -644,7 +646,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
      * @param T the type of objects contained in the resulting list.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toList() = runCatching {
         MAPPER.readValue(value, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java)) as List<T>
@@ -662,7 +664,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
      * @param T the type of objects contained in the resulting list.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toMList() = runCatching { toList<T>().getOrThrow().toMList() }
 
@@ -678,7 +680,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param T The type of elements expected in the resulting [Set].
      * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toSet() = runCatching {
         MAPPER.readValue(value, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java)) as Set<T>
@@ -696,7 +698,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param T The type of elements expected in the resulting [Set].
      * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toMSet() = runCatching { toSet<T>().getOrThrow().toMSet() }
 
@@ -712,7 +714,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param V The type of the values in the resulting [Map].
      * @return A [Result] containing the deserialized [Map] on success, or an exception on failure.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified V> toMap(): Result<Map<String, V>> = runCatching {
         MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V>
@@ -722,7 +724,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Converts the current value to a DataMap instance using a JSON mapper.
      *
      * @return a [Result] containing the [DataMap] if the conversion is successful, or an error if it fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMap(): Result<DataMap> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap
@@ -731,7 +733,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Converts the current value to a DataMapNN instance using a JSON mapper.
      *
      * @return a [Result] containing the [DataMapNN] if the conversion is successful, or an error if it fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMapNN(): Result<DataMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN
@@ -749,7 +751,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param V The type of the values in the resulting [Map].
      * @return A [Result] containing the deserialized [Map] on success, or an exception on failure.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified V> toMMap(): Result<MMap<String, V>> = runCatching { toMap<V>().getOrThrow().toMMap() }
 
@@ -757,7 +759,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Converts the current value to a DataMMap instance using a JSON mapper.
      *
      * @return a [Result] containing the [DataMMap] if the conversion is successful, or an error if it fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMMap(): Result<DataMMap> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap
@@ -766,7 +768,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Converts the current value to a DataMMapNN instance using a JSON mapper.
      *
      * @return a [Result] containing the [DataMMapNN] if the conversion is successful, or an error if it fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMMapNN(): Result<DataMMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN
@@ -776,7 +778,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Writes the current object to the specified file in JSON format using the configured mapper.
      *
      * @param file The file to which the object should be written. The file must be writable and accessible.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun writeToFile(file: File) = MAPPER.writeValue(file, MAPPER.readTree(value))
 
@@ -786,7 +788,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param keyPath The string representing the nested path to the desired value, separated by the specified regex separator.
      * @param regexSeparator The regex used to split the key path into individual keys. If null mapped to `DEFAULT_SEPARATOR`.
      * @return The nested JSON node at the specified key path, or `null` if the path does not exist.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun get(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR): JsonNode? {
         var node = MAPPER.readTree(value)
@@ -806,7 +808,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param value the value to match against the property's value. The method handles equality checks for
      *              numbers, strings, booleans, nulls, and arrays.
      * @return a [Result] containing a list of matched JSON nodes if successful, or an exception if an error occurs.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun findByPropertyValue(key: String, value: Any?) = runCatching {
         val node = MAPPER.readTree(this.value)
@@ -834,9 +836,9 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *                       representing the traversal hierarchy. Defaults to `DEFAULT_SEPARATOR`.
      * @param value The value to match against in the JSON property. The type of the provided value
      *              determines the comparison logic applied.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun findByPropertyValueFromNestedJSON(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR, value: Any?) = runCatching {
+    fun findByPropertyValueFromNestedJson(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR, value: Any?) = runCatching {
         val result = mutableListOf<JsonNode>()
         var node = MAPPER.readTree(this.value)
         var last = ""
@@ -864,13 +866,13 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param other the JSON object to be merged with the current JSON
      * @return a new JSON object containing the merged data
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun plus(other: JSON): JSON {
+    operator fun plus(other: Json): Json {
         val node1 = MAPPER.readTree(value)
         val node2 = MAPPER.readTree(other.value)
         (node1 as ObjectNode).setAll(node2 as ObjectNode?)
-        return JSON(MAPPER.writeValueAsString(node1))
+        return Json(MAPPER.writeValueAsString(node1))
     }
     /**
      * Combines the current JSON object with the given Iterable of JSON objects,
@@ -878,23 +880,23 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param others An iterable collection of JSON objects to merge with this JSON.
      * @return A new JSON object representing the merged contents of the initial JSON and the provided JSON objects.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun plus(others: Iterable<JSON>): JSON {
+    operator fun plus(others: Iterable<Json>): Json {
         var mergedJson = value
         others.forEach { mergedJson += it }
-        return JSON(mergedJson)
+        return Json(mergedJson)
     }
     /**
      * Adds a new field to a JSON object.
      *
      * @param field A pair consisting of the field name as a String and the field value as a JsonNode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun plus(field: Pair<String, Any?>): JSON {
+    operator fun plus(field: Pair<String, Any?>): Json {
         val node = MAPPER.readTree(value)
         (node as ObjectNode).set(field.first, MAPPER.valueToTree(field.second))
-        return JSON(MAPPER.writeValueAsString(node))
+        return Json(MAPPER.writeValueAsString(node))
     }
     /**
      * Adds a nested field to the current JSON structure by navigating through the hierarchy
@@ -908,9 +910,9 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *                      If null, a default separator is applied.
      *                    - The third element is the object to be added at the specified nested field path.
      * @return Result encapsulating the new JSON instance with the updated structure.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun plus(nestedField: Triple<String, Regex?, Any?>): JSON {
+    operator fun plus(nestedField: Triple<String, Regex?, Any?>): Json {
         val rootNode = MAPPER.readTree(value)
         var current = rootNode as ObjectNode
         val fieldNames = nestedField.first.split(nestedField.second ?: DEFAULT_SEPARATOR)
@@ -922,7 +924,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
             current = current.get(currentField) as ObjectNode
         }
         current.set(fieldNames.last(), MAPPER.valueToTree(nestedField.third))
-        return JSON(MAPPER.writeValueAsString(current))
+        return Json(MAPPER.writeValueAsString(current))
     }
 
     /**
@@ -930,12 +932,12 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param fieldName the name of the field to be removed from the JSON object.
      * @return a new JSON object string with the specified field removed, if successful.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun minus(fieldName: String): JSON {
+    operator fun minus(fieldName: String): Json {
         val node = MAPPER.readTree(value)
         (node as ObjectNode).remove(fieldName)
-        return JSON(MAPPER.writeValueAsString(node))
+        return Json(MAPPER.writeValueAsString(node))
     }
 
     /**
@@ -947,30 +949,30 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param field A pair where the first value is the field name string to remove (with optional nested structure)
      *              and the second value is an optional regex used for splitting the field name.
      * @return A new JSON object with the specified field removed.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun minus(field: Pair<String, Regex?>): JSON {
+    operator fun minus(field: Pair<String, Regex?>): Json {
         val rootNode = MAPPER.readTree(value)
         var current = rootNode as ObjectNode
         val fieldNames = field.first.split(field.second ?: DEFAULT_SEPARATOR)
 
         for (i in 0 until fieldNames.size - 1)
-            current = current.get(fieldNames[i]) as ObjectNode? ?: return JSON(MAPPER.writeValueAsString(rootNode))
+            current = current.get(fieldNames[i]) as ObjectNode? ?: return Json(MAPPER.writeValueAsString(rootNode))
         current.remove(fieldNames.last())
-        return JSON(MAPPER.writeValueAsString(current))
+        return Json(MAPPER.writeValueAsString(current))
     }
     
     /**
      * Filters the JSON object to only include the specified fields.
      *
      * @param fieldsToKeep The fields to retain in the filtered JSON object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun filterFields(vararg fieldsToKeep: String) = runCatching {
         val node = MAPPER.readTree(value)
         val result = MAPPER.createObjectNode()
         fieldsToKeep.forEach { if (node.has(it)) result.set(it, node.get(it)) }
-        JSON(MAPPER.writeValueAsString(result))
+        Json(MAPPER.writeValueAsString(result))
     }
 
     /**
@@ -978,7 +980,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param regexSeparator the delimiter used to split field paths into nested levels, defaulting to DEFAULT_SEPARATOR.
      * @param fieldsToKeep the list of field paths to retain in the filtered JSON object. Field paths should be specified as strings.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun filterNestedFields(regexSeparator: Regex = DEFAULT_SEPARATOR, vararg fieldsToKeep: String) = runCatching {
         val rootNode = MAPPER.readTree(value)
@@ -998,7 +1000,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param fieldPath the string representing the path of the field to be checked
      * @param regexSeparator a custom regex separator to split the field path, or null to use the default separator
      * @return true if the field exists in the JSON structure, otherwise false
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun invoke(fieldPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR): Boolean {
         var node = MAPPER.readTree(value)
@@ -1017,7 +1019,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param expectedFields The list of field names that are expected to be present in the JSON structure.
      * @param restrictive When set to true, ensures the JSON contains only the expected fields; otherwise, allows additional fields.
      * @return `true` if the structure is valid according to the conditions, otherwise `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isValidStructure(vararg expectedFields: String, restrictive: Boolean = true): Boolean {
         val node = MAPPER.readTree(value)
@@ -1034,7 +1036,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * @param regexSeparator The optional regular expression used to separate nested fields. Defaults to DEFAULT_SEPARATOR.
      * @param expectedFields The fields to be checked for existence within the JSON structure.
      * @return `true` if all expected fields are present in the JSON structure, `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isValidNestedStructure(regexSeparator: Regex = DEFAULT_SEPARATOR, vararg expectedFields: String): Boolean {
         val node = MAPPER.readTree(value)
@@ -1051,12 +1053,12 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @param direction The sorting direction, either ascending or descending. Default is `SortDirection.ASCENDING`.
      * @return A new instance of JSON with the keys of the object sorted as specified, or the original JSON if it is not an object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun sortedKeys(direction: SortDirection = SortDirection.ASCENDING): JSON {
+    fun sortedKeys(direction: SortDirection = SortDirection.ASCENDING): Json {
         val node = MAPPER.readTree(value)
         val sortedNode = sortKeysRecursively(node, direction)
-        return JSON(MAPPER.writeValueAsString(sortedNode))
+        return Json(MAPPER.writeValueAsString(sortedNode))
     }
 
     private fun sortKeysRecursively(node: JsonNode, direction: SortDirection): JsonNode {
@@ -1088,18 +1090,18 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * either an empty object or an empty array.
      *
      * @return True if the JSON entity is empty, otherwise false.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun isEmptyJSON() = isEmptyObject() || isEmptyArray()
+    fun isEmptyJson() = isEmptyObject() || isEmptyArray()
 
     /**
      * Negates the current state by checking if the JSON is empty.
      * This method is an operator function, meaning it can be used with the `!` operator.
      *
      * @return `true` if the JSON is empty; otherwise, `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun not() = isEmptyJSON()
+    operator fun not() = isEmptyJson()
 
     /**
      * Checks if the object is an empty JSON object.
@@ -1109,7 +1111,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      *
      * @return `true` if the object represents an empty JSON, `false` otherwise.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isEmptyObject() =
         value.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", "") == EMPTY_JSON.value
@@ -1121,7 +1123,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Returns `true` if the value represents an empty JSON array, otherwise returns `false`.
      *
      * @return `true` if the value is an empty JSON array, otherwise `false`
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isEmptyArray() =
         value.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "") == EMPTY_JSON_ARRAY.value
@@ -1133,7 +1135,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * or character, returning true if it does, otherwise false.
      *
      * @return true if the instance is not empty, false otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isNotEmpty() = !isEmptyObject() && !isEmptyArray()
     
@@ -1144,7 +1146,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * returning `true` if the object is not empty and `false` otherwise.
      *
      * @return `true` if the object is not empty, `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isNotEmptyObject() = !isEmptyObject()
     
@@ -1153,7 +1155,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * returning true if the array contains at least one element and false otherwise.
      *
      * @return `true` if the array is not empty, `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun isNotEmptyArray() = !isEmptyArray()
 
@@ -1161,7 +1163,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Recursively removes all null values from a map structure, including nested objects and arrays.
      *
      * @return A new map with all null values removed recursively.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     private fun DataMap.removeNullsRecursively(): DataMap {
         return mapNotNull { (key, value) ->
@@ -1189,7 +1191,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Recursively removes all null values from a list, including nested objects and arrays.
      *
      * @return A new list with all null values removed recursively.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     private fun List<*>.removeNullsFromList(): List<Any?> {
         return this.mapNotNull { item ->
@@ -1217,7 +1219,7 @@ class JSON private constructor(@param:Language("json") override val value: Strin
      * Recursively removes all null values from an array, including nested objects and arrays.
      *
      * @return A new array with all null values removed recursively.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     private fun Array<*>.removeNullsFromArray(): Array<Any?> {
         return this.mapNotNull { item ->

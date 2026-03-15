@@ -69,54 +69,54 @@ open class UnsupportedTypeException : IllegalArgumentException {
  *
  * This class extends the `UnsupportedTypeException` to specialize it for JSON-specific cases.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-open class UnsupportedJSONTypeException : UnsupportedTypeException {
+open class UnsupportedJsonTypeException : UnsupportedTypeException {
     /**
-     * Initializes a new instance of the `UnsupportedJSONTypeException` class
+     * Initializes a new instance of the `UnsupportedJsonTypeException` class
      * with no detail message.
      *
      * This constructor creates an exception instance that represents an unsupported
      * JSON type without providing any additional context or specific error details.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor() : super()
     /**
-     * Constructs an `UnsupportedJSONTypeException` with the specified detail message.
+     * Constructs an `UnsupportedJsonTypeException` with the specified detail message.
      *
      * This constructor can be used to provide additional context about
      * an issue where a JSON type is not supported. The detail message can assist 
      * in identifying the specific type or scenario that caused the exception.
      *
      * @param message The detail message describing the unsupported JSON type, or null if no message is provided.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(message: String?) : super(message)
     /**
-     * Constructs an `UnsupportedJSONTypeException` with the specified detail message and cause.
+     * Constructs an `UnsupportedJsonTypeException` with the specified detail message and cause.
      *
-     * This constructor allows creating an `UnsupportedJSONTypeException` instance to provide
+     * This constructor allows creating an `UnsupportedJsonTypeException` instance to provide
      * detailed information about the encountered error, including the error message and the
      * root cause. It facilitates exception chaining and provides context for issues related
      * to unsupported JSON data types.
      *
      * @param message A detailed message describing the error, or null if no specific message is provided.
      * @param cause The cause of this exception, or null if no cause is specified.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(message: String?, cause: Throwable?) : super(message, cause)
     /**
-     * Constructs an `UnsupportedJSONTypeException` with the specified cause.
+     * Constructs an `UnsupportedJsonTypeException` with the specified cause.
      *
-     * This constructor is used to create an `UnsupportedJSONTypeException` instance
+     * This constructor is used to create an `UnsupportedJsonTypeException` instance
      * that encapsulates the underlying cause of the unsupported JSON type error.
      * It allows for exception chaining and provides additional context about the
      * root cause of the issue.
      *
      * @param cause The underlying cause of this exception, or null if no cause is provided.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(cause: Throwable?) : super(cause)
 }
@@ -131,51 +131,51 @@ open class UnsupportedJSONTypeException : UnsupportedTypeException {
  * This class provides multiple constructors to support flexibility in specifying
  * error details, including a message, a cause, or both.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-open class UnsupportedYAMLTypeException : UnsupportedTypeException {
+open class UnsupportedYamlTypeException : UnsupportedTypeException {
     /**
-     * Initializes a new instance of the UnsupportedJYAMLTypeException class with no detail message.
+     * Initializes a new instance of the UnsupportedYamlTypeException class with no detail message.
      *
-     * This constructor creates an UnsupportedJYAMLTypeException instance without any specific error
+     * This constructor creates an UnsupportedYamlTypeException instance without any specific error
      * message or cause, indicating a generic issue related to unsupported JYAML types.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor() : super()
     /**
-     * Constructs an `UnsupportedJYAMLTypeException` with the specified detail message.
+     * Constructs an `UnsupportedYamlTypeException` with the specified detail message.
      *
      * This constructor is used to create an exception instance by providing a
      * detailed error message. It helps in identifying the nature of the issue
      * related to unsupported JYAML types.
      *
      * @param message The detail message describing the exception, or null if no message is provided.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(message: String?) : super(message)
     /**
-     * Constructs an `UnsupportedJYAMLTypeException` with the specified detail message and cause.
+     * Constructs an `UnsupportedYamlTypeException` with the specified detail message and cause.
      *
-     * This constructor allows for the creation of an `UnsupportedJYAMLTypeException` instance by 
+     * This constructor allows for the creation of an `UnsupportedYamlTypeException` instance by
      * specifying an error message and the underlying cause. It can be used to provide more 
      * detailed context about errors caused by unsupported JYAML data types, and enables exception chaining.
      *
      * @param message A detailed message describing the error, or null if no specific message is provided.
      * @param cause The cause of this exception, or null if no cause is specified.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(message: String?, cause: Throwable?) : super(message, cause)
     /**
-     * Constructs an `UnsupportedJYAMLTypeException` with the specified cause.
+     * Constructs an `UnsupportedYamlTypeException` with the specified cause.
      *
-     * This constructor allows creating an instance of `UnsupportedJYAMLTypeException`
+     * This constructor allows creating an instance of `UnsupportedYamlTypeException`
      * using another exception as the cause. It facilitates exception chaining and provides
      * additional context about the root cause of the error related to unsupported JYAML types.
      *
      * @param cause The underlying cause of this exception, or null if no specific cause is provided.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(cause: Throwable?) : super(cause)
 }

@@ -17,18 +17,18 @@ import java.util.concurrent.ThreadLocalRandom
  * This class is implemented as a value class, providing lightweight encapsulation over a `Long` value.
  * It includes utility methods for extracting specific components of the Snowflake ID and validation checks.
  *
- * @since 2.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @OptIn(RiskyApproximationOfTemporal::class)
 @JvmInline
 @Suppress("unused")
-value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
+value class SnowflakeId(val value: Long) : Comparable<SnowflakeId> {
     /**
      * Represents the elapsed time portion of the Snowflake ID.
      * This value is derived by shifting the internal value by the defined
      * timestamp shift and interpreting the result as milliseconds of duration.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     val elapsedTime: Duration get() = (value ushr TIMESTAMP_SHIFT).asMillisOfDuration()
     /**
@@ -37,7 +37,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * This represents the number of milliseconds since the custom epoch.
      * It's derived by shifting the internal value by a predefined constant
      * and adding the custom epoch time to decode the timestamp.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     val timestamp: Long get() = (value ushr TIMESTAMP_SHIFT) + EPOCH
     /**
@@ -45,7 +45,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * The timestamp is measured as the number of milliseconds since the Unix epoch (1970-01-01T00:00:00Z).
      *
      * This value is derived from the internal `timestamp` field of the snowflake ID.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     val instant: Instant get() = Instant(timestamp)
     /**
@@ -57,7 +57,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * Provides the sequence portion of the Snowflake ID value.
      * This is calculated by applying a bitwise AND operation between the `value` field
      * and the `MAX_SEQUENCE` constant and converting the result to an integer.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     val sequence: Int get() = (value and MAX_SEQUENCE).toInt()
 
@@ -65,7 +65,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * Constructs a new SnowflakeID instance by parsing the given character sequence as a long value.
      *
      * @param value The character sequence to be parsed into a long value and used to initialize the SnowflakeID.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().toLong())
     /**
@@ -77,7 +77,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      *
      * The `defaultGenerator.nextId()` method ensures the uniqueness of the ID by
      * combining the elapsed time, node ID, and sequence, following the Snowflake ID format.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     constructor() : this(defaultGenerator.nextId().value)
 
@@ -95,7 +95,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          * This value corresponds to the custom starting point from which all
          * timestamps in the SnowflakeID system are measured, and serves as the basis
          * for determining elapsed time when constructing unique IDs.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val EPOCH = 1_704_067_200_000L
         /**
@@ -106,7 +106,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          * simultaneously in a distributed system.
          *
          * With a value of 10, the system can support up to 2^10 (1024) unique nodes.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val NODE_BITS = 10
         /**
@@ -115,7 +115,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          * These bits are used to distinguish multiple Snowflake IDs generated in the same
          * millisecond, ensuring uniqueness when IDs are created rapidly in high-concurrency
          * environments.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val SEQUENCE_BITS = 12
         /**
@@ -123,28 +123,28 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          * a Snowflake ID. This value is derived by summing the bit allocations for the
          * node identifier and the sequence number, ensuring the timestamp occupies the
          * most significant bits in the Snowflake ID.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val TIMESTAMP_SHIFT = NODE_BITS + SEQUENCE_BITS
         /**
          * Represents the bit-wise shift value used for encoding the node identifier
          * within the unique Snowflake ID generation process. The value is derived
          * from the number of bits allocated for the sequence component.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val NODE_SHIFT = SEQUENCE_BITS
         /**
          * Represents the maximum possible value for a node identifier within the SnowflakeID system.
          * It is derived based on the bit length defined by the `NODE_BITS` constant.
          * This value is used to ensure that node identifiers do not exceed the allowed bit allocation.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val MAX_NODE_ID = (1L shl NODE_BITS) - 1L
         /**
          * Represents the maximum allowable value for the sequence portion in a Snowflake ID.
          * This value is determined by shifting 1 left by the number of bits allocated to the sequence (defined by `SEQUENCE_BITS`)
          * and subtracting 1. It ensures that the sequence remains within the allowed bit-width constraints.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         const val MAX_SEQUENCE = (1L shl SEQUENCE_BITS) - 1L
 
@@ -155,9 +155,9 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          * is determined by successfully constructing a `SnowflakeID` object with the value.
          *
          * @return `true` if the value can be successfully used to create a `SnowflakeID`, `false` otherwise.
-         * @since 2.0.0
+         * @since 3.0.0
          */
-        fun Long.isValidSnowflakeID() = runCatching { SnowflakeID(this) }.isSuccess
+        fun Long.isValidSnowflakeId() = runCatching { SnowflakeId(this) }.isSuccess
         /**
          * Validates whether the current character sequence can be parsed as a valid SnowflakeID.
          *
@@ -166,20 +166,20 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          *
          * @receiver The character sequence to validate as a SnowflakeID.
          * @return `true` if the character sequence represents a valid SnowflakeID, otherwise `false`.
-         * @since 2.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidSnowflakeID() = runCatching { SnowflakeID(this) }.isSuccess
+        fun CharSequence.isValidSnowflakeId() = runCatching { SnowflakeId(this) }.isSuccess
 
         /**
-         * Converts the current [Long] value to an instance of [SnowflakeID].
+         * Converts the current [Long] value to an instance of [SnowflakeId].
          *
          * The conversion is wrapped in a [Result] object to safely handle potential exceptions
-         * during the creation of the [SnowflakeID] instance.
+         * during the creation of the [SnowflakeId] instance.
          *
-         * @return A [Result] containing the created [SnowflakeID] instance if successful, or an exception if the creation fails.
-         * @since 2.0.0
+         * @return A [Result] containing the created [SnowflakeId] instance if successful, or an exception if the creation fails.
+         * @since 3.0.0
          */
-        fun Long.toSnowflakeID() = runCatching { SnowflakeID(this) }
+        fun Long.toSnowflakeId() = runCatching { SnowflakeId(this) }
         /**
          * Converts the current character sequence into a `SnowflakeID` instance.
          *
@@ -190,17 +190,17 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
          * @receiver The character sequence to be converted into a `SnowflakeID`.
          * @return A `Result` containing the successfully created `SnowflakeID` instance,
          *         or a failure if the character sequence could not be parsed into a valid long value.
-         * @since 2.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toSnowflakeID() = runCatching { SnowflakeID(this) }
+        fun CharSequence.toSnowflakeId() = runCatching { SnowflakeId(this) }
 
-        private fun resolveDefaultNodeID() = try {
+        private fun resolveDefaultNodeId() = try {
             val hostname = java.net.InetAddress.getLocalHost().hostName
             (hostname.hashCode() and 0x7FFF_FFFF) % (MAX_NODE_ID + 1).toInt()
         } catch (_: Exception) {
             ThreadLocalRandom.current().nextInt((MAX_NODE_ID + 1).toInt())
         }
-        private val defaultGenerator by lazy { Generator(resolveDefaultNodeID()) }
+        private val defaultGenerator by lazy { Generator(resolveDefaultNodeId()) }
     }
 
     /**
@@ -209,9 +209,9 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * @param other The SnowflakeID to be compared.
      * @return A negative integer, zero, or a positive integer as this SnowflakeID
      *         is less than, equal to, or greater than the specified SnowflakeID.
-     * @since 2.0.0
+     * @since 3.0.0
      */
-    override fun compareTo(other: SnowflakeID) = value.compareTo(other.value)
+    override fun compareTo(other: SnowflakeId) = value.compareTo(other.value)
     /**
      * Returns a string representation of the SnowflakeID.
      *
@@ -219,7 +219,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * The resulting string reflects the unique identifier encapsulated by this instance.
      *
      * @return The string representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     override fun toString() = value.toString()
 
@@ -227,7 +227,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * Converts the internal value of the SnowflakeID to its Double representation.
      *
      * @return The Double value corresponding to the internal value of this SnowflakeID.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toDouble() = value.toDouble()
     /**
@@ -238,7 +238,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * floating-point number interpretation of the SnowflakeID is required.
      *
      * @return A Float representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toFloat() = value.toFloat()
     /**
@@ -248,7 +248,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * allowing it to be used as a primitive long type.
      *
      * @return The 64-bit long value representing this SnowflakeID.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toLong() = value
     /**
@@ -259,14 +259,14 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * original but encoded in unsigned form.
      *
      * @return The unsigned long (`ULong`) representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toULong() = value.toULong()
     /**
      * Converts the internal value of this SnowflakeID to an integer.
      *
      * @return The integer representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toInt() = value.toInt()
     /**
@@ -276,7 +276,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * which can be useful for scenarios where an unsigned integer representation is required.
      *
      * @return The unsigned 32-bit integer equivalent of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toUInt() = value.toUInt()
     /**
@@ -287,7 +287,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * representation of the SnowflakeID is required.
      *
      * @return The `Short` representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toShort() = value.toShort()
     /**
@@ -298,7 +298,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * the lower 16 bits of the internal value.
      *
      * @return The [UShort] representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toUShort() = value.toUShort()
     /**
@@ -310,7 +310,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * with systems that operate on byte-sized data.
      *
      * @return The byte representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toByte() = value.toByte()
     /**
@@ -320,7 +320,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * compatibility with systems or operations requiring unsigned byte data.
      *
      * @return The unsigned byte representation of the internal value.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun toUByte() = value.toUByte()
 
@@ -335,7 +335,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
      * @param nodeId The unique identifier for the machine or node generating the IDs. Must be within the range of 0 to MAX_NODE_ID.
      * @param epoch The custom epoch (in milliseconds) to be used as the starting point for the timestamp. Defaults to EPOCH.
      * @param clock A supplier function providing the current time in milliseconds. Defaults to the system clock.
-     * @since 2.0.0
+     * @since 3.0.0
      * @author Tommaso Pastorelli
      */
     class Generator(
@@ -349,7 +349,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
 
         private val state = java.util.concurrent.atomic.AtomicLong(0L)
 
-        fun nextId(): SnowflakeID {
+        fun nextId(): SnowflakeId {
             while (true) {
                 val currentTime = clock()
                 val elapsed = currentTime - epoch
@@ -380,7 +380,7 @@ value class SnowflakeID(val value: Long) : Comparable<SnowflakeID> {
                     val id = (newTimestamp shl TIMESTAMP_SHIFT) or
                             (nodeId.toLong() shl NODE_SHIFT) or
                             newSequence
-                    return SnowflakeID(id)
+                    return SnowflakeId(id)
                 }
             }
 

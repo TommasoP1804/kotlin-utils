@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.classes.identifiers.NanoID.Companion.DEFAULT_ALPHABET
-import dev.tommasop1804.kutils.classes.identifiers.NanoID.Companion.DEFAULT_SIZE
+import dev.tommasop1804.kutils.classes.identifiers.NanoId.Companion.DEFAULT_ALPHABET
+import dev.tommasop1804.kutils.classes.identifiers.NanoId.Companion.DEFAULT_SIZE
 import dev.tommasop1804.kutils.exceptions.NumberSignException
 import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateInputFormat
@@ -36,15 +36,15 @@ import kotlin.math.ln
  * implementing the [CharSequence] interface to allow basic string operations.
  *
  * @author Tommaso Pastorelli
- * @since 1.0.0
+ * @since 3.0.0
  */
-@JsonSerialize(using = NanoID.Companion.Serializer::class)
-@JsonDeserialize(using = NanoID.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = NanoID.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = NanoID.Companion.OldDeserializer::class)
+@JsonSerialize(using = NanoId.Companion.Serializer::class)
+@JsonDeserialize(using = NanoId.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = NanoId.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = NanoId.Companion.OldDeserializer::class)
 @Suppress("unused")
 @JvmInline
-value class NanoID(private val value: String) : CharSequence, Serializable {
+value class NanoId(private val value: String) : CharSequence, Serializable {
 
     /**
      * Represents the length of the NanoId string.
@@ -52,7 +52,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
      * This property provides the total number of characters present in the `value` field of the NanoId instance.
      *
      * @return the number of characters in the NanoId string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length: Int
         get() = value.length
@@ -67,7 +67,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
      * @param random the source of randomness for generating the NanoId. Defaults to an instance of [java.security.SecureRandom].
      * @param alphabet the set of characters that can appear in the generated NanoId. Defaults to [DEFAULT_ALPHABET].
      * @param size the length of the NanoId to generate. Defaults to [DEFAULT_SIZE]. Must be a positive value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(
         random: Random = SecureRandom(),
@@ -88,7 +88,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
          * This character set is used to ensure that NanoIDs are URL-friendly,
          * unambiguous, and versatile for a wide range of applications.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         val DEFAULT_ALPHABET = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()
 
@@ -99,21 +99,21 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
          * the generated NanoID string. This default value is used unless another
          * size is explicitly specified during NanoID creation.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val DEFAULT_SIZE = 21
 
         /**
-         * Converts the current [CharSequence] to a [NanoID] instance, encapsulating this string as its value.
+         * Converts the current [CharSequence] to a [NanoId] instance, encapsulating this string as its value.
          *
-         * This method attempts to create a [NanoID] object from the string representation of the current [CharSequence].
+         * This method attempts to create a [NanoId] object from the string representation of the current [CharSequence].
          * The operation is wrapped in a [Result] to handle any exceptions that may occur during instantiation.
          *
-         * @receiver the [CharSequence] to be converted into a [NanoID].
-         * @return a [NanoID] instance if the conversion is successful, or throws an exception if a failure occurs.
-         * @since 1.0.0
+         * @receiver the [CharSequence] to be converted into a [NanoId].
+         * @return a [NanoId] instance if the conversion is successful, or throws an exception if a failure occurs.
+         * @since 3.0.0
          */
-        fun CharSequence.toNanoID() = NanoID(toString())
+        fun CharSequence.toNanoId() = NanoId(toString())
 
         /**
          * Generates a random NanoId string using the specified random generator, character alphabet, and size.
@@ -124,7 +124,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
          * @return a randomly generated NanoId string with the specified parameters.
          * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException if the alphabet is empty or contains more than 255 characters.
          * @throws NumberSignException if the size is not positive.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun randomNanoId(
             random: Random = SecureRandom(),
@@ -152,79 +152,79 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
             }
         }
 
-        class Serializer : ValueSerializer<NanoID>() {
-            override fun serialize(value: NanoID, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<NanoId>() {
+            override fun serialize(value: NanoId, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<NanoID>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = NanoID(p.string)
+        class Deserializer : ValueDeserializer<NanoId>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = NanoId(p.string)
         }
 
-        class OldSerializer : JsonSerializer<NanoID>() {
-            override fun serialize(value: NanoID, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<NanoId>() {
+            override fun serialize(value: NanoId, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<NanoID>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): NanoID = NanoID(p.text)
+        class OldDeserializer : JsonDeserializer<NanoId>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): NanoId = NanoId(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<NanoID?, String?> {
-            override fun convertToDatabaseColumn(attribute: NanoID?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): NanoID? = dbData?.let { NanoID(it) }
+        class Converter : AttributeConverter<NanoId?, String?> {
+            override fun convertToDatabaseColumn(attribute: NanoId?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): NanoId? = dbData?.let { NanoId(it) }
         }
 
-        class Type : EnhancedUserType<NanoID> {
+        class Type : EnhancedUserType<NanoId> {
             override fun getSqlType(): Int = SqlTypes.VARCHAR
 
-            override fun returnedClass(): Class<NanoID> = NanoID::class.java
+            override fun returnedClass(): Class<NanoId> = NanoId::class.java
 
             override fun equals(
-                x: NanoID?,
-                y: NanoID?
+                x: NanoId?,
+                y: NanoId?
             ): Boolean = x == y
 
-            override fun hashCode(x: NanoID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: NanoId?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): NanoID? {
+            ): NanoId? {
                 val value = rs?.getString(position) ?: return null
-                return NanoID(value)
+                return NanoId(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: NanoID?,
+                value: NanoId?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 st?.setString(index, value?.value) ?: throw IllegalArgumentException("Statement cannot be null")
             }
 
-            override fun deepCopy(value: NanoID?): NanoID? = value?.let { NanoID(it.value) }
+            override fun deepCopy(value: NanoId?): NanoId? = value?.let { NanoId(it.value) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: NanoID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: NanoId?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): NanoID? = cached as? NanoID
+            ): NanoId? = cached as? NanoId
 
-            override fun toSqlLiteral(value: NanoID?): String? = value?.let { "'${it.value}'" }
+            override fun toSqlLiteral(value: NanoId?): String? = value?.let { "'${it.value}'" }
 
-            override fun toString(value: NanoID?): String? = value?.value
+            override fun toString(value: NanoId?): String? = value?.value
 
-            override fun fromStringValue(sequence: CharSequence?): NanoID =
-                sequence?.let { NanoID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to NanoID")
+            override fun fromStringValue(sequence: CharSequence?): NanoId =
+                sequence?.let { NanoId(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to NanoID")
         }
     }
 
@@ -234,7 +234,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
      * @param index the position of the character to be returned, where the first character is at index 0.
      * @return the character at the specified [index].
      * @throws IndexOutOfBoundsException if [index] is less than 0 or greater than or equal to the length of the string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -248,7 +248,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
      * @param startIndex the beginning index, inclusive. Must be non-negative and less than or equal to [endIndex].
      * @param endIndex the ending index, exclusive. Must be greater than or equal to [startIndex] and no greater than
      * the length of this sequence.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -259,7 +259,7 @@ value class NanoID(private val value: String) : CharSequence, Serializable {
      * within the NanoId instance.
      *
      * @return a string representation of the NanoId.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 }

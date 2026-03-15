@@ -1,8 +1,8 @@
 package dev.tommasop1804.kutils.classes.colors
 
 import dev.tommasop1804.kutils.String2
-import dev.tommasop1804.kutils.classes.coding.JSON
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.coding.Json
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 
 internal object PantoneConverter {
     val json = """
@@ -9251,8 +9251,8 @@ internal object PantoneConverter {
     """.trimIndent()
 
     fun byCode(code: String): String2? {
-        val first = JSON(json)["$code.name", JSON.DEFAULT_SEPARATOR] ?: return null
-        return first.toString().replace("\"", "") to JSON(json)["$code.hex", JSON.DEFAULT_SEPARATOR]!!.toString().replace("\"", "")
+        val first = Json(json)["$code.name", Json.DEFAULT_SEPARATOR] ?: return null
+        return first.toString().replace("\"", "") to Json(json)["$code.hex", Json.DEFAULT_SEPARATOR]!!.toString().replace("\"", "")
     }
 
     fun byName(name: String): String? {

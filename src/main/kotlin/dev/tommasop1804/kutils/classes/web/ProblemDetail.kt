@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.DataMapNN
+import dev.tommasop1804.kutils.Uri
 import dev.tommasop1804.kutils.classes.web.HttpStatus.Companion.toHttpStatus
 import dev.tommasop1804.kutils.ifNotNull
 import tools.jackson.databind.DeserializationContext
@@ -42,10 +43,10 @@ import java.net.URI
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ProblemDetail.Companion.OldDeserializer::class)
 data class ProblemDetail(
     val status: HttpStatus? = null,
-    val type: URI = DEFAULT_TYPE,
+    val type: Uri = DEFAULT_TYPE,
     val title: String? = status?.reasonPhrase,
     val detail: String? = null,
-    val instance: URI? = null,
+    val instance: Uri? = null,
     val extensions: DataMapNN? = null
 ) {
     /**

@@ -2,9 +2,9 @@
 
 package dev.tommasop1804.kutils.classes.constants
 
-import dev.tommasop1804.kutils.classes.coding.JSON
+import dev.tommasop1804.kutils.classes.coding.Json
 import dev.tommasop1804.kutils.classes.coding.Language
-import dev.tommasop1804.kutils.classes.coding.YAML
+import dev.tommasop1804.kutils.classes.coding.Yaml
 import dev.tommasop1804.kutils.classes.collections.Table
 import dev.tommasop1804.kutils.classes.colors.Color
 import dev.tommasop1804.kutils.classes.geography.BoundingBox
@@ -742,7 +742,7 @@ enum class ObjType(
      *
      * @since 1.0.0
      */
-    JSON(dev.tommasop1804.kutils.classes.coding.JSON::class, macroType = MacroType.STRING),
+    JSON(dev.tommasop1804.kutils.classes.coding.Json::class, macroType = MacroType.STRING),
 
     /**
      * Represents a YAML configuration or structure associated with a specific `KClass`
@@ -752,7 +752,7 @@ enum class ObjType(
      *
      * @since 1.0.0
      */
-    YAML(dev.tommasop1804.kutils.classes.coding.YAML::class, macroType = MacroType.STRING);
+    YAML(dev.tommasop1804.kutils.classes.coding.Yaml::class, macroType = MacroType.STRING);
 
     /**
      * Returns the simple name of the class represented by this enum value.
@@ -887,11 +887,11 @@ enum class ObjType(
         }
         this == CURRENCY -> {
             if (obj is Currency || obj is java.util.Currency) true
-            try { Currency.valueOf(+obj.toString()); true } catch (e: Exception) { false }
+            else try { Currency.valueOf(+obj.toString()); true } catch (e: Exception) { false }
         }
         this == ZONE_IDENT -> {
             if (obj is ZoneIdent || obj is ZoneId) true
-            try {
+            else try {
                 TimeZoneDesignator.valueOf(+obj.toString())
                 true
             } catch (e: Exception) {
@@ -905,7 +905,7 @@ enum class ObjType(
         }
         this == SEX -> {
             if (obj is Sex) true
-            try {
+            else try {
                 Sex.valueOf(+obj.toString())
                 true
             } catch (e: Exception) {
@@ -923,14 +923,14 @@ enum class ObjType(
             else try { Contact.PhoneNumber(obj.toString()); true } catch (e: Exception) { false }
         }
         JSON -> {
-            if (obj is JSON) true
+            if (obj is Json) true
             else try {
-                dev.tommasop1804.kutils.classes.coding.JSON(obj.toString()); true } catch (e: Exception) { false }
+                dev.tommasop1804.kutils.classes.coding.Json(obj.toString()); true } catch (e: Exception) { false }
         }
         YAML -> {
-            if (obj is YAML) true
+            if (obj is Yaml) true
             else try {
-                dev.tommasop1804.kutils.classes.coding.YAML(obj.toString()); true } catch (e: Exception) { false }
+                dev.tommasop1804.kutils.classes.coding.Yaml(obj.toString()); true } catch (e: Exception) { false }
         }
         else -> kClass.isInstance(obj)
     }

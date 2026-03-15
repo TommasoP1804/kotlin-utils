@@ -8,43 +8,15 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.DOT
-import dev.tommasop1804.kutils.DataMMap
-import dev.tommasop1804.kutils.DataMMapNN
-import dev.tommasop1804.kutils.DataMap
-import dev.tommasop1804.kutils.DataMapNN
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.HYPEN
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.LF
-import dev.tommasop1804.kutils.LocalDate
-import dev.tommasop1804.kutils.MList
-import dev.tommasop1804.kutils.MMap
-import dev.tommasop1804.kutils.MSet
 import dev.tommasop1804.kutils.OffsetDateTime
-import dev.tommasop1804.kutils.after
 import dev.tommasop1804.kutils.annotations.Beta
-import dev.tommasop1804.kutils.before
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.MAPPER
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.toJSON
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.expect
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.isDecimal
-import dev.tommasop1804.kutils.isNotDecimal
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.isNull
-import dev.tommasop1804.kutils.mMapOf
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.sentenceCase
-import dev.tommasop1804.kutils.serialize
-import dev.tommasop1804.kutils.startsWith
-import dev.tommasop1804.kutils.toMList
-import dev.tommasop1804.kutils.toMSet
-import dev.tommasop1804.kutils.tryOr
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.LoaderOptions
-import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import org.yaml.snakeyaml.error.MarkedYAMLException
 import org.yaml.snakeyaml.error.YAMLException
@@ -58,11 +30,8 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.io.File
 import java.nio.file.Path
 import java.time.*
-import kotlin.apply
-import kotlin.collections.map
-import kotlin.collections.mapKeys
-import kotlin.collections.mapValues
 import org.intellij.lang.annotations.Language as IJLanguage
+import org.yaml.snakeyaml.Yaml as SnakeYaml
 
 /**
  * The `YAML` class is a representation of YAML-encoded data. It provides functionality to parse, validate,
@@ -81,16 +50,16 @@ import org.intellij.lang.annotations.Language as IJLanguage
  *
  * @param value The raw YAML content as a string.
  * @constructor Creates an instance of the YAML class with the given string content or a `YAMLNode`.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = YAML.Companion.Serializer::class)
-@JsonDeserialize(using = YAML.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = YAML.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = YAML.Companion.OldDeserializer::class)
+@JsonSerialize(using = Yaml.Companion.Serializer::class)
+@JsonDeserialize(using = Yaml.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Yaml.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Yaml.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
 @Beta(since = "6.11.0")
-class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence, Code(value, Language.YAML) {
+class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence, Code(value, Language.YAML) {
 
     /**
      * Indicates whether the current YAML instance can be represented as an object-like structure (e.g., a map or dictionary).
@@ -98,7 +67,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * The underlying implementation relies on the result of a safe deserialization attempt using SnakeYAML.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isObject = toDataMap().isSuccess
     /**
@@ -111,32 +80,32 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * This property is typically used to infer if the underlying YAML structure
      * represents an array (or list) based on its serialized format and conventions.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isArray = toList<Any>().isSuccess && value.trim() startsWith Char.HYPEN
     /**
      * Indicates whether the current YAML node represents a scalar value.
      * This property evaluates to `true` if the node is neither an array nor an object.
      * 
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isValue = !isArray && !isObject
 
     /**
-     * Constructs a new instance of the YAML class using a given [YAMLNode].
+     * Constructs a new instance of the YAML class using a given [YamlNode].
      *
      * @param node The YAMLNode instance whose raw value will be used to initialize the YAML object.
      * The raw value is converted to a string and passed to the primary constructor of the YAML class.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(node: YAMLNode) : this(node.rawValue.toString())
+    constructor(node: YamlNode) : this(node.rawValue.toString())
 
     /**
      * Secondary constructor that initializes an instance using a `Code` object.
      *
      * @param code The `Code` object containing the value to initialize.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(code: Code) : this(code.value) {
         code.language.expect(Language.YAML)
@@ -147,7 +116,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * parameter to the primary constructor.
      *
      * @param file The file whose content will be read and used to initialize the instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(file: File) : this(file.readText())
     /**
@@ -155,7 +124,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * parameter to the primary constructor.
      *
      * @param path The path of the file whose content will be read and used to initialize the instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(path: Path) : this(path.toFile().readText())
 
@@ -190,15 +159,15 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
                 multiRepresenters[CharSequence::class.java] = Represent { representScalar(Tag.STR, it.toString()) }
                 multiRepresenters[Any::class.java] = Represent {
                     when {
-                        it is YAMLNode -> when {
+                        it is YamlNode -> when {
                             it.isArray -> representSequence(Tag.SEQ, it.asList<Any>(), DumperOptions.FlowStyle.BLOCK)
                             it.isMap -> representMapping(Tag.MAP, it.asMap<Any>(), DumperOptions.FlowStyle.BLOCK)
-                            it.isObject -> representMapping(Tag.MAP, it.toJSON().toMap<Any>()(), DumperOptions.FlowStyle.BLOCK)
+                            it.isObject -> representMapping(Tag.MAP, it.toJson().toMap<Any>()(), DumperOptions.FlowStyle.BLOCK)
                             else -> representScalar(Tag.STR, it.rawValue.toString())
                         }
                         it is CharSequence -> representScalar(Tag.STR, it.toString())
                         it is Iterable<*> -> representSequence(Tag.SEQ, it, DumperOptions.FlowStyle.BLOCK)
-                        it.toJSON().isObject -> representMapping(Tag.MAP, it.toJSON().toMap<Any>()(), DumperOptions.FlowStyle.BLOCK)
+                        it.toJson().isObject -> representMapping(Tag.MAP, it.toJson().toMap<Any>()(), DumperOptions.FlowStyle.BLOCK)
                         else -> representScalar(Tag.STR, it.serialize())
                     }
                 }
@@ -208,7 +177,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
             tagInspector = TagInspector { _ -> true }
         }
         private val CONSTRUCTOR = Constructor(LOADER_OPTIONS)
-        val SNAKE_YAML = Yaml(CONSTRUCTOR, REPRESENTER, DUMPER_OPTIONS, LOADER_OPTIONS)
+        val SNAKE_YAML = SnakeYaml(CONSTRUCTOR, REPRESENTER, DUMPER_OPTIONS, LOADER_OPTIONS)
 
         /**
          * Checks if the String represents a valid YAML structure.
@@ -219,9 +188,9 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * 
          * @receiver The String to be validated as YAML.
          * @return `true` if the String is valid YAML; `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun String.isValidYAML() = runCatching { YAML(this) }
+        fun String.isValidYaml() = runCatching { Yaml(this) }
 
         /**
          * Converts the current `String` into a YAML representation and wraps the operation in a `Result`.
@@ -231,9 +200,9 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          *
          * @receiver The `String` to be converted to YAML.
          * @return A `Result` that either contains the parsed YAML object or an exception if parsing fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun String.toYAML() = runCatching { YAML(this) }
+        fun String.toYaml() = runCatching { Yaml(this) }
         /**
          * Converts the current `JSON` instance into its equivalent `YAML` representation.
          *
@@ -241,12 +210,12 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * `YAML` format, preserving the structure and content of the original data.
          *
          * @return A `YAML` instance representing the data structure of the original `JSON` input.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("jsonToYaml")
-        fun JSON.toYAML(): YAML {
+        fun Json.toYaml(): Yaml {
             val obj = toObject<Any>()()
-            return obj.toYAML()
+            return obj.toYaml()
         }
         /**
          * Converts the given object to its YAML representation.
@@ -254,12 +223,12 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @param includeTag Specifies whether to include the YAML type tag in the generated output. 
          *                   If `true`, the type tag is included; if `false`, it is omitted. Default is `true`.
          * @return The YAML representation of the object as an instance of the `YAML` class.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("anyToYaml")
-        fun Any.toYAML(includeTag: Boolean = true): YAML {
+        fun Any.toYaml(includeTag: Boolean = true): Yaml {
             val value1 = SNAKE_YAML.dump(this)!!
-            return YAML(
+            return Yaml(
                 if (includeTag) value1
                 else if (value1 startsWith "!!") value1 after Char.LF
                 else value1
@@ -272,7 +241,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @param file the file to be read and parsed as YAML
          * @return a Result containing the parsed YAML object if the operation is successful, 
          * or an exception if an error occurs
-         * @since 1.0.0
+         * @since 3.0.0
          */
         fun <T> readFromFile(file: File): Result<T> = runCatching { SNAKE_YAML.load(file.readText()) }
         /**
@@ -286,7 +255,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @param file The file from which the array is read.
          * @return A `Result` containing the array of type `T` if the operation succeeds, 
          * or the encapsulated exception if the operation fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         inline fun <reified T> readArrayFromFile(file: File): Result<Array<T>> = runCatching { readListFromFile<T>(file)().toTypedArray() }
         /**
@@ -298,9 +267,9 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @param file The file to read from. It should contain YAML-formatted data.
          * @return A [Result] containing the parsed list of objects of type [T], 
          * or an exception if the operation fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun <T> readListFromFile(file: File): Result<List<T>> = runCatching { YAML(file.readText()).toList<T>()() }
+        fun <T> readListFromFile(file: File): Result<List<T>> = runCatching { Yaml(file.readText()).toList<T>()() }
         /**
          * Reads the content of a given file, parses it as YAML, and converts it to a set of type `T`.
          *
@@ -312,9 +281,9 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @param file The file to be read, whose content is expected to be in YAML format.
          * @return A [Result] containing a [Set] of elements of type `T` if the operation is successful. 
          * In case of failure, the [Result] will encapsulate the exception.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun <T> readSetFromFile(file: File): Result<Set<T>> = runCatching { YAML(file.readText()).toSet<T>()() }
+        fun <T> readSetFromFile(file: File): Result<Set<T>> = runCatching { Yaml(file.readText()).toSet<T>()() }
         /**
          * Reads the contents of a specified file and parses it into a map structure from YAML format.
          *
@@ -325,12 +294,12 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @param file The file containing the YAML data to be parsed.
          * @return A [Result] containing the parsed map with keys as `String` and values of type `T`
          *         on success, or an exception on failure.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching { YAML(file.readText()).toMap<T>()() }
+        fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching { Yaml(file.readText()).toMap<T>()() }
 
-        class Serializer : ValueSerializer<YAML>() {
-            override fun serialize(value: YAML, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Yaml>() {
+            override fun serialize(value: Yaml, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 val node = MAPPER.readTree(value.value)
                 when {
                     node.isArray -> {
@@ -341,17 +310,17 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
                         val mapValue = value.toMap<Any>()()
                         gen.writePOJO(mapValue)
                     }
-                    else -> gen.writeRaw(value.toJSON().value)
+                    else -> gen.writeRaw(value.toJson().value)
                 }
             }
         }
 
-        class Deserializer : ValueDeserializer<YAML>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = JSON(p.objectReadContext().readTree<JsonNode>(p).toString()).toYAML()
+        class Deserializer : ValueDeserializer<Yaml>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Json(p.objectReadContext().readTree<JsonNode>(p).toString()).toYaml()
         }
 
-        class OldSerializer : JsonSerializer<YAML>() {
-            override fun serialize(value: YAML, gen: JsonGenerator, serializers: SerializerProvider) {
+        class OldSerializer : JsonSerializer<Yaml>() {
+            override fun serialize(value: Yaml, gen: JsonGenerator, serializers: SerializerProvider) {
                 val node = MAPPER.readTree(value.value)
                 when {
                     node.isArray -> {
@@ -362,13 +331,13 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
                         val mapValue = value.toMap<Any>()()
                         gen.writeObject(mapValue)
                     }
-                    else -> gen.writeRaw(value.toJSON().value)
+                    else -> gen.writeRaw(value.toJson().value)
                 }
             }
         }
 
-        class OldDeserializer : JsonDeserializer<YAML>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): YAML = JSON(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString()).toYAML()
+        class OldDeserializer : JsonDeserializer<Yaml>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Yaml = Json(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString()).toYaml()
         }
     }
 
@@ -379,10 +348,10 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @return A [Result] containing an instance of type [T] if the conversion succeeds,
      *         or an exception if the conversion fails.
      * @throws IllegalArgumentException if the value cannot be converted to the specified type.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toObject() = runCatching {
-        tryOr({ toJSON().toObject<T>()() }) {
+        tryOr({ toJson().toObject<T>()() }) {
             SNAKE_YAML.loadAs(value, T::class.java)!!
         }
     }
@@ -400,7 +369,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @throws ClassCastException If the YAML content cannot be cast to `T` at runtime.
      * @throws YAMLException If the YAML content is malformed.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     inline fun <reified T> toArray() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toTypedArray() }
 
@@ -412,7 +381,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param T The type to which each element in the resulting list will be cast.
      * @return A `Result` wrapping either the successfully parsed list of objects or any exception encountered during parsing.
      * @throws ClassCastException If an element in the YAML content cannot be cast to the specified type `T`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <T> toList() = runCatching { SNAKE_YAML.loadAll(value).map { it as T } }
     /**
@@ -423,7 +392,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param T The type of elements in the resulting mutable list.
      * @return A [Result] containing the mutable list of type [T], or an exception if the operation fails.
      * @throws ClassCastException If any element in the YAML content cannot be cast to the specified type [T].
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <T> toMList() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toMList() }
 
@@ -438,7 +407,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param T The type of the elements in the resulting set.
      * @return A `Result` containing the set of objects of type `T` or an exception 
      *         if an error occurs.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <T> toSet() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toSet() }
     /**
@@ -449,7 +418,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @return A `Result` wrapping a mutable set of type T, containing the parsed and distinct elements from the YAML content.
      *         If parsing or type casting fails, a `Failure` with the corresponding exception is returned.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <T> toMSet() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toMSet() }
 
@@ -463,7 +432,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param V The type of values expected in the resulting map.
      * @return A `Result<Map<String, T>>` containing the parsed map if successful or the exception if an error occurred.
      * @throws IllegalStateException If the YAML content cannot be parsed due to formatting issues or data type mismatches.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <V> toMap() = runCatching { SNAKE_YAML.load<Map<String, V>>(value)!! }
     /**
@@ -475,7 +444,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param V The type of the values in the resulting mutable map.
      * @return A `Result` containing the parsed `MMap<String, T>` on success, or an exception on failure.
      * @throws NullPointerException If the YAML parsing result is null.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <V> toMMap() = runCatching { SNAKE_YAML.load<MMap<String, V>>(value)!! }
     /**
@@ -485,7 +454,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * If parsing fails, the exception is caught and returned within the `Result` object.
      *
      * @return A `Result` containing either the parsed `DataMap` object or an exception if parsing fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMap() = runCatching { SNAKE_YAML.load<DataMap>(value)!! }
     /**
@@ -494,7 +463,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * wrapped in a `Result` object. Parsing errors are caught and encapsulated within the `Result`.
      *
      * @return A `Result` containing the parsed `DataMMap` or the exception in case of a failure.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMMap() = runCatching { SNAKE_YAML.load<DataMMap>(value)!! }
     /**
@@ -507,7 +476,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @throws IllegalStateException If the YAML content is null or cannot be converted to `DataMapNN`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMapNN() = runCatching { SNAKE_YAML.load<DataMapNN>(value)!! }
     /**
@@ -519,7 +488,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * 
      * @return [Result] containing either the successfully parsed [DataMMapNN] object or an exception.
      * @throws NullPointerException if the YAML value is parsed as `null`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toDataMMapNN() = runCatching { SNAKE_YAML.load<DataMMapNN>(value)!! }
 
@@ -529,7 +498,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param index The position of the element to retrieve. Must be within the bounds of the value.
      * @return The element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of range.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -539,7 +508,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @param startIndex the start index (inclusive) of the subsequence.
      * @param endIndex the end index (exclusive) of the subsequence.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -550,7 +519,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * of the instance content or state.
      *
      * @return A string representation of the object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -558,7 +527,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * Writes the content of a specified text value to the provided file.
      *
      * @param file The file to which the text content will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun writeToFile(file: File) = file.writeText(value)
 
@@ -567,23 +536,23 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @param dotPath The dot-separated string representing the path to the desired YAML node.
      * @return The YAMLNode corresponding to the specified path.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun get(dotPath: String) =
-        if (Char.DOT !in dotPath) YAMLNode(toDataMap()()[dotPath])
-        else YAMLNode(toDataMap()()[dotPath before Char.DOT])[dotPath after Char.DOT]
+        if (Char.DOT !in dotPath) YamlNode(toDataMap()()[dotPath])
+        else YamlNode(toDataMap()()[dotPath before Char.DOT])[dotPath after Char.DOT]
 
     /**
      * Sets the value at the specified dot-delimited path within the YAML structure.
      *
      * @param dotPath The dot-delimited path to identify the location in the YAML structure where the value should be set.
      * @param value The value to be set at the specified path. It can be null.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun set(dotPath: String, value: Any?) {
-        val rootNode = YAMLNode(toDataMap()())
+        val rootNode = YamlNode(toDataMap()())
         rootNode[dotPath] = value
-        this.value = rootNode.rawValue!!.toYAML().value
+        this.value = rootNode.rawValue!!.toYaml().value
     }
 
     /**
@@ -593,7 +562,7 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * This function modifies the string by eliminating segments that match the regex pattern.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun removeComments() {
         value -= Regex("#.*")
@@ -606,12 +575,12 @@ class YAML(@param:IJLanguage("YAML") override var value: String) : CharSequence,
  *
  * @constructor Creates a new YAMLNode instance from a given raw value.
  * @param rawValue The raw value to be encapsulated by the node. May hold any type or be null.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration", "UNCHECKED_CAST")
 @Beta(since = "8.0.0")
-class YAMLNode(val rawValue: Any?) {
+class YamlNode(val rawValue: Any?) {
     /**
      * Indicates whether the current YAMLNode is missing a value.
      *
@@ -619,14 +588,14 @@ class YAMLNode(val rawValue: Any?) {
      * otherwise it evaluates to `false`. Can be utilized to quickly determine 
      * if the node lacks any assigned value.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isMissing: Boolean = rawValue.isNull()
     /**
      * Indicates whether the current YAML node represents an array-like structure.
      * This is determined by checking if the underlying raw value is an instance of `Iterable`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isArray: Boolean = rawValue is Iterable<*>
     /**
@@ -635,7 +604,7 @@ class YAMLNode(val rawValue: Any?) {
      *
      * @return `true` if the `rawValue` is a Map, otherwise `false`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isMap: Boolean = rawValue is Map<*, *>
     /**
@@ -646,9 +615,9 @@ class YAMLNode(val rawValue: Any?) {
      *
      * @receiver `YAMLNode` instance whose `rawValue` is evaluated.
      * @return `true` if the node is a JSON object; `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    val isObject: Boolean = rawValue?.toJSON()?.isObject == true
+    val isObject: Boolean = rawValue?.toJson()?.isObject == true
     /**
      * Indicates whether the underlying value of this `YAMLNode` instance is a `String`.
      *
@@ -656,7 +625,7 @@ class YAMLNode(val rawValue: Any?) {
      *
      * @return `true` if the `rawValue` is a `String`, otherwise `false`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isString: Boolean = rawValue is String
     /**
@@ -664,14 +633,14 @@ class YAMLNode(val rawValue: Any?) {
      * This property evaluates to `true` if the `rawValue` is an instance of a numeric type, 
      * otherwise it evaluates to `false`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isNumber: Boolean = rawValue is Number
     /**
      * Indicates whether the raw value of this YAML node represents an integer number.
      * The check ensures that the raw value is of type `Number` and it does not have a decimal component.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isIntegerNumber: Boolean = rawValue is Number && rawValue.isNotDecimal
     /**
@@ -680,7 +649,7 @@ class YAMLNode(val rawValue: Any?) {
      * The property evaluates to `true` if `rawValue` is of type `Number` and is explicitly a decimal
      * type, distinguishing it from integers. Otherwise, it evaluates to `false`.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isDecimalNumber: Boolean = rawValue is Number && rawValue.isDecimal
     /**
@@ -689,9 +658,9 @@ class YAMLNode(val rawValue: Any?) {
      * This property evaluates `true` if the `rawValue` of the YAML node is a `Boolean`.
      * It can be used to determine the type of the value stored in the node for type-safe operations.
      *
-     * @see YAMLNode.asBoolean
-     * @see YAMLNode.rawValue
-     * @since 1.0.0
+     * @see YamlNode.asBoolean
+     * @see YamlNode.rawValue
+     * @since 3.0.0
      */
     val isBoolean: Boolean = rawValue is Boolean
     /**
@@ -699,27 +668,27 @@ class YAMLNode(val rawValue: Any?) {
      * 
      * The value is determined based on the type of the `rawValue` field.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isDate: Boolean = rawValue is LocalDate
     /**
      * Indicates whether the raw value of this node represents a valid date-time or instant object.
      * The raw value is considered a date-time if it is an instance of [OffsetDateTime] or [Instant] or [LocalDateTime].
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isDateTime: Boolean = rawValue is OffsetDateTime || rawValue is LocalDateTime || rawValue is Instant
     /**
      * Indicates whether the current node represents a singular value in the YAML structure.
      * A node is considered a value if it is not an array, map, or missing.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val isValue: Boolean = !isArray && !isMap && !isMissing
 
     companion object {
-        private fun missingNode() = YAMLNode(null)
-        private fun unwrap(value: Any?) = if (value is YAMLNode) value.rawValue else value
+        private fun missingNode() = YamlNode(null)
+        private fun unwrap(value: Any?) = if (value is YamlNode) value.rawValue else value
 
         /**
          * Converts the current YAML instance into a `YAMLNode`.
@@ -730,19 +699,19 @@ class YAMLNode(val rawValue: Any?) {
          *
          * @param includeTag Specifies whether the tag information should be included during the conversion. 
          *                   Defaults to true.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun YAML.toYAMLNode(includeTag: Boolean = true) = YAMLNode(if (isArray) toList<Any>() else toDataMap()())
+        fun Yaml.toYamlNode(includeTag: Boolean = true) = YamlNode(if (isArray) toList<Any>() else toDataMap()())
         /**
          * Converts the current object into a YAMLNode representation.
          *
          * @param includeTag Indicates whether to include the YAML tag in the resulting node. 
          *                   If true, the tag will be included; otherwise, it will be omitted.
          *                   Defaults to true.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @JvmName("anyToYAMLNode")
-        fun Any?.toYAMLNode(includeTag: Boolean = true) = YAMLNode(this)
+        fun Any?.toYamlNode(includeTag: Boolean = true) = YamlNode(this)
     }
 
     /**
@@ -756,9 +725,9 @@ class YAMLNode(val rawValue: Any?) {
      * @param dotPath the dot-separated path to the target node.
      * @return the YAMLNode at the specified path or a missing node 
      *         if the path is invalid or node is not found.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun get(dotPath: String): YAMLNode {
+    operator fun get(dotPath: String): YamlNode {
         if (dotPath.isBlank()) return this
 
         val keys = dotPath.split(".")
@@ -781,24 +750,24 @@ class YAMLNode(val rawValue: Any?) {
      *              Must be a non-negative integer within the bounds of the list.
      * @return The YAMLNode at the specified index if the current node is a list 
      *         and the index is valid; otherwise, a missing node.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun get(index: Int): YAMLNode {
+    operator fun get(index: Int): YamlNode {
         if (rawValue is List<*>)
             if (index >= 0 && index < rawValue.size) {
-                return YAMLNode(rawValue[index])
+                return YamlNode(rawValue[index])
             }
         return missingNode()
     }
     @Suppress("FunctionName")
-    private fun _get(key: String) = if (rawValue is Map<*, *>) YAMLNode(rawValue[key]) else missingNode()
+    private fun _get(key: String) = if (rawValue is Map<*, *>) YamlNode(rawValue[key]) else missingNode()
 
     /**
      * Sets a value in a nested data structure based on a dotted path representation.
      *
      * @param dotPath A string representing the path to the target property, where nested properties are separated by dots.
      * @param value The value to set at the specified path. Can be of any type.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun set(dotPath: String, value: Any?) {
         val keys = dotPath.split(".")
@@ -828,7 +797,7 @@ class YAMLNode(val rawValue: Any?) {
      * @param value The new value to be assigned at the specified index.
      * @throws IndexOutOfBoundsException If the specified index is out of the list's bounds.
      * @throws UnsupportedOperationException If the underlying raw value is not a mutable list.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun set(index: Int, value: Any?) {
         if (rawValue is MutableList<*>) {
@@ -858,7 +827,7 @@ class YAMLNode(val rawValue: Any?) {
      * Converts the current YAMLNode's raw value to its string representation.
      *
      * @return The string representation of the raw value if it exists
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asString() = rawValue?.toString()
     /**
@@ -868,7 +837,7 @@ class YAMLNode(val rawValue: Any?) {
      * convert it to a number if possible.
      *
      * @return The integer representation of the node's value
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asInt() = asString()?.toDoubleOrNull()?.toInt()
     /**
@@ -878,7 +847,7 @@ class YAMLNode(val rawValue: Any?) {
      * and converted to Long.
      * 
      * @return the Long representation of the YAMLNode's value
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asLong() = asString()?.toDoubleOrNull()?.toLong()
     /**
@@ -887,7 +856,7 @@ class YAMLNode(val rawValue: Any?) {
      * If the value is not directly convertible to a Double, it will return 0.0.
      * 
      * @return the value of the node as a Double, or 0.0 if conversion fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asDouble() = asString()?.toDoubleOrNull()
     /**
@@ -900,7 +869,7 @@ class YAMLNode(val rawValue: Any?) {
      *
      * @return the Boolean representation of the node's value, or `false`
      *         if the string value does not match "true".
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asBoolean() = asString().toBoolean()
     /**
@@ -910,7 +879,7 @@ class YAMLNode(val rawValue: Any?) {
      *
      * @return a list containing YAMLNode objects constructed from elements of the underlying iterable raw value,
      *         or an empty list if the raw value is not iterable.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <T> asList(): List<T>? = (rawValue as? Iterable<*>)?.map { it as T }
     /**
@@ -923,7 +892,7 @@ class YAMLNode(val rawValue: Any?) {
      * @return a map where the keys are strings derived from the original map keys
      *         and the values are corresponding `YAMLNode` instances. Returns an empty map if
      *         the `rawValue` is not a map or is null.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun <T> asMap(): Map<String, T> = (rawValue as? Map<*, *>)?.mapKeys { it.key.toString() }?.mapValues { it.value as T } ?: emptyMap()
     /**
@@ -933,7 +902,7 @@ class YAMLNode(val rawValue: Any?) {
      * The parsing uses the ISO_LOCAL_DATE format. If the string cannot be parsed, an exception is thrown.
      *
      * @return the LocalDate representation of the node's value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asDate() = asString()?.let(::LocalDate)?.getOrThrow()
     /**
@@ -944,7 +913,7 @@ class YAMLNode(val rawValue: Any?) {
      * An exception will be thrown if parsing fails.
      *
      * @return an OffsetDateTime object parsed from the node's value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asDateTime(): OffsetDateTime? = asString()?.let(::OffsetDateTime)?.getOrThrow()
     /**
@@ -955,7 +924,7 @@ class YAMLNode(val rawValue: Any?) {
      * represented as an [Instant], an exception is thrown.
      *
      * @return The parsed [Instant] instance representing the node's value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun asInstant(): Instant? = asString()?.let(::Instant)?.getOrThrow()
 
@@ -966,7 +935,7 @@ class YAMLNode(val rawValue: Any?) {
      * of the underlying raw value contained within the node.
      *
      * @return a string representation of the raw value encapsulated by this node.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString(): String = rawValue.toString()
 
@@ -978,7 +947,7 @@ class YAMLNode(val rawValue: Any?) {
      *
      * @param dotPath the dot-separated path to the target node.
      * @return `true` if the node at the specified path exists and is not marked as missing; otherwise, `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun invoke(dotPath: String) = !get(dotPath).isMissing
     /**
@@ -991,7 +960,7 @@ class YAMLNode(val rawValue: Any?) {
      * the accessed node.
      *
      * @param index The index of the node to check. Must be a non-negative integer.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun invoke(index: Int) = !get(index).isMissing
 }

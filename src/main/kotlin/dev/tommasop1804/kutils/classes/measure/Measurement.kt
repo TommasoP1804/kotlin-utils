@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package dev.tommasop1804.kutils.classes.measure
 
 import com.fasterxml.jackson.core.JsonGenerator
@@ -5,7 +7,6 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.DataSize
 import dev.tommasop1804.kutils.exceptions.ValidationFailedException
 import dev.tommasop1804.kutils.invoke
 import tools.jackson.databind.DeserializationContext
@@ -38,7 +39,6 @@ import kotlin.reflect.KProperty
 @JsonDeserialize(using = Measurement.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Measurement.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Measurement.Companion.OldDeserializer::class)
-@Suppress("unused")
 open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Serializable, Comparable<Measurement> {
     /**
      * Retrieves the measurement unit as a string representation.
@@ -563,7 +563,6 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
 @JsonDeserialize(using = RMeasurement.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RMeasurement.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RMeasurement.Companion.OldDeserializer::class)
-@Suppress("unused")
 class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, unit), Serializable {
     companion object {
         /**
@@ -650,3 +649,123 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
         }
     }
 }
+
+/**
+ * Defines a type alias for `RMeasurement` specifically for measurements of data size.
+ *
+ * This alias simplifies the usage of the `RMeasurement` class when associated with the
+ * `MeasureUnit.DataSizeUnit` unit, representing various units of data size such as bytes,
+ * kilobytes, megabytes, etc.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.DataSizeUnit
+ * @since 3.0.0
+ */
+typealias DataSize = RMeasurement<MeasureUnit.DataSizeUnit>
+/**
+ * A type alias for `RMeasurement` specialized with length units.
+ *
+ * This type alias simplifies the usage of `RMeasurement` when working specifically
+ * with physical measurements expressed in length units. The `MeasureUnit.LengthUnit`
+ * type parameter ensures that only length-related units are used in conjunction with
+ * this type alias.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.LengthUnit
+ * @since 3.0.0
+ */
+typealias Length = RMeasurement<MeasureUnit.LengthUnit>
+/**
+ * A type alias representing a measurement specifically for temperature-related units.
+ *
+ * This alias simplifies working with temperature measurements by explicitly associating
+ * them with the `MeasureUnit.TemperatureUnit` scalar type. It is backed by the `RMeasurement`
+ * class, enabling the use of the encapsulated functionalities like serialization support
+ * and type safety for temperature measurements.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.TemperatureUnit
+ * @since 3.0.0
+ */
+typealias Temperature = RMeasurement<MeasureUnit.TemperatureUnit>
+/**
+ * A type alias for `RMeasurement` with `MeasureUnit.AreaUnit` as the scalar unit type.
+ *
+ * This alias represents a measurement of area, wherein the unit of measurement
+ * is constrained to `MeasureUnit.AreaUnit`. It simplifies access to area-related
+ * measurements by reducing verbosity and enhancing readability.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.AreaUnit
+ * @since 3.0.0
+ */
+typealias Area = RMeasurement<MeasureUnit.AreaUnit>
+/**
+ * A type alias representing a measurement of volume.
+ *
+ * The `Volume` type is a specialized usage of the `RMeasurement` class,
+ * bound specifically to scalar units categorized as `MeasureUnit.VolumeUnit`.
+ * It represents a numerical value paired with a unit of volume measurement.
+ *
+ * This type alias enables more meaningful and concise code, improving readability
+ * when working with measurements of volume.
+ *
+ * @since 3.0.0
+ */
+typealias Volume = RMeasurement<MeasureUnit.VolumeUnit>
+/**
+ * A type alias for `RMeasurement` with `MeasureUnit.SpeedUnit` as the scalar unit type.
+ *
+ * This alias represents a speed measurement, where the numerical value is paired
+ * with a unit of speed. It simplifies working with speed-related measurements by
+ * providing a more descriptive type name.
+ *
+ * @since 3.0.0
+ */
+typealias Speed = RMeasurement<MeasureUnit.SpeedUnit>
+/**
+ * A type alias representing a measurement of acceleration with an associated unit of measurement.
+ *
+ * This alias simplifies the usage of `RMeasurement` with `MeasureUnit.AccelerationUnit`,
+ * which represents acceleration units within the measurement framework.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.AccelerationUnit
+ * @since 3.0.0
+ */
+typealias Accelertation = RMeasurement<MeasureUnit.AccelerationUnit>
+/**
+ * A typealias representing a density measurement with units restricted to those of type `MeasureUnit.DensityUnit`.
+ *
+ * This typealias simplifies the use of `RMeasurement` for operations specifically related to density values,
+ * where the unit of measurement is expected to be one of the predefined `DensityUnit`s in the `MeasureUnit` hierarchy.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.DensityUnit
+ * @since 3.0.0
+ */
+typealias Density = RMeasurement<MeasureUnit.DensityUnit>
+/**
+ * Typealias representing a plane angle measurement.
+ *
+ * `PlaneAngle` is a specific type of `RMeasurement` where the units are restricted to
+ * those defined under `MeasureUnit.PlaneAngleUnit`. This allows for precise and
+ * specialized handling of measurements related to plane angles.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.PlaneAngleUnit
+ * @since 3.0.0
+ */
+typealias PlaneAngle = RMeasurement<MeasureUnit.PlaneAngleUnit>
+/**
+ * A type alias representing a restricted measurement of mass.
+ *
+ * This alias is defined for `RMeasurement` using `MeasureUnit.MassUnit` as the scalar unit type,
+ * specialized for measurements that pertain to mass. It simplifies working with mass units while
+ * ensuring type safety and adherence to the `RMeasurement` structure.
+ *
+ * @see RMeasurement
+ * @see MeasureUnit.MassUnit
+ * @since 3.0.0
+ */
+typealias Mass = RMeasurement<MeasureUnit.MassUnit>

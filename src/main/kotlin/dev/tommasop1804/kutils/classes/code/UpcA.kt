@@ -10,7 +10,7 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
-import dev.tommasop1804.kutils.classes.code.ProductCode.UPC.Companion.computeCheckDigit
+import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
 import dev.tommasop1804.kutils.minus
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
@@ -30,27 +30,27 @@ import java.nio.file.Path
  * This value class enforces format validation and provides operations to generate various representations
  * such as barcodes, images, and streams.
  *
- * Implements the [CharSequence], [ProductCode.UPC], and [PrintableBarcode] interfaces for data manipulation
+ * Implements the [CharSequence], [ProductCode.Upc], and [PrintableBarcode] interfaces for data manipulation
  * and compatibility with barcode processing utilities.
  *
  * @property value The underlying string representation of the UPC-A code.
  * @constructor Accepts a validated [CharSequence] and trims it to ensure proper format.
- * @since 1.0.0
+ * @since 3.0.0
  */
 @JvmInline
 @Suppress("unused", "functionName", "className")
-@JsonSerialize(using = UPC_A.Companion.Serializer::class)
-@JsonDeserialize(using = UPC_A.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UPC_A.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UPC_A.Companion.OldDeserializer::class)
-value class UPC_A private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.UPC, PrintableBarcode {
+@JsonSerialize(using = UpcA.Companion.Serializer::class)
+@JsonDeserialize(using = UpcA.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UpcA.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UpcA.Companion.OldDeserializer::class)
+value class UpcA private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Upc, PrintableBarcode {
     /**
      * Represents the length of the `value` field, which denotes the number of
      * characters in the underlying value associated with the class.
      *
      * The property is read-only and computes the length dynamically.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -60,12 +60,12 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * and delegating to the primary constructor with the processed string.
      *
      * @param value the input CharSequence to be processed and used to construct the instance
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim())
 
     init {
-        validateInputFormat(value.isValidUPC_A(), UPC_A::class)
+        validateInputFormat(value.isValidUpcA(), UpcA::class)
     }
 
     companion object {
@@ -77,43 +77,43 @@ value class UPC_A private constructor(override val value: String) : CharSequence
          *
          * @receiver The string to be validated as a UPC-A code.
          * @return `true` if the string is a valid UPC-A code, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidUPC_A() = matches(Regex("[0-9]{12}")) && computeCheckDigit(toString() - 1) == this[11]
+        fun CharSequence.isValidUpcA() = matches(Regex("[0-9]{12}")) && computeCheckDigit(toString() - 1) == this[11]
 
         /**
          * Converts the string to a UPC-A representation by filtering out all non-digit characters.
          * The resulting string is then used to create a UPC_A object.
          *
          * @receiver The original string to be converted.
-         * @return A [Result] containing the [UPC_A] object if successful, or an exception if the conversion fails.
-         * @since 1.0.0
+         * @return A [Result] containing the [UpcA] object if successful, or an exception if the conversion fails.
+         * @since 3.0.0
          */
-        fun CharSequence.toUPC_A() = filter { it.isDigit() }.run { runCatching { UPC_A(this) } }
+        fun CharSequence.toUpcA() = filter { it.isDigit() }.run { runCatching { UpcA(this) } }
 
-        class Serializer : ValueSerializer<UPC_A>() {
-            override fun serialize(value: UPC_A, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<UpcA>() {
+            override fun serialize(value: UpcA, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<UPC_A>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = UPC_A(p.string)
+        class Deserializer : ValueDeserializer<UpcA>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = UpcA(p.string)
         }
 
-        class OldSerializer : JsonSerializer<UPC_A>() {
-            override fun serialize(value: UPC_A, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<UpcA>() {
+            override fun serialize(value: UpcA, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<UPC_A>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): UPC_A = UPC_A(p.text)
+        class OldDeserializer : JsonDeserializer<UpcA>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): UpcA = UpcA(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<UPC_A?, String?> {
-            override fun convertToDatabaseColumn(attribute: UPC_A?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): UPC_A? = dbData?.let { UPC_A(it) }
+        class Converter : AttributeConverter<UpcA?, String?> {
+            override fun convertToDatabaseColumn(attribute: UpcA?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): UpcA? = dbData?.let { UpcA(it) }
         }
     }
 
@@ -123,7 +123,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * @param index The index of the character to retrieve. Must be within the bounds of the value.
      * @return The character at the specified index.
      * @throws IndexOutOfBoundsException If the index is out of range.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -135,7 +135,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * @param endIndex the end index, exclusive.
      * @return a subsequence of the original character sequence.
      * @throws IndexOutOfBoundsException if startIndex or endIndex is invalid.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -145,7 +145,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * The method provides the string equivalent of the `value` property of the instance.
      *
      * @return The string representation stored in the `value` property.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -154,7 +154,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * into a BufferedImage format suitable for rendering or further processing.
      *
      * @return a BufferedImage representing the barcode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(): BufferedImage = MatrixToImageWriter.toBufferedImage(generateMatrix())
 
@@ -166,7 +166,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * for the BufferedImage.
      * @return A BufferedImage representation of the barcode based on the generated matrix
      * and the given configuration.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(
         config: MatrixToImageConfig
@@ -177,7 +177,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      *
      * @param format The format to use for writing the barcode image (e.g., "PNG", "JPG").
      * @param file The file where the barcode image will be saved.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -191,7 +191,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      *
      * @param format The format in which the barcode should be written (e.g., "PNG", "JPG").
      * @param file The target file path where the barcode will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -206,7 +206,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      *
      * @param format the format in which the barcode image is to be written (e.g., "PNG", "JPEG").
      * @param stream the `OutputStream` to which the barcode image will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -221,7 +221,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * @param format the format for the output (e.g., "PNG", "JPEG").
      * @param stream the output stream where the matrix will be written.
      * @param config the configuration for generating the image from the matrix.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -238,7 +238,7 @@ value class UPC_A private constructor(override val value: String) : CharSequence
      * with predefined dimensions of 285x120 pixels.
      *
      * @return a `BitMatrix` object representing the encoded EAN-8 barcode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun generateMatrix(): BitMatrix {
         val writer = MultiFormatWriter()

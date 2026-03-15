@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.afterLast
-import dev.tommasop1804.kutils.classes.code.ProductCode.EAN
+import dev.tommasop1804.kutils.classes.code.ProductCode.Ean
 import dev.tommasop1804.kutils.isEven
 import dev.tommasop1804.kutils.minus
 import dev.tommasop1804.kutils.validateInputFormat
@@ -24,21 +24,21 @@ import tools.jackson.databind.annotation.JsonSerialize
  * EAN-14 is used primarily for marking cartons or packages of items.
  *
  * This class is immutable and provides validation to ensure that the EAN-14 code is valid upon creation.
- * It implements the [CharSequence], [ProductCode], and [ProductCode.EAN] interfaces for compatibility and additional functionality.
+ * It implements the [CharSequence], [ProductCode], and [ProductCode.Ean] interfaces for compatibility and additional functionality.
  *
  * @property value The validated EAN-14 code as a string.
- * @constructor Creates an instance of [EAN14] by validating and normalizing the input.
+ * @constructor Creates an instance of [Ean14] by validating and normalizing the input.
  * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the input is not a valid EAN-14 code.
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
 @JvmInline
 @Suppress("unused")
-@JsonSerialize(using = EAN14.Companion.Serializer::class)
-@JsonDeserialize(using = EAN14.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = EAN14.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = EAN14.Companion.OldDeserializer::class)
-value class EAN14 private constructor(override val value: String) : CharSequence, ProductCode, EAN {
+@JsonSerialize(using = Ean14.Companion.Serializer::class)
+@JsonDeserialize(using = Ean14.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean14.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean14.Companion.OldDeserializer::class)
+value class Ean14 private constructor(override val value: String) : CharSequence, ProductCode, Ean {
     /**
      * Returns the length of the value represented by this instance.
      * The length is determined by the underlying string value.
@@ -61,7 +61,7 @@ value class EAN14 private constructor(override val value: String) : CharSequence
     constructor(value: CharSequence) : this(value.toString().trim())
 
     init {
-        validateInputFormat(value.isValidEAN14(), EAN14::class)
+        validateInputFormat(value.isValidEan14(), Ean14::class)
     }
 
     companion object {
@@ -77,7 +77,7 @@ value class EAN14 private constructor(override val value: String) : CharSequence
          * @return `true` if the string is a valid EAN-14 code, otherwise `false`.
          * @since 1.0.0
          */
-        fun CharSequence.isValidEAN14() = matches(Regex("(\\(01\\))?[0-9]{14}")) && computeCheckDigit(toString() - 1) == last()
+        fun CharSequence.isValidEan14() = matches(Regex("(\\(01\\))?[0-9]{14}")) && computeCheckDigit(toString() - 1) == last()
 
         /**
          * Converts the current string to an instance of `EAN14` by attempting to create a valid object
@@ -92,7 +92,7 @@ value class EAN14 private constructor(override val value: String) : CharSequence
          * the exception that occurred during the conversion.
          * @since 1.0.0
          */
-        fun CharSequence.toEAN14() = run { runCatching { EAN14(this) } }
+        fun CharSequence.toEan14() = run { runCatching { Ean14(this) } }
 
         /**
          * Computes the check digit for a given string code based on the EAN checksum algorithm.
@@ -104,7 +104,7 @@ value class EAN14 private constructor(override val value: String) : CharSequence
          * @since 1.0.0
          */
         fun computeCheckDigit(code: String): Char {
-            code.afterLast(')').validateInputFormat(EAN::class) {
+            code.afterLast(')').validateInputFormat(Ean::class) {
                 it matches Regex("[0-9]+") && it.length == 13
             }
             val sum = code.mapIndexed { index, ch -> if (index.isEven) ch.digitToInt() else ch.digitToInt() * 3 }.sum()
@@ -112,29 +112,29 @@ value class EAN14 private constructor(override val value: String) : CharSequence
             return ((((sum / 10) + 1) * 10) - sum).digitToChar()
         }
 
-        class Serializer : ValueSerializer<EAN14>() {
-            override fun serialize(value: EAN14, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ean14>() {
+            override fun serialize(value: Ean14, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<EAN14>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = EAN14(p.string)
+        class Deserializer : ValueDeserializer<Ean14>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Ean14(p.string)
         }
 
-        class OldSerializer : JsonSerializer<EAN14>() {
-            override fun serialize(value: EAN14, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ean14>() {
+            override fun serialize(value: Ean14, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<EAN14>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): EAN14 = EAN14(p.text)
+        class OldDeserializer : JsonDeserializer<Ean14>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ean14 = Ean14(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<EAN14?, String?> {
-            override fun convertToDatabaseColumn(attribute: EAN14?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): EAN14? = dbData?.let { EAN14(it) }
+        class Converter : AttributeConverter<Ean14?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ean14?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Ean14? = dbData?.let { Ean14(it) }
         }
     }
 

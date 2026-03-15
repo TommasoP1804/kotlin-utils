@@ -11,6 +11,7 @@ import Break
 import Continue
 import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.constants.SortDirection
+import dev.tommasop1804.kutils.classes.identifiers.Ulid
 import dev.tommasop1804.kutils.classes.numbers.Percentage
 import dev.tommasop1804.kutils.exceptions.TooFewResultsException
 import dev.tommasop1804.kutils.exceptions.TooManyElementsException
@@ -1429,7 +1430,15 @@ fun Iterable<Char>.toMList(): CharMList = toMutableList()
  * @since 1.0.0
  */
 @JvmName("uuidIterableToMList")
-fun Iterable<UUID>.toMList(): UUIDMList = toMutableList()
+fun Iterable<UUID>.toMList(): UuidMList = toMutableList()
+/**
+ * Converts a collection of ULIDs into a mutable list represented by ULIDMList.
+ *
+ * @return a ULIDMList containing all elements of the original collection.
+ * @since 3.0.0
+ */
+@JvmName("ulidIterableToMList")
+fun Iterable<Ulid>.toMList(): UlidMList = toMutableList()
 /**
  * Converts the current collection into a mutable list of the same type.
  *
@@ -1486,7 +1495,15 @@ fun Iterable<Char>.toMSet(): CharMSet = toMutableSet()
  * @since 1.0.0
  */
 @JvmName("uuidIterableToMSet")
-fun Iterable<UUID>.toMSet(): UUIDMSet = toMutableSet()
+fun Iterable<Uuid>.toMSet(): UuidMSet = toMutableSet()
+/**
+ * Converts the collection of ULIDs into a mutable set (MSet).
+ *
+ * @return A mutable set containing all unique elements from the collection.
+ * @since 3.0.0
+ */
+@JvmName("ulidIterableToMSet")
+fun Iterable<Ulid>.toMSet(): UlidMSet = toMutableSet()
 /**
  * Converts the given collection into a mutable set, preserving unique elements and discarding duplicates.
  *
@@ -1542,7 +1559,15 @@ fun mListOf(vararg elements: Char): CharMList = mutableListOf(*elements.toTypedA
  * @return A mutable list of UUIDs containing the provided elements.
  * @since 1.0.0
  */
-fun mListOf(vararg elements: UUID): UUIDMList = mutableListOf(*elements)
+fun mListOf(vararg elements: Uuid): UuidMList = mutableListOf(*elements)
+/**
+ * Creates a mutable list containing the specified ULID elements.
+ *
+ * @param elements A variable number of ULID elements to be added to the list.
+ * @return A mutable list of ULIDs containing the provided elements.
+ * @since 3.0.0
+ */
+fun mListOf(vararg elements: Ulid): UlidMList = mutableListOf(*elements)
 /**
  * Creates a new instance of an MList containing the specified elements.
  *
@@ -1600,7 +1625,15 @@ fun mSetOf(vararg elements: Char): CharMSet = mutableSetOf(*elements.toTypedArra
  * @return A mutable set containing the provided UUID elements.
  * @since 1.0.0
  */
-fun mSetOf(vararg elements: UUID): UUIDMSet = mutableSetOf(*elements)
+fun mSetOf(vararg elements: Uuid): UuidMSet = mutableSetOf(*elements)
+/**
+ * Creates a mutable set of ULID elements.
+ *
+ * @param elements A variable number of ULID elements to include in the set.
+ * @return A mutable set containing the provided ULID elements.
+ * @since 3.0.0
+ */
+fun mSetOf(vararg elements: Ulid): UlidMSet = mutableSetOf(*elements)
 /**
  * Creates a mutable set containing the specified elements.
  *
@@ -1632,8 +1665,16 @@ fun <T> Array<String>.toMList(): StringMList = toMutableList()
  * @return a mutable list containing all the elements of the original array.
  * @since 1.0.0
  */
-@JvmName("anyArrayToMList")
-fun <T> Array<UUID>.toMList(): UUIDMList = toMutableList()
+@JvmName("uuidArrayToMList")
+fun <T> Array<UUID>.toMList(): UuidMList = toMutableList()
+/**
+ * Converts an array of ULID objects into a mutable list of ULID objects.
+ *
+ * @return a mutable list containing all the elements of the original array.
+ * @since 3.0.0
+ */
+@JvmName("ulidArrayToMList")
+fun <T> Array<Ulid>.toMList(): UlidMList = toMutableList()
 /**
  * Converts the array into a mutable list.
  *
@@ -1698,8 +1739,16 @@ fun <T> Array<String>.toMSet(): StringMSet = toMutableSet()
  * @return a UUIDMList containing all elements of the original array.
  * @since 1.0.0
  */
-@JvmName("UUIDArrayToMSet")
-fun <T> Array<UUID>.toMSet(): UUIDMSet = toMutableSet()
+@JvmName("uuidArrayToMSet")
+fun <T> Array<Uuid>.toMSet(): UuidMSet = toMutableSet()
+/**
+ * Converts an array of ULIDs into a mutable list of ULIDs.
+ *
+ * @return a ULIDMList containing all elements of the original array.
+ * @since 3.0.0
+ */
+@JvmName("ulidArrayToMSet")
+fun <T> Array<Ulid>.toMSet(): UlidMSet = toMutableSet()
 /**
  * Converts the array into a mutable set.
  *

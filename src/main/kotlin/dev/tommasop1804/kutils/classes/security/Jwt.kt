@@ -9,9 +9,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.JSON
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.MAPPER
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.toJSON
+import dev.tommasop1804.kutils.classes.coding.Json
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.toEmail
 import dev.tommasop1804.kutils.classes.time.Duration
 import dev.tommasop1804.kutils.classes.web.HttpMethod
@@ -43,20 +43,20 @@ import com.auth0.jwt.algorithms.Algorithm as Auth0JwtAlgorithm
  * @constructor Creates a JWT object by parsing a JWT string. 
  * @param value The raw string representation of the JWT.
  * @throws MalformedInputException If the input is not a valid three-part JWT.
- * @since 1.0.0
+ * @since 3.0.0
  */
-@JsonSerialize(using = JWT.Companion.Serializer::class)
-@JsonDeserialize(using = JWT.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = JWT.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = JWT.Companion.OldDeserializer::class)
+@JsonSerialize(using = Jwt.Companion.Serializer::class)
+@JsonDeserialize(using = Jwt.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Jwt.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Jwt.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "PropertyName")
-class JWT private constructor(private val value: String) : CharSequence {
+class Jwt private constructor(private val value: String) : CharSequence {
     /**
      * Represents the decoded JSON object of the JWT header.
      * The header typically contains metadata about the token, such as the signing algorithm
      * and token type.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val header: DataMap
 
@@ -68,7 +68,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      * This property holds the claims in JSON format, allowing
      * further verification and processing.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val payload: DataMap
 
@@ -76,7 +76,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      * Represents the cryptographic signature component of a JSON Web Token (JWT).
      * The signature is used to validate the authenticity and integrity of the token.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val signature: String
 
@@ -85,7 +85,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      * This property retrieves the number of characters in the associated value.
      *
      * @return The length of the value as an integer.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length: Int get() = value.length
 
@@ -94,141 +94,141 @@ class JWT private constructor(private val value: String) : CharSequence {
     /**
      * [RFC 7515#4.1.1](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.1)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_algorithm get() = (header["alg"] as String).toEnumConst<Algorithm>()
     /**
      * [RFC 7515#4.1.2](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.2)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    val hd_jwkSetURL get() = (header["jku"] as? String)?.toURI()?.invoke()
+    val hd_jwkSetURL get() = (header["jku"] as? String)?.toUri()?.invoke()
     /**
      * [RFC 7515#4.1.3](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.3)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_jsonWebKey get() = header["jwk"] as? String
     /**
      * [RFC 7515#4.1.4](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.4)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_keyId get() = header["kid"] as? String
     /**
      * [RFC 7515#4.1.5](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.5)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    val hd_x509URL get() = (header["x5u"] as? String)?.toURI()?.invoke()
+    val hd_x509URL get() = (header["x5u"] as? String)?.toUri()?.invoke()
     /**
      * [RFC 7515#4.1.6](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.6)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    val hd_x509CertificateChain get() = tryOr({ JSON(header["x5c"] as String).toList<String>()() }) { header["x5c"] as? StringList }
+    val hd_x509CertificateChain get() = tryOr({ Json(header["x5c"] as String).toList<String>()() }) { header["x5c"] as? StringList }
     /**
      * [RFC 7515#4.1.7](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.7)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_x509CertificateSHA1Thumbripnt get() = header["x5t"] as? String
     /**
      * [RFC 7515#4.1.8](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.8)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_x509CertificateSHA256Thumbripnt get() = header["x5t#S256"] as? String
     /**
      * [RFC 7515#4.1.9](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.9)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_type get() = header["typ"] as? String
     /**
      * [RFC 7515#4.1.10](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.1)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val hd_contentType get() = header["cty"] as? String
     /**
      * [RFC 7515#4.1.11](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.11)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    val hd_critical get() = tryOr({ JSON(header["crit"] as String).toList<String>()() }) { header["crit"] as? StringList }
+    val hd_critical get() = tryOr({ Json(header["crit"] as String).toList<String>()() }) { header["crit"] as? StringList }
 
     /**
      * [RFC 7519#4.1.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_issuer get() = payload["iss"] as? String
     /**
      * [RFC 7519#4.1.2](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_subject get() = payload["sub"] as? String
     /**
      * [RFC 7519#4.1.3](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_audience get() = payload["aud"] as? String
     /**
      * [RFC 7519#4.1.4](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_expiration get() = (payload["exp"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [RFC 7519#4.1.5](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_notBefore get() = (payload["nbf"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [RFC 7519#4.1.6](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_issuedAt get() = (payload["iat"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [RFC 7519#4.1.7](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_jwtId get() = payload["jti"] as? String
 
     /**
      * [OPENID Connect Core 1.0#2](https://openid.net/specs/openid-connect-core-1_0-final.html#IDToken)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_authTime get() = (payload["auth_time"] as? Number)?.toString()?.let { if (length == 10) Instant(epochSeconds = it.toLong()) else Instant(epochMilliseconds = it.toLong()) }
     /**
      * [OPENID Connect Core 1.0#2](https://openid.net/specs/openid-connect-core-1_0-final.html#IDToken)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_nonce get() = payload["nonce"] as? String
     /**
      * [OPENID Connect Core 1.0#2](https://openid.net/specs/openid-connect-core-1_0-final.html#IDToken)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_authenticationContextClassReference get() = payload["acr"] as? String
     /**
      * [OPENID Connect Core 1.0#2](https://openid.net/specs/openid-connect-core-1_0-final.html#IDToken)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_authenticationMethodsReferences get() = payload["amr"] as? String
     /**
      * [OPENID Connect Core 1.0#2](https://openid.net/specs/openid-connect-core-1_0-final.html#IDToken)
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_authorizedParty get() = payload["azp"] as? String
 
@@ -237,7 +237,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_realmAccess get() = payload["realm_access"] as? DataMap
     /**
@@ -245,7 +245,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_realmAccessRoles get() = pl_kc_realmAccess?.get("roles") as? StringList
     /**
@@ -253,7 +253,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_scope get() = payload["scope"] as? String
     /**
@@ -261,7 +261,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_emailVerified get() = payload["email_verified"] as? Boolean
     /**
@@ -269,7 +269,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_name get() = payload["name"] as? String
     /**
@@ -277,7 +277,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_preferredUsername get() = payload["preferred_username"] as? String
     /**
@@ -285,7 +285,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_givenName get() = payload["given_name"] as? String
     /**
@@ -293,7 +293,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_familyName get() = payload["family_name"] as? String
     /**
@@ -301,7 +301,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * DO NOT SEARCH IF YOU ARE NOT USING KEYCLOAK.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val pl_kc_email get() = (payload["email"] as? String)?.toEmail()?.invoke()
 
@@ -324,15 +324,15 @@ class JWT private constructor(private val value: String) : CharSequence {
      * - **NoSuchElementException**: Thrown if no key matching the specified key ID (`hd_keyId`) is found in the JWKS.
      *
      * @return A `Result` containing the generated RSA public key or an exception if the operation fails.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @Suppress("RedundantLabeledReturnOnLastExpressionInLambda")
-    val RSAPublicKey: Result<RSAPublicKey>
+    val rsaPublicKey: Result<RSAPublicKey>
         get() = runCatching {
             if (pl_issuer.isNullOrBlank()) throw RequiredFieldException("issuer")
             val client = HttpClient.newHttpClient()
 
-            fun fetchJSON(url: String): JsonNode {
+            fun fetchJson(url: String): JsonNode {
                 val uri = URI.create(url)
                 val request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -346,9 +346,9 @@ class JWT private constructor(private val value: String) : CharSequence {
             val discoveryURL = (if (pl_issuer!!.endsWith(Char.SLASH)) pl_issuer else ("$pl_issuer/"))
                 .plus(".well-known/openid-configuration")
 
-            val tree = fetchJSON(discoveryURL)
+            val tree = fetchJson(discoveryURL)
             val jwksUri = tree["jwks_uri"].asString()
-            val jwks = fetchJSON(jwksUri)
+            val jwks = fetchJson(jwksUri)
             val keys = jwks["keys"]
             if (keys.isArray) {
                 for (key in keys) {
@@ -377,7 +377,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param jwt The character sequence representing the JSON Web Token, which may
      *            optionally include the "Bearer " prefix.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(jwt: CharSequence) : this((jwt.toString() - "Bearer ").trim())
 
@@ -385,8 +385,8 @@ class JWT private constructor(private val value: String) : CharSequence {
         val parts = value.split(Char.DOT)
         if (parts.size != 3) throw MalformedInputException("Invalid JWT")
 
-        header = String(Base64.getUrlDecoder().decode(parts[0])).toJSON()().toDataMap()()
-        payload = String(Base64.getUrlDecoder().decode(parts[1])).toJSON()().toDataMap()()
+        header = String(Base64.getUrlDecoder().decode(parts[0])).toJson()().toDataMap()()
+        payload = String(Base64.getUrlDecoder().decode(parts[1])).toJson()().toDataMap()()
         signature = parts[2]
     }
 
@@ -400,9 +400,9 @@ class JWT private constructor(private val value: String) : CharSequence {
          *
          * @receiver The character sequence to validate as a JWT.
          * @return `true` if the character sequence represents a valid JWT; `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidJWT() = runCatching { JWT(this) }.isSuccess
+        fun CharSequence.isValidJwt() = runCatching { Jwt(this) }.isSuccess
 
         /**
          * Converts the current [CharSequence] into a JWT object by attempting to parse it.
@@ -416,9 +416,9 @@ class JWT private constructor(private val value: String) : CharSequence {
          * @receiver The [CharSequence] to be converted into a JWT object.
          * @return A [Result] containing the initialized `JWT` object if successful, or
          *         an error if the input is invalid or the parsing fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toJWT() = runCatching { JWT(this) }
+        fun CharSequence.toJwt() = runCatching { Jwt(this) }
 
         /**
          * Generates a JWT (JSON Web Token) using a given payload and an optional expiration time.
@@ -430,11 +430,11 @@ class JWT private constructor(private val value: String) : CharSequence {
          * @param expiresTime Optional duration until the token expires. If not provided, the generated 
          *                     token will not have an expiration claim.
          * @return A builder object for further customization of the JWT.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @OptIn(RiskyApproximationOfTemporal::class)
         @Suppress("KotlinConstantConditions", "UNCHECKED_CAST", "FunctionName")
-        private fun _generateJWT(payload: DataMap, expiresTime: Duration? = null): JWTCreator.Builder {
+        private fun _generateJwt(payload: DataMap, expiresTime: Duration? = null): JWTCreator.Builder {
             val builder = com.auth0.jwt.JWT.create()
             for ((key, value) in payload) {
                 when (value) {
@@ -467,19 +467,19 @@ class JWT private constructor(private val value: String) : CharSequence {
          * @param payload A map containing key-value pairs to include as claims in the payload of the JWT.
          * @param secret A secret key used for signing the JWT with the HMAC256 algorithm.
          * @return A signed JWT instance.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateHMAC256(payload: DataMap, secret: String) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.HMAC256(secret))!!)
+        fun generateHmac256(payload: DataMap, secret: String) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.HMAC256(secret))!!)
         /**
          * Generates a signed HMAC256 JSON Web Token (JWT) based on the given payload and secret key.
          *
          * @param payload The JSON payload to be included in the token, which will be converted to a data map.
          * @param secret The secret key used to generate the HMAC256 signature for the token.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateHMAC256(payload: JSON, secret: String) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.HMAC256(secret))!!)
+        fun generateHmac256(payload: Json, secret: String) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.HMAC256(secret))!!)
         /**
          * Generates an HMAC384-signed JSON Web Token (JWT) using the provided payload and secret key.
          *
@@ -488,19 +488,19 @@ class JWT private constructor(private val value: String) : CharSequence {
          * @param secret A `String` representing the secret key used for HMAC384 signing.
          * This key is essential for ensuring the integrity and authenticity of the token.
          * @return A signed JWT encapsulated in a `JWT` object.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateHMAC384(payload: DataMap, secret: String) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.HMAC384(secret))!!)
+        fun generateHmac384(payload: DataMap, secret: String) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.HMAC384(secret))!!)
         /**
          * Generates a JWT signed using the HMAC384 algorithm.
          *
          * @param payload the JSON payload object to be encoded and signed.
          * @param secret the secret key used for generating the HMAC384 signature.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateHMAC384(payload: JSON, secret: String) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.HMAC384(secret))!!)
+        fun generateHmac384(payload: Json, secret: String) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.HMAC384(secret))!!)
         /**
          * Generates an HMAC-512 signed JSON Web Token (JWT) based on the provided payload and secret.
          * This method ensures the payload is securely signed using the HMAC-512 algorithm.
@@ -509,19 +509,19 @@ class JWT private constructor(private val value: String) : CharSequence {
          *                The payload can contain various types like strings, numbers, booleans, dates, and more.
          * @param secret A secret key used to sign the JWT using the HMAC-512 algorithm.
          *               It is recommended to use a secure and high-entropy key to maintain the integrity of the token.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateHMAC512(payload: DataMap, secret: String) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.HMAC512(secret))!!)
+        fun generateHmac512(payload: DataMap, secret: String) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.HMAC512(secret))!!)
         /**
          * Generates a JWT token signed using the HMAC512 algorithm.
          *
          * @param payload The JSON object containing the claims to be included in the JWT payload.
          * @param secret The secret key used to sign the JWT using the HMAC512 algorithm.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateHMAC512(payload: JSON, secret: String) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.HMAC512(secret))!!)
+        fun generateHmac512(payload: Json, secret: String) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.HMAC512(secret))!!)
         /**
          * Generates a signed RSA256 JWT (JSON Web Token) using the provided payload and private key.
          *
@@ -530,10 +530,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          * @param payload The key-value data map to be included as claims within the JWT.
          * @param privateKey The RSA private key used to generate the signature for the JWT.
          * @return A signed JWT object containing the provided claims.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateRSA256(payload: DataMap, privateKey: RSAPrivateKey) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.RSA256(privateKey))!!)
+        fun generateRsa256(payload: DataMap, privateKey: RSAPrivateKey) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.RSA256(privateKey))!!)
         /**
          * Generates a JWT (JSON Web Token) signed using the RSA256 algorithm.
          *
@@ -541,10 +541,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          * It must be converted to a data map before processing.
          * @param privateKey The RSA private key used to sign the token.
          * @return A signed JWT object.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateRSA256(payload: JSON, privateKey: RSAPrivateKey) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.RSA256(privateKey))!!)
+        fun generateRsa256(payload: Json, privateKey: RSAPrivateKey) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.RSA256(privateKey))!!)
         /**
          * Generates a JWT signed with the RSA384 algorithm based on the given payload and private key.
          *
@@ -552,29 +552,29 @@ class JWT private constructor(private val value: String) : CharSequence {
          *   and values must conform to accepted claim formats such as String, Boolean, Int, Long, Double, Date, Instant, Map, or List.
          * @param privateKey The RSA private key used to sign the JWT using the RSA384 algorithm.
          * @return A `JWT` object representing the generated token.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateRSA384(payload: DataMap, privateKey: RSAPrivateKey) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.RSA384(privateKey))!!)
+        fun generateRsa384(payload: DataMap, privateKey: RSAPrivateKey) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.RSA384(privateKey))!!)
         /**
          * Generates an RSA384 signed JSON Web Token (JWT) using the provided payload and private key.
          *
          * @param payload The JSON object containing the claims to include in the JWT.
          * @param privateKey The RSA private key used to sign the JWT with the RSA384 algorithm.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateRSA384(payload: JSON, privateKey: RSAPrivateKey) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.RSA384(privateKey))!!)
+        fun generateRsa384(payload: Json, privateKey: RSAPrivateKey) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.RSA384(privateKey))!!)
         /**
          * Generates a signed RSA-512 JSON Web Token (JWT) based on the provided payload and private key.
          * The payload data is included as claims in the JWT, and the token is signed using the RSA-512 algorithm.
          *
          * @param payload Represents the key-value pairs to include as claims in the JWT.
          * @param privateKey The RSA private key used to sign the JWT.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateRSA512(payload: DataMap, privateKey: RSAPrivateKey) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.RSA512(privateKey))!!)
+        fun generateRsa512(payload: DataMap, privateKey: RSAPrivateKey) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.RSA512(privateKey))!!)
         /**
          * Generates a JWT (JSON Web Token) using the RSA-512 signing algorithm.
          * Takes a JSON payload and an RSA private key as input, 
@@ -582,10 +582,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          *
          * @param payload The JSON payload to be included in the JWT.
          * @param privateKey The RSA private key used to sign the token.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateRSA512(payload: JSON, privateKey: RSAPrivateKey) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.RSA512(privateKey))!!)
+        fun generateRsa512(payload: Json, privateKey: RSAPrivateKey) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.RSA512(privateKey))!!)
         /**
          * Generates an ECDSA256 signed JSON Web Token (JWT) using the provided payload and private key.
          *
@@ -596,10 +596,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          *                represents a claim to be included in the token.
          * @param privateKey The EC (Elliptic Curve) private key used to sign the JWT using the ECDSA256 
          *                   algorithm.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateECDSA256(payload: DataMap, privateKey: ECPrivateKey) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.ECDSA256(privateKey))!!)
+        fun generateEcdsa256(payload: DataMap, privateKey: ECPrivateKey) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.ECDSA256(privateKey))!!)
         /**
          * Generates a JSON Web Token (JWT) using the ECDSA-256 (Elliptic Curve Digital Signature Algorithm) algorithm.
          * The method signs the provided payload with the specified private key.
@@ -607,10 +607,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          * @param payload The JSON payload to include in the JWT. This should contain the data to be encoded.
          * @param privateKey The elliptic curve private key used to sign the JWT.
          * @return The generated JWT as a string.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateECDSA256(payload: JSON, privateKey: ECPrivateKey) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.ECDSA256(privateKey))!!)
+        fun generateEcdsa256(payload: Json, privateKey: ECPrivateKey) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.ECDSA256(privateKey))!!)
         /**
          * Generates a JSON Web Token (JWT) using the ECDSA384 cryptographic algorithm.
          * This method signs a token created from the provided payload using the specified EC private key.
@@ -619,10 +619,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          *                claim names and its values represent claim values.
          * @param privateKey The EC private key used to sign the JWT.
          * @return A signed JWT instance.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateECDSA384(payload: DataMap, privateKey: ECPrivateKey) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.ECDSA384(privateKey))!!)
+        fun generateEcdsa384(payload: DataMap, privateKey: ECPrivateKey) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.ECDSA384(privateKey))!!)
         /**
          * Generates a JSON Web Token (JWT) using the ECDSA algorithm with a 384-bit key.
          *
@@ -632,10 +632,10 @@ class JWT private constructor(private val value: String) : CharSequence {
          *
          * @param payload The JSON object to include in the payload section of the token.
          * @param privateKey The elliptic curve private key used for signing the JWT.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateECDSA384(payload: JSON, privateKey: ECPrivateKey) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.ECDSA384(privateKey))!!)
+        fun generateEcdsa384(payload: Json, privateKey: ECPrivateKey) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.ECDSA384(privateKey))!!)
         /**
          * Generates a JWT (JSON Web Token) signed using the ECDSA-512 algorithm.
          *
@@ -643,43 +643,43 @@ class JWT private constructor(private val value: String) : CharSequence {
          * where the key is a String and the value can be various types, such as Boolean, Int, String, or Date.
          * @param privateKey The ECPrivateKey used to sign the JWT using the ECDSA-512 algorithm.
          * @return A signed JWT as an instance of the JWT class.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateECDSA512(payload: DataMap, privateKey: ECPrivateKey) =
-            JWT(_generateJWT(payload).sign(Auth0JwtAlgorithm.ECDSA512(privateKey))!!)
+        fun generateEcdsa512(payload: DataMap, privateKey: ECPrivateKey) =
+            Jwt(_generateJwt(payload).sign(Auth0JwtAlgorithm.ECDSA512(privateKey))!!)
         /**
          * Generates a signed JSON Web Token (JWT) using the ECDSA algorithm with a 512-bit key.
          *
          * @param payload The JSON object containing the payload data for the JWT.
          * @param privateKey The EC private key used to sign the JWT.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generateECDSA512(payload: JSON, privateKey: ECPrivateKey) =
-            JWT(_generateJWT(payload.toDataMap()()).sign(Auth0JwtAlgorithm.ECDSA512(privateKey))!!)
+        fun generateEcdsa512(payload: Json, privateKey: ECPrivateKey) =
+            Jwt(_generateJwt(payload.toDataMap()()).sign(Auth0JwtAlgorithm.ECDSA512(privateKey))!!)
 
-        class Serializer : ValueSerializer<JWT>() {
-            override fun serialize(value: JWT, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Jwt>() {
+            override fun serialize(value: Jwt, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.toString())
             }
         }
 
-        class Deserializer : ValueDeserializer<JWT>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = JWT(p.string)
+        class Deserializer : ValueDeserializer<Jwt>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Jwt(p.string)
         }
 
-        class OldSerializer : JsonSerializer<JWT>() {
-            override fun serialize(value: JWT, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Jwt>() {
+            override fun serialize(value: Jwt, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.toString())
         }
 
-        class OldDeserializer : JsonDeserializer<JWT>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): JWT = JWT(p.text)
+        class OldDeserializer : JsonDeserializer<Jwt>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Jwt = Jwt(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<JWT?, String?> {
-            override fun convertToDatabaseColumn(attribute: JWT?): String? = attribute?.toString()
-            override fun convertToEntityAttribute(dbData: String?): JWT? = dbData?.let { JWT(it) }
+        class Converter : AttributeConverter<Jwt?, String?> {
+            override fun convertToDatabaseColumn(attribute: Jwt?): String? = attribute?.toString()
+            override fun convertToEntityAttribute(dbData: String?): Jwt? = dbData?.let { Jwt(it) }
         }
     }
 
@@ -689,7 +689,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param bearerPrefix Specifies whether the returned string should include the "Bearer " prefix.
      * If true, the returned string starts with "Bearer "; otherwise, it does not include the prefix.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toString(bearerPrefix: Boolean) = (if (bearerPrefix) "Bearer " else String.EMPTY) + value
 
@@ -699,7 +699,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      * human-readable representation of the object's value.
      *
      * @return the string representation of the object
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -708,7 +708,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param index The position of the character to retrieve.
      * @return The character at the specified index.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int): Char = value[index]
 
@@ -718,7 +718,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      * @param startIndex the start index of the subsequence, inclusive.
      * @param endIndex the end index of the subsequence, exclusive.
      * @return a CharSequence representing the subsequence defined by the specified range.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = value.subSequence(startIndex, endIndex)
 
@@ -732,7 +732,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      * @param token The JWT token to be verified.
      * @param algorithm The algorithm object representing the cryptographic 
      * method used to sign the token.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @Suppress("functionName")
     private fun _verify(token: String, algorithm: Auth0JwtAlgorithm) =
@@ -746,9 +746,9 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param publicKey The RSA public key used for verification.
      * @param privateKey The RSA private key paired with the public key.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyRSA256(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) =
+    fun verifyRsa256(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) =
         _verify(toString(), Auth0JwtAlgorithm.RSA256(publicKey, privateKey))
     /**
      * Verifies the JWT token using the RSA-384 algorithm.
@@ -758,9 +758,9 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param publicKey The RSA public key used for verification.
      * @param privateKey The RSA private key used for verification.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyRSA384(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) =
+    fun verifyRsa384(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) =
         _verify(toString(), Auth0JwtAlgorithm.RSA384(publicKey, privateKey))
     /**
      * Verifies the integrity and authenticity of the JWT using the RSA512 algorithm.
@@ -769,42 +769,42 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param publicKey The RSA public key used to verify the token's signature.
      * @param privateKey The RSA private key associated with the token for the verification process.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyRSA512(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) =
+    fun verifyRsa512(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) =
         _verify(toString(), Auth0JwtAlgorithm.RSA512(publicKey, privateKey))
     /**
      * Verifies the HMAC256 signature of the current JWT instance using the provided secret.
      *
      * @param secret The secret key used to verify the HMAC256 signature.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyHMAC256(secret: String) =
+    fun verifyHmac256(secret: String) =
         _verify(toString(), Auth0JwtAlgorithm.HMAC256(secret))
     /**
      * Verifies the HMAC384 signature of the JWT using the provided secret.
      *
      * @param secret The secret key used for generating and verifying the HMAC384 signature.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyHMAC384(secret: String) =
+    fun verifyHmac384(secret: String) =
         _verify(toString(), Auth0JwtAlgorithm.HMAC384(secret))
     /**
      * Verifies the current JWT using the HMAC512 algorithm with the provided secret key.
      *
      * @param secret The secret key used to verify the HMAC512 signature of the JWT.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyHMAC512(secret: String) =
+    fun verifyHmac512(secret: String) =
         _verify(toString(), Auth0JwtAlgorithm.HMAC512(secret))
     /**
      * Verifies the JWT token using the ECDSA256 algorithm with the provided elliptic curve public and private keys.
      *
      * @param publicKey The ECPublicKey instance used for verifying the signature of the token.
      * @param privateKey The ECPrivateKey instance used for internal verification operations.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyECDSA256(publicKey: ECPublicKey, privateKey: ECPrivateKey) =
+    fun verifyEcdsa256(publicKey: ECPublicKey, privateKey: ECPrivateKey) =
         _verify(toString(), Auth0JwtAlgorithm.ECDSA256(publicKey, privateKey))
     /**
      * Verifies a JWT token using the ECDSA algorithm with a 384-bit curve.
@@ -815,18 +815,18 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * @param publicKey An instance of [ECPublicKey] representing the public key used to verify the signature.
      * @param privateKey An instance of [ECPrivateKey] representing the private key used in the verification process.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyECDSA384(publicKey: ECPublicKey, privateKey: ECPrivateKey) =
+    fun verifyEcdsa384(publicKey: ECPublicKey, privateKey: ECPrivateKey) =
         _verify(toString(), Auth0JwtAlgorithm.ECDSA384(publicKey, privateKey))
     /**
      * Verifies the JWT using the ECDSA signature algorithm with a SHA-512 hash.
      *
      * @param publicKey The ECDSA public key used for signature validation.
      * @param privateKey The ECDSA private key used for signature computation.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun verifyECDSA512(publicKey: ECPublicKey, privateKey: ECPrivateKey) =
+    fun verifyEcdsa512(publicKey: ECPublicKey, privateKey: ECPrivateKey) =
         _verify(toString(), Auth0JwtAlgorithm.ECDSA512(publicKey, privateKey))
 
     /**
@@ -837,7 +837,7 @@ class JWT private constructor(private val value: String) : CharSequence {
      *
      * Usage of these algorithms ensures the integrity and authenticity of the JWT during verification.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     enum class Algorithm {
         HS256,

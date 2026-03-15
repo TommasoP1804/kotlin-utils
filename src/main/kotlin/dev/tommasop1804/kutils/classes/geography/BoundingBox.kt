@@ -169,9 +169,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
          *
          * @param wkt The WKT string representing a polygon
          * @return A new BoundingBox instance, wrapped in a [Result]
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        infix fun fromWKT(wkt: String) = runCatching {
+        infix fun fromWkt(wkt: String) = runCatching {
             val coordinates = wkt.after("((").before("))").split(",")
                 .map { it.trim().split(" ").map { coord -> coord.toDouble() } }
 
@@ -192,9 +192,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
          * @param postgis The PostGIS string representing a polygon with SRID
          * @return A new BoundingBox instance, wrapped in a [Result]
          * @throws IllegalArgumentException if the PostGIS string is not valid
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        infix fun fromPostGIS(postgis: String) = runCatching { fromWKT(postgis after ";") }
+        infix fun fromPostGis(postgis: String) = runCatching { fromWkt(postgis after ";") }
 
         /**
          * Creates a BoundingBox from a GeoJSON polygon string.
@@ -202,9 +202,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
          * @param geojson The GeoJSON string representing a polygon
          * @return A new BoundingBox instance, wrapped in a [Result]
          * @throws IllegalArgumentException if the GeoJSON string is not valid
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        infix fun fromGeoJSON(geojson: String) = runCatching {
+        infix fun fromGeoJson(geojson: String) = runCatching {
             val coords = geojson.after("[[").before("]]")
                 .split("],[")
                 .map { it.trim('[', ']').split(",").map { coord -> coord.toDouble() } }
@@ -389,9 +389,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
      * (minLon minLat, maxLon minLat, maxLon maxLat, minLon maxLat, minLon minLat)
      *
      * @return A string containing the WKT representation of the bounding box.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toWKT(): String {
+    fun toWkt(): String {
         return "POLYGON ((" +
                 "${min.longitude} ${min.latitude}, " +
                 "${max.longitude} ${min.latitude}, " +
@@ -406,9 +406,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
      * The format is similar to WKT but includes SRID specification for WGS84.
      *
      * @return A string containing the PostGIS representation of the bounding box.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toPostGIS() = "SRID=4326;${toWKT()}"
+    fun toPostGis() = "SRID=4326;${toWkt()}"
 
     /**
      * Converts the bounding box to GeoJSON format.
@@ -416,9 +416,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
      * [[minLon,minLat], [maxLon,minLat], [maxLon,maxLat], [minLon,maxLat], [minLon,minLat]]
      *
      * @return A string containing the GeoJSON representation of the bounding box.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toGeoJSON(): String {
+    fun toGeoJson(): String {
         return """
             {
                 "type": "Polygon",
@@ -448,9 +448,9 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
         "width" to width,
         "height" to height,
         "centroid" to centroid,
-        "wkt" to toWKT(),
-        "postGIS" to toPostGIS(),
-        "geoJSON" to toGeoJSON()
+        "wkt" to toWkt(),
+        "postGis" to toPostGis(),
+        "geoJson" to toGeoJson()
     )
 
     /**
@@ -462,8 +462,8 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
      * - `height` - TYPE: [Double]
      * - `centroid` - TYPE: [GeoCoordinate]
      * - `wkt` - TYPE: [String]
-     * - `postGIS` - TYPE: [String]
-     * - `geoJSON` - TYPE: [String]
+     * - `postGis` - TYPE: [String]
+     * - `geoJson` - TYPE: [String]
      *
      * @param thisRef The object that contains the property. This parameter is typically ignored in this context.
      * @param property The property whose value is being retrieved. The name of the property is used to look up the value in the map.

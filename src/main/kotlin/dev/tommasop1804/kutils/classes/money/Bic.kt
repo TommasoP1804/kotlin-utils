@@ -33,22 +33,22 @@ import tools.jackson.databind.annotation.JsonSerialize
  *
  * @property value The string representation of the BIC. This value is validated for format compliance upon instantiation.
  * @constructor Initializes the object with a BIC string after enforcing validation rules.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @JvmInline
-@JsonSerialize(using = BIC.Companion.Serializer::class)
-@JsonDeserialize(using = BIC.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = BIC.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = BIC.Companion.OldDeserializer::class)
+@JsonSerialize(using = Bic.Companion.Serializer::class)
+@JsonDeserialize(using = Bic.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Bic.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Bic.Companion.OldDeserializer::class)
 @Suppress("unused")
-value class BIC private constructor(val value: String) : CharSequence {
+value class Bic private constructor(val value: String) : CharSequence {
     /**
      * Represents the length of the BIC (Bank Identifier Code) string.
      * This property corresponds to the total number of characters in the underlying BIC value.
      *
      * @return the length of the BIC value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -59,7 +59,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      * function on the underlying BIC string to obtain the first four characters.
      *
      * @return a string representation of the bank code
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val bankCode: String
         get() = 4(value)
@@ -72,7 +72,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      * its two-character ISO 3166-1 alpha-2 country code.
      *
      * @return A [Country] instance if the extraction is successful; otherwise, null.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val country: Country?
         get() = Country ofAlpha2 value[4..5]
@@ -87,7 +87,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      *
      * Validity of the location code adheres to the format rules specified in the BIC standard.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val locationCode: String
         get() = value[6..7]
@@ -100,7 +100,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      *
      * @return A string containing the branch code, or a default placeholder (e.g., "XXX") if unspecified.
      * @throws IndexOutOfBoundsException If the BIC value does not have sufficient length to include a branch code.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val branchCode: String
         get() = try { value[8..10] } catch (_: StringIndexOutOfBoundsException) { DEFAULT_BRANCH_CODE }
@@ -117,7 +117,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      * @throws MalformedInputException if the resulting string does not conform
      * to the expected BIC format.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(+(value.toString() - Char.SPACE))
 
@@ -134,7 +134,7 @@ value class BIC private constructor(val value: String) : CharSequence {
          * This constant is primarily used in scenarios where the branch portion of the BIC is either
          * optional or not explicitly defined.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private const val DEFAULT_BRANCH_CODE = "XXX"
 
@@ -146,9 +146,9 @@ value class BIC private constructor(val value: String) : CharSequence {
          *
          * @receiver The character sequence to be validated as a BIC.
          * @return `true` if the input is a valid BIC, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidBIC() = runCatching { BIC(this) }.isSuccess
+        fun CharSequence.isValidBic() = runCatching { Bic(this) }.isSuccess
 
         /**
          * Attempts to convert the current `CharSequence` into a `BIC` instance.
@@ -158,33 +158,33 @@ value class BIC private constructor(val value: String) : CharSequence {
          *
          * @receiver The `CharSequence` to be converted into a `BIC`.
          * @return A `Result` containing the successfully created `BIC` instance or a failure wrapping the exception.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toBIC() = runCatching { BIC(this) }
+        fun CharSequence.toBic() = runCatching { Bic(this) }
 
-        class Serializer : ValueSerializer<BIC>() {
-            override fun serialize(value: BIC, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Bic>() {
+            override fun serialize(value: Bic, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<BIC>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = BIC(p.string)
+        class Deserializer : ValueDeserializer<Bic>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Bic(p.string)
         }
 
-        class OldSerializer : JsonSerializer<BIC>() {
-            override fun serialize(value: BIC, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Bic>() {
+            override fun serialize(value: Bic, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<BIC>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): BIC = BIC(p.text)
+        class OldDeserializer : JsonDeserializer<Bic>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Bic = Bic(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<BIC?, String?> {
-            override fun convertToDatabaseColumn(attribute: BIC?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): BIC? = dbData?.let { BIC(it) }
+        class Converter : AttributeConverter<Bic?, String?> {
+            override fun convertToDatabaseColumn(attribute: Bic?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Bic? = dbData?.let { Bic(it) }
         }
     }
 
@@ -194,7 +194,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      * @param index the index of the character to be returned. Must be within the bounds of the string length.
      * @return the character at the specified position.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -204,7 +204,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      *
      * @param startIndex the starting index of the subsequence, inclusive. Must be non-negative and less than or equal to [endIndex].
      * @param endIndex the ending index of the subsequence, exclusive. Must be non-negative and greater than or equal to [startIndex].
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -215,7 +215,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      * the raw string value of the BIC.
      *
      * @return The underlying string value of this BIC instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -226,7 +226,7 @@ value class BIC private constructor(val value: String) : CharSequence {
      *        from the end of the string if it exists. When `false`, the full BIC value, including
      *        the branch code, will be returned.
      * @return The string representation of the BIC value, with or without the default branch code.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toString(omitDefaultBranchCode: Boolean) = if (omitDefaultBranchCode) {
         if (DEFAULT_BRANCH_CODE in value) value - 3

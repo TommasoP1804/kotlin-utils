@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.toJSON
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
+import dev.tommasop1804.kutils.classes.measure.DataSize
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit
 import dev.tommasop1804.kutils.classes.measure.RMeasurement.Companion.ofUnit
-import dev.tommasop1804.kutils.classes.security.JWT
-import dev.tommasop1804.kutils.classes.security.JWT.Companion.toJWT
+import dev.tommasop1804.kutils.classes.security.Jwt
+import dev.tommasop1804.kutils.classes.security.Jwt.Companion.toJwt
 import dev.tommasop1804.kutils.classes.time.Duration
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asSecondsOfDuration
 import dev.tommasop1804.kutils.classes.time.TimeZone
@@ -181,7 +182,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      * @param pair A Pair where the `first` represents the header name and the `second` represents the list of header values.
      * @since 2.1.0
      */
-    constructor(pair: Pair<String, Iterable<Any>>) : this(pair.first, pair.second)
+    constructor(pair: Pair<String, Any>) : this(from(pair))
     /**
      * Secondary constructor for the HttpHeader class that initializes
      * the object using an existing Map.Entry instance.
@@ -190,7 +191,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      *              a StringList representing the header values as the value.
      * @since 2.1.0
      */
-    constructor(entry: Map.Entry<String, Iterable<Any>>) : this(entry.key, entry.value)
+    constructor(entry: Map.Entry<String, Any>) : this(from(entry))
 
     /**
      * Initializes the HttpHeader instance with the specified name and value.
@@ -204,10 +205,22 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      */
     constructor(name: String, vararg values: Any) : this(name, values.map(Any::toString).toList())
 
+    /**
+     * Constructs an instance by parsing a notation string into components.
+     * The input string is expected to contain two parts separated by a colon (`:`).
+     * The first part is used as the first parameter, and the second part is split by commas (`,`),
+     * forming the second parameter as a list.
+     *
+     * @param notation A string in the format "part1:part2,part3,part4,...".
+     *
+     * @since 2.1.0
+     */
     constructor(notation: String) : this(
         notation.splitAndTrim(Char.COLON, limit = 2).first(),
         notation.splitAndTrim(Char.COLON, limit = 2).second() / Char.COMMA
     )
+
+    private constructor(header: HttpHeader) : this(header.name, header.values)
 
     init {
         validate(name.isNotBlank()) { "Header name cannot be blank" }
@@ -310,7 +323,18 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
          * @since 2.1.0
          */
         val Any.eTag
-            get() = toJSON().value hashingToString HashingAlgorithm.MD5
+            get() = toJson().value hashingToString HashingAlgorithm.MD5
+
+        @Suppress("UNCHECKED_CAST")
+        private fun from(pair: Pair<String, Any>) = when(pair.second) {
+            is Iterable<*> -> HttpHeader(pair.first, (pair.second as Iterable<Any>))
+            else -> HttpHeader(pair.first, pair.second)
+        }
+        @Suppress("UNCHECKED_CAST")
+        private fun from(entry: Map.Entry<String, Any>) = when(entry.value) {
+            is Iterable<*> -> HttpHeader(entry.key, (entry.value as Iterable<Any>))
+            else -> HttpHeader(entry.key, entry.value)
+        }
 
         /**
          * Converts a string representation of a date, commonly found in HTTP headers, into an [Instant].
@@ -479,7 +503,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      * further processing or integration with APIs that require an `HttpHeaders` type.
      *
      * @return A new `HttpHeaders` instance created from the current `HttpHeader`.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun toHttpHeaders() = HttpHeaders(this)
 
@@ -631,14 +655,15 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
  * Represents a collection of HTTP headers, allowing for various operations
  * such as retrieving, deserializing, and manipulating header values.
  *
+ * @author Tommaso Pastorelli
  * @since 2.1.0
  */
-@Suppress("unused", "JavaDefaultMethodsNotOverriddenByDelegation")
+@Suppress("unused")
 @JsonSerialize(using = HttpHeaders.Companion.Serializer::class)
 @JsonDeserialize(using = HttpHeaders.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = HttpHeaders.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = HttpHeaders.Companion.OldDeserializer::class)
-class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
+class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : MultiStringMap {
     /**
      * Represents the size of the collection based on the number of elements 
      * within the `headers` object.
@@ -704,6 +729,15 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
     fun isNotEmpty() = headers.isNotEmpty()
 
     /**
+     * Constructs an instance of the class by converting the provided collection of HTTP headers
+     * into a mutable set and delegating to another constructor.
+     *
+     * @param headers A collection of HTTP headers to be converted into a mutable set.
+     * @since 2.2.2
+     */
+    constructor(headers: Collection<HttpHeader>) : this(headers.toMSet())
+
+    /**
      * Constructs an `HttpHeaders` instance containing the provided HTTP headers.
      *
      * This constructor allows initializing the `HttpHeaders` object with a variable number of
@@ -713,7 +747,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @param headers A variable number of `HttpHeader` instances to be included in the collection.
      * @since 2.1.0
      */
-    constructor(vararg headers: HttpHeader) : this(headers.toSet().toMSet())
+    constructor(vararg headers: HttpHeader) : this(headers.toMSet())
     
     /**
      * Constructs an `HttpHeaders` instance using a single `HttpHeader` object.
@@ -728,6 +762,18 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @since 2.1.0
      */
     constructor(header: HttpHeader) : this(header.asSingleMSet())
+
+    /**
+     * Secondary constructor that initializes an instance using a variable number of
+     * key-value pairs. Each pair represents a header with the key as the header
+     * name and the value as the header's corresponding value. The pairs are converted
+     * into a list of `HttpHeader` objects and passed to the primary constructor.
+     *
+     * @param pairs Vararg parameter of key-value pairs where the key is the header
+     * name and the value is the associated header value.
+     * @since 2.2.2
+     */
+    constructor(vararg pairs: Pair<String, Any>) : this(pairs.map(::HttpHeader))
 
     /**
      * Constructs an instance of `HttpHeaders` by wrapping the provided header name and value
@@ -769,7 +815,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Converts the input map into a collection of `HttpHeader` objects and initializes the primary constructor.
      *
      * @param map A map where keys are header names and values are iterables of corresponding header values.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     constructor(map: Map<String, Iterable<Any>>) : this(map.map { HttpHeader(it.key, it.value) }.toMSet())
 
@@ -881,7 +927,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Defaults to throwing a `NoSuchHeaderException` initialized with the provided key.
      * @return The value associated with the specified key, if present.
      * @throws Throwable The exception provided by the `lazyException` supplier if the key is not found.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) =
         get(key) ?: throw lazyException()
@@ -1187,7 +1233,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @param key The key used to locate the header with the list of values.
      * @return The third value from the list, deserialized into the specified type [T].
      * @throws NoSuchElementException If the header with the provided key is not found.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     inline fun <reified T> getThirdTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()
     /**
@@ -1513,7 +1559,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param key The name of the header to set.
      * @param values The values to associate with the header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun set(key: String, values: Iterable<Any>) {
         headers.removeIf { it.nameEquals(key) }
@@ -1524,7 +1570,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param key The name of the header to set.
      * @param value The value to associate with the given header key.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     @JvmName("setValueAny")
     operator fun set(key: String, value: Any) {
@@ -1619,7 +1665,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * name already exists, the values are combined; otherwise, the new header is added.
      *
      * @param header The HTTP header to be added or updated in the collection.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun plusAssign(header: HttpHeader) {
         get(header.name).let { origin ->
@@ -1633,7 +1679,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * to the current collection of headers.
      *
      * @param headers The [HttpHeaders] instance whose headers should be added.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun plusAssign(headers: HttpHeaders) {
         headers.headers.forEach { plusAssign(it) }
@@ -1643,7 +1689,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * This operator allows combining multiple headers into the current set of headers.
      *
      * @param headers An iterable collection of HTTP headers to be added.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun plusAssign(headers: Iterable<HttpHeader>) {
         headers.forEach { plusAssign(it) }
@@ -1654,7 +1700,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param headers a map where each key is the name of the header and the corresponding value is 
      *                an iterable collection of header values to add.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun plusAssign(headers: Map<String, Iterable<Any>>) {
         headers.forEach { plusAssign(HttpHeader(it.key, it.value)) }
@@ -1665,7 +1711,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param header a key-value pair where the key is a header name, and the value is an iterable
      * of any objects representing the header values.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun plusAssign(header: Map.Entry<String, Iterable<Any>>) {
         plusAssign(HttpHeader(header))
@@ -1676,7 +1722,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param header A pair consisting of a header name as a `String` and a collection of header values as an `Iterable<Any>`. 
      *               The header name should represent the key, and the collection should represent the values associated with the key.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun plusAssign(header: Pair<String, Iterable<Any>>) {
         plusAssign(HttpHeader(header))
@@ -1688,7 +1734,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * remain for the header, it is completely removed from the set of headers.
      *
      * @param header The `HttpHeader` instance whose values are to be subtracted from the current headers.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(header: HttpHeader) {
         get(header.name).let { origin ->
@@ -1702,7 +1748,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * The operation applies to each header in the provided `HttpHeaders` object.
      *
      * @param headers The `HttpHeaders` object containing the headers to be removed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(headers: HttpHeaders) {
         headers.headers.forEach { minusAssign(it) }
@@ -1712,7 +1758,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * This operator function allows removing multiple headers by iterating through the provided collection.
      *
      * @param headers a collection of `HttpHeader` objects to be subtracted from the current collection.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(headers: Iterable<HttpHeader>) {
         headers.forEach { minusAssign(it) }
@@ -1721,7 +1767,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Removes the specified headers from the current collection by subtracting them.
      *
      * @param headers a map of header names to their corresponding iterable values to be removed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(headers: Map<String, Iterable<Any>>) {
         headers.forEach { minusAssign(HttpHeader(it.key, it.value)) }
@@ -1731,7 +1777,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param header a map entry representing the HTTP header to be removed, 
      * consisting of a key as the header name and a value as an iterable of the header's values.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(header: Map.Entry<String, Iterable<Any>>) {
         minusAssign(HttpHeader(header))
@@ -1743,7 +1789,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * the header represented by the provided key-value pair.
      *
      * @param header a pair consisting of a header key as a String and its associated values as an Iterable of Any.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(header: Pair<String, Iterable<Any>>) {
         minusAssign(HttpHeader(header))
@@ -1752,7 +1798,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Removes headers from the current collection if their names are contained within the provided iterable of keys.
      *
      * @param key An iterable collection of strings representing the keys of the headers to be removed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     @JvmName("minusAssignIterableString")
     operator fun minusAssign(key: Iterable<String>) {
@@ -1762,7 +1808,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Removes all headers with the specified key from the `headers` collection.
      *
      * @param key The name of the header(s) to be removed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     operator fun minusAssign(key: String) {
         headers.removeIf { it.name == key }
@@ -1897,7 +1943,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      */
     override fun hashCode() = headers.hashCode()
 
-    // 2.2.02.2.02.2.02.2.02.2.02.2.02.2.02.2.0-
+    // 3.0.03.0.03.0.03.0.03.0.03.0.03.0.03.0.0-
 
     /**
      * Retrieves and parses the "ACCEPT" header values into a list of `MediaType` objects.
@@ -1908,7 +1954,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return A list of `MediaType` objects parsed from the "ACCEPT" header values.
      * @throws NoSuchHeaderException if the header is missing.
      * @throws MalformedInputException if the header value is malformed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAccept() = getOrThrow(ACCEPT).map { MediaType.parse(it)() }
     /**
@@ -1917,7 +1963,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Allows specifying multiple media types that the client is willing to accept.
      *
      * @param values Vararg parameter representing the media types to set in the "Accept" header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAccept(vararg values: MediaType) = set(ACCEPT, values.toList())
 
@@ -1931,7 +1977,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return A list of `LanguageRange` objects based on the `Accept-Language` header value,
      * or an empty list if the value is invalid or not present.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAcceptLanguage(): List<LanguageRange> {
         val value = getFirstOrThrow(ACCEPT_LANGUAGE)
@@ -1946,7 +1992,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @param values A variable number of `LanguageRange` objects representing the desired languages
      *               and their respective weights. The weight is a decimal value between 0.0 and 1.0,
      *               where 1.0 is the highest preference.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAcceptLangauge(vararg values: LanguageRange) {
         val decimal = DecimalFormat("0.0", DecimalFormatSymbols(Locale.ROOT))
@@ -1970,7 +2016,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return a list of Locale objects derived from the Accept-Language header.
      *         Returns an empty list if the header contains no valid entries.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAcceptLanguageAsLocales(): List<Locale> {
         val ranges = getAcceptLanguage()
@@ -1984,7 +2030,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Converts the input locales into language ranges and applies them.
      *
      * @param values A vararg of `Locale` objects representing the languages to be set.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAcceptLanguageAsLocales(vararg values: Locale) =
         setAcceptLangauge(*values.map { LanguageRange(it.toLanguageTag()) }.toTypedArray())
@@ -1998,7 +2044,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return A list of parsed `MediaType` objects representing the values of the "Accept-Patch" header.
      * @throws NoSuchHeaderException if the header is missing.
      * @throws MalformedInputException if the header value is malformed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAcceptPatch() = getOrThrow(ACCEPT_PATCH).map { MediaType.parse(it)() }
     /**
@@ -2010,7 +2056,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param values A variable number of `MediaType` instances representing
      *               the media types to include in the "Accept-Patch" header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAcceptPatch(vararg values: MediaType) = set(ACCEPT_PATCH, values.toList())
 
@@ -2021,7 +2067,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return `true` if the "Access-Control-Allow-Credentials" header is present and its value is truthy, `false` otherwise.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAccessControlAllowCredentials() = getFirstOrThrow(ACCESS_CONTROL_ALLOW_CREDENTIALS)
         .toBoolean()
@@ -2031,7 +2077,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param allowCredentials A boolean value indicating whether the resource supports
      * credentials. If true, credentials are allowed; otherwise, they are not.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAccessControlAllowCredentials(allowCredentials: Boolean) = set(ACCESS_CONTROL_ALLOW_CREDENTIALS, allowCredentials.toString())
 
@@ -2045,7 +2091,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return A list of `HttpMethod` enum constants representing the allowed HTTP methods.
      * @throws dev.tommasop1804.kutils.exceptions.NoSuchEntryException if the header value cannot be parsed correctly.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAccessControlAllowMethods() = getFirstOrThrow(ACCESS_CONTROL_ALLOW_METHODS)
         .split(Char.COMMA).map { it.toEnumConst<HttpMethod>() }
@@ -2055,7 +2101,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * This method is used to configure the allowed HTTP methods for Cross-Origin Resource Sharing (CORS).
      *
      * @param values The HTTP methods to be allowed, provided as vararg parameters. Each method is represented by an instance of [HttpMethod].
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAccessControlAllowMethods(vararg values: HttpMethod) = set(ACCESS_CONTROL_ALLOW_METHODS, values.joinToString(String.COMMA, transform = HttpMethod::name))
 
@@ -2067,7 +2113,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return The maximum age for access control as a duration in seconds.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAccessControlMaxAge() = getFirstOrThrow(ACCESS_CONTROL_MAX_AGE)
         .toLong()
@@ -2078,7 +2124,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param maxAge The maximum duration, as a [Duration], for which the access control settings
      *               are considered valid.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     @OptIn(RiskyApproximationOfTemporal::class)
     fun setAccessControlMaxAge(maxAge: Duration) = set(ACCESS_CONTROL_MAX_AGE, maxAge.toSeconds())
@@ -2093,7 +2139,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return The corresponding [HttpMethod] enum constant determined from the header value.
      * @throws dev.tommasop1804.kutils.exceptions.NoSuchEntryException If the header value cannot be matched to a valid enum constant.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAccessControlRequestMethod(value: HttpMethod) = getFirstOrThrow(ACCESS_CONTROL_REQUEST_METHOD)
         .toEnumConst<HttpMethod>()
@@ -2102,7 +2148,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * This header indicates which HTTP method will be used during the actual request.
      *
      * @param value The HTTP method to set for the `Access-Control-Request-Method` header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAccessControlRequestMethod(value: HttpMethod) = set(ACCESS_CONTROL_REQUEST_METHOD, value.name)
 
@@ -2114,7 +2160,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return a list of character sets specified in the "Accept-Charset" header.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAcceptCharset(): List<Charset> {
         val value = getFirstOrThrow(ACCEPT_CHARSET)
@@ -2132,7 +2178,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * Sets the Accept-Charset header with the specified character sets.
      *
      * @param values A vararg of Charset objects to be included in the Accept-Charset header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAcceptCharset(vararg values: Charset) = set(ACCEPT_CHARSET, values.joinToString(String.COMMA) { it.name().lowercase(Locale.ROOT) })
 
@@ -2146,14 +2192,14 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return A list of `HttpMethod` enum constants derived from the "Allow" header field.
      * @throws NoSuchHeaderException If the "Allow" header is not present in the data source.
      * @throws dev.tommasop1804.kutils.exceptions.NoSuchEntryException If any of the tokens cannot be mapped to a valid `HttpMethod` enum constant.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getAllow() = getFirstOrThrow(ALLOW).splitAndTrim(Char.COMMA).map { it.toEnumConst<HttpMethod>() }
     /**
      * Configures the allowed HTTP methods for a specific resource or endpoint.
      *
      * @param values A variable number of HTTP methods to allow, specified as instances of [HttpMethod].
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setAllow(vararg values: HttpMethod) = set(ALLOW, values.joinToString(String.COMMA, transform = HttpMethod::name))
 
@@ -2164,16 +2210,16 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return The JWT token extracted from the AUTHORIZATION header.
      * @throws NoSuchHeaderException if the AUTHORIZATION header is missing or invalid.
-     * @since 2.2.0
+     * @since 3.0.0
      */
-    fun getBearerAuth() = getFirstOrThrow(AUTHORIZATION).toJWT()()
+    fun getBearerAuth() = getFirstOrThrow(AUTHORIZATION).toJwt()()
     /**
      * Sets the Bearer Authorization header with the provided JWT token.
      *
      * @param token The JWT token to use in the Authorization header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
-    fun setBearerAuth(token: JWT) = set(AUTHORIZATION, token.toString(true))
+    fun setBearerAuth(token: Jwt) = set(AUTHORIZATION, token.toString(true))
 
     /**
      * Sets the Authorization header to use Basic Authentication with the provided encoded credentials.
@@ -2182,7 +2228,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * This method adheres to the Basic Authentication standard and updates the Authorization header accordingly.
      *
      * @param encodedCredentials The Base64-encoded "username:password" string to be used for Basic Authentication.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setBasicAuth(encodedCredentials: String) = set(AUTHORIZATION, "Basic $encodedCredentials")
     /**
@@ -2196,7 +2242,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @param charset The character set used to encode the credentials. Defaults to ISO_8859_1.
      * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the charset cannot encode the username or password,
      * or if the username contains a colon.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setBasicAuth(username: String, password: String, charset: Charset = ISO_8859_1) {
         username.validate("setBasicAuth", "username", "Username cannot contains a colon") { Char.COLON !in it }
@@ -2213,7 +2259,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return the Locale corresponding to the content language tag.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getContentLanguage(): Locale = getFirstOrThrow(CONTENT_LANGUAGE).let(Locale::forLanguageTag)
     /**
@@ -2222,7 +2268,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * transformed to its corresponding language tag.
      *
      * @param value the Locale representing the language to set as the content language.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setContentLanguage(value: Locale) = set(CONTENT_LANGUAGE, value.toLanguageTag())
 
@@ -2237,7 +2283,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return The content length in bytes as a `Long`.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getContentLength() = getFirstOrThrow(CONTENT_LENGTH).toLong() ofUnit MeasureUnit.DataSizeUnit.BYTE
     /**
@@ -2245,14 +2291,14 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param value The content length to set. The value is specified as a `DataSize` object 
      *              and will be internally converted to bytes.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setContentLength(value: DataSize) = set(CONTENT_LENGTH, value.convertTo(MeasureUnit.DataSizeUnit.BYTE)().value)
     /**
      * Sets the value of the Content-Length header for a request.
      *
      * @param bytes The length of the content in bytes to be set in the Content-Length header.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setContentLength(bytes: Long) = set(CONTENT_LENGTH, bytes)
 
@@ -2263,14 +2309,14 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return A `MediaType` object representing the parsed content type.
      * @throws MalformedInputException if the content type cannot be parsed.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getContentType() = getFirstOrThrow(CONTENT_TYPE).let { MediaType.parse(it)() }
     /**
      * Sets the content type for the request or response by assigning a specified MediaType value.
      *
      * @param value The MediaType object representing the MIME type to be set as the content type.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setContentType(value: MediaType) = set(CONTENT_TYPE, value.toString())
 
@@ -2281,7 +2327,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return an Instant representing the parsed date and time.
      * @throws NoSuchHeaderException if the header is missing.
      * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getDate(): Instant = getFirstOrThrow(DATE).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
     /**
@@ -2290,7 +2336,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @throws java.time.DateTimeException if the provided TemporalAccessor cannot be formatted as a header date.
      * @param value the TemporalAccessor representation of the date to be set
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setDate(value: TemporalAccessor = Instant()) = set(DATE, RFC_7231_DATE_TIME_FORMATTER(value))
 
@@ -2301,7 +2347,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return the expiration date and time as an Instant
      * @throws NoSuchHeaderException if the header is missing.
      * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getExpires(): Instant = getFirstOrThrow(EXPIRES).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
     /**
@@ -2310,7 +2356,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param value the temporal accessor representing the expiration date and time
      * @throws java.time.DateTimeException if the provided temporal accessor cannot be formatted as a header date.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setExpires(value: TemporalAccessor) = set(EXPIRES, RFC_7231_DATE_TIME_FORMATTER(value))
 
@@ -2324,7 +2370,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return an `InetSocketAddress` instance with the extracted host and port, or a host with port `0` if no port is specified.
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     @Suppress("kutils_substring_as_int_invoke")
     fun getHost(): InetSocketAddress = getFirstOrThrow(HOST).let {
@@ -2344,7 +2390,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param host the socket address containing the host name or IP address 
      * and port that will be set as the host value.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setHost(host: InetSocketAddress) {
         var value = host.hostString
@@ -2361,7 +2407,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return The `Instant` representation of the `If-Modified-Since` header value.
      * @throws NoSuchHeaderException if the header is missing.
      * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getIfModifiedSince(): Instant = getFirstOrThrow(IF_MODIFIED_SINCE).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
     /**
@@ -2374,7 +2420,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @param value The temporal accessor representing the date and time to set for the "If-Modified-Since" header.
      *              It must be formatted using the RFC 7231 date-time format.
      * @throws java.time.DateTimeException if the provided temporal accessor cannot be formatted as a header date.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setIfModifiedSince(value: TemporalAccessor) = set(IF_MODIFIED_SINCE, RFC_7231_DATE_TIME_FORMATTER(value))
 
@@ -2386,7 +2432,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @return an Instant representing the parsed "If-Unmodified-Since" header value
      * @throws NoSuchHeaderException if the header is missing.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getIfUnmodifiedSince(): Instant = getFirstOrThrow(IF_UNMODIFIED_SINCE).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
     /**
@@ -2397,7 +2443,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @param value the timestamp to compare against, specified as a [TemporalAccessor]. This value is formatted 
      *              according to the RFC 7231 standard before being applied to the request.
      * @throws java.time.DateTimeException if the provided temporal accessor cannot be formatted as a header date.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setIfUnmodifiedSince(value: TemporalAccessor) = set(IF_UNMODIFIED_SINCE, RFC_7231_DATE_TIME_FORMATTER(value))
 
@@ -2410,7 +2456,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return an Instant representing the last modified timestamp.
      * @throws NoSuchHeaderException if the header is missing.
      * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun getLastModified(): Instant = getFirstOrThrow(LAST_MODIFIED).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
     /**
@@ -2421,7 +2467,7 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      *
      * @param value the temporal accessor representing the date and time to set as the last modified timestamp
      * @throws java.time.DateTimeException if the provided temporal accessor cannot be formatted as a header date.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setLastModified(value: TemporalAccessor = Instant()) = set(LAST_MODIFIED, RFC_7231_DATE_TIME_FORMATTER(value))
 
@@ -2435,14 +2481,14 @@ class HttpHeaders(private val headers: MSet<HttpHeader>) : MultiStringMap {
      * @return the location as a URI
      * @throws NoSuchElementException if the `LOCATION` key is not found
      * @throws IllegalArgumentException if the value cannot be converted to a valid URI
-     * @since 2.2.0
+     * @since 3.0.0
      */
-    fun getLocation() = getFirstOrThrow(LOCATION).toURI()()
+    fun getLocation() = getFirstOrThrow(LOCATION).toUri()()
     /**
      * Sets the location URI for the given key.
      * 
      * @param value The URI to be set as the location.
-     * @since 2.2.0
+     * @since 3.0.0
      */
     fun setLocation(value: URI) = set(LOCATION, value.toString())
 }

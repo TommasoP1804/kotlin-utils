@@ -10,7 +10,7 @@ package dev.tommasop1804.kutils
 import com.github.lalyos.jfiglet.FigletFont
 import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.classes.base.Base62
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.EMAIL_REGEX
 import dev.tommasop1804.kutils.exceptions.*
 import org.apache.commons.codec.binary.Base32
@@ -734,9 +734,9 @@ val String.isEmail get() = EMAIL_REGEX.matches(this)
  *
  * @receiver The string to be checked.
  * @return `true` if the string matches a valid URL pattern, `false` otherwise.
- * @since 1.0.0
+ * @since 3.0.0
  */
-val String.isURL get() = matches(Regex("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"))
+val String.isUrl get() = matches(Regex("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"))
 
 /**
  * Indicates whether all characters in the string belong to the ASCII character set.

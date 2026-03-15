@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Supplier
 import dev.tommasop1804.kutils.Transformer
-import dev.tommasop1804.kutils.UUID
-import dev.tommasop1804.kutils.classes.identifiers.ULID.Companion.generateHashULID
-import dev.tommasop1804.kutils.classes.identifiers.ULID.Factory.ByteRandom.Companion.newRandomFunction
+import dev.tommasop1804.kutils.Uuid
+import dev.tommasop1804.kutils.classes.identifiers.Ulid.Companion.generateHashUlid
+import dev.tommasop1804.kutils.classes.identifiers.Ulid.Factory.ByteRandom.Companion.newRandomFunction
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNull
@@ -54,9 +54,6 @@ import kotlin.code
 import kotlin.let
 import kotlin.runCatching
 import kotlin.time.ExperimentalTime
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
-import kotlin.uuid.toJavaUuid
 
 /**
  * Represents a Universally Unique Lexicographically Sortable Identifier (ULID).
@@ -69,15 +66,15 @@ import kotlin.uuid.toJavaUuid
  * @property instant Optional timestamp component of the ULID, typically representing creation time.
  * @property timestamp Optional time field derived from the timestamp for lexicographical sorting.
  * @property randomComponent Optional random component that guarantees uniqueness within the same timestamp.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = ULID.Companion.Serializer::class)
-@JsonDeserialize(using = ULID.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ULID.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ULID.Companion.OldDeserializer::class)
+@JsonSerialize(using = Ulid.Companion.Serializer::class)
+@JsonDeserialize(using = Ulid.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ulid.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ulid.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_temporal_of_as_temporal")
-class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<ULID>, Serializable, CharSequence {
+class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<Ulid>, Serializable, CharSequence {
 
     /**
      * Length of the ULID string representation.
@@ -85,7 +82,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * This property defines the fixed length of the ULID when represented as a base-32 encoded string.
      * The standard length ensures consistent formatting and compatibility across systems utilizing ULIDs.
      *
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override val length: Int = 26
 
@@ -93,7 +90,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * Represents the point in time derived from the ULID's timestamp.
      * This value is computed using the epoch millisecond value of the ULID's timestamp.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val instant: Instant
         get() = Instant.ofEpochMilli(timestamp)
@@ -105,7 +102,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * This value provides the temporal portion of the ULID, which is encoded
      * in the most significant bits of the identifier.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val timestamp
         get() = mostSignificantBits ushr 16
@@ -120,7 +117,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * component section of the ULID specification.
      *
      * @return A ByteArray containing the random component of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val randomComponent: ByteArray
         get() {
@@ -146,9 +143,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * Copies the most significant and least significant bits from the provided ULID.
      *
      * @param ulid The ULID instance from which to copy the bit values.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    private constructor(ulid: ULID) : this(ulid.mostSignificantBits, ulid.leastSignificantBits)
+    private constructor(ulid: Ulid) : this(ulid.mostSignificantBits, ulid.leastSignificantBits)
     /**
      * Constructs a ULID (Universally Unique Lexicographically Sortable Identifier) instance
      * by combining the provided time and random components.
@@ -161,7 +158,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param random The random component of this ULID. Must be exactly 10 bytes in length.
      * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException If the `time` does not fit within 48 bits.
      * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException If the size of the `random` array is different from 10 bytes.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(time: Long, random: ByteArray) : this(
         calculateMostSignificantBits(time, random),
@@ -181,7 +178,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * string representation provided.
      *
      * @param string The string representation of the ULID to be converted into an instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(string: String) : this(from(string))
     /**
@@ -194,7 +191,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param instant The point in time used to generate the ULID, represented as an `Instant`.
      * @param monotonic A flag indicating whether to generate a monotonic ULID. If `true`, the ULID will ensure
      * monotonicity for closely related timestamps. Default is `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(instant: Instant, monotonic: Boolean = false) : this(if (monotonic) generateMonotonic(instant.toEpochMilli()) else generate(instant.toEpochMilli()))
     /**
@@ -207,7 +204,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param instant The point in time used to generate the ULID, represented as an `Instant`.
      * @param monotonic A flag indicating whether to generate a monotonic ULID. If `true`, the ULID will ensure
      * monotonicity for closely related timestamps. Default is `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, monotonic: Boolean = false) : this(if (monotonic) generateMonotonic(instant.toEpochMilliseconds()) else generate(instant.toEpochMilliseconds()))
@@ -222,7 +219,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param monotonic A flag indicating whether the ULID should be generated with monotonicity guarantees.
      * Defaults to `false`, implying standard (non-monotonic) generation.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(time: Long, monotonic: Boolean = false) : this(if (monotonic) generateMonotonic(time) else generate(time))
     /**
@@ -233,21 +230,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * instance with the derived values.
      *
      * @param uuid The UUID from which the ULID will be constructed.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(uuid: UUID) : this(from(uuid))
-    /**
-     * Constructs a ULID instance from the given UUID.
-     *
-     * This constructor utilizes the `from` function to extract the most significant
-     * and least significant bits of the provided `UUID` and initializes a new ULID
-     * instance with the derived values.
-     *
-     * @param uuid The UUID from which the ULID will be constructed.
-     * @since 1.1.0
-     */
-    @OptIn(ExperimentalUuidApi::class)
-    constructor(uuid: Uuid) : this(from(uuid.toJavaUuid()))
+    constructor(uuid: dev.tommasop1804.kutils.Uuid) : this(from(uuid))
     /**
      * Constructs a ULID instance from the given byte array.
      *
@@ -258,7 +243,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * It must be exactly 16 bytes in length, with the first 8 bytes
      * representing the most significant bits and the last 8 bytes
      * representing the least significant bits.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(bytes: ByteArray) : this(from(bytes))
     /**
@@ -271,9 +256,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param time The timestamp used to generate the ULID.
      * @param string The string input to be hashed along with the timestamp to create the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(time: Long, string: String) : this(generateHashULID(time, string))
+    constructor(time: Long, string: String) : this(generateHashUlid(time, string))
     /**
      * Constructs a ULID instance by generating a hashed ULID based on the provided timestamp and string input.
      *
@@ -282,9 +267,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param time The timestamp used to calculate the ULID, represented as an `Instant`.
      * @param string A string input used to influence the hash generation of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(time: Instant, string: String) : this(generateHashULID(time.toEpochMilli(), string))
+    constructor(time: Instant, string: String) : this(generateHashUlid(time.toEpochMilli(), string))
     /**
      * Constructs a ULID instance by generating a hashed ULID based on the provided timestamp and string input.
      *
@@ -293,10 +278,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param time The timestamp used to calculate the ULID, represented as an `Instant`.
      * @param string A string input used to influence the hash generation of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OptIn(ExperimentalTime::class)
-    constructor(time: kotlin.time.Instant, string: String) : this(generateHashULID(time.toEpochMilliseconds(), string))
+    constructor(time: kotlin.time.Instant, string: String) : this(generateHashUlid(time.toEpochMilliseconds(), string))
     /**
      * Constructs a new ULID instance using a specific timestamp and a hashed representation of a byte array.
      *
@@ -306,10 +291,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param time An `Instant` representing the timestamp portion of the ULID. Must fit within 48 bits.
      * @param bytes A byte array to be hashed for generating the random component of the ULID.
      * @throws IllegalArgumentException If the timestamp exceeds 48 bits or if the hash-derived random component is invalid.
-     * @see generateHashULID
-     * @since 1.0.0
+     * @see generateHashUlid
+     * @since 3.0.0
      */
-    constructor(time: Instant, bytes: ByteArray) : this(generateHashULID(time.toEpochMilli(), bytes))
+    constructor(time: Instant, bytes: ByteArray) : this(generateHashUlid(time.toEpochMilli(), bytes))
     /**
      * Constructs a new ULID instance using a specific timestamp and a hashed representation of a byte array.
      *
@@ -319,11 +304,11 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param time An `Instant` representing the timestamp portion of the ULID. Must fit within 48 bits.
      * @param bytes A byte array to be hashed for generating the random component of the ULID.
      * @throws IllegalArgumentException If the timestamp exceeds 48 bits or if the hash-derived random component is invalid.
-     * @see generateHashULID
-     * @since 1.1.0
+     * @see generateHashUlid
+     * @since 3.0.0
      */
     @OptIn(ExperimentalTime::class)
-    constructor(time: kotlin.time.Instant, bytes: ByteArray) : this(generateHashULID(time.toEpochMilliseconds(), bytes))
+    constructor(time: kotlin.time.Instant, bytes: ByteArray) : this(generateHashUlid(time.toEpochMilliseconds(), bytes))
     /**
      * Constructs a new ULID instance by deriving its components from the given ULID and time values.
      *
@@ -333,9 +318,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param ulid The existing ULID instance from which the random component will be extracted.
      * @param time The time value to set in the new ULID instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(ulid: ULID, time: Long) : this(time, ulid.randomComponent)
+    constructor(ulid: Ulid, time: Long) : this(time, ulid.randomComponent)
     /**
      * Secondary constructor for the ULID class.
      *
@@ -347,9 +332,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param ulid The ULID instance from which the random component is derived.
      * @param time The `Instant` used to set the timestamp.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(ulid: ULID, time: Instant) : this(time.toEpochMilli(), ulid.randomComponent)
+    constructor(ulid: Ulid, time: Instant) : this(time.toEpochMilli(), ulid.randomComponent)
     /**
      * Secondary constructor for the ULID class.
      *
@@ -361,10 +346,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param ulid The ULID instance from which the random component is derived.
      * @param time The `Instant` used to set the timestamp.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OptIn(ExperimentalTime::class)
-    constructor(ulid: ULID, time: kotlin.time.Instant) : this(time.toEpochMilliseconds(), ulid.randomComponent)
+    constructor(ulid: Ulid, time: kotlin.time.Instant) : this(time.toEpochMilliseconds(), ulid.randomComponent)
     /**
      * Constructs a new ULID using a ULID instance and optionally enforces monotonicity for sequential ULID generation.
      * The ULID has the same timestamp of the given one, but a different random part.
@@ -372,9 +357,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param ulid The ULID instance used as a reference for generating the new ULID.
      * @param monotonic Specifies whether the monotonic generation should be applied. If `true`,
      * ensures that the generated ULIDs are ordered sequentially in strictly increasing order. Defaults to `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(ulid: ULID, monotonic: Boolean = false) : this(ulid.timestamp, monotonic)
+    constructor(ulid: Ulid, monotonic: Boolean = false) : this(ulid.timestamp, monotonic)
     /**
      * Creates a ULID with the same timestamp as the provided `ulid` but derived
      * from the specified `string`.
@@ -384,9 +369,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param ulid The ULID whose timestamp will be preserved in the new instance.
      * @param string The input string used to derive a new ULID with the same timestamp.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(ulid: ULID, string: String) : this(ulid.timestamp, string)
+    constructor(ulid: Ulid, string: String) : this(ulid.timestamp, string)
     /**
      * Constructs a new ULID instance using a specified random component while keeping
      * the timestamp from the provided `ULID` instance.
@@ -397,9 +382,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param bytes The random component to be used for creating the new ULID.
      * Must be exactly 10 bytes in length.
      * @throws IllegalArgumentException If the size of the `bytes` array is different from 10 bytes.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(ulid: ULID, bytes: ByteArray) : this(ulid.timestamp, bytes)
+    constructor(ulid: Ulid, bytes: ByteArray) : this(ulid.timestamp, bytes)
     /**
      * Constructs a ULID instance based on the provided monotonicity preference.
      *
@@ -409,7 +394,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param monotonic Indicates whether the ULID should be generated using the monotonic factory (`true`)
      * or the standard factory (`false`). Defaults to `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(monotonic: Boolean = false) : this(if (monotonic) generateMonotonic() else generate())
 
@@ -421,7 +406,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * The ULID_CHARS constant defines the size of the character set utilized in the encoding
          * and ensures compatibility with the ULID specification.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val ULID_CHARS: Int = 26
 
@@ -432,7 +417,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * This constant specifies the fixed length of the time component
          * when encoding or decoding a ULID.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val TIME_CHARS: Int = 10
 
@@ -440,7 +425,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * Defines the default length of the random character component used in the ULID generation process.
          * The value represents the standard size for ensuring unique identifiers.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val RANDOM_CHARS: Int = 16
 
@@ -448,7 +433,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * Represents the number of bytes required to store a ULID (Universally Unique Lexicographically Sortable Identifier).
          * ULIDs are 128-bit identifiers, which equate to 16 bytes.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val ULID_BYTES: Int = 16
 
@@ -458,7 +443,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * The time component is a significant part of the ULID, providing sorting capabilities
          * based on the time of creation.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val TIME_BYTES: Int = 6
 
@@ -468,7 +453,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * This constant is utilized for defining the length of random byte data required
          * for generating unique identifiers, ensuring sufficient entropy.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val RANDOM_BYTES: Int = 10
 
@@ -480,9 +465,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * used as a reference or sentinel value when working with ULID
          * instances.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        val MIN: ULID = ULID(0x0000000000000000L, 0x0000000000000000L)
+        val MIN: Ulid = Ulid(0x0000000000000000L, 0x0000000000000000L)
 
         /**
          * A constant ULID value representing the maximum possible ULID.
@@ -492,9 +477,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * This value can be used as a reference point for comparisons or
          * as a limit in operations involving ULIDs.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        val MAX: ULID = ULID(-0x1L, -0x1L)
+        val MAX: Ulid = Ulid(-0x1L, -0x1L)
 
         /**
          * A `ByteArray` containing precomputed values for encoding and decoding operations
@@ -507,7 +492,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * This variable is intended for internal use to optimize performance during
          * encoding or decoding operations.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val ALPHABET_VALUES: ByteArray = ByteArray(256)
 
@@ -519,7 +504,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * The character set includes numbers (0-9) and uppercase letters from the English alphabet
          * (A-Z), excluding 'I' and 'O'.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val ALPHABET_UPPERCASE: CharArray = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".toCharArray()
 
@@ -529,7 +514,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * This array is often used for generating unique identifiers or encoding data into
          * a concise, compact, and human-readable format.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val ALPHABET_LOWERCASE: CharArray = "0123456789abcdefghjkmnpqrstvwxyz".toCharArray()
 
@@ -539,7 +524,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * 64-bit integer (0xffffffffffffffffL) is incremented by 1, causing it to wrap
          * around to 0x0000000000000000L.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         // 0xffffffffffffffffL + 1 = 0x0000000000000000L
         private const val INCREMENT_OVERFLOW = 0x0000000000000000L
@@ -572,7 +557,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @param time The timestamp to be used for generating the most significant bits.
          * @param random A byte array providing additional randomness for the calculation.
          * @return A Long value representing the most significant bits of the ULID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun calculateMostSignificantBits(time: Long, random: ByteArray): Long {
             var long0: Long = 0
@@ -589,7 +574,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *               The array is assumed to have a minimum length of 10 bytes, where the required bytes are taken
          *               starting from index 2 to index 9.
          * @return A long value representing the least significant bits derived from the given byte array.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun calculateLeastSignificantBits(random: ByteArray): Long {
             var long1: Long = 0
@@ -612,7 +597,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * and a random component to ensure uniqueness.
          *
          * @return a newly created ULID instance
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun generate() = Factory.Holder.INSTANCE.create()
 
@@ -620,7 +605,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) based on the provided time.
          *
          * @param time The timestamp in milliseconds to be used for ULID generation.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun generate(time: Long) = Factory.Holder.INSTANCE.create(time)
 
@@ -633,7 +618,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * to create ULIDs with enhanced uniqueness and proper handling of clock drift tolerance.
          *
          * @return A newly generated monotonic ULID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun generateMonotonic() = Factory.MonotonicHolder.INSTANCE.create()
 
@@ -646,7 +631,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * It is expected to be the current system time, but can also handle scenarios
          * where the clock moves backward or remains unchanged.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun generateMonotonic(time: Long) = Factory.MonotonicHolder.INSTANCE.create(time)
 
@@ -655,10 +640,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @param time The timestamp used to compute the ULID.
          * @param string The string input which will be hashed to generate the ULID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        private fun generateHashULID(time: Long, string: String) =
-            generateHashULID(time, string.toByteArray(StandardCharsets.UTF_8))
+        private fun generateHashUlid(time: Long, string: String) =
+            generateHashUlid(time, string.toByteArray(StandardCharsets.UTF_8))
 
         /**
          * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) instance
@@ -670,10 +655,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @param bytes The input byte array to be hashed. Used to generate the random component of the ULID.
          * @return A ULID instance constructed from the given time and the hashed random component.
          * @throws IllegalArgumentException If the time does not fit in 48 bits or the resulting random component is invalid.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        private fun generateHashULID(time: Long, bytes: ByteArray) =
-            ULID(time, MessageDigest.getInstance("SHA-256").digest(bytes).copyOf(10))
+        private fun generateHashUlid(time: Long, bytes: ByteArray) =
+            Ulid(time, MessageDigest.getInstance("SHA-256").digest(bytes).copyOf(10))
 
         /**
          * Generates a new ULID based on the current system time and a randomly generated component.
@@ -681,12 +666,12 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * adds uniqueness to ULIDs generated at the same timestamp.
          *
          * @return A newly generated ULID instance combining the current system time and a random component.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun fast(): ULID {
+        fun fast(): Ulid {
             val time = System.currentTimeMillis()
             val random = ThreadLocalRandom.current()!!
-            return ULID((time shl 16) or (random.nextLong() and 0xffffL), random.nextLong())
+            return Ulid((time shl 16) or (random.nextLong() and 0xffffL), random.nextLong())
         }
 
         /**
@@ -694,9 +679,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @param time The time in milliseconds used to calculate the ULID. The lower 16 bits will be set to zero.
          * @return A ULID generated from the given time parameter.
-         * @since 1.1.0
+         * @since 3.0.0
          */
-        infix fun minOf(time: Long) = ULID((time shl 16) or 0x0000L, 0x0000000000000000L)
+        infix fun minOf(time: Long) = Ulid((time shl 16) or 0x0000L, 0x0000000000000000L)
 
         /**
          * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) based on the provided time value.
@@ -704,30 +689,30 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * The generated ULID uses the given time shifted by 16 bits combined with a constant value.
          *
          * @param time The time value used to generate the ULID. This time is expected to be in milliseconds.
-         * @since 1.1.0
+         * @since 3.0.0
          */
-        infix fun maxOf(time: Long) = ULID((time shl 16) or 0xffffL, -0x1L)
+        infix fun maxOf(time: Long) = Ulid((time shl 16) or 0xffffL, -0x1L)
 
         /**
-         * Converts a [UUID] to a [ULID] representation.
+         * Converts a [UUID] to a [Ulid] representation.
          *
          * The conversion utilizes the `mostSignificantBits` and `leastSignificantBits` of the [UUID]
-         * to construct a new [ULID].
+         * to construct a new [Ulid].
          *
          * @receiver A [UUID] instance to be converted.
-         * @return A [ULID] instance representing the same underlying 128-bit value as the original [UUID].
-         * @since 1.0.0
+         * @return A [Ulid] instance representing the same underlying 128-bit value as the original [UUID].
+         * @since 3.0.0
          */
-        fun UUID.toULID() = ULID(this.mostSignificantBits, this.leastSignificantBits)
+        fun UUID.toUlid() = Ulid(this.mostSignificantBits, this.leastSignificantBits)
 
         /**
          * Creates a ULID instance from a given UUID.
          *
          * @param uuid The UUID whose most significant and least significant bits will be used to construct the ULID.
          * @return A new ULID instance derived from the given UUID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        private fun from(uuid: UUID) = ULID(uuid.mostSignificantBits, uuid.leastSignificantBits)
+        private fun from(uuid: UUID) = Ulid(uuid.mostSignificantBits, uuid.leastSignificantBits)
 
         /**
          * Constructs a ULID from the given byte array.
@@ -738,9 +723,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @param bytes the input byte array containing the 128-bit ULID value
          * @return a ULID instance created from the given byte array
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        private fun from(bytes: ByteArray): ULID {
+        private fun from(bytes: ByteArray): Ulid {
             expect(bytes.size, ULID_BYTES) { "Invalid ULID bytes" }
 
             var msb: Long = 0
@@ -764,7 +749,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             lsb = lsb or ((bytes[0xe].toLong() and 0xffL) shl 8)
             lsb = lsb or (bytes[0xf].toLong() and 0xffL)
 
-            return ULID(msb, lsb)
+            return Ulid(msb, lsb)
         }
 
         /**
@@ -775,9 +760,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @param string the string representation of the ULID to be converted. It must be a valid ULID.
          * @return the ULID object constructed from the given string representation.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        private fun from(string: String): ULID {
+        private fun from(string: String): Ulid {
             val chars = toCharArray(string)
 
             var time: Long = 0
@@ -816,7 +801,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             val msb = (time shl 16) or (random0 ushr 24)
             val lsb = (random0 shl 40) or (random1 and 0xffffffffffL)
 
-            return ULID(msb, lsb)
+            return Ulid(msb, lsb)
         }
 
         /**
@@ -825,7 +810,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @param string The input string to be converted to a character array.
          * @return A character array representation of the provided string.
          * @throws IllegalArgumentException if the generated character array is invalid according to ULID specification.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun toCharArray(string: String): CharArray {
             val chars: CharArray = (string.toCharArray())
@@ -838,7 +823,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @param chars The character array to validate as a ULID.
          * @return `true` if the character array is a valid ULID; `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun isValidCharArray(chars: CharArray): Boolean {
             if (chars.size != ULID_CHARS) return false
@@ -870,124 +855,124 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * the validation using `isValidCharArray`.
          *
          * @return `true` if the input string is a valid ULID, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidULID() = isValidCharArray(toString().toCharArray())
+        fun CharSequence.isValidUlid() = isValidCharArray(toString().toCharArray())
 
         /**
-         * Attempts to convert the current [CharSequence] into a [ULID] instance by parsing its string representation.
+         * Attempts to convert the current [CharSequence] into a [Ulid] instance by parsing its string representation.
          *
          * This function wraps the parsing operation in a `Result` object, allowing the caller to handle
          * success and failure scenarios gracefully. The operation will succeed if the [CharSequence]
          * contains a valid ULID string; otherwise, it will fail with an exception.
          *
          * @receiver The [CharSequence] representing the potential ULID.
-         * @return A [Result] containing the parsed [ULID] if successful, or a failure if the parsing fails.
-         * @since 1.0.0
+         * @return A [Result] containing the parsed [Ulid] if successful, or a failure if the parsing fails.
+         * @since 3.0.0
          */
-        fun CharSequence.toULID() = runCatching { from(toString()) }
+        fun CharSequence.toUlid() = runCatching { from(toString()) }
 
-        class Serializer : ValueSerializer<ULID>() {
-            override fun serialize(value: ULID, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ulid>() {
+            override fun serialize(value: Ulid, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.toString())
             }
         }
 
-        class Deserializer : ValueDeserializer<ULID>() {
+        class Deserializer : ValueDeserializer<Ulid>() {
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = from(p.string)
         }
 
-        class OldSerializer : JsonSerializer<ULID>() {
-            override fun serialize(value: ULID, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ulid>() {
+            override fun serialize(value: Ulid, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.toString())
         }
 
-        class OldDeserializer : JsonDeserializer<ULID>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ULID =
+        class OldDeserializer : JsonDeserializer<Ulid>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ulid =
                 from(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<ULID?, String?> {
-            override fun convertToDatabaseColumn(attribute: ULID?): String? = attribute?.toString()
-            override fun convertToEntityAttribute(dbData: String?): ULID? = dbData?.let { from(it) }
+        class Converter : AttributeConverter<Ulid?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ulid?): String? = attribute?.toString()
+            override fun convertToEntityAttribute(dbData: String?): Ulid? = dbData?.let { from(it) }
         }
 
-        class TypeChar : EnhancedUserType<ULID> {
+        class TypeChar : EnhancedUserType<Ulid> {
             override fun getSqlType(): Int = SqlTypes.CHAR
 
-            override fun returnedClass(): Class<ULID> = ULID::class.java
+            override fun returnedClass(): Class<Ulid> = Ulid::class.java
 
             override fun equals(
-                x: ULID?,
-                y: ULID?
+                x: Ulid?,
+                y: Ulid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ULID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ulid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): ULID? {
+            ): Ulid? {
                 val value = rs?.getString(position) ?: return null
-                return ULID(value)
+                return Ulid(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: ULID?,
+                value: Ulid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
             }
 
-            override fun deepCopy(value: ULID?): ULID? = value?.let { ULID(it) }
+            override fun deepCopy(value: Ulid?): Ulid? = value?.let { Ulid(it) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: ULID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: Ulid?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ULID? = cached as? ULID
+            ): Ulid? = cached as? Ulid
 
-            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it}'" }
+            override fun toSqlLiteral(value: Ulid?): String? = value?.let { "'${it}'" }
 
-            override fun toString(value: ULID?): String? = value?.toString()
+            override fun toString(value: Ulid?): String? = value?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): ULID =
-                sequence?.let { ULID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+            override fun fromStringValue(sequence: CharSequence?): Ulid =
+                sequence?.let { Ulid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
         }
 
-        class TypeBytea : EnhancedUserType<ULID> {
+        class TypeBytea : EnhancedUserType<Ulid> {
             override fun getSqlType(): Int = SqlTypes.VARBINARY
 
-            override fun returnedClass(): Class<ULID> = ULID::class.java
+            override fun returnedClass(): Class<Ulid> = Ulid::class.java
 
             override fun equals(
-                x: ULID?,
-                y: ULID?
+                x: Ulid?,
+                y: Ulid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ULID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ulid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): ULID? {
+            ): Ulid? {
                 val bytes = rs?.getBytes(position) ?: return null
-                return ULID(bytes = bytes)
+                return Ulid(bytes = bytes)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: ULID?,
+                value: Ulid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
@@ -998,77 +983,77 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 }
             }
 
-            override fun deepCopy(value: ULID?): ULID? = value
+            override fun deepCopy(value: Ulid?): Ulid? = value
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: ULID?): Serializable? = value?.toByteArray()
+            override fun disassemble(value: Ulid?): Serializable? = value?.toByteArray()
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ULID? = (cached as? ByteArray)?.let { ULID(it) }
+            ): Ulid? = (cached as? ByteArray)?.let { Ulid(it) }
 
-            override fun toSqlLiteral(value: ULID?): String? = value?.let { "E'\\\\x${it.toHex()}'" }
+            override fun toSqlLiteral(value: Ulid?): String? = value?.let { "E'\\\\x${it.toHex()}'" }
 
-            override fun toString(value: ULID?): String? = value?.toString()
+            override fun toString(value: Ulid?): String? = value?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): ULID =
-                sequence?.let { ULID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+            override fun fromStringValue(sequence: CharSequence?): Ulid =
+                sequence?.let { Ulid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
         }
 
-        class TypeUUID : EnhancedUserType<ULID> {
+        class TypeUuid : EnhancedUserType<Ulid> {
             override fun getSqlType(): Int = SqlTypes.UUID
 
-            override fun returnedClass(): Class<ULID> = ULID::class.java
+            override fun returnedClass(): Class<Ulid> = Ulid::class.java
 
             override fun equals(
-                x: ULID?,
-                y: ULID?
+                x: Ulid?,
+                y: Ulid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ULID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ulid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): ULID? {
+            ): Ulid? {
                 val value = rs?.getObject(position, UUID::class.java) ?: return null
-                return ULID(value)
+                return Ulid(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: ULID?,
+                value: Ulid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 if (value.isNull()) {
                     st?.setNull(index, SqlTypes.UUID)
                 } else {
-                    st?.setObject(index, value.toUUID())
+                    st?.setObject(index, value.toUuid())
                 }
             }
 
-            override fun deepCopy(value: ULID?): ULID? = value?.let { ULID(it.toUUID()) }
+            override fun deepCopy(value: Ulid?): Ulid? = value?.let { Ulid(it.toUuid()) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: ULID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: Ulid?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ULID? = cached as? ULID
+            ): Ulid? = cached as? Ulid
 
-            override fun toSqlLiteral(value: ULID?): String? = value?.let { "'${it.toUUID()}'" }
+            override fun toSqlLiteral(value: Ulid?): String? = value?.let { "'${it.toUuid()}'" }
 
-            override fun toString(value: ULID?): String? = value?.toUUID()?.toString()
+            override fun toString(value: Ulid?): String? = value?.toUuid()?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): ULID =
-                sequence?.let { ULID(UUID(it.toString())) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+            override fun fromStringValue(sequence: CharSequence?): Ulid =
+                sequence?.let { Ulid(Uuid(it.toString())) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
         }
     }
 
@@ -1078,7 +1063,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param index The position of the character to be retrieved. Must be a valid index within the bounds of the string.
      * @return The character at the specified index.
      * @throws IndexOutOfBoundsException If the index is negative or not within the bounds of the string.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun get(index: Int) = toString()[index]
 
@@ -1090,7 +1075,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param startIndex The beginning index, inclusive.
      * @param endIndex The ending index, exclusive.
      * @return A character sequence representing the specified subsequence.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
 
@@ -1102,9 +1087,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * maintains compatibility with systems or APIs that accept UUIDs.
      *
      * @return A `UUID` instance representing the same value as this ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toUUID() = UUID(mostSignificantBits, leastSignificantBits)
+    fun toUuid(): Uuid = UUID(mostSignificantBits, leastSignificantBits)
 
     /**
      * Converts the ULID to a byte array representation, with the most significant bits and least significant bits
@@ -1112,7 +1097,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @return A 16-byte array where the first 8 bytes represent the most significant bits and
      * the last 8 bytes represent the least significant bits of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toByteArray(): ByteArray {
         val bytes = ByteArray(ULID_BYTES)
@@ -1145,7 +1130,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * The resulting string is generated using the predefined uppercase character alphabet.
      *
      * @return A string representation of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = toString(ALPHABET_UPPERCASE)
 
@@ -1158,7 +1143,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param alphabet A character array used as the mapping for the string representation.
      * The alphabet must contain exactly 32 unique characters.
      * @return A string representation of the ULID using the provided character alphabet.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     private fun toString(alphabet: CharArray): String {
         val chars = CharArray(ULID_CHARS)
@@ -1207,7 +1192,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * case-sensitive environments or when following specific format conventions.
      *
      * @return A string containing the lowercase representation of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun lowercase() = toString(ALPHABET_LOWERCASE)
 
@@ -1216,7 +1201,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * to its lowercase representation.
      *
      * @return A new string where all characters of the original string are converted to lowercase.
-     * @since 1.1.0
+     * @since 3.0.0
      */
     operator fun unaryMinus() = lowercase()
 
@@ -1229,15 +1214,15 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * to encode the version and variant according to the standard.
      *
      * @return A new ULID instance that adheres to the RFC 4122 version 4 specification.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toRFC4122(): ULID {
+    fun toRfc4122(): Ulid {
         // set the 4 most significant bits of the 7th byte to 0, 1, 0 and 0
         val msb4: Long = (mostSignificantBits and -0xf001L) or 0x0000000000004000L // RFC-4122 version 4
         // set the 2 most significant bits of the 9th byte to 1 and 0
         val lsb4: Long = (leastSignificantBits and 0x3fffffffffffffffL) or Long.MIN_VALUE // RFC-4122 variant 2
 
-        return ULID(msb4, lsb4)
+        return Ulid(msb4, lsb4)
     }
 
     /**
@@ -1246,9 +1231,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * the most significant bits are incremented to account for the overflow.
      *
      * @return A new ULID instance with an incremented value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    operator fun inc(): ULID {
+    operator fun inc(): Ulid {
         var newMsb: Long = mostSignificantBits
         val newLsb: Long = leastSignificantBits + 1 // increment the LEAST significant bits
 
@@ -1256,7 +1241,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             newMsb += 1 // increment the MOST significant bits
         }
 
-        return ULID(newMsb, newLsb)
+        return Ulid(newMsb, newLsb)
     }
 
     /**
@@ -1264,13 +1249,13 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      *
      * @param other The object to compare with this instance.
      * @return `true` if the specified object is equal to this instance, otherwise `false`.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun equals(other: Any?): Boolean {
         if (other.isNull()) return false
-        if (other.javaClass != ULID::class.java) return false
+        if (other.javaClass != Ulid::class.java) return false
 
-        val that = other as ULID
+        val that = other as Ulid
         if (leastSignificantBits != that.leastSignificantBits) return false
         else if (mostSignificantBits != that.mostSignificantBits) return false
         return true
@@ -1282,7 +1267,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @return An integer representing the hash code, derived from the XOR of
      * the most significant and least significant bits, further processed for
      * even distribution.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun hashCode(): Int {
         val bits: Long = mostSignificantBits xor leastSignificantBits
@@ -1295,10 +1280,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param other the ULID instance to be compared with.
      * @return a negative integer, zero, or a positive integer as this ULID is less than,
      * equal to, or greater than the specified ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      * @author Tommaso Pastorelli
      */
-    override operator fun compareTo(other: ULID): Int {
+    override operator fun compareTo(other: Ulid): Int {
         // used to compare as UNSIGNED longs
         val min: Long = Long.MIN_VALUE
 
@@ -1324,12 +1309,10 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * of the ULID and then transforms it into a hexadecimal string using the `toHex` function.
      *
      * @return A Hex instance containing the hexadecimal representation of the ULID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toHex() = toByteArray().toHex()
-
-
-
+    
     /**
      * Represents a Factory class for generating ULIDs.
      * Provides methods to create ULID instances with default or customized behavior
@@ -1342,11 +1325,11 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * Primary constructor allowing custom ULID function and clock.
      * Allows for fine-grained customization of ULID generation.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      * @author Tommaso Pastorelli
      */
     class Factory(
-        private val ulidTransformer: Transformer<Long, ULID>,
+        private val ulidTransformer: Transformer<Long, Ulid>,
         private val clock: Clock = Clock.systemUTC()
     ) {
         /**
@@ -1354,18 +1337,18 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * and a default clock set to the UTC system clock.
          *
          * @param ulidTransformer A function that generates ULID values based on the provided time in milliseconds.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        constructor(ulidTransformer: Transformer<Long, ULID>) : this(ulidTransformer, Clock.systemUTC())
+        constructor(ulidTransformer: Transformer<Long, Ulid>) : this(ulidTransformer, Clock.systemUTC())
         /**
          * Secondary constructor for the `Factory` class.
          * Initializes the `ulidFunction` field with an instance of `ULIDFunction` using a random generator.
          * Initializes the `clock` field with the system's UTC clock.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         constructor() : this(
-            ULIDFunction(IRandom.newInstance()),
+            UlidFunction(IRandom.newInstance()),
             Clock.systemUTC()
         )
 
@@ -1377,26 +1360,26 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * The `ULIDFunction` encapsulates the logic for generating ULIDs based on a given timestamp and a random component.
              *
              * @return a new instance of the `Factory` class.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newInstance() = Factory(ULIDFunction(IRandom.newInstance()))
+            fun newInstance() = Factory(UlidFunction(IRandom.newInstance()))
 
             /**
              * Creates a new instance of `Factory` with a ULID function based on the provided random generator.
              *
              * @param random An optional `Random` instance used for generating ULID values. If `null`, a default implementation will be used.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newInstance(random: Random?) = Factory(ULIDFunction(IRandom.newInstance(random)))
+            fun newInstance(random: Random?) = Factory(UlidFunction(IRandom.newInstance(random)))
 
             /**
              * Creates a new instance of `Factory` using the provided random function.
              *
              * @param randomFunction A function that generates random `Long` values. This is used to initialize
              * the `ULIDFunction` internally, which generates ULIDs based on the provided randomness.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newInstance(randomFunction: Supplier<Long>) = Factory(ULIDFunction(IRandom.newInstance(randomFunction)))
+            fun newInstance(randomFunction: Supplier<Long>) = Factory(UlidFunction(IRandom.newInstance(randomFunction)))
 
             /**
              * Creates a new instance of `Factory` using the provided random byte array generating function.
@@ -1405,9 +1388,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * number of bytes, and returns a ByteArray of that length to be used for random data generation.
              * @return A new instance of the `Factory` class configured with a `ULIDFunction` that utilizes
              * the specified random byte array function.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newInstance(randomTransformer: Transformer<Int, ByteArray>) = Factory(ULIDFunction(IRandom.newInstance(randomTransformer)))
+            fun newInstance(randomTransformer: Transformer<Int, ByteArray>) = Factory(UlidFunction(IRandom.newInstance(randomTransformer)))
 
             /**
              * Creates a new instance of `Factory` with a monotonic ULID generation function.
@@ -1418,7 +1401,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * and introduces randomness for unique ULIDs.
              *
              * @return A new instance of `Factory` configured with a monotonic ULID function.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newMonotonicInstance() = Factory(MonotonicFunction(IRandom.newInstance()))
 
@@ -1428,9 +1411,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * @param random An optional `Random` instance that will be used to seed the `ULIDFunction`.
              *               If `null`, a default random number generator will be used.
              * @return A new instance of `Factory` configured with a monotonic `ULIDFunction`.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newMonotonicInstance(random: Random?) = Factory(ULIDFunction(IRandom.newInstance(random)))
+            fun newMonotonicInstance(random: Random?) = Factory(UlidFunction(IRandom.newInstance(random)))
 
             /**
              * Creates a new monotonic instance of the `Factory` class using the specified random function.
@@ -1438,9 +1421,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              *
              * @param randomFunction A function that generates random `Long` values for ULID creation.
              * @return A new instance of `Factory` configured with a monotonic ULID function.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newMonotonicInstance(randomFunction: Supplier<Long>) = Factory(ULIDFunction(IRandom.newInstance(randomFunction)))
+            fun newMonotonicInstance(randomFunction: Supplier<Long>) = Factory(UlidFunction(IRandom.newInstance(randomFunction)))
 
             /**
              * Creates a new instance of `Factory` using a monotonic ULID generator.
@@ -1448,9 +1431,9 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * @param randomTransformer A function that generates a `ByteArray` of the specified size.
              *                        This is used as the source of random values for ULID generation.
              * @return A new instance of `Factory` configured with a monotonic ULID generator.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun newMonotonicInstance(randomTransformer: Transformer<Int, ByteArray>) = Factory(ULIDFunction(IRandom.newInstance(randomTransformer)))
+            fun newMonotonicInstance(randomTransformer: Transformer<Int, ByteArray>) = Factory(UlidFunction(IRandom.newInstance(randomTransformer)))
 
             /**
              * Creates a new instance of the `Factory` class configured with a monotonic function.
@@ -1459,7 +1442,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * of `IRandom` for the internal monotonic function.
              * @param clock The `Clock` instance to provide timestamps for the monotonic function.
              * @return A `Factory` instance configured with a monotonic ULID generation function and clock.
-             * @since 1.0.0
+             * @since 3.0.0
              * */
             fun newMonotonicInstance(randomFunction: Supplier<Long>, clock: Clock): Factory {
                 return Factory(
@@ -1477,7 +1460,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * @param randomTransformer A function that generates a `ByteArray` of the specified size.
              * @param clock The clock instance used for time-based functionality.
              * @return A new `Factory` instance configured with a `MonotonicFunction` and the specified clock.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newMonotonicInstance(randomTransformer: Transformer<Int, ByteArray>, clock: Clock): Factory {
                 return Factory(
@@ -1497,7 +1480,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @return A ULID generated based on the current timestamp.
          * @throws IllegalStateException If the clock instance is not initialized.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @Synchronized
         fun create() = ulidTransformer(clock.millis())
@@ -1508,7 +1491,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * @param time The timestamp in milliseconds to generate the ULID.
          * @return The generated ULID as a string.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         @Synchronized
         fun create(time: Long) = ulidTransformer(time)
@@ -1521,24 +1504,24 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @property random The random generator used to produce random components of the ULID.
          * @constructor Creates an instance of ULIDFunction using the specified random generator.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
-        internal class ULIDFunction(private val random: IRandom) : Transformer<Long, ULID> {
+        internal class UlidFunction(private val random: IRandom) : Transformer<Long, Ulid> {
             /**
              * Generates a ULID (Universally Unique Lexicographically Sortable Identifier) based on the provided time and random data.
              *
              * @param time The timestamp in milliseconds used to generate the ULID.
              * @return A new ULID instance generated using the specified time and random data.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            override fun invoke(time: Long): ULID {
+            override fun invoke(time: Long): Ulid {
                 if (random is ByteRandom) {
-                    return ULID(time, random.nextBytes(RANDOM_BYTES))
+                    return Ulid(time, random.nextBytes(RANDOM_BYTES))
                 }
                 val msb: Long = (time shl 16) or (random.nextLong() and 0xffffL)
                 val lsb: Long = random.nextLong()
-                return ULID(msb, lsb)
+                return Ulid(msb, lsb)
             }
         }
 
@@ -1555,11 +1538,11 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @constructor Creates an instance of the monotonic function with a given random generator
          * and clock. This ensures determinism and supports specific use cases around time-based ULID generation.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
-        internal open class MonotonicFunction private constructor(private val lastULID: ULID, private val random: IRandom) :
-            Transformer<Long, ULID> {
+        internal open class MonotonicFunction private constructor(private val lastUlid: Ulid, private val random: IRandom) :
+            Transformer<Long, Ulid> {
             /**
              * Constructs a new instance of the MonotonicFunction class using the given random generator and clock.
              *
@@ -1569,15 +1552,15 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              *
              * @param random An instance of the IRandom interface used to generate random bytes for the ULID.
              * @param clock  A Clock instance used to provide the current time for the ULID generation.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            constructor(random: IRandom, clock: Clock) : this(ULID(clock.millis(), random.nextBytes(RANDOM_BYTES)), random)
+            constructor(random: IRandom, clock: Clock) : this(Ulid(clock.millis(), random.nextBytes(RANDOM_BYTES)), random)
             /**
              * Constructs a `MonotonicFunction` instance using the provided random number generator.
              * The clock used for timestamp generation defaults to the system UTC clock.
              *
              * @param random The random number generator implementation used for `ULID` generation.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             constructor(random: IRandom) : this(random, Clock.systemUTC())
 
@@ -1588,12 +1571,12 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              *
              * @param time The timestamp used for generating a new ULID. It should be provided in milliseconds.
              * @return A newly generated ULID instance that preserves monotonicity.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             @Suppress("localVariableName")
-            override fun invoke(time: Long): ULID {
-                val lastTime: Long = lastULID.timestamp
-                var _lastULID = lastULID
+            override fun invoke(time: Long): Ulid {
+                val lastTime: Long = lastUlid.timestamp
+                var _lastULID = lastUlid
 
                 // Check if the current time is the same as the previous time or has moved
                 // backwards after a small system clock adjustment or after a leap second.
@@ -1602,15 +1585,15 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                     _lastULID = _lastULID.inc()
                 } else {
                     if (random is ByteRandom) {
-                        _lastULID = ULID(time, random.nextBytes(RANDOM_BYTES))
+                        _lastULID = Ulid(time, random.nextBytes(RANDOM_BYTES))
                     } else {
                         val msb = (time shl 16) or (random.nextLong() and 0xffffL)
                         val lsb: Long = random.nextLong()
-                       _lastULID = ULID(msb, lsb)
+                       _lastULID = Ulid(msb, lsb)
                     }
                 }
 
-                return ULID(_lastULID)
+                return Ulid(_lastULID)
             }
 
             companion object {
@@ -1626,7 +1609,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  * A typical use case for this value is handling scenarios such as minor clock adjustments or leap
                  * seconds during operations that require unique, time-ordered identifiers.
                  *
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 protected const val CLOCK_DRIFT_TOLERANCE = 10000
             }
@@ -1636,7 +1619,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * Interface for generating random values.
          * Provides methods to generate random `Long` values and random byte arrays.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
         internal interface IRandom {
@@ -1644,7 +1627,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * Generates the next random long value based on the implementation's random number generation strategy.
              *
              * @return The generated random long value.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun nextLong(): Long
 
@@ -1653,7 +1636,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              *
              * @param length the number of random bytes to generate.
              * @return a ByteArray containing random byte values.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun nextBytes(length: Int): ByteArray
 
@@ -1662,7 +1645,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  * Creates a new instance of the `IRandom` implementation.
                  *
                  * @return A concrete implementation of `IRandom`. By default, this will be an instance of `ByteRandom`.
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 fun newInstance(): IRandom = ByteRandom()
 
@@ -1675,7 +1658,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  *
                  * @param random An optional Random instance. If null, a default `ByteRandom` is created.
                  * @return A new instance of an implementation of the IRandom interface.
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 fun newInstance(random: Random?): IRandom {
                     return if (random.isNull()) ByteRandom() else {
@@ -1689,7 +1672,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  *
                  * @param randomFunction A lambda function that generates a `Long` value.
                  * This function is used as the source of randomness for the created `LongRandom` instance.
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 fun newInstance(randomFunction: Supplier<Long>) = LongRandom(randomFunction)
 
@@ -1699,7 +1682,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  * @param randomTransformer A function that generates a `ByteArray` of the specified length.
                  * It serves as the source of randomness for the generated object.
                  * @return A new `ByteRandom` instance utilizing the provided `randomFunction`.
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 fun newInstance(randomTransformer: Transformer<Int, ByteArray>) = ByteRandom(randomTransformer)
             }
@@ -1719,7 +1702,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @constructor Overloaded constructor that allows initializing the [LongRandom]
          * with a [Random] instance.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
         internal class LongRandom (private val randomFunction: Supplier<Long> = newRandomFunction(null)) : IRandom {
@@ -1732,7 +1715,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * @param random An optional `Random` instance to serve as the source of entropy.
              *               If null, a default `SecureRandom` instance is used.
              *
-             * @since 1.0.0
+             * @since 3.0.0
              */
             constructor(random: Random?) : this(newRandomFunction(random))
 
@@ -1743,7 +1726,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * based on the underlying random function provided to the instance.
              *
              * @return A random `Long` value.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             override fun nextLong() = randomFunction()
 
@@ -1752,7 +1735,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              *
              * @param length the number of random bytes to generate.
              * @return a ByteArray containing the randomly generated bytes.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             override fun nextBytes(length: Int): ByteArray {
                 var shift = 0
@@ -1780,7 +1763,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  *
                  * @param random the `Random` instance used to generate random values, or `null` to use a default `SecureRandom` instance.
                  * @return a function that generates random `Long` values.
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 fun newRandomFunction(random: Random?): Supplier<Long> {
                     val entropy = random ?: SecureRandom()
@@ -1797,7 +1780,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @property randomTransformer A function that generates a random [ByteArray] given a specified length.
          * By default, this uses a secure random function created by [newRandomFunction].
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
         internal class ByteRandom(private val randomTransformer: Transformer<Int, ByteArray> = newRandomFunction(null)) : IRandom {
@@ -1806,7 +1789,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * a specific implementation based on the provided Random instance.
              *
              * @param random an optional Random instance to initialize the random function; if null, a SecureRandom instance is used.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             constructor(random: Random?) : this(newRandomFunction(random))
 
@@ -1817,7 +1800,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * contributes to the construction of the final value by shifting and combining bits.
              *
              * @return A random `Long` value generated from the internal random byte function.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             override fun nextLong(): Long {
                 var number: Long = 0
@@ -1832,7 +1815,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
              * Generates a random byte array of the specified length.
              *
              * @param length The number of random bytes to generate. Must be a non-negative integer.
-             * @since 1.0.0
+             * @since 3.0.0
              */
             override fun nextBytes(length: Int) = randomTransformer(length)
 
@@ -1845,7 +1828,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  *               to use a `SecureRandom` instance.
                  * @return a function that takes an `Int` input representing the desired length of the byte array
                  *         and returns a `ByteArray` of that length filled with random data.
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 fun newRandomFunction(random: Random?): Transformer<Int, ByteArray> {
                     val entropy = random ?: SecureRandom()
@@ -1866,7 +1849,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          *
          * It ensures thread-safe access to the instance of `Factory`.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
         internal class Holder {
@@ -1876,7 +1859,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  * Provides a thread-safe mechanism to access the shared `Factory` instance
                  * initialized with an internal ULID generation function and a random number generator.
                  *
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 val INSTANCE = newInstance()
             }
@@ -1889,7 +1872,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * during its operations, particularly for use in generating ULIDs or managing related clock
          * operations.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          * @author Tommaso Pastorelli
          */
         internal class MonotonicHolder {
@@ -1898,7 +1881,7 @@ class ULID(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  * A singleton instance of a monotonic object, used to maintain a consistent monotonic function behavior.
                  * This instance is internally instantiated using the `newMonotonicInstance` function.
                  *
-                 * @since 1.0.0
+                 * @since 3.0.0
                  */
                 val INSTANCE = newMonotonicInstance()
             }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.JSON
+import dev.tommasop1804.kutils.classes.coding.Json
 import dev.tommasop1804.kutils.classes.time.TimeZone
 import dev.tommasop1804.kutils.classes.time.TimeZoneDesignator
 import dev.tommasop1804.kutils.exceptions.ConversionException
@@ -320,12 +320,12 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
             .newHttpClient()
             .send(
                 HttpRequest.newBuilder()
-                    .uri("https://api.frankfurter.dev/v1/latest?base=${this.currency.currencyCode}&symbols=${currency.currencyCode}&amount=${amount}".toURI()())
+                    .uri("https://api.frankfurter.dev/v1/latest?base=${this.currency.currencyCode}&symbols=${currency.currencyCode}&amount=${amount}".toUri()())
                     .build(),
                 HttpResponse.BodyHandlers.ofString()
             ).requireOrThrow({ CurrencyConversionException("Unable to convert money to currency ${currency.currencyCode}") }) { it.statusCode() in 200..299 }
             .body()
-            .let(::JSON)
+            .let(::Json)
 
         return Pair(
             Money(response["rates"]!![currency.currencyCode].asDecimal().toBigDecimal(), currency),

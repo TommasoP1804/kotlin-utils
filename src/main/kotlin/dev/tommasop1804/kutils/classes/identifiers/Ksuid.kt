@@ -47,15 +47,15 @@ import kotlin.time.toJavaInstant
  * @property ksuidBytes The raw byte array representation of the KSUID.
  * @property instant The timestamp represented as an Instant, allowing interoperability
  * with standard temporal and date-time APIs.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = KSUID.Companion.Serializer::class)
-@JsonDeserialize(using = KSUID.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = KSUID.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = KSUID.Companion.OldDeserializer::class)
+@JsonSerialize(using = Ksuid.Companion.Serializer::class)
+@JsonDeserialize(using = Ksuid.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ksuid.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ksuid.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_null_check")
-class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: ByteArray? = null) : Comparable<KSUID>, Serializable, CharSequence {
+class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: ByteArray? = null) : Comparable<Ksuid>, Serializable, CharSequence {
 
     /**
      * Represents the timestamp component of a KSUID (K-Sortable Unique Identifier).
@@ -65,14 +65,14 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * This property is backed by a delegate and must be set before use. It is initialized
      * at object creation and can only be modified within the containing class.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val timestamp: Int
     /**
      * The payload portion of the KSUID, represented as a 16-byte array.
      * This value is immutable and is set internally on object creation.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val payload: ByteArray
     /**
@@ -83,7 +83,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * The value of this property is immutable from outside the class, ensuring the integrity
      * of the KSUID structure after it has been created.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val ksuidBytes: ByteArray
 
@@ -95,7 +95,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * This allows the KSUID to be interpreted in terms of
      * standard temporal representations.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val instant: Instant
         get() = Instant.ofEpochSecond(timestamp.toLong() + EPOCH)
@@ -108,7 +108,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * the length of the resulting string.
      *
      * @return The number of characters in the Base62-encoded representation of the KSUID.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override val length: Int = 27
 
@@ -117,9 +117,9 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * with a byte array representation of the provided `ksuid` argument.
      *
      * @param ksuid The KSUID instance used to initialize this constructor.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    private constructor(ksuid: KSUID) : this(ksuidBytes = ksuid.ksuidBytes)
+    private constructor(ksuid: Ksuid) : this(ksuidBytes = ksuid.ksuidBytes)
     /**
      * Constructs a new KSUID instance with the specified parameters.
      *
@@ -131,7 +131,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @param timestamp The optional timestamp associated with the KSUID. If null, a default value is used.
      * @param payload The mandatory hexadecimal payload for the KSUID.
      * @param ksuidBytes An optional byte array representation of the KSUID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(timestamp: Int? = null, payload: Hex, ksuidBytes: ByteArray? = null) : this(timestamp, payload.toByteArray(), ksuidBytes)
     /**
@@ -142,7 +142,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      *
      * @param cs The Base62-encoded string to initialize the KSUID instance.
      * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the provided string contains invalid Base62 characters.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(cs: CharSequence) : this(ksuidBytes = Base62.decode(cs.toString().trim())) {
         validate(cs.toString().trim().length == PAD_TO_LENGTH) { "Invalid Base62 string" }
@@ -152,27 +152,27 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * The KSUID is generated based on the provided `instant`.
      *
      * @param instant the timestamp to use for generating the KSUID
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(instant: Instant) : this(Generator.INSTANCE.newKSUID(instant))
+    constructor(instant: Instant) : this(Generator.INSTANCE.newKsuid(instant))
     /**
      * Constructs a KSUID instance using the provided timestamp.
      * The KSUID is generated based on the provided `instant`.
      *
      * @param instant the timestamp to use for generating the KSUID
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OptIn(ExperimentalTime::class)
-    constructor(instant: kotlin.time.Instant) : this(Generator.INSTANCE.newKSUID(instant.toJavaInstant()))
+    constructor(instant: kotlin.time.Instant) : this(Generator.INSTANCE.newKsuid(instant.toJavaInstant()))
     /**
      * Constructs a new instance of the KSUID class using a newly generated KSUID string.
      *
      * This constructor internally calls a factory method to generate a KSUID value,
      * which is then converted to its string representation.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor() : this(Generator.createKSUID())
+    constructor() : this(Generator.createKsuid())
 
     init {
         if (ksuidBytes != null) {
@@ -202,7 +202,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * since a specified Unix epoch (2014-05-13T16:53:20Z). This epoch is used as a reference point for
          * calculating the timestamp component of a KSUID.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private const val EPOCH = 1400000000
         /**
@@ -210,14 +210,14 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * KSUIDs consist of a timestamp and a payload, with the payload providing additional uniqueness.
          * This constant specifies the fixed size of the payload portion in bytes.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private const val PAYLOAD_BYTES = 16
         /**
          * Represents the fixed byte size of the timestamp portion in a KSUID.
          * This value is used to define the number of bytes allocated to storing the timestamp.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private const val TIMESTAMP_BYTES = 4
         /**
@@ -227,7 +227,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * This value is used to define the total size of the KSUID structure
          * when working with its byte representation.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private const val TOTAL_BYTES = PAYLOAD_BYTES + TIMESTAMP_BYTES
         /**
@@ -237,7 +237,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * This constant ensures consistent formatting and alignment
          * of KSUID strings across different outputs or systems.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private const val PAD_TO_LENGTH = 27
         /**
@@ -250,9 +250,9 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * The comparator ensures a consistent order for KSUID objects, aiding in sorting and other
          * operations that rely on defined ordering.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        private val COMPARATOR = Comparator.comparingInt(KSUID::timestamp).thenComparing { it.payload.contentToString() }
+        private val COMPARATOR = Comparator.comparingInt(Ksuid::timestamp).thenComparing { it.payload.contentToString() }
 
         /**
          * Checks whether the current `CharSequence` is a valid KSUID.
@@ -263,122 +263,122 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          *
          * @receiver The `CharSequence` to validate as a KSUID.
          * @return `true` if the `CharSequence` represents a valid KSUID; `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidKSUID() = runCatching { KSUID(toString()) }.isSuccess
+        fun CharSequence.isValidKsuid() = runCatching { Ksuid(toString()) }.isSuccess
 
         /**
-         * Converts the given [CharSequence] into a [KSUID] instance.
+         * Converts the given [CharSequence] into a [Ksuid] instance.
          *
-         * This method attempts to create a [KSUID] object using the string representation of the
+         * This method attempts to create a [Ksuid] object using the string representation of the
          * [CharSequence]. The result is wrapped in a [Result] to handle potential exceptions
          * that may occur during the creation process, such as invalid format or other constraints.
          *
-         * @return A [Result] containing the [KSUID] instance if successful, or an exception if an error occurs.
-         * @since 1.0.0
+         * @return A [Result] containing the [Ksuid] instance if successful, or an exception if an error occurs.
+         * @since 3.0.0
          */
-        fun CharSequence.toKSUID() = runCatching { KSUID(toString()) }
+        fun CharSequence.toKsuid() = runCatching { Ksuid(toString()) }
 
-        class Serializer : ValueSerializer<KSUID>() {
-            override fun serialize(value: KSUID, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ksuid>() {
+            override fun serialize(value: Ksuid, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.toString())
             }
         }
 
-        class Deserializer : ValueDeserializer<KSUID>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = KSUID(p.string)
+        class Deserializer : ValueDeserializer<Ksuid>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Ksuid(p.string)
         }
 
-        class OldSerializer : JsonSerializer<KSUID>() {
-            override fun serialize(value: KSUID, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ksuid>() {
+            override fun serialize(value: Ksuid, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.toString())
         }
 
-        class OldDeserializer : JsonDeserializer<KSUID>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): KSUID = KSUID(p.text)
+        class OldDeserializer : JsonDeserializer<Ksuid>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ksuid = Ksuid(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<KSUID?, String?> {
-            override fun convertToDatabaseColumn(attribute: KSUID?): String? = attribute?.toString()
-            override fun convertToEntityAttribute(dbData: String?): KSUID? = dbData?.let { KSUID(it) }
+        class Converter : AttributeConverter<Ksuid?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ksuid?): String? = attribute?.toString()
+            override fun convertToEntityAttribute(dbData: String?): Ksuid? = dbData?.let { Ksuid(it) }
         }
 
-        class TypeChar : EnhancedUserType<KSUID> {
+        class TypeChar : EnhancedUserType<Ksuid> {
             override fun getSqlType(): Int = SqlTypes.CHAR
 
-            override fun returnedClass(): Class<KSUID> = KSUID::class.java
+            override fun returnedClass(): Class<Ksuid> = Ksuid::class.java
 
             override fun equals(
-                x: KSUID?,
-                y: KSUID?
+                x: Ksuid?,
+                y: Ksuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: KSUID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ksuid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): KSUID? {
+            ): Ksuid? {
                 val value = rs?.getString(position) ?: return null
-                return KSUID(value)
+                return Ksuid(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: KSUID?,
+                value: Ksuid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
             }
 
-            override fun deepCopy(value: KSUID?): KSUID? = value?.let { KSUID(it) }
+            override fun deepCopy(value: Ksuid?): Ksuid? = value?.let { Ksuid(it) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: KSUID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: Ksuid?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): KSUID? = cached as? KSUID
+            ): Ksuid? = cached as? Ksuid
 
-            override fun toSqlLiteral(value: KSUID?): String? = value?.let { "'${it}'" }
+            override fun toSqlLiteral(value: Ksuid?): String? = value?.let { "'${it}'" }
 
-            override fun toString(value: KSUID?): String? = value?.toString()
+            override fun toString(value: Ksuid?): String? = value?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): KSUID =
-                sequence?.let { KSUID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to KSUID")
+            override fun fromStringValue(sequence: CharSequence?): Ksuid =
+                sequence?.let { Ksuid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to KSUID")
         }
 
-        class TypeBytea : EnhancedUserType<KSUID> {
+        class TypeBytea : EnhancedUserType<Ksuid> {
             override fun getSqlType(): Int = SqlTypes.VARBINARY
 
-            override fun returnedClass(): Class<KSUID> = KSUID::class.java
+            override fun returnedClass(): Class<Ksuid> = Ksuid::class.java
 
             override fun equals(
-                x: KSUID?,
-                y: KSUID?
+                x: Ksuid?,
+                y: Ksuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: KSUID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ksuid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): KSUID? {
+            ): Ksuid? {
                 val bytes = rs?.getBytes(position) ?: return null
-                return KSUID(ksuidBytes = bytes)
+                return Ksuid(ksuidBytes = bytes)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: KSUID?,
+                value: Ksuid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
@@ -390,23 +390,23 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
                 }
             }
 
-            override fun deepCopy(value: KSUID?): KSUID? = value?.let { KSUID(it) }
+            override fun deepCopy(value: Ksuid?): Ksuid? = value?.let { Ksuid(it) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: KSUID?): Serializable? = value?.toByteArray()
+            override fun disassemble(value: Ksuid?): Serializable? = value?.toByteArray()
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): KSUID? = (cached as? ByteArray)?.let { KSUID(ksuidBytes = it) }
+            ): Ksuid? = (cached as? ByteArray)?.let { Ksuid(ksuidBytes = it) }
 
-            override fun toSqlLiteral(value: KSUID?): String? = value?.let { "E'\\\\x${it.toHex().toString(symbol = Hex.HexSymbol.NONE)}'" }
+            override fun toSqlLiteral(value: Ksuid?): String? = value?.let { "E'\\\\x${it.toHex().toString(symbol = Hex.HexSymbol.NONE)}'" }
 
-            override fun toString(value: KSUID?): String? = value?.toString()
+            override fun toString(value: Ksuid?): String? = value?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): KSUID =
-                sequence?.let { KSUID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to KSUID")
+            override fun fromStringValue(sequence: CharSequence?): Ksuid =
+                sequence?.let { Ksuid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to KSUID")
         }
     }
 
@@ -414,7 +414,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * Converts the KSUID instance into a byte array representation.
      *
      * @return A copy of the internal byte array representing this KSUID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toByteArray() = ksuidBytes.copyOf()
 
@@ -425,7 +425,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * of the KSUID and then transforms it into a hexadecimal string using the `toHex` function.
      *
      * @return A string containing the hexadecimal representation of the KSUID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toHex() = toByteArray().toHex()
 
@@ -435,7 +435,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * `toString` method, the timestamp, the payload, and the `ksuidBytes` array.
      *
      * @return A detailed log string containing the values of key properties of the instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toLogString() = StringJoiner(", ", this::class.simpleName + "[", "]")
         .add("string = " + toString())
@@ -452,7 +452,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * padded to a predefined length if necessary.
      *
      * @return A Base62-encoded string representing the KSUID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = Base62.encode(ksuidBytes, PAD_TO_LENGTH)
 
@@ -464,13 +464,13 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      *
      * @param other The object to compare for equality with this instance.
      * @return `true` if the specified object is equal to this instance, `false` otherwise.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as KSUID
+        other as Ksuid
 
         if (!payload.contentEquals(other.payload)) return false
         if (!ksuidBytes.contentEquals(other.ksuidBytes)) return false
@@ -484,7 +484,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * hash codes of its components, including `payload`, `ksuidBytes` and `timestamp`.
      *
      * @return the computed hash code value for the KSUID instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun hashCode(): Int {
         var result = payload.contentHashCode()
@@ -499,7 +499,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @param index The zero-based index of the character to retrieve.
      * @return The character at the specified index.
      * @throws IndexOutOfBoundsException If the index is out of bounds of the string length.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun get(index: Int) = toString()[index]
 
@@ -513,7 +513,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @param endIndex The end index of the subsequence, exclusive. Must be greater than or equal to startIndex
      *                 and within the bounds of the string.
      * @return A character sequence corresponding to the specified range of indices within the string representation.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
 
@@ -523,9 +523,9 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @param other the KSUID instance to compare this instance with
      * @return a negative integer, zero, or a positive integer as this instance
      *         is less than, equal to, or greater than the specified instance
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    override fun compareTo(other: KSUID): Int = COMPARATOR.compare(this, other)
+    override fun compareTo(other: Ksuid): Int = COMPARATOR.compare(this, other)
 
     /**
      * A private class that serves as a generator for creating KSUID instances. This class is responsible
@@ -537,7 +537,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @constructor Initializes the generator by requiring the payload supplier to produce valid byte arrays
      * of length `PAYLOAD_BYTES`. If the validation fails, an `IllegalArgumentException` is thrown.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      * @author Tommaso Pastorelli
      */
     private class Generator(val payloadSupplier: Supplier<ByteArray>) {
@@ -546,7 +546,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * random byte arrays using the provided Random instance.
          *
          * @param random the Random instance used to generate random byte arrays
-         * @since 1.0.0
+         * @since 3.0.0
          */
         constructor(random: Random) : this({
             val payload = ByteArray(PAYLOAD_BYTES)
@@ -563,7 +563,7 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
              * A singleton instance of the `Generator` class initialized with a secure random number generator.
              * This instance is used to create KSUIDs with a unique payload each time.
              *
-             * @since 1.0.0
+             * @since 3.0.0
              */
             val INSTANCE = Generator(SecureRandom())
 
@@ -577,9 +577,9 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
              * @throws IllegalArgumentException If the payload byte array size does not match
              * the expected size required by the underlying `Generator` implementation.
              *
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun generate() = createKSUID().toString()
+            fun generate() = createKsuid().toString()
             /**
              * Generates a new KSUID (K-Sortable Unique Identifier) instance using the default generator.
              *
@@ -591,17 +591,17 @@ class KSUID(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
              * to ensure uniqueness and temporal sortability of the generated KSUID.
              *
              * @return A new KSUID instance.
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun createKSUID() = INSTANCE.newKSUID()
+            fun createKsuid() = INSTANCE.newKsuid()
         }
 
         /**
          * Generates a new KSUID instance based on the provided time or the current time if no time is provided.
          *
          * @param instant The point in time to be used for the KSUID. Defaults to the current time (`Instant.now()`).
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun newKSUID(instant: Instant = Instant()) = KSUID((instant.toEpochMilli() / 1000 - EPOCH).toInt(), payloadSupplier())
+        fun newKsuid(instant: Instant = Instant()) = Ksuid((instant.toEpochMilli() / 1000 - EPOCH).toInt(), payloadSupplier())
     }
 }

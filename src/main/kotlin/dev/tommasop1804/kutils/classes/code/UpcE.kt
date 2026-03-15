@@ -10,7 +10,7 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
-import dev.tommasop1804.kutils.classes.code.ProductCode.UPC.Companion.computeCheckDigit
+import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
 import dev.tommasop1804.kutils.minus
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
@@ -36,21 +36,21 @@ import java.nio.file.Path
  * @constructor Initializes the UPC-E from a given sequence of characters.
  * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the provided UPC-E code is invalid.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @JvmInline
 @Suppress("unused", "functionName", "className")
-@JsonSerialize(using = UPC_E.Companion.Serializer::class)
-@JsonDeserialize(using = UPC_E.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UPC_E.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UPC_E.Companion.OldDeserializer::class)
-value class UPC_E private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.UPC, PrintableBarcode {
+@JsonSerialize(using = UpcE.Companion.Serializer::class)
+@JsonDeserialize(using = UpcE.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UpcE.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UpcE.Companion.OldDeserializer::class)
+value class UpcE private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Upc, PrintableBarcode {
     /**
      * Represents the length of the value held by this property.
      * The length is dynamically calculated based on the size of the value.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -61,12 +61,12 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      * and passing it to the primary constructor.
      *
      * @param value The CharSequence input that represents the UPC-E code
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim())
 
     init {
-        validateInputFormat(value.isValidUPC_E(), UPC_E::class)
+        validateInputFormat(value.isValidUpcE(), UpcE::class)
     }
 
     companion object {
@@ -82,9 +82,9 @@ value class UPC_E private constructor(override val value: String) : CharSequence
          *
          * @receiver The string to validate as a UPC-E code.
          * @return `true` if the string is a valid UPC-E code, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidUPC_E() = matches(Regex("[0-9]{8}")) && computeCheckDigit(toString() - 1) == this[7]
+        fun CharSequence.isValidUpcE() = matches(Regex("[0-9]{8}")) && computeCheckDigit(toString() - 1) == this[7]
 
         /**
          * Converts the current string into a UPC_E-compatible object by filtering out non-digit characters and
@@ -95,33 +95,33 @@ value class UPC_E private constructor(override val value: String) : CharSequence
          *
          * @receiver The string to be converted to a UPC_E-compatible format.
          * @return A `Result` wrapping a `UPC_A` instance if the conversion is successful, or an exception otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toUPC_E() = filter { it.isDigit() }.run { runCatching { UPC_A(this) } }
+        fun CharSequence.toUpcE() = filter { it.isDigit() }.run { runCatching { UpcA(this) } }
 
-        class Serializer : ValueSerializer<UPC_E>() {
-            override fun serialize(value: UPC_E, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<UpcE>() {
+            override fun serialize(value: UpcE, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<UPC_E>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = UPC_E(p.string)
+        class Deserializer : ValueDeserializer<UpcE>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = UpcE(p.string)
         }
 
-        class OldSerializer : JsonSerializer<UPC_E>() {
-            override fun serialize(value: UPC_E, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<UpcE>() {
+            override fun serialize(value: UpcE, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<UPC_E>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): UPC_E = UPC_E(p.text)
+        class OldDeserializer : JsonDeserializer<UpcE>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): UpcE = UpcE(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<UPC_E?, String?> {
-            override fun convertToDatabaseColumn(attribute: UPC_E?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): UPC_E? = dbData?.let { UPC_E(it) }
+        class Converter : AttributeConverter<UpcE?, String?> {
+            override fun convertToDatabaseColumn(attribute: UpcE?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): UpcE? = dbData?.let { UpcE(it) }
         }
     }
 
@@ -131,7 +131,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      * @param index the index of the element to retrieve
      * @return the element at the specified index
      * @throws IndexOutOfBoundsException if the index is out of range
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -141,7 +141,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      *
      * @param startIndex the start index of the subsequence, inclusive
      * @param endIndex the end index of the subsequence, exclusive
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -150,7 +150,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      * default implementation to provide a custom string representation of the value.
      *
      * @return A string representation of the value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -158,7 +158,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      * Converts the internally generated matrix to a BufferedImage.
      *
      * @return a BufferedImage representation of the generated matrix.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(): BufferedImage = MatrixToImageWriter.toBufferedImage(generateMatrix())
 
@@ -167,7 +167,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      *
      * @param config the configuration to customize the output image, such as colors and other settings
      * @return a BufferedImage representation of the current bit matrix
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(
         config: MatrixToImageConfig
@@ -178,7 +178,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      *
      * @param format the image format to use (e.g., "PNG", "JPG").
      * @param file the file to which the barcode image will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -192,7 +192,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      *
      * @param format The image format (e.g., "PNG", "JPG") in which the matrix will be written.
      * @param file The target file path where the image will be saved.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -206,7 +206,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      *
      * @param format the image format in which the matrix will be written (e.g., "PNG", "JPEG").
      * @param stream the output stream to which the matrix will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -221,7 +221,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      * @param format the image format to use for the output (e.g., "PNG", "JPEG").
      * @param stream the output stream where the image representation of the barcode will be written.
      * @param config the configuration used for rendering the image, including colors and other visual properties.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -235,7 +235,7 @@ value class UPC_E private constructor(override val value: String) : CharSequence
      * Generates a BitMatrix representation of the barcode data following the EAN-8 format.
      *
      * @return a BitMatrix that encodes the barcode with the specified dimensions and format.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun generateMatrix(): BitMatrix {
         val writer = MultiFormatWriter()

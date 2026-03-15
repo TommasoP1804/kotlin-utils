@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.BigInt
-import dev.tommasop1804.kutils.UUID
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNull
-import dev.tommasop1804.kutils.toUUID
+import dev.tommasop1804.kutils.toUuid
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
@@ -29,8 +28,7 @@ import kotlin.math.ceil
 import kotlin.math.ln
 import kotlin.repeat
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
-import kotlin.uuid.toJavaUuid
+import kotlin.uuid.toKotlinUuid
 
 /**
  * Represents a compact, URL-safe and human-readable identifier derived from a UUID.
@@ -43,13 +41,13 @@ import kotlin.uuid.toJavaUuid
  * @param value The string representation of the short UUID.
  * @constructor Constructs a ShortUUID from a given string representation.
  * @author Tommaso Pastorelli
- * @since 1.0.0
+ * @since 3.0.0
  */
-@JsonSerialize(using = ShortUUID.Companion.Serializer::class)
-@JsonDeserialize(using = ShortUUID.Companion.Deserializer::class)
+@JsonSerialize(using = ShortUuid.Companion.Serializer::class)
+@JsonDeserialize(using = ShortUuid.Companion.Deserializer::class)
 @JvmInline
 @Suppress("unused", "kutils_substring_as_get_intprogression", "kutils_take_as_int_invoke")
-value class ShortUUID(private val value: String) : Serializable, CharSequence {
+value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
     /**
      * Provides the length of the value string associated with the ShortUUID instance.
@@ -58,12 +56,12 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * in the `value` string.
      *
      * @return The length of the value string.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override val length: Int get() = value.length
 
     /**
-     * Creates an instance of the [ShortUUID] class using a [UUID].
+     * Creates an instance of the [ShortUuid] class using a [UUID].
      *
      * This constructor encodes the given [UUID] into a shortened string format
      * using a custom alphabet. The encoding process is performed by converting
@@ -71,26 +69,12 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * it using a specific length calculated based on the size of the custom alphabet.
      *
      * @param uuid the UUID to encode into a shortened string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor(uuid: UUID) : this(encode(
+    constructor(uuid: Uuid) : this(encode(
         BigInt(uuid.toString().replace("-", ""), 16),
         ceil((ln(25.0) / ln(ALPHABET.size.toDouble())) * 16).toInt()
     ))
-
-    /**
-     * Creates an instance of the [ShortUUID] class using a [Uuid].
-     *
-     * This constructor encodes the given [Uuid] into a shortened string format
-     * using a custom alphabet. The encoding process is performed by converting
-     * the UUID into a [BigInt], removing non-numeric characters, and encoding
-     * it using a specific length calculated based on the size of the custom alphabet.
-     *
-     * @param uuid the UUID to encode into a shortened string.
-     * @since 1.0.0
-     */
-    @OptIn(ExperimentalUuidApi::class)
-    constructor(uuid: Uuid) : this(uuid.toJavaUuid())
 
     /**
      * Default constructor for the ShortUUID class.
@@ -99,15 +83,15 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * This constructor facilitates the creation of a ShortUUID with no prior inputs, leveraging
      * the underlying default UUID generation mechanism.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    constructor() : this(UUID())
+    constructor() : this(Uuid())
 
     /**
      * Companion object for the ShortUUID class. Provides utility methods and nested classes
      * for serialization, deserialization, string encoding/decoding, and database conversions.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     companion object {
         /**
@@ -118,7 +102,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
          * This array can be utilized to generate unique identifiers or for any use case
          * requiring a restricted and distinctive character set.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val ALPHABET = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray()
 
@@ -128,7 +112,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
          *
          * @param bigInt The BigInt value to be encoded.
          * @param padToLen The length to which the encoded result should be padded. If set to 0, no padding will occur.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun encode(bigInt: BigInt, padToLen: Int) = buildString {
             var value = BigInt(bigInt.toString())
@@ -154,15 +138,15 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
          * 8 characters-4 characters-4 characters-4 characters-12 characters, following UUID conventions.
          *
          * @param encoded A character array containing the encoded representation of the UUID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun decode(encoded: CharArray) = buildString{
             var sum = BigInt.ZERO
             val alphaSize = BigInt.valueOf(ALPHABET.size.toLong())
 
-            for (i in 0 until encoded.size) {
+            for ((i, element) in encoded.withIndex()) {
                 sum = sum.add(alphaSize.pow(i).multiply(BigInt.valueOf(
-                    Arrays.binarySearch(ALPHABET, encoded[i]).toLong()
+                    Arrays.binarySearch(ALPHABET, element).toLong()
                 )))
             }
             var str = sum.toString(16)
@@ -180,28 +164,16 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
         }
 
         /**
-         * Converts this [UUID] into its shortened [ShortUUID] representation.
+         * Converts this [UUID] into its shortened [ShortUuid] representation.
          *
-         * This extension function utilizes the [ShortUUID] class constructor to generate
-         * a compact, encoded string representation of the UUID. The resulting [ShortUUID]
+         * This extension function utilizes the [ShortUuid] class constructor to generate
+         * a compact, encoded string representation of the UUID. The resulting [ShortUuid]
          * provides a more concise alternative format for the UUID.
          *
-         * @return A [ShortUUID] instance representing the shortened form of the original UUID.
-         * @since 1.0.0
+         * @return A [ShortUuid] instance representing the shortened form of the original UUID.
+         * @since 3.0.0
          */
-        fun UUID.toShortUUID() = ShortUUID(this)
-        /**
-         * Converts this [UUID] into its shortened [ShortUUID] representation.
-         *
-         * This extension function utilizes the [ShortUUID] class constructor to generate
-         * a compact, encoded string representation of the UUID. The resulting [ShortUUID]
-         * provides a more concise alternative format for the UUID.
-         *
-         * @return A [ShortUUID] instance representing the shortened form of the original UUID.
-         * @since 1.0.3
-         */
-        @OptIn(ExperimentalUuidApi::class)
-        fun Uuid.toShortUUID() = ShortUUID(this)
+        fun UUID.toShortUuid() = ShortUuid(this)
         /**
          * Converts a [CharSequence] into a `ShortUUID` representation.
          *
@@ -210,13 +182,13 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
          *
          * @receiver The [CharSequence] to be converted into a `ShortUUID`.
          * @return A `ShortUUID` instance representing the shortened UUID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toShortUUID() = ShortUUID(toString())
+        fun CharSequence.toShortUuid() = ShortUuid(toString())
 
-        class Serializer : ValueSerializer<ShortUUID>() {
+        class Serializer : ValueSerializer<ShortUuid>() {
             override fun serialize(
-                value: ShortUUID,
+                value: ShortUuid,
                 gen: tools.jackson.core.JsonGenerator,
                 ctxt: SerializationContext
             ) {
@@ -224,127 +196,127 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
             }
         }
 
-        class Deserializer : ValueDeserializer<ShortUUID>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = ShortUUID(p.string)
+        class Deserializer : ValueDeserializer<ShortUuid>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = ShortUuid(p.string)
         }
 
-        class OldSerializer : JsonSerializer<ShortUUID>() {
-            override fun serialize(value: ShortUUID, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<ShortUuid>() {
+            override fun serialize(value: ShortUuid, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<ShortUUID>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ShortUUID = ShortUUID(p.text)
+        class OldDeserializer : JsonDeserializer<ShortUuid>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ShortUuid = ShortUuid(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<ShortUUID?, UUID?> {
-            override fun convertToDatabaseColumn(attribute: ShortUUID?): UUID? = attribute?.value.toUUID()()
-            override fun convertToEntityAttribute(dbData: UUID?): ShortUUID? = dbData?.toShortUUID()
+        class Converter : AttributeConverter<ShortUuid?, UUID?> {
+            override fun convertToDatabaseColumn(attribute: ShortUuid?): UUID? = attribute?.value?.toUuid()()
+            override fun convertToEntityAttribute(dbData: UUID?): ShortUuid? = dbData?.toShortUuid()
         }
 
-        class TypeVarchar : EnhancedUserType<ShortUUID> {
+        class TypeVarchar : EnhancedUserType<ShortUuid> {
             override fun getSqlType(): Int = SqlTypes.VARCHAR
 
-            override fun returnedClass(): Class<ShortUUID> = ShortUUID::class.java
+            override fun returnedClass(): Class<ShortUuid> = ShortUuid::class.java
 
             override fun equals(
-                x: ShortUUID?,
-                y: ShortUUID?
+                x: ShortUuid?,
+                y: ShortUuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ShortUUID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: ShortUuid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): ShortUUID? {
+            ): ShortUuid? {
                 val value = rs?.getString(position) ?: return null
-                return ShortUUID(value)
+                return ShortUuid(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: ShortUUID?,
+                value: ShortUuid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 st?.setString(index, value?.value)
             }
 
-            override fun deepCopy(value: ShortUUID?): ShortUUID? = value?.let { ShortUUID(it.value) }
+            override fun deepCopy(value: ShortUuid?): ShortUuid? = value?.let { ShortUuid(it.value) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: ShortUUID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: ShortUuid?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ShortUUID? = cached as? ShortUUID
+            ): ShortUuid? = cached as? ShortUuid
 
-            override fun toSqlLiteral(value: ShortUUID?): String? = value?.let { "'${it.value}'" }
+            override fun toSqlLiteral(value: ShortUuid?): String? = value?.let { "'${it.value}'" }
 
-            override fun toString(value: ShortUUID?): String? = value?.value
+            override fun toString(value: ShortUuid?): String? = value?.value
 
-            override fun fromStringValue(sequence: CharSequence?): ShortUUID =
-                sequence?.let { ShortUUID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
+            override fun fromStringValue(sequence: CharSequence?): ShortUuid =
+                sequence?.let { ShortUuid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
         }
 
-        class TypeUUID : EnhancedUserType<ShortUUID> {
+        class TypeUuid : EnhancedUserType<ShortUuid> {
             override fun getSqlType(): Int = SqlTypes.UUID
 
-            override fun returnedClass(): Class<ShortUUID> = ShortUUID::class.java
+            override fun returnedClass(): Class<ShortUuid> = ShortUuid::class.java
 
             override fun equals(
-                x: ShortUUID?,
-                y: ShortUUID?
+                x: ShortUuid?,
+                y: ShortUuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ShortUUID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: ShortUuid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): ShortUUID? {
+            ): ShortUuid? {
                 val value = rs?.getObject(position, UUID::class.java) ?: return null
-                return ShortUUID(value)
+                return ShortUuid(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: ShortUUID?,
+                value: ShortUuid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 if (value.isNull()) {
                     st?.setNull(index, SqlTypes.UUID)
                 } else {
-                    st?.setObject(index, value.toUUID())
+                    st?.setObject(index, value.toUuid())
                 }
             }
 
-            override fun deepCopy(value: ShortUUID?): ShortUUID? = value?.let { ShortUUID(it.toUUID()) }
+            override fun deepCopy(value: ShortUuid?): ShortUuid? = value?.let { ShortUuid(it.toUuid()) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: ShortUUID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: ShortUuid?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ShortUUID? = cached as? ShortUUID
+            ): ShortUuid? = cached as? ShortUuid
 
-            override fun toSqlLiteral(value: ShortUUID?): String? = value?.let { "'${it.toUUID()}'" }
+            override fun toSqlLiteral(value: ShortUuid?): String? = value?.let { "'${it.toUuid()}'" }
 
-            override fun toString(value: ShortUUID?): String? = value?.toString()
+            override fun toString(value: ShortUuid?): String? = value?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): ShortUUID =
-                sequence?.let { ShortUUID(it.toUUID()().toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
+            override fun fromStringValue(sequence: CharSequence?): ShortUuid =
+                sequence?.let { ShortUuid(it.toUuid()().toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
         }
     }
 
@@ -354,7 +326,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * based on its internal state.
      *
      * @return A string representation of the object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -364,7 +336,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * @param index The position of the character to retrieve. Must be a valid index within the range of the internal value.
      * @return The character at the specified index.
      * @throws IndexOutOfBoundsException If the index is out of range.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -375,7 +347,7 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * @param startIndex The beginning index, inclusive. Must be non-negative and less than or equal to [endIndex].
      * @param endIndex The ending index, exclusive. Must be greater than or equal to [startIndex] and less than or equal to the length of the sequence.
      * @return A new character sequence that is a subsequence of this sequence.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -383,16 +355,16 @@ value class ShortUUID(private val value: String) : Serializable, CharSequence {
      * Decodes a given shortened UUID string into its full UUID representation.
      *
      * @receiver The shortened UUID string to decode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toUUID() = UUID(decode(value.toCharArray()))
+    fun toUuid(): Uuid = Uuid(decode(value.toCharArray()))
 
     /**
      * Decodes a given shortened UUID string into its full UUID representation.
      *
      * @receiver The shortened UUID string to decode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OptIn(ExperimentalUuidApi::class)
-    fun toKotlinUuid() = Uuid(decode(value.toCharArray()))
+    fun toKotlinUuid() = Uuid(decode(value.toCharArray())).toKotlinUuid()
 }

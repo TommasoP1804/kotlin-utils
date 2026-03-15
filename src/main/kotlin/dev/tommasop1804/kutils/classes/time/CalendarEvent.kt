@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.LocalTime
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.asSet
+import dev.tommasop1804.kutils.Uri
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.asSet
 import dev.tommasop1804.kutils.classes.colors.Color
 import dev.tommasop1804.kutils.classes.registry.Contact
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalTo
@@ -27,8 +28,6 @@ import java.net.URI
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import kotlin.collections.isNotEmpty
-import kotlin.collections.map
 import kotlin.reflect.KProperty
 import kotlin.text.startsWith
 
@@ -60,7 +59,7 @@ data class CalendarEvent(
     var period: TemporalInterval,
     var repeat: Repeat? = null,
     var partecipants: Set<EventPartecipation> = emptySet(),
-    var conferencing: URI? = null,
+    var conferencing: Uri? = null,
     var description: String? = null,
     var location: String? = null,
     var busy: Boolean = true,

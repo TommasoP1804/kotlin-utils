@@ -153,14 +153,14 @@ fun HttpRequest.Builder.method(method: HttpMethod, body: Any) =
  *
  * @receiver The string to be converted to a [URI].
  * @return A [Result] object containing either a successfully parsed [URI] or an exception if parsing fails.
- * @since 1.0.0
+ * @since 3.0.0
  */
-fun String.toURI() = runCatching { URI(this) }
+fun String.toUri() = runCatching { Uri(this) }
 /**
  * Converts the string to a URL wrapped in a Result.
  * The method first attempts to convert the string to a URI and, if successful, converts the URI to a URL.
  *
  * @return A [Result] containing the [URL] if the conversion was successful, or an exception if it failed.
- * @since 1.0.0
+ * @since 3.0.0
  */
-fun String.toURL(): Result<URL> = runCatching { toURI()().toURL() }
+fun String.toUrl(): Result<Url> = runCatching { toUri()().toURL() }

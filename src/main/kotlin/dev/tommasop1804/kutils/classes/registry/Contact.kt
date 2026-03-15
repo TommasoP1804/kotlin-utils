@@ -64,8 +64,8 @@ data class Contact(
     var importantDates: Map<String, TemporalAdjuster> = emptyMap(),
     var relationships: DataMap = emptyMap(),
     var notes: String? = null,
-    var websites: Map<String, URI> = emptyMap(),
-    var profilePicture: URI? = null,
+    var websites: Map<String, Uri> = emptyMap(),
+    var profilePicture: Uri? = null,
     var isFavourite: Boolean = false,
     var otherFields: DataMap = emptyMap(),
     

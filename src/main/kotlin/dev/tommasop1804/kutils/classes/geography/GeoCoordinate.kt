@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.JSON
+import dev.tommasop1804.kutils.classes.coding.Json
 import dev.tommasop1804.kutils.classes.geometry.Point
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit
 import dev.tommasop1804.kutils.classes.measure.RMeasurement
@@ -207,7 +207,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          */
         fun parse(coordinate: String) = runCatching {
             if (coordinate.startsWith("SRID"))
-                parsePostGIS(coordinate)()
+                parsePostGis(coordinate)()
             else {
                 val parts = coordinate.split(
                     (if (";" in coordinate) ";" else (if ("," in coordinate) "," else "")).toRegex()
@@ -381,7 +381,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          * @since 1.0.0
          */
         @Suppress("LocalVariableName")
-        fun ofUTM(zone: String, easting: Double, northing: Double): GeoCoordinate {
+        fun ofUtm(zone: String, easting: Double, northing: Double): GeoCoordinate {
             val zoneNumber = zone.dropLast(1).toInt()
 
             val a = 6378137.0 // WGS84 equatorial radius
@@ -435,9 +435,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          * - `utm.first`: the UTM zone as a `String`.
          * - `utm.second`: the easting value as a `Double`.
          * - `utm.third`: the northing value as a `Double`.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun ofUTM(utm: Triple<String, Double, Double>) = ofUTM(utm.first, utm.second, utm.third)
+        fun ofUtm(utm: Triple<String, Double, Double>) = ofUtm(utm.first, utm.second, utm.third)
 
         /**
          * Creates a GeoCoordinate using the UTM (Universal Transverse Mercator) coordinate system.
@@ -449,9 +449,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          * @param latitudeBand the latitude band character, identifying the region's north-south hemispheric zone.
          * @param easting the easting value (in meters) relative to the central meridian of the UTM zone.
          * @param northing the northing value (in meters) relative to the Equator for the specified latitude band.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun ofUTM(zone: Int, latitudeBand: Char, easting: Double, northing: Double) = ofUTM("$zone$latitudeBand", easting, northing)
+        fun ofUtm(zone: Int, latitudeBand: Char, easting: Double, northing: Double) = ofUtm("$zone$latitudeBand", easting, northing)
 
         /**
          * Parses a UTM (Universal Transverse Mercator) coordinate string and converts it into a structured representation.
@@ -459,13 +459,13 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          *
          * @param utm The UTM coordinate string to parse. Expected to be in the format "zone easting northing".
          * @return A Result wrapping the parsed UTM object if successful, or an exception if the input format is invalid.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun parseUTM(utm: String) = runCatching {
+        fun parseUtm(utm: String) = runCatching {
             val parts = utm.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             parts.size == 3 || throw MalformedInputException("Invalid UTM format: $utm")
 
-            ofUTM(parts[0], parts[1].toDouble(), parts[2].toDouble())
+            ofUtm(parts[0], parts[1].toDouble(), parts[2].toDouble())
         }
 
         /**
@@ -476,9 +476,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          *            It should follow the format "POINT(x y)" where x and y
          *            are the coordinates.
          * @return A [GeoCoordinate] object representing the parsed coordinate.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun parseWKT(wkt: String) = runCatching {
+        fun parseWkt(wkt: String) = runCatching {
             wkt.contains("POINT(", true) || throw MalformedInputException("Invalid WKT format: $wkt")
             val parts = wkt.replace("POINT(", "").replace(")", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()
@@ -492,9 +492,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          *
          * @param geoJson The GeoJSON string that must start with '{"type":"Point"}' and contain valid coordinates.
          * @return A [Result] containing a [GeoCoordinate] if parsing and validation are successful; otherwise, an error.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun parseGeoJSON(geoJson: CharSequence) = runCatching {
+        fun parseGeoJson(geoJson: CharSequence) = runCatching {
             geoJson.startsWith("{\"type\":\"Point\"") || throw MalformedInputException("Invalid GeoJSON format: $geoJson")
             val parts =
                 geoJson.toString().replace("{\"type\":\"Point\",\"coordinates\":[", "").replace("]}", "").split(",".toRegex())
@@ -513,9 +513,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          * @return A [Result] wrapping a [GeoCoordinate] object if parsing is successful, or an exception if parsing fails.
          * @throws MalformedInputException if the input string does not follow the PostGIS format.
          * @throws ExpectationMismatchException if the SRID is not 4326.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun parsePostGIS(postgis: String) = runCatching {
+        fun parsePostGis(postgis: String) = runCatching {
             if (postgis.startsWith("SRID") && ";POINT(" in postgis) {
                 val srid = postgis[5..<';'.code.toChar()(postgis)].toInt()
                 srid == 4326 || throw ExpectationMismatchException("SRID must be 4326")
@@ -583,10 +583,10 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
         "listNumericDMS" to toListNumericDMS(),
         "listDM" to toListDM(),
         "listNumericDM" to toListNumericDM(),
-        "utm" to toUTM(),
-        "wkt" to toWKT(),
-        "geoJSON" to toGeoJSON(),
-        "postgis" to toPostGIS(),
+        "utm" to toUtm(),
+        "wkt" to toWkt(),
+        "geoJson" to toGeoJson(),
+        "postgis" to toPostGis(),
         "geoLatteGeom" to toGeoLatteGeom(),
         "geoLattePoint" to toGeoLattePoint(),
     )
@@ -602,7 +602,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * - `listNumericDM` - TYPE: `List<DoubleArray>`
      * - `utm` - TYPE: `Triple<String, Double, Double>`
      * - `wkt` - TYPE: [String]
-     * - `geoJSON` - TYPE: [JSON]
+     * - `geoJson` - TYPE: [Json]
      * - `postgis` - TYPE: [String]
      * - `geoLatteGeom` - TYPE: [Geometry]
      * - `geoLattePoint` - TYPE: `Point<G2D>`
@@ -1025,10 +1025,10 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      *
      * 
      * @return A [Triple] containing the UTM zone as a [String] (e.g., "33T"), the easting as [Double] (in meters), and the northing as [Double] (in meters).
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @Suppress("LocalVariableName")
-    fun toUTM(): Triple<String, Double, Double> {
+    fun toUtm(): Triple<String, Double, Double> {
         val latRad = Math.toRadians(latitude)
         val lonRad = Math.toRadians(longitude)
 
@@ -1071,10 +1071,10 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * 
      * @return A string representing the UTM coordinates, formatted with the zone,
      *         easting, and northing values with three decimal places of precision.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toStringUTM(): String {
-        val utm = toUTM()
+    fun toStringUtm(): String {
+        val utm = toUtm()
         return utm.first + " " + String.format("%.3f", utm.second) + " " + String.format("%.3f", utm.third)
     }
 
@@ -1103,9 +1103,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      *
      * 
      * @return The WKT formatted string representation of the point.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toWKT() = "POINT($longitude $latitude)"
+    fun toWkt() = "POINT($longitude $latitude)"
 
     /**
      * Converts the spatial information of the object into a GeoJSON `Point` representation.
@@ -1114,18 +1114,18 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      *
      * 
      * @return A `String` representing the GeoJSON `Point` format for the given spatial data.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toGeoJSON(): JSON = JSON("{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]}")
+    fun toGeoJson(): Json = Json("{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]}")
 
     /**
      * Converts the current geographical coordinates into a PostGIS-compatible representation.
      *
      * 
      * @return A string formatted as a PostGIS-compatible representation containing the SRID and the POINT coordinates (longitude and latitude).
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    fun toPostGIS() = "SRID=4326;POINT($longitude $latitude)"
+    fun toPostGis() = "SRID=4326;POINT($longitude $latitude)"
 
     /**
      * Converts the current object to a Point instance using its longitude and latitude properties.
@@ -1145,7 +1145,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      *
      * @since 1.0.0
      */
-    fun toGeoLatteGeom(): Geometry<*> = Wkt.fromWkt(toWKT())
+    fun toGeoLatteGeom(): Geometry<*> = Wkt.fromWkt(toWkt())
 
     /**
      * Converts the geographic coordinates into a GeoLatte Point.

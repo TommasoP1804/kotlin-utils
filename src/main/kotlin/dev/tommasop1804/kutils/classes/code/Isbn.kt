@@ -33,15 +33,15 @@ import java.nio.file.Path
  *
  * @constructor Primary constructor for private instantiation. Takes a pre-validated ISBN string.
  * @constructor Secondary public constructor for accepting and processing raw input as an ISBN.
- * @since 1.0.0
+ * @since 3.0.0
  */
 @JvmInline
 @Suppress("unused")
-@JsonSerialize(using = ISBN.Companion.Serializer::class)
-@JsonDeserialize(using = ISBN.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ISBN.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ISBN.Companion.OldDeserializer::class)
-value class ISBN private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.EAN, PrintableBarcode {
+@JsonSerialize(using = Isbn.Companion.Serializer::class)
+@JsonDeserialize(using = Isbn.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Isbn.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Isbn.Companion.OldDeserializer::class)
+value class Isbn private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean, PrintableBarcode {
     /**
      * Provides the length of the `value` property, which represents the number of characters
      * in the underlying `value` string associated with this ISBN instance.
@@ -49,7 +49,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * This property overrides the default behavior and returns the length of the `value` string.
      *
      * @return the length of the `value` string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -62,7 +62,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * This property is designed for use exclusively with ISBN-13 format codes that conform
      * to the specified dash requirement.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val eanPrefix
@@ -86,7 +86,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * For reference to the meaning of the linguistic group, see the
      * [List of ISBN registration groups](https://en.wikipedia.org/wiki/List_of_ISBN_registration_groups) article on Wikipedia.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val linguisticGroup
@@ -110,7 +110,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * articles on Wikipedia.
      *
      * @return The publisher segment of the ISBN-13 value or `null` if the format is invalid.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val publisher
@@ -130,7 +130,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * may lead to unexpected results or a `null` value.
      *
      * @return the title segment from the ISBN-13 code, or `null` if the format is invalid.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val title
@@ -143,7 +143,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * It is derived from the last character of the `ISBN` value.
      *
      * @return the final character of the ISBN value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val checkDigit
         get() = last()
@@ -156,12 +156,12 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * before initializing the `ISBN` object.
      *
      * @param value the character sequence to initialize the ISBN instance with.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim() - Char.SPACE)
 
     init {
-        validateInputFormat(value.isValidISBN(), ISBN::class)
+        validateInputFormat(value.isValidIsbn(), Isbn::class)
     }
 
     companion object {
@@ -175,9 +175,9 @@ value class ISBN private constructor(override val value: String) : CharSequence,
          *   matches the actual check digit of the input value.
          *
          * @return `true` if the `CharSequence` is a valid ISBN-13, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidISBN() = matches(Regex("97[89]-?[0-9]{1,5}-?[0-9]{2,7}-?[0-9]{1,6}[0-9]-?[0-9]")) && filter { it.isDigit() }.length == 13 && computeCheckDigit(toString()) == last()
+        fun CharSequence.isValidIsbn() = matches(Regex("97[89]-?[0-9]{1,5}-?[0-9]{2,7}-?[0-9]{1,6}[0-9]-?[0-9]")) && filter { it.isDigit() }.length == 13 && computeCheckDigit(toString()) == last()
 
         /**
          * Converts the current `CharSequence` to an `ISBN` instance by filtering out
@@ -186,9 +186,9 @@ value class ISBN private constructor(override val value: String) : CharSequence,
          *
          * @receiver The original `CharSequence` to be processed and converted to `ISBN`.
          * @return A `Result` containing the successfully constructed `ISBN` object or capturing an exception if the conversion fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toISBN() = filter { it.isDigit() || it == Char.HYPEN }.run { runCatching { ISBN(this) } }
+        fun CharSequence.toIsbn() = filter { it.isDigit() || it == Char.HYPEN }.run { runCatching { Isbn(this) } }
 
         /**
          * Computes the check digit for an input code string using the EAN-13 checksum algorithm.
@@ -198,33 +198,33 @@ value class ISBN private constructor(override val value: String) : CharSequence,
          *
          * @param code the 12-digit numeric string for which the check digit is to be computed.
          * @return the computed check digit as a single character.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun computeCheckDigit(code: String) = EAN13.computeCheckDigit(code - 1 - Char.HYPEN)
+        fun computeCheckDigit(code: String) = Ean13.computeCheckDigit(code - 1 - Char.HYPEN)
 
-        class Serializer : ValueSerializer<ISBN>() {
-            override fun serialize(value: ISBN, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Isbn>() {
+            override fun serialize(value: Isbn, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<ISBN>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = ISBN(p.string)
+        class Deserializer : ValueDeserializer<Isbn>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Isbn(p.string)
         }
 
-        class OldSerializer : JsonSerializer<ISBN>() {
-            override fun serialize(value: ISBN, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Isbn>() {
+            override fun serialize(value: Isbn, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<ISBN>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ISBN = ISBN(p.text)
+        class OldDeserializer : JsonDeserializer<Isbn>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Isbn = Isbn(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<ISBN?, String?> {
-            override fun convertToDatabaseColumn(attribute: ISBN?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): ISBN? = dbData?.let { ISBN(it) }
+        class Converter : AttributeConverter<Isbn?, String?> {
+            override fun convertToDatabaseColumn(attribute: Isbn?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Isbn? = dbData?.let { Isbn(it) }
         }
     }
 
@@ -233,7 +233,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      *
      * @param index the position of the element to retrieve, starting from 0.
      * @return the element at the specified index.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -243,7 +243,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * @param startIndex the starting index of the subsequence, inclusive.
      * @param endIndex the ending index of the subsequence, exclusive.
      * @return a new character sequence representing the subsequence.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -254,7 +254,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * and provides a custom string representation based on the `value`.
      *
      * @return the string representation of the `value` field.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -262,7 +262,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * Generates a BufferedImage representation of the barcode.
      *
      * @return the barcode encoded as a BufferedImage
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(): BufferedImage = MatrixToImageWriter.toBufferedImage(generateMatrix())
 
@@ -271,7 +271,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      *
      * @param config specifies the configuration options for rendering the matrix into an image.
      * @return a `BufferedImage` representing the matrix with applied configuration settings.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(
         config: MatrixToImageConfig
@@ -282,7 +282,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      *
      * @param format the image format (e.g., "PNG", "JPG") to use when writing the barcode.
      * @param file the file to which the barcode image will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -296,7 +296,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      *
      * @param format the desired image format (e.g., "PNG", "JPG") to use when saving the barcode.
      * @param file the path to the file where the barcode will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -310,7 +310,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      *
      * @param format the desired format for the output (e.g., "PNG", "JPEG").
      * @param stream the output stream to which the barcode will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -326,7 +326,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * @param format the format to use when writing the matrix image (e.g., "PNG", "JPEG").
      * @param stream the output stream where the matrix image will be written.
      * @param config the configuration options used to render the matrix into an image.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -344,7 +344,7 @@ value class ISBN private constructor(override val value: String) : CharSequence,
      * before generating the matrix. The resulting barcode has fixed dimensions.
      *
      * @return a `BitMatrix` representing the encoded ISBN barcode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun generateMatrix(): BitMatrix {
         val writer = MultiFormatWriter()

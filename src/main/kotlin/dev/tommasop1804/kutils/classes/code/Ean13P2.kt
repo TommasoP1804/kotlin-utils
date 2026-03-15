@@ -35,21 +35,21 @@ import tools.jackson.databind.annotation.JsonSerialize
  * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the provided value does not conform to the EAN-13P2 format.
  *
  * @author Tommaso Pastorelli
- * @since 1.0.0
+ * @since 3.0.0
  */
 @Suppress("unused", "functionName", "ClassName")
 @JvmInline
-@JsonSerialize(using = EAN13_P2.Companion.Serializer::class)
-@JsonDeserialize(using = EAN13_P2.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = EAN13_P2.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = EAN13_P2.Companion.OldDeserializer::class)
-value class EAN13_P2 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.EAN {
+@JsonSerialize(using = Ean13P2.Companion.Serializer::class)
+@JsonDeserialize(using = Ean13P2.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean13P2.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean13P2.Companion.OldDeserializer::class)
+value class Ean13P2 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean {
     /**
      * Returns the length of the string representation of the EAN13P2 value.
      * This corresponds to the number of characters in the encoded value.
      *
      * @return The length of the value string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -60,12 +60,12 @@ value class EAN13_P2 private constructor(override val value: String) : CharSeque
      * This ensures that any leading or trailing whitespace in the input is removed.
      *
      * @param value The character sequence to initialize the `EAN13P2` instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim() - Char.SPACE)
 
     init {
-        validateInputFormat(value.isValidEAN13_P2(), EAN13_P2::class)
+        validateInputFormat(value.isValidEan13P2(), Ean13P2::class)
     }
 
     companion object {
@@ -80,9 +80,9 @@ value class EAN13_P2 private constructor(override val value: String) : CharSeque
          * and verifying the checksum using the `computeControlDigit` function.
          *
          * @return `true` if the string is a valid EAN-13 P2 code; otherwise, `false`.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidEAN13_P2() = matches(Regex("[0-9]{13} ?[0-9]{2}")) && filter { it.isDigit() }.run { EAN13.computeCheckDigit(toString() - 3) == this[12] }
+        fun CharSequence.isValidEan13P2() = matches(Regex("[0-9]{13} ?[0-9]{2}")) && filter { it.isDigit() }.run { Ean13.computeCheckDigit(toString() - 3) == this[12] }
 
         /**
          * Converts the current string into an instance of the `EAN13P2` class, encapsulating the EAN-13 P2 barcode logic.
@@ -92,33 +92,33 @@ value class EAN13_P2 private constructor(override val value: String) : CharSeque
          *
          * @return A `Result` instance containing the `EAN13P2` object if the conversion succeeds,
          * or an exception if the operation fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toEAN13_P2() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { EAN13_P2(this) } }
+        fun CharSequence.toEan13P2() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { Ean13P2(this) } }
 
-        class Serializer : ValueSerializer<EAN13_P2>() {
-            override fun serialize(value: EAN13_P2, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ean13P2>() {
+            override fun serialize(value: Ean13P2, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<EAN13_P2>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = EAN13_P2(p.string)
+        class Deserializer : ValueDeserializer<Ean13P2>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Ean13P2(p.string)
         }
 
-        class OldSerializer : JsonSerializer<EAN13_P2>() {
-            override fun serialize(value: EAN13_P2, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ean13P2>() {
+            override fun serialize(value: Ean13P2, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<EAN13_P2>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): EAN13_P2 = EAN13_P2(p.text)
+        class OldDeserializer : JsonDeserializer<Ean13P2>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ean13P2 = Ean13P2(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<EAN13_P2?, String?> {
-            override fun convertToDatabaseColumn(attribute: EAN13_P2?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): EAN13_P2? = dbData?.let { EAN13_P2(it) }
+        class Converter : AttributeConverter<Ean13P2?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ean13P2?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Ean13P2? = dbData?.let { Ean13P2(it) }
         }
     }
 
@@ -128,7 +128,7 @@ value class EAN13_P2 private constructor(override val value: String) : CharSeque
      * @param index The index of the character to return. Must be a valid index within the string.
      * @return The character at the specified position.
      * @throws IndexOutOfBoundsException If the index is out of range.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -139,7 +139,7 @@ value class EAN13_P2 private constructor(override val value: String) : CharSeque
      *
      * @param startIndex the start index (inclusive) of the subsequence
      * @param endIndex the end index (exclusive) of the subsequence
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -148,7 +148,7 @@ value class EAN13_P2 private constructor(override val value: String) : CharSeque
      * The returned value corresponds to the encapsulated `value` property of the class.
      *
      * @return A string representation of the object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value.insert(13, Char.SPACE)
 }

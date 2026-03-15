@@ -125,7 +125,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @since 1.0.0
      */
     fun checkValidParentIds(): Boolean {
-        val parentIds: List<UUID?> = flatNodesDFS().map { it.parentId }.toMutableList()
+        val parentIds: List<Uuid?> = flatNodesDFS().map { it.parentId }.toMutableList()
         if (parentIds.isEmpty()) return true
         if (parentIds.first().isNotNull()) return false
         return parentIds.drop(1).none { it.isNull() }
@@ -418,7 +418,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @return The tree node with the matching ID, or null if no such node exists in the tree.
      * @since 1.0.0
      */
-    fun findByIdBFS(node: TreeNode<T?> = root, id: UUID?): TreeNode<T?>? {
+    fun findByIdBFS(node: TreeNode<T?> = root, id: Uuid?): TreeNode<T?>? {
         if (id.isNull()) return null
         if (node.id == id) return node
 
@@ -443,7 +443,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @return The TreeNode<T> with the given ID if found, or null if not found.
      * @since 1.0.0
      */
-    fun findByIdDFS(node: TreeNode<T?> = root, id: UUID?): TreeNode<T?>? {
+    fun findByIdDFS(node: TreeNode<T?> = root, id: Uuid?): TreeNode<T?>? {
         if (node.id == id) return node
 
         for (child in node.children) {
@@ -543,10 +543,10 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @return A list of UUIDs representing the path from the given node to the root, starting with the given node's ID.
      * @since 1.0.0
      */
-    fun pathToRootOf(node: TreeNode<T?>): List<UUID?> {
+    fun pathToRootOf(node: TreeNode<T?>): List<Uuid?> {
         var effNode: TreeNode<T?>? = node
-        val path = mutableListOf<UUID?>()
-        var id: UUID? = node.id
+        val path = mutableListOf<Uuid?>()
+        var id: Uuid? = node.id
         while (effNode.isNotNull()) {
             path.add(id)
             id = effNode.parentId

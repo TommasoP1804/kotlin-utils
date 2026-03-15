@@ -168,7 +168,7 @@ fun <K, V: Collection<IV>, IV> Map<K, V>.addToMapValue(key: K, vararg valuesToIn
  * @return a new map consisting of merged keys and concatenated values, or null if all input maps are null or empty
  * @since 1.0.0
  */
-fun <K, V> mergeMapsValuesList(vararg maps: Map<K, List<V>>): Map<K, List<V>> {
+fun <K, V> mergeMapsValuesList(vararg maps: MultiMap<K, V>): MultiMap<K, V> {
     if (maps.isEmpty()) return emptyMap()
     if (maps.size == 1) return maps[0]
     val result = maps[0].toMutableMap()
@@ -199,7 +199,7 @@ fun <K, V> mergeMapsValuesList(vararg maps: Map<K, List<V>>): Map<K, List<V>> {
  * @return a new map consisting of merged keys and concatenated values, or null if all input maps are null or empty
  * @since 1.0.0
  */
-fun <K, V> mergeMapsValuesSet(vararg maps: Map<K, Set<V>>): Map<K, Set<V>> {
+fun <K, V> mergeMapsValuesSet(vararg maps: SetMap<K, V>): SetMap<K, V> {
     if (maps.isEmpty()) return emptyMap()
     if (maps.size == 1) return maps[0]
     val result = maps[0].toMutableMap()

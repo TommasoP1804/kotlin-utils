@@ -1,3 +1,5 @@
+@file:Suppress("unused", "kutils_drop_as_int_invoke")
+
 package dev.tommasop1804.kutils.classes.base
 
 import com.fasterxml.jackson.databind.JsonDeserializer
@@ -36,7 +38,6 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Base36.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Base36.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Base36.Companion.OldDeserializer::class)
-@Suppress("unused", "kutils_drop_as_int_invoke")
 class Base36(private val value: String) : Number(), CharSequence, Comparable<Number> {
     /**
      * Represents the length of the `value` field in the `Base36` class.
@@ -737,3 +738,11 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
      */
     override operator fun compareTo(other: Number) = toLong().compareTo(other.toLong())
 }
+
+/**
+ * Type alias for representing a Base36 type.
+ * Base36 encodes numerical values using digits (0-9) and letters (A-Z), allowing for compact representation.
+ *
+ * @since 3.0.0
+ */
+typealias Hexatrigesimal = Base36

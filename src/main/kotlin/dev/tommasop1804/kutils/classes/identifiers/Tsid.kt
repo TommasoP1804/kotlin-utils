@@ -7,14 +7,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.BigInt
-import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.expect
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.isNull
-import dev.tommasop1804.kutils.unaryPlus
-import dev.tommasop1804.kutils.validate
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
@@ -33,7 +26,6 @@ import java.time.Clock
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.apply
 import kotlin.math.ceil
 import kotlin.math.ln
 
@@ -44,15 +36,15 @@ import kotlin.math.ln
  *
  * @property number A 64-bit long value representing the TSID.
  * @constructor Creates a TSID from a long value.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = TSID.Companion.Serializer::class)
-@JsonDeserialize(using = TSID.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TSID.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TSID.Companion.OldDeserializer::class)
+@JsonSerialize(using = Tsid.Companion.Serializer::class)
+@JsonDeserialize(using = Tsid.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Tsid.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Tsid.Companion.OldDeserializer::class)
 @JvmInline
-value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequence {
+value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequence {
     /**
      * Provides the length of the string representation of the TSID.
      *
@@ -61,7 +53,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * string representation, and subsequently returns the length of this string.
      *
      * @return The length of the string representation of the TSID.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override val length get() = toString().length
 
@@ -72,7 +64,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * This value is read-only and is dynamically evaluated each time it is accessed.
      *
      * @return The current instant as an `Instant` object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val instant
         get() = Instant(timestamp)
@@ -84,7 +76,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * This property retrieves the timestamp value associated with the current TSID.
      *
      * @return The timestamp value in milliseconds since the Unix epoch.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val timestamp
         get() = timeComponent + TSID_EPOCH
@@ -99,7 +91,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      *
      * This field is immutable and serves as a core component for time-based sorting and comparisons.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val timeComponent
         get() = number ushr RANDOM_BITS
@@ -111,7 +103,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * The randomComponent helps ensure uniqueness within the TSID 
      * by combining it with other components like time.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val randomComponent
         get() = number and RANDOM_MASK
@@ -125,7 +117,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * identifier format.
      *
      * @return A string containing the Base32-encoded TSID.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val base32String
         get(): String {
@@ -159,7 +151,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the string is not a valid Base32 encoded TSID and `base32` is `true`.
      * The validation checks ensure the string adheres to the expected TSID format, including length and character set.
      * 
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(string: String, base32: Boolean = true) : this(with(string) {
         if (!base32) return@with string.toLong()
@@ -190,7 +182,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      *
      * @param bytes The byte array to initialize the instance. Must contain exactly 8 bytes.
      * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException If the size of the byte array is not equal to 8 bytes.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(bytes: ByteArray) : this(with(bytes) {
         expect(size == TSID_BYTES) { "TSID must be 8 bytes long" }
@@ -215,7 +207,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * is selected and used to produce the required data for the primary constructor.
      *
      * @param factoryType The type of factory to use for generating the instance.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(factoryType: FactoryType) : this(
         when (factoryType) {
@@ -231,35 +223,35 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * The factory is utilized to generate the required input for delegating the initialization.
      *
      * @param factory The Factory instance responsible for generating the necessary data.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(factory: Factory) : this(factory.generate().number)
 
     /**
      * Returns a fast new TSID.
 
-     * This static method is a quick alternative to [Factory.getTSID].
+     * This static method is a quick alternative to [Factory.getTsid].
 
      * It employs [AtomicInteger] to generate up to 2^22 (4,194,304) TSIDs per
      * millisecond. It can be useful, for example, for logging.
 
      * Security-sensitive applications that require a cryptographically secure
-     * pseudo-random generator **should** use [Factory.getTSID]}.
+     * pseudo-random generator **should** use [Factory.getTsid]}.
 
      * System property "tsid.node" and environment variable
      * "TSID_NODE" are ignored by this method. Therefore, there will be
      * collisions if more than one process is generating TSIDs using this method. In
-     * that case, [Factory.getTSID] **should** be used in conjunction
+     * that case, [Factory.getTsid] **should** be used in conjunction
      * with that property or variable.
      *
      * @return a TSID
      * @see AtomicInteger
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor() : this(with(Unit) {
         val time = (System.currentTimeMillis() - TSID_EPOCH) shl RANDOM_BITS
         val tail = LazyHolder.counter.incrementAndGet().toLong() and RANDOM_MASK
-        TSID(time or tail).number
+        Tsid(time or tail).number
     })
 
     companion object {
@@ -268,14 +260,14 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * This constant defines the fixed size, in bytes, for the binary representation of a TSID.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val TSID_BYTES = 8
         /**
          * Represents the fixed length of a TSID (Time-Sorted Identifier) when encoded using Base32.
          * The value corresponds to the number of characters required to encode the TSID.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val TSID_CHARS = 13
         /**
@@ -285,7 +277,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * It serves as the reference point for calculating timestamps relative to this specific time, 
          * enabling smaller numeric values for the timestamp component in TSIDs.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val TSID_EPOCH = 1577836800000L // 2020-01-01T00:00:00Z epoch millis
         /**
@@ -298,7 +290,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * Modifying this value would impact the randomness entropy of TSIDs and could lead 
          * to unintended consequences if not handled carefully.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val RANDOM_BITS = 22
         /**
@@ -308,7 +300,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * This mask limits the random component to 22 bits, ensuring it fits within
          * the required bit range for proper encoding and comparison.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         const val RANDOM_MASK = 0x003fffffL
         /**
@@ -322,7 +314,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * This alphabet is commonly utilized in scenarios where base-32 encoding with unambiguous characters is required.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val ALPHABET = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z')
         /**
@@ -335,7 +327,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * The default value of -1 indicates an unmapped or uninitialized state for any 
          * given index.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val ALPHABET_VALUES = LongArray(128) { -1 }
 
@@ -419,9 +411,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @receiver The string to validate as a Base32 TSID.
          * @return `true` if the string is a valid Base32 TSID, otherwise `false`.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidBase32TSID() = toString().toCharArray().isValidCharArray()
+        fun CharSequence.isValidBase32Tsid() = toString().toCharArray().isValidCharArray()
         /**
          * Validates whether the `CharArray` represents a valid character sequence
          * based on predefined constraints. The validation checks include ensuring
@@ -430,7 +422,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          *
          * @return `true` if the `CharArray` is valid according to the predefined
          *         criteria; `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun CharArray.isValidCharArray(): Boolean {
             if (size != TSID_CHARS || ALPHABET_VALUES[get(0).code] and 0b10000 != 0L) return false
@@ -448,9 +440,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * @return A Result encapsulating the successful conversion to a TSID instance, or any 
          * exception that occurred during the process.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toTSID(base32: Boolean = true) = runCatching { TSID(toString(), base32) }
+        fun CharSequence.toTsid(base32: Boolean = true) = runCatching { Tsid(toString(), base32) }
         /**
          * Converts a `Long` value to a `TSID` instance.
          *
@@ -459,9 +451,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * a unique identifier that the `TSID` type models.
          *
          * @return A `TSID` instance initialized with the `Long` value.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun Long.toTSID() = TSID(this)
+        fun Long.toTsid() = Tsid(this)
         
         /**
          * Decodes the current string representation of a TSID (Time-Sorted Unique Identifier) 
@@ -474,86 +466,86 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * @return The decoded TSID instance.
          * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the base is outside the valid range or if the string
          * does not conform to the expected format for the specified base.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.decodeToTSID(base: Int): TSID {
+        fun CharSequence.decodeToTsid(base: Int): Tsid {
             validate(base in 2..62) { "Invalid base: $base" }
             return BaseN.decode(toString(), base)
         }
 
-        class Serializer : ValueSerializer<TSID>() {
-            override fun serialize(value: TSID, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Tsid>() {
+            override fun serialize(value: Tsid, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.toString())
             }
         }
 
-        class Deserializer : ValueDeserializer<TSID>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = TSID(p.string)
+        class Deserializer : ValueDeserializer<Tsid>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Tsid(p.string)
         }
 
-        class OldSerializer : JsonSerializer<TSID>() {
-            override fun serialize(value: TSID, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Tsid>() {
+            override fun serialize(value: Tsid, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.toString())
         }
 
-        class OldDeserializer : JsonDeserializer<TSID>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): TSID = TSID(p.text)
+        class OldDeserializer : JsonDeserializer<Tsid>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Tsid = Tsid(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<TSID?, Long?> {
-            override fun convertToDatabaseColumn(attribute: TSID?): Long? = attribute?.number
-            override fun convertToEntityAttribute(dbData: Long?): TSID? = dbData?.let { TSID(it) }
+        class Converter : AttributeConverter<Tsid?, Long?> {
+            override fun convertToDatabaseColumn(attribute: Tsid?): Long? = attribute?.number
+            override fun convertToEntityAttribute(dbData: Long?): Tsid? = dbData?.let { Tsid(it) }
         }
 
-        class Type : EnhancedUserType<TSID> {
+        class Type : EnhancedUserType<Tsid> {
             override fun getSqlType(): Int = SqlTypes.BIGINT
 
-            override fun returnedClass(): Class<TSID> = TSID::class.java
+            override fun returnedClass(): Class<Tsid> = Tsid::class.java
 
             override fun equals(
-                x: TSID?,
-                y: TSID?
+                x: Tsid?,
+                y: Tsid?
             ): Boolean = x == y
 
-            override fun hashCode(x: TSID?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Tsid?): Int = x?.hashCode() ?: 0
 
             override fun nullSafeGet(
                 rs: ResultSet?,
                 position: Int,
                 session: SharedSessionContractImplementor?,
                 owner: Any?
-            ): TSID? {
+            ): Tsid? {
                 val value = rs?.getLong(position)?.run { if (this == -1L) null else this } ?: return null
-                return TSID(value)
+                return Tsid(value)
             }
 
             override fun nullSafeSet(
                 st: PreparedStatement?,
-                value: TSID?,
+                value: Tsid?,
                 index: Int,
                 session: SharedSessionContractImplementor?
             ) {
                 st?.setLong(index, value?.number ?: -1) ?: throw IllegalArgumentException("Statement cannot be null")
             }
 
-            override fun deepCopy(value: TSID?): TSID? = value?.let { TSID(it.number) }
+            override fun deepCopy(value: Tsid?): Tsid? = value?.let { Tsid(it.number) }
 
             override fun isMutable(): Boolean = false
 
-            override fun disassemble(value: TSID?): Serializable? = deepCopy(value)
+            override fun disassemble(value: Tsid?): Serializable? = deepCopy(value)
 
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): TSID? = cached as? TSID
+            ): Tsid? = cached as? Tsid
 
-            override fun toSqlLiteral(value: TSID?): String? = value?.let { "'${it.number}'" }
+            override fun toSqlLiteral(value: Tsid?): String? = value?.let { "'${it.number}'" }
 
-            override fun toString(value: TSID?): String? = value?.toString()
+            override fun toString(value: Tsid?): String? = value?.toString()
 
-            override fun fromStringValue(sequence: CharSequence?): TSID =
-                sequence?.let { TSID(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to TSID")
+            override fun fromStringValue(sequence: CharSequence?): Tsid =
+                sequence?.let { Tsid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to TSID")
         }
     }
 
@@ -565,7 +557,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * 
      * @return The `timeComponent` of the object as defined by its implementation.
      * 
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun component1() = timeComponent
     /**
@@ -573,7 +565,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * This operator function extracts the second constituent (component) of an object.
      *
      * @return The second component of the object.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     operator fun component2() = randomComponent
 
@@ -581,7 +573,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * Returns an `Instant` object based on a given custom epoch.
      *
      * @param customEpoch An `Instant` object representing the custom epoch from which an adjusted timestamp is calculated.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun getInstant(customEpoch: Instant) = Instant(getTimestamp(customEpoch.toEpochMilli()))
     /**
@@ -589,7 +581,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      *
      * @param customEpoch the custom epoch offset, in milliseconds, to be added to the time component.
      * @return the computed timestamp, which represents the time adjusted by the custom epoch.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun getTimestamp(customEpoch: Long) = timeComponent + customEpoch
 
@@ -597,7 +589,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * Converts the current TSID to its byte array representation.
      *
      * @return A `ByteArray` of size 8 that contains the byte representation of the TSID number.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toByteArray(): ByteArray {
         val bytes = ByteArray(TSID_BYTES)
@@ -621,7 +613,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * should be in base32 format. If true, the result will be the base32-encoded 
      * string; otherwise, it will be the standard numeric string representation.
      * @return The string representation of the object based on the specified format.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun toString(base32: Boolean) = if (base32) base32String else number.toString()
     /**
@@ -629,7 +621,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * Delegates to the `toString(Boolean)` method, using `true` as the default argument.
      *
      * @return A string representation of the TSID, encoded in Base32 format.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = toString(true)
 
@@ -641,9 +633,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      *         - `1` if this instance is greater than the specified instance, 
      *         - `-1` if this instance is smaller than the specified instance, 
      *         - `0` if both instances are equal.
-     * @since 1.0.0
+     * @since 3.0.0
      */
-    override fun compareTo(other: TSID): Int {
+    override fun compareTo(other: Tsid): Int {
         val a = number.toULong()
         val b = other.number.toULong()
 
@@ -658,7 +650,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      *
      * @param base The base to use for encoding. Must be between 2 and 62, inclusive.
      * @return A string representation of the object encoded in the specified base.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     fun encode(base: Int): String {
         validate(base in 2..62) { "Invalid base: $base" }
@@ -672,7 +664,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * @param index The zero-based index of the character to retrieve.
      * @return The character at the specified index.
      * @throws IndexOutOfBoundsException if the index is negative or not within the bounds of the string.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun get(index: Int) = toString()[index]
 
@@ -683,7 +675,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * @param startIndex the starting index of the subsequence, inclusive.
      * @param endIndex the ending index of the subsequence, exclusive.
      * @return the specified subsequence as a `CharSequence`.
-     * @since 1.0.3
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
 
@@ -691,7 +683,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
         val MAX: BigInt = BigInt.valueOf(2).pow(64)
         const val ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
-        fun encode(tsid: TSID, base: Int): String {
+        fun encode(tsid: Tsid, base: Int): String {
             var x = BigInt(1, tsid.toByteArray())
             val radix = BigInt.valueOf(base.toLong())
             val length = ceil(64 / (ln(base.toDouble()) / ln(2.0))).toInt()
@@ -708,12 +700,12 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
             return String(buffer)
         }
 
-        fun decode(str: String, base: Int): TSID {
+        fun decode(str: String, base: Int): Tsid {
             var x = BigInt.ZERO
             val radix = BigInt.valueOf(base.toLong())
             val length = ceil(64 / (ln(base.toDouble()) / ln(2.0))).toInt()
             expect(str.length == length) { String.format("Invalid base-%d length: %s", base, str.length) }
-            for (i in 0..<str.length) {
+            for (i in str.indices) {
                 val plus = str[i](ALPHABET).toLong()
                 validate(plus in 0..<base) { String.format("Invalid base-%d character: %s", base, str[i]) }
                 x = x.multiply(radix).add(BigInt.valueOf(plus))
@@ -721,7 +713,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
             validate(x <= MAX) {
                 String.format("Invalid base-%d value (overflow): %s", base, x)
             }
-            return TSID(x.toLong())
+            return Tsid(x.toLong())
         }
     }
     
@@ -732,7 +724,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * This object utilizes Java's `AtomicInteger` to ensure thread-safety and consistency
      * when accessing the `counter` property, which is initialized with a random integer.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     private object LazyHolder {
         /**
@@ -743,7 +735,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * using `SplittableRandom` to help reduce collisions in concurrent environments.
          *
          * @receiver TSID
-         * @since 1.0.0
+         * @since 3.0.0
          */
         val counter = AtomicInteger(SplittableRandom().nextInt())
     }
@@ -755,13 +747,13 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      *
      * @author Tommaso Pastoreli
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     enum class FactoryType {
         /**
          * Represents the default factory type used when no specific type is specified.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         DEFAULT,
         /**
@@ -769,7 +761,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * This type is typically used to configure or specify behavior involving a resource
          * or system with 256 nodes or equivalent entities.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         NODES_256,
         /**
@@ -779,7 +771,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * This is a member of the FactoryType enumeration, providing
          * predefined configurations for various node sizes.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         NODES_1024,
         /**
@@ -787,7 +779,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * This enum constant is part of the `FactoryType` enumeration, which provides predefined configurations 
          * for various node capacities. It is typically used to specify larger-scale node configurations.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         NODES_4096;
     }
@@ -818,7 +810,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
      * distributed system.
      *
      * @author Tommaso Pastorelli
-     * @since 1.0.0
+     * @since 3.0.0
      */
     class Factory(builder: Builder) {
         private var counter: Int
@@ -879,7 +871,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * Returns a new factory for up to 256 nodes and 16384 ID/ms.
              *
              * @return [Factory]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newInstance256() = builder().withNodeBits(NODE_BITS_256).build()
 
@@ -888,7 +880,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param node the node identifier
              * @return [Factory]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newInstance256(node: Int) = builder().withNodeBits(NODE_BITS_256).withNode(node).build()
 
@@ -898,7 +890,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * It is equivalent to `Factory()`.
              *
              * @return [Factory]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newInstance1024() = builder().withNodeBits(NODE_BITS_1024).build()
 
@@ -909,7 +901,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param node the node identifier
              * @return [Factory]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newInstance1024(node: Int) = builder().withNodeBits(NODE_BITS_1024).withNode(node).build()
 
@@ -917,7 +909,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * Returns a new factory for up to 4096 nodes and 1024 ID/ms.
              *
              * @return [Factory]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newInstance4096() = builder().withNodeBits(NODE_BITS_4096).build()
 
@@ -926,7 +918,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param node the node identifier
              * @return [Factory]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun newInstance4096(node: Int) = builder().withNodeBits(NODE_BITS_4096).withNode(node).build()
 
@@ -934,7 +926,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * Returns a builder object.
              *
              * It is used to build a custom [Factory].
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun builder(): Builder = Builder()
 
@@ -967,9 +959,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * necessary to maintain monotonicity and generation speed.
              *
              * @return a TSID
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun getTSID(): TSID = INSTANCE.generate()
+            fun getTsid(): Tsid = INSTANCE.generate()
 
             /**
              * Returns a new TSID.
@@ -994,9 +986,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * necessary to maintain monotonicity and generation speed.
              *
              * @return a TSID
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun getTSID256(): TSID = INSTANCE_256.generate()
+            fun getTsid256(): Tsid = INSTANCE_256.generate()
 
             /**
              * Returns a new TSID.
@@ -1021,9 +1013,9 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * necessary to maintain monotonicity and generation speed.
              *
              * @return a TSID
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun getTSID1024(): TSID = INSTANCE_1024.generate()
+            fun getTsid1024(): Tsid = INSTANCE_1024.generate()
 
             /**
              * Returns a new TSID.
@@ -1048,18 +1040,18 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * necessary to maintain monotonicity and generation speed.
              *
              * @return a TSID number
-             * @since 1.0.0
+             * @since 3.0.0
              */
-            fun getTSID4096(): TSID = INSTANCE_4096.generate()
+            fun getTsid4096(): Tsid = INSTANCE_4096.generate()
         }
 
         /**
          * Returns a TSID.
          *
          * @return a TSID.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun generate(): TSID {
+        fun generate(): Tsid {
             val time: Long
             val counterValue: Long
             synchronized(LOCK) {
@@ -1067,7 +1059,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
                 counterValue = counter.toLong() and counterMask.toLong()
             }
             val nodeValue = node.toLong() shl counterBits
-            return TSID(time or nodeValue or counterValue)
+            return Tsid(time or nodeValue or counterValue)
         }
 
         /**
@@ -1081,7 +1073,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * operations is 2^12 = 4096.
          *
          * @return the current time
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun getTime(): Long {
             var time = clock.millis()
@@ -1112,7 +1104,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * if the node identifier has 10 bits, the counter has 12 bits.
          *
          * @return a number
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun getRandomCounter(): Int {
             return if (random is ByteRandom) {
@@ -1134,7 +1126,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * Returns a random value based on the counter and the current Thread id.
          *
          * @return a number
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private fun getRandomValue(): Int {
             val randomCounter = getRandomCounter()
@@ -1147,7 +1139,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
          * A nested class that builds custom TSID factories.
          *
          * It is used to setup a custom [Factory].
-         * @since 1.0.0
+         * @since 3.0.0
          */
         class Builder {
             private var node: Int? = null
@@ -1163,7 +1155,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * @return [Builder]
              * @throws IllegalArgumentException if the node identifier is out of the range
              *                                  [0, 2^nodeBits-1] when `build()` is invoked
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withNode(node: Int): Builder {
                 this.node = node
@@ -1177,7 +1169,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * @return [Builder]
              * @throws IllegalArgumentException if the node bits are out of the range [0, 20]
              *                                  when `build()` is invoked
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withNodeBits(nodeBits: Int): Builder {
                 this.nodeBits = nodeBits
@@ -1189,7 +1181,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param customEpoch an instant that represents the custom epoch.
              * @return [Builder]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withCustomEpoch(customEpoch: Instant): Builder {
                 this.customEpoch = customEpoch.toEpochMilli()
@@ -1204,7 +1196,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param random a [Random] generator
              * @return [Builder]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withRandom(random: Random?): Builder {
                 random?.let {
@@ -1224,7 +1216,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param randomFunction a random function that returns an integer value
              * @return [Builder]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withRandomFunction(randomFunction: () -> Int): Builder {
                 random = IntRandom(randomFunction)
@@ -1245,7 +1237,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param randomFunction a random function that returns a byte array
              * @return [Builder]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withRandomFunction(randomFunction: (Int) -> ByteArray): Builder {
                 random = ByteRandom(randomFunction)
@@ -1257,7 +1249,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @param clock a clock
              * @return [Builder]
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun withClock(clock: Clock): Builder {
                 this.clock = clock
@@ -1269,7 +1261,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @return a number
              * @throws IllegalArgumentException if the node is out of range
-             * @since 1.0.0
+             * @since 3.0.0
              */
             internal fun getNode(): Int {
                 val bits = nodeBits ?: NODE_BITS_1024
@@ -1292,7 +1284,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              *
              * @return a number
              * @throws IllegalArgumentException if the node bits are out of range
-             * @since 1.0.0
+             * @since 3.0.0
              */
             internal fun getNodeBits(): Int {
                 if (nodeBits.isNull()) {
@@ -1311,7 +1303,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * Gets the custom epoch.
              *
              * @return a number
-             * @since 1.0.0
+             * @since 3.0.0
 */
             internal fun getCustomEpoch() = customEpoch ?: TSID_EPOCH // 2020-01-01
 
@@ -1319,7 +1311,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * Gets the random generator.
              *
              * @return a random generator
-             * @since 1.0.0
+             * @since 3.0.0
 */
             internal fun getRandom(): IRandom {
                 if (random.isNull()) {
@@ -1332,7 +1324,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * Gets the clock to be used in tests.
              *
              * @return a clock
-             * @since 1.0.0
+             * @since 3.0.0
              */
             internal fun getClock(): Clock {
                 if (clock.isNull()) {
@@ -1347,7 +1339,7 @@ value class TSID(val number: Long) : Comparable<TSID>, Serializable, CharSequenc
              * @return [Factory]
              * @throws IllegalArgumentException if the node is out of range
              * @throws IllegalArgumentException if the node bits are out of range
-             * @since 1.0.0
+             * @since 3.0.0
              */
             fun build() = Factory(this)
         }

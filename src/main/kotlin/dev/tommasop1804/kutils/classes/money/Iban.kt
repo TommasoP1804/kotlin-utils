@@ -30,16 +30,16 @@ import kotlin.reflect.KProperty
  * Instances of this class are immutable.
  *
  * @param value The IBAN string that satisfies the validation criteria, such as correct country and format.
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @JvmInline
-@JsonSerialize(using = IBAN.Companion.Serializer::class)
-@JsonDeserialize(using = IBAN.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = IBAN.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = IBAN.Companion.OldDeserializer::class)
+@JsonSerialize(using = Iban.Companion.Serializer::class)
+@JsonDeserialize(using = Iban.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Iban.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Iban.Companion.OldDeserializer::class)
 @Suppress("unused")
-value class IBAN private constructor(val value: String) : CharSequence {
+value class Iban private constructor(val value: String) : CharSequence {
     /**
      * Provides the length of the IBAN value.
      *
@@ -49,7 +49,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      * representing the IBAN's string data.
      *
      * @return The count of characters in the IBAN value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -60,7 +60,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      *
      * This property provides a getter to obtain the country object based on the specified value.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val country
         get() = Country ofAlpha2 2(value)
@@ -73,7 +73,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      * 3rd and 4th positions of the IBAN value and are used to verify the integrity of the IBAN.
      *
      * @return A string representing the two check digits of the IBAN.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val checkDigits
         get() = value[2..3]
@@ -89,7 +89,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      *
      * @return The BBAN component of the IBAN as a string.
      * @throws IllegalStateException If the `value` of the IBAN is not initialized or invalid.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     val bban
         get() = (-4)(value)
@@ -103,7 +103,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      *
      * @param value The input character sequence representing the IBAN value,
      *              which may contain spaces.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(+(value.toString() - Char.SPACE))
 
@@ -326,7 +326,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
          * - Numerical characters ('0' to '9') mapped to their integer equivalents.
          * - Uppercase alphabetical characters ('A' to 'Z') mapped to integers starting from 10 up to 35.
          *
-         * @since 1.0.0
+         * @since 3.0.0
          */
         private val EUROPEAN_CHECK_DIGITS_CONVERSION = mapOf(
             '0' to 0,
@@ -376,9 +376,9 @@ value class IBAN private constructor(val value: String) : CharSequence {
          *
          * @receiver The string to be validated as an IBAN.
          * @return `true` if the string is successfully validated as an IBAN format; `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidIBAN() = runCatching { IBAN(this) }.isSuccess
+        fun CharSequence.isValidIban() = runCatching { Iban(this) }.isSuccess
 
         /**
          * Attempts to convert the current string into an IBAN instance.
@@ -390,33 +390,33 @@ value class IBAN private constructor(val value: String) : CharSequence {
          * @receiver The string to be converted into an IBAN.
          * @return A `Result` containing the successfully created IBAN instance or an exception
          *         if the conversion fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toIBAN() = runCatching { IBAN(this) }
+        fun CharSequence.toIban() = runCatching { Iban(this) }
 
-        class Serializer : ValueSerializer<IBAN>() {
-            override fun serialize(value: IBAN, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Iban>() {
+            override fun serialize(value: Iban, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<IBAN>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = IBAN(p.string)
+        class Deserializer : ValueDeserializer<Iban>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Iban(p.string)
         }
 
-        class OldSerializer : JsonSerializer<IBAN>() {
-            override fun serialize(value: IBAN, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Iban>() {
+            override fun serialize(value: Iban, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<IBAN>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): IBAN = IBAN(p.text)
+        class OldDeserializer : JsonDeserializer<Iban>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Iban = Iban(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<IBAN?, String?> {
-            override fun convertToDatabaseColumn(attribute: IBAN?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): IBAN? = dbData?.let { IBAN(it) }
+        class Converter : AttributeConverter<Iban?, String?> {
+            override fun convertToDatabaseColumn(attribute: Iban?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Iban? = dbData?.let { Iban(it) }
         }
     }
 
@@ -428,7 +428,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      *
      * @return A map with the keys "country", "checkDigits", and "bban", corresponding to the values of the
      * respective properties in the IBAN.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @Suppress("functionName")
     private fun _toMap() = mapOf(
@@ -453,7 +453,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      * @param property The property whose name is used to retrieve the value from the map.
      * @throws NoSuchElementException If the specified property name does not exist in the map.
      * @throws ClassCastException If the retrieved value cannot be cast to the expected type [R].
-     * @since 1.0.0
+     * @since 3.0.0
      */
     @Suppress("unchecked_cast")
     operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name) as R
@@ -467,7 +467,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      * @param index The zero-based position of the character to retrieve. Must be in the range
      * of `0` to `length - 1` where `length` is the number of characters in the IBAN's value.
      * @throws IndexOutOfBoundsException If the [index] is less than 0 or greater than or equal to the length of the IBAN value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -478,7 +478,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      * @param endIndex the end index (exclusive) of the subsequence, must be within the bounds of the sequence and
      *                 greater than or equal to `startIndex`.
      * @return a new subsequence from the range [startIndex, endIndex).
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -490,7 +490,7 @@ value class IBAN private constructor(val value: String) : CharSequence {
      * is a readable and formatted representation of the IBAN.
      *
      * @return A string representation of the IBAN, formatted into groups of four characters.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = (value % 4).joinToString(separator = String.SPACE)
 }

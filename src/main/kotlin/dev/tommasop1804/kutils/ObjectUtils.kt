@@ -10,7 +10,7 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.coding.JSON.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.constants.TextCase
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.exceptions.*

@@ -16,6 +16,9 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import java.net.URLConnection
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * Represents a media type (MIME type) in the context of content negotiation, file type determination,
@@ -462,6 +465,65 @@ value class MimeType private constructor(val value: String) : CharSequence {
          * @since 2.0.0
          */
         val ANY = MimeType("*/*")
+
+        /**
+         * Attempts to resolve the MIME type from a given file extension.
+         *
+         * This method takes a file extension as input and performs several checks:
+         * - It first looks up the extension in a pre-defined map of known extensions.
+         * - If not found, it falls back to using the `URLConnection` API to determine the MIME type.
+         * - Finally, it leverages `Files.probeContentType` to probe the file type based on the extension.
+         *
+         * @param extension The file extension (e.g., "txt", "jpg", "pdf"). The extension may include or exclude a leading dot.
+         * @return An instance of [MimeType] representing the resolved MIME type if successful, or `null` if the type could not be determined.
+         * @since 3.0.0
+         */
+        infix fun fromExtension(extension: String): MimeType? {
+            val ext = (-extension).trimStart('.')
+            knownExtensions[ext]?.let { return it }
+
+            URLConnection.getFileNameMap().getContentTypeFor("file.$ext")
+                ?.let { runCatching { MimeType(it) }.getOrNull() }
+                ?.let { return it }
+
+            runCatching {
+                Files.probeContentType(Path.of("file.$ext"))
+                    ?.let { MimeType(it) }
+            }.getOrNull()?.let { return it }
+
+            return null
+        }
+
+        private val knownExtensions: Map<String, MimeType> by lazy {
+            buildMap {
+                put("json",     APPLICATION_JSON)
+                put("yaml",     APPLICATION_YAML)
+                put("yml",      APPLICATION_YAML)
+                put("xml",      APPLICATION_XML)
+                put("pdf",      APPLICATION_PDF)
+                put("zip",      APPLICATION_ZIP)
+                put("cbor",     APPLICATION_CBOR)
+                put("pb",       APPLICATION_PROTOBUF)
+                put("proto",    APPLICATION_PROTOBUF)
+                put("atom",     APPLICATION_ATOM_XML)
+                put("rss",      APPLICATION_RSS_XML)
+                put("txt",      TEXT_PLAIN)
+                put("html",     TEXT_HTML)
+                put("htm",      TEXT_HTML)
+                put("css",      TEXT_CSS)
+                put("csv",      TEXT_CSV)
+                put("js",       TEXT_JAVASCRIPT)
+                put("mjs",      TEXT_JAVASCRIPT)
+                put("md",       TEXT_MARKDOWN)
+                put("markdown", TEXT_MARKDOWN)
+                put("png",      IMAGE_PNG)
+                put("jpg",      IMAGE_JPEG)
+                put("jpeg",     IMAGE_JPEG)
+                put("gif",      IMAGE_GIF)
+                put("svg",      IMAGE_SVG)
+                put("webp",     IMAGE_WEBP)
+            }
+        }
 
         private fun of(type: String, subtype: String): String{
             validateInputFormat(type.isNotEmpty() && subtype.isNotEmpty()) { "Invalid MIME type: $type/$subtype" }

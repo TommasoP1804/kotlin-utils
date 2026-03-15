@@ -5,25 +5,19 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Beta
 import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.base.Base36
-import dev.tommasop1804.kutils.classes.coding.JSON
-import dev.tommasop1804.kutils.classes.coding.YAML
-import dev.tommasop1804.kutils.classes.coding.YAMLNode
 import dev.tommasop1804.kutils.classes.collections.MTable
 import dev.tommasop1804.kutils.classes.collections.Table
-import dev.tommasop1804.kutils.classes.colors.Color
 import dev.tommasop1804.kutils.classes.constants.QuantityLevel
-import dev.tommasop1804.kutils.classes.identifiers.*
-import dev.tommasop1804.kutils.classes.measure.MeasureUnit
-import dev.tommasop1804.kutils.classes.measure.RMeasurement
+import dev.tommasop1804.kutils.classes.identifiers.Ulid
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator
 import dev.tommasop1804.kutils.classes.tuples.Quadruple
 import dev.tommasop1804.kutils.classes.tuples.Quintuple
-import dev.tommasop1804.kutils.exceptions.UnsupportedJSONTypeException
-import dev.tommasop1804.kutils.exceptions.UnsupportedYAMLTypeException
 import java.math.BigInteger
+import java.net.HttpURLConnection
+import java.net.URI
+import java.net.URL
+import java.net.URLConnection
 import java.util.*
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -169,11 +163,11 @@ typealias CharMList = MutableList<Char>
  * This alias can be used to simplify the representation of collections that strictly
  * hold `UUID` elements, improving code readability and reducing verbosity.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @see List
  * @see UUID
  */
-typealias UUIDList = List<UUID>
+typealias UuidList = List<UUID>
 /**
  * A typealias representing a mutable list of UUIDs.
  *
@@ -181,11 +175,29 @@ typealias UUIDList = List<UUID>
  * to improve code readability and maintainability
  * in contexts where mutable lists of UUIDs are frequently used.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @see MutableList
  * @see UUID
  */
-typealias UUIDMList = MutableList<UUID>
+typealias UuidMList = MutableList<UUID>
+
+/**
+ * A typealias representing a list of ULID (Universally Unique Lexicographically Sortable Identifier) objects.
+ *
+ * This typealias is used to simplify the representation of lists containing ULID instances,
+ * making the code more concise and readable when dealing with collections of ULIDs.
+ *
+ * @since 3.0.0
+ */
+typealias UlidList = List<Ulid>
+/**
+ * A type alias for a mutable list of ULID objects.
+ *
+ * This type alias is used to simplify the declaration of mutable lists containing ULIDs.
+ *
+ * @since 3.0.0
+ */
+typealias UlidMList = MutableList<Ulid>
 
 /**
  * Typealias for a generic MutableList in Kotlin.
@@ -348,11 +360,11 @@ typealias CharMSet = MutableSet<Char>
  * A type alias representing a set of universally unique identifiers (UUIDs).
  * This can be used wherever a set of UUIDs is required to enhance code readability.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @see Set
  * @see UUID
  */
-typealias UUIDSet = Set<UUID>
+typealias UuidSet = Set<UUID>
 /**
  * A typealias for a mutable set that holds UUID objects.
  *
@@ -360,11 +372,29 @@ typealias UUIDSet = Set<UUID>
  * to a `MutableSet<UUID>`, often used for collections of unique
  * identifiers that can be modified.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @see MutableSet
  * @see UUID
  */
-typealias UUIDMSet = MutableSet<UUID>
+typealias UuidMSet = MutableSet<UUID>
+
+/**
+ * A type alias representing a set of ULID objects.
+ *
+ * This type alias is provided for convenience to represent
+ * collections of ULIDs when working with grouped ULID data.
+ *
+ * @since 3.0.0
+ */
+typealias UlidSet = Set<Ulid>
+/**
+ * Represents a type alias for a mutable set of ULID objects.
+ * ULID (Universally Unique Lexicographically Sortable Identifier) is
+ * a unique identifier that can be stored in a set with mutable operations.
+ *
+ * @since 3.0.0
+ */
+typealias UlidMSet = MutableSet<Ulid>
 
 /**
  * A typealias for MutableSet<E>, providing a more concise name for usage in the codebase.
@@ -396,14 +426,322 @@ typealias MultiSet<E> = Set<Set<E>>
 typealias MultiMSet<E> = MSet<MSet<E>>
 
 /**
- * A typealias representing a mutable collection of elements.
+ * A type alias representing a collection of elements where the type of elements is `Any`.
  *
- * This type alias simplifies the usage of `MutableCollection` and can be used interchangeably.
+ * This alias can be used to simplify references to collections that are not type-specific,
+ * allowing for more generic handling of data.
  *
- * @param E the type of elements contained in the mutable collection
+ * @since 3.0.0
+ */
+typealias AnyCollection = Collection<Any>
+/**
+ * A type alias representing a mutable collection that can hold elements of any type.
+ *
+ * This alias simplifies the declaration of mutable collections that do not restrict their element types.
+ *
+ * @since 3.0.0
+ */
+typealias AnyMCollection = MutableCollection<Any>
+
+/**
+ * A type alias for a collection of integers.
+ *
+ * This alias simplifies the usage and readability of code 
+ * that deals with collections specifically storing integers.
+ *
+ * @since 3.0.0
+ */
+typealias IntCollection = Collection<Int>
+/**
+ * A typealias representing a MutableCollection of Integers.
+ *
+ * This typealias provides a shorthand for working with collections 
+ * that allow modification of integer elements. It can be used wherever 
+ * a MutableCollection of Ints is required.
+ *
+ * @since 3.0.0
+ */
+typealias IntMCollection = MutableCollection<Int>
+
+/**
+ * A type alias representing a collection of Long values.
+ *
+ * This type alias simplifies the usage of collections specifically holding Long elements.
+ *
+ * @since 3.0.0
+ */
+typealias LongCollection = Collection<Long>
+/**
+ * A typealias for a mutable collection of `Long` values.
+ *
+ * This alias can be used to simplify and improve code readability when working
+ * with collections specifically containing `Long` data type elements.
+ *
+ * @since 3.0.0
+ */
+typealias LongMCollection = MutableCollection<Long>
+
+/**
+ * A type alias representing a collection of `Double` elements. 
+ * This can be used to simplify type declarations where a `Collection<Double>` is required.
+ *
+ * @since 3.0.0
+ */
+typealias DoubleCollection = Collection<Double>
+/**
+ * A type alias for a mutable collection of Double values.
+ *
+ * This alias provides a more concise and meaningful name for collections intended to hold Double elements in mutable data structures.
+ *
+ * @since 3.0.0
+ */
+typealias DoubleMCollection = MutableCollection<Double>
+
+/**
+ * A type alias for a collection of strings.
+ *
+ * This type alias is used to simplify the usage of `Collection<String>` 
+ * throughout the codebase, improving readability and maintainability.
+ *
+ * @since 3.0.0
+ */
+typealias StringCollection = Collection<String>
+/**
+ * A typealias representing a mutable collection of strings. This allows for simplifying the usage of 
+ * `MutableCollection<String>` throughout the codebase by referring to it as `StringMCollection`.
+ *
+ * @since 3.0.0
+ */
+typealias StringMCollection = MutableCollection<String>
+
+/**
+ * A typealias representing a collection of characters.
+ *
+ * This alias can be used wherever a `Collection<Char>` is expected,
+ * improving code readability and simplifying type declarations.
+ *
+ * @since 3.0.0
+ */
+typealias CharCollection = Collection<Char>
+/**
+ * A typealias representing a mutable collection of characters.
+ *
+ * This provides a shorthand notation for `MutableCollection<Char>`, 
+ * allowing for cleaner and more concise code in contexts where operations 
+ * involving a mutable collection of characters are required.
+ *
+ * @since 3.0.0
+ */
+typealias CharMCollection = MutableCollection<Char>
+
+/**
+ * A type alias for a collection of UUIDs.
+ *
+ * This alias represents a collection that stores elements of type UUID, 
+ * providing a more concise and semantic way to reference such collections 
+ * in code, improving readability and maintainability.
+ *
+ * @since 3.0.0
+ */
+typealias UuidCollection = Collection<UUID>
+/**
+ * A type alias representing a mutable collection of UUIDs.
+ *
+ * This alias simplifies the declaration and usage of collections
+ * containing UUID elements, providing a more descriptive and concise name.
+ *
+ * @since 3.0.0
+ */
+typealias UuidMCollection = MutableCollection<UUID>
+
+/**
+ * A typealias for a collection of ULID objects. This provides a more descriptive and domain-specific 
+ * name when working with collections of ULID instances in the codebase.
+ * 
+ * ULID (Universally Unique Lexicographically Sortable Identifier) is a type of identifier commonly 
+ * used to uniquely identify entities.
+ * 
+ * @since 3.0.0
+ */
+typealias UlidCollection = Collection<Ulid>
+/**
+ * A type alias for a mutable collection of ULID instances.
+ *
+ * This alias simplifies the usage of collections containing ULIDs
+ * by providing a more concise and readable type definition.
+ *
+ * @since 3.0.0
+ */
+typealias UlidMCollection = MutableCollection<Ulid>
+
+/**
+ * A type alias for the [MutableCollection] interface, providing a shorthand way to refer to it.
+ *
+ * @param E the type of elements contained in the collection.
  * @since 2.1.0
  */
 typealias MCollection<E> = MutableCollection<E>
+
+/**
+ * A type alias representing an iterable collection of elements where each element can be of any type.
+ *
+ * This type alias provides a shorthand for `Iterable<Any>` and can be used to simplify type declarations
+ * when working with collections that accept or contain elements of any type.
+ *
+ * @since 3.0.0
+ */
+typealias AnyIterable = Iterable<Any>
+/**
+ * A type alias for a mutable iterable collection of elements of type `Any`.
+ *
+ * This alias provides a shorthand for `MutableIterable<Any>`, which can be used to represent 
+ * any mutable iterable structure containing elements of any type.
+ *
+ * @since 3.0.0
+ */
+typealias AnyMIterable = MutableIterable<Any>
+
+/**
+ * A typealias that represents an [Iterable] of [Int].
+ *
+ * This can be used as a shorthand to simplify usage of `Iterable<Int>` throughout the codebase.
+ *
+ * @since 3.0.0
+ */
+typealias IntIterable = Iterable<Int>
+/**
+ * A typealias for a `MutableIterable` of integers.
+ * 
+ * This typealias simplifies the usage of `MutableIterable<Int>` 
+ * by providing a shorter and more descriptive name.
+ *
+ * @since 3.0.0
+ */
+typealias IntMIterable = MutableIterable<Int>
+
+/**
+ * A typealias representing an [Iterable] of [Long] values.
+ *
+ * This type can be used wherever an [Iterable] of [Long] is required,
+ * providing a more concise and readable way to define such constructs.
+ *
+ * @since 3.0.0
+ */
+typealias LongIterable = Iterable<Long>
+/**
+ * A type alias for `MutableIterable<Long>`, representing a mutable iterable collection of `Long` values.
+ *
+ * This can be used to improve code readability and provide a more concise way to reference
+ * a mutable iterable structure holding `Long` elements.
+ *
+ * @since 3.0.0
+ */
+typealias LongMIterable = MutableIterable<Long>
+
+/**
+ * A type alias that represents an [Iterable] of [Double] values.
+ *
+ * This alias simplifies the representation of collections containing 
+ * [Double] elements, allowing for improved readability and consistency 
+ * in APIs and implementations.
+ *
+ * @since 3.0.0
+ */
+typealias DoubleIterable = Iterable<Double>
+/**
+ * A type alias representing a `MutableIterable` of `Double` values.
+ *
+ * This can be used as a shorthand to simplify code where a `MutableIterable` 
+ * of `Double` elements is required.
+ *
+ * @since 3.0.0
+ */
+typealias DoubleMIterable = MutableIterable<Double>
+
+/**
+ * A typealias representing an `Iterable` of `String` objects.
+ *
+ * This can be used to simplify type declarations and improve readability
+ * when working with collections of `String`.
+ *
+ * @since 3.0.0
+ */
+typealias StringIterable = Iterable<String>
+/**
+ * A typealias for a [MutableIterable] of [String].
+ *
+ * This alias simplifies the use of mutable iterables that contain strings.
+ *
+ * @since 3.0.0
+ */
+typealias StringMIterable = MutableIterable<String>
+
+/**
+ * A type alias for `Iterable<Char>` providing a more descriptive and concise name for iterables of characters.
+ *
+ * This can be used in places where `Iterable<Char>` is expected, improving code readability.
+ *
+ * @since 3.0.0
+ */
+typealias CharIterable = Iterable<Char>
+/**
+ * A typealias representing a mutable iterable collection of characters.
+ *
+ * This alias simplifies the use of `MutableIterable<Char>` by providing a more concise name.
+ *
+ * @since 3.0.0
+ */
+typealias CharMIterable = MutableIterable<Char>
+
+/**
+ * Represents an iterable collection of UUID objects.
+ *
+ * This type alias simplifies the usage of `Iterable<UUID>` in scenarios 
+ * where a collection of UUIDs needs to be iterated.
+ *
+ * @since 3.0.0
+ */
+typealias UuidIterable = Iterable<UUID>
+/**
+ * A typealias representing a mutable iterable collection of UUID elements.
+ *
+ * This typealias simplifies the usage of MutableIterable when working specifically 
+ * with UUID objects, providing a more descriptive and meaningful name for use in 
+ * codebases that frequently handle iterables of UUIDs.
+ *
+ * @since 3.0.0
+ */
+typealias UuidMIterable = MutableIterable<UUID>
+
+/**
+ * A type alias for an iterable collection of ULID objects.
+ *
+ * This type alias simplifies the typing and enhances readability when working
+ * with collections of ULID instances.
+ *
+ * ULID (Universally Unique Lexicographically Sortable Identifier) is commonly used
+ * as a unique identifier with sorting capabilities.
+ *
+ * @since 3.0.0
+ */
+typealias UlidIterable = Iterable<Ulid>
+/**
+ * A type alias representing a mutable iterable collection of ULID instances.
+ *
+ * This alias simplifies the usage of collections requiring mutable iteration
+ * capabilities for ULID elements.
+ *
+ * @since 3.0.0
+ */
+typealias UlidMIterable = MutableIterable<Ulid>
+
+/**
+ * A typealias for `MutableIterable<T>` that simplifies the usage of its type declaration.
+ *
+ * @param T the type of elements contained within the iterable.
+ * @since 3.0.0
+ */
+typealias MIterable<T> = MutableIterable<T>
 
 /**
  * A type alias for `Table<String, String, V>` where the row and column keys are both of type `String`.
@@ -634,6 +972,29 @@ typealias MultiMap<K, V> = Map<K, List<V>>
  * @see MutableList
  */
 typealias MultiMMap<K, V> = MutableMap<K, MutableList<V>>
+
+/**
+ * A typealias representing a map where each key maps to a set of values.
+ *
+ * This can be used to model relationships where keys have multiple associated values,
+ * but the values for each key are unique and stored in a set.
+ *
+ * @param K The type of keys in the map.
+ * @param V The type of elements in the sets associated with each key.
+ * @since 3.0.0
+ */
+typealias SetMap<K, V> = Map<K, Set<V>>
+/**
+ * A type alias representing a mutable map where each key is associated with a mutable set of values.
+ *
+ * This can be used in scenarios where a key is mapped to a collection of unique elements, and
+ * both the keys and the associated collections might change over the lifetime of the map.
+ *
+ * @param K The type of keys in the map.
+ * @param V The type of elements in the mutable sets associated with the keys.
+ * @since 3.0.0
+ */
+typealias SetMMap<K, V> = MutableMap<K, MutableSet<V>>
 
 /**
  * A type alias for a map where the keys are of type String, and the values are lists of Strings.
@@ -1565,96 +1926,6 @@ typealias NullableString5 = Quintuple<String?, String?, String?, String?, String
 typealias MonoQuintuple<T> = Quintuple<T, T, T, T, T>
 
 /**
- * Type alias for the `CUID` class or type.
- * This provides an alternative name for `CUID`, allowing it to be referred to as `Cuid`
- * within the codebase for improved readability or convention adherence.
- *
- * @since 1.0.0
- * @see CUID
- */
-typealias Cuid = CUID
-
-/**
- * A type alias for the KSUID class. This alias provides a more concise or context-specific
- * naming convention for KSUID, making the code more readable and easier to understand
- * within specific contexts in the application.
- *
- * @since 1.0.0
- * @see KSUID
- */
-typealias Ksuid = KSUID
-
-/**
- * Type alias for the NanoID class, which can be used to substitute the NanoID type with NanoId for readability
- * or convenience.
- *
- * This alias provides better customizability and flexibility when using NanoID-based functionality.
- *
- * @since 1.0.0
- * @see NanoID
- */
-typealias NanoId = NanoID
-
-/**
- * Alias for the `ShortUUID` type.
- *
- * This typealias is used to simplify references and improve code readability.
- *
- * @since 1.0.0
- * @see ShortUUID
- */
-typealias ShortUuid = ShortUUID
-
-/**
- * Defines a type alias for the TSID class.
- *
- * This alias can be used to simplify and improve the readability
- * of code where the TSID type is frequently referenced.
- * @since 1.1.0
- */
-typealias Tsid = TSID
-
-/**
- * Represents a type alias for the ULID (Universally Unique Lexicographically Sortable Identifier) type.
- * Ulid is used to improve code clarity by providing a semantic name for the underlying ULID type.
- *
- * @since 1.0.0
- * @see ULID
- */
-typealias Ulid = ULID
-
-/**
- * Defines a type alias for `JSON`, making it available as `Json`.
- *
- * This can be used to increase readability or provide a simplified name for the `JSON` type.
- *
- * @since 1.0.0
- */
-typealias Json = JSON
-
-/**
- * A typealias for the `YAML` class.
- * This can be used interchangeably with the original `YAML` type,
- * providing a more concise or contextually descriptive naming alternative.
- *
- * @since 1.0.0
- */
-@Beta
-typealias Yaml = YAML
-
-/**
- * Defines an alias for the `YAMLNode` type. This alias is intended for use when working with YAML data structures.
- *
- * Usage of this type alias should be done with caution as it is marked with the `@Beta` annotation, indicating
- * it is in the beta stage of development and may still undergo changes before it becomes stable.
- *
- * @see YAMLNode
- * @since 1.0.1
- */
-@Beta
-typealias YamlNode = YAMLNode
-
-/**
  * Typealias for `Instant` from the kotlinx-datetime library, enabling the use of `Instant` with a shorter name (`KInstant`).
  * This typealias is experimental and subject to change as the `kotlinx-datetime` library evolves.
  *
@@ -1684,162 +1955,40 @@ typealias KDuration = Duration
 typealias BigInt = BigInteger
 
 /**
- * Defines a type alias for `RMeasurement` specifically for measurements of data size.
+ * A typealias for the `UUID` class, representing a universally unique identifier.
  *
- * This alias simplifies the usage of the `RMeasurement` class when associated with the
- * `MeasureUnit.DataSizeUnit` unit, representing various units of data size such as bytes,
- * kilobytes, megabytes, etc.
+ * This typealias provides a more concise and readable way to refer to `UUID` in the codebase.
  *
- * @see RMeasurement
- * @see MeasureUnit.DataSizeUnit
- * @since 1.0.0
+ * @since 3.0.0
  */
-typealias DataSize = RMeasurement<MeasureUnit.DataSizeUnit>
-/**
- * A type alias for `RMeasurement` specialized with length units.
- *
- * This type alias simplifies the usage of `RMeasurement` when working specifically
- * with physical measurements expressed in length units. The `MeasureUnit.LengthUnit`
- * type parameter ensures that only length-related units are used in conjunction with
- * this type alias.
- *
- * @see RMeasurement
- * @see MeasureUnit.LengthUnit
- * @since 1.0.0
- */
-typealias Length = RMeasurement<MeasureUnit.LengthUnit>
-/**
- * A type alias representing a measurement specifically for temperature-related units.
- *
- * This alias simplifies working with temperature measurements by explicitly associating
- * them with the `MeasureUnit.TemperatureUnit` scalar type. It is backed by the `RMeasurement`
- * class, enabling the use of the encapsulated functionalities like serialization support
- * and type safety for temperature measurements.
- *
- * @see RMeasurement
- * @see MeasureUnit.TemperatureUnit
- * @since 1.0.0
- */
-typealias Temperature = RMeasurement<MeasureUnit.TemperatureUnit>
-/**
- * A type alias for `RMeasurement` with `MeasureUnit.AreaUnit` as the scalar unit type.
- *
- * This alias represents a measurement of area, wherein the unit of measurement
- * is constrained to `MeasureUnit.AreaUnit`. It simplifies access to area-related
- * measurements by reducing verbosity and enhancing readability.
- *
- * @see RMeasurement
- * @see MeasureUnit.AreaUnit
- * @since 1.0.0
- */
-typealias Area = RMeasurement<MeasureUnit.AreaUnit>
-/**
- * A type alias representing a measurement of volume.
- *
- * The `Volume` type is a specialized usage of the `RMeasurement` class,
- * bound specifically to scalar units categorized as `MeasureUnit.VolumeUnit`.
- * It represents a numerical value paired with a unit of volume measurement.
- *
- * This type alias enables more meaningful and concise code, improving readability
- * when working with measurements of volume.
- *
- * @since 1.0.0
- */
-typealias Volume = RMeasurement<MeasureUnit.VolumeUnit>
-/**
- * A type alias for `RMeasurement` with `MeasureUnit.SpeedUnit` as the scalar unit type.
- *
- * This alias represents a speed measurement, where the numerical value is paired
- * with a unit of speed. It simplifies working with speed-related measurements by
- * providing a more descriptive type name.
- *
- * @since 1.0.0
- */
-typealias Speed = RMeasurement<MeasureUnit.SpeedUnit>
-/**
- * A type alias representing a measurement of acceleration with an associated unit of measurement.
- *
- * This alias simplifies the usage of `RMeasurement` with `MeasureUnit.AccelerationUnit`,
- * which represents acceleration units within the measurement framework.
- *
- * @see RMeasurement
- * @see MeasureUnit.AccelerationUnit
- * @since 1.0.0
- */
-typealias Accelertation = RMeasurement<MeasureUnit.AccelerationUnit>
-/**
- * A typealias representing a density measurement with units restricted to those of type `MeasureUnit.DensityUnit`.
- *
- * This typealias simplifies the use of `RMeasurement` for operations specifically related to density values,
- * where the unit of measurement is expected to be one of the predefined `DensityUnit`s in the `MeasureUnit` hierarchy.
- *
- * @see RMeasurement
- * @see MeasureUnit.DensityUnit
- * @since 1.0.0
- */
-typealias Density = RMeasurement<MeasureUnit.DensityUnit>
-/**
- * Typealias representing a plane angle measurement.
- *
- * `PlaneAngle` is a specific type of `RMeasurement` where the units are restricted to
- * those defined under `MeasureUnit.PlaneAngleUnit`. This allows for precise and
- * specialized handling of measurements related to plane angles.
- *
- * @see RMeasurement
- * @see MeasureUnit.PlaneAngleUnit
- * @since 1.0.0
- */
-typealias PlaneAngle = RMeasurement<MeasureUnit.PlaneAngleUnit>
-/**
- * A type alias representing a restricted measurement of mass.
- *
- * This alias is defined for `RMeasurement` using `MeasureUnit.MassUnit` as the scalar unit type,
- * specialized for measurements that pertain to mass. It simplifies working with mass units while
- * ensuring type safety and adherence to the `RMeasurement` structure.
- *
- * @see RMeasurement
- * @see MeasureUnit.MassUnit
- * @since 1.0.0
- */
-typealias Mass = RMeasurement<MeasureUnit.MassUnit>
+typealias Uuid = UUID
 
 /**
- * Type alias for the `Color` class, allowing the use of the alternative name `Colour`.
+ * Type alias for the `URI` class from the `java.net` package. This allows the `URI` class to be referenced
+ * and used with the shorter name `Uri` throughout the codebase for improved readability.
  *
- * This can be used interchangeably with `Color` throughout the codebase.
- *
- * @since 1.0.0
+ * @since 3.0.0
  */
-typealias Colour = Color
-
+typealias Uri = URI
 /**
- * Type alias for representing a Base36 type.
- * Base36 encodes numerical values using digits (0-9) and letters (A-Z), allowing for compact representation.
+ * A typealias for the `URL` class, providing a more concise or context-specific naming convention.
  *
- * @since 1.0.0
+ * This alias can be used interchangeably with `URL` in any context where `URL` is required.
+ *
+ * @since 3.0.0
  */
-typealias Hexatrigesimal = Base36
-
+typealias Url = URL
 /**
- * Represents an alias for the `UnsupportedJSONTypeException` class.
+ * Type alias for the `HttpURLConnection` class, allowing for more concise references
+ * to HTTP connection operations provided by the Java standard library.
  *
- * This typealias is provided for convenience and maintains consistency
- * in naming when referring to exceptions specific to unsupported JSON types.
- *
- * @see UnsupportedJSONTypeException
- * @since 1.0.0
+ * @since 3.0.0
  */
-typealias UnsupportedJsonTypeException = UnsupportedJSONTypeException
-
+typealias HttpUrlConnection = HttpURLConnection
 /**
- * Alias for `UnsupportedYAMLTypeException`.
+ * A type alias for the [URLConnection] class, used to represent a communication link between the
+ * application and a URL resource. This alias serves to improve code readability and maintainability.
  *
- * This typealias provides a more convenient or readable name for
- * `UnsupportedYAMLTypeException`, which represents an exception
- * thrown when an unsupported JYAML type is encountered during
- * processing operations.
- *
- * @see UnsupportedYAMLTypeException
- * @since 1.0.0
+ * @since 3.0.0
  */
-typealias UnsupportedYamlTypeException = UnsupportedYAMLTypeException
+typealias UrlConnection = URLConnection

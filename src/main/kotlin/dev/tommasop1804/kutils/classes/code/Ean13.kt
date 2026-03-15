@@ -40,20 +40,20 @@ import java.nio.file.Path
  * @property value The 13-digit string representing the EAN-13 code.
  * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the provided input does not meet the EAN-13 format.
  * @author Tommaso Pastorelli
- * @since 1.0.0
+ * @since 3.0.0
  */
 @JvmInline
 @Suppress("unused")
-@JsonSerialize(using = EAN13.Companion.Serializer::class)
-@JsonDeserialize(using = EAN13.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = EAN13.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = EAN13.Companion.OldDeserializer::class)
-value class EAN13 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.EAN, PrintableBarcode {
+@JsonSerialize(using = Ean13.Companion.Serializer::class)
+@JsonDeserialize(using = Ean13.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean13.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean13.Companion.OldDeserializer::class)
+value class Ean13 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean, PrintableBarcode {
     /**
      * Returns the length of the underlying value representing the EAN-13 code.
      * This property delegates to the `length` of the string value.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -64,12 +64,12 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * and delegates to the primary constructor.
      *
      * @param value The input value to be processed and stored as a trimmed string.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim())
 
     init {
-        validateInputFormat(value.isValidEAN13(), EAN13::class)
+        validateInputFormat(value.isValidEan13(), Ean13::class)
     }
 
     companion object {
@@ -82,9 +82,9 @@ value class EAN13 private constructor(override val value: String) : CharSequence
          *
          * @receiver The string to be validated as an EAN-13 code.
          * @return `true` if the string is a valid EAN-13 code, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidEAN13() = matches(Regex("[0-9]{13}")) && computeCheckDigit(toString() - 1) == this[12]
+        fun CharSequence.isValidEan13() = matches(Regex("[0-9]{13}")) && computeCheckDigit(toString() - 1) == this[12]
 
         /**
          * Converts a string to an instance of the EAN13 class, encapsulating a valid EAN-13 barcode.
@@ -97,9 +97,9 @@ value class EAN13 private constructor(override val value: String) : CharSequence
          * @receiver the string to be converted.
          * @return a `Result` containing the `EAN13` object if the conversion succeeds, or the exception
          * if it fails.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toEAN13() = filter { it.isDigit() }.run { runCatching { EAN13(this) } }
+        fun CharSequence.toEan13() = filter { it.isDigit() }.run { runCatching { Ean13(this) } }
 
         /**
          * Computes the check digit for a given string code based on the EAN checksum algorithm.
@@ -108,10 +108,10 @@ value class EAN13 private constructor(override val value: String) : CharSequence
          *
          * @param code the input string representing the numeric code for which the check digit is to be computed.
          * @return the character representing the computed check digit.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         fun computeCheckDigit(code: String): Char {
-            code.afterLast(')').validateInputFormat(EAN13::class) {
+            code.afterLast(')').validateInputFormat(Ean13::class) {
                 it matches Regex("[0-9]+") && it.length == 12
             }
             val sum = code.mapIndexed { index, ch -> if (index.isEven) ch.digitToInt() else ch.digitToInt() * 3 }.sum()
@@ -119,29 +119,29 @@ value class EAN13 private constructor(override val value: String) : CharSequence
             return ((((sum / 10) + 1) * 10) - sum).digitToChar()
         }
 
-        class Serializer : ValueSerializer<EAN13>() {
-            override fun serialize(value: EAN13, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ean13>() {
+            override fun serialize(value: Ean13, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<EAN13>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = EAN13(p.string)
+        class Deserializer : ValueDeserializer<Ean13>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = Ean13(p.string)
         }
 
-        class OldSerializer : JsonSerializer<EAN13>() {
-            override fun serialize(value: EAN13, gen: JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ean13>() {
+            override fun serialize(value: Ean13, gen: JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<EAN13>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): EAN13 = EAN13(p.text)
+        class OldDeserializer : JsonDeserializer<Ean13>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ean13 = Ean13(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<EAN13?, String?> {
-            override fun convertToDatabaseColumn(attribute: EAN13?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): EAN13? = dbData?.let { EAN13(it) }
+        class Converter : AttributeConverter<Ean13?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ean13?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Ean13? = dbData?.let { Ean13(it) }
         }
     }
 
@@ -151,7 +151,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * @param index the index of the character to be retrieved.
      * @return the character at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of range of the EAN13 value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -162,7 +162,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * @param endIndex the end index (exclusive) of the subsequence.
      * @return the specified subsequence.
      * @throws IndexOutOfBoundsException if the start or end indices are out of range.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -171,7 +171,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * This method provides the raw string backing the EAN13 instance, which represents the product code.
      *
      * @return The string value of the EAN13 code.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -181,7 +181,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * of the EAN-13 barcode.
      *
      * @return a BufferedImage representing the rendered EAN-13 barcode as a matrix image.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(): BufferedImage = MatrixToImageWriter.toBufferedImage(generateMatrix())
 
@@ -190,7 +190,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      *
      * @param config specifies the configuration options for rendering the matrix into an image.
      * @return a `BufferedImage` representing the matrix with applied configuration settings.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(
         config: MatrixToImageConfig
@@ -201,7 +201,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      *
      * @param format the desired format in which the barcode will be written, for example, "PNG" or "JPG".
      * @param file the file to which the barcode will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -215,7 +215,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      *
      * @param format the file format in which the matrix should be written (e.g., "PNG", "JPG").
      * @param file the path where the file should be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -230,7 +230,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      *
      * @param format the desired format of the output image (e.g., "PNG", "JPG").
      * @param stream the output stream to which the image representation will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -245,7 +245,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * @param format the format of the image (e.g., "PNG", "JPG"). Must be a supported format.
      * @param stream the output stream to write the generated image to.
      * @param config the configuration for generating the image, including colors and other parameters.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -262,7 +262,7 @@ value class EAN13 private constructor(override val value: String) : CharSequence
      * The generated matrix has fixed dimensions with a width of 200 and a height of 100.
      *
      * @return A BitMatrix object representing the encoded EAN-13 barcode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun generateMatrix(): BitMatrix {
         val writer = MultiFormatWriter()

@@ -1,11 +1,11 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.EMPTY
+import dev.tommasop1804.kutils.Uri
 import dev.tommasop1804.kutils.before
 import dev.tommasop1804.kutils.classes.web.HttpMethod
 import dev.tommasop1804.kutils.classes.web.HttpStatus
 import dev.tommasop1804.kutils.isNotNull
-import java.net.URI
 
 /**
  * Represents an exception that occurs during HTTP-related operations.
@@ -47,7 +47,7 @@ open class HttpException : RuntimeException {
      * @param errorMessage An optional error message providing additional context, or null if not specified.
      * @since 1.0.0
      */
-    constructor(statusCode: Int?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}")
+    constructor(statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}")
     /**
      * Constructs an `HttpException` with a dynamically generated message based on the provided parameters.
      *
@@ -67,7 +67,7 @@ open class HttpException : RuntimeException {
      * @param errorMessage An optional error message providing additional context, or null if not specified.
      * @since 2.0.0
      */
-    constructor(statusCode: HttpStatus, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}")
+    constructor(statusCode: HttpStatus, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}")
     /**
      * Constructs an `HttpException` with the specified detail message.
      *
@@ -139,7 +139,7 @@ open class HttpRequestException : HttpException {
      * @param errorMessage A detailed error message describing the exception, or null if not specified.
      * @since 1.0.0
      */
-    constructor(statusCode: Int?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
+    constructor(statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
     /**
      * Constructs an `HttpRequestException` with the specified status code, URI, HTTP method, and error message.
      *
@@ -153,7 +153,7 @@ open class HttpRequestException : HttpException {
      * @param errorMessage A detailed error message describing the exception, or null if not specified.
      * @since 2.0.0
      */
-    constructor(statusCode: HttpStatus, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
+    constructor(statusCode: HttpStatus, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
     /**
      * Constructs an `HttpRequestException` with the specified detail message.
      *
@@ -222,7 +222,7 @@ open class HttpResponseException : HttpException {
      * @param errorMessage A detailed message describing the error, or null if no specific message is provided.
      * @since 1.0.0
      */
-    constructor(statusCode: Int?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
+    constructor(statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
     /**
      * Constructs an `HttpResponseException` with the specified status code, URI, HTTP method,
      * and error message. This constructor provides flexibility for creating an exception
@@ -234,7 +234,7 @@ open class HttpResponseException : HttpException {
      * @param errorMessage A detailed message describing the error, or null if no specific message is provided.
      * @since 2.0.0
      */
-    constructor(statusCode: HttpStatus, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
+    constructor(statusCode: HttpStatus, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super(statusCode, uri, method, errorMessage)
     /**
      * Constructs an `HttpResponseException` with the specified detail message.
      *
@@ -334,7 +334,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, statusCode: Int?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
+    constructor(serviceName: String?, statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
     /**
      * Creates an ExternalServiceHttpException with detailed HTTP request information.
      *
@@ -351,7 +351,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 2.0.0
      */
-    constructor(serviceName: String?, statusCode: HttpStatus?, uri: URI? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
+    constructor(serviceName: String?, statusCode: HttpStatus?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
     /**
      * Constructs a new ExternalServiceHttpException with the specified service name and error message.
      *

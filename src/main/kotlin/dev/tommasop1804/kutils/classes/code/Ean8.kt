@@ -42,23 +42,23 @@ import java.nio.file.Path
  * Implements `CharSequence`, allowing access to barcode digits as character indices.
  * Also implements `ProductCode` and `ProductCode.EAN`.
  *
- * @since 1.0.0
+ * @since 3.0.0
  * @author Tommaso Pastorelli
  */
 @JvmInline
-@JsonSerialize(using = EAN8.Companion.Serializer::class)
-@JsonDeserialize(using = EAN8.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = EAN8.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = EAN8.Companion.OldDeserializer::class)
+@JsonSerialize(using = Ean8.Companion.Serializer::class)
+@JsonDeserialize(using = Ean8.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean8.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean8.Companion.OldDeserializer::class)
 @Suppress("unused")
-value class EAN8 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.EAN, PrintableBarcode {
+value class Ean8 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean, PrintableBarcode {
     /**
      * The length of the underlying string representation of the EAN-8 code.
      *
      * This property returns the total number of characters in the `value` of this instance.
      * It implements the `length` property of the `CharSequence` interface.
      *
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override val length
         get() = value.length
@@ -68,12 +68,12 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      * The provided input is converted to a trimmed `String` before being passed to the primary constructor.
      *
      * @param value the input value of type `CharSequence` to represent the EAN8 code.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     constructor(value: CharSequence) : this(value.toString().trim())
 
     init {
-        validateInputFormat(value.isValidEAN8(), EAN8::class)
+        validateInputFormat(value.isValidEan8(), Ean8::class)
     }
 
     companion object {
@@ -86,9 +86,9 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
          *
          * @receiver The string to validate as an EAN-8 code.
          * @return `true` if the string is a valid EAN-8 code, `false` otherwise.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.isValidEAN8() = matches(Regex("[0-9]{8}")) && computeCheckDigit(toString() - 1) == this[7]
+        fun CharSequence.isValidEan8() = matches(Regex("[0-9]{8}")) && computeCheckDigit(toString() - 1) == this[7]
 
         /**
          * Converts the current string to an EAN-8 object, encapsulating the representation of an EAN-8 barcode.
@@ -99,9 +99,9 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
          * @receiver The string being converted to the EAN-8 format.
          * @return A `Result` wrapping the constructed `EAN8` instance. If an error occurs during conversion,
          * the `Result` will contain the exception.
-         * @since 1.0.0
+         * @since 3.0.0
          */
-        fun CharSequence.toEAN8() = filter { it.isDigit() }.run { runCatching { EAN8(this) } }
+        fun CharSequence.toEan8() = filter { it.isDigit() }.run { runCatching { Ean8(this) } }
 
         /**
          * Computes the check digit for a given string code based on the EAN checksum algorithm.
@@ -110,10 +110,10 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
          *
          * @param code the input string representing the numeric code for which the check digit is to be computed.
          * @return the character representing the computed check digit.
-         * @since 1.0.0
+         * @since 3.0.0
          */
         fun computeCheckDigit(code: String): Char {
-            code.afterLast(')').validateInputFormat(EAN8::class) {
+            code.afterLast(')').validateInputFormat(Ean8::class) {
                 it matches Regex("[0-9]+") && it.length == 7
             }
             val sum = code.mapIndexed { index, ch -> if (index.isOdd) ch.digitToInt() else ch.digitToInt() * 3 }.sum()
@@ -121,29 +121,29 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
             return ((((sum / 10) + 1) * 10) - sum).digitToChar()
         }
 
-        class Serializer : ValueSerializer<EAN8>() {
-            override fun serialize(value: EAN8, gen: JsonGenerator, ctxt: SerializationContext) {
+        class Serializer : ValueSerializer<Ean8>() {
+            override fun serialize(value: Ean8, gen: JsonGenerator, ctxt: SerializationContext) {
                 gen.writeString(value.value)
             }
         }
 
-        class Deserializer : ValueDeserializer<EAN8>() {
-            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): EAN8 = EAN8(p.string)
+        class Deserializer : ValueDeserializer<Ean8>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): Ean8 = Ean8(p.string)
         }
 
-        class OldSerializer : JsonSerializer<EAN8>() {
-            override fun serialize(value: EAN8, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) =
+        class OldSerializer : JsonSerializer<Ean8>() {
+            override fun serialize(value: Ean8, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) =
                 gen.writeString(value.value)
         }
 
-        class OldDeserializer : JsonDeserializer<EAN8>() {
-            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): EAN8 = EAN8(p.text)
+        class OldDeserializer : JsonDeserializer<Ean8>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Ean8 = Ean8(p.text)
         }
 
         @jakarta.persistence.Converter(autoApply = true)
-        class Converter : AttributeConverter<EAN8?, String?> {
-            override fun convertToDatabaseColumn(attribute: EAN8?): String? = attribute?.value
-            override fun convertToEntityAttribute(dbData: String?): EAN8? = dbData?.let { EAN8(it) }
+        class Converter : AttributeConverter<Ean8?, String?> {
+            override fun convertToDatabaseColumn(attribute: Ean8?): String? = attribute?.value
+            override fun convertToEntityAttribute(dbData: String?): Ean8? = dbData?.let { Ean8(it) }
         }
     }
 
@@ -153,7 +153,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      * @param index the index of the element to retrieve, must be within the bounds of the collection.
      * @return the element at the specified index.
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index >= size).
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun get(index: Int) = value[index]
 
@@ -163,7 +163,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      *
      * @param startIndex the beginning index, inclusive.
      * @param endIndex the ending index, exclusive.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = value.subSequence(startIndex, endIndex)
 
@@ -174,7 +174,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      * associated with the `EAN8` instance.
      *
      * @return The string value representing the `EAN8` code.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toString() = value
 
@@ -185,7 +185,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      * and converts it to a `BufferedImage` using the ZXing library's `MatrixToImageWriter`.
      *
      * @return a BufferedImage representing the EAN-8 barcode.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(): BufferedImage = MatrixToImageWriter.toBufferedImage(generateMatrix())
 
@@ -194,7 +194,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      *
      * @param config the configuration used for customizing the colors and appearance of the image
      * @return a BufferedImage representation of the barcode matrix
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun toBufferedImage(
         config: MatrixToImageConfig
@@ -205,7 +205,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      *
      * @param format The format in which the barcode will be written (e.g., "PNG", "JPG").
      * @param file The file to which the barcode will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -219,7 +219,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      *
      * @param format the format in which the matrix should be written (e.g., "PNG", "JPEG").
      * @param file the file path where the barcode will be saved.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToPath(
         format: String,
@@ -233,7 +233,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      *
      * @param format the image format for the output (e.g., "PNG", "JPEG").
      * @param stream the output stream where the encoded barcode image will be written.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -248,7 +248,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      * @param format The format of the image to be written (e.g., "PNG", "JPG").
      * @param stream The output stream to which the image will be written.
      * @param config The configuration for the barcode image (e.g., colors for foreground and background).
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun writeToStream(
         format: String,
@@ -263,7 +263,7 @@ value class EAN8 private constructor(override val value: String) : CharSequence,
      * This matrix can be used to create visual representations of the barcode.
      *
      * @return a `BitMatrix` containing the encoded EAN-8 value.
-     * @since 1.0.0
+     * @since 3.0.0
      */
     override fun generateMatrix(): BitMatrix {
         val writer = MultiFormatWriter()

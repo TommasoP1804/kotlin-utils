@@ -1,7 +1,7 @@
 package dev.tommasop1804.kutils.classes.tree
 
 import dev.tommasop1804.kutils.MList
-import dev.tommasop1804.kutils.UUID
+import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.isNull
 import java.util.*
@@ -20,7 +20,7 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration")
-class TreeNode<T> private constructor(id: UUID, var parentId: UUID?, var value: T?, children: MList<TreeNode<T>>)/*: Serializable*/ {
+class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: T?, children: MList<TreeNode<T>>)/*: Serializable*/ {
     /**
      * Represents the unique identifier for the TreeNode instance.
      * This identifier helps distinguish the node within a tree structure.
@@ -28,7 +28,7 @@ class TreeNode<T> private constructor(id: UUID, var parentId: UUID?, var value: 
      * 
      * @since 1.0.0
      */
-    var id: UUID = id
+    var id: Uuid = id
         private set
     /**
      * Represents the mutable list of child nodes for this `TreeNode`.
@@ -133,7 +133,7 @@ class TreeNode<T> private constructor(id: UUID, var parentId: UUID?, var value: 
      * @param children The list of child nodes, defaulting to an empty mutable list if not provided.
      * @since 1.0.0
      */
-    constructor(parentId: UUID? = null, value: T? = null, children: List<TreeNode<T>> = mutableListOf<TreeNode<T>>()): this(UUID(), parentId, value, children.toMutableList())
+    constructor(parentId: Uuid? = null, value: T? = null, children: List<TreeNode<T>> = mutableListOf<TreeNode<T>>()): this(Uuid(), parentId, value, children.toMutableList())
 
     /*companion object {
         @Serial private const val serialVersionUID = 1L
@@ -147,7 +147,7 @@ class TreeNode<T> private constructor(id: UUID, var parentId: UUID?, var value: 
      * @param children The list of child nodes. Defaults to the current node's children.
      * @since 1.0.0
      */
-    fun copy(parentId: UUID? = this.parentId, value: T? = this.value, children: List<TreeNode<T>> = this.children) = TreeNode(parentId, value, children)
+    fun copy(parentId: Uuid? = this.parentId, value: T? = this.value, children: List<TreeNode<T>> = this.children) = TreeNode(parentId, value, children)
 
     /**
      * Converts the current `TreeNode` instance into a `Map` representation.
