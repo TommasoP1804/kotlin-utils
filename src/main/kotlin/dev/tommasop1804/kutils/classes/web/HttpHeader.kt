@@ -708,25 +708,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     override val entries: Set<Map.Entry<String, StringList>>
         get() = headers.map(HttpHeader::toMapEntry).toSet()
 
-    /**
-     * Checks if the collection of headers is empty.
-     *
-     * This method determines whether the headers collection contains no elements.
-     *
-     * @return `true` if the headers collection is empty, otherwise `false`.
-     * @since 2.2.1
-     */
-    override fun isEmpty() = headers.isEmpty()
-
-    /**
-     * Checks whether the collection of headers is not empty.
-     *
-     * This method verifies if there is at least one element present in the `headers` collection.
-     *
-     * @return `true` if the `headers` collection contains one or more elements, `false` otherwise.
-     * @since 2.2.1
-     */
-    fun isNotEmpty() = headers.isNotEmpty()
+    constructor() : this(emptyMSet())
 
     /**
      * Constructs an instance of the class by converting the provided collection of HTTP headers
@@ -892,6 +874,26 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext) = p.readValueAs(MultiStringMap::class.java).toHttpHeaders()
         }
     }
+
+    /**
+     * Checks if the collection of headers is empty.
+     *
+     * This method determines whether the headers collection contains no elements.
+     *
+     * @return `true` if the headers collection is empty, otherwise `false`.
+     * @since 2.2.1
+     */
+    override fun isEmpty() = headers.isEmpty()
+
+    /**
+     * Checks whether the collection of headers is not empty.
+     *
+     * This method verifies if there is at least one element present in the `headers` collection.
+     *
+     * @return `true` if the `headers` collection contains one or more elements, `false` otherwise.
+     * @since 2.2.1
+     */
+    fun isNotEmpty() = headers.isNotEmpty()
 
     /**
      * Checks whether a header with the specified name exists in the collection.
