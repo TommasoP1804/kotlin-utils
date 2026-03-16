@@ -4,9 +4,9 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.time.Duration
-import dev.tommasop1804.kutils.classes.web.HttpMethod
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.time.*
+import dev.tommasop1804.kutils.classes.web.*
 import dev.tommasop1804.kutils.classes.web.HttpStatus.Companion.toHttpStatus
 import java.net.URI
 import java.net.URL
@@ -164,3 +164,18 @@ fun String.toUri() = runCatching { Uri(this) }
  * @since 3.0.0
  */
 fun String.toUrl(): Result<Url> = runCatching { toUri()().toURL() }
+
+/**
+ * Converts this URL to a Uri.
+ *
+ * @return a [Uri] representation of this URL.
+ * @since 3.0.3
+ */
+fun URL.toUri(): Uri = toURI()
+/**
+ * Converts the URI instance into a Url object.
+ *
+ * @return the Url representation of the URI.
+ * @since 3.0.3
+ */
+fun URI.toUrl(): Url = toURL()

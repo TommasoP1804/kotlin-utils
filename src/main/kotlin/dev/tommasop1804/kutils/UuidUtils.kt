@@ -5,9 +5,9 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.identifiers.*
-import dev.tommasop1804.kutils.exceptions.RequiredParameterException
+import dev.tommasop1804.kutils.exceptions.*
 import java.net.NetworkInterface
 import java.nio.ByteBuffer
 import java.security.MessageDigest
@@ -249,7 +249,7 @@ fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UuidNamesp
  * @throws IllegalArgumentException If the input string is not a valid UUID format.
  * @since 3.0.0
  */
-fun Uuid(string: String) = UUID.fromString(string)!!
+fun Uuid(string: String): Uuid = UUID.fromString(string)!!
 /**
  * Converts a given ULID to its corresponding UUID representation.
  *
@@ -281,7 +281,7 @@ fun Uuid(shortUuid: ShortUuid) = shortUuid.toUuid()
  *         thrown during parsing if the input is not a valid UUID string.
  * @since 3.0.0
  */
-fun CharSequence.toUuid() = runCatching { UUID.fromString(toString())!! }
+fun CharSequence.toUuid(): Result<Uuid> = runCatching { UUID.fromString(toString())!! }
 /**
  * Converts the current [CharSequence] to a [Uuid] instance. The method attempts to parse
  * the [CharSequence] as a valid UUID string.
