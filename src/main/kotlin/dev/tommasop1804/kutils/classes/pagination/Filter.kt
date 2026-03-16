@@ -176,7 +176,7 @@ data class FilterOption(
                 gen.writeStartObject()
                 if (value.field.isNotNull())
                     gen.writeStringProperty("field", "${value.field}")
-                gen.writeStringProperty("operator", value.operator.name)
+                gen.writeStringProperty("operator", value.operator.symbol)
                 gen.writeStringProperty("value", value.value?.toString())
                 gen.writeEndObject()
             }
@@ -187,7 +187,7 @@ data class FilterOption(
                 gen.writeStartObject()
                 if (value.field.isNotNull())
                     gen.writeStringField("field", "${value.field}")
-                gen.writeStringField("operator", value.operator.name)
+                gen.writeStringField("operator", value.operator.symbol)
                 gen.writeStringField("value", value.value?.toString())
                 gen.writeEndObject()
             }
@@ -239,11 +239,17 @@ data class FilterOption(
  * @property category Since 4.6.8, a category that groups filter operations based on their functionalities.
  *                    This property is used to categorize filter operations for better organization
  *                    and filtering logic management.
+ * @property symbol   A symbol or shorthand notation for the operator, for visual representation only.
  *
  * @author Tommaso Pastorelli
  * @since 1.0.0
  */
-enum class FilterOperator(val operator: String, val sql: String, @field:Since("4.6.8") val category: Category) {
+enum class FilterOperator(
+    val operator: String,
+    val sql: String,
+    val category: Category,
+    val symbol: String
+) {
     /**
      * Represents the equality filter operation within the `FilterOperator` class.
      *
@@ -252,12 +258,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      *
      * The SQL representation of this operator is defined as "{field} = {value}".
      *
-     * @property operator The string representation of the filter operator, typically "eq" for equality.
-     * @property sql The SQL syntax associated with the filter operation.
-     * @property category Since 4.6.8, the category of the filter operation
      * @since 1.0.0
      */
-    EQUALS("eq", "{field} = {value}", Category.EQUALITY),
+    EQUALS("eq", "{field} = {value}", Category.EQUALITY, "="),
     /**
      * Represents the "not equals" filter operator in a query.
      *
@@ -265,24 +268,17 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * is not equal to a given value. This operator is commonly utilized in query-building
      * scenarios for data filtering purposes.
      *
-     * @property operator The shorthand notation for the operator, typically used in query language syntax.
-     * @property sql The SQL representation of the operator.
-     * @property category Since 4.6.8, the category of the filter operation
      * @since 1.0.0
      */
-    NOT_EQUALS("ne", "{field} <> {value}", Category.EQUALITY),
+    NOT_EQUALS("ne", "{field} <> {value}", Category.EQUALITY, "≠"),
     /**
      * Represents the "in" operator used for filtering.
      *
      * The `IN` operator is used to check if a value is present within a specific set of values provided in a filter.
      *
-     * @property operator A string representation of the operator, in this case, "in".
-     * @property sql The SQL representation of the operator, formatted as "{value} in {field}".
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    IN("in", "{value} IN {field}", Category.ARRAY_SEARCH),
+    IN("in", "{value} IN {field}", Category.ARRAY_SEARCH, "∈"),
     /**
      * Represents the `NOT IN` filter operator used to determine if a given value does not exist
      * within a specified set of values or collection.
@@ -293,13 +289,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * The `operator` ("nin") defines the symbolic representation of this filter operator, while
      * the `sql` pattern ("{value} NOT IN {field}") specifies how the operator should be formatted during translation to SQL or similar query languages.
      *
-     * @param operator The symbolic representation of the `NOT IN` filter operator.
-     * @param sql The pattern defining how the operator is expressed in a query language.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    NOT_IN("nin", "{value} NOT IN {field}", Category.ARRAY_SEARCH),
+    NOT_IN("nin", "{value} NOT IN {field}", Category.ARRAY_SEARCH, "∉"),
     /**
      * Represents a "less than" filter operation in a query or filtering system.
      *
@@ -307,13 +299,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * is less than the given comparison value. It is typically utilized in filtering scenarios
      * to include only records that satisfy the specified "less than" condition.
      *
-     * @property operator The string representation of the filter operator.
-     * @property sql The corresponding SQL representation for the operator.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    LESS_THAN("lt", "{field} < {value}", Category.COMPARISON),
+    LESS_THAN("lt", "{field} < {value}", Category.COMPARISON, "<"),
     /**
      * Represents a "greater than" filter operator for use in filtering operations.
      *
@@ -323,13 +311,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * filtering by field value is needed.
      *
      * The operator has a symbolic representation `>` for SQL and similar query languages.
-     * @property operator The string representation of the filter operator.
-     * @property sql The corresponding SQL representation for the operator.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    GREATER_THAN("gt", "{field} > {value}", Category.COMPARISON),
+    GREATER_THAN("gt", "{field} > {value}", Category.COMPARISON, ">"),
     /**
      * Represents a filtering operator for "less than or equal to" comparisons.
      *
@@ -337,26 +321,18 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * to a specified value, evaluating to true if the field's value is less than or equal
      * to the given value. It is commonly utilized in database queries or filtering mechanisms.
      *
-     * @param operator The symbolic representation of the operator, i.e., "le".
-     * @param sql The SQL representation used in query generation, i.e., "{field} <= {value}".
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    LESS_THAN_OR_EQUALS("le", "{field} <= {value}", Category.COMPARISON),
+    LESS_THAN_OR_EQUALS("le", "{field} <= {value}", Category.COMPARISON, "≤"),
     /**
      * A filter operator representing the "greater than or equals" comparison.
      *
      * The `GREATER_THAN_OR_EQUALS` operator is used to filter data where a field value is greater than or equal to a specified value.
      * It is commonly employed in filtering criteria in data retrieval or query-building scenarios.
      *
-     * @property operator The shorthand identifier for the "greater than or equals" operation.
-     * @property sql The SQL representation of the "greater than or equals" operation.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    GREATER_THAN_OR_EQUALS("ge", "{field} >= {value}", Category.COMPARISON),
+    GREATER_THAN_OR_EQUALS("ge", "{field} >= {value}", Category.COMPARISON, "≥"),
     /**
      * Represents a `STARTS_WITH` filter operation for querying datasets.
      *
@@ -364,26 +340,18 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * This operator generates an SQL `LIKE` expression using the format:
      * `{field} LIKE CONCAT({value}, '%')`.
      *
-     * @param operator The representation of the operator as a string, used for logical identification.
-     * @param sql The corresponding SQL fragment for the filter operation.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    STARTS_WITH("startswith", "{field} LIKE CONCAT({value}, '%')", Category.STRING),
+    STARTS_WITH("startswith", "{field} LIKE CONCAT({value}, '%')", Category.STRING, "starts with"),
     /**
      * Represents a filter operator that matches values where the specified field does not start with the given value.
      *
      * This operator constructs an SQL condition using the "NOT LIKE" clause with a wildcard (%) appended
      * to the provided value, ensuring that the field does not start with the specified pattern.
      *
-     * @property operator The symbolic representation of the filter operator.
-     * @property sql The SQL expression that corresponds to the operator.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    NOT_STARTS_WITH("nstartswith", "{field} NOT LIKE CONCAT({value}, '%')", Category.STRING),
+    NOT_STARTS_WITH("nstartswith", "{field} NOT LIKE CONCAT({value}, '%')", Category.STRING, "not starts with"),
     /**
      * Represents a filter operator that checks if the field value ends with the specified value.
      *
@@ -394,13 +362,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * Operator: `endswith`
      * SQL Translation: `{field} LIKE CONCAT('%', {value})`
      *
-     * @property operator The string representation of the filter operator.
-     * @property sql The corresponding SQL representation for the operator.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    ENDS_WITH("endswith", "{field} LIKE CONCAT('%', {value})", Category.STRING),
+    ENDS_WITH("endswith", "{field} LIKE CONCAT('%', {value})", Category.STRING, "ends with"),
     /**
      * Represents a filter operator that checks if a field's value does not end with the specified value.
      *
@@ -410,13 +374,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * Operator: `notendwith`
      * SQL Translation: `{field} NOT LIKE CONCAT('%', {value})`
      *
-     * @property operator The string representation of the filter operator.
-     * @property sql The corresponding SQL representation for the operator.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    NOT_ENDS_WITH("nendswith", "{field} NOT LIKE CONCAT('%', {value})", Category.STRING),
+    NOT_ENDS_WITH("nendswith", "{field} NOT LIKE CONCAT('%', {value})", Category.STRING, "not ends with"),
     /**
      * An operator used for filtering data by checking if a field contains a specified value.
      *
@@ -424,14 +384,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * is checked to be a substring of the field's content. The operation format
      * is represented as `{field} LIKE CONCAT('%', {value}, '%')`.
      *
-     * @property operator The name of the filter operation, represented as "contains".
-     * @property sql The SQL representation of the filter operation.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
-     *
      * @since 1.0.0
      */
-    CONTAINS("contains", "{field} LIKE CONCAT('%', {value}, '%')", Category.STRING),
+    CONTAINS("contains", "{field} LIKE CONCAT('%', {value}, '%')", Category.STRING, "⊇"),
     /**
      * Represents a filter operator that checks if a field does not contain a specified value.
      *
@@ -445,26 +400,18 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * This is useful for scenarios where you need to filter out records based on
      * partial matches within string fields.
      *
-     * @param operator The name of the operator as a string.
-     * @param sql The SQL representation of the operator condition.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    NOT_CONTAINS("ncontains", "{field} NOT LIKE CONCAT('%', {value}, '%')", Category.STRING),
+    NOT_CONTAINS("ncontains", "{field} NOT LIKE CONCAT('%', {value}, '%')", Category.STRING, "⊉"),
     /**
      * Represents a SQL `LIKE` operator used for filtering data where a field matches a specified pattern.
      *
      * This operator is generally used in query conditions to perform pattern matching
      * against string data types. The comparison is case-sensitive in most SQL implementations.
      *
-     * @property operator The string representing the operator, in this case "like".
-     * @property sql The SQL representation of the operator, including placeholders for the field and value.
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    LIKE("like", "{field} LIKE {value}", Category.STRING),
+    LIKE("like", "{field} LIKE {value}", Category.STRING, "~"),
     /**
      * Represents an operator used for filtering entities based on a NOT LIKE condition.
      *
@@ -472,13 +419,9 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
      * The `NOT_LIKE` operator determines whether a specified field's value does not match a given pattern
      * using a SQL `NOT LIKE` expression.
      *
-     * @property operator The symbolic representation of the operation, in this case, "nlike".
-     * @property sql The SQL-compatible template for the NOT LIKE operation, "{field} NOT LIKE {value}".
-     * @property category Since 4.6.8, the category of the filter operation
-     *
      * @since 1.0.0
      */
-    NOT_LIKE("nlike", "{field} NOT LIKE {value}", Category.STRING);
+    NOT_LIKE("nlike", "{field} NOT LIKE {value}", Category.STRING, "≁");
 
     companion object {
         /**
@@ -508,6 +451,15 @@ enum class FilterOperator(val operator: String, val sql: String, @field:Since("4
          * @since 1.0.0
          */
         infix fun byCategory(category: Category) = FilterOperator.entries.filter { it.category == category }
+
+        /**
+         * Finds a FilterOperator that matches the given symbol.
+         *
+         * @param symbol The symbol to search for within the list of FilterOperator entries.
+         * @return The matching FilterOperator if found, or null if no match is found.
+         * @since 3.0.2
+         */
+        infix fun ofSymbol(symbol: String) = FilterOperator.entries.find { it.symbol equalsIgnoreCase symbol }
     }
 
     /**

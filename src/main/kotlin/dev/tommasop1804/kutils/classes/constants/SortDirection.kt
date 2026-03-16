@@ -9,7 +9,7 @@ import dev.tommasop1804.kutils.unaryMinus
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-enum class SortDirection(vararg val operators: String) {
+enum class SortDirection(vararg val operators: String, val symbol: Char) {
     /**
      * Represents an ascending sorting order within the SortDirection enumeration.
      *
@@ -18,7 +18,7 @@ enum class SortDirection(vararg val operators: String) {
      *
      * @since 1.0.0
      */
-    ASCENDING("as", "asc", "ascending"),
+    ASCENDING("as", "asc", "ascending", symbol = '↑'),
     /**
      * Represents the descending sorting order.
      *
@@ -27,7 +27,7 @@ enum class SortDirection(vararg val operators: String) {
      *
      * @since 1.0.0
      */
-    DESCENDING("de", "des", "desc", "descending");
+    DESCENDING("de", "des", "desc", "descending", symbol = '↓');
 
     companion object {
         /**
@@ -43,5 +43,15 @@ enum class SortDirection(vararg val operators: String) {
          */
         infix fun ofOperator(operator: String) = entries
             .find { -operator in it.operators }
+
+        /**
+         * Finds and returns an entry within the enum's `entries` collection where the symbol matches
+         * the given `symbol` parameter.
+         *
+         * @param symbol The character symbol to search for within the `entries` of the enum.
+         * @return The matching enum entry, or `null` if no match is found.
+         * @since 3.0.2
+         */
+        infix fun ofSymbol(symbol: Char) = entries.find { it.symbol == symbol }
     }
 }

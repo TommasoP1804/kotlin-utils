@@ -132,7 +132,7 @@ data class SortOption(
             ) {
                 gen.writeStartObject()
                 gen.writeStringProperty("field", value.field)
-                gen.writeStringProperty("direction", value.direction.name)
+                gen.writeStringProperty("direction", value.direction.symbol.toString())
                 gen.writeEndObject()
             }
         }
@@ -141,7 +141,7 @@ data class SortOption(
             override fun serialize(value: SortOption, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
                 gen.writeStringField("field", value.field)
-                gen.writeStringField("direction", value.direction.name)
+                gen.writeStringField("direction", value.direction.symbol.toString())
                 gen.writeEndObject()
             }
         }
