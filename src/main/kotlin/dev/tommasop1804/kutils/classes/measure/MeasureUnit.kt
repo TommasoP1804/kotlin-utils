@@ -1077,9 +1077,9 @@ class MeasureUnit internal constructor(override val measure: String, override va
      * @since 1.0.0
      */
     enum class DataSizeUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        BIT(MeasureUnit("bit", "quantity of information", "b", knownSymbol = true)),
-        BYTE(MeasureUnit("byte", "quantity of information", "B", knownSymbol = true)),
-        NIBBLE(MeasureUnit("nibble", "quantity of information", "nibble", knownSymbol = true)),
+        BIT(MeasureUnit("bit", "data size", "b", knownSymbol = true)),
+        BYTE(MeasureUnit("byte", "data size", "B", knownSymbol = true)),
+        NIBBLE(MeasureUnit("nibble", "data size", "nibble", knownSymbol = true)),
 
         // in that case, are reported also multiple and submultiple of the units, due to average use
         KILOBIT(MeasureUnit("kilobit", "data size", "kb", knownSymbol = true)),
