@@ -8,8 +8,8 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonSerialize
@@ -461,6 +461,41 @@ enum class FilterOperator(
          */
         infix fun ofSymbol(symbol: String) = FilterOperator.entries.find { it.symbol equalsIgnoreCase symbol }
     }
+
+    /**
+     * Provides the first component of a destructured declaration for this object.
+     *
+     * Typically used in conjunction with destructuring declarations to extract specific 
+     * values or properties of this object.
+     *
+     * @return The first component defined in this object.
+     * @since 3.1.0
+     */
+    operator fun component1() = operator
+    /**
+     * Operator function that defines the `component2` functionality for destructuring declarations.
+     * This function allows accessing the second component of an object.
+     *
+     * @return The value of the `sql` property.
+     * @since 3.1.0
+     */
+    operator fun component2() = sql
+    /**
+     * Operator function that retrieves the third component of a destructured object.
+     * This function is typically used in destructuring declarations to access the `category` property.
+     *
+     * @return The value of the `category` property.
+     * @since 3.1.0
+     */
+    operator fun component3() = category
+    /**
+     * Deconstructs the object to retrieve its fourth component, typically representing the `symbol` property.
+     * This operator function is intended to be used in destructuring declarations.
+     *
+     * @return The `symbol` property associated with this component.
+     * @since 3.1.0
+     */
+    operator fun component4() = symbol
 
     /**
      * Enum representing categories for different types of operations.

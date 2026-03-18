@@ -1,10 +1,10 @@
 package dev.tommasop1804.kutils.classes.money
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.constants.TextCase
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
-import dev.tommasop1804.kutils.classes.geography.Country
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.classes.geography.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KProperty
 
 /**
@@ -368,4 +368,89 @@ enum class Currency (
 	 */
 	@Suppress("unchecked_cast")
 	operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name) as R
+	
+	/**
+	 * Provides the first component for destructuring declarations in a currency-related context.
+	 * This operator enables extracting the `currencyName` property as the first component 
+	 * when using destructuring syntax with the associated object.
+	 *
+	 * @return The name of the currency represented by this component.
+	 * @since 3.1.0
+	 */
+	operator fun component1() = currencyName
+	/**
+	 * Provides the value of the second component of the data class, typically representing
+	 * the `code` property of the object. This function enables destructuring declarations
+	 * to access the second element of the data structure directly.
+	 *
+	 * @return The value of the `code` property.
+	 * @since 3.1.0
+	 */
+	operator fun component2() = code
+	/**
+	 * Provides the third component of a data class decomposition.
+	 * 
+	 * This method is typically used for destructuring declarations, 
+	 * enabling the retrieval of the `numericCode` property in 
+	 * scenarios where destructuring is supported.
+	 *
+	 * @return The `numericCode` value associated with this instance.
+	 * @since 3.1.0
+	 */
+	operator fun component3() = numericCode
+	/**
+	 * Provides the fourth component of the deconstructed data structure.
+	 *
+	 * This operator function allows the fourth value of the object to be accessed 
+	 * using Kotlin's destructuring declarations. When used in a `destructuring declaration`,
+	 * it represents the `symbol` property of the object.
+	 *
+	 * @return The fourth component represented by `symbol`.
+	 * @since 3.1.0
+	 */
+	operator fun component4() = symbol
+	/**
+	 * Provides the fifth component of a destructured object.
+	 *
+	 * This operator function is typically used in destructuring declarations
+	 * to retrieve the fractional unit value stored in the object.
+	 *
+	 * @return The fractional unit associated with the object.
+	 * 
+	 * @since 3.1.0
+	 */
+	operator fun component5() = fractionalUnit
+	/**
+	 * Decomposes and provides the sixth component of the current instance 
+	 * when used in a destructuring declaration.
+	 *
+	 * This operator function is specifically implemented to retrieve the 
+	 * `numberOfFractionalUnits` property, which generally represents the 
+	 * fractional or sub-unit count associated with the instance.
+	 *
+	 * @return The value of `numberOfFractionalUnits`.
+	 *
+	 * @since 3.1.0
+	 */
+	operator fun component6() = numberOfFractionalUnits
+	/**
+	 * Provides access to the seventh component of a data structure.
+	 * This method is typically used for destructuring declarations.
+	 *
+	 * @return The value stored in the `digitsAfterDecimalPoint` property.
+	 * @since 3.1.0
+	 */
+	operator fun component7() = digitsAfterDecimalPoint
+	/**
+	 * Operator function `component8` that enables destructuring declaration syntax
+	 * to retrieve the `countries` property as the eighth component of an object.
+	 *
+	 * This function is specifically used in conjunction with destructuring to 
+	 * access this property in a concise manner.
+	 *
+	 * @return The `countries` property associated with the eighth component.
+	 *
+	 * @since 3.1.0
+	 */
+	operator fun component8() = countries
 }

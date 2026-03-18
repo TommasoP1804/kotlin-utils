@@ -9,10 +9,8 @@ package dev.tommasop1804.kutils
 
 import Break
 import Continue
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.exceptions.TooFewResultsException
-import dev.tommasop1804.kutils.exceptions.TooManyElementsException
-import dev.tommasop1804.kutils.exceptions.TooManyResultsException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.exceptions.*
 import java.util.*
 import java.util.stream.Collector
 import kotlin.collections.map
@@ -753,7 +751,7 @@ infix fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier) = 
  */
 infix fun <K, V> Map<K, V>.onlyEntry(predicate: BiPredicate<K, V>) = entries
     .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
-    .filter { (k, v) -> predicate(k, v) }.run {
+    .filter { [k, v] -> predicate(k, v) }.run {
         if (size == 1) first()
         else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
     }
@@ -785,7 +783,7 @@ infix fun <K, V> Map<K, V>.onlyEntry(predicate: Predicate<Map.Entry<K, V>>) = en
  * the condition.
  * @since 1.0.0
  */
-infix fun <K, V> Map<K, V>.onlyEntryOrNull(predicate: BiPredicate<K, V>) = filter { (k, v) -> predicate(k, v) }.entries.run { if (size == 1) first() else null }
+infix fun <K, V> Map<K, V>.onlyEntryOrNull(predicate: BiPredicate<K, V>) = filter { [k, v] -> predicate(k, v) }.entries.run { if (size == 1) first() else null }
 /**
  * Returns the single entry in the map that matches the given [predicate], or `null` if no entry
  * matches or more than one entry matches the [predicate].
@@ -804,7 +802,7 @@ infix fun <K, V> Map<K, V>.onlyEntryOrNull(predicate: Predicate<Map.Entry<K, V>>
  * @return the single matching map entry if exactly one matches the predicate, otherwise the supplied default entry
  * @since 1.0.0
  */
-fun <K, V> Map<K, V>.onlyEntryOr(default: Supplier<Pair<K, V>>, predicate: BiPredicate<K, V>) = filter { (k, v) -> predicate(k, v) }.entries.run { if (size == 1) first() else default().toMapEntry() }
+fun <K, V> Map<K, V>.onlyEntryOr(default: Supplier<Pair<K, V>>, predicate: BiPredicate<K, V>) = filter { [k, v] -> predicate(k, v) }.entries.run { if (size == 1) first() else default().toMapEntry() }
 /**
  * Filters entries in a map based on a given predicate and returns the single matching entry.
  * If there is no matching entry or more than one entry matches, the provided default value is returned.
@@ -826,7 +824,7 @@ fun <K, V> Map<K, V>.onlyEntryOr(default: Supplier<Pair<K, V>>, predicate: Predi
  * @throws Throwable The exception provided by the lazyException supplier if the number of matching entries is different from one.
  * @since 1.0.0
  */
-fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier, predicate: BiPredicate<K, V>) = filter { (k, v) -> predicate(k, v) }.entries.run { if (size == 1) first() else throw lazyException() }
+fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier, predicate: BiPredicate<K, V>) = filter { [k, v] -> predicate(k, v) }.entries.run { if (size == 1) first() else throw lazyException() }
 /**
  * Filters the map according to the provided predicate and ensures that it contains only one matching entry.
  * If there is exactly one entry that matches the predicate, it returns that entry.

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -136,6 +136,25 @@ class Sphere (var center: Point = Point(), radius: Double = 0.0) : Serializable,
      * @since 1.0.0
      */
     fun copy(center: Point = this.center, radius: Double = this.radius) = Sphere(center, radius)
+
+    /**
+     * Returns the `center` property of the `Sphere` instance as its first component.
+     * This operator function is generally used for destructuring declarations, allowing
+     * the `center` value to be directly accessed in a destructured form.
+     *
+     * @return The `center` of the sphere.
+     * @since 3.1.0
+     */
+    operator fun component1() = center
+    /**
+     * Retrieves the `radius` value of the `Sphere` instance.
+     * This function is used as part of the component destructuring mechanism,
+     * allowing access to the second component (`radius`) of the `Sphere` object.
+     *
+     * @return The radius of the sphere as a `Double`.
+     * @since 3.1.0
+     */
+    operator fun component2() = radius
 
     /**
      * Compares this `Sphere` object with another object for equality.

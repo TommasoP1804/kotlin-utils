@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.classes.geometry.Line.Companion.TOLERANCE
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -278,11 +278,31 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
     fun copy(start: Point = this.start, end: Point = this.end): Line = Line(start, end)
 
     /**
-     * Checks whether the current line is parallel to the specified line.
+     * Operator function that enables destructuring declarations to access the `start` property.
+     * This function is typically called as part of a destructuring declaration when extracting components
+     * from an instance of the class.
      *
-     * 
-     * @param other The line to compare against for parallelism.
-     * @return `true` if the current line is parallel to the specified line, otherwise `false`.
+     * @return The `start` property of the instance.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Returns the second component of this object when destructuring.
+     * This is commonly used in destructuring declarations to extract specific values.
+     *
+     * @return The value of the `end` property.
+     * @since 3.1.0
+     */
+    operator fun component2() = end
+
+    /**
+     * Determines if the current line is parallel to another line.
+     *
+     * Two lines are considered parallel if their direction vectors are scalar multiples
+     * of each other. This method accounts for 2D and 3D line representations.
+     *
+     * @param other The other line to check parallelism against.
+     * @return `true` if the current line is parallel to the given line, otherwise `false`.
      * @since 1.0.3
      */
     infix fun isParallelWith(other: Line): Boolean {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.Double3
+import dev.tommasop1804.kutils.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -240,7 +240,39 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
      * @since 1.0.0
      */
     fun copy(a: Point = this.a, b: Point = this.b, c: Point = this.c) = Triangle(a, b, c)
-
+    
+    /**
+     * Retrieves the first component of the triangle, specifically the vertex `a`.
+     * 
+     * This operator function is used as part of the destructuring declaration syntax
+     * to access the vertices of the triangle in a structured manner.
+     * 
+     * @receiver The current instance of the triangle.
+     * @return The value of the vertex `a`.
+     * @since 3.1.0
+     */
+    operator fun component1() = a
+    /**
+     * Returns the second component (`b`) of the triangle when destructuring declarations are used.
+     *
+     * This operator is part of the component functions provided by the triangle to support 
+     * destructuring declarations. Specifically, it enables access to the `b` vertex of the triangle.
+     *
+     * @return The second vertex (`b`) of the triangle.
+     * @since 3.1.0
+     */
+    operator fun component2() = b
+    /**
+     * Provides access to the third component (`c`) of the triangle's vertices.
+     *
+     * This operator function allows the destructuring of a [Triangle] instance
+     * to retrieve its third vertex (`c`).
+     *
+     * @return The third vertex (`c`) of the triangle.
+     * @since 3.1.0
+     */
+    operator fun component3() = c
+    
     /**
      * Determines if the specified point lies inside the triangle or not.
      *

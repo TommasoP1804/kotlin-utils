@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -129,6 +129,27 @@ class Circle(
      * @since 1.0.0
      */
     fun copy(radius: Double = this.radius, center: Point = this.center) = Circle(radius, center)
+
+    /**
+     * Decomposes the `Circle` object to retrieve the `radius` component.
+     *
+     * This operator function allows destructuring declarations on a `Circle` instance,
+     * where the first component corresponds to the radius of the circle.
+     *
+     * @return The radius of the circle.
+     * @since 3.1.0
+     */
+    operator fun component1() = radius
+    /**
+     * Retrieves the center of the `Circle` instance.
+     *
+     * This operator function allows for the deconstruction of a `Circle` object
+     * to extract its second component, which represents its `center`.
+     *
+     * @return The `center` property of the `Circle`, typically represented as a `Point`.
+     * @since 3.1.0
+     */
+    operator fun component2() = center
 
     /**
      * Compares this circle with the specified circle based on their radii.

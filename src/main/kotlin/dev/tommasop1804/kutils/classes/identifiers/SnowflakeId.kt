@@ -1,12 +1,9 @@
 package dev.tommasop1804.kutils.classes.identifiers
 
-import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.RiskyApproximationOfTemporal
-import dev.tommasop1804.kutils.Supplier
-import dev.tommasop1804.kutils.classes.time.Duration
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMillisOfDuration
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.validate
+import dev.tommasop1804.kutils.exceptions.*
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
@@ -361,7 +358,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId> {
                 val prevTimestamp = prev ushr 22
                 val prevSequence = prev and MAX_SEQUENCE
 
-                val (newTimestamp, newSequence) = if (elapsed == prevTimestamp) {
+                val [newTimestamp, newSequence] = if (elapsed == prevTimestamp) {
                     val seq = prevSequence + 1
                     if (seq > MAX_SEQUENCE) {
                         continue

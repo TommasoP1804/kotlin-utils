@@ -49,4 +49,15 @@ enum class Sex(val symbol: Char) {
             else -> null
         }
     }
+
+    /**
+     * Provides the symbol representation of the `Sex` enum as a component function for destructuring declarations.
+     *
+     * This function allows instances of the `Sex` enum to be destructured into their `symbol` property values,
+     * enabling a more concise way to access the internal representation.
+     *
+     * @return The Unicode character symbol representing the `Sex` type.
+     * @since 3.1.0
+     */
+    operator fun component1() = symbol
 }

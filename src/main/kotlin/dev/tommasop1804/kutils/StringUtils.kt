@@ -8,8 +8,8 @@
 package dev.tommasop1804.kutils
 
 import com.github.lalyos.jfiglet.FigletFont
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.base.Base62
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.base.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.EMAIL_REGEX
 import dev.tommasop1804.kutils.exceptions.*
@@ -1137,7 +1137,7 @@ fun String.titleCase(): String {
     if (isEmpty()) return this
 
     val words = split(Regex("\\s+")).toMutableList()
-    for ((i, _) in words.withIndex())
+    for ([i, _] in words.withIndex())
         words[i] = +words[i][0] + -words[i].substring(1)
 
     return words.joinToString(" ")
@@ -1241,7 +1241,7 @@ fun String.pascalCase(): String {
     if (isEmpty()) return this
 
     val words = split(Regex("\\s+")).toMutableList()
-    for ((i, _) in words.withIndex())
+    for ([i, _] in words.withIndex())
         words[i] = +words[i][0] + -words[i].substring(1)
 
     return words.joinToString("")
@@ -1260,7 +1260,7 @@ fun String.camelCase(): String {
     if (isEmpty()) return this
 
     val words = split(Regex("\\s+")).toMutableList()
-    for ((i, word) in words.withIndex())
+    for ([i, word] in words.withIndex())
         words[i] = if (i == 0) -words[i] else +word[0] + -word.substring(1)
 
     return words.joinToString("")
@@ -1936,7 +1936,7 @@ operator fun String.invoke(
     fromTo: MonoPair<Regex> = Regex("\\{") to Regex("}"),
     args: Iterable<Any?>
 ): String {
-    val (startRegex, endRegex) = fromTo
+    val [startRegex, endRegex] = fromTo
 
     // Trova tutte le occorrenze che corrispondono a {qualcosa}
     val pattern = Regex("${startRegex.pattern}(.*?)${endRegex.pattern}")

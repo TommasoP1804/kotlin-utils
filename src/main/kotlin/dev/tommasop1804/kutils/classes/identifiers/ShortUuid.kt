@@ -144,7 +144,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
             var sum = BigInt.ZERO
             val alphaSize = BigInt.valueOf(ALPHABET.size.toLong())
 
-            for ((i, element) in encoded.withIndex()) {
+            for ([i, element] in encoded.withIndex()) {
                 sum = sum.add(alphaSize.pow(i).multiply(BigInt.valueOf(
                     Arrays.binarySearch(ALPHABET, element).toLong()
                 )))

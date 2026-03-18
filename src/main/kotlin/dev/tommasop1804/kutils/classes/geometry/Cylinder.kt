@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -169,6 +169,33 @@ class Cylinder (var baseCenter: Point = Point(), radius: Double = 0.0, height: D
      * @since 1.0.0
      */
     fun copy(baseCenter: Point = this.baseCenter, radius: Double = this.radius, height: Double = this.height) = Cylinder(baseCenter, radius, height)
+    
+    /**
+     * Extracts the `baseCenter` component of the Cylinder.
+     * This is primarily used to enable destructuring declarations for the Cylinder instance.
+     *
+     * @return The `baseCenter` property of the Cylinder, representing the center point of its base.
+     * @since 3.1.0
+     */
+    operator fun component1() = baseCenter
+    /**
+     * Provides support for destructuring declarations to access the `radius` 
+     * property of the `Cylinder` instance as the second component.
+     *
+     * @return The value of the `radius` property of the cylinder.
+     * @since 3.1.0
+     */
+    operator fun component2() = radius
+    /**
+     * Retrieves the height of the cylinder as the third component in a destructuring declaration.
+     *
+     * This operator function allows the `height` property of the Cylinder to be accessed when using 
+     * destructuring declarations. The third component corresponds to the height of the cylinder.
+     *
+     * @return The height of the cylinder.
+     * @since 3.1.0
+     */
+    operator fun component3() = height
 
     /**
      * Indicates whether some other object is "equal to" this one. The comparison can optionally consider the position

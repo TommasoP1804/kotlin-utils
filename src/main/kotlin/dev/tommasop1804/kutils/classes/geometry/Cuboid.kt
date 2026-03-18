@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -159,6 +159,47 @@ open class Cuboid (var minCorner: Point = Point(), width: Double = 0.0, height: 
     fun copy(minCorner: Point = this.minCorner, width: Double = this.width, height: Double = this.height, depth: Double = this.depth) = Cuboid(minCorner, width, height, depth)
 
     /**
+     * Decomposes the `Cuboid` into its `minCorner` property when using destructuring declarations.
+     *
+     * This operator function allows for the `minCorner` (the bottom-left-front corner) 
+     * of the cuboid to be directly accessed as the first component in destructuring syntax.
+     *
+     * @receiver The current instance of the `Cuboid`.
+     * @return The `minCorner` of this `Cuboid`.
+     * @since 3.1.0
+     */
+    operator fun component1() = minCorner
+    /**
+     * Returns the width of the `Cuboid` instance when used in a destructuring declaration.
+     * 
+     * Commonly paired with the `component1` operator to extract properties from a `Cuboid` object.
+     *
+     * @return The width of the cuboid as a `Double`.
+     * @since 3.1.0
+     */
+    operator fun component2() = width
+    /**
+     * Returns the height of the cuboid as the third component in a destructuring declaration.
+     *
+     * This operator function allows the `Cuboid` class to be used in destructuring declarations,
+     * where the third element corresponds to the `height` property of the cuboid.
+     *
+     * @return The height of the cuboid.
+     * @since 3.1.0
+     */
+    operator fun component3() = height
+    /**
+     * Retrieves the depth of the cuboid when using destructuring declarations.
+     *
+     * This operator provides access to the fourth component of a `Cuboid` instance, 
+     * which represents the depth dimension of the cuboid.
+     *
+     * @return The depth of the cuboid as a `Double`.
+     * @since 3.1.0
+     */
+    operator fun component4() = depth
+    
+    /**
      * Determines whether the specified point is contained within the cuboid.
      *
      * 
@@ -216,6 +257,18 @@ open class Cuboid (var minCorner: Point = Point(), width: Double = 0.0, height: 
 
         return true
     }
+
+    /**
+     * Compares this cuboid instance with another object for equality. This implementation
+     * internally calls the `equals(other: Any?, considerPosition: Boolean)` method with a
+     * default consideration of position.
+     *
+     * @param other An object of type `Any?` to compare with this `Cuboid` instance.
+     * @return `true` if the specified object is a `Cuboid` and is considered equal to this instance
+     * based on its dimensions and position (by default), otherwise `false`.
+     * @since 3.1.0
+     */
+    override fun equals(other: Any?): Boolean = equals(other, true)
 
     /**
      * Computes the hash code for this `Cuboid` instance based on its properties.

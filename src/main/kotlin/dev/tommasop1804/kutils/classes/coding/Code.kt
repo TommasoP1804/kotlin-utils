@@ -3,10 +3,8 @@ package dev.tommasop1804.kutils.classes.coding
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.asSingleList
-import dev.tommasop1804.kutils.exceptions.CompilationException
-import dev.tommasop1804.kutils.exceptions.RequiredParameterException
-import dev.tommasop1804.kutils.toEnumConst
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -1105,6 +1103,23 @@ open class Code(open val value: String, val language: Language) : CharSequence {
      * @since 1.0.0
      */
     override fun toString(): String = "Code(value=```$value```, language=$language)"
+
+    /**
+     * Extracts the first component of the data object, typically used for destructuring declarations.
+     *
+     * This operator function allows the object's first property to be retrieved when using destructuring syntax.
+     * 
+     * @return The value associated with the first component of the object.
+     * @since 3.1.0
+     */
+    operator fun component1() = value
+    /**
+     * Provides the second component of the data class, typically used for destructuring declarations.
+     *
+     * @return The value of the `language` property.
+     * @since 3.1.0
+     */
+    operator fun component2() = language
 
     /**
      * Represents a Java source file provided as a string. This class extends `SimpleJavaFileObject`

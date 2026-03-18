@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -957,7 +957,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         val groupedByRow = _entries.groupBy { it.rowKey }
         val allColumnsKeys = _entries.groupBy { it.columnKey }.keys
         allColumnsKeys.forEach { columnKey ->
-            groupedByRow.forEach { (rowKey, cells) ->
+            groupedByRow.forEach { [rowKey, cells] ->
                 val isPresent: Boolean = cells.rForEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
                 if (!isPresent) _entries.add(Cell(rowKey, columnKey, null))
             }
@@ -1221,7 +1221,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
     override fun toString(): String {
         if (isEmpty()) return "Empty Table"
         val width = valuesByColumns.mapKeys { it.key.toString() }
-            .mapValues { (key, list) ->
+            .mapValues { [key, list] ->
                 (list + key).maxOf { it?.toString()?.length ?: 0 }
             }
         val keyWidth = rowKeys.maxOfOrNull { it.toString().length } ?: 0
@@ -1247,7 +1247,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
                 append("╍".repeat(width[col]!!)).append("┿")
             setLength(length - 1)
             append("┫")
-            for ((index, row) in rowKeys.withIndex()) {
+            for ([index, row] in rowKeys.withIndex()) {
                 appendLine()
                 append("┃").append(ANSI.BOLD + row.toString().padEnd(keyWidth) + ANSI.RESET).append("┋")
                 for (column in columnKeys) {
@@ -1794,7 +1794,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
         val groupedByRow = _entries.groupBy { it.rowKey }
         val allColumnsKeys = _entries.groupBy { it.columnKey }.keys
         allColumnsKeys.forEach { columnKey ->
-            groupedByRow.forEach { (rowKey, cells) ->
+            groupedByRow.forEach { [rowKey, cells] ->
                 val isPresent: Boolean = cells.rForEach { if (it.columnKey == columnKey) breakLoop(true) } ?: false
                 if (!isPresent) _entries.add(MCell(rowKey, columnKey, null))
             }
@@ -2427,7 +2427,7 @@ fun <R, C, V> mTableOf(entries: Iterable<CellInterface<R, C, V?>>): MTable<R, C,
  */
 fun <R, C, V> Map<R, Map<C, V>>.toTable(): Table<R, C, V?> {
     val list = mutableListOf<Cell<R, C, V?>>()
-    forEach { (rowKey, columnMap) -> columnMap.forEach { (columnKey, value) -> list.add(Cell(rowKey, columnKey, value)) } }
+    forEach { [rowKey, columnMap] -> columnMap.forEach { [columnKey, `value`] -> list.add(Cell(rowKey, columnKey, value)) } }
     return Table(list)
 }
 /**

@@ -6,9 +6,9 @@ package dev.tommasop1804.kutils
 
 import Break
 import Continue
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.constants.SortDirection
-import dev.tommasop1804.kutils.exceptions.TooManyElementsException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -258,7 +258,7 @@ inline fun <E> Sequence<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) =
  */
 inline fun <E> Sequence<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
     with(LoopContext()) {
-        for ((index, element) in withIndex()) {
+        for ([index, element] in withIndex()) {
             try {
                 block(index, element)
             } catch (b: Break) {
@@ -311,7 +311,7 @@ inline fun <E, R> Sequence<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E
 @Suppress("UNCHECKED_CAST")
 inline fun <E, R> Sequence<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
     with(LoopContext()) {
-        for ((index, element) in withIndex()) {
+        for ([index, element] in withIndex()) {
             try {
                 action(index, element)
             } catch (b: Break) {

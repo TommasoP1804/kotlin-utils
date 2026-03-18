@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.geography.Country
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.classes.geography.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -188,6 +188,57 @@ value class Bic private constructor(val value: String) : CharSequence {
         }
     }
 
+    /**
+     * Retrieves the primary component of the BIC (Bank Identifier Code).
+     *
+     * This component typically represents the primary identifier part of the BIC value.
+     * It is extracted from the underlying data structure and returned as a single value.
+     *
+     * @return The primary component of the BIC.
+     * @since 3.1.0
+     */
+    operator fun component1() = value
+    /**
+     * Provides the second component of the BIC (Business Identifier Code), specifically the bank code.
+     * 
+     * This method allows destructuring declarations, enabling the bank code to be retrieved directly 
+     * when unpacking a `Bic` instance.
+     *
+     * @return The bank code as part of the BIC.
+     * @since 3.1.0
+     */
+    operator fun component2() = bankCode
+    /**
+     * Provides destructuring support for extracting the country code from a BIC (Bank Identifier Code).
+     *
+     * This operator function corresponds to the third component in a destructuring declaration.
+     *
+     * @return The country code of the BIC as a string.
+     * @since 3.1.0
+     */
+    operator fun component3() = country
+    /**
+     * Provides the destructuring component that represents the `locationCode` field of the BIC.
+     *
+     * This operator function is used to retrieve the fourth component of the BIC representation
+     * during destructuring declarations or other contexts that utilize component functions.
+     *
+     * @return The `locationCode` associated with this BIC.
+     * @since 3.1.0
+     */
+    operator fun component4() = locationCode
+    /**
+     * Retrieves the branch code component of this BIC (Bank Identifier Code).
+     *
+     * This method is a part of the `componentN` family of functions providing
+     * destructuring capabilities. Specifically, `component5` corresponds to 
+     * the branch code segment of the BIC.
+     *
+     * @return The branch code component of this BIC.
+     * @since 3.1.0
+     */
+    operator fun component5() = branchCode
+    
     /**
      * Returns the character at the specified [index] in the underlying string representation of the BIC.
      *

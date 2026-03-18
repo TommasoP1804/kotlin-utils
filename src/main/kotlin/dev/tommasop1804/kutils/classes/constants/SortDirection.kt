@@ -1,6 +1,6 @@
 package dev.tommasop1804.kutils.classes.constants
 
-import dev.tommasop1804.kutils.unaryMinus
+import dev.tommasop1804.kutils.*
 
 /**
  * Enum class representing the direction of sorting order.
@@ -9,7 +9,7 @@ import dev.tommasop1804.kutils.unaryMinus
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-enum class SortDirection(vararg val operators: String, val symbol: Char) {
+enum class SortDirection(val operators: StringSet, val symbol: Char) {
     /**
      * Represents an ascending sorting order within the SortDirection enumeration.
      *
@@ -18,7 +18,7 @@ enum class SortDirection(vararg val operators: String, val symbol: Char) {
      *
      * @since 1.0.0
      */
-    ASCENDING("as", "asc", "ascending", symbol = '↑'),
+    ASCENDING(setOf("as", "asc", "ascending"), symbol = '↑'),
     /**
      * Represents the descending sorting order.
      *
@@ -27,7 +27,7 @@ enum class SortDirection(vararg val operators: String, val symbol: Char) {
      *
      * @since 1.0.0
      */
-    DESCENDING("de", "des", "desc", "descending", symbol = '↓');
+    DESCENDING(setOf("de", "des", "desc", "descending"), symbol = '↓');
 
     companion object {
         /**
@@ -54,4 +54,26 @@ enum class SortDirection(vararg val operators: String, val symbol: Char) {
          */
         infix fun ofSymbol(symbol: Char) = entries.find { it.symbol == symbol }
     }
+    
+    /**
+     * Provides the first component of the `SortDirection` class for destructuring declarations.
+     *
+     * This function enables the `operators` property of `SortDirection` to be accessed 
+     * in a concise manner during destructuring. It is particularly useful when 
+     * working with tuples or extracting specific data from the `SortDirection` class.
+     *
+     * @return The `operators` property of the `SortDirection` class.
+     * @since 3.1.0
+     */
+    operator fun component1() = operators
+    /**
+     * Provides the symbol representation of the `SortDirection` class as the second component in destructuring declarations.
+     *
+     * This function is an operator function that supports destructuring of `SortDirection` instances,
+     * allowing access to the `symbol` property as the second component.
+     *
+     * @return The symbol representing the `SortDirection` instance.
+     * @since 3.1.0
+     */
+    operator fun component2() = symbol
 }

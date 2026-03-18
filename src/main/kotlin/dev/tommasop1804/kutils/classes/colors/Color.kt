@@ -9,16 +9,13 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.colors.Color.Companion.ofRGB
-import dev.tommasop1804.kutils.classes.constants.TextCase
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
-import dev.tommasop1804.kutils.classes.numbers.Hex
-import dev.tommasop1804.kutils.classes.numbers.Percentage
+import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.FULL
 import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.ZERO_PERCENT
-import dev.tommasop1804.kutils.classes.tuples.Quadruple
-import dev.tommasop1804.kutils.classes.tuples.Quintuple
-import dev.tommasop1804.kutils.exceptions.NoMatchingFormatException
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.classes.tuples.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -1345,7 +1342,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
             val q = brightness * (1 - saturation * f)
             val t = brightness * (1 - saturation * (1 - f))
 
-            val (r, g, b) = when (i % 6) {
+            val [r, g, b] = when (i % 6) {
                 0 -> Triple(brightness, t, p)
                 1 -> Triple(q, brightness, p)
                 2 -> Triple(p, brightness, t)

@@ -1,15 +1,9 @@
 package dev.tommasop1804.kutils.classes.coding
 
-import dev.tommasop1804.kutils.DOT
-import dev.tommasop1804.kutils.StringList
-import dev.tommasop1804.kutils.classes.constants.TextCase
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
-import dev.tommasop1804.kutils.equalsIgnoreCase
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.unaryMinus
-import dev.tommasop1804.kutils.unaryPlus
 import java.time.Year
-import kotlin.collections.map
 
 /**
  * Enum representing major programming and markup languages with relevant information.
@@ -892,6 +886,22 @@ enum class Language(
         Category.MARKUP
     );
 
+    constructor(
+        displayName: String,
+        yearCreated: Int,
+        paradigms: StringList,
+        fileExtensions: StringList,
+        description: String,
+        category: Category
+    ) : this(
+        displayName,
+        dev.tommasop1804.kutils.Year(yearCreated),
+        paradigms,
+        fileExtensions,
+        description,
+        category
+    )
+
     companion object {
         /**
          * A list of display names for all languages (programming, markup, data serialization, etc.).
@@ -959,21 +969,70 @@ enum class Language(
         infix fun byCategory(category: Category) = entries.filter { it.category == category }.toSet()
     }
 
-    constructor(
-        displayName: String,
-        yearCreated: Int,
-        paradigms: StringList,
-        fileExtensions: StringList,
-        description: String,
-        category: Category
-    ) : this(
-        displayName,
-        dev.tommasop1804.kutils.Year(yearCreated),
-        paradigms,
-        fileExtensions,
-        description,
-        category
-    )
+    /**
+     * Deconstructs the object to provide its `displayName` as the first component.
+     *
+     * This function is typically used in conjunction with destructuring declarations 
+     * to extract specific properties from the object in a concise manner.
+     *
+     * @return The `displayName` of the object, representing its first component in 
+     *         destructuring operations.
+     * @since 3.1.0
+     */
+    operator fun component1() = displayName
+    /**
+     * Provides the `component2` functionality for destructuring declarations.
+     * This operator allows accessing the `yearCreated` property as the second
+     * component in a destructuring assignment or when used directly.
+     *
+     * @return The value of the `yearCreated` property.
+     * @since 3.1.0
+     */
+    operator fun component2() = yearCreated
+    /**
+     * Returns the third component of the object when destructuring is used.
+     *
+     * This operator function allows the object to provide the value of its 
+     * third component, typically used in destructuring declarations.
+     *
+     * @return The value of the third component, represented by `paradigms`.
+     * @since 3.1.0
+     */
+    operator fun component3() = paradigms
+    /**
+     * Operator function `component4` that retrieves the fourth component of a data class
+     * or destructured object, representing the `fileExtensions` property.
+     *
+     * This function enables usage of the "destructuring declaration" syntax, 
+     * allowing you to extract the `fileExtensions` component directly.
+     *
+     * @return The value of the `fileExtensions` property.
+     * @since 3.1.0
+     */
+    operator fun component4() = fileExtensions
+    /**
+     * Provides the fifth component in a destructuring declaration, corresponding to the `description` property.
+     *
+     * This operator function allows the use of the "destructuring declaration" syntax to retrieve
+     * the value of the `description` property as the fifth component.
+     *
+     * @return The value of the `description` property.
+     * @since 3.1.0
+     */
+    operator fun component5() = description
+    /**
+     * Provides the sixth component of a destructured object.
+     *
+     * This operator function allows the usage of the `component6` call in a
+     * destructuring declaration. It typically represents the property 
+     * `category` within the associated object and is used to extract it 
+     * when the object is destructured.
+     * 
+     * @return The value of the `category` property.
+     * 
+     * @since 3.1.0
+     */
+    operator fun component6() = category
 
     /**
      * Represents a classification of programming-related categories.

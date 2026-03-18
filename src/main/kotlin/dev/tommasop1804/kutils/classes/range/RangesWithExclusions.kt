@@ -5,7 +5,7 @@
 package dev.tommasop1804.kutils.classes.range
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 
 /**
  * Represents a closed range `[start, endInclusive]` with additional exclusions.
@@ -167,6 +167,36 @@ class ClosedRangeWithExclusions<T : Comparable<T>>(
     fun clearExclusions() {
         excluded.clear()
     }
+
+    /**
+     * Retrieves the `start` value of the range.
+     *
+     * @return The starting value of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Retrieves the `endInclusive` property of the range.
+     *
+     * This operator function provides destructuring capabilities for instances
+     * of the class. When used in a destructuring declaration, it represents the
+     * ending element of the inclusive range.
+     *
+     * @return The `endInclusive` property of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endInclusive
+    /**
+     * Retrieves the third component of the `ClosedRangeWithExclusions` object.
+     *
+     * This operator function allows destructuring assignment to access the `excluded` property
+     * as the third component of the range. The `excluded` property contains the list of values
+     * explicitly excluded from the range.
+     *
+     * @return The `excluded` list, representing the elements explicitly excluded from the range.
+     * @since 3.1.0
+     */
+    operator fun component3() = excluded
 }
 
 /**
@@ -343,6 +373,39 @@ class ClosedRangeWithConditions<T : Comparable<T>>(
     fun clearConditions() {
         conditions.clear()
     }
+
+    /**
+     * Extracts and returns the `start` value of the range.
+     *
+     * This operator function enables destructuring declarations to access the starting 
+     * value of the range directly. It is commonly used in cases where a range is deconstructed 
+     * into its individual components.
+     *
+     * @return The starting value (`start`) of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Returns the `endInclusive` value of the range.
+     *
+     * This operator function is part of the component functions typically used for destructuring declarations.
+     * It enables access to the `endInclusive` property when destructuring an instance of the containing class.
+     *
+     * @return The `endInclusive` value of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endInclusive
+    /**
+     * Retrieves the third component of the range, which represents the additional conditions.
+     *
+     * This operator function is used to destructure the range object, providing access to the
+     * `conditions` that are associated with the range. These conditions define additional 
+     * constraints that influence membership within the range.
+     *
+     * @return The set of additional conditions associated with the range.
+     * @since 3.1.0
+     */
+    operator fun component3() = conditions
 }
 
 /**
@@ -525,6 +588,39 @@ class OpenEndRangeWithExclusions<T : Comparable<T>>(
     fun clearExclusions() {
         excluded.clear()
     }
+    
+    /**
+     * Retrieves the starting value of the range.
+     *
+     * This operator function allows destructuring the range to access its `start` value
+     * as the first component during operations such as destructuring declarations.
+     *
+     * @return The starting value of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Retrieves the second component of the range, which represents the exclusive upper bound.
+     *
+     * This operator function provides destructuring functionality for the `OpenEndRangeWithExclusions` class, 
+     * allowing the `endExclusive` value to be obtained as the second component.
+     *
+     * @return The exclusive upper bound of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endExclusive
+    /**
+     * Retrieves the third component of the range. 
+     * 
+     * This operator function is used in destructuring declarations or to specifically get the 
+     * `excluded` list associated with this range. The `excluded` list contains elements that are 
+     * explicitly excluded from being considered part of the range, even if they fall within the 
+     * range bounds defined by `start` and `endExclusive`.
+     *
+     * @return The list of excluded elements for this range.
+     * @since 3.1.0
+     */
+    operator fun component3() = excluded
 }
 
 /**
@@ -684,6 +780,37 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
     fun clearConditions() {
         conditions.clear()
     }
+
+    /**
+     * Retrieves the starting element (`start`) of the range.
+     *
+     * This function is a component function, primarily used in destructuring declarations,
+     * to access the starting value of the range represented by this instance.
+     *
+     * @return The starting element of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Provides the second component of the range, which represents the exclusive upper bound.
+     *
+     * The `component2` operator function allows for destructuring declarations,
+     * enabling the retrieval of the range's `endExclusive` value in contexts where destructuring is used.
+     *
+     * @return The `endExclusive` value of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endExclusive
+    /**
+     * Provides access to the third component of the `OpenEndRangeWithConditions`.
+     *
+     * This operator function enables the use of destructuring declarations to retrieve
+     * the `conditions` associated with the range.
+     *
+     * @return The `conditions` of the range, represented as a list of predicates.
+     * @since 3.1.0
+     */
+    operator fun component3() = conditions
 }
 
 /**
@@ -723,6 +850,28 @@ class IntRangeWithExclusions(
             if (endInclusive == Int.MAX_VALUE) error("Cannot return the exclusive upper bound of a range that includes MAX_VALUE.")
             return endInclusive + 1
         }
+    
+    /**
+     * Retrieves the first valid element of the range, considering any exclusions.
+     *
+     * This property computes and returns the first element in the range that is not excluded. 
+     * If all elements are excluded or the range is empty, its behavior may vary depending 
+     * on the specific implementation of the range.
+     *
+     * @since 3.1.0
+     */
+    val first get() = first()
+    /**
+     * Retrieves the last value of the range, adjusted to account for any exclusions or modifications.
+     *
+     * This property calculates the last valid element by considering the specified exclusions 
+     * and range boundaries. If exclusions prevent identification of a valid "last" element,  
+     * additional logic may determine an appropriate fallback behavior.
+     *
+     * @return the last valid integer within the range, considering exclusions.
+     * @since 3.1.0
+     */
+    val last get() = last()
 
     companion object {
         /**
@@ -939,6 +1088,37 @@ class IntRangeWithExclusions(
     fun clearExclusions() {
         excluded.clear()
     }
+
+    /**
+     * Provides the starting value of the range.
+     *
+     * This operator function is defined to enable destructuring declarations for the `IntRangeWithExclusions` class.
+     * It retrieves the first component of the range, which corresponds to the `start` property.
+     *
+     * @return the starting value of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Provides access to the `endInclusive` property of the range instance.
+     *
+     * This operator function allows destructuring declarations to retrieve the ending value 
+     * of the range, inclusive of its bounds. It is the second component in the destructuring sequence.
+     *
+     * @return the ending (inclusive) value of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endInclusive
+    /**
+     * Retrieves the third component of the `IntRangeWithExclusions` instance.
+     *
+     * This function is typically used in destructuring declarations to access the value of `excluded`, 
+     * which represents the integers explicitly excluded from the range.
+     *
+     * @return the collection of excluded integers within the range.
+     * @since 3.1.0
+     */
+    operator fun component3() = excluded
 }
 
 /**
@@ -981,6 +1161,31 @@ class IntRangeWithConditions(
             if (endInclusive == Int.MAX_VALUE) error("Cannot return the exclusive upper bound of a range that includes MAX_VALUE.")
             return endInclusive + 1
         }
+    
+    /**
+     * Retrieves the first non-excluded element in the range.
+     *
+     * This property evaluates the range and conditions to return the first integer value
+     * that is not excluded by the specified conditions. If no such element exists, a 
+     * `NoSuchElementException` may be thrown.
+     *
+     * @throws NoSuchElementException If the range is empty or all elements are excluded.
+     * @return The first non-excluded integer value in the range.
+     * @since 3.1.0
+     */
+    val first get() = first()
+    /**
+     * Retrieves the last value in the range that is not excluded by any condition.
+     *
+     * This property computes the last integer within the range [start, endInclusive] that does not
+     * satisfy any of the exclusion conditions defined in the `conditions` property. If the range is empty
+     * or all values are excluded, an appropriate exception is thrown.
+     *
+     * @return The last non-excluded integer in the range.
+     * @throws NoSuchElementException If the range is empty or all values are excluded by the conditions.
+     * @since 3.1.0
+     */
+    val last get() = last()
 
     companion object {
         /**
@@ -1195,4 +1400,683 @@ class IntRangeWithConditions(
     fun clearConditions() {
         conditions.clear()
     }
+
+    /**
+     * Retrieves the starting value of the range.
+     *
+     * This component function is used to destructure the `IntRangeWithConditions` object,
+     * providing access to the `start` property of the range.
+     *
+     * @return The starting value (`start`) of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Retrieves the upper bound (`endInclusive`) of the range.
+     *
+     * The `component2()` operator function allows destructuring declarations to access the 
+     * `endInclusive` value of the range. This represents the inclusive end of the range.
+     *
+     * @return The `endInclusive` value of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endInclusive
+    /**
+     * Returns the third component of the range, which represents the conditions applied
+     * to the range.
+     *
+     * The `conditions` property contains a collection of predicates used to filter
+     * or exclude specific integers from the range. These conditions define additional
+     * constraints beyond the start and end values of the range.
+     *
+     * This function is part of the destructuring declarations mechanism and allows
+     * direct access to the `conditions` collection of the range.
+     * 
+     * @return The collection of conditions applied to the range.
+     * @since 3.1.0
+     */
+    operator fun component3() = conditions
+}
+
+/**
+ * Represents a range of `Long` values with additional support for excluding specific elements.
+ *
+ * The class allows the definition of a range between a starting value (`start`) and an inclusive
+ * ending value (`endInclusive`), along with a collection of excluded elements (`excluded`) that
+ * will not be included in range operations or iteration.
+ *
+ * @property start The starting value of the range.
+ * @property endInclusive The inclusive ending value of the range.
+ * @property endExclusive A representation of the range's exclusive upper bound.
+ * @property first The first valid value in the range, considering exclusions.
+ * @property last The last valid value in the range, considering exclusions.
+ * @property excluded A collection of values that are excluded from the range.
+ *
+ * @since 3.1.0
+ * @author Tommaso Pastorelli
+ */
+class LongRangeWithExclusions(
+    override val start: Long,
+    override val endInclusive: Long,
+    val excluded: LongMList = emptyMList()
+) : ClosedRange<Long>, OpenEndRange<Long>, Iterable<Long> {
+    
+    /**
+     * Represents the exclusive upper bound of the range.
+     *
+     * This property returns a value that is one greater than the `endInclusive` value of the range,
+     * provided the `endInclusive` value is not `Long.MAX_VALUE`. If the `endInclusive` value is
+     * `Long.MAX_VALUE`, invoking this property will throw an exception as it is impossible
+     * to represent the exclusive upper bound in such a case.
+     *
+     * @deprecated This property is deprecated and may throw an exception when the range includes `Long.MAX_VALUE`.
+     * It is recommended to use the `endInclusive` property instead, which does not throw an exception.
+     * @since 3.1.0
+     */
+    @Deprecated("Can throw an exception when it's impossible to represent the value with Int type, for example, when the range includes MAX_VALUE. It's recommended to use 'endInclusive' property that doesn't throw.")
+    override val endExclusive: Long
+        get() {
+            if (endInclusive == Long.MAX_VALUE) error("Cannot return the exclusive upper bound of a range that includes MAX_VALUE.")
+            return endInclusive + 1
+        }
+
+    /**
+     * Retrieves the first valid element of the range, considering any exclusions.
+     *
+     * This property computes and returns the first element in the range that is not excluded. 
+     * If all elements are excluded or the range is empty, its behavior may vary depending 
+     * on the specific implementation of the range.
+     *
+     * @since 3.1.0
+     */
+    val first get() = first()
+    /**
+     * Retrieves the last value of the range, adjusted to account for any exclusions or modifications.
+     *
+     * This property calculates the last valid element by considering the specified exclusions 
+     * and range boundaries. If exclusions prevent identification of a valid "last" element,  
+     * additional logic may determine an appropriate fallback behavior.
+     *
+     * @return the last valid long within the range, considering exclusions.
+     * @since 3.1.0
+     */
+    val last get() = last()
+
+    companion object {
+        /**
+         * Creates a new `LongRangeWithExclusions` by excluding the specified element from the current `LongRange`.
+         *
+         * This function generates a range based on the current `LongRange` (`start` to `endInclusive`) 
+         * and excludes the given `element`. The returned range behaves as an immutable representation
+         * of the original range with the specified exclusions applied.
+         *
+         * @param element the `Long` value to be excluded from the range.
+         * @return a `LongRangeWithExclusions` representing the range with the specified value excluded.
+         * @since 3.1.0
+         */
+        infix fun LongRange.exclude(element: Long) =
+            LongRangeWithExclusions(start, endInclusive, element.asSingleMList())
+        
+        /**
+         * Creates a new `LongRangeWithExclusions` object by excluding specified elements from the current range.
+         *
+         * This function returns an immutable range that behaves like the original `LongRange` but skips over
+         * the specified elements when iterating or performing range operations.
+         *
+         * @param elements The elements to exclude from the range. These elements will not be present 
+         * in the resulting `LongRangeWithExclusions`.
+         * @since 3.1.0
+         */
+        fun LongRange.exclude(vararg elements: Long) =
+            LongRangeWithExclusions(start, endInclusive, elements.toMList())
+        
+        /**
+         * Creates a new `LongRangeWithExclusions` by excluding the specified elements from this range.
+         *
+         * This function takes an iterable collection of long values and excludes them from the current range,
+         * resulting in a modified representation of the range that accounts for the exclusions.
+         *
+         * @param elements An iterable collection of `Long` values to be excluded from the range.
+         * @since 3.1.0
+         */
+        infix fun LongRange.exclude(elements: Iterable<Long>) =
+            LongRangeWithExclusions(start, endInclusive, elements.toMList())
+    }
+    
+    /**
+     * Returns an iterator over the elements in the given range, excluding the specified values.
+     *
+     * The iterator skips any values present in the `excluded` collection 
+     * and only traverses values between `start` and `endInclusive` that are not excluded.
+     *
+     * @return A [LongIterator] that iterates over the filtered range of values.
+     * @since 3.1.0
+     */
+    override fun iterator(): LongIterator = object : LongIterator() {
+        /**
+         * Tracks the current position within the range iteration, starting from the initial value `start`.
+         *
+         * This variable is used internally to maintain and update the current position as the iteration progresses.
+         * It skips values that are part of the `excluded` set and ensures iteration stops at `endInclusive`.
+         *
+         * @since 3.1.0
+         */
+        private var current = start
+        
+        /**
+         * Determines whether there are more elements in the range that are not excluded.
+         *
+         * The method iterates through the range to check for the next valid element
+         * that is not part of the excluded set and within the bounds of the range.
+         *
+         * @return `true` if there is at least one more valid element in the range that is not excluded;
+         *         `false` otherwise.
+         * @since 3.1.0
+         */
+        override fun hasNext(): Boolean {
+            var next = current
+            while (next <= endInclusive && next in excluded) {
+                next++
+            }
+            return next <= endInclusive
+        }
+        
+        /**
+         * Returns the next `Long` value in the range that is not part of the excluded set.
+         *
+         * This method increments the current value until it finds a value that is both within the range 
+         * and not part of the excluded set. If no such value exists, a `NoSuchElementException` is thrown.
+         *
+         * @return The next `Long` value in the range, skipping excluded values.
+         * @throws NoSuchElementException If no valid values are left in the range.
+         * @since 3.1.0
+         */
+        override fun nextLong(): Long {
+            while (current <= endInclusive && current in excluded) {
+                current++
+            }
+            if (current > endInclusive)
+                throw NoSuchElementException()
+            return current++
+        }
+    }
+    
+    /**
+     * Checks if the specified value is within the defined range, excluding certain values.
+     *
+     * The method determines whether the given `value` lies inclusively within the range 
+     * defined by `start` and `endInclusive`, but ensures the value is not within the 
+     * `excluded` elements of the range.
+     *
+     * @param value The value to check for presence within the range.
+     * @return `true` if the value is within the range and not excluded, otherwise `false`.
+     * @since 3.1.0
+     */
+    override operator fun contains(value: Long) = value in start..endInclusive && value !in excluded
+    
+    /**
+     * Checks whether the range is empty.
+     *
+     * A range is considered empty if its starting point is greater than its end point.
+     *
+     * @return `true` if the range is empty, `false` otherwise.
+     * @since 3.1.0
+     */
+    @CannotCheckExcludedElements
+    override fun isEmpty() = start > endInclusive
+    
+    /**
+     * Removes the specified element from the collection of excluded elements.
+     *
+     * The method allows you to mark a particular element as included again 
+     * by removing it from the excluded elements list within the instance.
+     *
+     * @param element The element to remove from the exclusion list.
+     * @since 3.1.0
+     */
+    infix fun exclude(element: Long) {
+        excluded.remove(element)
+    }
+    /**
+     * Adds the specified `Long` elements to the list of exclusions.
+     *
+     * This function updates the state of exclusions by appending all provided elements
+     * to the list of excluded values. The `Long` values passed as arguments 
+     * are converted to a list and added to the exclusion list.
+     *
+     * @param elements A vararg parameter representing the `Long` values to be excluded.
+     * @since 3.1.0
+     */
+    fun exclude(vararg elements: Long) {
+        excluded.addAll(elements.toList())
+    }
+    /**
+     * Adds the specified iterable of `Long` elements to the exclusions.
+     *
+     * This function allows the exclusion of multiple `Long` values from the range by adding
+     * all elements in the provided iterable to the excluded set.
+     *
+     * @param elements an iterable collection of `Long` values to be excluded.
+     * @since 3.1.0
+     */
+    infix fun exlude(elements: Iterable<Long>) {
+        excluded.addAll(elements)
+    }
+    /**
+     * Removes the specified element from the excluded set.
+     *
+     * Subtracts the given element from the collection of excluded elements, 
+     * ensuring it is no longer part of the tracked set.
+     *
+     * @param element The element to remove from the excluded set.
+     * @since 3.1.0
+     */
+    operator fun minus(element: Long) {
+        excluded.add(element)
+    }
+    /**
+     * Removes the specified elements from the existing collection by adding them to the exclusion list.
+     *
+     * @param elements An iterable collection of Long values to be excluded.
+     * @since 3.1.0
+     */
+    operator fun minus(elements: Iterable<Long>) {
+        excluded.addAll(elements)
+    }
+    
+    /**
+     * Removes the specified element from the list of excluded values.
+     *
+     * This method modifies the existing exclusions by removing the provided element, if it exists
+     * within the list of exclusions.
+     *
+     * @param element The value to be removed from the exclusions.
+     * @since 3.1.0
+     */
+    infix fun removeExclusion(element: Long) {
+        excluded.remove(element)
+    }
+    /**
+     * Removes the specified elements from the collection of excluded elements.
+     *
+     * This function accepts a variable number of `Long` arguments and attempts to remove 
+     * each of them from the internal list of currently excluded elements.
+     *
+     * @param elements Zero or more `Long` values to be removed from the exclusions.
+     * @since 3.1.0
+     */
+    fun removeExclusions(vararg elements: Long) {
+        excluded.removeAll(elements.toList())
+    }
+    /**
+     * Removes the specified elements from the excluded set of this range.
+     *
+     * This function takes an iterable of `Long` elements and ensures that each element 
+     * is removed from the exclusions in the current range. If the elements are not present 
+     * in the excluded set, no changes are made for those elements.
+     *
+     * @param elements the iterable collection of `Long` values to be removed from the excluded set.
+     * @since 3.1.0
+     */
+    infix fun removeExclusions(elements: Iterable<Long>) {
+        excluded.removeAll(elements.toSet())
+    }
+    
+    /**
+     * Clears all currently excluded elements within the range.
+     *
+     * This method removes all elements from the exclusion set, effectively resetting any exclusions
+     * that have been applied to the range.
+     *
+     * @since 3.1.0
+     */
+    fun clearExclusions() {
+        excluded.clear()
+    }
+    
+    /**
+     * Provides the starting value of the range represented by this instance.
+     *
+     * This operator function is typically used for destructuring declarations,
+     * to retrieve the `start` value of the range.
+     *
+     * @return The starting value of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Returns the `endInclusive` value of the range, representing the upper bound.
+     *
+     * This function is part of the `componentN` operator series and is typically used for destructuring declarations, 
+     * allowing convenient access to the `endInclusive` property of the `LongRangeWithExclusions` instance.
+     *
+     * @return The `endInclusive` value of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endInclusive
+    /**
+     * Provides access to the third component of the `LongRangeWithExclusions`, which represents the `excluded` elements
+     * within the range.
+     *
+     * This operator function is commonly used in conjunction with destructuring declarations, allowing users to
+     * retrieve the excluded elements in the range when destructuring an instance of `LongRangeWithExclusions`.
+     *
+     * @return The `excluded` elements of the range.
+     * @since 3.1.0
+     */
+    operator fun component3() = excluded
+}
+
+/**
+ * Represents a range of `Long` values with additional filtering conditions.
+ *
+ * This class extends the functionality of a range by allowing predicates to be
+ * specified, which can filter out certain values from the range. The range is
+ * defined by a `start` value and an `endInclusive` value, and it supports
+ * iteration, filtering, and condition-based element exclusion.
+ *
+ * @property start The starting value of the range.
+ * @property endInclusive The inclusive upper bound of the range.
+ * @property conditions A list of predicates applied to filter elements in the range.
+ * @property endExclusive A derived property representing the exclusive upper limit.
+ * @property first Represents the first valid value in the range.
+ * @property last Represents the last valid value in the range.
+ * @since 3.1.0
+ * @author Tommaso Pastorelli
+ */
+class LongRangeWithConditions(
+    override val start: Long,
+    override val endInclusive: Long,
+    val conditions: MList<Predicate<Long>> = emptyMList(),
+) : ClosedRange<Long>, OpenEndRange<Long>, Iterable<Long> {
+    /**
+     * The exclusive upper bound of the range.
+     *
+     * This property provides the value immediately following the `endInclusive` value of the range.
+     * 
+     * @throws IllegalStateException If the `endInclusive` value is `Long.MAX_VALUE`, as it's not possible
+     * to represent the exclusive upper bound in this case without causing overflow. In such scenarios,
+     * it's recommended to use the `endInclusive` property instead.
+     * 
+     * @return The smallest `Long` value greater than the `endInclusive` value of the range.
+     * 
+     * @since 3.1.0
+     */
+    @Deprecated("Can throw an exception when it's impossible to represent the value with Int type, for example, when the range includes MAX_VALUE. It's recommended to use 'endInclusive' property that doesn't throw.")
+    override val endExclusive: Long
+        get() {
+            if (endInclusive == Long.MAX_VALUE) error("Cannot return the exclusive upper bound of a range that includes MAX_VALUE.")
+            return endInclusive + 1
+        }
+    
+    /**
+     * A read-only property that retrieves the first element of a collection.
+     * The property delegates its call to the `first()` function, which returns
+     * the first element from the underlying collection or sequence.
+     *
+     * @throws NoSuchElementException if the collection is empty.
+     * @since 3.1.0
+     */
+    val first get() = first()
+    val last get() = last()
+
+    companion object {
+        /**
+         * Extends a `LongRange` by applying a condition to exclude specific elements 
+         * based on the provided predicate, producing an instance of `LongRangeWithConditions`.
+         *
+         * The specified predicate is used to determine which elements in the range 
+         * should be excluded. This allows for the creation of a range with custom 
+         * constraints.
+         *
+         * @param element the predicate used to exclude elements from the range. 
+         *        Elements that satisfy this predicate will be excluded.
+         * @since 3.1.0
+         */
+        infix fun LongRange.exclude(element: Predicate<Long>) =
+            LongRangeWithConditions(start, endInclusive, element.asSingleMList())
+        
+        /**
+         * Creates a new `LongRangeWithConditions` by excluding specific elements that satisfy the given predicates.
+         *
+         * @param elements The predicate functions that define the exclusion conditions. Each predicate is applied
+         *                 to the elements of the original range to determine whether they should be excluded 
+         *                 from the resulting range.
+         * @return A `LongRangeWithConditions` with specified exclusion conditions applied.
+         * @since 3.1.0
+         */
+        fun LongRange.exclude(vararg elements: Predicate<Long>) =
+            LongRangeWithConditions(start, endInclusive, elements.toMList() as MList<Predicate<Long>>)
+        
+        /**
+         * Filters the current `LongRange` by excluding elements that match any of the specified predicates.
+         *
+         * This function creates a new `LongRangeWithConditions` instance with conditions applied based on the provided predicates.
+         * The resulting range excludes elements that satisfy one or more of the given conditions.
+         *
+         * @param elements An iterable collection of predicates of type `Predicate<Long>`. Each predicate defines a condition
+         *                 for excluding elements from the range.
+         * @return A new instance of `LongRangeWithConditions` with the specified exclusion conditions applied.
+         * @since 3.1.0
+         */
+        infix fun LongRange.exclude(elements: Iterable<Predicate<Long>>) =
+            LongRangeWithConditions(start, endInclusive, elements.toMList())
+    }
+    
+    /**
+     * Returns an iterator over the elements of a sequence of `Long` values, allowing iteration through a range
+     * with additional conditions for exclusion.
+     *
+     * @return A `LongIterator` that iterates over the specified range, skipping values excluded by custom conditions.
+     * @since 3.1.0
+     */
+    override fun iterator(): LongIterator = object : LongIterator() {
+        /**
+         * Represents the current position within the range being iterated.
+         *
+         * This variable is initialized with the starting value of the range and 
+         * is incremented during the iteration process to track the next value.
+         * It is adjusted to skip values excluded by defined conditions.
+         *
+         * @since 3.1.0
+         */
+        private var current = start
+        
+        /**
+         * Determines whether the given value is excluded based on the defined conditions.
+         *
+         * @param value the value to be checked against the exclusion conditions.
+         * @return `true` if the value meets any of the exclusion conditions; `false` otherwise.
+         * @since 3.1.0
+         */
+        private fun isExcluded(value: Long): Boolean =
+            conditions.any { it(value) }
+        
+        /**
+         * Checks if there are any remaining elements in the range that meet the specified conditions.
+         *
+         * The method evaluates whether there exists a "next" element within the range that is not excluded
+         * by the conditions defined in the current context. If such an element exists, the function returns true.
+         *
+         * @return `true` if there is a next element within the range that satisfies the conditions; `false` otherwise.
+         * @since 3.1.0
+         */
+        override fun hasNext(): Boolean {
+            var next = current
+            while (next <= endInclusive && isExcluded(next)) {
+                next++
+            }
+            return next <= endInclusive
+        }
+        
+        /**
+         * Returns the next valid `Long` in the sequence, skipping over any values excluded by the conditions.
+         *
+         * If there are no more valid elements remaining in the sequence, a `NoSuchElementException` is thrown.
+         *
+         * @return The next valid `Long` in the sequence.
+         * @throws NoSuchElementException if no valid elements are available in the range.
+         * @since 3.1.0
+         */
+        override fun nextLong(): Long {
+            while (current <= endInclusive && isExcluded(current)) {
+                current++
+            }
+            if (current > endInclusive)
+                throw NoSuchElementException()
+            return current++
+        }
+    }
+    
+    /**
+     * Checks if the specified value is contained within the range defined by `start` and `endInclusive`,
+     * and ensures that the value does not meet any condition specified in the `conditions` predicate list.
+     *
+     * @param value The value to check for containment.
+     * @return `true` if the value is within the range and does not satisfy any condition, otherwise `false`.
+     * @since 3.1.0
+     */
+    override operator fun contains(value: Long) = value in start..endInclusive && conditions.none { it(value) }
+    
+    /**
+     * Checks if the range is empty based on its boundaries.
+     *
+     * A range is considered empty if the start value is strictly greater than 
+     * the endInclusive value. This method provides an efficient mechanism 
+     * to determine whether the range has no valid elements.
+     *
+     * @return `true` if the range is empty, `false` otherwise.
+     *
+     * @since 3.1.0
+     */
+    @CannotCheckExcludedElements
+    override fun isEmpty() = start > endInclusive
+    
+    /**
+     * Adds one or more conditions as predicates that will be applied to a range of `Long` values.
+     *
+     * Each condition provided as a vararg parameter is added to the internal list of conditions, allowing
+     * the range to enforce additional constraints defined by these predicates.
+     *
+     * @param conditions One or more predicates of type `Predicate<Long>` to be added to the range's conditions. 
+     *                   Each predicate represents a condition that values within the range must satisfy.
+     * @since 3.1.0
+     */
+    fun conditions(vararg conditions: Predicate<Long>) {
+        this.conditions.addAll(conditions)
+    }
+    /**
+     * Adds the provided iterable of conditions to the current set of conditions.
+     * 
+     * This method appends all the predicates from the given iterable to the internal 
+     * list of conditions. These conditions are used to evaluate and filter elements 
+     * in the context of this object.
+     *
+     * @param conditions An iterable collection of predicates, where each predicate
+     * evaluates a `Long` value and returns a boolean result. Each predicate defines
+     * a specific condition to be applied.
+     * @since 3.1.0
+     */
+    infix fun conditions(conditions: Iterable<Predicate<Long>>) {
+        this.conditions.addAll(conditions)
+    }
+    /**
+     * Subtracts the given condition from the current set of conditions.
+     *
+     * @param condition a predicate that represents the condition to be removed from the list of conditions.
+     * @since 3.1.0
+     */
+    operator fun minus(condition: Predicate<Long>) {
+        conditions.add(condition)
+    }
+    /**
+     * Subtracts the given iterable of predicates from the existing collection of conditions.
+     *
+     * The method adds the specified predicates to the current list of conditions.
+     *
+     * @param condition an iterable collection of predicates to be added to the conditions list.
+     * @since 3.1.0
+     */
+    operator fun minus(condition: Iterable<Predicate<Long>>) {
+        conditions.addAll(condition)
+    }
+    
+    /**
+     * Removes a specific condition from the current list of conditions.
+     *
+     * This function searches for the given condition predicate in the existing
+     * collection of conditions and removes it if found.
+     *
+     * @param condition the predicate to remove from the list of conditions.
+     * @since 3.1.0
+     */
+    infix fun removeCondition(condition: Predicate<Long>) {
+        conditions.remove(condition)
+    }
+    /**
+     * Removes the specified conditions from the current set of conditions.
+     *
+     * @param conditions The conditions to be removed, provided as a vararg of `Predicate<Long>`.
+     * @since 3.1.0
+     */
+    fun removeConditions(vararg conditions: Predicate<Long>) {
+        this.conditions.removeAll(conditions.toSet())
+    }
+    /**
+     * Removes the specified conditions from the current set of conditions.
+     *
+     * This function takes an `Iterable` of predicates and removes all matching predicates
+     * from the existing conditions within the class.
+     *
+     * @param conditions the iterable collection of predicates to be removed. Each predicate is a function
+     * that evaluates a `Long` value and returns a boolean result.
+     * @since 3.1.0
+     */
+    infix fun removeConditions(conditions: Iterable<Predicate<Long>>) {
+        this.conditions.removeAll(conditions.toSet())
+    }
+    
+    /**
+     * Removes all conditions currently applied to the range.
+     *
+     * This method clears the internal collection of conditions associated with the range,
+     * leaving it in a state where no conditions are applied. After calling this method,
+     * the range will not have any filtering conditions affecting its behavior.
+     *
+     * @since 3.1.0
+     */
+    fun clearConditions() {
+        conditions.clear()
+    }
+    
+    /**
+     * Returns the starting value of the range.
+     *
+     * This is a component function typically used in destructuring declarations, allowing direct 
+     * access to the starting value `start` of the `LongRangeWithConditions` range.
+     *
+     * @return The starting value of the range.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Provides the upper bound of the range represented by this instance.
+     *
+     * This operator function is typically used in destructuring declarations to access the second component
+     * of the range, which corresponds to its inclusive upper limit.
+     *
+     * @return The value representing the inclusive upper limit of the range.
+     * @since 3.1.0
+     */
+    operator fun component2() = endInclusive
+    /**
+     * Retrieves the third component of the `LongRangeWithConditions`, specifically the `conditions`.
+     * 
+     * This function is a component operator that allows destructuring declarations
+     * to access the `conditions` associated with the object.
+     *
+     * @return The conditions of the range as defined in `LongRangeWithConditions`.
+     * @since 3.1.0
+     */
+    operator fun component3() = conditions
 }

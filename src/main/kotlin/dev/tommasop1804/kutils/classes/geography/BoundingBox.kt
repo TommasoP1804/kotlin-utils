@@ -5,10 +5,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.after
-import dev.tommasop1804.kutils.before
-import dev.tommasop1804.kutils.classes.geometry.Point
-import dev.tommasop1804.kutils.classes.geometry.Rectangle
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.geometry.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -229,6 +227,27 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
      * @since 1.0.0
      */
     fun copy(min: GeoCoordinate = this.min, max: GeoCoordinate = this.max) = BoundingBox(min, max)
+
+    /**
+     * Retrieves the `min` coordinate of the bounding box when destructuring the object.
+     *
+     * This operator function is commonly used during destructuring to extract
+     * the minimum coordinate of a `BoundingBox` instance. The `min` coordinate
+     * typically represents the lower-left corner of the bounding box.
+     *
+     * @return The `min` coordinate of the bounding box.
+     * @since 3.1.0
+     */
+    operator fun component1() = min
+    /**
+     * Provides the second component of the `BoundingBox` using destructuring declarations.
+     * This component corresponds to the `min` field of the `BoundingBox`,
+     * which represents the minimum coordinate value.
+     *
+     * @return The `min` coordinate of the `BoundingBox`.
+     * @since 3.1.0
+     */
+    operator fun component2() = min
 
     /**
      * Compares this `BoundingBox` instance with the specified `BoundingBox` instance.

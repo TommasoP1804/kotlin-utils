@@ -1,14 +1,12 @@
 package dev.tommasop1804.kutils.classes.pagination
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.InternalScope
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.builder.SqlQueryBuilder
-import dev.tommasop1804.kutils.classes.constants.SortDirection
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.builder.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.pagination.FilterOperator.*
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator.Category.*
-import dev.tommasop1804.kutils.classes.pagination.FilterOperator.GREATER_THAN
-import dev.tommasop1804.kutils.classes.pagination.FilterOperator.GREATER_THAN_OR_EQUALS
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.EntityManager
 import net.sf.jsqlparser.parser.feature.Feature
 import org.slf4j.Logger

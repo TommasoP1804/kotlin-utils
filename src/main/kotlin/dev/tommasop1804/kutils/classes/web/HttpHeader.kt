@@ -7,12 +7,11 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
-import dev.tommasop1804.kutils.classes.measure.DataSize
-import dev.tommasop1804.kutils.classes.measure.MeasureUnit
+import dev.tommasop1804.kutils.classes.measure.*
 import dev.tommasop1804.kutils.classes.measure.RMeasurement.Companion.ofUnit
-import dev.tommasop1804.kutils.classes.security.Jwt
+import dev.tommasop1804.kutils.classes.security.*
 import dev.tommasop1804.kutils.classes.security.Jwt.Companion.toJwt
-import dev.tommasop1804.kutils.classes.time.Duration
+import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asSecondsOfDuration
 import dev.tommasop1804.kutils.classes.time.TimeZone
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCEPT
@@ -35,8 +34,7 @@ import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.IF_MODIFIED_SINC
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.IF_UNMODIFIED_SINCE
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LAST_MODIFIED
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LOCATION
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.NoSuchHeaderException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -649,6 +647,26 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      * @since 2.1.0
      */
     fun valueEquals(other: StringList) = values == other.asSingleList()
+
+    /**
+     * Operator function `component1` for destructuring declarations.
+     * Returns the `name` property of the object.
+     *
+     * @return The `name` property value.
+     * @since 3.1.0
+     */
+    operator fun component1() = name
+    /**
+     * Provides the first component of a data structure for destructuring declarations.
+     *
+     * This operator function is used to retrieve and return the `values` property 
+     * from the current object when performing destructuring declarations. The precise 
+     * nature of `values` depends on the implementation within the class or data type.
+     *
+     * @return The `values` property of the object.
+     * @since 3.1.0
+     */
+    operator fun component2() = values
 }
 
 /**

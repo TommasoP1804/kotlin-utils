@@ -1,9 +1,6 @@
 package dev.tommasop1804.kutils.classes.time
 
-import dev.tommasop1804.kutils.MonoPair
-import dev.tommasop1804.kutils.expect
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.toYear
+import dev.tommasop1804.kutils.*
 import java.time.*
 import java.time.temporal.*
 import kotlin.reflect.KProperty
@@ -792,4 +789,124 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @since 1.0.0
      */
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name)
+
+    /**
+     * Provides the first component of a destructuring declaration.
+     *
+     * This method is typically used to extract the `firstDay` value 
+     * from an instance of the class in which it is defined during 
+     * a destructuring declaration.
+     *
+     * @return the `firstDay` value of the instance.
+     * @since 3.1.0
+     */
+    operator fun component1() = firstDay
+    /**
+     * Provides the second component of the destructuring declaration, typically representing the `lastDay` value. 
+     * This enables a concise way to unpack the associated data structure.
+     *
+     * @return The value of `lastDay`.
+     * 
+     * @since 3.1.0
+     */
+    operator fun component2() = lastDay
+    /**
+     * Operator function that enables destructuring declaration to retrieve the third component,
+     * specifically the week of the year associated with the instance.
+     *
+     * @return The week of the year as an integer.
+     * @since 3.1.0
+     */
+    operator fun component3() = weekOfYear
+    /**
+     * Provides the fourth component of a destructured declaration, typically representing
+     * the week of the month associated with this instance.
+     *
+     * This operator function is used in component destructuring, allowing the shorthand
+     * unpacking of the week of the month value.
+     *
+     * @return The week of the month as an integer.
+     * @since 3.1.0
+     */
+    operator fun component4() = weekOfMonth
+    /**
+     * Retrieves the fifth component of the object, typically representing the `year` value.
+     * This method is part of the destructuring declaration mechanism in Kotlin, allowing 
+     * objects to be decomposed into their constituent properties.
+     *
+     * @return The `year` associated with this object.
+     * @since 3.1.0
+     */
+    operator fun component5() = year
+    /**
+     * Decomposes the object to retrieve the sixth component, which represents the month.
+     *
+     * This operator function enables destructuring declarations to directly access the month value.
+     *
+     * @return The month component of the object.
+     * @since 3.1.0
+     */
+    operator fun component6() = month
+    /**
+     * Represents the seventh component of a destructured value, returning the aligned week of the year 
+     * for the first day of a specific time definition.
+     *
+     * This function is typically used in conjunction with destructuring declarations to extract 
+     * meaningful information from complex time-based data structures.
+     *
+     * @return The aligned week of the year corresponding to the first day.
+     * @since 3.1.0
+     */
+    operator fun component7() = alignedWeekOfYearOfFirstDay
+    /**
+     * Operator function that provides the eighth destructured component for an instance.
+     * 
+     * This component corresponds to the `alignedWeekOfMonthOfFirstDay` property, which typically
+     * represents the week index in the current month that aligns with the first day.
+     *
+     * @return The value of the `alignedWeekOfMonthOfFirstDay` property.
+     * @since 3.1.0
+     */
+    operator fun component8() = alignedWeekOfMonthOfFirstDay
+    /**
+     * Provides the ninth component of a destructured object, representing the 
+     * aligned week of the year for the last day in the specific context.
+     *
+     * This function is utilized in destructuring declarations to obtain the 
+     * aligned week of the year value associated with the object's last day.
+     *
+     * @return The aligned week of the year for the last day.
+     * @since 3.1.0
+     */
+    operator fun component9() = alignedWeekOfYearOfLastDay
+    /**
+     * Provides the tenth component of a destructured object, representing the aligned week of 
+     * the month for the last day in the current context.
+     *
+     * This operator function is used to enable destructuring declarations where the tenth 
+     * component corresponds to specific temporal or contextual data tied to the 
+     * 'alignedWeekOfMonthOfLastDay' value.
+     *
+     * @return The aligned week of the month for the last day as an integer.
+     * @since 3.1.0
+     */
+    operator fun component10() = alignedWeekOfMonthOfLastDay
+    /**
+     * Provides access to the eleventh component of the object, which represents the `days` property.
+     *
+     * This operator function enables destructuring declarations to retrieve the value of `days`.
+     *
+     * @return The value of the `days` property.
+     * @since 3.1.0
+     */
+    operator fun component11() = days
+    /**
+     * Provides the twelfth component of this object, representing the `daysRange`.
+     * This function enables the usage of the `component12` operator
+     * for destructuring declarations.
+     *
+     * @return The `daysRange` associated with this object.
+     * @since 3.1.0
+     */
+    operator fun component12() = daysRange
 }

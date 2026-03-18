@@ -3,8 +3,8 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.3.0"
-    kotlin("plugin.noarg") version "2.3.0"
+    id("org.jetbrains.kotlin.jvm") version "2.3.20"
+    kotlin("plugin.noarg") version "2.3.20"
     id("maven-publish")
     id("io.freefair.aspectj.post-compile-weaving") version "9.1.0" // AspectJ plugin
     id("com.vanniktech.maven.publish") version "0.30.0"
@@ -16,10 +16,10 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "3.0.4"
+version = "3.1.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260316T140749Z
+// Last update: Tommaso Pastorelli | 20260318T131221Z
 
 repositories {
     mavenCentral()
@@ -95,10 +95,8 @@ dependencies {
 kotlin {
     jvmToolchain(21)
     compilerOptions {
-        freeCompilerArgs.add("-Xallow-contracts-on-more-functions")
         freeCompilerArgs.add("-Xcontext-parameters")
-        freeCompilerArgs.add("-Xallow-holdsin-contract")
-        freeCompilerArgs.add("-Xallow-condition-implies-returns-contracts")
+        freeCompilerArgs.add("-Xname-based-destructuring=complete")
     }
 }
 
@@ -120,7 +118,7 @@ tasks.withType<KotlinCompile> {
 }
 
 mavenPublishing {
-    coordinates("dev.tommasop1804", "kotlin-utils", "3.0.4")
+    coordinates("dev.tommasop1804", "kotlin-utils", "3.1.0")
 
     pom {
         name.set("Kotlin Utils")

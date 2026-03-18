@@ -2,37 +2,23 @@
 
 package dev.tommasop1804.kutils.classes.constants
 
-import dev.tommasop1804.kutils.classes.coding.Json
-import dev.tommasop1804.kutils.classes.coding.Language
-import dev.tommasop1804.kutils.classes.coding.Yaml
-import dev.tommasop1804.kutils.classes.collections.Table
-import dev.tommasop1804.kutils.classes.colors.Color
-import dev.tommasop1804.kutils.classes.geography.BoundingBox
-import dev.tommasop1804.kutils.classes.geography.Country
-import dev.tommasop1804.kutils.classes.geography.GeoCoordinate
-import dev.tommasop1804.kutils.classes.geometry.Line
-import dev.tommasop1804.kutils.classes.geometry.Point
-import dev.tommasop1804.kutils.classes.geometry.Shape2D
-import dev.tommasop1804.kutils.classes.geometry.Shape3D
-import dev.tommasop1804.kutils.classes.measure.Measure
-import dev.tommasop1804.kutils.classes.measure.Measurement
-import dev.tommasop1804.kutils.classes.measure.ScalarUnit
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.colors.*
+import dev.tommasop1804.kutils.classes.geography.*
+import dev.tommasop1804.kutils.classes.geometry.*
+import dev.tommasop1804.kutils.classes.measure.*
+import dev.tommasop1804.kutils.classes.money.*
 import dev.tommasop1804.kutils.classes.money.Currency
-import dev.tommasop1804.kutils.classes.money.Money
-import dev.tommasop1804.kutils.classes.numbers.Hex
+import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
-import dev.tommasop1804.kutils.classes.numbers.RomanNumber
-import dev.tommasop1804.kutils.classes.registry.Contact
+import dev.tommasop1804.kutils.classes.registry.*
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.isValidEmail
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.TimeZone
-import dev.tommasop1804.kutils.classes.tree.Tree
-import dev.tommasop1804.kutils.classes.tree.TreeNode
-import dev.tommasop1804.kutils.classes.tuples.Quadruple
-import dev.tommasop1804.kutils.classes.tuples.Quintuple
-import dev.tommasop1804.kutils.expect
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.unaryPlus
+import dev.tommasop1804.kutils.classes.tree.*
+import dev.tommasop1804.kutils.classes.tuples.*
 import java.time.ZoneId
 import java.time.chrono.ChronoPeriod
 import java.time.temporal.Temporal
@@ -855,7 +841,72 @@ enum class ObjType(
          */
         infix fun byMacroType(macroType: MacroType) = entries.filter { it.macroType == macroType }
     }
-
+    
+    /**
+     * Retrieves the first component of the `ObjType` instance, corresponding to the `kClass` property.
+     *
+     * This method is part of the destructuring mechanism for the `ObjType` class,
+     * allowing for the seamless extraction of the `kClass` value when the object 
+     * is used within a destructuring declaration.
+     *
+     * @return The `kClass` property of the `ObjType` instance.
+     * @since 3.1.0
+     */
+    operator fun component1() = kClass
+    /**
+     * Retrieves the second component of the `ObjType`, typically represented
+     * by the `macroType` field. This operator function allows the destructuring
+     * operation to access `macroType` directly when working with instances
+     * of the `ObjType` class.
+     *
+     * This function is part of the Kotlin standard destructuring conventions,
+     * enabling concise syntax for unpacking class properties in local variables.
+     *
+     * @return The value of the `macroType` field associated with the given `ObjType` instance.
+     * @since 3.1.0
+     */
+    operator fun component2() = macroType
+    /**
+     * Provides the third component in a destructuring declaration.
+     *
+     * This operator function is typically used in a destructuring context
+     * to retrieve the `isCompiledAsPrimitive` value from an `ObjType` instance.
+     *
+     * @return The value of the `isCompiledAsPrimitive` property.
+     * @since 3.1.0
+     */
+    operator fun component3() = isCompiledAsPrimitive
+    /**
+     * Provides the fourth component of the `ObjType` instance when destructuring.
+     *
+     * This operator function is primarily used for destructuring declarations,
+     * giving access to the `isJavaType` property of the `ObjType` class.
+     *
+     * @return Returns the value of the `isJavaType` property.
+     * @since 3.1.0
+     */
+    operator fun component4() = isJavaType
+    /**
+     * Provides the fifth component functionality for destructuring declarations.
+     *
+     * This operator maps to the `isKotlinBaseType` property of the `ObjType` class, 
+     * allowing its value to be accessed as the fifth component in a destructuring context.
+     *
+     * @return A `Boolean` indicating whether the object type is a base type in Kotlin.
+     * @since 3.1.0
+     */
+    operator fun component5() = isKotlinBaseType
+    /**
+     * Provides access to the sixth destructured component of the `ObjType` instance.
+     *
+     * This component corresponds to the `isInterface` property, which indicates 
+     * whether the represented type is an interface.
+     *
+     * @return A boolean value representing whether the type is an interface.
+     * @since 3.1.0
+     */
+    operator fun component6() = isInterface
+    
     /**
      * Validates if the specified object matches the expected type based on the context
      * of the current `KotlinType` instance. The validation supports a variety of types,

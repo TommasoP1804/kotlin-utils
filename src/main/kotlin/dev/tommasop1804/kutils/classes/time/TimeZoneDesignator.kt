@@ -1,7 +1,6 @@
 package dev.tommasop1804.kutils.classes.time
 
-import dev.tommasop1804.kutils.StringList
-import dev.tommasop1804.kutils.StringMap
+import dev.tommasop1804.kutils.*
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.*
@@ -524,4 +523,71 @@ enum class TimeZoneDesignator(
 	 */
 	@Suppress("unchecked_cast")
 	override operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name) as R
+
+	/**
+	 * Represents a destructuring operator function that provides the first component of the associated object.
+	 * It is commonly used to retrieve the `letter` property when using destructuring declarations.
+	 *
+	 * @return The value of the `letter` property associated with this object.
+	 * @since 3.1.0
+	 */
+	operator fun component1() = letter
+	/**
+	 * Provides the second component of the object when used in a destructuring declaration.
+	 * This operator allows access to the `phonetic` property.
+	 *
+	 * @return The phonetic representation associated with the object.
+	 * @since 3.1.0
+	 */
+	operator fun component2() = phonetic
+	/**
+	 * Returns the third component of the object when destructuring.
+	 *
+	 * This operator function allows the use of `component3()` for destructuring declarations.
+	 * It typically represents the third item or value associated with the instance.
+	 *
+	 * @return The value of the third component, represented by `offset`.
+	 * @since 3.1.0
+	 */
+	operator fun component3() = offset
+	/**
+	 * Operator function `component4` provides a destructuring component that represents 
+	 * the `completeDesignation` property of an object. This function is typically used 
+	 * in conjunction with destructuring declarations to simplify access to the fourth 
+	 * element in the data structure.
+	 *
+	 * @return The `completeDesignation` property of the object.
+	 * @since 3.1.0
+	 */
+	operator fun component4() = completeDesignation
+	/**
+	 * Provides the sixth component of the data class, representing the UTC offset value.
+	 *
+	 * The UTC offset indicates the difference, in hours and minutes, between the local time and Coordinated Universal Time (UTC).
+	 * This operator function allows for destructuring declarations to directly access the UTC offset value.
+	 *
+	 * @return The value of the UTC offset.
+	 * @since 3.1.0
+	 */
+	operator fun component6() = utcOffset
+	/**
+	 * Provides the seventh component in a destructuring declaration, which represents the `zoneId`.
+	 *
+	 * This operator function enables the use of `zoneId` as the seventh value when using destructuring declarations.
+	 *
+	 * @return The `zoneId` associated with this instance.
+	 * @since 3.1.0
+	 */
+	operator fun component7() = zoneId
+	/**
+	 * Provides the eighth component of a destructured enumeration.
+	 *
+	 * This operator function is used to enable destructuring declarations for 
+	 * an object, allowing retrieval of the value associated with the eighth 
+	 * positional component, typically `enumName`.
+	 *
+	 * @return The name of the enumeration represented as a string.
+	 * @since 3.1.0
+	 */
+	operator fun component8() = enumName
 }

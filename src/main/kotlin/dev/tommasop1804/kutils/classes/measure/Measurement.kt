@@ -7,8 +7,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
-import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -163,6 +163,28 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @since 1.0.0
      */
     fun copy(value: Double = this.value, unit: ScalarUnit = this.unit) = Measurement(value, unit)
+    
+    /**
+     * Returns the first component of the object, typically used for destructuring declarations.
+     *
+     * This operator function allows the object to be destructured, providing
+     * access to its primary value or property in the first position.
+     *
+     * @return The value associated with the first component of the object.
+     * @since 3.1.0
+     */
+    operator fun component1() = value
+    /**
+     * Provides the second component of a destructured object.
+     *
+     * This operator function enables the use of destructuring declarations to extract 
+     * the second property or value from an object. It allows concise access to this 
+     * information in destructuring contexts, improving code readability and usability.
+     *
+     * @return The second component of the object, represented by `unit`.
+     * @since 3.1.0
+     */
+    operator fun component2() = unit
 
     /**
      * Converts the current measurement to a `Byte` value by truncating the internal `value`

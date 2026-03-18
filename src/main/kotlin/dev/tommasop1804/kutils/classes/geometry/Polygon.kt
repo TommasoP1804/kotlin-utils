@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -256,6 +256,17 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
      * @since 1.0.0
      */
     fun copy(vertices: List<Point> = this.vertices) = Polygon(vertices.toMutableList())
+
+    /**
+     * Retrieves the first component of a data structure, typically used for destructuring declarations.
+     *
+     * This operator function is designed to provide access to the `vertices` property
+     * when the object is destructured, allowing for concise and readable code.
+     *
+     * @return The `vertices` associated with the object.
+     * @since 3.1.0
+     */
+    operator fun component1() = vertices
 
     /**
      * Adds one or more vertices to the existing list of vertices in the polygon.

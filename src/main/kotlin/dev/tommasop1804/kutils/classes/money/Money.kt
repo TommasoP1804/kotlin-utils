@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.Json
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.TimeZone
-import dev.tommasop1804.kutils.classes.time.TimeZoneDesignator
-import dev.tommasop1804.kutils.exceptions.ConversionException
-import dev.tommasop1804.kutils.exceptions.CurrencyConversionException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -256,10 +255,10 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
          */
         fun parse(s: String, currencyBefore: Boolean = true) = runCatching {
             if (currencyBefore) {
-                val (currency, amount) = s.split(" ", limit = 2)
+                val [currency, amount] = s.split(" ", limit = 2)
                 Money(BigDecimal(amount), java.util.Currency.getInstance(currency))
             } else {
-                val (amount, currency) = s.split(" ", limit = 2)
+                val [amount, currency] = s.split(" ", limit = 2)
                 Money(BigDecimal(amount), java.util.Currency.getInstance(currency))
             }
         }
@@ -303,7 +302,34 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * @since 1.0.0
      */
     fun copy(amount: BigDecimal = this.amount, currency: Currency = constCurrency) = Money(amount, currency)
-
+    
+    /**
+     * Provides the first component of a data class, typically used for destructuring declarations.
+     *
+     * This method allows retrieving the value of the `amount` property when the object is
+     * destructured.
+     *
+     * @return The value of the `amount` property.
+     * @since 3.1.0
+     */
+    operator fun component1() = amount
+    /**
+     * Destructuring declaration operator function that returns the currency component
+     * of the corresponding object. Primarily used when destructuring objects 
+     * into multiple variables.
+     *
+     * @return The currency associated with the object.
+     * @since 3.1.0
+     */
+    operator fun component2() = currency
+    /**
+     * Provides the third component of the data structure for destructuring declarations.
+     * 
+     * @return The `constCurrency` value associated with this component.
+     * @since 3.1.0
+     */
+    operator fun component3() = constCurrency
+    
     /**
      * Converts the current monetary value to a specified currency using exchange rates.
      *

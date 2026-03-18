@@ -1,9 +1,6 @@
 package dev.tommasop1804.kutils.classes.tree
 
-import dev.tommasop1804.kutils.MList
-import dev.tommasop1804.kutils.Uuid
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.*
 import java.util.*
 import kotlin.reflect.KProperty
 
@@ -435,4 +432,41 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      */
     @Suppress("UNCHECKED_CAST")
     fun pathFromRoot(tree: Tree<T>) = tree.pathFromRootOf(this as TreeNode<T?>)
+
+    /**
+     * Component function that enables destructuring declarations to extract the first property, `id`.
+     *
+     * This function is typically used in conjunction with data classes or other classes 
+     * that define custom `componentN` functions to allow seamless decomposition into variables.
+     *
+     * @return The `id` property of the instance.
+     * @since 3.1.0
+     */
+    operator fun component1() = id
+    /**
+     * Destructures the object to extract its second component, corresponding to `parentId`.
+     * This method allows the use of destructuring declarations for objects containing this method.
+     *
+     * @return The `parentId` associated with the object.
+     * @since 3.1.0
+     */
+    operator fun component2() = parentId
+    /**
+     * Provides the third component of a destructured object.
+     *
+     * This operator function is used to allow destructuring declarations
+     * to retrieve the third value from a composite object.
+     *
+     * @return The third component of the object.
+     * @since 3.1.0
+     */
+    operator fun component3() = value
+    /**
+     * Provides the fourth component of the object when using destructuring declarations.
+     * This method allows accessing the `children` property in a structured manner.
+     *
+     * @return The `children` property of the object.
+     * @since 3.1.0
+     */
+    operator fun component4() = children
 }

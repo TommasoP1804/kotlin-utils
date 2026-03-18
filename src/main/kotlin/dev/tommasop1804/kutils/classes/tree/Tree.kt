@@ -652,4 +652,23 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      */
     @Suppress("unchecked_cast")
     operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name) as R
+
+    /**
+     * Provides the first component of the object, typically used for destructuring declarations.
+     *
+     * @return The value of the `root` property associated with the object.
+     * @since 3.1.0
+     */
+    operator fun component1() = root
+    /**
+     * Provides the second component of a destructured declaration for this object.
+     * The second component typically corresponds to the `leaves` property.
+     *
+     * This operator function enables destructuring declarations in a concise way,
+     * allowing access to the second component of the object it is called on.
+     *
+     * @return The value of `leaves`.
+     * @since 3.1.0
+     */
+    operator fun component2() = leaves
 }

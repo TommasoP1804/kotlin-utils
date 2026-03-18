@@ -9,15 +9,13 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.Json
+import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.toEmail
-import dev.tommasop1804.kutils.classes.time.Duration
-import dev.tommasop1804.kutils.classes.web.HttpMethod
-import dev.tommasop1804.kutils.exceptions.HttpResponseException
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.RequiredFieldException
+import dev.tommasop1804.kutils.classes.time.*
+import dev.tommasop1804.kutils.classes.web.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
@@ -682,6 +680,38 @@ class Jwt private constructor(private val value: String) : CharSequence {
             override fun convertToEntityAttribute(dbData: String?): Jwt? = dbData?.let { Jwt(it) }
         }
     }
+
+    /**
+     * Provides the `component1` functionality for destructuring declarations of the `Jwt` class.
+     *
+     * This operator function returns the `header` property of the `Jwt` instance, which represents
+     * the first component of the JWT structure.
+     *
+     * @return The `header` part of the JWT as a string.
+     * @since 3.1.0
+     */
+    operator fun component1() = header
+    /**
+     * Retrieves the payload of the JWT as the second component in a destructuring declaration.
+     *
+     * This operator function allows for the convenient extraction of the payload from a JWT 
+     * instance when used in destructuring declarations.
+     *
+     * @return The payload part of the JWT.
+     * @since 3.1.0
+     */
+    operator fun component2() = payload
+    /**
+     * Provides the third component of the JWT instance when destructuring.
+     *
+     * This operator function corresponds to the `signature` field of the JWT,
+     * which represents the cryptographic signature used to ensure the token's integrity
+     * and authenticity.
+     *
+     * @return The signature component of the JWT as a string.
+     * @since 3.1.0
+     */
+    operator fun component3() = signature
 
     /**
      * Returns a string representation of the current JWT instance, optionally including

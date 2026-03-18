@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.MonoPair
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -253,6 +253,38 @@ class Ellipse (var center: Point = Point(), xRadius: Double = 0.0, yRadius: Doub
      * @since 1.0.0
      */
     fun copy(center: Point = this.center, xRadius: Double = this.xRadius, yRadius: Double = this.yRadius) = Ellipse(center, xRadius, yRadius)
+    
+    /**
+     * Returns the center point of the ellipse.
+     *
+     * This operator function enables destructuring declarations, where the first component
+     * of an `Ellipse` instance corresponds to its center point.
+     *
+     * @return The center of the ellipse as a [Point].
+     *
+     * @since 3.1.0
+     */
+    operator fun component1() = center
+    /**
+     * Retrieves the x-axis radius of the `Ellipse`.
+     *
+     * This method is used as part of the destructuring declaration for an `Ellipse`
+     * instance, allowing convenient access to its `xRadius` property.
+     *
+     * @return The x-axis radius of the ellipse.
+     * @since 3.1.0
+     */
+    operator fun component2() = xRadius
+    /**
+     * Provides the third component of a destructured `Ellipse` object.
+     *
+     * This operator function allows the y-axis radius (`yRadius`) of the ellipse
+     * to be retrieved during destructuring.
+     *
+     * @return The y-axis radius of the ellipse as a `Double`.
+     * @since 3.1.0
+     */
+    operator fun component3() = yRadius
 
     /**
      * Checks if the given point is contained within the bounds of the ellipse.

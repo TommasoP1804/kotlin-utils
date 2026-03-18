@@ -5,8 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.unaryMinus
+import dev.tommasop1804.kutils.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -248,6 +247,65 @@ class MeasureUnit internal constructor(override val measure: String, override va
     fun copy(measure: String = this.measure, unitName: String = this.unitName, isISUnit: Boolean = isSIUnit, isAcceptedByIS: Boolean = isAcceptedBySI, symbol: String? = this.symbol): MeasureUnit =
         MeasureUnit(measure, unitName, isISUnit, isAcceptedByIS, symbol, knownSymbol)
 
+    /**
+     * Provides the first component of a destructured object, which typically represents the `measure` property.
+     * This function allows the object to be broken down into its individual components using destructuring declarations.
+     *
+     * @return The value of the `measure` property.
+     * @since 3.1.0
+     */
+    operator fun component1() = measure
+    /**
+     * Retrieves the second component of a destructured pair or data object.
+     *
+     * This operator function is primarily used for enabling structured bindings
+     * (destructuring declarations) in Kotlin, allowing access to the second
+     * value defined by this component in the object.
+     *
+     * @return The second component, represented by `unitName`.
+     * @since 3.1.0
+     */
+    operator fun component2() = unitName
+    /**
+     * Returns the third component of the instance using the destructuring declaration syntax.
+     * Typically used to retrieve the `isSIUnit` property.
+     *
+     * @return The value of the `isSIUnit` property.
+     * @since 3.1.0
+     */
+    operator fun component3() = isSIUnit
+    /**
+     * Returns the fourth component of the object when using destructuring declarations.
+     * This operator function is typically used to provide an easier way to access a specific property
+     * of the class in a destructured context.
+     *
+     * @return The value of the `isAcceptedBySI` property.
+     * @since 3.1.0
+     */
+    operator fun component4() = isAcceptedBySI
+    /**
+     * Decomposes the object to provide the fifth component in a destructuring declaration.
+     *
+     * This operator function allows the usage of the object's properties within a destructuring declaration
+     * by returning the value associated with the fifth component.
+     *
+     * @return The fifth component value, typically referred to as `symbol`.
+     * @since 3.1.0
+     */
+    operator fun component5() = symbol
+    /**
+     * Provides the sixth component of a destructuring declaration.
+     *
+     * This operator function returns the value that corresponds to the sixth element
+     * in a destructuring decomposition when the class supports it. Typically, this
+     * function is used in conjunction with destructuring declarations to allow
+     * retrieval of specific values from an object.
+     *
+     * @return The value corresponding to the sixth component of the destructuring.
+     * @since 3.1.0
+     */
+    operator fun component6() = knownSymbol
+    
     /**
      * Returns the string representation of the `MeasureUnit` instance.
      *

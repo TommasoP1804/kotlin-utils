@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.geography.Country
+import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -419,6 +419,38 @@ value class Iban private constructor(val value: String) : CharSequence {
             override fun convertToEntityAttribute(dbData: String?): Iban? = dbData?.let { Iban(it) }
         }
     }
+    
+    /**
+     * Provides destructuring support to retrieve the `country` property from the `Iban` instance.
+     *
+     * This operator function enables the usage of the destructuring declaration syntax
+     * to directly access the `country` value of an `Iban` object. The `country` corresponds
+     * to the country code associated with the IBAN.
+     *
+     * @return The `country` property of the IBAN.
+     * @since 3.1.0
+     */
+    operator fun component1() = country
+    /**
+     * Extracts the second component of the `Iban` instance, which corresponds to the `bban` property.
+     *
+     * This operator function allows the `bban` value to be destructured from an `Iban` object when using
+     * destructuring declarations. The `bban` represents the basic bank account number portion of the IBAN.
+     *
+     * @return The `bban` portion of the IBAN.
+     * @since 3.1.0
+     */
+    operator fun component2() = bban
+    /**
+     * Retrieves the check digits of the IBAN.
+     *
+     * This method is a component function that allows destructuring of the `Iban` class
+     * to access its `checkDigits` property directly when used in a destructuring declaration.
+     *
+     * @return The check digits of the IBAN as a string.
+     * @since 3.1.0
+     */
+    operator fun component3() = checkDigits
 
     /**
      * Converts the IBAN instance's key properties into a map representation.

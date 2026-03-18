@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.GeometryException
-import dev.tommasop1804.kutils.expect
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -220,6 +220,39 @@ open class Rectangle(var topLeft: Point = Point(), width: Double = 0.0, height: 
      * @since 1.0.0
      */
     fun copy(topLeft: Point = this.topLeft, width: Double = this.width, height: Double = this.height) = Rectangle(topLeft, width, height)
+
+    /**
+     * Retrieves the top-left corner of the rectangle.
+     *
+     * This operator function allows the rectangle instance to be destructured into its components,
+     * with this method corresponding to the first component, which is the top-left point.
+     *
+     * @return The top-left corner of the rectangle as a [Point].
+     * @since 3.1.0
+     */
+    operator fun component1() = topLeft
+    /**
+     * Retrieves the `width` property of the `Rectangle` as the second component in a destructuring declaration.
+     *
+     * This function is used to enable destructuring patterns for rectangles, where the `width` is accessed
+     * as the second value.
+     *
+     * @return The `width` of the rectangle.
+     * @since 3.1.0
+     */
+    operator fun component2() = width
+    /**
+     * Retrieves the `height` property of the rectangle.
+     *
+     * This function is part of the component decomposition mechanism for the `Rectangle` class,
+     * allowing destructuring declarations to extract the `height` of the rectangle as the third component.
+     *
+     * Commonly used when working with tuples derived from a `Rectangle` object.
+     *
+     * @return The `height` of the rectangle.
+     * @since 3.1.0
+     */
+    operator fun component3() = height
 
     /**
      * Checks whether the given point is contained within the rectangle.

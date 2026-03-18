@@ -4,11 +4,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.SLASH
-import dev.tommasop1804.kutils.STAR
-import dev.tommasop1804.kutils.classes.builder.buildRegex
-import dev.tommasop1804.kutils.unaryMinus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.builder.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -607,4 +604,26 @@ value class MimeType private constructor(val value: String) : CharSequence {
      * @since 2.0.0
      */
     fun toMediaType() = MediaType(this)
+    
+    /**
+     * Retrieves the `type` component of the MimeType.
+     *
+     * This function is primarily used for destructuring declarations, allowing
+     * the `type` property of the MimeType to be accessed directly.
+     *
+     * @return The `type` value of the MimeType instance.
+     * @since 3.1.0
+     */
+    operator fun component1() = type
+    /**
+     * Retrieves the subtype component of this MimeType.
+     *
+     * This function is typically used in conjunction with the component1 function 
+     * to enable destructuring declarations. The subtype represents the second 
+     * part of the MIME type structure (e.g., "json" in "application/json").
+     *
+     * @return The subtype of this MimeType instance.
+     * @since 3.1.0
+     */
+    operator fun component2() = subtype
 }

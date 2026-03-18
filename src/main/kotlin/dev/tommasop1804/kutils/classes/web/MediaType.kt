@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.StringMap
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.mapToMap
-import dev.tommasop1804.kutils.unaryMinus
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -408,7 +405,7 @@ data class MediaType(
             val parts = value.split(';').map { it.trim() }
             val mimeType = MimeType(parts.first())
             val params = (-1)(parts).associate { param ->
-                val (k, v) = param.split('=', limit = 2)
+                val [k, v] = param.split('=', limit = 2)
                 k.trim() to v.trim()
             }
             MediaType(mimeType, params)
@@ -496,7 +493,7 @@ data class MediaType(
      */
     override fun toString(): String = buildString {
         append(mimeType)
-        parameters.forEach { (k, v) -> append("; $k=$v") }
+        parameters.forEach { [k, v] -> append("; $k=$v") }
     }
 
     /**

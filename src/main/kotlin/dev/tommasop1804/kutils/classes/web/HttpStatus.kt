@@ -1,6 +1,6 @@
 package dev.tommasop1804.kutils.classes.web
 
-import dev.tommasop1804.kutils.hasAnnotation
+import dev.tommasop1804.kutils.*
 
 /**
  * Represents the enumeration of HTTP status codes as defined by the HTTP standard.
@@ -256,18 +256,48 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
     override fun toString() = "$value $reasonPhrase"
 
     /**
+     * Extracts the `value` property of the `HttpStatus` instance as a component in a destructuring declaration.
+     *
+     * This method enables the use of destructuring declarations to retrieve the `value` field of the `HttpStatus` object.
+     *
+     * @return The HTTP status code represented by the `value` field.
+     * @since 3.1.0
+     */
+    operator fun component1() = value
+    /**
+     * Retrieves the `family` property of the `HttpStatus` object when using this function
+     * as part of destructuring declarations or other component-based operations.
+     * 
+     * @return The `family` of the current `HttpStatus`, providing information about the
+     *         category or group to which this HTTP status belongs (e.g., informational, success, etc.).
+     * @since 3.1.0
+     */
+    operator fun component2() = family
+    /**
+     * Retrieves the `reasonPhrase` component of the `HttpStatus`.
+     *
+     * This operator function allows destructuring declarations to access the `reasonPhrase`, 
+     * which represents the textual description associated with the HTTP status code.
+     *
+     * @return The `reasonPhrase` of this `HttpStatus`.
+     * @since 3.1.0
+     */
+    operator fun component3() = reasonPhrase
+
+    /**
      * Represents a categorization of HTTP status codes into standard classes based on their function.
      *
      * Each class groups HTTP status codes that share similar semantics and purposes,
      * aiding in the interpretation and handling of responses during communication between
      * clients and servers.
      *
+     * @property displayName The name of the HTTP status code family.
      * @property value The integer value of the HTTP status code family.
      *
      * @since 2.0.0
      * @author Tommaso Pastorelli
      */
-    enum class Family(val value: Int) {
+    enum class Family(val displayName: String, val value: Int) {
         /**
          * The INFORMATIONAL status family represents HTTP responses with status codes in the range of 1xx.
          *
@@ -275,7 +305,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * often requiring the client to make further actions to complete the request.
          * @since 2.0.0
          */
-        INFORMATIONAL(1),
+        INFORMATIONAL("Informational", 1),
         /**
          * Represents the "SUCCESSFUL" category within the Family enum class.
          *
@@ -286,7 +316,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * Examples of successful status codes include 200 (OK), 201 (Created), and 204 (No Content).
          * @since 2.0.0
          */
-        SUCCESSFUL(2),
+        SUCCESSFUL("Successful", 2),
         /**
          * Represents the REDIRECTION status in the HTTP response status code categorization.
          *
@@ -294,7 +324,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * This category is typically used for redirecting the client to a different resource, as navigated by a Location header.
          * @since 2.0.0
          */
-        REDIRECTION(3),
+        REDIRECTION("Redirection", 3),
         /**
          * Represents the client error family of HTTP status codes.
          *
@@ -304,7 +334,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * unauthorized access, forbidden access, or requests that cannot be fulfilled.
          * @since 2.0.0
          */
-        CLIENT_ERROR(4),
+        CLIENT_ERROR("Client Error", 4),
         /**
          * Represents the server error family of HTTP response codes.
          *
@@ -313,10 +343,31 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * with status codes in the range of 500 to 599.
          * @since 2.0.0
          */
-        SERVER_ERROR(5);
+        SERVER_ERROR("Server Error", 5);
 
         companion object {
             infix fun of(code: Int) = entries.find { it.value == code }
         }
+
+        /**
+         * Extracts the first component of the Family instance.
+         *
+         * This operator function provides destructuring support, allowing the `displayName` property
+         * of the Family class to be retrieved as the first element in a destructuring declaration.
+         *
+         * @return The value of the `displayName` property in the Family class.
+         * @since 3.1.0
+         */
+        operator fun component1() = displayName
+        /**
+         * Extracts the first component of the Family instance.
+         *
+         * This operator function provides destructuring support, allowing the `value` property
+         * of the Family class to be retrieved as the first element in a destructuring declaration.
+         *
+         * @return The value of the `value` property in the Family class.
+         * @since 3.1.0
+         */
+        operator fun component2() = value
     }
 }

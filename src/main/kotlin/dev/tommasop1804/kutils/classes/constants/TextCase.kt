@@ -1,7 +1,7 @@
 package dev.tommasop1804.kutils.classes.constants
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.ConversionException
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KProperty
 
 /**
@@ -120,7 +120,7 @@ enum class TextCase(
             try {
                 if (from == CAMEL_CASE || from == PASCAL_CASE) {
                     val sb = StringBuilder()
-                    for ((i, c) in withIndex()) {
+                    for ([i, c] in withIndex()) {
                         if (i != 0 && (c.isUpperCase() || (c.isDigit() && !this[i-1].isDigit()))) {
                             sb.append(to.separator)
                             sb.append(c.lowercaseChar())

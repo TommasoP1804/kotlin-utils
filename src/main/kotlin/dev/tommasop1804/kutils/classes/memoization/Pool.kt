@@ -1,9 +1,6 @@
 package dev.tommasop1804.kutils.classes.memoization
 
-import dev.tommasop1804.kutils.Consumer
-import dev.tommasop1804.kutils.Supplier
-import dev.tommasop1804.kutils.Transformer
-import dev.tommasop1804.kutils.emptyMSet
+import dev.tommasop1804.kutils.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -18,7 +15,7 @@ import kotlin.concurrent.withLock
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@Suppress("unused", "kutils_collection_declaration")
+@Suppress("unused")
 class Pool<T>(
     val maxSize: Int,
     private val factory: Supplier<T>,

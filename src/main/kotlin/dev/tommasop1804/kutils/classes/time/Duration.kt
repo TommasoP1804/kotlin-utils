@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.LocalDateTime
 import dev.tommasop1804.kutils.RiskyApproximationOfTemporal
 import dev.tommasop1804.kutils.before
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.validate
@@ -28,8 +28,6 @@ import java.time.chrono.Chronology
 import java.time.chrono.IsoChronology
 import java.time.temporal.*
 import kotlin.reflect.KProperty
-import kotlin.text.isBlank
-import kotlin.text.isEmpty
 import kotlin.text.startsWith
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
@@ -1869,4 +1867,70 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
         result = 31 * result + nanos.hashCode()
         return result
     }
+
+    /**
+     * Extracts and returns the `years` property of the object.
+     * This function enables the use of destructuring declarations, allowing the first component
+     * to be accessed in a structured manner.
+     *
+     * @return The `years` value associated with this object.
+     * @since 3.1.0
+     */
+    operator fun component1() = years
+    /**
+     * Returns the second component of this object.
+     * This method is typically used in destructuring declarations.
+     *
+     * @return The `months` property of the object.
+     * @since 3.1.0
+     */
+    operator fun component2() = months
+    /**
+     * Provides the third component of a destructured object,
+     * corresponding to the `days` property.
+     *
+     * This operator function is typically used when destructuring
+     * declarations are performed on an object that supports multiple 
+     * components, allowing the third value to be directly extracted.
+     *
+     * @return The `days` value associated with the object.
+     * @since 3.1.0
+     */
+    operator fun component3() = days
+    /**
+     * Returns the fourth component of the data structure, typically representing the `hours` value.
+     * This function is primarily used in destructuring declarations to access the hours value directly.
+     *
+     * @return The value of `hours`.
+     * @since 3.1.0
+     */
+    operator fun component4() = hours
+    /**
+     * Retrieves the fifth component of the object, typically representing minutes.
+     * This operator function is used to enable destructuring declarations, allowing
+     * the `minutes` value to be accessed directly.
+     *
+     * @return The value representing minutes.
+     * @since 3.1.0
+     */
+    operator fun component5() = minutes
+    /**
+     * Provides the sixth component of a destructured object, typically representing seconds.
+     *
+     * This function enables support for destructuring declarations by returning the `seconds` value of the object.
+     *
+     * @return the value of seconds as an integer or appropriate numeric type.
+     * @since 3.1.0
+     */
+    operator fun component6() = seconds
+    /**
+     * Returns the seventh component of the object, commonly used in destructuring declarations.
+     *
+     * This operator function allows the `component7` function to be utilized in destructuring patterns
+     * to retrieve the value stored in `nanos`.
+     *
+     * @return The value of `nanos`, representing the seventh component of the object.
+     * @since 3.1.0
+     */
+    operator fun component7() = nanos
 }

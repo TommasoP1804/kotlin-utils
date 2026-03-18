@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Double2
 import dev.tommasop1804.kutils.DoubleList
 import dev.tommasop1804.kutils.StringList
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isNull
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
@@ -22,6 +22,7 @@ import java.io.Serializable
 import kotlin.math.acos
 import kotlin.math.sqrt
 import kotlin.reflect.KProperty
+import kotlin.text.startsWith
 
 /**
  * Represents a point in a three-dimensional space with x, y, and z coordinates.
@@ -269,6 +270,35 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @since 1.0.0
      */
     fun copy(x: Double = this.x, y: Double = this.y, z: Double = this.z) = Point(x, y, z)
+    
+    /**
+     * Provides the first component of a destructured object.
+     *
+     * This operator function is used to enable destructuring declarations,
+     * allowing the caller to retrieve the first value associated with the object.
+     *
+     * @return The value of the first component.
+     * @since 3.1.0
+     */
+    operator fun component1() = x
+    /**
+     * Returns the second component of a data class when destructuring declarations are used.
+     * This operator function is automatically invoked during destructuring to provide the value 
+     * associated with the second component of the object.
+     *
+     * @return The value of the second component.
+     * @since 3.1.0
+     */
+    operator fun component2() = y
+    /**
+     * Operator function that provides destructuring declaration component for the third value.
+     * This function is typically used in destructuring declarations to retrieve the third
+     * component (z) of the implementing class or data structure.
+     *
+     * @return The third component (z) of the implementing class or data structure.
+     * @since 3.1.0
+     */
+    operator fun component3() = z
 
     /**
      * Compares this object with another for equality.

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -457,4 +455,37 @@ class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Seria
      * @since 1.0.0
      */
     override infix fun subtractFrom(temporal: Temporal) = elapsed.subtractFrom(temporal)
+
+    /**
+     * Returns the starting component of a destructured object.
+     * This function is used in destructuring declarations to retrieve the first value 
+     * associated with the object.
+     *
+     * @return The value of the `start` property.
+     * @since 3.1.0
+     */
+    operator fun component1() = start
+    /**
+     * Provides the second component of a destructuring declaration.
+     *
+     * @return The value of the `end` property.
+     * @since 3.1.0
+     */
+    operator fun component2() = end
+    /**
+     * Provides destructuring support for accessing the third component of an object.
+     * Returns the state of the `isRunning` property.
+     *
+     * @return The value of the `isRunning` property.
+     * @since 3.1.0
+     */
+    operator fun component3() = isRunning
+    /**
+     * Destructuring operator function for the fourth component of the object.
+     * Provides access to the `elapsed` property in a destructuring declaration.
+     *
+     * @return The value of the `elapsed` property.
+     * @since 3.1.0
+     */
+    operator fun component4() = elapsed
 }

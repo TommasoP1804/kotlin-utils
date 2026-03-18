@@ -145,4 +145,65 @@ enum class HttpMethod(
      * @since 1.0.0
      */
     TRACE(canHasResponseBody = true, secure = true, idempotent = true);
+
+    /**
+     * Destructures the `HttpMethod` instance to retrieve the `canHasRequestBody` property.
+     *
+     * This operator function is part of the component destructuring mechanism,
+     * allowing for concise decomposition of the `HttpMethod` object.
+     *
+     * @return A `Boolean` flag indicating the ability of the HTTP method to contain a request body.
+     *
+     * @since 3.1.0
+     */
+    operator fun component1() = canHasRequestBody
+    /**
+     * Destructures the instance, providing the value of the `canHasResponseBody` property.
+     *
+     * This operator function allows the second component of the `HttpMethod` object
+     * to be accessed when destructured.
+     *
+     * @return The value of the `canHasResponseBody` property.
+     * @since 3.1.0
+     */
+    operator fun component2() = canHasResponseBody
+    /**
+     * Provides access to the `secure` property of the `HttpMethod` class
+     * as a component within a destructuring declaration.
+     *
+     * This operator function is the third component of the `HttpMethod`
+     * class, often used in destructuring assignments to retrieve the
+     * associated value for `secure`.
+     *
+     * @return The value of the `secure` property.
+     * @since 3.1.0
+     */
+    operator fun component3() = secure
+    /**
+     * Returns the `idempotent` property of the HttpMethod instance.
+     *
+     * The `idempotent` property indicates whether the HTTP method is idempotent,
+     * meaning that performing the same operation multiple times will have the
+     * same effect as performing it once.
+     *
+     * @return The value of the `idempotent` property.
+     * @since 3.1.0
+     */
+    operator fun component4() = idempotent
+    /**
+     * Destructures the `HttpMethod` instance to extract the value of the `cacheable` property.
+     * This component is used as part of the Kotlin destructuring declaration mechanism.
+     *
+     * @return A boolean value indicating whether the HTTP method is cacheable.
+     * @since 3.1.0
+     */
+    operator fun component5() = cacheable
+    /**
+     * Provides the sixth component of the HttpMethod instance when destructuring.
+     * This component indicates whether the HTTP method can be used in HTML modules.
+     *
+     * @return A Boolean value representing if the method can be included in HTML modules.
+     * @since 3.1.0
+     */
+    operator fun component6() = canBeInHTMLModules
 }

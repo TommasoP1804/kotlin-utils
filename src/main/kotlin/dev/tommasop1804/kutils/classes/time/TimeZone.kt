@@ -1,8 +1,6 @@
 package dev.tommasop1804.kutils.classes.time
 
-import dev.tommasop1804.kutils.StringList
-import dev.tommasop1804.kutils.StringMap
-import dev.tommasop1804.kutils.unaryPlus
+import dev.tommasop1804.kutils.*
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -540,4 +538,72 @@ enum class TimeZone(
 	 */
 	@Suppress("unchecked_cast")
 	override operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name) as R
+
+	/**
+	 * Operator function that enables destructuring declarations for this class.
+	 * Provides the first component of the class, typically used in a destructuring context.
+	 *
+	 * @return Returns the `id`, representing the first component of the class.
+	 * @since 3.1.0
+	 */
+	operator fun component1() = id
+	/**
+	 * Provides the second component in a decomposition operation, typically used in destructuring declarations.
+	 * This function returns the name of the zone associated with the instance.
+	 *
+	 * @return The zone name as a string.
+	 * @since 3.1.0
+	 */
+	operator fun component2() = zoneName
+	/**
+	 * Provides the third component of the object, typically used in destructuring declarations.
+	 * This operator function returns the `offset` property of the object.
+	 *
+	 * @return The value of the `offset` property.
+	 * @since 3.1.0
+	 */
+	operator fun component3() = offset
+	/**
+	 * Supports destructuring declarations by providing the fourth component.
+	 *
+	 * This operator function allows retrieval of the `zoneIdByAbbreviation` 
+	 * property when using destructuring on an instance of the containing class.
+	 *
+	 * @return The `zoneIdByAbbreviation` property of the instance.
+	 * @since 3.1.0
+	 */
+	operator fun component4() = zoneIdByAbbreviation
+	/**
+	 * Provides the `component5` functionality for destructuring declarations.
+	 * Returns the UTC offset associated with the instance.
+	 * 
+	 * This operator allows the fifth destructured value of the instance
+	 * to be accessed directly, representing the UTC offset.
+	 *
+	 * @return The UTC offset as a time value associated with the instance.
+	 *
+	 * @since 3.1.0
+	 */
+	operator fun component5() = utcOffset
+	/**
+	 * Extracts the sixth component of the object: the time zone designator.
+	 *
+	 * This operator function allows for destructuring declarations to retrieve the
+	 * time zone designator as the sixth positional component of the data structure.
+	 *
+	 * @return The time zone designator.
+	 * @since 3.1.0
+	 */
+	operator fun component6() = timeZoneDesignator
+	/**
+	 * Provides a destructuring component that returns the value of the seventh element 
+	 * in the context of a destructuring declaration.
+	 *
+	 * This operator function is typically used to retrieve the seventh component 
+	 * when an object implementing destructuring is being destructured.
+	 *
+	 * @return The value associated with the seventh component.
+	 * @since 3.1.0
+	 */
+	operator fun component7() = enumName
 }

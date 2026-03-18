@@ -69,4 +69,24 @@ enum class HttpVersion(val notation: String, val version: Double) {
          */
         infix fun of(version: Number) = entries.find { it.version == version }
     }
+
+    /**
+     * Returns the `notation` value of the current instance.
+     * This function enables destructuring declarations to extract `notation`
+     * as the first component of the `HttpVersion` class.
+     *
+     * @return the `notation` field of the `HttpVersion` instance.
+     * @since 3.1.0
+     */
+    operator fun component1() = notation
+    /**
+     * Retrieves the second component of the HttpVersion instance.
+     * 
+     * This method returns the `version` property of the HttpVersion class,
+     * enabling usage in destructuring declarations.
+     *
+     * @return the `version` value of the current HttpVersion instance
+     * @since 3.1.0
+     */
+    operator fun component2() = version 
 }

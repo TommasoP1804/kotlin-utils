@@ -1,8 +1,8 @@
 package dev.tommasop1804.kutils.classes.colors
 
-import dev.tommasop1804.kutils.classes.numbers.Percentage
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.numbers.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -12,14 +12,14 @@ internal object ColorParser {
     // ---------- RGB ----------
     fun parseRgb(s: String): Color {
         val regex = Regex("""rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)""")
-        val (r, g, b) = regex.matchEntire(s)?.destructured
+        val [r, g, b] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         return Color(r.toInt(), g.toInt(), b.toInt())
     }
 
     fun parseRgba(s: String): Color {
         val regex = Regex("""rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (r, g, b, a) = regex.matchEntire(s)?.destructured
+        val [r, g, b, a] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         return Color(r.toInt(), g.toInt(), b.toInt(), parseAlpha(a))
     }
@@ -27,7 +27,7 @@ internal object ColorParser {
     // ---------- HSL ----------
     fun parseHsl(s: String): Color {
         val regex = Regex("""hsl\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*\)""")
-        val (hStr, sStr, lStr) = regex.matchEntire(s)?.destructured
+        val [hStr, sStr, lStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val sVal = parsePercentOrFraction(sStr)
@@ -37,7 +37,7 @@ internal object ColorParser {
 
     fun parseHsla(s: String): Color {
         val regex = Regex("""hsla\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (hStr, sStr, lStr, aStr) = regex.matchEntire(s)?.destructured
+        val [hStr, sStr, lStr, aStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val sVal = parsePercentOrFraction(sStr)
@@ -54,7 +54,7 @@ internal object ColorParser {
         val x = c * (1 - abs((H * 6) % 2 - 1))
         val m = L - c / 2
 
-        val (r1, g1, b1) = when ((H * 6).toInt()) {
+        val [r1, g1, b1] = when ((H * 6).toInt()) {
             0 -> Triple(c, x, 0.0)
             1 -> Triple(x, c, 0.0)
             2 -> Triple(0.0, c, x)
@@ -72,7 +72,7 @@ internal object ColorParser {
     // ---------- HSV ----------
     fun parseHsv(s: String): Color {
         val regex = Regex("""hsv\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*\)""")
-        val (hStr, sStr, vStr) = regex.matchEntire(s)?.destructured
+        val [hStr, sStr, vStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val sVal = parsePercentOrFraction(sStr)
@@ -82,7 +82,7 @@ internal object ColorParser {
 
     fun parseHsva(s: String): Color {
         val regex = Regex("""hsva\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (hStr, sStr, vStr, aStr) = regex.matchEntire(s)?.destructured
+        val [hStr, sStr, vStr, aStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val sVal = parsePercentOrFraction(sStr)
@@ -99,7 +99,7 @@ internal object ColorParser {
         val x = c * (1 - abs(H % 2 - 1))
         val m = V - c
 
-        val (r1, g1, b1) = when (H.toInt()) {
+        val [r1, g1, b1] = when (H.toInt()) {
             0 -> Triple(c, x, 0.0)
             1 -> Triple(x, c, 0.0)
             2 -> Triple(0.0, c, x)
@@ -117,7 +117,7 @@ internal object ColorParser {
     // ---------- HSB ----------
     fun parseHsb(s: String): Color {
         val regex = Regex("""hsb\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*\)""")
-        val (hStr, sStr, bStr) = regex.matchEntire(s)?.destructured
+        val [hStr, sStr, bStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val sVal = parsePercentOrFraction(sStr)
@@ -127,7 +127,7 @@ internal object ColorParser {
 
     fun parseHsba(s: String): Color {
         val regex = Regex("""hsba\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (hStr, sStr, bStr, aStr) = regex.matchEntire(s)?.destructured
+        val [hStr, sStr, bStr, aStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val sVal = parsePercentOrFraction(sStr)
@@ -144,7 +144,7 @@ internal object ColorParser {
         val x = c * (1 - abs((H * 6) % 2 - 1))
         val m = B - c
 
-        val (r1, g1, b1) = when ((H * 6).toInt()) {
+        val [r1, g1, b1] = when ((H * 6).toInt()) {
             0 -> Triple(c, x, 0.0)
             1 -> Triple(x, c, 0.0)
             2 -> Triple(0.0, c, x)
@@ -163,7 +163,7 @@ internal object ColorParser {
     // ---------- CMYK ----------
     fun parseCmyk(s: String): Color {
         val regex = Regex("""cmyk\(\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*\)""")
-        val (cStr, mStr, yStr, kStr) = regex.matchEntire(s)?.destructured
+        val [cStr, mStr, yStr, kStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val c = parsePercentOrFraction(cStr)
         val m = parsePercentOrFraction(mStr)
@@ -174,7 +174,7 @@ internal object ColorParser {
 
     fun parseCmyka(s: String): Color {
         val regex = Regex("""cmyka\(\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (cStr, mStr, yStr, kStr, aStr) = regex.matchEntire(s)?.destructured
+        val [cStr, mStr, yStr, kStr, aStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val c = parsePercentOrFraction(cStr)
         val m = parsePercentOrFraction(mStr)
@@ -199,7 +199,7 @@ internal object ColorParser {
     // ---------- HWB ----------
     fun parseHwb(s: String): Color {
         val regex = Regex("""hwb\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*\)""")
-        val (hStr, wStr, bStr) = regex.matchEntire(s)?.destructured
+        val [hStr, wStr, bStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val w = parsePercentOrFraction(wStr)
@@ -209,7 +209,7 @@ internal object ColorParser {
 
     fun parseHwba(s: String): Color {
         val regex = Regex("""hwba\(\s*([0-9]+)\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)%?\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (hStr, wStr, bStr, aStr) = regex.matchEntire(s)?.destructured
+        val [hStr, wStr, bStr, aStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
         val h = hStr.toInt()
         val w = parsePercentOrFraction(wStr)
@@ -267,7 +267,7 @@ internal object ColorParser {
     // ---------- XYZ ----------
     fun parseXyz(s: String): Color {
         val regex = Regex("""xyz\(\s*([0-9]*\.?[0-9]+)\s*,\s*([0-9]*\.?[0-9]+)\s*,\s*([0-9]*\.?[0-9]+)\s*\)""")
-        val (xStr, yStr, zStr) = regex.matchEntire(s)?.destructured
+        val [xStr, yStr, zStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
 
         val X = xStr.toDouble() / 100.0
@@ -291,7 +291,7 @@ internal object ColorParser {
     // ---------- LAB ----------
     fun parseLab(s: String): Color {
         val regex = Regex("""lab\(\s*(-?[0-9]*\.?[0-9]+)\s*,\s*(-?[0-9]*\.?[0-9]+)\s*,\s*(-?[0-9]*\.?[0-9]+)\s*\)""")
-        val (lStr, aStr, bStr) = regex.matchEntire(s)?.destructured
+        val [lStr, aStr, bStr] = regex.matchEntire(s)?.destructured
             ?: throw MalformedInputException("The format is not valid:  $s")
 
         val L = lStr.toDouble()

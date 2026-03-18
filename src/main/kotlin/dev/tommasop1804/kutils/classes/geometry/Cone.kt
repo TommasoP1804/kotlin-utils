@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.GeometryException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -203,6 +203,37 @@ class Cone(
      * @since 1.0.0
      */
     fun copy(baseCenter: Point = this.baseCenter, radius: Double = this.radius, height: Double = this.height) = Cone(baseCenter, radius, height)
+    
+    /**
+     * Retrieves the center of the base of the cone.
+     *
+     * This operator function allows the `baseCenter` property to be destructured
+     * when using the destructuring declaration syntax on a `Cone` object.
+     *
+     * @return The `baseCenter` property of the `Cone`.
+     * @since 3.1.0
+     */
+    operator fun component1() = baseCenter
+    /**
+     * Retrieves the radius of the cone as part of the destructuring declaration.
+     *
+     * This operator function provides access to the `radius` property of the `Cone` object
+     * in a destructuring context, allowing the radius to be extracted as the second component.
+     *
+     * @return The radius of the cone.
+     * @since 3.1.0
+     */
+    operator fun component2() = radius
+    /**
+     * Returns the `height` property of the `Cone` instance.
+     * 
+     * This is the third component of the `Cone` decomposition, providing
+     * direct access to the `height` value in destructuring declarations.
+     *
+     * @return The height of the cone.
+     * @since 3.1.0
+     */
+    operator fun component3() = height
 
     /**
      * Compares this `Cone` object with another object for equality.
