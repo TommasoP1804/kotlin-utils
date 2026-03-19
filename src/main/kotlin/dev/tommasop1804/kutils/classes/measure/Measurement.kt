@@ -89,6 +89,39 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
          */
         infix fun <T : ScalarUnit> Number.ofUnitUnrestricted(unit: T) = RMeasurement(toDouble(), unit)
 
+        /**
+         * Parses an unrestricted measurement string into a Measurement object.
+         *
+         * The input string is expected to contain a numeric value followed by a unit symbol,
+         * separated by one or more spaces.
+         *
+         * @param string the measurement string to be parsed, containing a number and a unit symbol.
+         * @return a Result wrapping the parsed Measurement object or an exception if parsing fails.
+         * @throws NoSuchEntryException if the unit symbol in the input string does not match any known units.
+         * @since 3.1.1
+         */
+        @Suppress("UNCHECKED_CAST")
+        infix fun parseUnrestricted(string: String) = runCatching {
+            val [number, unit] = string / (Char.SPACE to 2)
+            Measurement(
+                number.toDouble(),
+                MeasureUnit.knownUnitsScalar.find { it.knownSymbol && it.symbol == unit } ?: throw NoSuchEntryException("Unknown symbol unit: $unit")
+            )
+        }
+
+        /**
+         * Converts the current string to a measurement by parsing it using the `parseUnrestricted` function.
+         *
+         * The input string should represent a valid measurement format that is compatible with parsing.
+         * The function provides a way to interpret such strings into a measurement object.
+         *
+         * @receiver The string to be converted into a measurement.
+         * @return A parsed measurement based on the input string wrapped in a Result.
+         *
+         * @since 3.1.1
+         */
+        fun String.toMeasurement() = parseUnrestricted(this)
+
         class Serializer : ValueSerializer<Measurement>() {
             override fun serialize(
                 value: Measurement,
@@ -108,7 +141,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): Measurement {
                 val node = p.objectReadContext().readTree<ObjectNode>(p)
                 val unit: MeasureUnit = if (node.get("unit").isString)
-                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asString() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asString() } ?: throw IllegalArgumentException("Symbol of scalar unit not found: ${node.get("unit").asString()}")
+                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asString() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asString() } ?: throw NoSuchEntryException("Symbol of scalar unit not found: ${node.get("unit").asString()}")
                 else MeasureUnit(
                     node.get("unit").get("name").asString(),
                     node.get("unit").get("measure").asString(),
@@ -138,7 +171,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext?): Measurement {
                 val node = p.codec.readTree<com.fasterxml.jackson.databind.node.ObjectNode>(p)
                 val unit: MeasureUnit = if (node.get("unit").isTextual)
-                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asText() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asText() } ?: throw IllegalArgumentException("Symbol of scalar unit not found: ${node.get("unit").asText()}")
+                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asText() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asText() } ?: throw NoSuchEntryException("Symbol of scalar unit not found: ${node.get("unit").asText()}")
                 else MeasureUnit(
                     node.get("unit").get("name").asText(),
                     node.get("unit").get("measure").asText(),
@@ -605,6 +638,37 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
          * @since 1.0.0
          */
         infix fun Number.ofUnit(unit: MeasureUnit.DataSizeUnit): DataSize = RMeasurement(toDouble(), unit)
+        
+        /**
+         * Parses the given string into a measurement object with a numeric value and a unit.
+         *
+         * @param string The input string in the format "number unit", where number is a numeric value
+         * and unit is a valid unit symbol. The unit symbol must correspond to a known measurement unit.
+         * @return A [Result] wrapping the measurement object with the parsed value and associated unit.
+         *         If the parsing fails or an unknown unit is provided, an exception is thrown and captured in the [Result].
+         * @since 3.1.1
+         */
+        @Suppress("UNCHECKED_CAST")
+        infix fun <T : ScalarUnit> parse(string: String) = runCatching {
+            val [number, unit] = string / (Char.SPACE to 2)
+            RMeasurement(
+                number.toDouble(),
+                MeasureUnit.knownUnitsScalar.find { it.knownSymbol && it.symbol == unit } as T? ?: throw NoSuchEntryException("Unknown symbol unit: $unit")
+            )
+        }
+
+        /**
+         * Converts the current string to a measurement by parsing it using the `parse` function.
+         *
+         * The input string should represent a valid measurement format that is compatible with parsing.
+         * The function provides a way to interpret such strings into a measurement object.
+         *
+         * @receiver The string to be converted into a measurement.
+         * @return A parsed measurement based on the input string wrapped in a Result.
+         *
+         * @since 3.1.1
+         */
+        fun <T : ScalarUnit> String.toMeasurement() = parse<T>(this)
 
         class Serializer : ValueSerializer<RMeasurement<*>>() {
             override fun serialize(
@@ -625,7 +689,7 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): RMeasurement<*> {
                 val node = p.objectReadContext().readTree<ObjectNode>(p)
                 val unit: MeasureUnit = if (node.get("unit").isString)
-                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asString() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asString() } ?: throw IllegalArgumentException("Symbol of scalar unit not found: ${node.get("unit").asString()}")
+                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asString() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asString() } ?: throw NoSuchEntryException("Symbol of scalar unit not found: ${node.get("unit").asString()}")
                 else MeasureUnit(
                     node.get("unit").get("name").asString(),
                     node.get("unit").get("measure").asString(),
@@ -655,7 +719,7 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext?): RMeasurement<*> {
                 val node = p.codec.readTree<com.fasterxml.jackson.databind.node.ObjectNode>(p)
                 val unit: MeasureUnit = if (node.get("unit").isTextual)
-                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asText() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asText() } ?: throw IllegalArgumentException("Symbol of scalar unit not found: ${node.get("unit").asText()}")
+                    MeasureUnit.knownUnits.find { it.symbol == node.get("unit").asText() } ?: MeasureUnit.knownUnits.find { it.unitName == node.get("unit").asText() } ?: throw NoSuchEntryException("Symbol of scalar unit not found: ${node.get("unit").asText()}")
                 else MeasureUnit(
                     node.get("unit").get("name").asText(),
                     node.get("unit").get("measure").asText(),

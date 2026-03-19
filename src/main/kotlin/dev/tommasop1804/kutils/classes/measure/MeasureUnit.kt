@@ -176,6 +176,22 @@ class MeasureUnit internal constructor(override val measure: String, override va
                 .map(ScalarUnit::measureUnit)
                 .toSet()
 
+        /**
+         * Represents a set of scalar units that are derived from known unit constants.
+         *
+         * This property provides a collection of predefined scalar units, obtained by converting
+         * `knownUnitsConsts` into a set. It serves as a reference for scalar units that are well-defined
+         * and recognized within the scope of the `MeasureUnit` class.
+         *
+         * The backing field ensures that the returned set always reflects the current state
+         * of `knownUnitsConsts`, providing a reliable and consistent snapshot of known scalar units.
+         *
+         * @return A set of scalar units derived from `knownUnitsConsts`.
+         * @since 3.1.1
+         */
+        internal val knownUnitsScalar: Set<ScalarUnit>
+            get() = knownUnitsConsts.toSet()
+
         class Serializer : ValueSerializer<MeasureUnit>() {
             override fun serialize(
                 value: MeasureUnit,
