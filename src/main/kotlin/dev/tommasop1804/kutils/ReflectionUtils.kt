@@ -8,7 +8,9 @@ import dev.tommasop1804.kutils.annotations.Since
 import dev.tommasop1804.kutils.exceptions.PropertyNotAccessibleException
 import dev.tommasop1804.kutils.exceptions.PropertyNotFoundException
 import kotlin.reflect.*
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
 
@@ -314,6 +316,26 @@ inline infix fun <reified T : Any> KClass<T>.getPropertiesOfType(type: KType) =
  */
 infix fun <T> KFunction<T>.getParameterByName(name: String): KParameter? =
     parameters.find { it.name == name }
+
+/**
+ * Searches for an annotation of the specified type on the property itself, its backing Java field,
+ * or the corresponding primary constructor parameter if available.
+ *
+ * @return The annotation of type [A] if found, or `null` if the annotation is not present.
+ * @since 3.1.2
+ */
+inline fun <reified A : Annotation> KProperty<*>.findAnnotationAnywhere(): A? {
+    findAnnotation<A>()?.let { return it }
+    (this as? KProperty1<*, *>)?.javaField?.getAnnotation(A::class.java)?.let { return it }
+    (this as? KProperty1<*, *>)
+        ?.let { prop ->
+            prop.javaField?.declaringClass?.kotlin?.primaryConstructor
+                ?.parameters
+                ?.firstOrNull { it.name == prop.name }
+                ?.findAnnotation<A>()
+        }?.let { return it }
+    return null
+}
 
 /**
  * Checks if the given object's class has a specified annotation.

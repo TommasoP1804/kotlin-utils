@@ -93,9 +93,9 @@ class SqlQueryBuilder {
      */
     fun select(@Language("sql") vararg columns: String, distinct: Boolean = false): SqlQueryBuilder {
         type = QueryType.SELECT
-        selectClause += "SELECT "
-        if (distinct) selectClause += "DISTINCT "
-        selectClause += if (columns.isEmpty()) "*" else columns.joinToString(", ")
+        if ("SELECT " notInIgnoreCase selectClause) selectClause += "SELECT "
+        if (distinct && "DISTINCT " notInIgnoreCase selectClause) selectClause += "DISTINCT "
+        selectClause += (if (selectClause.last() != Char.SPACE) ", " else String.EMPTY) + (if (columns.isEmpty()) "*" else columns.joinToString(", "))
         return this
     }
 
@@ -111,9 +111,9 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun from(@Language("sql") vararg tables: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call from() method before calling select() method.")
         validate(tables.isNotEmpty())
-        fromClause += " FROM ${tables.joinToString()}"
+        fromClause += if (" FROM " notInIgnoreCase fromClause) " FROM ${tables.joinToString()}"
+        else ", ${tables.joinToString()}"
         return this
     }
 
@@ -129,7 +129,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun join(@Language("sql") table: String, @Language("sql") joinType: String, @Language("sql") onCondition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call join() method before calling select() method.")
         joinClause += " ${+joinType} JOIN $table ON $onCondition"
         return this
     }
@@ -150,7 +149,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun join(@Language("sql") table: String, joinType: JoinType, @Language("sql") onCondition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call join() method before calling select() method.")
         joinClause += " ${+joinType.sqlKeyWord} JOIN $table ON $onCondition"
         return this
     }
@@ -170,7 +168,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun lateralJoin(@Language("sql") query: String, @Language("sql") joinType: String, @Language("sql") onCondition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call join() method before calling select() method.")
         joinClause += " ${+joinType} JOIN LATERAL ($query) ON $onCondition"
         return this
     }
@@ -185,7 +182,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun lateralJoin(@Language("sql") query: String, joinType: JoinType, @Language("sql") onCondition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call join() method before calling select() method.")
         joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL ($query) ON $onCondition"
         return this
     }
@@ -206,7 +202,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun lateralJoin(query: SqlQuery, @Language("sql") joinType: String, @Language("sql") onCondition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call join() method before calling select() method.")
         joinClause += " ${+joinType} JOIN LATERAL (${query.value}) ON $onCondition"
         return this
     }
@@ -227,7 +222,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun lateralJoin(query: SqlQuery, joinType: JoinType, @Language("sql") onCondition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call join() method before calling select() method.")
         joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL (${query.value}) ON $onCondition"
         return this
     }
@@ -246,7 +240,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun groupBy(@Language("sql") vararg columns: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call groupBy() method before calling select() method.")
         groupByClause += if (groupByClause.isEmpty()) " GROUP BY ${columns.joinToString(", ")}" else ", ${
             columns.joinToString(
                 ", "
@@ -268,7 +261,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun having(@Language("sql") condition: String): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call having() method before calling select() method.")
         havingClause += if (havingClause.isEmpty()) " HAVING $condition" else " AND $condition"
         return this
     }
@@ -315,7 +307,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun columns(@Language("sql") vararg columns: String): SqlQueryBuilder {
-        type == QueryType.INSERT || throw UnsupportedOperationException("You can't call columns() method before calling insertInto() method.")
         insertColumns += columns
         return this
     }
@@ -331,7 +322,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun values(@Language("sql") vararg values: String): SqlQueryBuilder {
-        type == QueryType.INSERT || throw UnsupportedOperationException("You can't call values() method before calling insertInto() method.")
         insertValues += values
         return this
     }
@@ -360,7 +350,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun set(@Language("sql") vararg setExpression: String): SqlQueryBuilder {
-        type == QueryType.UPDATE || throw UnsupportedOperationException("You can't call set() method before calling update() method.")
         setClause += setExpression.joinToString(", ")
         return this
     }
@@ -480,7 +469,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun orderBy(vararg columns: Pair<String, SortDirection>): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call orderBy() method before calling from() method.")
         orderByClause += " ORDER BY "
         columns.forEachIndexed { i, it ->
             orderByClause += it.first + (if (it.second == SortDirection.ASCENDING) String.EMPTY else " DESC") + (if (i == columns.size - 1) String.EMPTY else ", ")
@@ -498,7 +486,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun orderBy(@Language("sql") vararg columns: String, direction: SortDirection = SortDirection.ASCENDING): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call orderBy() method before calling from() method.")
         orderByClause += " ORDER BY "
         columns.forEachIndexed { i, it ->
             orderByClause += it + (if (direction == SortDirection.ASCENDING) String.EMPTY else " DESC") + (if (i == columns.size - 1) String.EMPTY else ", ")
@@ -518,7 +505,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun limit(limit: Int): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call limit() method before calling from() method.")
         limitClause += " LIMIT $limit"
         return this
     }
@@ -531,7 +517,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun offset(offset: Int): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call offset() method before calling from() method.")
         offsetClause += " OFFSET $offset"
         return this
     }
@@ -547,7 +532,6 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun range(range: IntRange): SqlQueryBuilder {
-        type == QueryType.SELECT || throw UnsupportedOperationException("You can't call limit() method before calling from() method.")
         limitClause += " LIMIT ${range.last - range.first + 1}"
         limitClause += " OFFSET ${range.first}"
         return this
