@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -539,6 +540,44 @@ inline fun <E> Array<E>?.ifNullOrEmpty(defaultValue: Supplier<Array<E>>): Array<
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }
     return if (isNullOrEmpty()) defaultValue() else this
+}
+
+/**
+ * Executes the given action if the array is not empty. Returns the result of the action
+ * if the array is non-empty; otherwise, returns the array itself.
+ *
+ * @param action A function to be invoked with the array as the receiver if it is not empty.
+ * @return The result of the action if the array is not empty, or the array itself if it is empty.
+ * @since 3.1.3
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <E, R> Array<E>.ifNotEmpty(action: ReceiverTransformer<Array<E>, R>): R {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return (if (isNotEmpty()) action(this) else this) as R
+}
+
+/**
+ * Executes the specified [action] if the array is not null and not empty.
+ *
+ * This function checks whether the array fulfills the condition of being non-null and having at least one element.
+ * If the condition is met, the given [action] is invoked with the array as its receiver.
+ * Otherwise, the function returns the array as is.
+ *
+ * @param action The lambda or function to execute when the array is not null and not empty.
+ * @return The result of the [action] if executed, or the original array cast to the expected type if not.
+ * @since 3.1.3
+ */
+@OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <E, R> Array<E>?.ifNotNullOrEmpty(action: ReceiverTransformer<Array<E>, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) implies returnsNotNull()
+    }
+    return (if (isNotNullOrEmpty()) action(this) else this) as R
 }
 
 /**

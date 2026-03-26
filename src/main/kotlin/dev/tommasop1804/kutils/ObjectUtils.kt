@@ -91,14 +91,14 @@ fun Any?.isNull(): Boolean {
  * Executes the specified action if the current nullable receiver is not null.
  *
  * @param action The action to perform on the non-null receiver of type [T].
- * @since 1.0.0
+ * @since 3.1.3
  */
-inline infix fun <T> T?.ifNotNull(action: ReceiverConsumer<T>) {
+inline fun <T, R> T?.ifNotNull(action: ReceiverTransformer<T, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (this@ifNotNull != null) holdsIn action
     }
-    if (this != null) this.action()
+    return if (this != null) this.action() else null
 }
 
 /**

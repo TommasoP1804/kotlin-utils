@@ -16,19 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.tommasop1804:kotlin-utils:3.1.2")
-}
-```
-
-### Gradle (Groovy)
-
-```groovy
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'dev.tommasop1804:kotlin-utils:3.1.2'
+    implementation("dev.tommasop1804:kotlin-utils:3.1.3")
 }
 ```
 

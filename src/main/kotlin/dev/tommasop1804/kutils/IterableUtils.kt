@@ -17,6 +17,7 @@ import dev.tommasop1804.kutils.exceptions.*
 import java.util.*
 import java.util.stream.Collector
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.collections.map as kMap
@@ -574,6 +575,44 @@ inline fun <C : Collection<E>, E> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }
     return if (isNullOrEmpty()) defaultValue() else this
+}
+
+/**
+ * Executes the given action if the collection is not empty.
+ *
+ * @param action A transformer that will be executed if the collection is not empty.
+ * @return The result of the action if the collection is not empty, or the collection itself otherwise.
+ * @since 3.1.3
+ */
+@Suppress("UNCHECKED_CAST")
+inline fun <C : Collection<E>, E, R> C.ifNotEmpty(action: ReceiverTransformer<C, R>): R {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return (if (isNotEmpty()) action(this) else this) as R
+}
+
+/**
+ * Performs the given [action] on the collection if it is not null and not empty.
+ *
+ * This method provides a safe way to execute an operation on a nullable collection only
+ * when it contains elements. If the collection is null or empty, no action is performed
+ * and the collection itself is returned.
+ *
+ * @param action The lambda function or transformation to be applied on the collection
+ *               if it is not null and not empty.
+ * @return The result of the [action] if the collection is not null and not empty,
+ *         otherwise the collection itself as is.
+ * @since 3.1.3
+ */
+@OptIn(ExperimentalExtendedContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <C : Collection<E>?, E, R> C?.ifNotNullOrEmpty(action: ReceiverTransformer<C, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) implies returnsNotNull()
+    }
+    return (if (isNotNullOrEmpty()) action(this) else this) as R
 }
 
 /**

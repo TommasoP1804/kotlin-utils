@@ -311,6 +311,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
         const val TRAILER = "Trailer"
         const val VIA = "Via"
         const val WARNING = "Warning"
+        const val PREFER = "Prefer"
 
         /**
          * Computes a unique hash-based identifier (eTag) for the current object.

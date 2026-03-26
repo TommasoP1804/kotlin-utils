@@ -16,6 +16,8 @@ import java.util.stream.Collector
 import kotlin.collections.map
 import kotlin.collections.putAll
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.collections.forEach as kForEach
 import kotlin.collections.groupBy as kGroupBy
@@ -963,6 +965,44 @@ operator fun <K, V> Map<K, V>?.not(): Boolean {
  * @since 1.0.0
  */
 infix fun <M : Map<K, V>, K, V> M?.ifNullOrEmpty(block: Supplier<M>): M = if (isNullOrEmpty()) block() else this
+
+/**
+ * Executes the given [action] if the map is not empty. If the map is empty, it returns the map itself.
+ *
+ * @param action A lambda function to be executed if the map is not empty. It takes the map as a receiver.
+ * @return The result of the [action] if the map is not empty, or the map itself if it is empty.
+ * @since 3.1.3
+ */
+@Suppress("UNCHECKED_CAST")
+inline fun <M : Map<K, V>, K, V, R> M.ifNotEmpty(action: ReceiverTransformer<M, R>): R {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return (if (isNotEmpty()) action(this) else this) as R
+}
+
+/**
+ * Executes the given action if the nullable map is not null and not empty.
+ *
+ * This method checks if the receiver map is neither null nor empty and, if true,
+ * invokes the specified action with the map as the input. If the map is null or empty,
+ * it simply returns the map without invoking the action.
+ *
+ * @param action The action to be executed if the map is not null and not empty.
+ *               It is a function that takes the map as input and returns a result.
+ * @return The result of the action if the map is not null and not empty,
+ *         or the map itself if it is null or empty.
+ * @since 3.1.3
+ */
+@OptIn(ExperimentalExtendedContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <M : Map<K, V>?, K, V, R> M?.ifNotNullOrEmpty(action: ReceiverTransformer<M, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) implies returnsNotNull()
+    }
+    return (if (isNotNullOrEmpty()) action(this) else this) as R
+}
 
 /**
  * Retrieves the first entry in the map that satisfies the given predicate.
