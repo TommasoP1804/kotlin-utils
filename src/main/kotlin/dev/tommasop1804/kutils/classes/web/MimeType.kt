@@ -73,6 +73,15 @@ value class MimeType private constructor(val value: String) : CharSequence {
      */
     val subtype: String get() = value.substringAfter('/')
     /**
+     * Retrieves the suffix portion of the MIME subtype, which is the part after the last occurrence
+     * of the "+" character in the `subtype` field.
+     *
+     * This property is typically used to identify specific subtypes within a more general MIME type.
+     * For example, in the MIME type "application/ld+json", the `suffix` would be "json".
+     * @since 3.2.0
+     */
+    val subtypeSuffix: String get() = subtype.substringAfterLast(Char.PLUS)
+    /**
      * The length of the value represented as an integer.
      * This property returns the number of characters present
      * in the `value` string. It is computed dynamically.
@@ -158,6 +167,26 @@ value class MimeType private constructor(val value: String) : CharSequence {
          * @since 2.0.0
          */
         val APPLICATION_PROBLEM_JSON = MimeType("application/problem+json")
+        /**
+         * Represents the MIME type `application/merge-patch+json`.
+         *
+         * This MIME type is primarily used to describe JSON Merge Patch documents,
+         * which are used for partial updates to JSON resources. It follows
+         * the specification outlined in RFC 7396, providing a lightweight mechanism
+         * for patching JSON documents by defining only the differences between the
+         * original and the desired state.
+         * @since 3.2.0
+         */
+        val APPLICATION_MERGE_PATCH_JSON = MimeType("application/merge-patch+json")
+        /**
+         * Represents the MIME type `application/json-patch+json`.
+         *
+         * This MIME type is commonly used to indicate a JSON Patch document,
+         * which defines a set of operations for modifying a JSON document.
+         * It conforms to the standard defined in RFC 6902.
+         * @since 3.2.0
+         */
+        val APPLICATION_JSON_PATCH_JSON = MimeType("application/json-patch+json")
         /**
          * Represents the MIME type for newline-delimited JSON (NDJSON) data streams.
          * NDJSON is a format where each line is a separate JSON object, allowing for
@@ -626,4 +655,14 @@ value class MimeType private constructor(val value: String) : CharSequence {
      * @since 3.1.0
      */
     operator fun component2() = subtype
+
+    /**
+     * Compares the suffixes of the subtypes of two MimeType instances for equality.
+     * The comparison considers the portion of the `subtype` after the "+" character.
+     *
+     * @param other The MimeType instance to compare the current instance against.
+     * @return `true` if the `type` values are equal and the suffixes (parts after "+") of the `subtype` values are also equal, `false` otherwise.
+     * @since 3.2.0
+     */
+    infix fun equalsSuffixes(other: MimeType) = type == other.type && subtypeSuffix == other.subtypeSuffix
 }

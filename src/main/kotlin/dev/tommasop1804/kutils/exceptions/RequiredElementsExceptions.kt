@@ -14,11 +14,11 @@ import kotlin.reflect.KProperty
  * Typically used in input validation processes where a field marked as required
  * is found to be null, empty, or otherwise invalid.
  *
- * @since 1.0.0
+ * @since 3.2.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-open class RequiredFieldException : ValidationFailedException {
+open class RequiredPropertyException : ValidationFailedException {
     /**
      * Extracts the internal error code from the associated message by retrieving the substring
      * that precedes the delimiter " @@@ ". If the extracted substring is blank, the result is null.
@@ -26,27 +26,27 @@ open class RequiredFieldException : ValidationFailedException {
      * This property provides additional context for errors, particularly when specific internal
      * codes are embedded within the message field.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     val internalErrorCode: String?
         get() = message?.before(" @@@ ")?.ifBlank { null }
 
     /**
-     * Constructs a new instance of RequiredFieldException with no detailed message.
-     * This exception indicates that a required field in the validation process was missing or incorrect.
+     * Constructs a new instance of RequiredPropertyException with no detailed message.
+     * This exception indicates that a required property in the validation process was missing or incorrect.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor() : super()
     /**
-     * Constructs a new RequiredFieldException with the specified detail message.
+     * Constructs a new RequiredPropertyException with the specified detail message.
      *
      * @param message the detail message, which provides additional information about the exception.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(message: String?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + message)
     /**
-     * Constructs an instance of RequiredFieldException with a detailed message
+     * Constructs an instance of RequiredPropertyException with a detailed message
      * describing the context of the provided property and variable name.
      *
      * The message created uses the provided `variableName` and `property` to construct
@@ -59,11 +59,11 @@ open class RequiredFieldException : ValidationFailedException {
      * @param property the property whose details are used in constructing the exception message
      * @param variableName an optional descriptive name for the variable, included in the message if provided and not blank
      * @throws IllegalArgumentException if the provided parameters cannot construct a valid message
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
-     * Constructs a new instance of `RequiredFieldException` with a formatted message based on
+     * Constructs a new instance of `RequiredPropertyException` with a formatted message based on
      * the provided property and variable name.
      *
      * @param property the property reference, used to construct the error message. Can be nullable.
@@ -75,28 +75,28 @@ open class RequiredFieldException : ValidationFailedException {
      * - The qualified name of the owner's class of `property` is included.
      * - The name and return type of `property` are included.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
-     * Constructs a new RequiredFieldException with the specified cause.
+     * Constructs a new RequiredPropertyException with the specified cause.
      * This constructor is typically used when another exception raised during validation serves as the root cause
      * for this exception, allowing it to be chained for better debugging and error analysis.
      *
      * @param cause the underlying cause of the exception, providing detailed information about the validation failure.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY), cause)
     /**
-     * Constructs a new RequiredFieldException with the specified detail message and cause.
+     * Constructs a new RequiredPropertyException with the specified detail message and cause.
      *
      * @param message the detail message, which provides additional information about the exception.
      * @param cause the cause of the exception, which can be used to trace the root issue.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + message, cause)
     /**
-     * Constructs an instance of `RequiredFieldException` with a message generated from the provided property,
+     * Constructs an instance of `RequiredPropertyException` with a message generated from the provided property,
      * variable name, and optional cause. The message describes the property, its owner class, and return type.
      *
      * @param property the Kotlin property associated with the exception, where relevant information such as
@@ -104,11 +104,11 @@ open class RequiredFieldException : ValidationFailedException {
      * @param variableName the name of the variable associated with the exception, if any. If present and not blank,
      * it will be included in the exception message. Nullable.
      * @param cause the optional cause of the exception, if any. Nullable.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
     /**
-     * Constructor for the RequiredFieldException class.
+     * Constructor for the RequiredPropertyException class.
      *
      * This constructor initializes the exception with a message formatted based on the
      * property and variable provided, and optionally includes a cause for the exception.
@@ -119,7 +119,7 @@ open class RequiredFieldException : ValidationFailedException {
      * @param property The property associated with the exception, or `null` if not applicable.
      * @param variable The variable that caused the exception.
      * @param cause The underlying cause of the exception, or `null` if not applicable.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
 }

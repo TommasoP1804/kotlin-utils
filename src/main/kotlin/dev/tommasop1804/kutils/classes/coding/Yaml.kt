@@ -15,6 +15,8 @@ import dev.tommasop1804.kutils.annotations.Beta
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.exceptions.NoSuchJsonPathException
+import dev.tommasop1804.kutils.exceptions.NoSuchYamlPathException
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.constructor.Constructor
@@ -383,7 +385,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @throws ClassCastException If an element in the YAML content cannot be cast to the specified type `T`.
      * @since 3.0.0
      */
-    fun <T> toList() = runCatching { SNAKE_YAML.loadAll(value).map { it as T } }
+    fun <T> toList() = runCatching { SNAKE_YAML.load<List<T>>(value) }
     /**
      * Parses the YAML content stored in the current object and converts it into a mutable list of type [T].
      * 
@@ -394,7 +396,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @throws ClassCastException If any element in the YAML content cannot be cast to the specified type [T].
      * @since 3.0.0
      */
-    fun <T> toMList() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toMList() }
+    fun <T> toMList() = runCatching { SNAKE_YAML.load<List<T>>(value).toMList() }
 
     /**
      * Converts the YAML content represented by `value` into a set of objects of type `T`.
@@ -409,7 +411,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *         if an error occurs.
      * @since 3.0.0
      */
-    fun <T> toSet() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toSet() }
+    fun <T> toSet() = runCatching { SNAKE_YAML.load<List<T>>(value).toSet() }
     /**
      * Parses the YAML content stored in the `value` field and converts it into a mutable set of elements of type T.
      *
@@ -420,7 +422,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *         If parsing or type casting fails, a `Failure` with the corresponding exception is returned.
      * @since 3.0.0
      */
-    fun <T> toMSet() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toMSet() }
+    fun <T> toMSet() = runCatching { SNAKE_YAML.load<List<T>>(value).toMSet() }
 
     /**
      * Converts the underlying YAML content into a map structure of key-value pairs.
@@ -566,6 +568,63 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      */
     fun removeComments() {
         value -= Regex("#.*")
+    }
+
+    /**
+     * Applies a merge patch to the current YAML object, transforming it based on the provided patch YAML.
+     *
+     * The method attempts to convert the YAML content to JSON, applies the JSON merge patch algorithm,
+     * and converts the resulting JSON back to YAML.
+     *
+     * @param patch the YAML object containing the patch to apply to the current YAML object
+     * @return a Result containing the patched YAML object, or an exception wrapped in the Result if an error occurs
+     * @since 3.2.0
+     */
+    infix fun mergePatch(patch: Yaml) = runCatching {
+        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty())) }, overwriteOnly = NoSuchJsonPathException::class) {
+            toJson().mergePatch(patch.toJson())().toYaml()
+        }
+    }
+    /**
+     * Applies a merge patch to the current YAML object, transforming it based on the provided patch JSON.
+     *
+     * The method attempts to convert the YAML content to JSON, applies the JSON merge patch algorithm,
+     * and converts the resulting JSON back to YAML.
+     *
+     * @param patch the JSON object containing the patch to apply to the current YAML object
+     * @return a Result containing the patched YAML object, or an exception wrapped in the Result if an error occurs
+     * @since 3.2.0
+     */
+    infix fun mergePatch(patch: Json) = runCatching {
+        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty())) }, overwriteOnly = NoSuchJsonPathException::class) {
+            toJson().mergePatch(patch)().toYaml()
+        }
+    }
+    /**
+     * Applies a YAML patch operation to modify the current YAML content and returns the result.
+     *
+     * @param patch the YAML patch to be applied. It represents the set of operations
+     * to modify the original YAML content.
+     * @return a [Result] encapsulating the modified YAML or an exception if the operation fails.
+     * @since 3.2.0
+     */
+    infix fun yamlPatch(patch: Yaml) = runCatching {
+        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty()), e.cause) }, includeCause = false, overwriteOnly = NoSuchJsonPathException::class) {
+            toJson().jsonPatch(patch.toJson())().toYaml()
+        }
+    }
+    /**
+     * Applies a YAML patch operation to modify the current YAML content and returns the result.
+     *
+     * @param patch the YAML patch to be applied. It represents the set of operations
+     * to modify the original YAML content.
+     * @return a [Result] encapsulating the modified YAML or an exception if the operation fails.
+     * @since 3.2.0
+     */
+    infix fun yamlPatch(patch: Json) = runCatching {
+        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty())) }, overwriteOnly = NoSuchJsonPathException::class) {
+            toJson().jsonPatch(patch)().toYaml()
+        }
     }
 }
 

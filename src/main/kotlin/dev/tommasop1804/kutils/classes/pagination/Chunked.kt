@@ -187,7 +187,7 @@ data class Chunked<T>(
                 }
             })
 
-            logger.debug("<> Query from ${ANSI.ITALIC}${this::class.simpleName}${ANSI.RESET}: {}", query.value)
+            logger.debug("<> Query from ${Ansi.ITALIC}${this::class.simpleName}${Ansi.RESET}: {}", query.value)
 
             val filtered = with(entityManager) { query.executeSelectMultipleResult<M>().map(dtoMapper) }
             return Chunked(

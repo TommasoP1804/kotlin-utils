@@ -280,6 +280,65 @@ open class MalformedInputException : ValidationFailedException {
 }
 
 /**
+ * Represents an exception indicating that a property is malformed or does not conform
+ * to the expected structure or type.
+ *
+ * `MalformedPropertyException` is a specific type of `MalformedInputException` that focuses on properties
+ * associated with a specific name, field type, or class being invalid or improperly structured.
+ * @author Tommaso Pastorelli
+ * @sice 3.2.0
+ */
+@Suppress("unused")
+open class MalformedPropertyException : MalformedInputException {
+    /**
+     * Initializes a new instance of the MalformedPropertyException class
+     * with no additional error details or message.
+     * @sice 3.2.0
+     */
+    constructor() : super()
+    /**
+     * Constructs a new instance of MalformedPropertyException with the provided error message and an optional
+     * internal error code.
+     *
+     * @param message The detail message describing the exception. This may be null.
+     * @param internalErrorCode An optional code representing an internal error, providing additional context. Defaults to null.
+     * @sice 3.2.0
+     */
+    constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode)
+    /**
+     * Constructs a new instance of the exception to indicate a malformed property.
+     *
+     * @param name The name of the property that caused the exception.
+     * @param fieldType The expected type of the property.
+     * @param `class` (Optional) The class where the property exists. Can be null if the class context is not applicable.
+     * @param internalErrorCode (Optional) A custom internal error code for the exception.
+     *
+     * The exception message provides a detailed description indicating the property name
+     * and its expected type. If the class context is provided and valid, it includes the class name in the message.
+     * @sice 3.2.0
+     */
+    constructor(name: String, fieldType: KClass<*>, `class`: KClass<*>?, internalErrorCode: String? = null) : super("Property `$name`${if (`class`.isNotNull()) " of class `${`class`.simpleName}`" else String.EMPTY} is not a valid `$fieldType`", internalErrorCode)
+    /**
+     * Constructs a new MalformedPropertyException with the specified detail message, cause,
+     * and an optional internal error code.
+     *
+     * @param message The detail message for the exception, or null if none.
+     * @param cause The cause of the exception, or null if none.
+     * @param internalErrorCode An optional internal error code for additional context, or null if none.
+     * @sice 3.2.0
+     */
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode)
+    /**
+     * Constructs a new MalformedPropertyException with the specified cause and an optional internal error code.
+     *
+     * @param cause The cause of the exception, which can be null.
+     * @param internalErrorCode An optional error code providing additional information about the internal error.
+     * @sice 3.2.0
+     */
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode)
+}
+
+/**
  * A specific type of `MalformedInputException` that indicates a parameter provided
  * to a method or function is malformed or does not conform to the expected format, type, or structure.
  *
@@ -981,28 +1040,28 @@ open class ClassMismatchException : ExpectationMismatchException {
  * with a custom message or including the cause of the validation failure.
  *
  * @author Tommaso Pastorelli
- * @since 1.0.0
+ * @since 3.2.0
  */
 @Suppress("unused")
-open class DuplicateFieldException : ValidationFailedException {
+open class DuplicatePropertyException : ValidationFailedException {
     /**
-     * Constructs a new instance of `DuplicateFieldException` without a specific error message or cause.
+     * Constructs a new instance of `DuplicatePropertyException` without a specific error message or cause.
      *
      * This exception is thrown to indicate that a validation error related to duplicate fields has occurred.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor() : super()
     /**
-     * Constructs a new `DuplicateFieldException` with the specified detail message.
+     * Constructs a new `DuplicatePropertyException` with the specified detail message.
      *
      * @param message the detail message, which allows for a more specific description
      *                of the exception condition.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(message: String?) : super(message)
     /**
-     * Constructs a DuplicateFieldException with a custom message based on the provided property and variable name.
+     * Constructs a DuplicatePropertyException with a custom message based on the provided property and variable name.
      *
      * If a variable name is provided and is not null or blank, it is included
      * in the message along with its type. Additionally, if the property is
@@ -1011,11 +1070,11 @@ open class DuplicateFieldException : ValidationFailedException {
      *
      * @param property the Kotlin reflection property used to describe the field
      * @param variableName an optional name of the variable to include in the exception message
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null) : super($$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
-     * Constructs a `DuplicateFieldException` with a custom message based on the given properties.
+     * Constructs a `DuplicatePropertyException` with a custom message based on the given properties.
      *
      * @param property The primary Kotlin property involved, which is used to describe the duplicate field.
      *                 Can be nullable.
@@ -1024,16 +1083,16 @@ open class DuplicateFieldException : ValidationFailedException {
      * If `variable.isNotNull()` evaluates to `true`, its name is included in the exception message.
      * The exception message also incorporates the containing class name, property name, and its return type.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>) : super($$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
-     * Constructs a new DuplicateFieldException with a detailed message generated
+     * Constructs a new DuplicatePropertyException with a detailed message generated
      * from the provided callable function and parameter name.
      *
      * @param callable The callable function where the parameter is located, or null if not specified.
      * @param parameterName The name of the parameter for which the exception is being constructed, or null if not specified.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(callable: KFunction<*>?, parameterName: String?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`")
     /**
@@ -1042,29 +1101,29 @@ open class DuplicateFieldException : ValidationFailedException {
      * @param callable The Kotlin function from which the parameter is extracted.
      * @param parameter The name of the parameter in the specified function.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(callable: KFunction<*>?, parameter: KProperty<*>) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter.name }?.type}`")
     /**
-     * Constructs a new `DuplicateFieldException` with the specified cause.
+     * Constructs a new `DuplicatePropertyException` with the specified cause.
      *
      * This constructor allows for wrapping a throwable that caused the validation error
-     * into a `DuplicateFieldException`.
+     * into a `DuplicatePropertyException`.
      *
      * @param cause the underlying cause of this exception, or `null` if no cause is provided.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(cause: Throwable?) : super(cause)
     /**
-     * Constructs a new `DuplicateFieldException` with the specified detail message and cause.
+     * Constructs a new `DuplicatePropertyException` with the specified detail message and cause.
      *
      * @param message the detail message, or `null` if no message is provided.
      * @param cause the cause of the exception, or `null` if the cause is not provided.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(message: String?, cause: Throwable?) : super(message, cause)
     /**
-     * Constructs a DuplicateFieldException with a detailed message and an optional cause.
+     * Constructs a DuplicatePropertyException with a detailed message and an optional cause.
      *
      * The exception message includes the type of the variable and property, if available.
      * If `variableName` is provided and is not null or blank, it will be included in the message.
@@ -1072,11 +1131,11 @@ open class DuplicateFieldException : ValidationFailedException {
      * @param property the property involved in the exception, nullable
      * @param variableName the name of the variable associated with the property, nullable
      * @param cause the cause of the exception, nullable
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, cause: Throwable?) : super($$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
     /**
-     * Constructor for the `DuplicateFieldException` class.
+     * Constructor for the `DuplicatePropertyException` class.
      *
      * Constructs a new exception that represents a duplicate field within a class.
      *
@@ -1087,54 +1146,54 @@ open class DuplicateFieldException : ValidationFailedException {
      * The exception message includes details regarding the property and variable. The `isNotNull` function
      * determines if the `variable` contains a non-null value, impacting the construction of the exception message.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>?, cause: Throwable?) : super($$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
     /**
-     * Constructs a DuplicateFieldException with a detailed message based on the provided callable function, parameter name,
+     * Constructs a DuplicatePropertyException with a detailed message based on the provided callable function, parameter name,
      * and cause of the exception.
      *
      * @param callable A Kotlin function whose parameter is causing the exception. It can be null.
      * @param parameterName The name of the parameter associated with the exception. It can be null.
      * @param cause The underlying cause of the exception. It can be null.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(callable: KFunction<*>?, parameterName: String?, cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`", cause)
     /**
-     * Constructs a new DuplicateFieldException with the specified callable name, parameter name, and cause.
+     * Constructs a new DuplicatePropertyException with the specified callable name, parameter name, and cause.
      *
      * This constructor is used when duplicate fields are encountered,
      * specifying the source callable name and parameter name for detailed error representation.
      * The error message follows the format: "<parameters of {callableName}>#{parameterName}".
      *
-     * @param callableName the name of the callable associated with the duplicate field, or null if not provided
+     * @param callableName the name of the callable associated with the duplicate property, or null if not provided
      * @param parameterName the name of the parameter that was found to be duplicate, or null if not provided
      * @param cause the underlying cause of the exception, or null if no cause is specified
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(callableName: String?, parameterName: String?, cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameterName}`", cause)
     /**
-     * Constructs a new instance of the exception for duplicate field parameters in a call to a function.
+     * Constructs a new instance of the exception for duplicate property parameters in a call to a function.
      *
-     * @param callable The function that contains the parameter with a duplicate field. May be null.
+     * @param callable The function that contains the parameter with a duplicate property. May be null.
      * @param parameter The property that corresponds to the parameter causing the exception.
      * @param cause The root cause of this exception. May be null.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(callable: KFunction<*>?, parameter: KProperty<*>?, cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`", cause)
     /**
-     * Constructs a new `DuplicateFieldException` with the specified details about a field duplication error.
+     * Constructs a new `DuplicatePropertyException` with the specified details about a property duplication error.
      *
      * This constructor initializes an exception with a detailed message that provides context about
-     * the duplicated field, including the callable name, the parameter name, and the parameter type.
+     * the duplicated property, including the callable name, the parameter name, and the parameter type.
      * An optional underlying cause for the exception can also be specified.
      *
      * @param callableName the name of the callable entity (e.g., method or property) where the duplication occurred; can be null
      * @param parameter the Kotlin property (`KProperty`) representing the parameter involved in the duplication; may be null
      * @param cause the throwable that triggered this exception, or null if no specific cause is given
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     constructor(callableName: String?, parameter: KProperty<*>?, cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.returnType}`", cause)
 }

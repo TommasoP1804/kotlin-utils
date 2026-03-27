@@ -6,10 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.Beta
-import dev.tommasop1804.kutils.classes.constants.SortDirection
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.UnsupportedJsonTypeException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
@@ -19,6 +18,7 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import tools.jackson.databind.cfg.DateTimeFeature
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.node.ArrayNode
 import tools.jackson.databind.node.ObjectNode
 import tools.jackson.module.kotlin.KotlinModule
 import java.io.File
@@ -1242,4 +1242,183 @@ class Json private constructor(@param:Language("json") override val value: Strin
             }
         }.toTypedArray()
     }
+
+    // JSON MERGE PATCH (RFC 7396)
+
+    /**
+     * Applies a JSON Merge Patch as per RFC 7386 to the current JSON object. The function takes a patch as input
+     * and merges it with the existing JSON content, producing a new JSON object that represents the result.
+     *
+     * @param patch The JSON object representing the patch to apply to the current JSON content.
+     * @return A Result containing the patched JSON object wrapped in a Json class, or an error if the operation fails.
+     * @since 3.2.0
+     */
+    infix fun mergePatch(patch: Json) = runCatching {
+        val targetNode = MAPPER.readTree(value)
+        val patchNode = MAPPER.readTree(patch.value)
+        Json(MAPPER.writeValueAsString(applyMergePatch(targetNode, patchNode)))
+    }
+    /**
+     * Applies a JSON Merge Patch to the current object using the provided YAML patch.
+     *
+     * @param patch The YAML object representing the patch to be applied.
+     * @since 3.2.0
+     */
+    @OptIn(Beta::class)
+    infix fun mergePatch(patch: Yaml) = mergePatch(patch.toJson())
+
+    private fun applyMergePatch(target: JsonNode?, patch: JsonNode): JsonNode {
+        if (patch.isObject) {
+            val targetObj = if (target.isNotNull() && target.isObject)
+                target.deepCopy() as ObjectNode
+            else MAPPER.createObjectNode()
+
+            patch.properties().forEach { entry ->
+                val key = entry.key
+                val value = entry.value
+
+                if (value.isNull) targetObj.remove(key)
+                else {
+                    val existing = targetObj.get(key)
+                    targetObj.set(key, applyMergePatch(existing, value))
+                }
+            }
+            return targetObj
+        }
+        return patch.deepCopy()
+    }
+
+    // JSON PATCH (RFC 6902)
+
+    /**
+     * Applies a JSON Patch to the current JSON data and returns the result. The method follows the specification
+     * of JSON Patch (RFC 6902) to modify the JSON structure according to the provided patch definition.
+     * This implementation supports operations such as "add", "replace", and "remove".
+     *
+     * @param patch The JSON Patch to apply. The patch must be a JSON array containing the operations to perform.
+     * @return The modified JSON object wrapped in a `Result` object, which will contain the result of the `runCatching` block.
+     * @since 3.2.0
+     */
+    infix fun jsonPatch(patch: Json) = runCatching {
+        val targetNode = MAPPER.readTree(value).deepCopy()
+        val patchNode = MAPPER.readTree(patch.value)
+
+        if (!patchNode.isArray) {
+            throw MalformedInputException("Patch must be an array of operations")
+        }
+
+        for (operation in patchNode) {
+            val op = operation.get("op")?.asString() ?: throw RequiredPropertyException("Operation 'op' is required")
+            val pathStr = operation.get("path")?.asString() ?: throw RequiredPropertyException("Operation 'path' is required")
+
+            when (op) {
+                "add" -> {
+                    val value = operation.get("value") ?: throw RequiredPropertyException("Operation 'value' is required for operation: $op")
+                    applyAdd(targetNode, pathStr, value)
+                }
+                "replace" -> {
+                    val value = operation.get("value") ?: throw RequiredPropertyException("Operation 'value' is required for operation: $op")
+                    val [parent, leaf] = resolvePointer(targetNode, pathStr)
+                    if (parent.isObject) {
+                        (parent as ObjectNode).set(leaf, value)
+                    } else if (parent.isArray) {
+                        (parent as ArrayNode).set(leaf.toInt(), value)
+                    }
+                }
+                "remove" -> {
+                    applyRemove(targetNode, pathStr)
+                }
+                "copy" -> {
+                    val fromStr = operation.get("from")?.asString() ?: throw RequiredPropertyException("`from` is required for 'copy'")
+                    val valueToCopy = getPointerValue(targetNode, fromStr)?.deepCopy()
+                        ?: throw NoSuchJsonPathException(fromStr)
+
+                    applyAdd(targetNode, pathStr, valueToCopy)
+                }
+                "move" -> {
+                    val fromStr = operation.get("from")?.asString() ?: throw RequiredPropertyException("`from` is required for 'move'")
+                    if (pathStr.startsWith("$fromStr/")) {
+                        throw IllegalOperationException("Cannot move a node into its own children: from $fromStr to $pathStr")
+                    }
+
+                    val valueToMove = getPointerValue(targetNode, fromStr)?.deepCopy()
+                        ?: throw NoSuchJsonPathException(fromStr)
+
+                    applyRemove(targetNode, fromStr)
+                    applyAdd(targetNode, pathStr, valueToMove)
+                }
+                "test" -> {
+                    val expectedValue = operation.get("value") ?: throw RequiredPropertyException("`value` is required for 'test'")
+                    val actualValue = getPointerValue(targetNode, pathStr)
+
+                    if (actualValue.isNull() || actualValue != expectedValue) {
+                        throw ExpectationMismatchException("$pathStr was expected as $expectedValue, but is $actualValue")
+                    }
+                }
+                else -> throw UnsupportedOperationException("Operation '$op' is not supported.")
+            }
+        }
+
+        Json(MAPPER.writeValueAsString(targetNode))
+    }
+    /**
+     * Applies a JSON Patch to the current JSON data and returns the result. The method follows the specification
+     * of JSON Patch (RFC 6902) to modify the JSON structure according to the provided patch definition.
+     * This implementation supports operations such as "add", "replace", and "remove".
+     *
+     * @param patch The JSON Patch to apply. The patch must be a JSON array containing the operations to perform.
+     * @return The modified JSON object wrapped in a `Result` object, which will contain the result of the `runCatching` block.
+     * @since 3.2.0
+     */
+    @OptIn(Beta::class)
+    infix fun jsonPatch(patch: Yaml) = jsonPatch(patch.toJson())
+
+    private fun applyAdd(root: JsonNode, pathStr: String, value: JsonNode) {
+        val [parent, leaf] = resolvePointer(root, pathStr)
+        if (parent.isObject) {
+            (parent as ObjectNode).set(leaf, value)
+        } else if (parent.isArray) {
+            val arr = parent as ArrayNode
+            val index = if (leaf == String.HYPEN) arr.size() else leaf.toInt()
+            arr.insert(index, value)
+        }
+    }
+
+    private fun applyRemove(root: JsonNode, pathStr: String) {
+        val [parent, leaf] = resolvePointer(root, pathStr)
+        if (parent.isObject) {
+            (parent as ObjectNode).remove(leaf)
+        } else if (parent.isArray) {
+            (parent as ArrayNode).remove(leaf.toInt())
+        }
+    }
+
+    private fun getPointerValue(root: JsonNode, pathStr: String): JsonNode? {
+        val [parent, leaf] = resolvePointer(root, pathStr)
+        return if (parent.isObject) {
+            parent.get(leaf)
+        } else if (parent.isArray) {
+            parent.get(leaf.toInt())
+        } else null
+    }
+
+    private fun resolvePointer(root: JsonNode, pathStr: String): Pair<JsonNode, String> {
+        if (pathStr.isEmpty() || !pathStr.startsWith("/")) {
+            throw MalformedParameterException("Invalid path: $pathStr")
+        }
+
+        val tokens = (-1)(pathStr.split(Char.SLASH)).map {
+            it.replace("~1", Char.SLASH).replace("~0", Char.TILDE)
+        }
+
+        var current = root
+        for (i in 0 until tokens.size - 1) {
+            val token = tokens[i]
+            current = (if (current.isArray) current.get(token.toInt())
+            else current.get(token)) ?: throw NoSuchJsonPathException(pathStr)
+        }
+
+        return current to tokens.last()
+    }
+
 }

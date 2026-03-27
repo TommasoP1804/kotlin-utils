@@ -4,23 +4,23 @@ package dev.tommasop1804.kutils
  * ANSI escape code for setting the background color to yellow in terminal outputs.
  * This constant can be used to style text with a yellow background color.
  *
- * @since 1.0.0
+ * @since 3.2.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-object ANSI {
+object Ansi {
     /**
      * ANSI escape code for resetting text formatting in console output.
      * This constant can be used to revert any applied styles, such as colors or text decorations, to default settings.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val RESET = "\u001B[0m"
     /**
      * ANSI escape code for enabling bold text styling in console output.
      * It is widely used for adding emphasis to text or headings.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BOLD = "\u001B[1m"
     /**
@@ -28,14 +28,14 @@ object ANSI {
      *
      * Can be used to format console output by enabling the italic style.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val ITALIC = "\u001B[3m"
     /**
      * ANSI escape sequence representing the underline text style.
      * This can be used to apply underline formatting to console output.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val UNDERLINE = "\u001B[4m"
     /**
@@ -43,7 +43,7 @@ object ANSI {
      * It enables a blinking display of text when supported by the terminal.
      * The effect may not be supported in all terminal environments.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLINK = "\u001B[5m"
     /**
@@ -52,14 +52,14 @@ object ANSI {
      *
      * Note: This effect may not be supported on all terminal emulators.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val RAPID_BLINK = "\u001B[6m"
     /**
      * ANSI escape code representing the reverse video effect.
      * This effect swaps the foreground and background colors when applied to text in a terminal supporting ANSI escape codes.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val REVERSE = "\u001B[7m"
     /**
@@ -67,14 +67,14 @@ object ANSI {
      * When applied, the text will not be visible on the terminal output.
      * Depending on the terminal emulator, this feature may or may not be supported.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val HIDDEN = "\u001B[8m"
     /**
      * ANSI escape code for applying strikethrough (crossed out) text formatting in terminal outputs.
      * This can be used to style text with a strikethrough effect.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val CROSSED_OUT = "\u001B[9m"
     /**
@@ -82,28 +82,28 @@ object ANSI {
      * It is used to apply the default terminal font style in environments
      * that support ANSI escape codes.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val PRIMARY_FONT = "\u001B[10m"
     /**
      * ANSI escape code string representing the "Fraktur" text style.
      * This style is primarily used in terminals or consoles that support ANSI escape code formatting.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val FRAKTUR = "\u001B[21m"
     /**
      * ANSI escape code representing the normal intensity text attribute in terminal outputs.
      * It resets bold or faint formatting, returning the text to its default weight.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val NORMAL = "\u001B[22m"
     /**
      * ANSI escape code for applying a framed text style in terminal output.
      * When used, it applies a framing effect around the text.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val FRAMED = "\u001B[51m"
     /**
@@ -112,7 +112,7 @@ object ANSI {
      *
      * Note: Support for this style may vary depending on the terminal or console.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val ENCIRCLED = "\u001B[52m"
     /**
@@ -121,56 +121,56 @@ object ANSI {
      *
      * Useful for styling console or terminal outputs when supported by the terminal.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val OVERLINED = "\u001B[53m"
     /**
      * ANSI escape code for black-colored text. This constant can be used
      * to apply black color formatting to terminal or console text output.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLACK_TEXT = "\u001B[30m"
     /**
      * ANSI escape code string that applies red color to text in terminal output.
      * It can be used for styling console messages to enhance readability or highlight errors.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val RED_TEXT = "\u001B[31m"
     /**
      * ANSI escape code to set the text color to green in terminal outputs.
      * This can be used to enhance terminal display by applying green coloring to the text.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val GREEN_TEXT = "\u001B[32m"
     /**
      * ANSI escape code for setting the text color to yellow in terminal outputs.
      * Can be used to style text in console applications or logs that support ANSI colors.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val YELLOW_TEXT = "\u001B[33m"
     /**
      * ANSI escape code for blue text formatting.
      * This constant can be used to apply blue color to console output text.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLUE_TEXT = "\u001B[34m"
     /**
      * ANSI escape code for setting the text color to magenta in terminal outputs.
      * Can be used to style text with the magenta color.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val MAGENTA_TEXT = "\u001B[35m"
     /**
      * ANSI escape code for cyan-colored text.
      * This constant can be used to format console output with cyan color.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val CYAN_TEXT = "\u001B[36m"
     /**
@@ -178,14 +178,14 @@ object ANSI {
      * This constant can be used to format console text with white color
      * when printed on supported terminals.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val WHITE_TEXT = "\u001B[37m"
     /**
      * Represents the default ANSI escape code for resetting text color to its default state in terminal output.
      * This constant can be used to revert text color back to its original state after applying other color codes.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val DEFAULT_TEXT = "\u001B[39m"
     /**
@@ -193,14 +193,14 @@ object ANSI {
      * in terminal output. This can be used to style console text
      * with a black background within supported terminals.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLACK_BACKGROUND = "\u001B[40m"
     /**
      * ANSI escape code for setting the background color to red in terminal output.
      * This constant can be used to style text output with a red background.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val RED_BACKGROUND = "\u001B[41m"
     /**
@@ -208,7 +208,7 @@ object ANSI {
      * It is typically used in environments that support ANSI escape codes
      * to format text color and background for better visibility and emphasis.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val GREEN_BACKGROUND = "\u001B[42m"
     /**
@@ -217,14 +217,14 @@ object ANSI {
      * This constant can be used to change the background color of printed text
      * to yellow when working with ANSI-compatible terminals.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val YELLOW_BACKGROUND = "\u001B[43m"
     /**
      * ANSI escape code for applying a blue background color in terminal text formatting.
      * This constant can be used to style terminal output with a blue background.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLUE_BACKGROUND = "\u001B[44m"
     /**
@@ -232,21 +232,21 @@ object ANSI {
      * This constant can be used to style text output in CLI applications by applying a magenta
      * background to the text that follows it.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val MAGENTA_BACKGROUND = "\u001B[45m"
     /**
      * ANSI escape code for setting the background color of terminal text to cyan.
      * This constant can be used to style terminal output with a cyan background.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val CYAN_BACKGROUND = "\u001B[46m"
     /**
      * ANSI escape code for setting the background color to white in terminal text formatting.
      * Can be used to enhance the visual representation of text in supported terminal environments.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val WHITE_BACKGROUND = "\u001B[47m"
     /**
@@ -254,42 +254,42 @@ object ANSI {
      * Used to reset the background color in terminal or console output.
      *
      * 
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val DEFAULT_BACKGROUND = "\u001B[49m"
     /**
      * Represents the ANSI escape code for black bright text formatting.
      * Can be used to style console output with the specified text color.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BALCK_BRIGHT_TEXT = "\u001B[90m"
     /**
      * ANSI escape code for bright red text color.
      * This constant can be used to apply bright red coloring to text in console outputs.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val RED_BRIGHT_TEXT = "\u001B[91m"
     /**
      * ANSI escape code representing bright green text color.
      * This can be used to format console output with a bright green text style.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val GREEN_BRIGHT_TEXT = "\u001B[92m"
     /**
      * Represents the ANSI escape code for bright yellow text color in terminal output.
      * This constant can be used to style text output in supported terminal environments.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val YELLOW_BRIGHT_TEXT = "\u001B[93m"
     /**
      * Represents the ANSI escape code for setting bright blue text color in terminal outputs.
      * This constant can be used to style text with a vivid blue color in console applications.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLUE_BRIGHT_TEXT = "\u001B[94m"
     /**
@@ -298,7 +298,7 @@ object ANSI {
      *
      * The ANSI escape code is "\u001B[95m".
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val MAGENTA_BRIGHT_TEXT = "\u001B[95m"
     /**
@@ -307,7 +307,7 @@ object ANSI {
      * a bright cyan color. It is compatible with terminals that
      * support ANSI coloring.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val CYAN_BRIGHT_TEXT = "\u001B[96m"
     /**
@@ -316,7 +316,7 @@ object ANSI {
      * This constant can be used to enhance text visibility by applying a bright white color formatting.
      * It is commonly utilized in conjunction with other ANSI codes to style terminal output.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val WHITE_BRIGHT_TEXT = "\u001B[97m"
     /**
@@ -326,7 +326,7 @@ object ANSI {
      * The ANSI escape code is widely supported by many terminal emulators but may not be
      * effective on platforms or environments that do not support ANSI codes.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val DEFAULT_BRIGHT_TEXT = "\u001B[99m"
     /**
@@ -334,21 +334,21 @@ object ANSI {
      * This constant represents the ANSI code `"\u001B[100m"` which, when applied,
      * changes the background color of text to bright black in supported terminal environments.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BALCK_BRIGHT_BACKGROUND = "\u001B[100m"
     /**
      * ANSI escape code for setting the background color to bright red in terminal output.
      * This value changes the background color of the text to bright red until the formatting is reset.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val RED_BRIGHT_BACKGROUND = "\u001B[101m"
     /**
      * ANSI escape code for applying a bright green background color in terminal output.
      * This constant can be used for enhancing the appearance of text by adding a bright green background.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val GREEN_BRIGHT_BACKGROUND = "\u001B[102m"
     /**
@@ -356,7 +356,7 @@ object ANSI {
      * It modifies the background color of the subsequent text when printed to terminals
      * that support ANSI escape codes.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val YELLOW_BRIGHT_BACKGROUND = "\u001B[103m"
     /**
@@ -364,7 +364,7 @@ object ANSI {
      * This code can be used to apply a bright blue background in terminal outputs
      * that support ANSI escape codes.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val BLUE_BRIGHT_BACKGROUND = "\u001B[104m"
     /**
@@ -374,7 +374,7 @@ object ANSI {
      *
      * Note that the appearance of this color may vary depending on the terminal emulator being used.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val MAGENTA_BRIGHT_BACKGROUND = "\u001B[105m"
     /**
@@ -382,14 +382,14 @@ object ANSI {
      * This constant can be used to format strings with a bright cyan background
      * when printed in ANSI-supported terminal environments.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val CYAN_BRIGHT_BACKGROUND = "\u001B[106m"
     /**
      * ANSI escape code for setting the background color to bright white in terminal text formatting.
      * Commonly used to enhance text appearance by altering the background color.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val WHITE_BRIGHT_BACKGROUND = "\u001B[107m"
     /**
@@ -398,7 +398,7 @@ object ANSI {
      *
      * The escape code corresponds to `\u001B[109m`.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     const val DEFAULT_BRIGHT_BACKGROUND = "\u001B[109m"
     
@@ -406,7 +406,7 @@ object ANSI {
      * Represents an ANSI code interface in which each implementation provides a specific ANSI code.
      * ANSI codes are typically used for styling console text, such as changing colors or formatting.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      * @author Tommaso Pastorelli
      */
     interface ANSICodes {
@@ -414,7 +414,7 @@ object ANSI {
          * Represents the ANSI code associated with a specific terminal formatting or color configuration.
          * Typically used in terminal or console-based applications to apply formatting effects.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         val code: Int
     }
@@ -431,9 +431,9 @@ object ANSI {
      *
      * @see ANSICodes
      *
-     * @see ANSI
+     * @see Ansi
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     enum class Effect(
         /**
@@ -441,7 +441,7 @@ object ANSI {
          * This value is used to define the ANSI escape sequence
          * for the specific text formatting effect represented by the enum constant.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         override val code: Int
     ) : ANSICodes {
@@ -451,7 +451,7 @@ object ANSI {
          * clearing any previously applied styles such as bold, italic,
          * underline, or color.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         RESET(0),
 
@@ -460,7 +460,7 @@ object ANSI {
          * This effect makes the text appear bold in terminal environments
          * where ANSI escape sequences are supported.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BOLD(1),
 
@@ -468,7 +468,7 @@ object ANSI {
          * Represents the ANSI effect for rendering text in a dim or faint style.
          * The DIM effect makes the text appear less prominent compared to regular text.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         DIM(2),
 
@@ -476,7 +476,7 @@ object ANSI {
          * Represents the ANSI text effect for italicized text in terminal formatting.
          * When applied, the text appears in an italic style, depending on terminal support.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         ITALIC(3),
 
@@ -484,7 +484,7 @@ object ANSI {
          * Represents the ANSI text effect for underlining text in terminal environments.
          * The ANSI code associated with this effect is 4.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         UNDERLINE(4),
 
@@ -493,7 +493,7 @@ object ANSI {
          * This effect corresponds to the ANSI escape code that applies a slow
          * blinking effect to terminal text.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BLINK(5),
 
@@ -503,7 +503,7 @@ object ANSI {
          * at a faster rate compared to standard blinking. Note that support for this effect may
          * vary across different terminal implementations.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         RAPID_BLINK(6),
 
@@ -515,7 +515,7 @@ object ANSI {
          *
          * Commonly used for creating visual emphasis or highlighting text in terminal applications.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         REVERSE(7),
 
@@ -523,7 +523,7 @@ object ANSI {
          * Represents hidden text effect in ANSI terminal formatting.
          * This effect makes the text invisible but still occupies space in the terminal.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         HIDDEN(8),
 
@@ -531,7 +531,7 @@ object ANSI {
          * Represents the ANSI effect code for rendering text as crossed out or strikethrough in terminal environments.
          * This effect is commonly used to indicate deleted or invalid text.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         CROSSED_OUT(9),
 
@@ -540,7 +540,7 @@ object ANSI {
          * This effect is used in terminal text formatting to apply the primary font
          * style as specified in the terminal settings.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         PRIMARY_FONT(10),
 
@@ -549,7 +549,7 @@ object ANSI {
          * Fraktur is a text effect commonly used to render stylized, Gothic-like fonts in terminal environments.
          * This effect is part of ANSI text formatting options but may not be supported across all terminals.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         FRAKTUR(21),
 
@@ -557,7 +557,7 @@ object ANSI {
          * ANSI text effect representing "normal" or "intensity off" style.
          * This effect resets the text intensity to the default, removing the bold or dim effect.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         NORMAL(22),
 
@@ -569,7 +569,7 @@ object ANSI {
          *
          * This constant corresponds to the ANSI effect code 51.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         FRAMED(51),
 
@@ -578,7 +578,7 @@ object ANSI {
          * This constant is used to apply an encircled text effect in terminal environments
          * that support ANSI escape sequences.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         ENCIRCLED(52),
 
@@ -586,7 +586,7 @@ object ANSI {
          * Represents the ANSI effect code for rendering text with an overlined appearance.
          * This effect adds a horizontal line above the text.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         OVERLINED(53);
     }
@@ -611,7 +611,7 @@ object ANSI {
      *
      * @see ANSICodes
      * @author Tommaso Pastorelli
-     * @since 1.0.0
+     * @since 3.2.0
      */
     enum class TextColor (
         /**
@@ -625,7 +625,7 @@ object ANSI {
          *
          * This field is immutable and assigned during the construction of the [TextColor] enum constants.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         override val code: Int
     ) : ANSICodes {
@@ -637,7 +637,7 @@ object ANSI {
          * text color to black in terminal output. It can be utilized to create ANSI
          * escape sequences for styling text color when supported by the terminal.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BLACK(30),
 
@@ -654,7 +654,7 @@ object ANSI {
          *  * ANSI Code: 31
          *
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         RED(31),
 
@@ -672,7 +672,7 @@ object ANSI {
          *
          * @see TextColor
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         GREEN(32),
 
@@ -691,7 +691,7 @@ object ANSI {
          *
          * @see TextColor
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         YELLOW(33),
 
@@ -707,7 +707,7 @@ object ANSI {
          * Blue is commonly used to emphasize informational or neutral
          * content in text output.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BLUE(34),
 
@@ -727,7 +727,7 @@ object ANSI {
          *
          * @see TextColor
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         MAGENTA(35),
 
@@ -742,7 +742,7 @@ object ANSI {
          *
          * @see ANSICodes
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         CYAN(36),
 
@@ -757,7 +757,7 @@ object ANSI {
          *
          * @see TextColor
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         WHITE(37),
 
@@ -773,7 +773,7 @@ object ANSI {
          * Can be used in combination with other ANSI codes to reset styled terminal output
          * to the terminal's predefined color scheme.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         DEFAULT(39),
 
@@ -787,7 +787,7 @@ object ANSI {
          *
          * @see ANSICodes
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_BLACK(90),
 
@@ -798,7 +798,7 @@ object ANSI {
          * This constant is used to format text with a bright red foreground color
          * in terminal environments supporting ANSI codes.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_RED(91),
 
@@ -813,7 +813,7 @@ object ANSI {
          *
          * Typically used to enhance text visibility or signify importance in terminal outputs.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_GREEN(92),
 
@@ -828,7 +828,7 @@ object ANSI {
          * This constant is a part of the `TextBrightColor` enumeration, which supports the
          * integration of bright text colors into ANSI escape sequences for enhanced text styling.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_YELLOW(93),
 
@@ -841,7 +841,7 @@ object ANSI {
          * environments. This constant can be used to render text
          * in bright blue when constructing ANSI escape sequences.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_BLUE(94),
 
@@ -853,7 +853,7 @@ object ANSI {
          *
          * Used for formatting text output in terminal environments.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_MAGENTA(95),
 
@@ -865,7 +865,7 @@ object ANSI {
          * for formatting text in terminal environments. It corresponds to the
          * numeric ANSI code `96`, which applies a bright cyan color to text.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_CYAN(96),
 
@@ -876,7 +876,7 @@ object ANSI {
          * This constant corresponds to the ANSI numeric code `97`, which is
          * used to format text with a bright white foreground in terminal environments.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_WHITE(97),
 
@@ -892,7 +892,7 @@ object ANSI {
          * or to reset to the terminal's default text color after applying other
          * color codes.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_DEFAULT(99);
     }
@@ -913,7 +913,7 @@ object ANSI {
      *
      * @see ANSICodes
      * @author Tommaso Pastorelli
-     * @since 1.0.0
+     * @since 3.2.0
      */
     enum class BackgroundColor(
         /**
@@ -927,7 +927,7 @@ object ANSI {
          * The integer value adheres to the standard ANSI escape code format for text styling.
          * It is associated with a specific background color as defined in the `BackgroundColor` enum.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         override val code: Int
     ) : ANSICodes {
@@ -944,7 +944,7 @@ object ANSI {
          * Part of the [BackgroundColor] enumeration, which provides a collection
          * of ANSI background color codes.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BLACK(40),
 
@@ -965,7 +965,7 @@ object ANSI {
          *
          * @see ANSICodes
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         RED(41),
 
@@ -977,7 +977,7 @@ object ANSI {
          * When used in composing ANSI escape sequences, this color sets the
          * background of text to green in compatible terminal environments.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         GREEN(42),
 
@@ -1001,7 +1001,7 @@ object ANSI {
          *
          * @see ANSICodes
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         YELLOW(43),
 
@@ -1017,7 +1017,7 @@ object ANSI {
          *
          * @see BackgroundColor
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BLUE(44),
 
@@ -1038,7 +1038,7 @@ object ANSI {
          *
          * @see ANSICodes
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         MAGENTA(45),
 
@@ -1050,7 +1050,7 @@ object ANSI {
          * Typically used to style terminal outputs by defining a cyan background,
          * enhancing readability or visual emphasis.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         CYAN(46),
 
@@ -1066,7 +1066,7 @@ object ANSI {
          * Typically utilized in combination with other ANSI codes to produce
          * styled terminal output.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         WHITE(47),
 
@@ -1084,7 +1084,7 @@ object ANSI {
          * required during terminal output customization, ensuring a clean
          * appearance or restoring default behavior.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         DEFAULT(49),
 
@@ -1093,7 +1093,7 @@ object ANSI {
          * It may be used in color-related operations or representations that
          * require extended color palettes.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_BLACK(100),
 
@@ -1102,7 +1102,7 @@ object ANSI {
          *
          * This constant can be used in contexts where a strong or vibrant red tone is required.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_RED(101),
 
@@ -1110,7 +1110,7 @@ object ANSI {
          * Represents a bright green color with its corresponding intensity value.
          * This constant is likely used for color representation and rendering purposes.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_GREEN(102),
 
@@ -1118,7 +1118,7 @@ object ANSI {
          * Constant representing the bright yellow color with the associated code 103.
          * It may be used in various contexts requiring a representation of bright yellow.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_YELLOW(103),
 
@@ -1126,7 +1126,7 @@ object ANSI {
          * Represents a bright blue color with a value of 104. Typically used for text styling
          * or enumeration purposes referencing color codes.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_BLUE(104),
 
@@ -1134,7 +1134,7 @@ object ANSI {
          * Constant representing the color bright magenta with an associated code value of 105.
          * This value may be used for text or background color settings where bright magenta is required.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_MAGENTA(105),
 
@@ -1144,7 +1144,7 @@ object ANSI {
          * This predefined constant can be used for representing the bright cyan color
          * in contexts where numeric color codes are utilized.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_CYAN(106),
 
@@ -1152,7 +1152,7 @@ object ANSI {
          * Represents the bright white color with its corresponding code.
          * This constant is typically used for color management or terminal coloring.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_WHITE(107),
 
@@ -1162,7 +1162,7 @@ object ANSI {
          * This represents the standard brightness configuration
          * that is used when no specific brightness level is provided.
          *
-         * @since 1.0.0
+         * @since 3.2.0
          */
         BRIGHT_DEFAULT(109);
     }
@@ -1191,7 +1191,7 @@ object ANSI {
      * @throws IllegalArgumentException if an element in the input array is neither an integer
      * nor an object implementing the [ANSICodes] interface.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun compose(vararg codes: Any?) = buildString {
         append("\u001B[")
@@ -1212,7 +1212,7 @@ object ANSI {
      *
      * @param row The row number (1-based) to move the cursor to.
      * @param column The column number (1-based) to move the cursor to.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun moveCursor(row: Int, column: Int) = "\u001B[$row;${column}H"
 
@@ -1225,7 +1225,7 @@ object ANSI {
      * - 0: Clears everything from the cursor to the end of the screen.
      * - 1: Clears everything from the cursor to the beginning of the screen.
      * - 2: Clears the entire screen and moves the cursor to the top-left.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun clearScreen(mode: Int = 2) = "\u001B[${mode}J"
 
@@ -1241,7 +1241,7 @@ object ANSI {
      * - 0: Clears from the cursor to the end of the line.
      * - 1: Clears from the beginning of the line to the cursor.
      * - 2: Clears the entire line. Default is `2`.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun clearLine(mode: Int = 2) = "\u001B[${mode}K"
 
@@ -1252,7 +1252,7 @@ object ANSI {
      * of lines is 1.
      *
      * @param lines The number of lines to move the cursor up. Defaults to 1.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun cursorUp(lines: Int = 1) = "\u001B[${lines}A"
 
@@ -1260,7 +1260,7 @@ object ANSI {
      * Moves the cursor down by the specified number of lines in a terminal or console output.
      *
      * @param lines The number of lines to move the cursor down. Defaults to 1.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun cursorDown(lines: Int = 1) = "\u001B[${lines}B"
 
@@ -1270,7 +1270,7 @@ object ANSI {
      *
      * @param columns The number of columns to move the cursor forward. Defaults to 1.
      * @return A string containing the ANSI escape code to move the cursor forward.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun cursorForward(columns: Int = 1) = "\u001B[${columns}C"
 
@@ -1280,7 +1280,7 @@ object ANSI {
      * By default, the cursor moves backward by 1 column.
      *
      * @param columns The number of columns to move the cursor backward. Defaults to 1.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun cursorBackward(columns: Int = 1) = "\u001B[${columns}D"
 
@@ -1292,7 +1292,7 @@ object ANSI {
      * (e.g., `"\u001B[u"`).
      *
      * @return The ANSI escape code as a string that, when used in a terminal, saves the current cursor position.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun saveCursorPosition() = "\u001B[s"
 
@@ -1304,7 +1304,7 @@ object ANSI {
      * It is commonly used in terminal-based applications for cursor manipulation.
      *
      * @return A string containing the ANSI escape sequence for restoring the cursor position.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun restoreCursorPosition() = "\u001B[u"
 
@@ -1315,7 +1315,7 @@ object ANSI {
      * The returned escape sequence is commonly used in terminal-based applications
      * to improve visual feedback, especially for animations or dynamic content updates.
      *
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun hideCursor() = "\u001B[?25l"
 
@@ -1324,7 +1324,7 @@ object ANSI {
      * Useful for restoring the cursor visibility after it has been hidden.
      *
      * @return A string containing the ANSI escape code to show the cursor.
-     * @since 1.0.0
+     * @since 3.2.0
      */
     fun showCursor() = "\u001B[?25h"
 }

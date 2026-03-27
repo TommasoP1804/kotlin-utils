@@ -418,12 +418,12 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * 
      * @param other the [Money] instance to subtract.
      * @return a new [Money] instance representing the result of the subtraction.
-     * @throws UnsupportedOperationException if the currencies of the two [Money] instances are not the same.
+     * @throws IllegalOperationException if the currencies of the two [Money] instances are not the same.
      * @since 1.0.0
      */
     operator fun minus(other: Money): Money {
         if (currency != other.currency) {
-            throw UnsupportedOperationException("The currencies must be the same")
+            throw IllegalOperationException("The currencies must be the same")
         }
         return Money(amount.subtract(other.amount), currency)
     }

@@ -327,7 +327,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
     @Suppress("RedundantLabeledReturnOnLastExpressionInLambda")
     val rsaPublicKey: Result<RSAPublicKey>
         get() = runCatching {
-            if (pl_issuer.isNullOrBlank()) throw RequiredFieldException("issuer")
+            if (pl_issuer.isNullOrBlank()) throw RequiredPropertyException("issuer")
             val client = HttpClient.newHttpClient()
 
             fun fetchJson(url: String): JsonNode {

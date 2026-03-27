@@ -3,10 +3,10 @@
 package dev.tommasop1804.kutils.classes.builder
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.SqlQuery
-import dev.tommasop1804.kutils.classes.constants.SortDirection
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
-import kotlin.apply
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -378,13 +378,13 @@ class SqlQueryBuilder {
      * @param autoApplyOperator whether to automatically apply the logical operator (AND, OR) to the next condition.
      * Auto is `AND`. For no-auto-apply operator use `null`.
      * @return the SQLQueryBuilder instance for method chaining
-     * @throws UnsupportedOperationException if the query is not of DELETE, UPDATE or SELECT
+     * @throws IllegalOperationException if the query is not of DELETE, UPDATE or SELECT
      * @since 1.0.0
      */
     fun where(@Language("sql") condition: String, autoApplyOperator: LogicOperator? = LogicOperator.AND): SqlQueryBuilder {
         (type == QueryType.DELETE
                 || type == QueryType.UPDATE
-                || type == QueryType.SELECT) || throw UnsupportedOperationException("You can't call where() method before calling from() method.")
+                || type == QueryType.SELECT) || throw IllegalOperationException("You can't call where() method before calling from() method.")
 
         whereClause += if (whereClause.isEmpty()) " WHERE $condition" else when (autoApplyOperator) {
             LogicOperator.AND -> " AND $condition"
@@ -404,16 +404,16 @@ class SqlQueryBuilder {
      *
      * @param condition The SQL condition to be added to the `WHERE` clause with an `AND` operator.
      * @return The current instance of `SQLQueryBuilder` for method chaining.
-     * @throws UnsupportedOperationException if `where()` has not been called before using this method.
-     * @throws UnsupportedOperationException if the query type is not `SELECT`, `UPDATE`, or `DELETE`.
+     * @throws IllegalOperationException if `where()` has not been called before using this method.
+     * @throws IllegalOperationException if the query type is not `SELECT`, `UPDATE`, or `DELETE`.
      * @since 1.0.0
      */
     fun and(@Language("sql") condition: String): SqlQueryBuilder {
-        hasWhere || throw UnsupportedOperationException("You can't call and() method before calling where() method.")
+        hasWhere || throw IllegalOperationException("You can't call and() method before calling where() method.")
         (type == QueryType.DELETE
                 || type == QueryType.UPDATE
                 || type == QueryType.SELECT
-                ) || throw UnsupportedOperationException("You can't call and() method before calling from() method.")
+                ) || throw IllegalOperationException("You can't call and() method before calling from() method.")
         whereClause += " AND $condition"
         return this
     }
@@ -424,15 +424,15 @@ class SqlQueryBuilder {
      *
      * @param condition The condition to be appended with the OR operator.
      * @return The current instance of `SQLQueryBuilder` for method chaining.
-     * @throws UnsupportedOperationException If called before `where()` or `from()` method depending on the query type.
+     * @throws IllegalOperationException If called before `where()` or `from()` method depending on the query type.
      * @since 1.0.0
      */
     fun or(@Language("sql") condition: String): SqlQueryBuilder {
-        hasWhere || throw UnsupportedOperationException("You can't call or() method before calling where() method.")
+        hasWhere || throw IllegalOperationException("You can't call or() method before calling where() method.")
         (type == QueryType.DELETE
                 || type == QueryType.UPDATE
                 || type == QueryType.SELECT
-                ) || throw UnsupportedOperationException("You can't call or() method before calling from() method.")
+                ) || throw IllegalOperationException("You can't call or() method before calling from() method.")
         whereClause += " OR $condition"
         return this
     }
@@ -444,16 +444,16 @@ class SqlQueryBuilder {
      * @param condition The SQL condition to negate. Must be provided as a valid SQL string.
      * @param logicOperator Optional logic operator (`AND`, `OR`, etc.) to prepend to the negated condition. If null, no operator will be added.
      * @return The current instance of `SqlQueryBuilder` for method chaining.
-     * @throws UnsupportedOperationException If called before the `where()` method.
-     * @throws UnsupportedOperationException If called before the `from()` method on `DELETE`, `UPDATE`, or `SELECT` query types.
+     * @throws IllegalOperationException If called before the `where()` method.
+     * @throws IllegalOperationException If called before the `from()` method on `DELETE`, `UPDATE`, or `SELECT` query types.
      * @since 1.0.0
      */
     fun not(@Language("sql") condition: String, logicOperator: LogicOperator? = null): SqlQueryBuilder {
-        hasWhere || throw UnsupportedOperationException("You can't call or() method before calling where() method.")
+        hasWhere || throw IllegalOperationException("You can't call or() method before calling where() method.")
         (type == QueryType.DELETE
                 || type == QueryType.UPDATE
                 || type == QueryType.SELECT
-                ) || throw UnsupportedOperationException("You can't call not() method before calling from() method.")
+                ) || throw IllegalOperationException("You can't call not() method before calling from() method.")
         whereClause += " ${if (logicOperator.isNotNull()) "${logicOperator.name} " else String.EMPTY}NOT ($condition)"
         return this
     }
@@ -911,7 +911,7 @@ class SqlQueryBuilder {
      * @throws UnsupportedOperationException if this method is called before specifying the trigger timing
      */
     fun onTable(@Language("sql") table: String): SqlQueryBuilder {
-        triggerTiming.isNotNull() || throw UnsupportedOperationException("You can't call onTable() method before calling beforeInsert(), afterInsert(), beforeUpdate(), afterUpdate(), beforeDelete() or afterDelete() method.")
+        triggerTiming.isNotNull() || throw IllegalOperationException("You can't call onTable() method before calling beforeInsert(), afterInsert(), beforeUpdate(), afterUpdate(), beforeDelete() or afterDelete() method.")
         triggerTable = table
         return this
     }
@@ -928,7 +928,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun forEachRow(): SqlQueryBuilder {
-        triggerTiming.isNotNull() || throw UnsupportedOperationException("You can't call forEachRow() method before calling beforeInsert(), afterInsert(), beforeUpdate(), afterUpdate(), beforeDelete() or afterDelete() method.")
+        triggerTiming.isNotNull() || throw IllegalOperationException("You can't call forEachRow() method before calling beforeInsert(), afterInsert(), beforeUpdate(), afterUpdate(), beforeDelete() or afterDelete() method.")
         triggerForEachRow = true
         return this
     }
@@ -946,7 +946,7 @@ class SqlQueryBuilder {
         (type == QueryType.CREATE_TRIGGER
                 || type == QueryType.CREATE_FUNCTION
                 || type == QueryType.CREATE_PROCEDURE
-                ) || throw UnsupportedOperationException("You can't call begin() method if is not called from createTrigger() method.")
+                ) || throw IllegalOperationException("You can't call begin() method if is not called from createTrigger() method.")
         bodyClause += " BEGIN"
         return this
     }
@@ -961,7 +961,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun addTriggerBody(@Language("sql") body: String): SqlQueryBuilder {
-        type == QueryType.CREATE_TRIGGER || throw UnsupportedOperationException("You can't call addTriggerBody() method if is not called from createTrigger() method.")
+        type == QueryType.CREATE_TRIGGER || throw IllegalOperationException("You can't call addTriggerBody() method if is not called from createTrigger() method.")
         bodyClause += " $body"
         return this
     }
@@ -978,7 +978,7 @@ class SqlQueryBuilder {
         (type == QueryType.CREATE_TRIGGER
                 || type == QueryType.CREATE_FUNCTION
                 || type == QueryType.CREATE_PROCEDURE
-                ) || throw UnsupportedOperationException("You can't call end() method if is not called from createTrigger() method.")
+                ) || throw IllegalOperationException("You can't call end() method if is not called from createTrigger() method.")
         bodyClause += " END"
         return this
     }
@@ -1028,7 +1028,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun returns(@Language("sql") returnType: String): SqlQueryBuilder {
-        type == QueryType.CREATE_FUNCTION || throw UnsupportedOperationException("You can't call returns() method before calling createFunction() method.")
+        type == QueryType.CREATE_FUNCTION || throw IllegalOperationException("You can't call returns() method before calling createFunction() method.")
         functionReturns = returnType
         return this
     }
@@ -1042,7 +1042,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun addFunctionBody(@Language("sql") body: String): SqlQueryBuilder {
-        type == QueryType.CREATE_FUNCTION || throw UnsupportedOperationException("You can't call addFunctionBody() method before calling createFunction() method.")
+        type == QueryType.CREATE_FUNCTION || throw IllegalOperationException("You can't call addFunctionBody() method before calling createFunction() method.")
         bodyClause += " $body"
         return this
     }
@@ -1092,7 +1092,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun addProcedureBody(@Language("sql") body: String): SqlQueryBuilder {
-        type == QueryType.CREATE_PROCEDURE || throw UnsupportedOperationException("You can't call addProcedureBody() method before calling createProcedure() method.")
+        type == QueryType.CREATE_PROCEDURE || throw IllegalOperationException("You can't call addProcedureBody() method before calling createProcedure() method.")
         bodyClause += " $body"
         return this
     }

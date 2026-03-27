@@ -86,6 +86,15 @@ val String.Companion.EM_DASH get() = '—'
 val String.Companion.UNDERSCORE get() = "_"
 
 /**
+ * Represents the tilde character (`~`).
+ * This is a predefined constant in the `Char` companion object
+ * for convenience and readability when working with the tilde symbol.
+ *
+ * @since 3.2.0
+ */
+val String.Companion.TILDE get() = '~'
+
+/**
  * A constant representing the forward slash character ('/').
  * This is often used as a directory path separator in Unix-based systems
  * or in URLs to separate path segments.

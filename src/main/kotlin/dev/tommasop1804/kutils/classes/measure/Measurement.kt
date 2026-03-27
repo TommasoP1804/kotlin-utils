@@ -538,11 +538,11 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @param other the specified measurement to compare to this measurement
      * @return a negative integer, zero, or a positive integer as this measurement is less than,
      *         equal to, or greater than the specified measurement
-     * @throws UnsupportedOperationException if the measurement units are different
+     * @throws IllegalOperationException if the measurement units are different
      * @since 1.0.0
      */
     override operator fun compareTo(other: Measurement): Int {
-        if (other.unit != unit) throw UnsupportedOperationException("Can't compare measurement of different type.")
+        if (other.unit != unit) throw IllegalOperationException("Can't compare measurement of different type.")
         return value.compareTo(ScalarUnit.convert(other, unit)().value)
     }
 
@@ -552,14 +552,14 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * 
      * @param measurements A variable number of measurements to be averaged. All measurements must share the same unit of measure.
      * @return A new Measurement representing the average of the input measurements.
-     * @throws UnsupportedOperationException If the units of the provided measurements are not the same.
+     * @throws IllegalOperationException If the units of the provided measurements are not the same.
      * @since 1.0.0
      */
     fun average(vararg measurements: Measurement): Measurement {
         var sum = 0.0
         for (measurement in measurements) {
             if (measurements[0].unit.measure == measurement.unit.measure)
-                throw UnsupportedOperationException("Cannot average measurements of different units")
+                throw IllegalOperationException("Cannot average measurements of different units")
             sum += ScalarUnit.convert(measurement, measurements[0].unit)().value
         }
         return Measurement(sum / measurements.size, measurements[0].unit)

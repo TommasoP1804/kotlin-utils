@@ -1,6 +1,7 @@
 package dev.tommasop1804.kutils.classes.tree
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.IllegalOperationException
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -357,11 +358,11 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * 
      * @param nodeToRemove The node to be removed from the tree.
      * @return Boolean True if the node is successfully removed, false otherwise.
-     * @throws UnsupportedOperationException If an attempt is made to remove the root node.
+     * @throws IllegalOperationException If an attempt is made to remove the root node.
      * @since 1.0.0
      */
     fun remove(nodeToRemove: TreeNode<T?>): Boolean {
-        if (nodeToRemove == root) throw UnsupportedOperationException("Can't remove the root node")
+        if (nodeToRemove == root) throw IllegalOperationException("Can't remove the root node")
         val queue = ArrayDeque<TreeNode<T?>>()
         queue.add(root)
 

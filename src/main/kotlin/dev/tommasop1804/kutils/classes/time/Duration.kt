@@ -5,11 +5,15 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.LocalDateTime
 import dev.tommasop1804.kutils.RiskyApproximationOfTemporal
 import dev.tommasop1804.kutils.before
+import dev.tommasop1804.kutils.emptyMList
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.isDecimal
+import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateInputFormat
@@ -31,6 +35,7 @@ import kotlin.reflect.KProperty
 import kotlin.text.startsWith
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
+import kotlin.toBigDecimal
 
 /**
  * Represents a duration of time, defined in terms of years, months, days, hours, minutes, seconds, and nanoseconds.
@@ -209,9 +214,9 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
         _minutes = _minutes.toLong().toDouble()
         _seconds += minuteFraction * 60
 
-        val secondFraction = _seconds - _seconds.toLong()
+        val secondFraction = _seconds.toBigDecimal() - _seconds.toLong().toBigDecimal()
+        _nanos += secondFraction.movePointRight(9).toLong()
         _seconds = _seconds.toLong().toDouble()
-        _nanos += (secondFraction * 1_000_000_000).toLong()
         
         _seconds += _nanos / 1_000_000_000
         _nanos %= 1_000_000_000
@@ -1756,50 +1761,72 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
      * @return A string representation of this `Duration` in ISO-8601 format.
      * @since 1.0.0
      */
+    @Suppress("RedundantValueArgument")
     override fun toString() = toString(true)
 
-    /**
-     * Converts the current `Duration` object into its ISO-8601 string representation.
-     *
-     * The format adheres to the pattern `PnYnMnWnDTnHnMnS`, where:
-     * - `P` denotes the start of the duration representation.
-     * - `nY` specifies the number of years if applicable.
-     * - `nM` specifies the number of months if applicable.
-     * - `nW` specifies the number of weeks if applicable.
-     * - `nD` specifies the number of days if applicable.
-     * - `T` separates the date components from the time components.
-     * - `nH` specifies the number of hours if applicable.
-     * - `nM` specifies the number of minutes if applicable.
-     * - `nS` specifies the number of seconds if applicable, including up to 9 fractional digits for nanoseconds.
-     *
-     * If the duration is equivalent to zero, the method returns "PT0S" as a special case.
-     *
-     *
-     * @return A string representation of this `Duration` in ISO-8601 format.
-     * @since 1.0.0
-     */
-    fun toString(weeks: Boolean) = if (this == Duration()) "PT0S" else buildString {
-        append('P')
-        if (years != 0L) append(years).append('Y')
-        if (months != 0L) append(months).append('M')
-        if (weeks) {
-            var _days = days
-            var _weeks = 0L
-            while (_days >= 7) {
-                _days -= 7
-                _weeks++
+    fun toString(weeks: Boolean = true, format: Format = Format.ISO): String = if (format == Format.ISO) {
+        if (this == Duration()) "PT0S" else buildString {
+            append('P')
+            if (years != 0L) append(years).append('Y')
+            if (months != 0L) append(months).append('M')
+            if (weeks) {
+                var _days = days
+                var _weeks = 0L
+                while (_days >= 7) {
+                    _days -= 7
+                    _weeks++
+                }
+                if (_weeks != 0L) append(_weeks).append('W')
+                if (_days != 0L) append(_days).append('D')
+            } else {
+                if (days != 0L) append(days).append('D')
             }
-            if (_weeks != 0L) append(_weeks).append('W')
-            if (_days != 0L) append(_days).append('D')
-        } else {
-            if (days != 0L) append(days).append('D')
+            if (hours != 0L || minutes != 0L || seconds != 0L || nanos != 0L) append('T')
+            if (hours != 0L) append(hours).append('H')
+            if (minutes != 0L) append(minutes).append('M')
+            if (seconds != 0L || nanos != 0L) append(seconds)
+                .append(if (nanos != 0L) "." + String.format("%09d", nanos).replace(Regex("0*$"), "") else "")
+                .append('S')
         }
-        if (hours != 0L || minutes != 0L || seconds != 0L || nanos != 0L) append('T')
-        if (hours != 0L) append(hours).append('H')
-        if (minutes != 0L) append(minutes).append('M')
-        if (seconds != 0L || nanos != 0L) append(seconds)
-            .append(if (nanos != 0L) "." + String.format("%09d", nanos).replace(Regex("0*$"), "") else "")
-            .append('S')
+    } else {
+        fun Number.fmt(full: String, short: String, format: Format): String =
+            when (format) {
+                Format.SHORT -> (if (isDecimal) this else toLong()).run { "$this$short" }
+                Format.FULL -> (if (isDecimal) this else toLong()).run { if (toLong() == 1L) "$this $full" else "$this ${full}s" }
+                else -> String.EMPTY
+            }
+
+        val iso = toString(weeks)
+        val periodPart = iso.substringBefore("T")
+        val timePart = if ('T' in iso) "PT${iso.substringAfter("T")}" else null
+
+        val parts = emptyMList<String>()
+
+        if (periodPart.length > 1) {
+            val period = Period.parse(periodPart)
+            if (period.years != 0) parts += period.years.fmt("year", "yr", format)
+            if (period.months != 0) parts += period.months.fmt("month", "mo", format)
+            if (weeks) {
+                val weeks = period.days / 7
+                val days = period.days % 7
+                if (weeks != 0) parts += weeks.fmt("week", "w", format)
+                if (days != 0) parts += days.fmt("day", "d", format)
+            } else {
+                if (period.days != 0) parts += period.days.fmt("day", "d", format)
+            }
+        }
+
+        if (timePart.isNotNull()) {
+            val duration = Duration(timePart)
+            val hours = duration.hours
+            val minutes = duration.minutes
+            val seconds = duration.seconds.toDouble() + (nanos / 1_000_000_000.0)
+            if (hours != 0L) parts += hours.fmt("hour", "h", format)
+            if (minutes != 0L) parts += minutes.fmt("minute", "m", format)
+            if (seconds != 0.0) parts += seconds.fmt("second", "s", format)
+        }
+
+        parts.joinToString(" ").ifEmpty { 0.fmt("second", "s", format) }
     }
 
     /**
@@ -1933,4 +1960,38 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
      * @since 3.1.0
      */
     operator fun component7() = nanos
+
+    /**
+     * Represents various formatting styles that can be used for duration representations.
+     * @since 3.2.0
+     * @author Tommaso Pastorelli
+     */
+    enum class Format {
+    /**
+     * Represents the ISO format within the Format enumeration.
+     *
+     * This enum constant is used to indicate that the ISO-specific format
+     * should be applied. Typically, it adheres to the standards defined by
+     * the International Organization for Standardization related to data formatting.
+     *
+     * Commonly used in contexts where an internationally recognized format
+     * is required for consistency and compatibility purposes.
+     * @since 3.2.0
+     */
+    ISO,
+    /**
+     * Represents the FULL format type as part of the Format enumeration.
+     * Typically used to denote a detailed or comprehensive representation of data.
+     * @since 3.2.0
+     */
+    FULL,
+    /**
+     * Represents a formatting style with concise representation.
+     *
+     * This enum constant is used to define short format style, often for representing
+     * data in a compact manner.
+     * @since 3.2.0
+     */
+    SHORT
+    }
 }

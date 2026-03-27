@@ -1227,7 +1227,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         val keyWidth = rowKeys.maxOfOrNull { it.toString().length } ?: 0
 
         return buildString {
-            append(ANSI.RESET + " ")
+            append(Ansi.RESET + " ")
             append(" ".repeat(keyWidth)).append("┏")
             for (col in columnKeys.map { it.toString() })
                 append("━".repeat(width[col]!!)).append("┯")
@@ -1237,7 +1237,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             append(" ")
             append(" ".repeat(keyWidth)).append("┃")
             for (col in columnKeys.map { it.toString() })
-                append(ANSI.BOLD + col.center(width[col]!!) + ANSI.RESET).append("│")
+                append(Ansi.BOLD + col.center(width[col]!!) + Ansi.RESET).append("│")
             setLength(length - 1)
             append("┃")
             appendLine()
@@ -1249,10 +1249,10 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             append("┫")
             for ([index, row] in rowKeys.withIndex()) {
                 appendLine()
-                append("┃").append(ANSI.BOLD + row.toString().padEnd(keyWidth) + ANSI.RESET).append("┋")
+                append("┃").append(Ansi.BOLD + row.toString().padEnd(keyWidth) + Ansi.RESET).append("┋")
                 for (column in columnKeys) {
                     val value = this@Table[row, column]?.toString()
-                    append(value?.padEnd(width[column.toString()]!!)?: (ANSI.BLACK_BACKGROUND + " ".repeat(width[column.toString()]!!) + ANSI.RESET))
+                    append(value?.padEnd(width[column.toString()]!!)?: (Ansi.BLACK_BACKGROUND + " ".repeat(width[column.toString()]!!) + Ansi.RESET))
                     append("│")
                 }
                 setLength(length - 1)

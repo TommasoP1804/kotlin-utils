@@ -133,6 +133,26 @@ data class MediaType(
          */
         val APPLICATION_PROBLEM_JSON = MediaType(MimeType.APPLICATION_PROBLEM_JSON)
         /**
+         * Represents the MIME type `application/merge-patch+json`.
+         *
+         * This MIME type is primarily used to describe JSON Merge Patch documents,
+         * which are used for partial updates to JSON resources. It follows
+         * the specification outlined in RFC 7396, providing a lightweight mechanism
+         * for patching JSON documents by defining only the differences between the
+         * original and the desired state.
+         * @since 3.2.0
+         */
+        val APPLICATION_MERGE_PATCH_JSON = MediaType(MimeType.APPLICATION_MERGE_PATCH_JSON)
+        /**
+         * Represents the MIME type `application/json-patch+json`.
+         *
+         * This MIME type is commonly used to indicate a JSON Patch document,
+         * which defines a set of operations for modifying a JSON document.
+         * It conforms to the standard defined in RFC 6902.
+         * @since 3.2.0
+         */
+        val APPLICATION_JSON_PATCH_JSON = MediaType(MimeType.APPLICATION_JSON_PATCH_JSON)
+        /**
          * Represents the `application/x-ndjson` media type, commonly used for streaming newline-delimited JSON (NDJSON) data.
          * NDJSON is a format where each line contains a single JSON object, enabling efficient transmission of structured data.
          * @since 2.0.0
@@ -544,11 +564,54 @@ data class MediaType(
      * @return `true` if the parameters of both MediaType instances are equal, `false` otherwise.
      * @since 2.0.1
      */
-    fun equalsParameters(other: MediaType): Boolean {
+    infix fun equalsParameters(other: MediaType): Boolean {
         if (this === other) return true
         if (parameters.mapToMap { -it.key to -it.value } != other.parameters.mapToMap { -it.key to -it.value }) return false
         return true
     }
+
+    /**
+     * Compares this instance's MIME type with another MIME type for equality.
+     *
+     * This method determines if the MIME type of this instance matches
+     * the MIME type of the provided `MimeType` object.
+     *
+     * @param other The MIME type to compare against.
+     * @return `true` if the MIME types are equal, `false` otherwise.
+     * @since 3.2.0
+     */
+    infix fun equalsMimeType(other: MimeType): Boolean = mimeType == other
+    /**
+     * Compares the MIME type of this MediaType instance with another MediaType instance for equality.
+     *
+     * @param other The MediaType instance to compare with this MediaType instance.
+     * @return `true` if the MIME types of both MediaType instances are equal, `false` otherwise.
+     * @since 3.2.0
+     */
+    infix fun equalsMimeType(other: MediaType): Boolean = mimeType == other.mimeType
+
+    /**
+     * Compares the MIME type suffixes of this MediaType instance with another `MimeType` instance.
+     *
+     * This method evaluates whether the suffixes of the MIME types of the two instances are equal.
+     *
+     * @param other The `MimeType` instance to compare suffixes with.
+     * @return `true` if the MIME type suffixes are equal, `false` otherwise.
+     * @since 3.2.0
+     */
+    infix fun equalsMimeTypeSuffixes(other: MimeType): Boolean = mimeType equalsSuffixes other
+    /**
+     * Compares the MIME type suffixes of this MediaType instance with another MediaType instance for equality.
+     *
+     * This method compares the suffixes of the `subtype` components of the MIME types. The comparison
+     * focuses on the portion of the `subtype` after the "+" character, ensuring that both the `type` values
+     * and the suffixes of the `subtype` values are equal.
+     *
+     * @param other The MediaType instance to compare with this MediaType instance.
+     * @return `true` if the `type` values are equal and the suffixes of the `subtype` values are also equal, `false` otherwise.
+     * @since 3.2.0
+     */
+    infix fun equalsMimeTypeSuffixes(other: MediaType): Boolean = mimeType equalsSuffixes other.mimeType
 
     /**
      * Computes the hash code for this MediaType instance.

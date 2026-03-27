@@ -9,9 +9,9 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
-import dev.tommasop1804.kutils.classes.constants.TextCase
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.exceptions.*
 import org.slf4j.Logger
@@ -1784,7 +1784,7 @@ fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @since 1.0.0
  */
 
-fun <T> T.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
@@ -1805,7 +1805,7 @@ fun <T> T.validateNull(property: KProperty<*>?, variableName: String? = null, me
  * @since 1.0.0
  */
 
-fun <T> T.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
@@ -1829,7 +1829,7 @@ fun <T> T.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message
  * @since 1.0.0
  */
 
-fun <T> T.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
@@ -1849,7 +1849,7 @@ fun <T> T.validateNull(callable: KFunction<*>?, parameterName: String? = null, m
  * @since 1.0.0
  */
 
-fun <T> T.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
@@ -1870,7 +1870,7 @@ fun <T> T.validateNull(callable: KFunction<*>?, parameter: KParameter?, message:
  * @since 1.0.0
  */
 
-fun <T> T.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
@@ -1891,7 +1891,7 @@ fun <T> T.validateNull(callableName: String?, parameterName: String? = null, mes
  * @since 1.0.0
  */
 
-fun <T> T.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
@@ -1957,7 +1957,7 @@ fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null,
  * @since 1.0.0
  */
 
-fun <T> T.validateNotNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
@@ -1980,7 +1980,7 @@ fun <T> T.validateNotNull(property: KProperty<*>?, variableName: String? = null,
  * @since 1.0.0
  */
 
-fun <T> T.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
@@ -2002,7 +2002,7 @@ fun <T> T.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, mess
  * @throws ValidationFailedException If the receiver is null, an exception with detailed context is thrown.
  * @since 1.0.0
  */
-fun <T> T.validateNotNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
@@ -2023,7 +2023,7 @@ fun <T> T.validateNotNull(callable: KFunction<*>?, parameterName: String? = null
  * @throws ValidationFailedException if the receiver is null
  * @since 1.0.0
  */
-fun <T> T.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
@@ -2041,7 +2041,7 @@ fun <T> T.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, messa
  * @return The receiver, if it is not null.
  * @since 1.0.0
  */
-fun <T> T.validateNotNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
@@ -2063,7 +2063,7 @@ fun <T> T.validateNotNull(callableName: String?, parameterName: String? = null, 
  * @return The current receiver (`this`) if the validation passes.
  * @since 1.0.0
  */
-fun <T> T.validateNotNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
@@ -2317,7 +2317,7 @@ fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, 
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2340,7 +2340,7 @@ fun <T> T.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2362,7 +2362,7 @@ fun <T> T.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyM
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2381,7 +2381,7 @@ fun <T> T.expectNull(property: KProperty<*>?, variableName: String? = null, caus
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2404,7 +2404,7 @@ fun <T> T.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: 
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2423,7 +2423,7 @@ fun <T> T.expectNull(callable: KFunction<*>?, parameterName: String? = null, cau
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2441,7 +2441,7 @@ fun <T> T.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: T
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2464,7 +2464,7 @@ fun <T> T.expectNull(callableName: String?, parameterName: String? = null, cause
  * @since 1.0.0
  */
 
-fun <T> T.expectNull(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
@@ -2629,37 +2629,37 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, 
  * @param cause an optional `Throwable` cause added to the `RequiredFieldException` to provide
  * additional debugging information. Can be null.
  * @return the original object if it is not null.
- * @throws RequiredFieldException if the object is null.
- * @since 1.0.0
+ * @throws RequiredPropertyException if the object is null.
+ * @since 3.2.0
  */
 
-fun <T> T?.requiredField(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
-        returns() implies (this@requiredField != null)
+        returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredFieldException("Field is required.", cause) else causeOf.initCause(RequiredFieldException("Field is required.", cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException("Property is required.", cause) else causeOf.initCause(RequiredPropertyException("Field is required.", cause))
     return this
 }
 
 /**
- * Ensures that the receiver is non-null. If the receiver is null, a `RequiredFieldException` is thrown.
+ * Ensures that the receiver is non-null. If the receiver is null, a `RequiredPropertyException` is thrown.
  *
  * @param causeOf an optional pre-existing throwable to use as the root cause for the exception, if applicable.
  * @param cause an optional secondary throwable to specify additional context for the exception.
  * @param lazyMessage a lambda function supplying a custom message for the exception when it is thrown.
  * @return the receiver instance if it is non-null.
- * @since 1.0.0
+ * @since 3.2.0
  */
 
-fun <T> T?.requiredField(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
-        returns() implies (this@requiredField != null)
+        returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredFieldException(lazyMessage().toString(), cause) else causeOf.initCause(RequiredFieldException(lazyMessage().toString(), cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException(lazyMessage().toString(), cause) else causeOf.initCause(RequiredPropertyException(lazyMessage().toString(), cause))
     return this
 }
 /**
- * Validates that the current object (`this`) is not null and throws a [RequiredFieldException]
+ * Validates that the current object (`this`) is not null and throws a [RequiredPropertyException]
  * if it is null, providing detailed context from the property and variable name. Optionally,
  * associates an additional cause for the exception.
  *
@@ -2670,17 +2670,17 @@ fun <T> T?.requiredField(causeOf: Throwable? = null, cause: Throwable? = null, l
  * @param causeOf An optional exception that is the root cause of this validation failure.
  *                If present, this exception will be the thrown exception, with its cause updated to include
  *                additional context from the validation process.
- * @param cause An optional underlying cause of the [RequiredFieldException], used for debugging or chaining.
+ * @param cause An optional underlying cause of the [RequiredPropertyException], used for debugging or chaining.
  * @return The current object (`this`), guaranteed to be non-null.
- * @throws RequiredFieldException If the current object (`this`) is null, providing detailed error context.
- * @since 1.0.0
+ * @throws RequiredPropertyException If the current object (`this`) is null, providing detailed error context.
+ * @since 3.2.0
  */
 
-fun <T> T?.requiredField(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredProperty(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
-        returns() implies (this@requiredField != null)
+        returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredFieldException(property, variableName, cause) else causeOf.initCause(RequiredFieldException(property, variableName, cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException(property, variableName, cause) else causeOf.initCause(RequiredPropertyException(property, variableName, cause))
     return this
 }
 /**
@@ -2691,12 +2691,12 @@ fun <T> T?.requiredField(property: KProperty<*>?, variableName: String? = null, 
  * @param variableName an optional name of the variable to include in the exception message for context. Nullable.
  * @param causeOf an optional throwable that triggers this exception, which will wrap a `RequiredFieldException`. Nullable.
  * @param cause an optional cause of the exception to be attached for debugging purposes. Nullable.
- * @since 1.0.0
+ * @since 3.2.0
  */
-fun <T> KProperty0<T>.requiredField(variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
+fun <T> KProperty0<T>.requiredProperty(variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
     if (this == null) throw
-    if (causeOf == null) RequiredFieldException(this@requiredField, variableName, cause)
-    else causeOf.initCause(RequiredFieldException(this@requiredField, variableName, cause))
+    if (causeOf == null) RequiredPropertyException(this@requiredProperty, variableName, cause)
+    else causeOf.initCause(RequiredPropertyException(this@requiredProperty, variableName, cause))
     this as T
 }
 /**
@@ -2710,16 +2710,15 @@ fun <T> KProperty0<T>.requiredField(variableName: String? = null, causeOf: Throw
  * @param causeOf An optional pre-existing exception that caused this validation failure.
  * @param cause An optional additional cause of the exception.
  * @return The original object if it is not null.
- * @throws RequiredFieldException if the object is null, with additional context
+ * @throws RequiredPropertyException if the object is null, with additional context
  *         provided by `property`, `variable`, `causeOf`, or `cause`.
- * @since 1.0.0
+ * @since 3.2.0
  */
-
-fun <T> T?.requiredField(property: KProperty<*>?, variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredProperty(property: KProperty<*>?, variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
-        returns() implies (this@requiredField != null)
+        returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredFieldException(property, variable, cause) else causeOf.initCause(RequiredFieldException(property, variable, cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException(property, variable, cause) else causeOf.initCause(RequiredPropertyException(property, variable, cause))
     return this
 }
 /**
@@ -2730,12 +2729,12 @@ fun <T> T?.requiredField(property: KProperty<*>?, variable: KProperty<*>, causeO
  * @param variable an optional variable to include in the exception message for context. Nullable.
  * @param causeOf an optional throwable that triggers this exception, which will wrap a `RequiredFieldException`. Nullable.
  * @param cause an optional cause of the exception to be attached for debugging purposes. Nullable.
- * @since 1.0.0
+ * @since 3.2.0
  */
-fun <T> KProperty0<T>.requiredField(variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
+fun <T> KProperty0<T>.requiredProperty(variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
     if (this == null) throw
-    if (causeOf == null) RequiredFieldException(this@requiredField, variable, cause)
-    else causeOf.initCause(RequiredFieldException(this@requiredField, variable, cause))
+    if (causeOf == null) RequiredPropertyException(this@requiredProperty, variable, cause)
+    else causeOf.initCause(RequiredPropertyException(this@requiredProperty, variable, cause))
     this as T
 }
 /**
@@ -2749,7 +2748,6 @@ fun <T> KProperty0<T>.requiredField(variable: KProperty<*>, causeOf: Throwable? 
  * @throws RequiredParameterException If the parameter is null, this exception is thrown with an appropriate message and cause.
  * @since 1.0.0
  */
-
 fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
