@@ -745,7 +745,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
      * Each enum value corresponds to a specific configuration of nodes, 
      * which determine the scalability and uniqueness of ID generation.
      *
-     * @author Tommaso Pastoreli
+     * @author Tommaso Pastorelli
      *
      * @since 3.0.0
      */

@@ -2,16 +2,10 @@
 
 package dev.tommasop1804.kutils.classes.builder
 
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.ReceiverConsumer
-import dev.tommasop1804.kutils.classes.coding.Code
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.NumberSignException
-import dev.tommasop1804.kutils.isNotNegative
-import dev.tommasop1804.kutils.isPositive
-import dev.tommasop1804.kutils.toCode
-import dev.tommasop1804.kutils.tryOrThrow
-import kotlin.apply
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.exceptions.*
+import org.intellij.lang.annotations.Language
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -597,7 +591,7 @@ class RegexBuilder {
      * @return The updated RegexBuilder instance with the appended pattern.
      * @since 1.0.0
      */
-    fun raw(regex: CharSequence): RegexBuilder {
+    fun raw(@Language("regex") regex: String): RegexBuilder {
         pattern.append(regex)
         return this
     }

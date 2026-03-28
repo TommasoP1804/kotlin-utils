@@ -1926,7 +1926,7 @@ class SqlQueryBuilder {
      * or similar operations where constraints or dependencies might exist.
      *
      * @since 1.0.0
-     * @author Tommaso Pastoreli
+     * @author Tommaso Pastorelli
      */
     enum class DropType {
         /**
