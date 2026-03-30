@@ -344,7 +344,11 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): Ksuid? = cached as? Ksuid
+            ): Ksuid? = when (cached) {
+                is Ksuid -> cached
+                is String -> Ksuid(cached)
+                else -> null
+            }
 
             override fun toSqlLiteral(value: Ksuid?): String? = value?.let { "'${it}'" }
 

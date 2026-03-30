@@ -217,7 +217,11 @@ value class NanoId(private val value: String) : CharSequence, Serializable {
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): NanoId? = cached as? NanoId
+            ): NanoId? = when (cached) {
+                is NanoId -> cached
+                is String -> NanoId(cached)
+                else -> null
+            }
 
             override fun toSqlLiteral(value: NanoId?): String? = value?.let { "'${it.value}'" }
 

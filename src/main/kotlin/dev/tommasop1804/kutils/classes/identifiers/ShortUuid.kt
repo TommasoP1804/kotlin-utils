@@ -255,7 +255,11 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): ShortUuid? = cached as? ShortUuid
+            ): ShortUuid? = when (cached) {
+                is ShortUuid -> cached
+                is String -> ShortUuid(cached)
+                else -> null
+            }
 
             override fun toSqlLiteral(value: ShortUuid?): String? = value?.let { "'${it.value}'" }
 

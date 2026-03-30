@@ -525,7 +525,11 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): Cuid? = cached as? Cuid
+            ): Cuid? = when (cached) {
+                is Cuid -> cached
+                is String -> Cuid(cached)
+                else -> null
+            }
 
             override fun toSqlLiteral(value: Cuid?): String? = value?.let { "'${it.value}'" }
 

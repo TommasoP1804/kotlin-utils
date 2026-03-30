@@ -535,10 +535,11 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
 
             override fun disassemble(value: Tsid?): Serializable? = deepCopy(value)
 
-            override fun assemble(
-                cached: Serializable?,
-                owner: Any?
-            ): Tsid? = cached as? Tsid
+            override fun assemble(cached: Serializable?, owner: Any?): Tsid? = when (cached) {
+                is Tsid -> cached
+                is Long -> Tsid(cached)
+                else -> null
+            }
 
             override fun toSqlLiteral(value: Tsid?): String? = value?.let { "'${it.number}'" }
 

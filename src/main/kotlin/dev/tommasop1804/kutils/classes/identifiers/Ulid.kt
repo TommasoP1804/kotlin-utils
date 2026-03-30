@@ -938,7 +938,12 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): Ulid? = cached as? Ulid
+            ): Ulid? = when (cached) {
+                is Ulid -> cached
+                is String -> Ulid(cached)
+                is CharArray -> Ulid(String(cached))
+                else -> null
+            }
 
             override fun toSqlLiteral(value: Ulid?): String? = value?.let { "'${it}'" }
 
@@ -1046,7 +1051,11 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             override fun assemble(
                 cached: Serializable?,
                 owner: Any?
-            ): Ulid? = cached as? Ulid
+            ): Ulid? = when (cached) {
+                is Ulid -> cached
+                is UUID -> Ulid(cached)
+                else -> null
+            }
 
             override fun toSqlLiteral(value: Ulid?): String? = value?.let { "'${it.toUuid()}'" }
 

@@ -1,9 +1,25 @@
 package dev.tommasop1804.kutils.classes.identifiers
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMillisOfDuration
 import dev.tommasop1804.kutils.exceptions.*
+import jakarta.persistence.AttributeConverter
+import org.hibernate.engine.spi.SharedSessionContractImplementor
+import org.hibernate.type.SqlTypes
+import org.hibernate.usertype.EnhancedUserType
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
+import java.io.Serializable
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
@@ -20,7 +36,7 @@ import java.util.concurrent.ThreadLocalRandom
 @OptIn(RiskyApproximationOfTemporal::class)
 @JvmInline
 @Suppress("unused")
-value class SnowflakeId(val value: Long) : Comparable<SnowflakeId> {
+value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable {
     /**
      * Represents the elapsed time portion of the Snowflake ID.
      * This value is derived by shifting the internal value by the defined
@@ -198,6 +214,82 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId> {
             ThreadLocalRandom.current().nextInt((MAX_NODE_ID + 1).toInt())
         }
         private val defaultGenerator by lazy { Generator(resolveDefaultNodeId()) }
+
+        class Serializer : ValueSerializer<SnowflakeId>() {
+            override fun serialize(value: SnowflakeId, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeString(value.toString())
+            }
+        }
+
+        class Deserializer : ValueDeserializer<SnowflakeId>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = SnowflakeId(p.string)
+        }
+
+        class OldSerializer : JsonSerializer<SnowflakeId>() {
+            override fun serialize(value: SnowflakeId, gen: JsonGenerator, serializers: SerializerProvider) =
+                gen.writeString(value.toString())
+        }
+
+        class OldDeserializer : JsonDeserializer<SnowflakeId>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): SnowflakeId = SnowflakeId(p.text)
+        }
+
+        @jakarta.persistence.Converter(autoApply = true)
+        class Converter : AttributeConverter<SnowflakeId?, Long?> {
+            override fun convertToDatabaseColumn(attribute: SnowflakeId?): Long? = attribute?.value
+            override fun convertToEntityAttribute(dbData: Long?): SnowflakeId? = dbData?.let { SnowflakeId(it) }
+        }
+
+        class Type : EnhancedUserType<SnowflakeId> {
+            override fun getSqlType(): Int = SqlTypes.BIGINT
+
+            override fun returnedClass(): Class<SnowflakeId> = SnowflakeId::class.java
+
+            override fun equals(
+                x: SnowflakeId?,
+                y: SnowflakeId?
+            ): Boolean = x == y
+
+            override fun hashCode(x: SnowflakeId?): Int = x?.hashCode() ?: 0
+
+            override fun nullSafeGet(
+                rs: ResultSet?,
+                position: Int,
+                session: SharedSessionContractImplementor?,
+                owner: Any?
+            ): SnowflakeId? {
+                val value = rs?.getLong(position)?.run { if (this == -1L) null else this } ?: return null
+                return SnowflakeId(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement?,
+                value: SnowflakeId?,
+                index: Int,
+                session: SharedSessionContractImplementor?
+            ) {
+                st?.setLong(index, value?.value ?: -1) ?: throw IllegalArgumentException("Statement cannot be null")
+            }
+
+            override fun deepCopy(value: SnowflakeId?): SnowflakeId? = value?.let { SnowflakeId(it.value) }
+
+            override fun isMutable(): Boolean = false
+
+            override fun disassemble(value: SnowflakeId?): Serializable? = deepCopy(value)
+
+            override fun assemble(cached: Serializable?, owner: Any?): SnowflakeId? = when (cached) {
+                is SnowflakeId -> cached
+                is Long -> SnowflakeId(cached)
+                else -> null
+            }
+
+            override fun toSqlLiteral(value: SnowflakeId?): String? = value?.let { "'${it.value}'" }
+
+            override fun toString(value: SnowflakeId?): String? = value?.toString()
+
+            override fun fromStringValue(sequence: CharSequence?): SnowflakeId =
+                sequence?.let { SnowflakeId(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to TSID")
+        }
     }
 
     /**
