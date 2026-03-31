@@ -405,14 +405,11 @@ class Json private constructor(@param:Language("json") override val value: Strin
          * The conversion is performed based on the specified type [T].
          *
          * @param T the type of elements to be extracted from the [JsonNode].
-         * @param force a flag indicating whether to force conversion
-         *              of unsupported types using the object mapper.
-         *              Defaults to `false`.
          * @return a [Result] containing the list of elements of type [T] if conversion is successful,
          *         or a failure if an error occurs.
          * @since 3.0.0
          */
-        inline fun <reified T> JsonNode.asList(force: Boolean = false): Result<List<T>> = runCatching {
+        inline fun <reified T> JsonNode.asList(): Result<List<T>> = runCatching {
             val list = emptyMList<T>()
             if (isArray) {
                 for (node in this) {
@@ -423,7 +420,7 @@ class Json private constructor(@param:Language("json") override val value: Strin
                         Boolean::class -> list.add(node.asBoolean() as T)
                         String::class -> list.add(node.asString() as T)
                         JsonNode::class -> list.add(node as T)
-                        else -> if (force) list.add(MAPPER.treeToValue(node, T::class.java))
+                        else -> list.add(MAPPER.treeToValue(node, T::class.java))
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
@@ -435,14 +432,11 @@ class Json private constructor(@param:Language("json") override val value: Strin
          * If the JsonNode represents an array, each element is converted to the specified type using
          * appropriate deserialization. The conversion may fail for incompatible or invalid elements.
          *
-         * @param force a flag indicating whether to force conversion
-         *              of unsupported types using the object mapper.
-         *              Defaults to `false`.
          * @return a Result containing a Set of elements of type T if the conversion is successful.
          *         If an error occurs during the conversion process, the Result contains the exception.
          * @since 3.0.0
          */
-        inline fun <reified T> JsonNode.asSet(force: Boolean = false): Result<Set<T>> = runCatching {
+        inline fun <reified T> JsonNode.asSet(): Result<Set<T>> = runCatching {
             val set = emptyMSet<T>()
             if (isArray) {
                 for (node in this) {
@@ -452,7 +446,7 @@ class Json private constructor(@param:Language("json") override val value: Strin
                         Double::class -> set.add(node.asDouble() as T)
                         Boolean::class -> set.add(node.asBoolean() as T)
                         String::class -> set.add(node.asString() as T)
-                        else -> if (force) set.add(MAPPER.treeToValue(node, T::class.java))
+                        else -> set.add(MAPPER.treeToValue(node, T::class.java))
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
