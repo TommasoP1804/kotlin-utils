@@ -424,10 +424,9 @@ class Json private constructor(@param:Language("json") override val value: Strin
                         String::class -> list.add(node.asString() as T)
                         JsonNode::class -> list.add(node as T)
                         else -> if (force) list.add(MAPPER.treeToValue(node, T::class.java))
-                            else throw UnsupportedJsonTypeException(T::class.simpleName)
                     }
                 }
-            }
+            } else throw UnsupportedJsonTypeException(T::class.simpleName)
             list.toList()
         }
         /**
@@ -454,10 +453,9 @@ class Json private constructor(@param:Language("json") override val value: Strin
                         Boolean::class -> set.add(node.asBoolean() as T)
                         String::class -> set.add(node.asString() as T)
                         else -> if (force) set.add(MAPPER.treeToValue(node, T::class.java))
-                            else throw UnsupportedJsonTypeException(T::class.simpleName)
                     }
                 }
-            }
+            } else throw UnsupportedJsonTypeException(T::class.simpleName)
             set.toSet()
         }
 

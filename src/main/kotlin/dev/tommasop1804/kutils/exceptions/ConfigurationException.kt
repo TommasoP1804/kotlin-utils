@@ -2,9 +2,7 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.before
-import dev.tommasop1804.kutils.isNotNull
+import dev.tommasop1804.kutils.*
 
 /**
  * Represents an exception that is thrown when a configuration error occurs.
@@ -136,6 +134,73 @@ open class InvalidEnvPropertyException : ConfigurationException {
      * @param internalErrorCode An optional code representing the internal error. Defaults to null.
      * 
      * @since 1.0.2
+     */
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode)
+}
+
+/**
+ * Represents an exception that is thrown when an attempt is made to access a non-existent
+ * or undefined environment property in the system configuration.
+ *
+ * This exception is a subtype of [ConfigurationException] and is designed to handle
+ * cases where environment-specific properties are expected but not found.
+ * @since 3.3.2
+ */
+open class NoSuchEnvPropertyException : ConfigurationException {
+    /**
+     * Constructs a new instance of [NoSuchEnvPropertyException] with no specific details.
+     *
+     * This constructor creates a default instance of the exception, which can be used
+     * in scenarios where detailed context about the missing environment property is not available
+     * or necessary.
+     * @since 3.3.2
+     */
+    constructor() : super()
+    /**
+     * Constructs a new instance of the exception with additional details.
+     *
+     * This constructor allows specifying the name of the missing property, an optional message
+     * providing additional context, and an optional internal error code to assist in error tracking.
+     *
+     * The generated exception message is formatted to include:
+     * - The internal error code (if provided).
+     * - The name of the missing property (if provided).
+     * - The additional message (if provided).
+     *
+     * @param propertyName The name of the environment property that was not found. Can be null.
+     * @param message An optional message providing additional details about the exception. Can be null.
+     * @param internalErrorCode An optional internal error code for diagnostic purposes. Can be null.
+     * @since 3.3.2
+     */
+    constructor(propertyName: String?, message: String? = null, internalErrorCode: String? = null) : super(
+        (internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + "Property${if (propertyName.isNotNull()) " `$propertyName` " else String.EMPTY}not found${if (message.isNotNull()) ": $message" else String.EMPTY}",
+        internalErrorCode
+    )
+    /**
+     * Creates an instance of [NoSuchEnvPropertyException] with a specified error message and an optional internal error code.
+     *
+     * @param message The detail message associated with the exception. Can be null.
+     * @param internalErrorCode An optional internal error code used for categorizing the exception.
+     * @since 3.3.2
+     */
+    constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode)
+    /**
+     * Constructs a new instance of NoSuchEnvPropertyException with the given cause and optional internal error code.
+     *
+     * @param cause The underlying exception that caused this exception to be thrown, or null if no cause is specified.
+     * @param internalErrorCode An optional identifier for the error, which may be used for tracking or debugging purposes.
+     * @since 3.3.2
+     */
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode)
+    /**
+     * Constructs an instance of [NoSuchEnvPropertyException] with the specified detail
+     * message, cause, and internal error code.
+     *
+     * @param message The detail message to describe the exception, or null if no message is provided.
+     * @param cause The cause of the exception, represented as a [Throwable], or null if no cause is provided.
+     * @param internalErrorCode An optional error code that can be used to represent internal errors,
+     *        or null if no error code is specified.
+     * @since 3.3.2
      */
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode)
 }
