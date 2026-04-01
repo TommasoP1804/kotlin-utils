@@ -350,7 +350,8 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun set(@Language("sql") vararg setExpression: String): SqlQueryBuilder {
-        setClause += setExpression.joinToString(", ")
+        setClause += if (setClause startsWith " SET ") ", " + setExpression.joinToString(", ")
+        else " SET " + setExpression.joinToString(", ")
         return this
     }
 
