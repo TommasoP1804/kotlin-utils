@@ -5,14 +5,12 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.collections.MTable
-import dev.tommasop1804.kutils.classes.collections.Table
-import dev.tommasop1804.kutils.classes.constants.QuantityLevel
-import dev.tommasop1804.kutils.classes.identifiers.Ulid
-import dev.tommasop1804.kutils.classes.pagination.FilterOperator
-import dev.tommasop1804.kutils.classes.tuples.Quadruple
-import dev.tommasop1804.kutils.classes.tuples.Quintuple
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.identifiers.*
+import dev.tommasop1804.kutils.classes.pagination.*
+import dev.tommasop1804.kutils.classes.tuples.*
 import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.net.URI
@@ -112,6 +110,20 @@ typealias DoubleList = List<Double>
  * @see Double
  */
 typealias DoubleMList = MutableList<Double>
+
+/**
+ * A typealias for a list containing elements of type Number.
+ * This can include integers, floating-point numbers, or any other subclass of Number.
+ * @since 3.4.0
+ */
+typealias NumberList = List<Number>
+/**
+ * A type alias representing a mutable list of elements of type Number.
+ * This alias can be used to simplify declarations and improve code readability
+ * when dealing with collections of numeric values.
+ * @since 3.4.0
+ */
+typealias NumberMList = MutableList<Number>
 
 /**
  * A type alias for a list of strings. This alias simplifies the readability and usability
@@ -318,6 +330,21 @@ typealias DoubleSet = Set<Double>
 typealias DoubleMSet = MutableSet<Double>
 
 /**
+ * A typealias representing a set of Number instances.
+ *
+ * This alias is intended to simplify the usage of sets that exclusively
+ * contain elements of type Number or its subtypes, such as Int, Double, etc.
+ * @since 3.4.0
+ */
+typealias NumberSet = Set<Number>
+/**
+ * A type alias representing a mutable set of Number objects.
+ * This can include any type that is a subclass of Number, such as Int, Float, Double, etc.
+ * @since 3.4.0
+ */
+typealias NumberMSet = MutableSet<Number>
+
+/**
  * Type alias for a set of strings.
  * This provides a more descriptive name when handling sets containing string values.
  *
@@ -498,6 +525,19 @@ typealias DoubleCollection = Collection<Double>
 typealias DoubleMCollection = MutableCollection<Double>
 
 /**
+ * A type alias for a collection of elements that implement the [Number] interface.
+ * Allows for more readable and concise code when working with collections of numeric values.
+ * @since 3.4.0
+ */
+typealias NumberCollection = Collection<Number>
+/**
+ * A type alias for `MutableCollection<Number>`, representing a mutable collection
+ * that can hold elements of type `Number` or its subtypes.
+ * @since 3.4.0
+ */
+typealias NumberMCollection = MutableCollection<Number>
+
+/**
  * A type alias for a collection of strings.
  *
  * This type alias is used to simplify the usage of `Collection<String>` 
@@ -657,6 +697,21 @@ typealias DoubleIterable = Iterable<Double>
  * @since 3.0.0
  */
 typealias DoubleMIterable = MutableIterable<Double>
+
+/**
+ * A type alias representing an Iterable of Number objects.
+ * It can be used to simplify the type declaration for any object
+ * that iterates over numbers.
+ * @since 3.4.0
+ */
+typealias NumberIterable = Iterable<Number>
+/**
+ * A typealias for a `MutableIterable` of `Number`.
+ * This provides a more concise way to refer to an iterable collection of numeric values
+ * that can be modified (e.g., addition or removal of elements).
+ * @since 3.4.0
+ */
+typealias NumberMIterable = MutableIterable<Number>
 
 /**
  * A typealias representing an `Iterable` of `String` objects.
@@ -1076,6 +1131,15 @@ typealias LongSequence = Sequence<Long>
  */
 typealias DoubleSequence = Sequence<Double>
 /**
+ * A type alias for a sequence of Number objects.
+ * This represents a lazily evaluated collection of Number elements, where
+ * each element can be accessed sequentially. NumberSequence can be used
+ * to handle a stream of numeric values of any type that extends the Number class,
+ * such as Int, Double, or Float.
+ * @since 3.4.0
+ */
+typealias NumberSequence = Sequence<Number>
+/**
  * A type alias that represents a sequence of strings.
  *
  * This can be used to simplify type definitions and improve code readability
@@ -1414,6 +1478,21 @@ typealias Double2 = Pair<Double, Double>
 typealias NullableDouble2 = Pair<Double?, Double?>
 
 /**
+ * A type alias representing a pair of numbers.
+ *
+ * Number2 is used to define a pair where both elements are of type Number.
+ * @since 3.4.0
+ */
+typealias Number2 = Pair<Number, Number>
+/**
+ * A type alias representing a pair of numbers.
+ * This alias provides a more descriptive name for a `Pair<Number, Number>`,
+ * emphasizing its use as a container for two numbers that may hold different numeric types.
+ * @since 3.4.0
+ */
+typealias NullableNumber2 = Pair<Number, Number>
+
+/**
  * A typealias for a Pair of Booleans.
  *
  * This alias is used to represent a pair of Boolean values
@@ -1553,6 +1632,23 @@ typealias Double3 = Triple<Double, Double, Double>
  * @see Double
  */
 typealias NullableDouble3 = Triple<Double?, Double?, Double?>
+
+/**
+ * Represents a type alias for a Triple containing three Number values.
+ *
+ * This alias simplifies the usage of Triple when working specifically
+ * with three numerical values, such as combining three coordinates
+ * or dimensions into a single value.
+ * @since 3.4.0
+ */
+typealias Number3 = Triple<Number, Number, Number>
+/**
+ * A typealias for a Triple consisting of three nullable Number objects.
+ * This can be used to represent a group of three numeric values,
+ * where any or all of the values may be null.
+ * @since 3.4.0
+ */
+typealias NullableNumber3 = Triple<Number?, Number?, Number?>
 
 /**
  * Represents a type alias for a Triple consisting of three Boolean values.
@@ -1716,6 +1812,25 @@ typealias Double4 = Quadruple<Double, Double, Double, Double>
 typealias NullableDouble4 = Quadruple<Double?, Double?, Double?, Double?>
 
 /**
+ * Represents a type alias for a quadruple of four numbers.
+ *
+ * This type alias simplifies the use of `Quadruple` in contexts where all four
+ * elements are of type `Number`. It is useful for grouping a set of four numeric
+ * values together and passing them as a single entity.
+ * @since 3.4.0
+ */
+typealias Number4 = Quadruple<Number, Number, Number, Number>
+/**
+ * A type alias representing a quadruple of nullable numeric values.
+ *
+ * This alias simplifies the declaration and usage of a `Quadruple` where all four elements
+ * are nullable and of type `Number`. It can be useful for scenarios where a group of
+ * up to four optional numeric values need to be stored or passed as a single entity.
+ * @since 3.4.0
+ */
+typealias NullableNumber4 = Quadruple<Number?, Number?, Number?, Number?>
+
+/**
  * A type alias for a [Quadruple] of four [Boolean] values.
  *
  * This alias simplifies working with quadruples of Boolean values by providing
@@ -1865,6 +1980,20 @@ typealias Double5 = Quintuple<Double, Double, Double, Double, Double>
  * @see Double
  */
 typealias NullableDouble5 = Quintuple<Double?, Double?, Double?, Double?, Double?>
+
+/**
+ * A typealias for `Quintuple` that represents a tuple of five `Number` objects.
+ *
+ * This can be used to group and manipulate five numeric values together as a single object.
+ */
+typealias Number5 = Quintuple<Number, Number, Number, Number, Number>
+/**
+ * A typealias representing a quintuple where each element is either a `Number` or nullable.
+ *
+ * This can be useful for cases where a group of five `Number` elements with potential nullability
+ * needs to be handled together.
+ */
+typealias NullableNumber5 = Quintuple<Number?, Number?, Number?, Number?, Number?>
 
 /**
  * A type alias representing a quintuple of five Boolean values.

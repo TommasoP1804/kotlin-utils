@@ -796,12 +796,11 @@ fun Number.sumOfDigits(includeDecimal: Boolean = true): Long {
  * @param numbers A variable number of pairs where each pair consists of a number and its associated weight
  * in the form of a Percentage object. The weight determines the influence of the value on the average.
  * @return The weighted average as a Double.
+ * @throws ArithmeticException If the sum of weights in the collection is zero, as division by zero is not allowed.
  * @since 3.3.5
  */
 fun weightedAverage(vararg numbers: Pair<Number, Percentage>) =
     numbers.sumOf { [number, weight] -> number.toDouble() * weight.value } / numbers.sumOf { it.second.value }
-
-
 /**
  * Calculates the weighted average of the given pairs of numbers and weights.
  *
@@ -809,11 +808,44 @@ fun weightedAverage(vararg numbers: Pair<Number, Percentage>) =
  *                The first value of the pair represents the number, and the second value represents the weight.
  * @return The weighted average computed as the sum of the product of each number and its weight,
  *         divided by the total sum of the weights.
+ * @throws ArithmeticException If the sum of weights in the collection is zero, as division by zero is not allowed.
  * @since 3.3.5
  */
-@JvmName("weightedAverageMonoPairNumber")
-fun weightedAverage(vararg numbers: MonoPair<Number>) =
+@JvmName("weightedAverageVarargNumber2")
+fun weightedAverage(vararg numbers: Number2) =
     numbers.sumOf { [number, weight] -> number.toDouble() * weight.toDouble() } / numbers.sumOf { it.second.toDouble() }
+
+/**
+ * Calculates the weighted average of a collection of number-percentage pairs.
+ *
+ * Each pair in the collection consists of a numerical value and its corresponding weight,
+ * represented as a percentage. The method computes the sum of all weighted values
+ * (number multiplied by weight) and divides it by the sum of all weights to determine
+ * the weighted average.
+ *
+ * @receiver An iterable collection of pairs containing a number and a percentage weight.
+ * @return The weighted average as a Double.
+ * @throws ArithmeticException If the sum of weights is zero, which would result in a division by zero.
+ * @since 3.4.0
+ */
+@JvmName("weightAverageIterablePairNumberPercentage")
+fun Iterable<Pair<Number, Percentage>>.weightAverage() =
+    sumOf { [number, weight] -> number.toDouble() * weight.value } / sumOf { it.second.value }
+/**
+ * Calculates the weighted average of a collection of `Number2` instances.
+ * Each instance in the collection is expected to represent a pair of a number and its associated weight.
+ *
+ * The weighted average is derived by summing the products of each number and its weight,
+ * and dividing it by the sum of the weights.
+ *
+ * @receiver An iterable collection of `Number2`, where each item consists of a number and its respective weight.
+ * @return The weighted average as a `Double` value.
+ * @throws ArithmeticException If the sum of weights in the collection is zero, as division by zero is not allowed.
+ * @since 3.4.0
+ */
+@JvmName("weightAverageIterablePairNumber2")
+fun Iterable<Number2>.weightAverage() =
+    sumOf { [number, weight] -> number.toDouble() * weight.toDouble() } / sumOf { it.second.toDouble() }
 
 /**
  * Converts the number to its scientific notation representation with the specified number of decimal places.

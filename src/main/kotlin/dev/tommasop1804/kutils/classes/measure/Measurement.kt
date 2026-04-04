@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.annotations.Beta
 import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -342,6 +343,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @throws dev.tommasop1804.kutils.exceptions.UnitConversionException if conversion failed.
      * @since 1.0.0
      */
+    @Beta
     infix fun convertTo(to: ScalarUnit) = ScalarUnit.convert(this, to)
 
     /**
@@ -354,6 +356,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @throws UnsupportedOperationException If the measurements are of different types.
      * @since 1.0.0
      */
+    @OptIn(Beta::class)
     operator fun plus(other: Measurement): Measurement {
         if (unit.measure != other.unit.measure) throw UnsupportedOperationException("Can't sum measurement of different type.")
         return Measurement(value + ScalarUnit.convert(other, unit)().value, unit)
@@ -379,6 +382,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @throws UnsupportedOperationException If the measurements are of different types.
      * @since 1.0.0
      */
+    @OptIn(Beta::class)
     operator fun minus(other: Measurement): Measurement {
         if (unit.measure != other.unit.measure) throw UnsupportedOperationException("Can't sum measurement of different type.")
         return Measurement(value - ScalarUnit.convert(other, unit)().value, unit)
@@ -541,6 +545,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @throws IllegalOperationException if the measurement units are different
      * @since 1.0.0
      */
+    @OptIn(Beta::class)
     override operator fun compareTo(other: Measurement): Int {
         if (other.unit != unit) throw IllegalOperationException("Can't compare measurement of different type.")
         return value.compareTo(ScalarUnit.convert(other, unit)().value)
@@ -555,6 +560,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
      * @throws IllegalOperationException If the units of the provided measurements are not the same.
      * @since 1.0.0
      */
+    @OptIn(Beta::class)
     fun average(vararg measurements: Measurement): Measurement {
         var sum = 0.0
         for (measurement in measurements) {
@@ -638,7 +644,80 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
          * @since 1.0.0
          */
         infix fun Number.ofUnit(unit: MeasureUnit.DataSizeUnit): DataSize = RMeasurement(toDouble(), unit)
-        
+        /**
+         * Converts a number into a measurement of the specified length unit.
+         *
+         * @param unit The length unit to associate with the number.
+         * @return A Length instance representing the number in the specified length unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.LengthUnit): Length = RMeasurement(toDouble(), unit)
+        /**
+         * Creates a Temperature measurement by associating a numeric value with a specific temperature unit.
+         *
+         * @param unit The temperature unit to associate with the numeric value.
+         * @return A Temperature instance representing the measurement in the specified unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.TemperatureUnit): Temperature = RMeasurement(toDouble(), unit)
+        /**
+         * Converts the current number to an area measurement with the specified unit.
+         *
+         * @param unit The unit of measurement to associate with the number.
+         * @return The resulting area as an instance of the Area class.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.AreaUnit): Area = RMeasurement(toDouble(), unit)
+        /**
+         * Converts a numeric value to a measurement of the specified volume unit.
+         *
+         * @param unit The volume unit to associate with the numeric value.
+         * @return A Volume instance representing the numeric value in the specified unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.VolumeUnit): Volume = RMeasurement(toDouble(), unit)
+        /**
+         * Converts the number to a Speed value in the specified unit of measurement.
+         *
+         * @param unit The unit of speed to associate with the number.
+         * @return A Speed instance representing the number in the specified unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.SpeedUnit): Speed = RMeasurement(toDouble(), unit)
+        /**
+         * Converts a numeric value into an instance of the Acceleration measurement with the specified unit.
+         *
+         * @param unit The measurement unit of type MeasureUnit.AccelerationUnit to associate with the value.
+         * @return An instance of Acceleration representing the numeric value in the specified unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.AccelerationUnit): Acceleration = RMeasurement(toDouble(), unit)
+        /**
+         * Converts the current number to a `Density` value expressed in the specified density unit.
+         *
+         * @param unit The density unit to associate with the numeric value.
+         * @return A `Density` instance representing the given numeric value and the specified density unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.DensityUnit): Density = RMeasurement(toDouble(), unit)
+        /**
+         * Creates a `PlaneAngle` measurement from this number and the specified plane angle unit.
+         *
+         * @param unit The plane angle unit to associate with this number.
+         * @return A `PlaneAngle` representation of this number in the specified unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.PlaneAngleUnit): PlaneAngle = RMeasurement(toDouble(), unit)
+        /**
+         * Converts a numeric value to a Mass measurement with the specified unit.
+         *
+         * @param unit The mass unit to associate with the numeric value.
+         * @return A Mass instance representing the value and its associated unit.
+         * @since 3.4.0
+         */
+        infix fun Number.ofUnit(unit: MeasureUnit.MassUnit): Mass = RMeasurement(toDouble(), unit)
+
+
         /**
          * Parses the given string into a measurement object with a numeric value and a unit.
          *
@@ -817,9 +896,9 @@ typealias Speed = RMeasurement<MeasureUnit.SpeedUnit>
  *
  * @see RMeasurement
  * @see MeasureUnit.AccelerationUnit
- * @since 3.0.0
+ * @since 3.4.0
  */
-typealias Accelertation = RMeasurement<MeasureUnit.AccelerationUnit>
+typealias Acceleration = RMeasurement<MeasureUnit.AccelerationUnit>
 /**
  * A typealias representing a density measurement with units restricted to those of type `MeasureUnit.DensityUnit`.
  *

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.annotations.Beta
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.measure.*
 import dev.tommasop1804.kutils.classes.measure.RMeasurement.Companion.ofUnit
@@ -2306,7 +2307,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchHeaderException if the header is missing.
      * @since 3.0.0
      */
-    fun getContentLength() = getFirstOrThrow(CONTENT_LENGTH).toLong() ofUnit MeasureUnit.DataSizeUnit.BYTE
+    fun getContentLength() = getFirstOrThrow(CONTENT_LENGTH).toLong() ofUnit MeasureUnit.DataSizeUnit.BYTES
     /**
      * Sets the content length of a data transfer operation.
      *
@@ -2314,7 +2315,8 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *              and will be internally converted to bytes.
      * @since 3.0.0
      */
-    fun setContentLength(value: DataSize) = set(CONTENT_LENGTH, value.convertTo(MeasureUnit.DataSizeUnit.BYTE)().value)
+    @OptIn(Beta::class)
+    fun setContentLength(value: DataSize) = set(CONTENT_LENGTH, value.convertTo(MeasureUnit.DataSizeUnit.BYTES)().value)
     /**
      * Sets the value of the Content-Length header for a request.
      *

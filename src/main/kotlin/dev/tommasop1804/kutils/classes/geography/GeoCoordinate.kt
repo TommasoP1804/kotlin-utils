@@ -771,13 +771,13 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * @return a `Measurement` object representing the distance between the two `GeoCoordinate` points in the specified unit.
      * @since 1.0.0
      */
-    fun distanceTo(other: GeoCoordinate, unit: MeasureUnit.LengthUnit = MeasureUnit.LengthUnit.KILOMETER): RMeasurement<MeasureUnit.LengthUnit> {
+    fun distanceTo(other: GeoCoordinate, unit: MeasureUnit.LengthUnit = MeasureUnit.LengthUnit.KILOMETERS): RMeasurement<MeasureUnit.LengthUnit> {
         val dLat = Math.toRadians(other.latitude - latitude)
         val dLon = Math.toRadians(other.longitude - longitude)
         val a = sin(dLat / 2) * sin(dLat / 2) +
                 cos(Math.toRadians(latitude)) * cos(Math.toRadians(other.latitude)) * sin(dLon / 2) * sin(dLon / 2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return RMeasurement(MeasureUnit.LengthUnit.KILOMETER.convertTo(EARTH_RADIUS_KM * c, unit), unit)
+        return RMeasurement(MeasureUnit.LengthUnit.KILOMETERS.convertTo(EARTH_RADIUS_KM * c, unit), unit)
     }
 
     /**

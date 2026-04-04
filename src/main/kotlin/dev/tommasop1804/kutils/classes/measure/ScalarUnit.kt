@@ -6,10 +6,10 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.*
-import dev.tommasop1804.kutils.exceptions.UnitConversionException
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.unaryMinus
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -106,7 +106,7 @@ interface ScalarUnit : Serializable {
      * Indicates whether the measure unit has a recognized or standardized symbol.
      * This property retrieves its value from the associated `measureUnit`.
      *
-     * @return `true` if the measure unit has a known standardized symbol, otherwise `false`.
+     * @return `true` if the measure unit has a  standardized symbol, otherwise `false`.
      * @since 1.0.0
      */
     val knownSymbol: Boolean
@@ -139,6 +139,7 @@ interface ScalarUnit : Serializable {
          * @throws UnitConversionException If the measure of the input measurement does not match the measure of the target scalar unit.
          * @since 1.0.0
          */
+        @Beta
         fun convert(measurement: Measurement, to: ScalarUnit) = runCatching {
             val message = "Cannot convert " + measurement.measure + " to " + to.measure
             if (measurement.measure != to.measure) {
@@ -162,64 +163,6 @@ interface ScalarUnit : Serializable {
                 is DataSizeUnit -> unit.convertTo(measurement.value, to as DataSizeUnit)
                 else -> throw UnitConversionException(message)
             }, to)
-        }
-
-        /**
-         * Attempts to retrieve a scalar unit by its known unit name.
-         * Searches through various unit categories (e.g., time, length, mass, etc.)
-         * to find a matching unit name. The unit name comparison is case-insensitive
-         * and trims any extra spaces.
-         *
-         * 
-         * @param name The name of the unit to search for.
-         * @return The matching ScalarUnit if found, or null if no matching unit is identified.
-         * @since 1.0.0
-         */
-        infix fun ofKnownUnitName(name: String): ScalarUnit? {
-            val effName = (-name).trim()
-
-            TimeUnit.ofName(effName)?.let { return it }
-            LengthUnit.ofName(effName)?.let { return it }
-            MassUnit.ofName(effName)?.let { return it }
-            TemperatureUnit.ofName(effName)?.let { return it }
-            PlaneAngleUnit.ofName(effName)?.let { return it }
-            PressureUnit.ofName(effName)?.let { return it }
-            EnergyUnit.ofName(effName)?.let { return it }
-            PowerUnit.ofName(effName)?.let { return it }
-            AreaUnit.ofName(effName)?.let { return it }
-            VolumeUnit.ofName(effName)?.let { return it }
-            SpeedUnit.ofName(effName)?.let { return it }
-            AccelerationUnit.ofName(effName)?.let { return it }
-            DensityUnit.ofName(effName)?.let { return it }
-            return null
-        }
-
-        /**
-         * Converts a given unit symbol into a corresponding known `ScalarUnit` instance if it matches
-         * a predefined symbol of a supported unit category such as time, length, mass, etc.
-         *
-         * 
-         * @param symbol The string representation of the unit symbol to be converted.
-         * @return The corresponding `ScalarUnit` if the symbol matches a known unit, or `null` if no match is found.
-         * @since 1.0.0
-         */
-        infix fun ofKnownUnitSymbol(symbol: String): ScalarUnit? {
-            val effSymbol = (-symbol).trim()
-
-            TimeUnit.ofSymbol(effSymbol)?.let { return it }
-            LengthUnit.ofSymbol(effSymbol)?.let { return it }
-            MassUnit.ofSymbol(effSymbol)?.let { return it }
-            TemperatureUnit.ofSymbol(effSymbol)?.let { return it }
-            PlaneAngleUnit.ofSymbol(effSymbol)?.let { return it }
-            PressureUnit.ofSymbol(effSymbol)?.let { return it }
-            EnergyUnit.ofSymbol(effSymbol)?.let { return it }
-            PowerUnit.ofSymbol(effSymbol)?.let { return it }
-            AreaUnit.ofSymbol(effSymbol)?.let { return it }
-            VolumeUnit.ofSymbol(effSymbol)?.let { return it }
-            SpeedUnit.ofSymbol(effSymbol)?.let { return it }
-            AccelerationUnit.ofSymbol(effSymbol)?.let { return it }
-            DensityUnit.ofSymbol(effSymbol)?.let { return it }
-            return null
         }
     }
 

@@ -20,21 +20,21 @@ enum class Measure(
 	val unitClass: KClass<out ScalarUnit>?,
 	val defaultUnit: ScalarUnit?
 ) {
-    TIME(true, true, MeasureUnit.TimeUnit::class, MeasureUnit.TimeUnit.SECOND),
-	LENGTH(true, true, MeasureUnit.LengthUnit::class, MeasureUnit.LengthUnit.METER),
-	MASS(true, true, MeasureUnit.MassUnit::class, MeasureUnit.MassUnit.KILOGRAM),
+    TIME(true, true, MeasureUnit.TimeUnit::class, MeasureUnit.TimeUnit.SECONDS),
+	LENGTH(true, true, MeasureUnit.LengthUnit::class, MeasureUnit.LengthUnit.METERS),
+	MASS(true, true, MeasureUnit.MassUnit::class, MeasureUnit.MassUnit.KILOGRAMS),
 	ELECTRIC_CURRENT(true, true, null, MeasureUnit("ampere", "electric current", "A", isSIUnit = true, isAcceptedBySI = true)),
-	TEMPERATURE(true, true, MeasureUnit.TemperatureUnit::class, MeasureUnit.TemperatureUnit.KELVIN),
+	TEMPERATURE(true, true, MeasureUnit.TemperatureUnit::class, MeasureUnit.TemperatureUnit.KELVINS),
 	AMOUNT_OF_SUBSTANCE(true, true, null, MeasureUnit("mole", "amount of substance", "mol", isSIUnit = true, isAcceptedBySI = true)),
 	LUMINOUS_INTENSITY(true, true, null, MeasureUnit("candela", "luminous intensity", "cd", isSIUnit = true, isAcceptedBySI = true)),
 
-	PLANE_ANGLE(true, false, MeasureUnit.PlaneAngleUnit::class, MeasureUnit.PlaneAngleUnit.RADIAN),
+	PLANE_ANGLE(true, false, MeasureUnit.PlaneAngleUnit::class, MeasureUnit.PlaneAngleUnit.RADIANS),
 	SOLID_ANGLE(true, false, null, MeasureUnit("steradian", "solid angle", "sr", isSIUnit = true, isAcceptedBySI = true)),
 	FREQUENCY(true, false, null, MeasureUnit("hertz", "frequency", "Hz", isSIUnit = true, isAcceptedBySI = true)),
 	FORCE(true, false, null, MeasureUnit("newton", "force", "N", isSIUnit = true, isAcceptedBySI = true)),
-	PRESSURE(true, false, MeasureUnit.PressureUnit::class, MeasureUnit.PressureUnit.PASCAL),
-	ENERGY(true, false, MeasureUnit.EnergyUnit::class, MeasureUnit.EnergyUnit.JOULE),
-	POWER(true, false, MeasureUnit.PowerUnit::class, MeasureUnit.PowerUnit.WATT),
+	PRESSURE(true, false, MeasureUnit.PressureUnit::class, MeasureUnit.PressureUnit.PASCALS),
+	ENERGY(true, false, MeasureUnit.EnergyUnit::class, MeasureUnit.EnergyUnit.JOULES),
+	POWER(true, false, MeasureUnit.PowerUnit::class, MeasureUnit.PowerUnit.WATTS),
 	DYNIAMIC_VISCOSITY(true, false, null, MeasureUnit("poiseuille", "dynamic viscosity", "μ", isSIUnit = true, isAcceptedBySI = true)),
 	ELECTRIC_CHARGE(true, false, null, MeasureUnit("coulomb", "electric charge", "C", isSIUnit = true, isAcceptedBySI = true)),
 	ELECTRIC_POTENTIAL(true, false, null, MeasureUnit("volt", "electric potential", "V", isSIUnit = true, isAcceptedBySI = true)),
@@ -50,13 +50,13 @@ enum class Measure(
 	DOSE_EQUIVALENT(true, false, null, MeasureUnit("sievert", "dose equivalent", "Sv", isSIUnit = true, isAcceptedBySI = true)),
 	CATALYTIC_ACTIVITY(true, false, null, MeasureUnit("katal", "catalytic activity", "kat", isSIUnit = true, isAcceptedBySI = true)),
 
-	AREA(true, false, MeasureUnit.AreaUnit::class, MeasureUnit.AreaUnit.SQUARE_METER),
-	VOLUME(true, false, MeasureUnit.VolumeUnit::class, MeasureUnit.VolumeUnit.CUBIC_METER),
-	SPEED(true, false, MeasureUnit.SpeedUnit::class, MeasureUnit.SpeedUnit.METER_PER_SECOND),
-	ACCELERATION(true, false, MeasureUnit.AccelerationUnit::class, MeasureUnit.AccelerationUnit.METER_PER_SECOND_SQUARED),
+	AREA(true, false, MeasureUnit.AreaUnit::class, MeasureUnit.AreaUnit.SQUARE_METERS),
+	VOLUME(true, false, MeasureUnit.VolumeUnit::class, MeasureUnit.VolumeUnit.CUBIC_METERS),
+	SPEED(true, false, MeasureUnit.SpeedUnit::class, MeasureUnit.SpeedUnit.METERS_PER_SECOND),
+	ACCELERATION(true, false, MeasureUnit.AccelerationUnit::class, MeasureUnit.AccelerationUnit.METERS_PER_SECOND_SQUARED),
 	ANGULAR_VELOCITY(true, false, null, MeasureUnit("radian per second", "angular velocity", "rpm", isSIUnit = true, isAcceptedBySI = true)),
 	ANGULAR_ACCELERATION(true, false, null, MeasureUnit("radian per second squared", "angular acceleration", "rpm²", isSIUnit = true, isAcceptedBySI = true)),
-	DENSITY(true, false, MeasureUnit.DensityUnit::class, MeasureUnit.DensityUnit.KILOGRAM_PER_CUBIC_METER),
+	DENSITY(true, false, MeasureUnit.DensityUnit::class, MeasureUnit.DensityUnit.KILOGRAMS_PER_CUBIC_METER),
 	MOLARITY(true, false, null, MeasureUnit("mole per kilogram", "molarity", "mol/kg", isSIUnit = true, isAcceptedBySI = true)),
 	MOLAR_VOLUME(true, false, null, MeasureUnit("cubic meter per mole", "molar volume", "m³/mol", isSIUnit = true, isAcceptedBySI = true)),
 
@@ -96,7 +96,7 @@ enum class Measure(
 	LUMINANCE(true, false, null, MeasureUnit("candela per square metre", "luminance", "cd/m²")),
 
 	// NOT SI
-	DATA_SIZE(false, false, MeasureUnit.DataSizeUnit::class, MeasureUnit.DataSizeUnit.BIT);
+	DATA_SIZE(false, false, MeasureUnit.DataSizeUnit::class, MeasureUnit.DataSizeUnit.BITS);
 
 	companion object {
 		/**

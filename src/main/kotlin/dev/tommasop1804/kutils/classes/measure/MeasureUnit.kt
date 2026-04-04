@@ -41,7 +41,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = MeasureUnit.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = MeasureUnit.Companion.OldDeserializer::class)
 @Suppress("unused")
-class MeasureUnit internal constructor(override val measure: String, override val unitName: String, override val isSIUnit: Boolean, override val isAcceptedBySI: Boolean, override val symbol: String?, override val knownSymbol: Boolean): ScalarUnit, Serializable {
+open class MeasureUnit internal constructor(override val measure: String, override val unitName: String, override val isSIUnit: Boolean, override val isAcceptedBySI: Boolean, override val symbol: String?, override val knownSymbol: Boolean): ScalarUnit, Serializable {
     /**
      * Provides access to the current measurement unit instance. This property ensures
      * the returned value is the specific `MeasureUnit` associated with the implementing object.
@@ -146,20 +146,20 @@ class MeasureUnit internal constructor(override val measure: String, override va
          * @since 1.0.0
          */
         val knownUnitsConsts: Set<ScalarUnit>
-            get() = TimeUnit.knownSymbol
-                .plus(LengthUnit.knownSymbol)
-                .plus(MassUnit.knownSymbol)
-                .plus(TemperatureUnit.knownSymbol)
-                .plus(PlaneAngleUnit.knownSymbol)
-                .plus(PressureUnit.knownSymbol)
-                .plus(EnergyUnit.knownSymbol)
-                .plus(PowerUnit.knownSymbol)
-                .plus(AreaUnit.knownSymbol)
-                .plus(VolumeUnit.knownSymbol)
-                .plus(SpeedUnit.knownSymbol)
-                .plus(AccelerationUnit.knownSymbol)
-                .plus(DensityUnit.knownSymbol)
-                .plus(DataSizeUnit.knownSymbol)
+            get() = TimeUnit.KNOWN_SYMBOLS
+                .plus(LengthUnit.KNOWN_SYMBOLS)
+                .plus(MassUnit.KNOWN_SYMBOLS)
+                .plus(TemperatureUnit.KNOWN_SYMBOLS)
+                .plus(PlaneAngleUnit.KNOWN_SYMBOLS)
+                .plus(PressureUnit.KNOWN_SYMBOLS)
+                .plus(EnergyUnit.KNOWN_SYMBOLS)
+                .plus(PowerUnit.KNOWN_SYMBOLS)
+                .plus(AreaUnit.KNOWN_SYMBOLS)
+                .plus(VolumeUnit.KNOWN_SYMBOLS)
+                .plus(SpeedUnit.KNOWN_SYMBOLS)
+                .plus(AccelerationUnit.KNOWN_SYMBOLS)
+                .plus(DensityUnit.KNOWN_SYMBOLS)
+                .plus(DataSizeUnit.KNOWN_SYMBOLS)
 
         /**
          * A computed property that provides a unique set of all known `MeasureUnit` instances.
@@ -423,867 +423,717 @@ class MeasureUnit internal constructor(override val measure: String, override va
     @Suppress("unchecked_cast")
     operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = _toMap().getValue(property.name) as R
 
-    /**
-     * Represents units of time measurement, defined with their respective attributes
-     * such as name, measurement category, symbol, and IS unit characteristics.
-     *
-     * Each `TimeUnit` corresponds to a predefined measurement unit (e.g., second, minute, etc.)
-     * and provides functionality for conversion between units.
-     *
-     * @property measureUnit The underlying `MeasureUnit` object describing the properties of the time unit.
-     * @since 1.0.0
-     */
-    enum class TimeUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        NANOSECOND(MeasureUnit("nanosecond", "time", "ns", knownSymbol = true)),
-        MILLISECOND(MeasureUnit("millisecond", "time", "ms", knownSymbol = true)),
-        SECOND(MeasureUnit("second", "time", "s", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		MINUTE(MeasureUnit("minute", "time", "min", isAcceptedBySI = true, knownSymbol = true)),
-		HOUR(MeasureUnit("hour", "time", "h", isAcceptedBySI = true, knownSymbol = true)),
-		DAY(MeasureUnit("day", "time", "d", isAcceptedBySI = true, knownSymbol = true)),
-		WEEK(MeasureUnit("week", "time", "wk", knownSymbol = true)),
-		MONTH(MeasureUnit("month", "time", "mo", knownSymbol = true)),
-		YEAR(MeasureUnit("year", "time", "yr", knownSymbol = true));
+    // ----------------
+
+    class TimeUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInSeconds: Transformer<Number, Number>,
+        private val unitFromSeconds: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "time", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForSeconds: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForSeconds.toDouble() }, { it.toDouble() / factorForSeconds.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): TimeUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): TimeUnit? = entries.find { it.symbol == symbol }
+            val NANOSECONDS = TimeUnit("nanoseconds", "ns", { it.toDouble() / 1e9 }, { it.toDouble() * 1e9 }, knownSymbol = true)
+            val MILLISECONDS = TimeUnit("milliseconds", "ms", { it.toDouble() / 1e3 }, { it.toDouble() * 1e3 }, knownSymbol = true)
+            val SECONDS = TimeUnit("seconds", "s", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val MINUTES = TimeUnit("minutes", "min", { it.toDouble() * 60.0 }, { it.toDouble() / 60.0 }, isAcceptedBySI = true, knownSymbol = true)
+            val HOURS = TimeUnit("hours", "h", { it.toDouble() * 3600.0 }, { it.toDouble() / 3600.0 }, isAcceptedBySI = true, knownSymbol = true)
+            val DAYS = TimeUnit("days", "d", { it.toDouble() * 86400.0 }, { it.toDouble() / 86400.0 }, isAcceptedBySI = true, knownSymbol = true)
+            val WEEKS = TimeUnit("weeks", "wk", { it.toDouble() * 604800.0 }, { it.toDouble() / 604800.0 }, knownSymbol = true)
+            val MONTHS = TimeUnit("months", "mo", { it.toDouble() * 2592000.0 }, { it.toDouble() / 2592000.0 }, knownSymbol = true)
+            val YEARS = TimeUnit("years", "yr", { it.toDouble() * 31536000.0 }, { it.toDouble() / 31536000.0 }, knownSymbol = true)
 
-            val acceptedBySI: Set<TimeUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-            
-            val knownSymbol: Set<TimeUnit>
-                get() = entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                NANOSECONDS,
+                MILLISECONDS,
+                SECONDS,
+                MINUTES,
+                HOURS,
+                DAYS,
+                WEEKS,
+                MONTHS,
+                YEARS
+            )
         }
 
-        private fun toSeconds(value: Double) = when (this) {
-            NANOSECOND -> value / 1e9
-            MILLISECOND -> value / 1e3
-            SECOND -> value
-            MINUTE -> value * 60
-            HOUR -> value * 3600
-            DAY -> value * 86400
-            WEEK -> value * 604800
-            MONTH -> value * 2592000
-            YEAR -> value * 31536000
-        }
+        private fun toSeconds(value: Double) = unitInSeconds(value).toDouble()
 
-        private fun fromSeconds(value: Double) = when (this) {
-            NANOSECOND -> value * 1e9
-            MILLISECOND -> value * 1e3
-            SECOND -> value
-            MINUTE -> value / 60
-            HOUR -> value / 3600
-            DAY -> value / 86400
-            WEEK -> value / 604800
-            MONTH -> value / 2592000
-            YEAR -> value / 31536000
-        }
+        private fun fromSeconds(value: Double) = unitFromSeconds(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: TimeUnit) = targetUnit.fromSeconds(toSeconds(value))
     }
 
-    /**
-     * Represents different units of length, each associated with a `MeasureUnit`
-     * containing detailed information like its name, measurement type, symbol, and
-     * whether it's an International System (IS) unit or accepted by the IS.
-     *
-     * This enumeration provides functionality to retrieve accepted IS units and
-     * to convert values between different length units, utilizing internal
-     * conversion methods to and from meters as a base unit.
-     *
-     * @property measureUnit The underlying `MeasureUnit` associated with this `LengthUnit`.
-     * @since 1.0.0
-     */
-    enum class LengthUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        METER(MeasureUnit("meter", "length", "m", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		KILOMETER(MeasureUnit("kilometer", "length", "km", knownSymbol = true)),
-		MILE(MeasureUnit("mile", "length", "mi", knownSymbol = true)),
-		NAUTICAL_MILE(MeasureUnit("nautical mile", "length", "nm", isAcceptedBySI = true, knownSymbol = true)),
-		FOOT(MeasureUnit("foot", "length", "ft", knownSymbol = true)),
-		INCH(MeasureUnit("inch", "length", "in", knownSymbol = true)),
-		YARD(MeasureUnit("yard", "length", "yd", knownSymbol = true)),
-		LIGHT_YEAR(MeasureUnit("light year", "length", "ly", knownSymbol = true)),
-		ASTRONOMICAL_UNIT(MeasureUnit("astronomical unit", "length", "au", isAcceptedBySI = true, knownSymbol = true)),
-		ANGSTROM(MeasureUnit("ångström", "length", "Å", isAcceptedBySI = true, knownSymbol = true));
+    class LengthUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInMeters: Transformer<Number, Number>,
+        private val unitFromMeters: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "length", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForMeters: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForMeters.toDouble() }, { it.toDouble() / factorForMeters.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): LengthUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): LengthUnit? = entries.find { it.symbol == symbol }
+            val METERS = LengthUnit("meters", "m", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val KILOMETERS = LengthUnit("kilometers", "km", { it.toDouble() * 1000 }, { it.toDouble() / 1000 }, knownSymbol = true)
+            val MILES = LengthUnit("miles", "mi", { it.toDouble() * 1609.34 }, { it.toDouble() / 1609.34 }, knownSymbol = true)
+            val NAUTICAL_MILES = LengthUnit("nautical miles", "nm", { it.toDouble() * 1852 }, { it.toDouble() / 1852 }, isAcceptedBySI = true, knownSymbol = true)
+            val FEET = LengthUnit("feet", "ft", { it.toDouble() * 0.3048 }, { it.toDouble() / 0.3048 }, knownSymbol = true)
+            val INCHES = LengthUnit("inches", "in", { it.toDouble() * 0.0254 }, { it.toDouble() / 0.0254 }, knownSymbol = true)
+            val YARDS = LengthUnit("yards", "yd", { it.toDouble() * 0.9144 }, { it.toDouble() / 0.9144 }, knownSymbol = true)
+            val LIGHT_YEARS = LengthUnit("light years", "ly", { it.toDouble() * 9.4607e15 }, { it.toDouble() / 9.4607e15 }, knownSymbol = true)
+            val ASTRONOMICAL_UNITS = LengthUnit("astronomical units", "au", { it.toDouble() * 1.496e11 }, { it.toDouble() / 1.496e11 }, isAcceptedBySI = true, knownSymbol = true)
+            val ANGSTROMS = LengthUnit("ångströms", "Å", { it.toDouble() / 1e10 }, { it.toDouble() * 1e10 }, isAcceptedBySI = true, knownSymbol = true)
 
-            val acceptedBySI: Set<LengthUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<LengthUnit>
-                get() = LengthUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                METERS,
+                KILOMETERS,
+                MILES,
+                NAUTICAL_MILES,
+                FEET,
+                INCHES,
+                YARDS,
+                LIGHT_YEARS,
+                ASTRONOMICAL_UNITS,
+                ANGSTROMS
+            )
         }
 
-        private fun toMeters(value: Double) = when (this) {
-            METER -> value
-            KILOMETER -> value * 1000
-            MILE -> value * 1609.34
-            NAUTICAL_MILE -> value * 1852
-            FOOT -> value * 0.3048
-            INCH -> value * 0.0254
-            YARD -> value * 0.9144
-            LIGHT_YEAR -> value * 9.4607e15
-            ASTRONOMICAL_UNIT -> value * 1.496e11
-            ANGSTROM -> value / 1e10
-        }
+        private fun toMeters(value: Double) = unitInMeters(value).toDouble()
 
-        private fun fromMeters(value: Double) = when (this) {
-            METER -> value
-            KILOMETER -> value / 1000
-            MILE -> value / 1609.34
-            NAUTICAL_MILE -> value / 1852
-            FOOT -> value / 0.3048
-            INCH -> value / 0.0254
-            YARD -> value / 0.9144
-            LIGHT_YEAR -> value / 9.4607e15
-            ASTRONOMICAL_UNIT -> value / 1.496e11
-            ANGSTROM -> value * 1e10
-        }
+        private fun fromMeters(value: Double) = unitFromMeters(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: LengthUnit) = targetUnit.fromMeters(toMeters(value))
     }
 
-    /**
-     * Represents a collection of mass units for measurement.
-     * Each unit includes its measure, name, symbol, and International System (IS) compliance properties.
-     * Supports unit conversion and retrieval based on name or symbol.
-     *
-     * All units are derived from the [MeasureUnit] class and implement the [ScalarUnit] interface.
-     * This class also provides functionalities for inter-unit conversions via `toKilograms` and `fromKilograms` methods.
-     *
-     * @property measureUnit The measure unit object containing corresponding attributes such as name, symbol, and compliance statuses.
-     * @since 1.0.0
-     */
-    enum class MassUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        KILOGRAM(MeasureUnit("kilogram", "mass", "kg", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		GRAM(MeasureUnit("gram", "mass", "g", knownSymbol = true)),
-		TONNE(MeasureUnit("tonne", "mass", "t", isAcceptedBySI = true, knownSymbol = true)),
-		POUND(MeasureUnit("pound", "mass", "lb", knownSymbol = true)),
-		OUNCE(MeasureUnit("ounce", "mass", "oz", knownSymbol = true)),
-		STONE(MeasureUnit("stone", "mass", "st", knownSymbol = true)),
-		CARAT(MeasureUnit("carat", "mass", "ct", knownSymbol = true)),
-		SLUG(MeasureUnit("slug", "mass", knownSymbol = true)),
-		ATOMIC_MASS_UNIT(MeasureUnit("atomic mass unit", "mass", "u", isAcceptedBySI = true, knownSymbol = true));
+    class MassUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInKilograms: Transformer<Number, Number>,
+        private val unitFromKilograms: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "mass", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForKilograms: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForKilograms.toDouble() }, { it.toDouble() / factorForKilograms.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): MassUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): MassUnit? = entries.find { it.symbol == symbol }
+            val KILOGRAMS = MassUnit("kilograms", "kg", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val GRAMS = MassUnit("grams", "g", { it.toDouble() / 1000 }, { it.toDouble() * 1000 }, knownSymbol = true)
+            val TONNES = MassUnit("tonnes", "t", { it.toDouble() * 1000 }, { it.toDouble() / 1000 }, isAcceptedBySI = true, knownSymbol = true)
+            val POUNDS = MassUnit("pounds", "lb", { it.toDouble() * 0.45359237 }, { it.toDouble() / 0.45359237 }, knownSymbol = true)
+            val OUNCES = MassUnit("ounces", "oz", { it.toDouble() * 0.028349523125 }, { it.toDouble() / 0.028349523125 }, knownSymbol = true)
+            val STONES = MassUnit("stones", "st", { it.toDouble() * 6.35029318 }, { it.toDouble() / 6.35029318 }, knownSymbol = true)
+            val CARATS = MassUnit("carats", "ct", { it.toDouble() * 0.002 }, { it.toDouble() / 0.002 }, knownSymbol = true)
+            val SLUGS = MassUnit("slugs", unitInKilograms = { it.toDouble() * 14.5939 }, unitFromKilograms = { it.toDouble() / 14.5939 }, knownSymbol = true)
+            val ATOMIC_MASS_UNITS = MassUnit("atomic mass units", "u", { it.toDouble() * 1.66053886e-27 }, { it.toDouble() / 1.66053886e-27 }, isAcceptedBySI = true, knownSymbol = true)
 
-            val acceptedBySI: Set<MassUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<MassUnit>
-                get() = MassUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                KILOGRAMS,
+                GRAMS,
+                TONNES,
+                POUNDS,
+                OUNCES,
+                STONES,
+                CARATS,
+                SLUGS,
+                ATOMIC_MASS_UNITS
+            )
         }
 
-        private fun toKilograms(value: Double) = when (this) {
-           KILOGRAM -> value
-           GRAM -> value / 1000
-           TONNE -> value * 1000
-           POUND -> value * 0.45359237
-           OUNCE -> value * 0.028349523125
-           STONE -> value * 6.35029318
-           CARAT -> value * 0.002
-           SLUG -> value * 14.5939
-           ATOMIC_MASS_UNIT -> value * 1.66053886e-27
-        }
+        private fun toKilograms(value: Double) = unitInKilograms(value).toDouble()
 
-        private fun fromKilograms(value: Double) = when (this) {
-            KILOGRAM -> value
-            GRAM -> value * 1000
-            TONNE -> value / 1000
-            POUND -> value / 0.45359237
-            OUNCE -> value / 0.028349523125
-            STONE -> value / 6.35029318
-            CARAT -> value / 0.002
-            SLUG -> value / 14.5939
-            ATOMIC_MASS_UNIT -> value / 1.66053886e-27
-        }
+        private fun fromKilograms(value: Double) = unitFromKilograms(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: MassUnit) = targetUnit.fromKilograms(toKilograms(value))
     }
 
-    /**
-     * Represents an enumeration of temperature units used for measurements.
-     * Each unit is associated with a `MeasureUnit` object containing its properties.
-     *
-     * @property measureUnit The `MeasureUnit` instance associated with the temperature unit.
-     * @since 1.0.0
-     */
-    enum class TemperatureUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        KELVIN(MeasureUnit("kelvin", "temperature", "K", true, isAcceptedBySI = true, knownSymbol = true)),
-		CELSIUS(MeasureUnit("celsius", "temperature", "°C", isAcceptedBySI = true, knownSymbol = true)),
-		FAHRENHEIT(MeasureUnit("fahrenheit", "temperature", "°F", knownSymbol = true));
+    class TemperatureUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInKelvins: Transformer<Number, Number>,
+        private val unitFromKelvins: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "temperature", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForKelvins: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForKelvins.toDouble() }, { it.toDouble() / factorForKelvins.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): TemperatureUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): TemperatureUnit? = entries.find { it.symbol == symbol }
+            val KELVINS = TemperatureUnit("kelvins", "K", { it.toDouble() }, { it.toDouble() }, true, isAcceptedBySI = true, knownSymbol = true)
+            val CELSIUS = TemperatureUnit("celsius", "°C", { it.toDouble() + 273.15 }, { it.toDouble() - 273.15 }, true, isAcceptedBySI = true, knownSymbol = true)
+            val FAHRENHEIT = TemperatureUnit("fahrenheit", "°F", { (it.toDouble() - 32) * 5 / 9 + 273.15 }, { (it.toDouble() - 273.15) * 9 / 5 + 32 }, knownSymbol = true)
 
-            val acceptedBySI: Set<TemperatureUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<TemperatureUnit>
-                get() = TemperatureUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                KELVINS,
+                CELSIUS,
+                FAHRENHEIT
+            )
         }
 
-        private fun toKelvin(value: Double) = when (this) {
-            KELVIN -> value
-            CELSIUS -> value + 273.15
-            FAHRENHEIT -> (value - 32) * 5 / 9 + 273.15
-        }
+        private fun toKelvins(value: Double) = unitInKelvins(value).toDouble()
 
-        private fun fromKelvin(value: Double) = when (this) {
-            KELVIN -> value
-            CELSIUS -> value - 273.15
-            FAHRENHEIT -> (value - 273.15) * 9 / 5 + 32
-        }
+        private fun fromKelvins(value: Double) = unitFromKelvins(value).toDouble()
 
-        fun convertTo(value: Double, targetUnit: TemperatureUnit) = targetUnit.fromKelvin(toKelvin(value))
+        fun convertTo(value: Double, targetUnit: TemperatureUnit) = targetUnit.fromKelvins(toKelvins(value))
     }
 
-    /**
-     * Represents the different units of plane angles. Implements the `ScalarUnit` interface,
-     * allowing interaction with broader scalar measurement concepts.
-     *
-     * Each unit is defined with a corresponding `MeasureUnit` instance containing its
-     * properties, including name, category, symbol, and IS standard compliance.
-     *
-     * @param measureUnit The related `MeasureUnit` instance containing properties
-     * of the specific unit.
-     * @since 1.0.0
-     */
-    enum class PlaneAngleUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        DEGREE_OF_ARC(MeasureUnit("degree of arc", "PLANE_ANGLE", "°", isAcceptedBySI = true, knownSymbol = true)),
-		MINUTE_OF_ARC(MeasureUnit("minute of arc", "PLANE_ANGLE", "'", isAcceptedBySI = true, knownSymbol = true)),
-		SECOND_OF_ARC(MeasureUnit("second of arc", "PLANE_ANGLE", "\"", isAcceptedBySI = true, knownSymbol = true)),
-		RADIAN(MeasureUnit("radian", "PLANE_ANGLE", "rad", true, isAcceptedBySI = true, knownSymbol = true)),
-		GRADIAN(MeasureUnit("gradian", "PLANE_ANGLE", "grad", knownSymbol = true));
+    class PlaneAngleUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInRadians: Transformer<Number, Number>,
+        private val unitFromRadians: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "plane angle", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForRadians: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForRadians.toDouble() }, { it.toDouble() / factorForRadians.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
+
 
         companion object {
-            infix fun ofName(name: String): PlaneAngleUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): PlaneAngleUnit? = entries.find { it.symbol == symbol }
+            val DEGREES_OF_ARC = PlaneAngleUnit("degrees of arc", "°", { Math.toRadians(it.toDouble()) }, { Math.toDegrees(it.toDouble()) }, isAcceptedBySI = true, knownSymbol = true)
+            val MINUTES_OF_ARC = PlaneAngleUnit("minutes of arc", "'", { Math.toRadians(it.toDouble() / 60) }, { Math.toDegrees(it.toDouble() * 60) }, isAcceptedBySI = true, knownSymbol = true)
+            val SECONDS_OF_ARC = PlaneAngleUnit("seconds of arc", "\"", { Math.toRadians(it.toDouble() / 3600) }, { Math.toDegrees(it.toDouble() * 3600) }, isAcceptedBySI = true, knownSymbol = true)
+            val RADIANS = PlaneAngleUnit("radians", "rad", { it.toDouble() }, { it.toDouble() }, true, isAcceptedBySI = true, knownSymbol = true)
+            val GRADIANS = PlaneAngleUnit("gradians", "gon", { it.toDouble() * (Math.PI / 200) }, { it.toDouble() * (200 / Math.PI) }, knownSymbol = true)
 
-            val acceptedBySI: Set<PlaneAngleUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<PlaneAngleUnit>
-                get() = PlaneAngleUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                DEGREES_OF_ARC,
+                MINUTES_OF_ARC,
+                SECONDS_OF_ARC,
+                RADIANS,
+                GRADIANS
+            )
         }
 
-        private fun toRadians(value: Double) = when (this) {
-            DEGREE_OF_ARC -> Math.toRadians(value)
-            MINUTE_OF_ARC -> Math.toRadians(value / 60)
-            SECOND_OF_ARC -> Math.toRadians(value / 3600)
-            RADIAN -> value
-            GRADIAN -> Math.toRadians(value / 200) / 10
-        }
+        private fun toRadians(value: Double) = unitInRadians(value).toDouble()
 
-        private fun fromRadians(value: Double) = when (this) {
-            DEGREE_OF_ARC -> Math.toDegrees(value)
-            MINUTE_OF_ARC -> Math.toDegrees(value) * 60
-            SECOND_OF_ARC -> Math.toDegrees(value) * 3600
-            RADIAN -> value
-            GRADIAN -> Math.toDegrees(value) * 200 / 10
-        }
+        private fun fromRadians(value: Double) = unitFromRadians(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: PlaneAngleUnit) = targetUnit.fromRadians(toRadians(value))
     }
 
-    /**
-     * Represents a pressure measurement unit, implementing the `ScalarUnit` interface.
-     * Each unit has associated metadata, such as its name, symbol, and whether it is an
-     * International System (IS) unit or accepted by the IS.
-     *
-     * @property measureUnit The underlying `MeasureUnit` associated with the given pressure unit.
-     * @since 1.0.0
-     */
-    enum class PressureUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        PASCAL(MeasureUnit("pascal", "pressure", "Pa", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		BAR(MeasureUnit("bar", "pressure", "bar", isAcceptedBySI = true, knownSymbol = true)),
-		ATMOSPHERE(MeasureUnit("atmosphere", "pressure", "atm", knownSymbol = true)),
-		TECHNICAL_ATMOSPHERE(MeasureUnit("technical atmosphere", "pressure", "at", knownSymbol = true)),
-		MILLIMTER_OF_MERCURY(MeasureUnit("millimeter of mercury", "pressure", "mmHg", isAcceptedBySI = true, knownSymbol = true)),
-		INCH_OF_MERCURY(MeasureUnit("inch of mercury", "pressure", "inHg", isAcceptedBySI = true, knownSymbol = true)),
-		POUND_PER_SQUARE_INCH(MeasureUnit("pound per square inch", "pressure", "psi", knownSymbol = true)),
-		TORR(MeasureUnit("torr", "pressure", "Torr", knownSymbol = true));
+    class PressureUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInPascals: Transformer<Number, Number>,
+        private val unitFromPascals: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "pressure", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForPascals: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForPascals.toDouble() }, { it.toDouble() / factorForPascals.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
+
 
         companion object {
-            infix fun ofName(name: String): PressureUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): PressureUnit? = entries.find { it.symbol == symbol }
+            val PASCALS = PressureUnit("pascals", "Pa", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val BARS = PressureUnit("bars", "bar", { it.toDouble() * 100000 }, { it.toDouble() / 100000 }, isAcceptedBySI = true, knownSymbol = true)
+            val ATMOSPHERES = PressureUnit("atmospheres", "atm", { it.toDouble() * 101325 }, { it.toDouble() / 101325 }, knownSymbol = true)
+            val TECHNICAL_ATMOSPHERES = PressureUnit("technical atmospheres", "at", { it.toDouble() * 98066.5 }, { it.toDouble() / 98066.5 }, knownSymbol = true)
+            val MILLIMTERS_OF_MERCURY = PressureUnit("millimeters of mercury", "mmHg", { it.toDouble() * 133.32236842105263 }, { it.toDouble() / 133.32236842105263 }, isAcceptedBySI = true, knownSymbol = true)
+            val INCHES_OF_MERCURY = PressureUnit("inches of mercury", "inHg", { it.toDouble() * 3386.3886664184383 }, { it.toDouble() / 3386.3886664184383 }, isAcceptedBySI = true, knownSymbol = true)
+            val POUNDS_PER_SQUARE_INCH = PressureUnit("pounds per square inch", "psi", { it.toDouble() * 6894.76 }, { it.toDouble() / 6894.76 }, knownSymbol = true)
+            val TORRS = PressureUnit("torrs", "Torr", { (it.toDouble() * 101325) / 760 }, { (it.toDouble() * 760) / 101325 }, knownSymbol = true)
 
-            val acceptedBySI: Set<PressureUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<PressureUnit>
-                get() = PressureUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                PASCALS,
+                BARS,
+                ATMOSPHERES,
+                TECHNICAL_ATMOSPHERES,
+                MILLIMTERS_OF_MERCURY,
+                INCHES_OF_MERCURY,
+                POUNDS_PER_SQUARE_INCH,
+                TORRS
+            )
         }
 
-        private fun toPascal(value: Double) = when (this) {
-            PASCAL -> value
-			BAR -> value * 100000
-			ATMOSPHERE -> value * 101325
-			TECHNICAL_ATMOSPHERE -> value * 98066.5
-			MILLIMTER_OF_MERCURY -> value * 133.32236842105263
-			INCH_OF_MERCURY -> value * 3386.3886664184383
-			POUND_PER_SQUARE_INCH -> value * 6894.76
-			TORR -> (value * 101325) / 760
-        }
+        private fun toPascals(value: Double) = unitInPascals(value).toDouble()
 
-        private fun fromPascals(value: Double) = when (this) {
-            PASCAL -> value
-            BAR -> value / 100000
-            ATMOSPHERE -> value / 101325
-            TECHNICAL_ATMOSPHERE -> value / 98066.5
-            MILLIMTER_OF_MERCURY -> value / 133.32236842105263
-            INCH_OF_MERCURY -> value / 3386.3886664184383
-            POUND_PER_SQUARE_INCH -> value / 6894.76
-            TORR -> 760 * (value / (101325))
-        }
+        private fun fromPascals(value: Double) = unitFromPascals(value).toDouble()
 
-        fun convertTo(value: Double, targetUnit: PressureUnit) = targetUnit.fromPascals(toPascal(value))
+        fun convertTo(value: Double, targetUnit: PressureUnit) = targetUnit.fromPascals(toPascals(value))
     }
 
-    /**
-     * Represents the enumeration of energy units and their associated properties and functionalities.
-     * Each energy unit is defined with its respective `MeasureUnit`, which includes its name, category,
-     * symbol, and specifications regarding IS (International System) compliance or acceptance.
-     *
-     * @property measureUnit The underlying `MeasureUnit` instance representing the unit's attributes.
-     * @since 1.0.0
-     */
-    enum class EnergyUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        JOULE(MeasureUnit("joule", "energy", "J", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-        CALORIE(MeasureUnit("calorie", "energy", "Cal", knownSymbol = true)),
-        KILOCALORIE(MeasureUnit("kilocalorie", "energy", "kCal", knownSymbol = true)),
-        ELECTRONVOLT(MeasureUnit("electronvolt", "energy", "eV", isAcceptedBySI = true, knownSymbol = true)),
-        BRITISH_TERMAL_UNIT(MeasureUnit("British thermal unit", "energy", "BTU")),
-        ERG(MeasureUnit("erg", "energy", "erg")),
-        FOOT_POUND_FORCE(MeasureUnit("foot-pound force", "energy", "F·lb")),
-        KILOWATT_HOUR(MeasureUnit("kilowatt-hour", "energy", "kWh"));
+    class EnergyUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInJoules: Transformer<Number, Number>,
+        private val unitFromJoules: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "energy", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForJoules: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForJoules.toDouble() }, { it.toDouble() / factorForJoules.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
+
 
         companion object {
-            infix fun ofName(name: String): EnergyUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): EnergyUnit? = entries.find { it.symbol == symbol }
+            val JOULES = EnergyUnit("joules", "J", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val CALORIES = EnergyUnit("calories", "Cal", { it.toDouble() * 4184 }, { it.toDouble() / 4184 }, knownSymbol = true)
+            val KILOCALORIES = EnergyUnit("kilocalories", "kCal", { it.toDouble() * 4184000 }, { it.toDouble() / 4184000 }, knownSymbol = true)
+            val ELECTRONVOLTS = EnergyUnit("electronvolts", "eV", { it.toDouble() * 1.602176634e-19 }, { it.toDouble() / 1.602176634e-19 }, isAcceptedBySI = true, knownSymbol = true)
+            val BRITISH_TERMAL_UNITS = EnergyUnit("British thermal units", "BTU", { it.toDouble() * 1055.06 }, { it.toDouble() / 1055.06 })
+            val ERGS = EnergyUnit("ergs", "erg", { it.toDouble() * 1e-7 }, { it.toDouble() / 1e-7 })
+            val FOOT_POUNDS_FORCE = EnergyUnit("foot-pounds force", "ft·lb", { it.toDouble() * 1.3558179483314003 }, { it.toDouble() / 1.3558179483314003 })
+            val KILOWATT_HOURS = EnergyUnit("kilowatt hours", "kWh", { it.toDouble() * 3600000 }, { it.toDouble() / 3600000 })
 
-            val acceptedBySI: Set<EnergyUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<EnergyUnit>
-                get() = EnergyUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                JOULES,
+                CALORIES,
+                KILOCALORIES,
+                ELECTRONVOLTS
+            )
         }
 
-        private fun toJoules(value: Double) = when (this) {
-            JOULE -> value
-            CALORIE -> value * 4184
-            KILOCALORIE -> value * 4184000
-            ELECTRONVOLT -> value * 1.602176634e-19
-            BRITISH_TERMAL_UNIT -> value * 1055.06
-            ERG -> value * 1e-7
-            FOOT_POUND_FORCE -> value * 1.3558179483314003
-            KILOWATT_HOUR -> value * 3600000
-        }
+        private fun toJoules(value: Double) = unitInJoules(value).toDouble()
 
-        private fun fromJoules(value: Double) = when (this) {
-            JOULE -> value
-            CALORIE -> value / 4184
-            KILOCALORIE -> value / 4184000
-            ELECTRONVOLT -> value / 1.602176634e-19
-            BRITISH_TERMAL_UNIT -> value / 1055.06
-            ERG -> value / 1e-7
-            FOOT_POUND_FORCE -> value / 1.3558179483314003
-            KILOWATT_HOUR -> value / 3600000
-        }
+        private fun fromJoules(value: Double) = unitFromJoules(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: EnergyUnit) = targetUnit.fromJoules(toJoules(value))
     }
 
-    /**
-     * Represents a set of power units, each defined with its respective `MeasureUnit` instance.
-     * This enumeration provides conversions between various power units and utilities to retrieve
-     * specific units by their name or symbol.
-     *
-     * @property measureUnit The underlying `MeasureUnit` instance associated with the power unit.
-     * @since 1.0.0
-     */
-    enum class PowerUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        WATT(MeasureUnit("watt", "power", "W", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		HORSEPOWER(MeasureUnit("horsepower", "power", "HP", knownSymbol = true)),
-		FOOT_POUND_PER_SECOND(MeasureUnit("foot-pound per second", "power", "ft·lb/s")),
-		CALORIE_PER_SECOND(MeasureUnit("calorie per second", "power", "Cal/s")),
-		BTU_PER_HOUR(MeasureUnit("British thermal unit per hour", "power", "BTU/h"));
+    class PowerUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInWatts: Transformer<Number, Number>,
+        private val unitFromWatts: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "power", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForWatts: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForWatts.toDouble() }, { it.toDouble() / factorForWatts.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): PowerUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): PowerUnit? = entries.find { it.symbol == symbol }
+            val WATTS = PowerUnit("watts", "W", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val HORSEPOWER = PowerUnit("horsepower", "HP", { it.toDouble() * 745.6998715822702 }, { it.toDouble() / 745.6998715822702 }, knownSymbol = true)
+            val FOOT_POUNDS_PER_SECOND = PowerUnit("foot-pounds per second", "ft·lb/s", { it.toDouble() * 1.3558179483314003 }, { it.toDouble() / 1.3558179483314003 })
+            val CALORIES_PER_SECOND = PowerUnit("calories per second", "Cal/s", { it.toDouble() * 4.184 }, { it.toDouble() / 4.184 })
+            val BRITISH_TERMAL_UNITS_PER_HOUR = PowerUnit("British thermal units per hour", "BTU/h", { it.toDouble() * 0.293071 }, { it.toDouble() / 0.293071 })
 
-            val acceptedBySI: Set<PowerUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<PowerUnit>
-                get() = PowerUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                WATTS,
+                HORSEPOWER
+            )
         }
 
-        private fun toWatts(value: Double) = when (this) {
-            WATT -> value
-            HORSEPOWER -> value * 745.6998715822702
-            FOOT_POUND_PER_SECOND -> value * 1.3558179483314003
-            CALORIE_PER_SECOND -> value * 4.184
-            BTU_PER_HOUR -> value * 0.293071
-        }
+        private fun toWatts(value: Double) = unitInWatts(value).toDouble()
 
-        private fun fromWatts(value: Double) = when (this) {
-            WATT -> value
-            HORSEPOWER -> value / 745.6998715822702
-            FOOT_POUND_PER_SECOND -> value / 1.3558179483314003
-            CALORIE_PER_SECOND -> value / 4.184
-            BTU_PER_HOUR -> value / 0.293071
-        }
+        private fun fromWatts(value: Double) = unitFromWatts(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: PowerUnit) = targetUnit.fromWatts(toWatts(value))
     }
 
-    /**
-     * Represents a set of area measurement units along with their properties and conversion logic.
-     *
-     * Each unit is associated with a `MeasureUnit` that defines its characteristics such as name, symbol,
-     * whether it is an International System (IS) unit, and whether it is accepted by the IS.
-     *
-     * Implements the `ScalarUnit` interface to provide standard unit properties.
-     *
-     * @property measureUnit The underlying `MeasureUnit` instance for this scalar unit.
-     * @since 1.0.0
-     */
-    enum class AreaUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        SQUARE_METER(MeasureUnit("square meter", "area", "m²", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-        SQUARE_KILOMETER(MeasureUnit("square kilometer", "area", "km²", knownSymbol = true)),
-		ARE(MeasureUnit("are", "area", "a", knownSymbol = true)),
-		HECTARE(MeasureUnit("hectare", "area", "ha", isAcceptedBySI = true, knownSymbol = true)),
-		SQUARE_FOOT(MeasureUnit("square foot", "area", "ft²", knownSymbol = true)),
-		SQUARE_INCH(MeasureUnit("square inch", "area", "in²", knownSymbol = true)),
-		SQUARE_YARD(MeasureUnit("square yard", "area", "yd²", knownSymbol = true)),
-		SQUARE_MILE(MeasureUnit("square mile", "area", "mi²", knownSymbol = true)),
-		ACRE(MeasureUnit("acre", "area", "ac", knownSymbol = true)),
-		BARN(MeasureUnit("barn", "area", "b", isAcceptedBySI = true, knownSymbol = true));
+    class AreaUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInSquareMeters: Transformer<Number, Number>,
+        private val unitFromSquareMeters: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "area", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForSquareMeters: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForSquareMeters.toDouble() }, { it.toDouble() / factorForSquareMeters.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
+
 
         companion object {
-            infix fun ofName(name: String): AreaUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): AreaUnit? = entries.find { it.symbol == symbol }
+            val SQUARE_METERS = AreaUnit("square meters", "m²", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val SQUARE_KILOMETERS = AreaUnit("square kilometers", "km²", { it.toDouble() * 1000000 }, { it.toDouble() / 1000000 }, knownSymbol = true)
+            val ARES = AreaUnit("ares", "a", { it.toDouble() * 100 }, { it.toDouble() / 100 }, knownSymbol = true)
+            val HECTARES = AreaUnit("hectares", "ha", { it.toDouble() * 10000 }, { it.toDouble() / 10000 }, isAcceptedBySI = true, knownSymbol = true)
+            val SQUARE_FEET = AreaUnit("square feet", "ft²", { it.toDouble() * 0.09290304 }, { it.toDouble() / 0.09290304 }, knownSymbol = true)
+            val SQUARE_INCHES = AreaUnit("square inches", "in²", { it.toDouble() * 0.00064516 }, { it.toDouble() / 0.00064516 }, knownSymbol = true)
+            val SQUARE_YARDS = AreaUnit("square yards", "yd²", { it.toDouble() * 0.83612736 }, { it.toDouble() / 0.83612736 }, knownSymbol = true)
+            val SQUARE_MILES = AreaUnit("square miles", "mi²", { it.toDouble() * 2589988.110336 }, { it.toDouble() / 2589988.110336 }, knownSymbol = true)
+            val ACRES = AreaUnit("acres", "ac", { it.toDouble() * 4046.8564224 }, { it.toDouble() / 4046.8564224 }, knownSymbol = true)
+            val BARNS = AreaUnit("barns", "b", { it.toDouble() * 1e-28 }, { it.toDouble() / 1e-28 }, isAcceptedBySI = true, knownSymbol = true)
 
-            val acceptedBySI: Set<AreaUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<AreaUnit>
-                get() = AreaUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                SQUARE_METERS,
+                SQUARE_KILOMETERS,
+                ARES,
+                HECTARES,
+                SQUARE_FEET,
+                SQUARE_INCHES,
+                SQUARE_YARDS,
+                SQUARE_MILES,
+                ACRES,
+                BARNS
+            )
         }
 
-        private fun toSquareMeters(value: Double) = when (this) {
-            SQUARE_METER -> value
-            SQUARE_KILOMETER -> value * 1000000.0
-            ARE -> value * 100
-            HECTARE -> value * 10000
-            SQUARE_FOOT -> value * 0.09290304
-            SQUARE_INCH -> value * 0.00064516
-            SQUARE_YARD -> value * 0.83612736
-            SQUARE_MILE -> value * 2589988.110336
-            ACRE -> value * 4046.8564224
-            BARN -> value * 1e-28
-        }
+        private fun toSquareMeters(value: Double) = unitInSquareMeters(value).toDouble()
 
-        private fun fromSquareMeters(value: Double) = when (this) {
-            SQUARE_METER -> value
-            SQUARE_KILOMETER -> value / 1000000.0
-            ARE -> value / 100
-            HECTARE -> value / 10000
-            SQUARE_FOOT -> value / 0.09290304
-            SQUARE_INCH -> value / 0.00064516
-            SQUARE_YARD -> value / 0.83612736
-            SQUARE_MILE -> value / 2589988.110336
-            ACRE -> value / 4046.8564224
-            BARN -> value / 1e-28
-        }
+        private fun fromSquareMeters(value: Double) = unitFromSquareMeters(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: AreaUnit) = targetUnit.fromSquareMeters(toSquareMeters(value))
     }
 
-    /**
-     * Represents a set of volume units and provides methods for unit conversion.
-     *
-     * Each volume unit is associated with a specific `MeasureUnit` that contains
-     * its name, measurement category, symbol, and its status as an International System (IS)
-     * unit or its acceptance by IS.
-     *
-     * This enum implements `ScalarUnit` and provides functionality to convert between
-     * different volume units by leveraging their equivalent values in cubic meters
-     * as a base reference.
-     *
-     * @property measureUnit The `MeasureUnit` instance associated with the volume unit.
-     * @since 1.0.0
-     */
-    enum class VolumeUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        CUBIC_METER(MeasureUnit("cubic meter", "volume", "m³", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		LITER(MeasureUnit("liter", "volume", "L", isAcceptedBySI = true, knownSymbol = true)),
-		CUBIC_CENTIMETER(MeasureUnit("cubic centimeter", "volume", "cm³", knownSymbol = true)),
-		CUBIC_INCH(MeasureUnit("cubic inch", "volume", "in³", knownSymbol = true)),
-		CUBIC_FOOT(MeasureUnit("cubic foot", "volume", "ft³", knownSymbol = true)),
-		CUBIC_YARD(MeasureUnit("cubic yard", "volume", "yd³", knownSymbol = true)),
-		US_GALLON(MeasureUnit("US gallon", "volume", "gal")),
-		IMPERIAL_GALLON(MeasureUnit("imperial gallon", "volume", "gal")),
-		US_QUART(MeasureUnit("US quart", "volume", "qt")),
-		IMPERIALI_QUART(MeasureUnit("imperial quart", "volume", "qt")),
-		US_PINT(MeasureUnit("US pint", "volume", "pt")),
-		IMPERIAL_PINT(MeasureUnit("imperial pint", "volume", "pt")),
-		US_FLUID_OUNCE(MeasureUnit("US fluid ounce", "volume", "fl oz")),
-		IMPERIAL_FLUID_OUNCE(MeasureUnit("imperial fluid ounce", "volume", "fl oz"));
+    class VolumeUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInCubicMeters: Transformer<Number, Number>,
+        private val unitFromCubicMeters: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "volume", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForCubicMeters: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForCubicMeters.toDouble() }, { it.toDouble() / factorForCubicMeters.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): VolumeUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): VolumeUnit? = entries.find { it.symbol == symbol }
+            val CUBIC_METERS = VolumeUnit("cubic meters", "m³", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val LITERS = VolumeUnit("liters", "L",{ it.toDouble() * 0.001 }, { it.toDouble() / 0.001 }, isAcceptedBySI = true, knownSymbol = true)
+            val CUBIC_CENTIMETERS = VolumeUnit("cubic centimeters", "cm³", { it.toDouble() * 1e-6 }, { it.toDouble() * 1e6 }, knownSymbol = true)
+            val CUBIC_INCHES = VolumeUnit("cubic inches", "in³", { it.toDouble() * 0.0000163871 }, { it.toDouble() / 0.0000163871 }, knownSymbol = true)
+            val CUBIC_FEET = VolumeUnit("cubic feet", "ft³", { it.toDouble() * 0.028316846592 }, { it.toDouble() / 0.028316846592 }, knownSymbol = true)
+            val CUBIC_YARDS = VolumeUnit("cubic yards", "yd³", { it.toDouble() * 0.76455486927 }, { it.toDouble() / 0.76455486927 }, knownSymbol = true)
+            val US_GALLONS = VolumeUnit("US gallons", "gal", { it.toDouble() * 0.003785411784 }, { it.toDouble() / 0.003785411784 })
+            val IMPERIAL_GALLONS = VolumeUnit("imperial gallons", "gal", { it.toDouble() * 0.00454609 }, { it.toDouble() / 0.00454609 })
+            val US_QUARTS = VolumeUnit("US quarts", "qt", { it.toDouble() * 0.000946352946 }, { it.toDouble() / 0.000946352946 })
+            val IMPERIAL_QUARTS = VolumeUnit("imperial quarts", "qt", { it.toDouble() * 0.00113652 }, { it.toDouble() / 0.00113652 })
+            val US_PINTS = VolumeUnit("US pints", "pt", { it.toDouble() * 0.000473176473 }, { it.toDouble() / 0.000473176473 })
+            val IMPERIAL_PINTS = VolumeUnit("imperial pints", "pt", { it.toDouble() * 0.00056826125 }, { it.toDouble() / 0.00056826125 })
+            val US_FLUID_OUNCES = VolumeUnit("US fluid ounces", "fl·oz", { it.toDouble() * 2.95735295625e-5 }, { it.toDouble() / 2.95735295625e-5 })
+            val IMPERIAL_FLUID_OUNCES = VolumeUnit("imperial fluid ounces", "fl·oz", { it.toDouble() * 2.84131e-5 }, { it.toDouble() / 2.84131e-5 })
 
-            val acceptedBySI: Set<VolumeUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<VolumeUnit>
-                get() = VolumeUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                CUBIC_METERS,
+                LITERS,
+                CUBIC_CENTIMETERS,
+                CUBIC_INCHES,
+                CUBIC_FEET,
+                CUBIC_YARDS
+            )
         }
 
-        private fun toCubicMeters(value: Double) = when (this) {
-            CUBIC_METER -> value
-            LITER -> value * 0.001
-            CUBIC_CENTIMETER -> value * 1e-6
-            CUBIC_INCH -> value * 0.0000163871
-            CUBIC_FOOT -> value * 0.028316846592
-            CUBIC_YARD -> value * 0.76455486927
-            US_GALLON -> value * 0.003785411784
-            IMPERIAL_GALLON -> value * 0.00454609
-            US_QUART -> value * 0.000946352946
-            IMPERIALI_QUART -> value * 0.00113652
-            US_PINT -> value * 0.000473176473
-            IMPERIAL_PINT -> value * 0.00056826125
-            US_FLUID_OUNCE -> value * 2.95735295625e-5
-            IMPERIAL_FLUID_OUNCE -> value * 2.84131e-5
-        }
+        private fun toCubicMeters(value: Double) = unitInCubicMeters(value).toDouble()
 
-        private fun fromCubicMeters(value: Double) = when (this) {
-            CUBIC_METER -> value
-            LITER -> value / 0.001
-            CUBIC_CENTIMETER -> value / 1e-6
-            CUBIC_INCH -> value / 0.0000163871
-            CUBIC_FOOT -> value / 0.028316846592
-            CUBIC_YARD -> value / 0.76455486927
-            US_GALLON -> value / 0.003785411784
-            IMPERIAL_GALLON -> value / 0.00454609
-            US_QUART -> value / 0.000946352946
-            IMPERIALI_QUART -> value / 0.00113652
-            US_PINT -> value / 0.000473176473
-            IMPERIAL_PINT -> value / 0.00056826125
-            US_FLUID_OUNCE -> value / 2.95735295625e-5
-            IMPERIAL_FLUID_OUNCE -> value / 2.84131e-5
-        }
+        private fun fromCubicMeters(value: Double) = unitFromCubicMeters(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: VolumeUnit) = targetUnit.fromCubicMeters(toCubicMeters(value))
     }
 
-    /**
-     * Represents a set of units for measuring speed, each associated with a corresponding `MeasureUnit`.
-     *
-     * Each `SpeedUnit` provides methods to handle conversions between other speed units, including
-     * conversion to and from meters per second as the canonical unit of measurement.
-     *
-     * @property measureUnit The underlying `MeasureUnit` instance associated with the speed unit.
-     * @since 1.0.0
-     */
-    enum class SpeedUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        METER_PER_SECOND(MeasureUnit("meter per second", "speed", "m/s", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		KILOMETER_PER_HOUR(MeasureUnit("kilometer per hour", "speed", "km/h", knownSymbol = true)),
-		MILE_PER_HOUR(MeasureUnit("mile per hour", "speed", "mph", knownSymbol = true)),
-		FOOT_PER_SECOND(MeasureUnit("foot per second", "speed", "ft/s", knownSymbol = true)),
-		KNOT(MeasureUnit("knot", "speed", "kn", isAcceptedBySI = true, knownSymbol = true)),
-		MACH(MeasureUnit("mach", "speed", "M", knownSymbol = true));
-        
+    class SpeedUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInMetersPerSecond: Transformer<Number, Number>,
+        private val unitFromMetersPerSecond: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "speed", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForMetersPerSecond: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForMetersPerSecond.toDouble() }, { it.toDouble() / factorForMetersPerSecond.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
+
         companion object {
-            infix fun ofName(name: String): SpeedUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): SpeedUnit? = entries.find { it.symbol == symbol }
+            val METERS_PER_SECOND = SpeedUnit("meters per second", "m/s", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val KILOMETERS_PER_HOUR = SpeedUnit("kilometers per hour", "km/h", { it.toDouble() * (1 / 3.6) }, { it.toDouble() * 3.6 }, knownSymbol = true)
+            val MILES_PER_HOUR = SpeedUnit("miles per hour", "mph", { it.toDouble() * 0.44704 }, { it.toDouble() / 0.44704 }, knownSymbol = true)
+            val FEET_PER_SECOND = SpeedUnit("feet per second", "ft/s", { it.toDouble() * 0.3048 }, { it.toDouble() / 0.3048 }, knownSymbol = true)
+            val KNOTS = SpeedUnit("knots", "kn", { it.toDouble() * 0.514444 }, { it.toDouble() / 0.514444 }, isAcceptedBySI = true, knownSymbol = true)
+            val MACH = SpeedUnit("mach", "mach", { it.toDouble() * 343.2 }, { it.toDouble() / 343.2 }, knownSymbol = true)
 
-            val acceptedBySI: Set<SpeedUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<SpeedUnit>
-                get() = SpeedUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                METERS_PER_SECOND,
+                KILOMETERS_PER_HOUR,
+                MILES_PER_HOUR,
+                FEET_PER_SECOND,
+                KNOTS,
+                MACH
+            )
         }
 
-        private fun toMetersPerSecond(value: Double) = when (this) {
-            METER_PER_SECOND -> value
-            KILOMETER_PER_HOUR -> value * (1 / 3.6)
-            MILE_PER_HOUR -> value * 0.44704
-            FOOT_PER_SECOND -> value * 0.3048
-            KNOT -> value * 0.514444
-            MACH -> value * 343.2
-        }
+        private fun toMetersPerSecond(value: Double) = unitInMetersPerSecond(value).toDouble()
 
-        private fun fromMetersPerSecond(value: Double) = when (this) {
-            METER_PER_SECOND -> value
-            KILOMETER_PER_HOUR -> value / (1 / 3.6)
-            MILE_PER_HOUR -> value / 0.44704
-            FOOT_PER_SECOND -> value / 0.3048
-            KNOT -> value / 0.514444
-            MACH -> value / 343.2
-        }
+        private fun fromMetersPerSecond(value: Double) = unitFromMetersPerSecond(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: SpeedUnit) = targetUnit.fromMetersPerSecond(toMetersPerSecond(value))
     }
 
-    /**
-     * Represents various units of acceleration and provides functionality for
-     * conversion between these units. Each unit is defined with its respective
-     * `MeasureUnit` properties, including its name, symbol, and whether it is an
-     * International System (IS) unit or accepted by the IS.
-     *
-     * This enum implements the `ScalarUnit` interface, which allows access to
-     * metadata associated with each acceleration unit, such as the measurement
-     * category, unit name, and symbol.
-     *
-     * @property measureUnit The underlying `MeasureUnit` instance associated with the acceleration unit.
-     * @since 1.0.0
-     */
-    enum class AccelerationUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        METER_PER_SECOND_SQUARED(MeasureUnit("meter per second squared", "acceleration", "m/s²", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		GAL(MeasureUnit("gal", "acceleration", "gal")),
-		FOOT_PER_SECOND_SQUADRED(MeasureUnit("foot per second squared", "acceleration", "ft/s²", knownSymbol = true)),
-		STANDARD_GRAVITY(MeasureUnit("standard_gravity", "acceleration", "g₀", knownSymbol = true));
+    class AccelerationUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInMetersPerSecondSquared: Transformer<Number, Number>,
+        private val unitFromMetersPerSecondSquared: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "acceleration", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForMetersPerSecondSquared: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForMetersPerSecondSquared.toDouble() }, { it.toDouble() / factorForMetersPerSecondSquared.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): AccelerationUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): AccelerationUnit? = entries.find { it.symbol == symbol }
+            val METERS_PER_SECOND_SQUARED = AccelerationUnit("meters per second squared", "m/s²", { it.toDouble() }, { it.toDouble() }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val KILOMETERS_PER_HOUR_SQUARED = AccelerationUnit("kilometers per hour squared", "km/h²", { it.toDouble() / 12960 }, { it.toDouble() * 12960 }, knownSymbol = true)
+            val MILES_PER_HOUR_SQUARED = AccelerationUnit("miles per hour squared", "mph²", { it.toDouble() * 0.000124228 }, { it.toDouble() / 0.000124228 }, knownSymbol = true)
+            val MACH_PER_SECOND_SQUARED = AccelerationUnit("mach per second squared", "mach/s²", { it.toDouble() * 340.29 }, { it.toDouble() / 340.29 }, knownSymbol = true)
+            val GALILEOS = AccelerationUnit("galileos", "gal", { it.toDouble() * 0.01 }, { it.toDouble() / 0.01 }, knownSymbol = true)
+            val FEET_PER_SECOND_SQUARED = AccelerationUnit("feet per second squared", "ft/s²", { it.toDouble() * 0.3048006096 }, { it.toDouble() / 0.3048006096 }, knownSymbol = true)
+            val STANDARD_GRAVITY = AccelerationUnit("standard gravity", "g", { it.toDouble() * 9.80665 }, { it.toDouble() / 9.80665 }, isAcceptedBySI = true, knownSymbol = true)
 
-            val acceptedBySI: Set<AccelerationUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<AccelerationUnit>
-                get() = AccelerationUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                METERS_PER_SECOND_SQUARED,
+                KILOMETERS_PER_HOUR_SQUARED,
+                MILES_PER_HOUR_SQUARED,
+                MACH_PER_SECOND_SQUARED,
+                GALILEOS,
+                FEET_PER_SECOND_SQUARED,
+                STANDARD_GRAVITY
+            )
         }
 
-        private fun toMetersPerSecondSquared(value: Double) = when (this) {
-            METER_PER_SECOND_SQUARED -> value
-            GAL -> value * 0.01
-            FOOT_PER_SECOND_SQUADRED -> value * 0.3048006096
-            STANDARD_GRAVITY -> value * 9.80665
-        }
+        private fun toMetersPerSecondSquared(value: Double) = unitInMetersPerSecondSquared(value).toDouble()
 
-        private fun fromMetersPerSecondSquared(value: Double) = when (this) {
-            METER_PER_SECOND_SQUARED -> value
-            GAL -> value / 0.01
-            FOOT_PER_SECOND_SQUADRED -> value / 0.3048006096
-            STANDARD_GRAVITY -> value / 9.80665
-        }
+        private fun fromMetersPerSecondSquared(value: Double) = unitFromMetersPerSecondSquared(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: AccelerationUnit) = targetUnit.fromMetersPerSecondSquared(toMetersPerSecondSquared(value))
     }
 
-    /**
-     * Enum class representing various units of density measurement.
-     *
-     * Each density unit is associated with a `MeasureUnit` instance that defines
-     * its properties, including name, category, symbol, and IS unit status.
-     *
-     * This class allows converting between density units and provides methods to
-     * retrieve density units by name or symbol. It also identifies units that
-     * are accepted by the International System (IS).
-     *
-     * @property measureUnit The underlying `MeasureUnit` instance representing the density unit.
-     * @since 1.0.0
-     */
-    enum class DensityUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        KILOGRAM_PER_CUBIC_METER(MeasureUnit("kilogram per cubic meter", "density", "kg/m³", isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)),
-		GRAM_PER_CUBIC_CENTIMETER(MeasureUnit("gram per cubic centimeter", "density", "g/cm³", knownSymbol = true)),
-		GRAM_PER_LITER(MeasureUnit("gram per liter", "density", "g/L", knownSymbol = true)),
-		POUND_PER_CUBIC_FOOT(MeasureUnit("pound per cubic foot", "density", "lb/ft³")),
-		POUND_PER_GALLON(MeasureUnit("pound per gallon", "density", "lb/gal")),
-		OUNCE_PER_GALLON(MeasureUnit("ounce per gallon", "density", "oz/gal")),
-		SLUG_PER_CUBIC_FOOT(MeasureUnit("slug per cubic foot", "density", "sl/ft³"));
+    class DensityUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInKilogramsPerCubicMeter: Transformer<Number, Number>,
+        private val unitFromKilogramsPerCubicMeter: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "density", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
+
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForKilogramsPerCubicMeter: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForKilogramsPerCubicMeter.toDouble() }, { it.toDouble() / factorForKilogramsPerCubicMeter.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): DensityUnit? = entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): DensityUnit? = entries.find { it.symbol == symbol }
+            val KILOGRAMS_PER_CUBIC_METER = DensityUnit("kilograms per cubic meter", "kg/m³", { it }, { it }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val GRAMS_PER_CUBIC_CENTIMETER = DensityUnit("grams per cubic centimeter", "g/cm³", { it.toDouble() * 1000 }, { it.toDouble() / 1000 }, knownSymbol = true)
+            val GRAMS_PER_LITER = DensityUnit("grams per liter", "g/L", { it }, { it }, knownSymbol = true)
+            val POUNDS_PER_CUBIC_FOOT = DensityUnit("pounds per cubic foot", "lb/ft³", { it.toDouble() * 16.0185 }, { it.toDouble() / 16.0185 })
+            val POUNDS_PER_GALLON = DensityUnit("pounds per gallon", "lb/gal", { it.toDouble() * 119.82643 }, { it.toDouble() / 119.82643 })
+            val OUNCES_PER_GALLON = DensityUnit("ounces per gallon", "oz/gal", { it.toDouble() * 8.2166693 }, { it.toDouble() / 8.2166693 })
+            val SLUGS_PER_CUBIC_FOOT = DensityUnit("slugs per cubic foot", "sl/ft³", { it.toDouble() * 515.37882 }, { it.toDouble() / 515.37882 })
 
-            val acceptedBySI: Set<DensityUnit>
-                get() = entries.filter { it.isAcceptedBySI }.toSet()
-
-            val knownSymbol: Set<DensityUnit>
-                get() = DensityUnit.entries.filter { it.knownSymbol }.toSet()
+            internal val KNOWN_SYMBOLS = setOf(
+                KILOGRAMS_PER_CUBIC_METER,
+                GRAMS_PER_CUBIC_CENTIMETER,
+                GRAMS_PER_LITER
+            )
         }
 
-        private fun toKilogramsPerCubicMeter(value: Double) = when (this) {
-            KILOGRAM_PER_CUBIC_METER, GRAM_PER_LITER -> value
-            GRAM_PER_CUBIC_CENTIMETER -> value * 1000
-            POUND_PER_CUBIC_FOOT -> value * 16.0185
-            POUND_PER_GALLON -> value * 119.82643
-            OUNCE_PER_GALLON -> value * 8.2166693
-            SLUG_PER_CUBIC_FOOT -> value * 515.37882
-        }
+        private fun toKilogramsPerCubicMeter(value: Double) = unitInKilogramsPerCubicMeter(value).toDouble()
 
-        private fun fromKilogramsPerCubicMeter(value: Double) = when (this) {
-            KILOGRAM_PER_CUBIC_METER, GRAM_PER_LITER -> value
-            GRAM_PER_CUBIC_CENTIMETER -> value / 1000
-            POUND_PER_CUBIC_FOOT -> value / 16.0185
-            POUND_PER_GALLON -> value / 119.82643
-            OUNCE_PER_GALLON -> value / 8.2166693
-            SLUG_PER_CUBIC_FOOT -> value / 515.37882
-        }
+        private fun fromKilogramsPerCubicMeter(value: Double) = unitFromKilogramsPerCubicMeter(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: DensityUnit) = targetUnit.fromKilogramsPerCubicMeter(toKilogramsPerCubicMeter(value))
     }
 
-    /**
-     * Represents the unit of quantity of information. This enumeration contains commonly used
-     * units such as bit, byte, nibble, and their respective multiples and submultiples
-     * in both decimal (base 10) and binary (base 2) systems.
-     *
-     * Every unit is associated with a specific [MeasureUnit] that describes its name, category, and symbol.
-     *
-     * This enum also provides companion object utilities to retrieve a specific unit based on its name
-     * or symbol and internal methods for unit conversion to and from bits for consistency.
-     *
-     * @constructor Accepts a [MeasureUnit] representing the underlying detailed attributes of the unit.
-     *
-     * @since 1.0.0
-     */
-    enum class DataSizeUnit(override val measureUnit: MeasureUnit) : ScalarUnit {
-        BIT(MeasureUnit("bit", "data size", "b", knownSymbol = true)),
-        BYTE(MeasureUnit("byte", "data size", "B", knownSymbol = true)),
-        NIBBLE(MeasureUnit("nibble", "data size", "nibble", knownSymbol = true)),
+    class DataSizeUnit(
+        unitName: String,
+        symbol: String? = null,
+        private val unitInBits: Transformer<Number, Number>,
+        private val unitFromBits: Transformer<Number, Number>,
+        isSIUnit: Boolean = false,
+        isAcceptedBySI: Boolean = false,
+        knownSymbol: Boolean = false
+    ) : MeasureUnit(unitName, "data size", symbol, isSIUnit, isAcceptedBySI, knownSymbol) {
 
-        // in that case, are reported also multiple and submultiple of the units, due to average use
-        KILOBIT(MeasureUnit("kilobit", "data size", "kb", knownSymbol = true)),
-        MEGABIT(MeasureUnit("megabit", "data size", "Mb", knownSymbol = true)),
-        GIGABIT(MeasureUnit("gigabit", "data size", "Gb", knownSymbol = true)),
-        TERABIT(MeasureUnit("terabit", "data size", "Tb", knownSymbol = true)),
-        PETABIT(MeasureUnit("petabit", "data size", "Pb", knownSymbol = true)),
-        EXABIT(MeasureUnit("exabit", "data size", "Eb", knownSymbol = true)),
-        ZETTABIT(MeasureUnit("zettabit", "data size", "Zb", knownSymbol = true)),
-        YOTTABIT(MeasureUnit("yottabit", "data size", "Yb", knownSymbol = true)),
-
-        KIBIBIT(MeasureUnit("kibibit", "data size", "Kib", knownSymbol = true)),
-        MEBIBIT(MeasureUnit("mebibit", "data size", "Mib", knownSymbol = true)),
-        GIBIBIT(MeasureUnit("gibibit", "data size", "Gib", knownSymbol = true)),
-        TEBIBIT(MeasureUnit("tebibit", "data size", "Tib", knownSymbol = true)),
-        PEBIBIT(MeasureUnit("pebibit", "data size", "Pib", knownSymbol = true)),
-        EXBIBIT(MeasureUnit("exbibit", "data size", "Eib", knownSymbol = true)),
-        ZEBIBIT(MeasureUnit("zebibit", "data size", "Zib", knownSymbol = true)),
-        YOBIBIT(MeasureUnit("yobibit", "data size", "Yib", knownSymbol = true)),
-
-        KILOBYTE(MeasureUnit("kilobyte", "data size", "kB", knownSymbol = true)),
-        MEGABYTE(MeasureUnit("megabyte", "data size", "MB", knownSymbol = true)),
-        GIGABYTE(MeasureUnit("gigabyte", "data size", "GB", knownSymbol = true)),
-        TERABYTE(MeasureUnit("terabyte", "data size", "TB", knownSymbol = true)),
-        PETABYTE(MeasureUnit("petabyte", "data size", "PB", knownSymbol = true)),
-        EXABYTE(MeasureUnit("exabyte", "data size", "EB", knownSymbol = true)),
-        ZETTABYTE(MeasureUnit("zettabyte", "data size", "ZB", knownSymbol = true)),
-        YOTTABYTE(MeasureUnit("yottabyte", "data size", "YB", knownSymbol = true)),
-        RONNABYTE(MeasureUnit("ronnabyte", "data size", "RB", knownSymbol = true)),
-        QUETTABYTE(MeasureUnit("quettabyte", "data size", "QB", knownSymbol = true)),
-
-        KIBIBYTE(MeasureUnit("kibibyte", "data size", "KiB", knownSymbol = true)),
-        MEBIBYTE(MeasureUnit("mebibyte", "data size", "MiB", knownSymbol = true)),
-        GIBIBYTE(MeasureUnit("gibibyte", "data size", "GiB", knownSymbol = true)),
-        TEBIBYTE(MeasureUnit("tebibyte", "data size", "TiB", knownSymbol = true)),
-        PEBIBYTE(MeasureUnit("pebibyte", "data size", "PiB", knownSymbol = true)),
-        EXBIBYTE(MeasureUnit("exbibyte", "data size", "EiB", knownSymbol = true)),
-        ZEBIBYTE(MeasureUnit("zebibyte", "data size", "ZiB", knownSymbol = true)),
-        YOBIBYTE(MeasureUnit("yobibyte", "data size", "YiB", knownSymbol = true));
+        constructor(
+            unitName: String,
+            symbol: String? = null,
+            factorForBits: Number,
+            isSIUnit: Boolean = false,
+            isAcceptedBySI: Boolean = false,
+            knownSymbol: Boolean = false
+        ) : this(unitName, symbol, { it.toDouble() * factorForBits.toDouble() }, { it.toDouble() / factorForBits.toDouble() }, isSIUnit, isAcceptedBySI, knownSymbol)
 
         companion object {
-            infix fun ofName(name: String): DataSizeUnit? = DataSizeUnit.entries.find { it.unitName == -name }
-            infix fun ofSymbol(symbol: String): DataSizeUnit? = DataSizeUnit.entries.find { it.symbol == symbol }
+            val BITS = DataSizeUnit("bits", "b", { it }, { it }, isSIUnit = true, isAcceptedBySI = true, knownSymbol = true)
+            val BYTES = DataSizeUnit("bytes", "B", { it.toDouble() * 8 }, { it.toDouble() / 8 }, knownSymbol = true)
+            val NIBBLES = DataSizeUnit("nibbles", "nb", { it.toDouble() * 4 }, { it.toDouble() / 4 }, knownSymbol = true)
 
-            val acceptedBySI: Set<DataSizeUnit>
-                get() = DataSizeUnit.entries.filter { it.isAcceptedBySI }.toSet()
+            val KILOBITS = DataSizeUnit("kilobits", "kb", { it.toDouble() * 10.0.pow(3) }, { it.toDouble() / 10.0.pow(3) }, knownSymbol = true)
+            val MEGABITS = DataSizeUnit("megabits", "Mb", { it.toDouble() * 10.0.pow(6) }, { it.toDouble() / 10.0.pow(6) }, knownSymbol = true)
+            val GIGABITS = DataSizeUnit("gigabits", "Gb", { it.toDouble() * 10.0.pow(9) }, { it.toDouble() / 10.0.pow(9) }, knownSymbol = true)
+            val TERABITS = DataSizeUnit("terabits", "Tb", { it.toDouble() * 10.0.pow(12) }, { it.toDouble() / 10.0.pow(12) }, knownSymbol = true)
+            val PETABITS = DataSizeUnit("petabits", "Pb", { it.toDouble() * 10.0.pow(15) }, { it.toDouble() / 10.0.pow(15) }, knownSymbol = true)
+            val EXABITS = DataSizeUnit("exabits", "Eb", { it.toDouble() * 10.0.pow(18) }, { it.toDouble() / 10.0.pow(18) }, knownSymbol = true)
+            val ZETTABITS = DataSizeUnit("zettabits", "Zb", { it.toDouble() * 10.0.pow(21) }, { it.toDouble() / 10.0.pow(21) }, knownSymbol = true)
+            val YOTTABITS = DataSizeUnit("yottabits", "Yb", { it.toDouble() * 10.0.pow(24) }, { it.toDouble() / 10.0.pow(24) }, knownSymbol = true)
 
-            val knownSymbol: Set<DataSizeUnit>
-                get() = DataSizeUnit.entries.filter { it.knownSymbol }.toSet()
+            val KIBIBITS = DataSizeUnit("kibibits", "Kib", { it.toDouble() * 2.0.pow(10) }, { it.toDouble() / 2.0.pow(10) }, knownSymbol = true)
+            val MEBIBITS = DataSizeUnit("mebibits", "Mib", { it.toDouble() * 2.0.pow(20) }, { it.toDouble() / 2.0.pow(20) }, knownSymbol = true)
+            val GIBIBITS = DataSizeUnit("gibibits", "Gib", { it.toDouble() * 2.0.pow(30) }, { it.toDouble() / 2.0.pow(30) }, knownSymbol = true)
+            val TEBIBITS = DataSizeUnit("tebibits", "Tib", { it.toDouble() * 2.0.pow(40) }, { it.toDouble() / 2.0.pow(40) }, knownSymbol = true)
+            val PEBIBITS = DataSizeUnit("pebibits", "Pib", { it.toDouble() * 2.0.pow(50) }, { it.toDouble() / 2.0.pow(50) }, knownSymbol = true)
+            val EXBIBITS = DataSizeUnit("exbibits", "Eib", { it.toDouble() * 2.0.pow(60) }, { it.toDouble() / 2.0.pow(60) }, knownSymbol = true)
+            val ZEBIBITS = DataSizeUnit("zebibits", "Zib", { it.toDouble() * 2.0.pow(70) }, { it.toDouble() / 2.0.pow(70) }, knownSymbol = true)
+            val YOBIBITS = DataSizeUnit("yobibits", "Yib", { it.toDouble() * 2.0.pow(80) }, { it.toDouble() / 2.0.pow(80) }, knownSymbol = true)
+
+            val KILOBYTES = DataSizeUnit("kilobytes", "kB", { it.toDouble() * 8 * 10.0.pow(3) }, { it.toDouble() / 8 / 10.0.pow(3) }, knownSymbol = true)
+            val MEGABYTES = DataSizeUnit("megabytes", "MB", { it.toDouble() * 8 * 10.0.pow(6) }, { it.toDouble() / 8 / 10.0.pow(6) }, knownSymbol = true)
+            val GIGABYTES = DataSizeUnit("gigabytes", "GB", { it.toDouble() * 8 * 10.0.pow(9) }, { it.toDouble() / 8 / 10.0.pow(9) }, knownSymbol = true)
+            val TERABYTES = DataSizeUnit("terabytes", "TB", { it.toDouble() * 8 * 10.0.pow(12) }, { it.toDouble() / 8 / 10.0.pow(12) }, knownSymbol = true)
+            val PETABYTES = DataSizeUnit("petabytes", "PB", { it.toDouble() * 8 * 10.0.pow(15) }, { it.toDouble() / 8 / 10.0.pow(15) }, knownSymbol = true)
+            val EXABYTES = DataSizeUnit("exabytes", "EB", { it.toDouble() * 8 * 10.0.pow(18) }, { it.toDouble() / 8 / 10.0.pow(18) }, knownSymbol = true)
+            val ZETTABYTES = DataSizeUnit("zettabytes", "ZB", { it.toDouble() * 8 * 10.0.pow(21) }, { it.toDouble() / 8 / 10.0.pow(21) }, knownSymbol = true)
+            val YOTTABYTES = DataSizeUnit("yottabytes", "YB", { it.toDouble() * 8 * 10.0.pow(24) }, { it.toDouble() / 8 / 10.0.pow(24) }, knownSymbol = true)
+            val RONNABYTES = DataSizeUnit("ronnabytes", "RB", { it.toDouble() * 8 * 10.0.pow(27) }, { it.toDouble() / 8 / 10.0.pow(27) }, knownSymbol = true)
+            val QUETTABYTES = DataSizeUnit("quettabytes", "QB", { it.toDouble() * 8 * 10.0.pow(30) }, { it.toDouble() / 8 / 10.0.pow(30) }, knownSymbol = true)
+
+            val KIBIBYTES = DataSizeUnit("kibibytes", "KiB", { it.toDouble() * 8 * 2.0.pow(10) }, { it.toDouble() / 8 / 2.0.pow(10) }, knownSymbol = true)
+            val MEBIBYTES = DataSizeUnit("mebibytes", "MiB", { it.toDouble() * 8 * 2.0.pow(20) }, { it.toDouble() / 8 / 2.0.pow(20) }, knownSymbol = true)
+            val GIBIBYTES = DataSizeUnit("gibibytes", "GiB", { it.toDouble() * 8 * 2.0.pow(30) }, { it.toDouble() / 8 / 2.0.pow(30) }, knownSymbol = true)
+            val TEBIBYTES = DataSizeUnit("tebibytes", "TiB", { it.toDouble() * 8 * 2.0.pow(40) }, { it.toDouble() / 8 / 2.0.pow(40) }, knownSymbol = true)
+            val PEBIBYTES = DataSizeUnit("pebibytes", "PiB", { it.toDouble() * 8 * 2.0.pow(50) }, { it.toDouble() / 8 / 2.0.pow(50) }, knownSymbol = true)
+            val EXBIBYTES = DataSizeUnit("exbibytes", "EiB", { it.toDouble() * 8 * 2.0.pow(60) }, { it.toDouble() / 8 / 2.0.pow(60) }, knownSymbol = true)
+            val ZEBIBYTES = DataSizeUnit("zebibytes", "ZiB", { it.toDouble() * 8 * 2.0.pow(70) }, { it.toDouble() / 8 / 2.0.pow(70) }, knownSymbol = true)
+            val YOBIBYTES = DataSizeUnit("yobibytes", "YiB", { it.toDouble() * 8 * 2.0.pow(80) }, { it.toDouble() / 8 / 2.0.pow(80) }, knownSymbol = true)
+
+            internal val KNOWN_SYMBOLS = setOf(
+                BITS,
+                BYTES,
+                NIBBLES,
+                KILOBITS,
+                MEGABITS,
+                GIGABITS,
+                TERABITS,
+                PETABITS,
+                EXABITS,
+                ZETTABITS,
+                YOTTABITS,
+                KIBIBITS,
+                MEBIBITS,
+                GIBIBITS,
+                TEBIBITS,
+                PEBIBITS,
+                EXBIBITS,
+                ZEBIBITS,
+                YOBIBITS,
+                KILOBYTES,
+                MEGABYTES,
+                GIGABYTES,
+                TERABYTES,
+                PETABYTES,
+                EXABYTES,
+                ZETTABYTES,
+                YOTTABYTES,
+                RONNABYTES,
+                QUETTABYTES,
+                KIBIBYTES,
+                MEBIBYTES,
+                GIBIBYTES,
+                TEBIBYTES,
+                PEBIBYTES,
+                EXBIBYTES,
+                ZEBIBYTES,
+                YOBIBYTES
+            )
         }
 
-        private fun toBits(value: Double) = when (this) {
-            BIT -> value
-            BYTE -> value * 8
-            NIBBLE -> value * 4
-            KILOBIT -> value * 10.0.pow(3)
-            MEGABIT -> value * 10.0.pow(6)
-            GIGABIT -> value * 10.0.pow(9)
-            TERABIT -> value * 10.0.pow(12)
-            PETABIT -> value * 10.0.pow(15)
-            EXABIT -> value * 10.0.pow(18)
-            ZETTABIT -> value * 10.0.pow(21)
-            YOTTABIT -> value * 10.0.pow(24)
-            KIBIBIT -> value * 2.0.pow(10)
-            MEBIBIT -> value * 2.0.pow(20)
-            GIBIBIT -> value * 2.0.pow(30)
-            TEBIBIT -> value * 2.0.pow(40)
-            PEBIBIT -> value * 2.0.pow(50)
-            EXBIBIT -> value * 2.0.pow(60)
-            ZEBIBIT -> value * 2.0.pow(70)
-            YOBIBIT -> value * 2.0.pow(80)
-            KILOBYTE -> value * 8 * 10.0.pow(3)
-            MEGABYTE -> value * 8 * 10.0.pow(6)
-            GIGABYTE -> value * 8 * 10.0.pow(9)
-            TERABYTE -> value * 8 * 10.0.pow(12)
-            PETABYTE -> value * 8 * 10.0.pow(15)
-            EXABYTE -> value * 8 * 10.0.pow(18)
-            ZETTABYTE -> value * 8 * 10.0.pow(21)
-            YOTTABYTE -> value * 8 * 10.0.pow(24)
-            RONNABYTE -> value * 8 * 10.0.pow(27)
-            QUETTABYTE -> value * 8 * 10.0.pow(30)
-            KIBIBYTE -> value * 8 * 2.0.pow(10)
-            MEBIBYTE -> value * 8 * 2.0.pow(20)
-            GIBIBYTE -> value * 8 * 2.0.pow(30)
-            TEBIBYTE -> value * 8 * 2.0.pow(40)
-            PEBIBYTE -> value * 8 * 2.0.pow(50)
-            EXBIBYTE -> value * 8 * 2.0.pow(60)
-            ZEBIBYTE -> value * 8 * 2.0.pow(70)
-            YOBIBYTE -> value * 8 * 2.0.pow(80)
-        }
+        private fun toBits(value: Double) = unitInBits(value).toDouble()
 
-        private fun fromBits(value: Double) = when (this) {
-            BIT -> value
-            BYTE -> value / 8
-            NIBBLE -> value / 4
-            KILOBIT -> value / 10.0.pow(3)
-            MEGABIT -> value / 10.0.pow(6)
-            GIGABIT -> value / 10.0.pow(9)
-            TERABIT -> value / 10.0.pow(12)
-            PETABIT -> value / 10.0.pow(15)
-            EXABIT -> value / 10.0.pow(18)
-            ZETTABIT -> value / 10.0.pow(21)
-            YOTTABIT -> value / 10.0.pow(24)
-            KIBIBIT -> value / 2.0.pow(10)
-            MEBIBIT -> value / 2.0.pow(20)
-            GIBIBIT -> value / 2.0.pow(30)
-            TEBIBIT -> value / 2.0.pow(40)
-            PEBIBIT -> value / 2.0.pow(50)
-            EXBIBIT -> value / 2.0.pow(60)
-            ZEBIBIT -> value / 2.0.pow(70)
-            YOBIBIT -> value / 2.0.pow(80)
-            KILOBYTE -> (value / 10.0.pow(3)) / 8
-            MEGABYTE -> (value / 10.0.pow(6)) / 8
-            GIGABYTE -> (value / 10.0.pow(9)) / 8
-            TERABYTE -> (value / 10.0.pow(12)) / 8
-            PETABYTE -> (value / 10.0.pow(15)) / 8
-            EXABYTE -> (value / 10.0.pow(18)) / 8
-            ZETTABYTE -> (value / 10.0.pow(21)) / 8
-            YOTTABYTE -> (value / 10.0.pow(24)) / 8
-            RONNABYTE -> (value / 10.0.pow(27)) / 8
-            QUETTABYTE -> (value / 10.0.pow(30)) / 8
-            KIBIBYTE -> (value / 2.0.pow(10)) / 8
-            MEBIBYTE -> (value / 2.0.pow(20)) / 8
-            GIBIBYTE -> (value / 2.0.pow(30)) / 8
-            TEBIBYTE -> (value / 2.0.pow(40)) / 8
-            PEBIBYTE -> (value / 2.0.pow(50)) / 8
-            EXBIBYTE -> (value / 2.0.pow(60)) / 8
-            ZEBIBYTE -> (value / 2.0.pow(70)) / 8
-            YOBIBYTE -> (value / 2.0.pow(80)) / 8
-        }
+        private fun fromBits(value: Double) = unitFromBits(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: DataSizeUnit) = targetUnit.fromBits(toBits(value))
     }

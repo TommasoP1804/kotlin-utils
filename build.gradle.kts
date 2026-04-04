@@ -16,10 +16,10 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "3.3.5"
+version = "3.4.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260401T222548Z
+// Last update: Tommaso Pastorelli | 20260404T103602Z
 
 repositories {
     mavenCentral()
@@ -37,13 +37,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
 
-    implementation("tools.jackson.core:jackson-databind:3.0.2")
-    implementation("tools.jackson.core:jackson-core:3.0.2")
-    implementation("tools.jackson.module:jackson-module-kotlin:2.20.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.20.1")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2")
+    implementation("tools.jackson.core:jackson-databind:3.1.1")
+    implementation("tools.jackson.core:jackson-core:3.1.1")
+    implementation("tools.jackson.module:jackson-module-kotlin:2.21.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.21.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.21.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     implementation("io.hypersistence:hypersistence-tsid:2.1.4")
     implementation("org.locationtech.jts:jts-core:1.19.0")
@@ -59,7 +59,7 @@ dependencies {
     implementation("org.openjdk.nashorn:nashorn-core:15.3")
     implementation("org.aspectj:aspectjrt:1.9.24")
     implementation("org.slf4j:slf4j-api:2.0.13")
-    implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation("ch.qos.logback:logback-classic:1.5.32")
     implementation("org.slf4j:jul-to-slf4j:2.0.13")
     /*implementation("org.geotools:gt-referencing:26.1") {
         exclude(group = "javax.media", module = "jai_core")
@@ -77,7 +77,7 @@ dependencies {
     implementation("com.auth0:java-jwt:4.4.0")
     implementation("org.yaml:snakeyaml:2.5")
     implementation("jakarta.mail:jakarta.mail-api:2.0.1")
-    implementation("com.sun.mail:jakarta.mail:2.0.1")
+    implementation("com.sun.mail:jakarta.mail:2.0.2")
 }
 
 
@@ -118,7 +118,7 @@ tasks.withType<KotlinCompile> {
 }
 
 mavenPublishing {
-    coordinates("dev.tommasop1804", "kotlin-utils", "3.3.5")
+    coordinates("dev.tommasop1804", "kotlin-utils", "3.4.0")
 
     pom {
         name.set("Kotlin Utils")
