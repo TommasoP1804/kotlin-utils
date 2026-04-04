@@ -160,27 +160,24 @@ interface TemporalInterval : Serializable {
         infix fun parse(s: String): Result<TemporalInterval> = runCatching {
             if (s.startsWith("R")) RepeatedTemporalInterval.parse(s).getOrThrow()
             else {
-                if (s.startsWith("R")) RepeatedTemporalInterval.parse(s).getOrThrow()
-                else {
-                    val parts = s.splitAndTrim("/")
-                    validateInputFormat(!(parts.isEmpty() || parts.size > 2)) { "Invalid time interval: $s. Should be not empty or with at most two parts." }
-                    if (parts.size == 1) of(Duration.parse(parts[0]).getOrThrow())
-                    else if (parts[0].startsWith("P")) {
-                        of(
-                            Duration.parse(parts[0]).getOrThrow(),
-                            parseTemporal(parts[1]) as Temporal
-                        )
-                    } else if (parts[1].startsWith("P")) {
-                        of(
-                            parseTemporal(parts[0]) as Temporal,
-                            Duration.parse(parts[1]).getOrThrow()
-                        )
-                    } else {
-                        of(
-                            parseTemporal(parts[0]) as Temporal,
-                            parseTemporal(parts[1]) as Temporal
-                        )
-                    }
+                val parts = s.splitAndTrim("/")
+                validateInputFormat(!(parts.isEmpty() || parts.size > 2)) { "Invalid time interval: $s. Should be not empty or with at most two parts." }
+                if (parts.size == 1) of(Duration.parse(parts[0]).getOrThrow())
+                else if (parts[0].startsWith("P")) {
+                    of(
+                        Duration.parse(parts[0]).getOrThrow(),
+                        parseTemporal(parts[1]) as Temporal
+                    )
+                } else if (parts[1].startsWith("P")) {
+                    of(
+                        parseTemporal(parts[0]) as Temporal,
+                        Duration.parse(parts[1]).getOrThrow()
+                    )
+                } else {
+                    of(
+                        parseTemporal(parts[0]) as Temporal,
+                        parseTemporal(parts[1]) as Temporal
+                    )
                 }
             }
         }
@@ -197,7 +194,7 @@ interface TemporalInterval : Serializable {
          * @since 1.0.0
          */
         @Suppress("UNCHECKED_CAST")
-        private fun <T: Temporal> parseTemporal(input: String): T {
+        internal fun <T: Temporal> parseTemporal(input: String): T {
             if ("T" in input) {
                 return if ("Z" in input || "+" in input || "-" in (-10)(input)) {
                     (input.parseToOffsetDateTime()).getOrThrow() as T

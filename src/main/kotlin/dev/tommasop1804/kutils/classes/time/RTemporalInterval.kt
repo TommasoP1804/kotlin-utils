@@ -2,9 +2,22 @@
 
 package dev.tommasop1804.kutils.classes.time
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.durationTo
 import dev.tommasop1804.kutils.classes.time.RTemporalInterval.Companion.restrictedIntervalTo
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalTo
+import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.parseTemporal
+import jakarta.persistence.AttributeConverter
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.*
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
+import java.time.*
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalUnit
 
@@ -22,6 +35,10 @@ import java.time.temporal.TemporalUnit
  * @author Tommaso Pastorelli
  */
 @Suppress("UNCHECKED_CAST", "RedundantValueArgument")
+@JsonSerialize(using = RTemporalInterval.Companion.Serialize::class)
+@JsonDeserialize(using = RTemporalInterval.Companion.Deserialize::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RTemporalInterval.Companion.OldSerialize::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RTemporalInterval.Companion.OldDeserialize::class)
 class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
     override val start: T1,
     override val end: T2,
@@ -95,6 +112,131 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
          */
         infix fun <T2 : Temporal> Duration.restrictedIntervalTo(end: T2) =
             RTemporalInterval(minus(this) as T2, end, startDuration = true)
+
+        /**
+         * Parses a string representation of a temporal interval into an `RTemporalInterval` instance.
+         *
+         * This function supports intervals defined with temporal start and end values,
+         * or duration-based definitions. Repeated intervals that start with "R" are not supported.
+         *
+         * @param s The string representation of the temporal interval to parse.
+         *          It should be formatted as "start/duration", "duration/end", or "start/end".
+         *          Repeated intervals, starting with "R", are not supported.
+         * @throws UnsupportedOperationException If the input string indicates a repeated interval
+         *                                       or contains only a duration.
+         * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the format of the input string is invalid.
+         * @return A result of type `Result<RTemporalInterval>` containing the parsed interval,
+         *         or an exception if errors occur during parsing.
+         * @return 3.4.1
+         */
+        infix fun <T1 : Temporal, T2 : Temporal> parse(s: String): Result<RTemporalInterval<T1, T2>> = runCatching {
+            if (s.startsWith("R")) throw UnsupportedOperationException("Repeated intervals are not supported. Use RepeatedTemporalInterval.parse(s).")
+            else {
+                val parts = s.splitAndTrim("/")
+                validateInputFormat(!(parts.isEmpty() || parts.size > 2)) { "Invalid time interval: $s. Should be not empty or with at most two parts." }
+                if (parts.size == 1) throw UnsupportedOperationException("Invalid time interval: $s. Should be not empty or with at most two parts. For only duration, use TemporalInterval.parse(s).")
+                else if (parts[0].startsWith("P")) {
+                    RTemporalInterval(
+                        Duration.parse(parts[0])(),
+                        parseTemporal(parts[1]) as T2
+                    ) as RTemporalInterval<T1, T2>
+                } else if (parts[1].startsWith("P")) {
+                    RTemporalInterval(
+                        parseTemporal(parts[0]) as T1,
+                        Duration.parse(parts[1])()
+                    ) as RTemporalInterval<T1, T2>
+                } else {
+                    RTemporalInterval(
+                        parseTemporal(parts[0]) as T1,
+                        parseTemporal(parts[1]) as T2
+                    )
+                }
+            }
+        }
+
+        class Serialize : ValueSerializer<TemporalInterval>() {
+            override fun serialize(
+                value: TemporalInterval,
+                gen: JsonGenerator,
+                ctxt: SerializationContext
+            ) {
+                gen.writeString(value.toString())
+            }
+        }
+
+        class Deserialize : ValueDeserializer<RTemporalInterval<*, *>>() {
+            private var startType: Class<*>? = null
+            private var endType: Class<*>? = null
+
+            override fun createContextual(
+                ctxt: DeserializationContext,
+                property: BeanProperty?
+            ): ValueDeserializer<*> {
+                val javaType = property?.type ?: ctxt.contextualType
+                val copy = Deserialize()
+                if (javaType.isNotNull() && javaType.containedTypeCount() >= 2) {
+                    copy.startType = javaType.containedType(0).rawClass
+                    copy.endType = javaType.containedType(1).rawClass
+                }
+                return copy
+            }
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): RTemporalInterval<*, *> {
+                val result = parse<Temporal, Temporal>(p.string)()
+                startType?.let {
+                    require(it.isInstance(result.start)) {
+                        "Cannot deserialize: expected start type ${it.simpleName}, got ${result.start::class.simpleName}"
+                    }
+                }
+                endType?.let {
+                    require(it.isInstance(result.end)) {
+                        "Cannot deserialize: expected end type ${it.simpleName}, got ${result.end::class.simpleName}"
+                    }
+                }
+                return result
+            }
+        }
+
+        class OldSerialize : JsonSerializer<RTemporalInterval<*, *>>() {
+            override fun serialize(value: RTemporalInterval<*, *>, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
+                gen.writeString(value.toString())
+            }
+        }
+
+        class OldDeserialize : JsonDeserializer<RTemporalInterval<*, *>>(), ContextualDeserializer {
+            private var startType: Class<*>? = null
+            private var endType: Class<*>? = null
+
+            override fun createContextual(ctxt: com.fasterxml.jackson.databind.DeserializationContext, property: com.fasterxml.jackson.databind.BeanProperty?): JsonDeserializer<*> {
+                val javaType = property?.type ?: ctxt.contextualType
+                val copy = OldDeserialize()
+                if (javaType.isNotNull() && javaType.containedTypeCount() >= 2) {
+                    copy.startType = javaType.containedType(0).rawClass
+                    copy.endType = javaType.containedType(1).rawClass
+                }
+                return copy
+            }
+
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): RTemporalInterval<*, *> {
+                val result = parse<Temporal, Temporal>(p.text)()
+                startType?.let {
+                    require(it.isInstance(result.start)) {
+                        "Cannot deserialize: expected start type ${it.simpleName}, got ${result.start::class.simpleName}"
+                    }
+                }
+                endType?.let {
+                    require(it.isInstance(result.end)) {
+                        "Cannot deserialize: expected end type ${it.simpleName}, got ${result.end::class.simpleName}"
+                    }
+                }
+                return result
+            }
+        }
+
+        @jakarta.persistence.Converter(autoApply = true)
+        class Converter : AttributeConverter<RTemporalInterval<*, *>?, String?> {
+            override fun convertToDatabaseColumn(attribute: RTemporalInterval<*, *>?) = attribute?.toString()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse<Temporal, Temporal>(dbData)()
+        }
     }
 
     /**
@@ -259,3 +401,91 @@ fun <T1: Temporal> RTemporalInterval(start: T1, duration: Duration) =
  */
 fun <T2: Temporal> RTemporalInterval(duration: Duration, end: T2) =
     duration.restrictedIntervalTo(end)
+
+/**
+ * A typealias that represents a temporal interval where both the lower and upper bounds
+ * share the same temporal type.
+ *
+ * This typealias simplifies the representation of temporal intervals in cases where
+ * the start and end points must be of the same type.
+ *
+ * @param T The type used for the temporal bounds of the interval (e.g., LocalDate, LocalDateTime).
+ * @since 3.4.1
+ */
+typealias MonoTemporalInterval<T> = RTemporalInterval<T, T>
+/**
+ * A typealias for an interval of time represented by start and end points,
+ * where both the start and end are instances of LocalDate.
+ *
+ * This alias simplifies the usage of RTemporalInterval with LocalDate
+ * as the bounds for the temporal interval.
+ * @since 3.4.1
+ */
+typealias LocalDateTemporalInterval = RTemporalInterval<LocalDate, LocalDate>
+/**
+ * A type alias representing a temporal interval where both the start and end points are
+ * instances of `LocalDateTime`.
+ *
+ * This alias simplifies working with a `RTemporalInterval` that specifically operates on
+ * `LocalDateTime` objects, ensuring type safety and readability in contexts where time intervals
+ * with precise date-time values are required.
+ * @since 3.4.1
+ */
+typealias LocalDateTimeTemporalInterval = RTemporalInterval<LocalDateTime, LocalDateTime>
+/**
+ * A type alias representing a temporal interval with `OffsetDateTime` as both the start and end types.
+ *
+ * This type alias is for a `RTemporalInterval` that specifies the usage of `OffsetDateTime`
+ * for defining the bounds of the interval. It is useful for working with time intervals
+ * where both the starting and ending points are represented as `OffsetDateTime`.
+ * @since 3.4.1
+ */
+typealias OffsetDateTimeTemporalInterval = RTemporalInterval<OffsetDateTime, OffsetDateTime>
+/**
+ * A type alias for `RTemporalInterval` with both the start and end points being `ZonedDateTime` objects.
+ *
+ * Represents a temporal interval where the boundaries are defined using `ZonedDateTime`.
+ * @since 3.4.1
+ */
+typealias ZonedDateTimeTemporalInterval = RTemporalInterval<ZonedDateTime, ZonedDateTime>
+/**
+ * A typealias representing a temporal interval with a start and end value of type `LocalTime`.
+ * `RTemporalInterval` is a generic class that accepts two type parameters,
+ * both of which are specified as `LocalTime` in this alias.
+ * @since 3.4.1
+ */
+typealias LocalTimeTemporalInterval = RTemporalInterval<LocalTime, LocalTime>
+/**
+ * A type alias representing a temporal interval with `OffsetTime` as the start and end type.
+ *
+ * This type alias simplifies the usage of `RTemporalInterval` when working specifically with
+ * temporal intervals defined by `OffsetTime` instances.
+ * @since 3.4.1
+ */
+typealias OffsetTimeTemporalInterval = RTemporalInterval<OffsetTime, OffsetTime>
+/**
+ * A type alias for `RTemporalInterval` with both the type parameters set to `Instant`.
+ *
+ * Represents a temporal interval where both the start and end points are `Instant` instances.
+ * @since 3.4.1
+ */
+typealias InstantTemporalInterval = RTemporalInterval<Instant, Instant>
+/**
+ * A typealias representing a temporal interval specifically constrained to the `Year` type.
+ *
+ * This is a specialization of the generic `RTemporalInterval` class where both the starting
+ * and ending bounds are defined using the `Year` type. It is useful for cases where the
+ * temporal interval solely involves years.
+ * @since 3.4.1
+ */
+typealias YearTemporalInterval = RTemporalInterval<Year, Year>
+/**
+ * A type alias representing a temporal interval with `YearMonth` as both the start and end type.
+ *
+ * This alias simplifies the usage of `RTemporalInterval` when working specifically
+ * with intervals defined by `YearMonth` objects.
+ *
+ * Example use cases include representing a range of months within a year or across multiple years.
+ * @since 3.4.1
+ */
+typealias YearMonthTemporalInterval = RTemporalInterval<YearMonth, YearMonth>
