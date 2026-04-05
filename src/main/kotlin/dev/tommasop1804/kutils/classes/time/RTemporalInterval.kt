@@ -419,9 +419,9 @@ typealias MonoTemporalInterval<T> = RTemporalInterval<T, T>
  *
  * This alias simplifies the usage of RTemporalInterval with LocalDate
  * as the bounds for the temporal interval.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias LocalDateTemporalInterval = RTemporalInterval<LocalDate, LocalDate>
+typealias LocalDateInterval = RTemporalInterval<LocalDate, LocalDate>
 /**
  * A type alias representing a temporal interval where both the start and end points are
  * instances of `LocalDateTime`.
@@ -429,56 +429,56 @@ typealias LocalDateTemporalInterval = RTemporalInterval<LocalDate, LocalDate>
  * This alias simplifies working with a `RTemporalInterval` that specifically operates on
  * `LocalDateTime` objects, ensuring type safety and readability in contexts where time intervals
  * with precise date-time values are required.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias LocalDateTimeTemporalInterval = RTemporalInterval<LocalDateTime, LocalDateTime>
+typealias LocalDateTimeInterval = RTemporalInterval<LocalDateTime, LocalDateTime>
 /**
  * A type alias representing a temporal interval with `OffsetDateTime` as both the start and end types.
  *
  * This type alias is for a `RTemporalInterval` that specifies the usage of `OffsetDateTime`
  * for defining the bounds of the interval. It is useful for working with time intervals
  * where both the starting and ending points are represented as `OffsetDateTime`.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias OffsetDateTimeTemporalInterval = RTemporalInterval<OffsetDateTime, OffsetDateTime>
+typealias OffsetDateTimeInterval = RTemporalInterval<OffsetDateTime, OffsetDateTime>
 /**
  * A type alias for `RTemporalInterval` with both the start and end points being `ZonedDateTime` objects.
  *
  * Represents a temporal interval where the boundaries are defined using `ZonedDateTime`.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias ZonedDateTimeTemporalInterval = RTemporalInterval<ZonedDateTime, ZonedDateTime>
+typealias ZonedDateTimeInterval = RTemporalInterval<ZonedDateTime, ZonedDateTime>
 /**
  * A typealias representing a temporal interval with a start and end value of type `LocalTime`.
  * `RTemporalInterval` is a generic class that accepts two type parameters,
  * both of which are specified as `LocalTime` in this alias.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias LocalTimeTemporalInterval = RTemporalInterval<LocalTime, LocalTime>
+typealias LocalTimeInterval = RTemporalInterval<LocalTime, LocalTime>
 /**
  * A type alias representing a temporal interval with `OffsetTime` as the start and end type.
  *
  * This type alias simplifies the usage of `RTemporalInterval` when working specifically with
  * temporal intervals defined by `OffsetTime` instances.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias OffsetTimeTemporalInterval = RTemporalInterval<OffsetTime, OffsetTime>
+typealias OffsetTimeInterval = RTemporalInterval<OffsetTime, OffsetTime>
 /**
  * A type alias for `RTemporalInterval` with both the type parameters set to `Instant`.
  *
  * Represents a temporal interval where both the start and end points are `Instant` instances.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias InstantTemporalInterval = RTemporalInterval<Instant, Instant>
+typealias InstantInterval = RTemporalInterval<Instant, Instant>
 /**
  * A typealias representing a temporal interval specifically constrained to the `Year` type.
  *
  * This is a specialization of the generic `RTemporalInterval` class where both the starting
  * and ending bounds are defined using the `Year` type. It is useful for cases where the
  * temporal interval solely involves years.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias YearTemporalInterval = RTemporalInterval<Year, Year>
+typealias YearInterval = RTemporalInterval<Year, Year>
 /**
  * A type alias representing a temporal interval with `YearMonth` as both the start and end type.
  *
@@ -486,6 +486,6 @@ typealias YearTemporalInterval = RTemporalInterval<Year, Year>
  * with intervals defined by `YearMonth` objects.
  *
  * Example use cases include representing a range of months within a year or across multiple years.
- * @since 3.4.1
+ * @since 3.4.2
  */
-typealias YearMonthTemporalInterval = RTemporalInterval<YearMonth, YearMonth>
+typealias YearMonthInterval = RTemporalInterval<YearMonth, YearMonth>
