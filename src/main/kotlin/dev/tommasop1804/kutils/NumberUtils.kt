@@ -14,6 +14,9 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import kotlin.math.*
 import kotlin.math.pow
+import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
+import kotlin.reflect.KProperty
 
 /**
  * Indicates whether the current number is not a decimal (i.e., it represents a whole number),
@@ -1010,3 +1013,550 @@ fun String.toBigDecimal(): Result<BigDecimal> = runCatching { BigDecimal.valueOf
  * @since 1.0.0
  */
 fun Number.toBigDecimal(): BigDecimal = BigDecimal.valueOf(toDouble())
+
+/**
+ * Validates that the number is positive. If the number is not positive, throws a `NumberSignException`.
+ *
+ * @param causeOf The optional throwable to use as the primary exception; if provided, its cause is set to a new `NumberSignException`.
+ * @param cause The optional throwable to be used as the cause of the `NumberSignException`.
+ * @return The number itself if it is positive.
+ * @throws NumberSignException If the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException("Value is not positive.", cause) else causeOf.initCause(NumberSignException("Value is not positive.", cause))
+    return this
+}
+/**
+ * Validates that the number is positive. If the number is not positive, a [NumberSignException] is thrown.
+ *
+ * @param causeOf An optional [Throwable] indicating the cause of the exception. If provided, it will be used as the base for exception chaining.
+ * @param cause An optional [Throwable] representing the cause of the exception. Can be null.
+ * @param lazyMessage A supplier function for the exception message, which will be lazily evaluated.
+ * @return The validated number if it is positive.
+ * @throws NumberSignException If the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause) else causeOf.initCause(NumberSignException(lazyMessage().toString(), cause))
+    return this
+}
+/**
+ * Validates that the current number is positive. If the number is not positive, a `NumberSignException` is thrown.
+ *
+ * @param property The Kotlin property associated with the validation, providing contextual information
+ *                 such as its owner class, name, and return type. May be `null`.
+ * @param variableName An optional name of the variable being validated. If provided, it will be included
+ *                     in the exception for better error context. Defaults to `null`.
+ * @param message An optional custom error message describing the validation failure. If not provided, a default
+ *                message "is not positive" will be used. Defaults to `null`.
+ * @param causeOf An optional `Throwable` to be used as the cause of the exception. If provided, it will wrap
+ *                the `NumberSignException`. Defaults to `null`.
+ * @param cause An optional `Throwable` to be included in the `NumberSignException` used for validation. Defaults to `null`.
+ * @return The current number (this) if the validation is successful.
+ * @throws NumberSignException if the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not positive", cause) else causeOf.initCause(NumberSignException(property, variableName, message ?: "is not positive", cause))
+    return this
+}
+/**
+ * Validates if the current number is positive. If the number is not positive, a `NumberSignException` is thrown.
+ *
+ * @param property The primary property being validated. This is used for exception context and can be null.
+ * @param variable An optional secondary property related to the validation. This is used for additional exception context if provided.
+ * @param message  An optional custom error message to include in the exception if the validation fails.
+ * @param causeOf  An optional root cause throwable to set as the cause of the exception. If null, a new `NumberSignException` is created.
+ * @param cause    An optional secondary cause throwable to include when creating the exception.
+ * @return The current instance if the validation passes.
+ * @throws NumberSignException If the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not positive", cause) else causeOf.initCause(NumberSignException(property, variable, message ?: "is not positive", cause))
+    return this
+}
+/**
+ * Validates that the number is positive and throws a `NumberSignException` if it is not.
+ *
+ * @param callable The Kotlin function that the parameter belongs to. Can be null.
+ * @param parameterName The name of the parameter being validated. Can be null.
+ * @param message An optional custom message to include in the exception. Defaults to "is not positive" if null.
+ * @param causeOf An existing exception to propagate by initializing its cause with a new `NumberSignException`. Can be null.
+ * @param cause An optional underlying cause for the exception. Can be null.
+ * @return The current number instance if it is confirmed to be positive.
+ * @throws NumberSignException if the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not positive", cause) else causeOf.initCause(NumberSignException(callable, parameterName, message ?: "is not positive", cause))
+    return this
+}
+/**
+ * Validates that the current number is positive.
+ * If the number is not positive, a `NumberSignException` is thrown.
+ *
+ * @param callable The function to which the parameter belongs, or null if not applicable.
+ * @param parameter The specific parameter within the function being validated, or null if not applicable.
+ * @param message An optional descriptive message to include in the exception, or null to use the default message.
+ * @param causeOf An exception that will serve as the cause of the `NumberSignException`, or null if not applicable.
+ * @param cause The underlying cause to associate with this exception, or null if not applicable.
+ * @return The current number if it is positive.
+ * @throws NumberSignException If the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not positive", cause) else causeOf.initCause(NumberSignException(callable, parameter, message ?: "is not positive", cause))
+    return this
+}
+/**
+ * Validates that the number is positive. If the number is not positive, a `NumberSignException` is thrown.
+ *
+ * @param callableName The name of the callable where this validation occurs, or null.
+ * @param parameterName The name of the parameter being validated, or null.
+ * @param message A custom error message to include in the exception, or null to use the default message.
+ * @param causeOf An optional throwable that will serve as the originating cause of the new exception, or null.
+ * @param cause An optional throwable used to link exceptions for diagnostic purposes, or null.
+ * @return The number if it is positive.
+ * @throws NumberSignException If the number is not positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not positive", cause) else causeOf.initCause(NumberSignException(callableName, parameterName, message ?: "is not positive", cause))
+    return this
+}
+/**
+ * Validates that the current number is positive. If the number is not positive, an exception is thrown.
+ *
+ * @param callableName The name of the callable (e.g., function or method) associated with the validation, or null if not applicable.
+ * @param parameter The parameter being validated, or null if not applicable.
+ * @param message An optional custom message to include in the exception if validation fails. Defaults to a generic "is not positive" message.
+ * @param causeOf An optional pre-existing throwable to be set as the cause of the thrown exception. If null, a new exception is constructed instead.
+ * @param cause An optional underlying cause for the validation failure.
+ * @return The current number if it passes the validation check.
+ * @throws NumberSignException If the number is not positive and no `causeOf` is provided.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not positive", cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message ?: "is not positive", cause))
+    return this
+}
+
+/**
+ * Validates that the current number is not positive. If the number is positive,
+ * it throws a `NumberSignException` with the specified cause or an initialized cause.
+ *
+ * @param causeOf The primary throwable cause to be used if the validation fails.
+ *                If non-null, it will be augmented with a `NumberSignException`.
+ * @param cause The secondary throwable cause. Used as the cause of the `NumberSignException`
+ *              if the number is positive, and `causeOf` is null.
+ * @return The current number instance if it is not positive.
+ * @throws NumberSignException If the current number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException("Value is positive.", cause) else causeOf.initCause(NumberSignException("Value is positive.", cause))
+    return this
+}
+/**
+ * Validates that the number is not positive. If the number is positive, an exception is thrown.
+ *
+ * @param causeOf An optional throwable that will serve as the main cause. If provided, it will be initialized with a
+ * secondary cause describing the positive value validation failure.
+ * @param cause An optional secondary throwable that may provide additional context for the exception.
+ * @param lazyMessage A supplier that generates the message used in the exception if the number is positive.
+ * @return The original number if it is not positive.
+ * @throws NumberSignException If the number is positive. The exception will use the lazyMessage's output as its
+ * message and may include the provided cause and/or causeOf for additional context.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause) else causeOf.initCause(NumberSignException(lazyMessage().toString(), cause))
+    return this
+}
+/**
+ * Validates that the current number is not positive. If the number is positive, a
+ * `NumberSignException` is thrown.
+ *
+ * @param property An optional `KProperty` providing metadata about the property being validated.
+ *                 This can include contextual information such as the class, property name, and
+ *                 return type. May be `null`.
+ * @param variableName An optional name of the variable being validated for additional context.
+ *                     If provided, it will be included in the exception message. May be `null`.
+ * @param message An optional custom error message that will be appended to the
+ *                exception message if the validation fails. May be `null`.
+ * @param causeOf An optional `Throwable` that caused this validation error, allowing exception
+ *                chaining. If provided, it is set as the cause of the exception. May be `null`.
+ * @param cause An optional `Throwable` providing additional context for the exception. May be
+ *              `null`.
+ * @return Returns the current number if it is not positive.
+ * @throws NumberSignException If the current number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is positive", cause) else causeOf.initCause(NumberSignException(property, variableName, message ?: "is positive", cause))
+    return this
+}
+/**
+ * Validates that the number is not positive.
+ *
+ * If the number is positive, a [NumberSignException] is thrown. The exception will include the provided property,
+ * variable, an optional custom message, and optional cause details.
+ *
+ * @param property The primary property being validated. Can be `null` if not applicable.
+ * @param variable An optional secondary property related to the validation. Can be `null` if not relevant.
+ * @param message An optional custom message to include in the exception if thrown. Defaults to "is positive" if `null`.
+ * @param causeOf An optional throwable that is considered the cause of this failure. If provided,
+ *                it will be initialized as the cause of the created exception.
+ * @param cause An optional root cause of this failure. If provided, it will be passed as part of the created exception.
+ * @return Returns the same number instance if it is not positive.
+ * @throws NumberSignException if the number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is positive", cause) else causeOf.initCause(NumberSignException(property, variable, message ?: "is positive", cause))
+    return this
+}
+/**
+ * Validates that the number is not positive. If the number is positive, a `NumberSignException` is thrown.
+ *
+ * @param callable The Kotlin function that the number parameter belongs to. Can be null.
+ * @param parameterName The name of the parameter being validated. Can be null.
+ * @param message A custom error message to provide additional context. Defaults to "is positive" if null.
+ * @param causeOf A custom throwable that serves as the main exception. If provided, it is initialized with the
+ *                `NumberSignException` as its cause.
+ * @param cause A secondary throwable that serves as the cause of the exception. This is used if `causeOf` is null.
+ * @return The number itself if the validation passes (i.e., the number is not positive).
+ * @throws NumberSignException If the number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is positive", cause) else causeOf.initCause(NumberSignException(callable, parameterName, message ?: "is positive", cause))
+    return this
+}
+/**
+ * Validates that the current number is not positive. If the number is positive, a `NumberSignException` is thrown.
+ *
+ * @param callable The function to which the parameter belongs, or null if not available.
+ * @param parameter The specific parameter within the function that caused the validation, or null if not applicable.
+ * @param message An optional descriptive message providing additional information about the validation failure.
+ * @param causeOf An optional exception that acts as the underlying cause of the validation failure.
+ * @param cause An optional exception to be used as the direct cause of the thrown `NumberSignException`.
+ * @return The current number, if it is not positive.
+ * @throws NumberSignException if the number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is positive", cause) else causeOf.initCause(NumberSignException(callable, parameter, message ?: "is positive", cause))
+    return this
+}
+/**
+ * Validates that the number is not positive. If the number is positive, a `NumberSignException` is thrown.
+ *
+ * @param callableName The name of the callable associated with this validation, or `null`.
+ * @param parameterName The name of the parameter being validated, or `null`.
+ * @param message Additional details about the validation failure. Defaults to `null` if not specified.
+ * @param causeOf An optional existing `Throwable`, which will have the thrown exception set as its cause.
+ * @param cause The throwable that caused this validation to fail, or `null` if there is none.
+ * @return The original number if it passes validation (not positive).
+ * @throws NumberSignException If the number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is positive", cause) else causeOf.initCause(NumberSignException(callableName, parameterName, message ?: "is positive", cause))
+    return this
+}
+/**
+ * Validates that the number is not positive. If the number is positive, a `NumberSignException` is thrown.
+ *
+ * @param callableName The name of the callable (e.g., function or method) associated with this validation, or null if not applicable.
+ * @param parameter The parameter related to this validation, or null if not applicable.
+ * @param message An optional message providing additional context if validation fails; defaults to "is positive" if not specified.
+ * @param causeOf The desired root cause of the exception, or null if none exists.
+ * @param cause An optional exception to associate as the cause; it will be attached as the `cause` of the thrown exception.
+ * @return The validated number if it is not positive.
+ * @throws NumberSignException if the number is positive.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is positive", cause) else causeOf.initCause(NumberSignException(callableName, parameter, message ?: "is positive", cause))
+    return this
+}
+
+/**
+ * Validates that the number is negative. If the number is not negative, an exception is thrown.
+ *
+ * @param causeOf An optional throwable that will be used as the cause of the exception if provided.
+ * @param cause An optional throwable that will be set as the cause of the `NumberSignException` if `causeOf` is not provided.
+ * @return The number instance if it is negative.
+ * @throws NumberSignException if the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException("Value is not negative.", cause) else causeOf.initCause(NumberSignException("Value is not negative.", cause))
+    return this
+}
+/**
+ * Validates if the calling number instance is negative. If the number is not negative,
+ * throws a [NumberSignException] with the specified message and optional cause.
+ *
+ * @param causeOf An optional `Throwable` that, if provided, will have its cause set to
+ *                a newly created [NumberSignException].
+ * @param cause An optional `Throwable` representing the cause of the exception to be
+ *              assigned to the [NumberSignException]. If null, no cause is set in the
+ *              exception.
+ * @param lazyMessage A supplier that generates the exception message if the number
+ *                    fails the validation.
+ * @return The current `Number` instance if the validation passes.
+ * @throws NumberSignException If the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause) else causeOf.initCause(NumberSignException(lazyMessage().toString(), cause))
+    return this
+}
+/**
+ * Validates that the current number is negative. If the number is not negative, a [NumberSignException]
+ * is thrown.
+ *
+ * @param property The Kotlin property associated with the validation, providing contextual information
+ *                 such as its owner class, name, and return type. May be `null`.
+ * @param variableName An optional name of the variable related to the validation for additional context.
+ *                     If provided, it will be included in the exception message. Defaults to `null`.
+ * @param message An optional custom error message. If provided, it will be used in the exception.
+ *                Defaults to `null`.
+ * @param causeOf An optional `Throwable` that caused this validation failure, allowing exception chaining.
+ *                If provided, it will be used to initialize the cause of the thrown exception. Defaults to `null`.
+ * @param cause An optional `Throwable` to provide additional context in the exception. May be `null`.
+ *              Defaults to `null`.
+ * @return The current number if it passes the validation (is negative).
+ * @throws NumberSignException If the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not negative", cause) else causeOf.initCause(NumberSignException(property, variableName, message ?: "is not negative", cause))
+    return this
+}
+/**
+ * Validates that the current `Number` instance is negative.
+ * If the number is not negative, a `NumberSignException` is thrown.
+ *
+ * @param property The primary property associated with the validation. Can be null.
+ * @param variable An optional secondary property used for additional context in the validation. Can be null.
+ * @param message A custom error message to provide additional details about the exception. Optional and can be null.
+ * @param causeOf An optional throwable that caused this exception. If provided, it is used as the cause of the exception.
+ * @param cause An additional optional throwable that will be associated as the cause for the `NumberSignException`. Can be null.
+ * @return The current `Number` instance if it is negative.
+ * @throws NumberSignException If the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not negative", cause) else causeOf.initCause(NumberSignException(property, variable, message ?: "is not negative", cause))
+    return this
+}
+/**
+ * Validates if the current number is negative. Throws a [NumberSignException] if the number is not negative.
+ *
+ * @param callable The Kotlin function that the parameter belongs to. Can be null.
+ * @param parameterName The name of the parameter being validated. Can be null.
+ * @param message Custom message providing additional context for the exception. Can be null, defaults to "is not negative".
+ * @param causeOf The higher-level cause leading to this validation failure. Can be null.
+ * @param cause The underlying exception causing this validation failure. Can be null.
+ * @return The current number if the validation passes (i.e., the number is negative).
+ * @throws NumberSignException If the current number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not negative", cause) else causeOf.initCause(NumberSignException(callable, parameterName, message ?: "is not negative", cause))
+    return this
+}
+/**
+ * Validates if the current number is negative. Throws a `NumberSignException` if the number is not negative.
+ *
+ * @param callable The function to which the parameter belongs, or null if not applicable.
+ * @param parameter The specific parameter within the function to be validated, or null if not applicable.
+ * @param message An optional message describing the validation failure, or null to use the default message.
+ * @param causeOf An optional `Throwable` that serves as the root cause of the exception.
+ * @param cause An optional `Throwable` providing additional context for the exception.
+ * @return The current number if it is negative.
+ * @throws NumberSignException If the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not negative", cause) else causeOf.initCause(NumberSignException(callable, parameter, message ?: "is not negative", cause))
+    return this
+}
+/**
+ * Validates that a number is negative. If the number is not negative, it throws a `NumberSignException`.
+ *
+ * @param callableName The name of the callable associated with this validation, or null.
+ * @param parameterName The name of the parameter being validated, or null.
+ * @param message Additional details about the validation failure; defaults to "is not negative" if null.
+ * @param causeOf An optional throwable that caused this validation failure. If provided, it will be chained.
+ * @param cause An optional cause for the `NumberSignException`. If provided, it will be associated with the exception.
+ * @return The number itself if it is negative.
+ * @throws NumberSignException If the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not negative", cause) else causeOf.initCause(NumberSignException(callableName, parameterName, message ?: "is not negative", cause))
+    return this
+}
+/**
+ * Validates if the current number is negative. Throws a `NumberSignException` if the number is not negative.
+ *
+ * @param callableName The name of the function or callable associated with the validation, or null if not applicable.
+ * @param parameter The parameter associated with the validation, or null if not applicable.
+ * @param message An optional custom message for the exception, or null to use the default message.
+ * @param causeOf The primary cause of the exception, or null if there is no prior throwable causing this validation failure.
+ * @param cause The underlying cause of the `NumberSignException`, or null if no additional cause exists.
+ * @return The current number (`this`) if it passes the validation check.
+ * @throws NumberSignException if the number is not negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not negative", cause) else causeOf.initCause(NumberSignException(callableName, parameter, message ?: "is not negative", cause))
+    return this
+}
+
+/**
+ * Validates that the calling number is not negative.
+ * If the number is negative, it throws a `NumberSignException`.
+ * Optionally, a custom cause or an overriding cause can be provided.
+ *
+ * @param causeOf An optional throwable used as the primary cause when initializing an exception chain.
+ * @param cause An optional throwable used as the secondary cause for the exception.
+ * @return The validated number if it is not negative.
+ * @throws NumberSignException if the number is negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException("Value is negative.", cause) else causeOf.initCause(NumberSignException("Value is negative.", cause))
+    return this
+}
+/**
+ * Validates that the number is not negative. If the number is negative, throws a [NumberSignException].
+ *
+ * @param causeOf An optional throwable to be used as the initial cause for the exception. If null,
+ *                [NumberSignException] will be created as the root cause.
+ * @param cause An optional throwable that can be specified as the secondary cause for the exception.
+ * @param lazyMessage A lazily evaluated message supplier to generate the error message for the exception if thrown.
+ * @return The current number if it is not negative.
+ * @throws NumberSignException If the number is negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause) else causeOf.initCause(NumberSignException(lazyMessage().toString(), cause))
+    return this
+}
+/**
+ * Validates that the current number is not negative. If the number is negative, a
+ * `NumberSignException` is thrown.
+ *
+ * @param property The Kotlin property associated with the value being validated, providing
+ *                 contextual information such as its owner class, name, and return type. May be `null`.
+ * @param variableName An optional name for the variable being validated. If provided, this name will
+ *                     be included in the exception message for easier identification. May be `null`.
+ * @param message An optional custom error message that will be used if the validation fails. Defaults
+ *                to "is negative" if not provided. May be `null`.
+ * @param causeOf An optional `Throwable` that represents the cause of this validation failure. If not
+ *                `null`, it will be initialized with a `NumberSignException` as its cause. May be `null`.
+ * @param cause An optional `Throwable` that provides additional context for the default exception chaining. May be `null`.
+ * @return The validated number if the validation passes and the number is not negative.
+ * @throws NumberSignException If the number is negative, a `NumberSignException` is thrown with
+ *                              appropriate contextual information and optional message or cause.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(property, variableName, message ?: "is negative", cause))
+    return this
+}
+/**
+ * Validates that the current number is not negative.
+ *
+ * If the number is negative, a `NumberSignException` is thrown.
+ * This method supports optional parameters for providing context about
+ * the property or variable related to the exception, a custom message, and
+ * an optional cause exception.
+ *
+ * @param property The primary property associated with this validation. Can be `null`.
+ * @param variable An optional secondary property providing additional context. Can be `null`.
+ * @param message A custom message to describe the exception if the number is negative. Defaults to `null`.
+ * @param causeOf An optional throwable to serve as the cause of the exception. Defaults to `null`.
+ * @param cause An optional secondary cause to provide further context. Defaults to `null`.
+ * @return The current number if it is not negative.
+ * @throws NumberSignException If the number is negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(property, variable, message ?: "is negative", cause))
+    return this
+}
+/**
+ * Validates that the number is not negative.
+ *
+ * @param callable The function in which the validation is performed. Can be null.
+ * @param parameterName The name of the parameter being validated. Can be null.
+ * @param message An optional message to customize the exception message if validation fails. Defaults to "is negative" if null.
+ * @param causeOf The prior throwable cause, used to initialize the chain of exceptions. Can be null.
+ * @param cause The root cause of the exception, if applicable. Can be null.
+ * @return The number itself if it is not negative.
+ * @throws NumberSignException If the number is negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(callable, parameterName, message ?: "is negative", cause))
+    return this
+}
+/**
+ * Validates that the current number is not negative. If the number is negative, a [NumberSignException] is thrown.
+ *
+ * @param callable The function to which the parameter belongs, or null if not applicable.
+ * @param parameter The parameter involved in the validation, or null if not applicable.
+ * @param message An optional message to include in the exception, or null for a default message ("is negative").
+ * @param causeOf An optional throwable indicating the root cause of this validation failure, or null if not applicable.
+ * @param cause An optional throwable to be set as the cause of the exception, or null if not applicable.
+ * @return The current number if it is not negative.
+ *
+ * @throws NumberSignException if the number is negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(callable, parameter, message ?: "is negative", cause))
+    return this
+}
+/**
+ * Validates that the current number is not negative. If the number is negative, a
+ * `NumberSignException` is thrown. The exception can optionally include information about the
+ * callable, parameter, custom message, and cause.
+ *
+ * @param callableName The name of the callable in which the validation is performed, or null.
+ * @param parameterName The name of the parameter being validated, or null.
+ * @param message An optional custom message to include in the exception if the validation fails.
+ * @param causeOf An optional `Throwable` that serves as the primary cause of the exception.
+ * @param cause An optional `Throwable` providing additional context for the exception.
+ * @return The original number if the validation passes (i.e., the number is not negative).
+ * @throws NumberSignException If the number is negative and validation fails.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(callableName, parameterName, message ?: "is negative", cause))
+    return this
+}
+/**
+ * Validates that the number is not negative. If the number is negative, throws a `NumberSignException`.
+ *
+ * @param callableName The name of the callable (e.g., function or method) associated with the value, or null if unassociated.
+ * @param parameter The parameter involved in the validation, or null if not applicable.
+ * @param message An optional detail message to include with the exception, or null for a default message.
+ * @param causeOf An optional throwable that serves as the primary cause of this exception, or null if not applicable.
+ * @param cause An optional secondary cause for the exception, or null if not applicable.
+ * @return The validated number if it is not negative.
+ * @throws NumberSignException If the number is negative.
+ * @since 3.5.0
+ */
+fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(callableName, parameter, message ?: "is negative", cause))
+    return this
+}

@@ -1203,61 +1203,193 @@ open class DuplicatePropertyException : ValidationFailedException {
  * issue related to the sign of a number.
  *
  * This exception is designed for scenarios where a number's sign (positive, negative, or zero)
- * does not meet the expected criteria in a given context. It extends `IllegalStateException`
+ * does not meet the expected criteria in a given context. It extends `ValidationFailedException`
  * and provides multiple constructors to accommodate different use cases, such as specifying
  * a detailed message, a cause, or both.
  *
  * @since 1.0.0
+ * @author Tommaso Pastorelli
  */
 @Suppress("unused")
 open class NumberSignException : ValidationFailedException {
     /**
-     * Initializes a new instance of the `NumberSignException` class with no detail message.
-     *
-     * This constructor creates an instance of `NumberSignException` without providing
-     * any specific message or additional context. It indicates a generic exception
-     * related to number sign operations, without further detail about the cause
-     * or nature of the issue.
-     *
+     * Default constructor for NumberSignException.
+     * Invokes the superclass constructor.
      * @since 1.0.0
      */
     constructor() : super()
-
     /**
-     * Constructs a `NumberSignException` with the specified detail message.
+     * Constructs a new NumberSignException with the specified detail message.
      *
-     * This constructor is used to create a `NumberSignException` with a custom detail message
-     * that provides additional information about the context of the exception.
-     *
-     * @param message The detail message associated with the exception, or null if no message is provided.
+     * @param message The detail message that provides additional information about the exception.
+     *                This may be null if no message is provided.
      * @since 1.0.0
      */
     constructor(message: String?) : super(message)
-
     /**
-     * Constructs a `NumberSignException` with the specified detail message and cause.
+     * Constructs a new instance of the `NumberSignException` class using the specified property, variable name,
+     * and an optional custom message. The exception message is dynamically generated based on the provided parameters.
      *
-     * This constructor allows for creating an exception instance by specifying
-     * a detailed message and the underlying cause. It is useful for providing
-     * more context and for enabling exception chaining when handling errors
-     * related to the invalid state caused by a number's sign.
-     *
-     * @param message A detailed message describing the error, or null if no specific message is provided.
-     * @param cause The cause of this exception, or null if no cause is specified.
-     * @since 1.0.0
+     * @param property The `KProperty` instance providing metadata about the property in question,
+     *                 or `null` if this detail is not available.
+     * @param variableName An optional parameter representing the name of a variable associated with the exception,
+     *                     or `null` if no variable name is relevant.
+     * @param message An optional custom message providing additional context about the exception. Defaults to an empty string.
+     * @since 3.5.0
      */
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
-
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"($${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}")
     /**
-     * Constructs a `NumberSignException` with the specified cause.
+     * Constructs a new instance of `NumberSignException`.
      *
-     * This constructor creates an instance of `NumberSignException` while
-     * encapsulating the underlying cause of the exception. It allows
-     * for exception chaining and helps provide more context about the
-     * origin of the error.
+     * @param callable The Kotlin function (`KFunction`) that is being referenced. It could be null.
+     * @param parameterName The name of the parameter in the function that might have triggered the exception. It could be null.
+     * @param message An optional message describing the exception in more detail. Defaults to an empty string.
      *
-     * @param cause The underlying cause of this exception, or null if no specific cause is provided.
+     * The constructor generates a detailed exception message using the following components:
+     * - The name of the function passed to the `callable` parameter.
+     * - The parameter name and its type, as found in the `callable` function, matched against the provided `parameterName`.
+     * - An optional message if the provided `message` parameter is neither null nor empty.
+     * @since 3.5.0
+     */
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    /**
+     * Secondary constructor for `NumberSignException`, initializing it with detailed information
+     * about the callable name, parameter name, and optional message.
+     *
+     * @param callableName The name of the callable which caused the exception, or null if not applicable.
+     * @param parameterName The name of the parameter involved in the exception, or null if not applicable.
+     * @param message An optional additional message providing context for the exception. Defaults to an empty string.
+     * @since 3.5.0
+     */
+    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"(<parameters of `$$callableName`>$`$$parameterName`)$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    /**
+     * Constructs an instance of `NumberSignException` with detailed information
+     * about an invalid parameter in the given callable function.
+     *
+     * @param callable The Kotlin function (`KFunction`) where the error occurred, or null if not available.
+     * @param parameter The specific property (`KProperty`) of the function that caused the error, or null if not applicable.
+     * @param message An optional descriptive message providing additional context about the exception, defaults to an empty string.
+     *
+     * The `message` will include detailed information derived from the `callable` and `parameter` arguments,
+     * such as parameter names and types, concatenated with the provided message (if any).
+     * @since 3.5.0
+     */
+    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    /**
+     * Constructs an instance of `NumberSignException` with the provided callable name,
+     * parameter, and optional message. The constructed exception message incorporates
+     * details about the callable and parameter involved, along with the additional
+     * message if supplied and non-empty.
+     *
+     * @param callableName The name of the callable function or property associated
+     *        with the exception, or null if not specified.
+     * @param parameter The Kotlin property (`KProperty`) associated with the exception,
+     *        or null if not specified.
+     * @param message An optional additional message to provide more context about the
+     *        exception. Defaults to an empty string if not provided.
+     * @since 3.5.0
+     */
+    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"(<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    /**
+     * Constructs a new instance of NumberSignException with the specified cause.
+     *
+     * @param cause The throwable cause that is saved for later retrieval by the Throwable.cause property.
      * @since 1.0.0
      */
     constructor(cause: Throwable?) : super(cause)
+    /**
+     * Constructs a new NumberSignException with the specified detail message and cause.
+     *
+     * @param message The detail message, which is saved for later retrieval by the `getMessage()` method.
+     * @param cause The cause, which is saved for later retrieval by the `getCause()` method. A null value is permitted, and indicates that the cause is nonexistent or unknown.
+     * @since 1.0.0
+     */
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    /**
+     * Constructs a new instance of the `NumberSignException` class with a detailed message
+     * describing the invalid state or operation, and optionally includes a cause of the exception.
+     *
+     * @param property The Kotlin property associated with the exception, providing contextual
+     *                 information such as its owner class, name, and return type. May be `null`.
+     * @param variableName An optional name of the variable related to the exception for additional
+     *                     context. If provided and not blank, it will be included in the exception message.
+     * @param message An optional custom error message. If provided and not empty, it will be
+     *                appended to the formatted exception description. Defaults to an empty string.
+     * @param cause An optional `Throwable` that caused this exception, allowing exception chaining. May be `null`.
+     * @since 3.5.0
+     */
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "", cause: Throwable?) : super(
+        $$"($${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    /**
+     * Constructs a new instance of NumberSignException.
+     *
+     * This constructor generates a detailed exception message by combining the provided property, variable, and message arguments.
+     * It supports optional input for enhanced flexibility and includes functionality to handle a cause (a throwable) if provided.
+     *
+     * @param property The primary property involved in the exception. It may be null but,
+     *                 if present, will be included in the generated message.
+     * @param variable An optional secondary property related to the exception. If provided and its name is not blank,
+     *                 it will be included in the generated message alongside its type.
+     * @param message  An optional additional explanation or context about the exception. If present and not empty,
+     *                 it will be appended to the generated message.
+     * @param cause    An optional throwable that caused this exception. If provided, it will be passed to the superclass constructor.
+     * @since 3.5.0
+     */
+    constructor(property: KProperty<*>?, variable: KProperty<*>? = null, message: String? = "", cause: Throwable?) : super(
+        $$"($${if (variable?.name.isNotNullOrBlank()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    /**
+     * Constructs an instance of the exception with detailed information about the parameter
+     * of a callable function that caused the exception.
+     *
+     * @param callable The Kotlin function that the parameter belongs to. Can be null.
+     * @param parameterName The name of the parameter that triggered the exception. Can be null.
+     * @param message Additional message providing more context about the exception. Defaults to an empty string.
+     * @param cause The underlying cause of the exception. Can be null.
+     *
+     * The exception message includes the name and type of the affected parameter from the provided `callable`,
+     * formatted with additional context if a `message` is provided.
+     * @since 3.5.0
+     */
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    /**
+     * Secondary constructor for the `NumberSignException` class. Initializes a new instance with
+     * the provided `callableName`, `parameterName`, `message`, and `cause`.
+     *
+     * The exception message will be constructed dynamically based on the supplied parameters.
+     * It incorporates the name of the callable (if provided), the specific parameter name
+     * (if applicable), and an additional message if it is not null or empty. The optional
+     * `cause` parameter allows chaining of exceptions for diagnostic purposes.
+     *
+     * @param callableName The name of the callable associated with this exception, or null.
+     * @param parameterName The name of the parameter that triggered this exception, or null.
+     * @param message Additional details about the exception. Defaults to an empty string
+     * if not specified.
+     * @param cause The throwable that caused this exception, or null if there is none.
+     * @since 3.5.0
+     */
+    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty()) " $message" else ""})", cause)
+    /**
+     * Constructs a new `NumberSignException` with detailed context about the parameter involved in an invalid operation.
+     *
+     * @param callable The function to which the parameter belongs, or null if not available.
+     * @param parameter The specific parameter within the function that caused the exception, or null if not applicable.
+     * @param message An optional descriptive message providing additional information about the exception.
+     * @param cause The underlying cause of the exception, or null if not applicable.
+     * @since 3.5.0
+     */
+    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    /**
+     * Constructs a new instance of the `NumberSignException` class.
+     *
+     * @param callableName The name of the callable (e.g., function or method) related to the exception, or null if not applicable.
+     * @param parameter The parameter involved in the exception, or null if not applicable.
+     * @param message An optional detail message providing additional context about the exception. Defaults to an empty string.
+     * @param cause The underlying cause of the exception, or null if none exists.
+     *
+     * The exception message is constructed dynamically to include information about the callable name,
+     * the parameter name, and its type (if provided), followed by the optional message (if non-empty).
+     * The `isNotNullOrEmpty` function is utilized to check if the message is non-null and non-empty before appending it.
+     * @since 3.5.0
+     */
+    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
 }

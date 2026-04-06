@@ -5,12 +5,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.PERCENT
-import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.percent
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.isDecimal
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -35,7 +31,7 @@ import kotlin.math.roundToLong
 @JsonDeserialize(using = Percentage.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Percentage.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Percentage.Companion.OldDeserializer::class)
-value class Percentage private constructor(internal val value: Double): Comparable<Percentage> {
+value class Percentage private constructor(internal val value: Double) : Comparable<Percentage> {
     /**
      * Indicates whether the current percentage value exceeds a threshold considered 
      * as positive overflowing (greater than 100.0).
