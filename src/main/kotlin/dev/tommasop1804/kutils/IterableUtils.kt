@@ -1237,6 +1237,25 @@ inline infix fun <E, R> Iterable<E>.filterNull(element: Transformer<E, R>) =
     filter { element(it).isNull() }
 
 /**
+ * Removes elements from the collection that match the specified predicate.
+ *
+ * @param removeIf A predicate used to test elements. Elements that satisfy this predicate will be removed from the collection.
+ * @since 3.5.1
+ */
+operator fun <E> MCollection<E>.minusAssign(removeIf: Predicate<E>) {
+    removeIf(removeIf)
+}
+
+/**
+ * Returns a list containing elements of the original iterable excluding those that match the given predicate.
+ *
+ * @param filterNot The predicate used to test whether an element should be excluded.
+ * @return A list of elements excluding those that match the predicate.
+ * @since 3.5.1
+ */
+operator fun <E> Iterable<E>.minus(filterNot: Predicate<E>) = filterNot(filterNot)
+
+/**
  * Iterates through each element in the iterable collection and applies the given block of code to it.
  * Returns the original iterable collection after the operation.
  *

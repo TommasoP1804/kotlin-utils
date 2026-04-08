@@ -1048,6 +1048,16 @@ inline operator fun <K, V> Map<K, V>.invoke(filter: Predicate<Map.Entry<K, V>>):
 }
 
 /**
+ * Returns a new map containing only the entries of the original map that do not match
+ * the specified predicate.
+ *
+ * @param filterNot A predicate to test each entry of the map.
+ * Entries for which the predicate returns `true` will be excluded from the resulting map.
+ * @since 3.5.1
+ */
+operator fun <K, V> Map<K, V>.minus(filterNot: Predicate<Map.Entry<K, V>>) = filterNot(filterNot)
+
+/**
  * Creates and returns a new empty mutable map.
  *
  * This function provides a type-safe way of creating an empty `MutableMap`
