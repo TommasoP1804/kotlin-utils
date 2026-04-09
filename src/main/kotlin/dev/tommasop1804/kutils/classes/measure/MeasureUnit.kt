@@ -429,11 +429,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
 
     // ----------------
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class TimeUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInSeconds: Transformer<Number, Number>,
-        private val unitFromSeconds: Transformer<Number, Number>,
+        @Transient private val unitInSeconds: Transformer<Number, Number>,
+        @Transient private val unitFromSeconds: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -479,11 +483,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: TimeUnit) = targetUnit.fromSeconds(toSeconds(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class LengthUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInMeters: Transformer<Number, Number>,
-        private val unitFromMeters: Transformer<Number, Number>,
+        @Transient private val unitInMeters: Transformer<Number, Number>,
+        @Transient private val unitFromMeters: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -531,11 +539,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: LengthUnit) = targetUnit.fromMeters(toMeters(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class MassUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInKilograms: Transformer<Number, Number>,
-        private val unitFromKilograms: Transformer<Number, Number>,
+        @Transient private val unitInKilograms: Transformer<Number, Number>,
+        @Transient private val unitFromKilograms: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -581,11 +593,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: MassUnit) = targetUnit.fromKilograms(toKilograms(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class TemperatureUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInKelvins: Transformer<Number, Number>,
-        private val unitFromKelvins: Transformer<Number, Number>,
+        @Transient private val unitInKelvins: Transformer<Number, Number>,
+        @Transient private val unitFromKelvins: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -619,11 +635,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: TemperatureUnit) = targetUnit.fromKelvins(toKelvins(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class PlaneAngleUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInRadians: Transformer<Number, Number>,
-        private val unitFromRadians: Transformer<Number, Number>,
+        @Transient private val unitInRadians: Transformer<Number, Number>,
+        @Transient private val unitFromRadians: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -662,11 +682,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: PlaneAngleUnit) = targetUnit.fromRadians(toRadians(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class PressureUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInPascals: Transformer<Number, Number>,
-        private val unitFromPascals: Transformer<Number, Number>,
+        @Transient private val unitInPascals: Transformer<Number, Number>,
+        @Transient private val unitFromPascals: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -711,11 +735,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: PressureUnit) = targetUnit.fromPascals(toPascals(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class EnergyUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInJoules: Transformer<Number, Number>,
-        private val unitFromJoules: Transformer<Number, Number>,
+        @Transient private val unitInJoules: Transformer<Number, Number>,
+        @Transient private val unitFromJoules: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -756,11 +784,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: EnergyUnit) = targetUnit.fromJoules(toJoules(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class PowerUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInWatts: Transformer<Number, Number>,
-        private val unitFromWatts: Transformer<Number, Number>,
+        @Transient private val unitInWatts: Transformer<Number, Number>,
+        @Transient private val unitFromWatts: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -795,11 +827,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: PowerUnit) = targetUnit.fromWatts(toWatts(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class AreaUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInSquareMeters: Transformer<Number, Number>,
-        private val unitFromSquareMeters: Transformer<Number, Number>,
+        @Transient private val unitInSquareMeters: Transformer<Number, Number>,
+        @Transient private val unitFromSquareMeters: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -848,11 +884,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: AreaUnit) = targetUnit.fromSquareMeters(toSquareMeters(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class VolumeUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInCubicMeters: Transformer<Number, Number>,
-        private val unitFromCubicMeters: Transformer<Number, Number>,
+        @Transient private val unitInCubicMeters: Transformer<Number, Number>,
+        @Transient private val unitFromCubicMeters: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -900,11 +940,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: VolumeUnit) = targetUnit.fromCubicMeters(toCubicMeters(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class SpeedUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInMetersPerSecond: Transformer<Number, Number>,
-        private val unitFromMetersPerSecond: Transformer<Number, Number>,
+        @Transient private val unitInMetersPerSecond: Transformer<Number, Number>,
+        @Transient private val unitFromMetersPerSecond: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -944,11 +988,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: SpeedUnit) = targetUnit.fromMetersPerSecond(toMetersPerSecond(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class AccelerationUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInMetersPerSecondSquared: Transformer<Number, Number>,
-        private val unitFromMetersPerSecondSquared: Transformer<Number, Number>,
+        @Transient private val unitInMetersPerSecondSquared: Transformer<Number, Number>,
+        @Transient private val unitFromMetersPerSecondSquared: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -990,11 +1038,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: AccelerationUnit) = targetUnit.fromMetersPerSecondSquared(toMetersPerSecondSquared(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class DensityUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInKilogramsPerCubicMeter: Transformer<Number, Number>,
-        private val unitFromKilogramsPerCubicMeter: Transformer<Number, Number>,
+        @Transient private val unitInKilogramsPerCubicMeter: Transformer<Number, Number>,
+        @Transient private val unitFromKilogramsPerCubicMeter: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false
@@ -1032,11 +1084,15 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         fun convertTo(value: Double, targetUnit: DensityUnit) = targetUnit.fromKilogramsPerCubicMeter(toKilogramsPerCubicMeter(value))
     }
 
+    @JsonSerialize(using = Serializer::class)
+    @JsonDeserialize(using = Deserializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = OldSerializer::class)
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = OldDeserializer::class)
     class DataSizeUnit(
         unitName: String,
         symbol: String? = null,
-        private val unitInBits: Transformer<Number, Number>,
-        private val unitFromBits: Transformer<Number, Number>,
+        @Transient private val unitInBits: Transformer<Number, Number>,
+        @Transient private val unitFromBits: Transformer<Number, Number>,
         isSIUnit: Boolean = false,
         isAcceptedBySI: Boolean = false,
         knownSymbol: Boolean = false

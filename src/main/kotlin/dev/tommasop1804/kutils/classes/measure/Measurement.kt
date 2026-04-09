@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.Beta
+import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -134,7 +134,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
                 ctxt: SerializationContext
             ) {
                 gen.writeStartObject()
-                gen.writePOJOProperty("value", value.value)
+                gen.writeNumberProperty("value", value.value)
                 if (value.unit.knownSymbol)
                     gen.writeStringProperty("unit", value.unit.symbol ?: value.unit.unitName)
                 else gen.writePOJOProperty("unit", value.unit)
@@ -164,7 +164,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
         class OldSerializer : JsonSerializer<Measurement>() {
             override fun serialize(value: Measurement, gen: JsonGenerator, serializers: SerializerProvider?) {
                 gen.writeStartObject()
-                gen.writeObjectField("value", value.value)
+                gen.writeNumberField("value", value.value)
                 if (value.unit.knownSymbol)
                     gen.writeStringField("unit", value.unit.symbol ?: value.unit.unitName)
                 else gen.writeObjectField("unit", value.unit)
@@ -760,7 +760,7 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
                 ctxt: SerializationContext
             ) {
                 gen.writeStartObject()
-                gen.writePOJOProperty("value", value.value)
+                gen.writeNumberProperty("value", value.value)
                 if (value.unit.knownSymbol)
                     gen.writeStringProperty("unit", value.unit.symbol ?: value.unit.unitName)
                 else gen.writePOJOProperty("unit", value.unit)
@@ -790,7 +790,7 @@ class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, 
         class OldSerializer : JsonSerializer<RMeasurement<*>>() {
             override fun serialize(value: RMeasurement<*>, gen: JsonGenerator, serializers: SerializerProvider?) {
                 gen.writeStartObject()
-                gen.writeObjectField("value", value.value)
+                gen.writeNumberField("value", value.value)
                 if (value.unit.knownSymbol)
                     gen.writeStringField("unit", value.unit.symbol ?: value.unit.unitName)
                 else gen.writeObjectField("unit", value.unit)
