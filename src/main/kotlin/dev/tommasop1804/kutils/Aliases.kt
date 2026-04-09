@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("AliasesKt")
 @file:Suppress("unused", "kutils_collection_declaration", "kutils_map_declaration", "kutils_tuple_declaration", "java_integer_as_kotlin_int")
 @file:Since("1.0.0")

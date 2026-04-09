@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:Suppress("unused")
 @file:Since("3.3.0")
 

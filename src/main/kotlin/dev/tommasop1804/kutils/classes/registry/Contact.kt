@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:Suppress("unused", "kutils_temporal_now_as_temporal", "kutils_temporal_parse_as_temporal", "kutils_collection_declaration")
 
 package dev.tommasop1804.kutils.classes.registry

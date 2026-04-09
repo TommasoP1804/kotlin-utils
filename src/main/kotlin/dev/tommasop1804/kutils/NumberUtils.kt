@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("NumberUtilsKt")
 @file:Suppress("unused", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "java_integer_as_kotlin_int")
 @file:Since("1.0.0")

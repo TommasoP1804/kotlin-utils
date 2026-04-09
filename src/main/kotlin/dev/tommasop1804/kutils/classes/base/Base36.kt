@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:Suppress("unused", "kutils_drop_as_int_invoke")
 
 package dev.tommasop1804.kutils.classes.base

@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.EMPTY

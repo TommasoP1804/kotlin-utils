@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("UuidUtilsKt")
 @file:Suppress("unused", "functionName", "kutils_uuid_fromstring_as_uuid", "kutils_randomuuid_as_uuid", "kutils_collection_declaration", "kutils_temporal_now_as_temporal")
 @file:Since("3.0.0")

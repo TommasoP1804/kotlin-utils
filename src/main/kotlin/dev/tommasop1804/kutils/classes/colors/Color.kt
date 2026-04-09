@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:Suppress("unused", "localVariableName", "kutils_substring_as_get_intprogression", "kutils_collection_declaration", "kutils_tuple_declaration", "kutils_take_as_int_invoke")
 
 package dev.tommasop1804.kutils.classes.colors

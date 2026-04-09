@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("BlockUtilsKt")
 @file:Suppress("unused", "kutils_collection_declaration", "JavaCollectionWithNullableTypeArgument",
     "kutils_tuple_declaration", "deprecation"

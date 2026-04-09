@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("MapUtilsKt")
 @file:Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration", "kutils_map_declaration", "kutils_drop_as_int_invoke",
     "kutils_null_check", "kutils_empty_check", "deprecation"

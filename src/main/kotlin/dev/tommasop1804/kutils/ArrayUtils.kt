@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("ArrayUtilsKt")
 @file:Since("1.0.0")
 @file:Suppress("unused", "kutils_null_check", "kutils_map_declaration", "kutils_collection_declaration",
@@ -766,6 +770,17 @@ operator fun <E> Array<E>.get(find: Predicate<E>, lazyException: ThrowableSuppli
  */
 fun <E> Array<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>) =
     find(find) ?: throw lazyException()
+
+/**
+ * Returns a new array containing elements of the original array that do not match
+ * the given predicate.
+ *
+ * @param filterNot A predicate used to filter out elements from the array.
+ *                  Elements that satisfy this predicate will be excluded from the result.
+ * @return A new array without the elements that match the given predicate.
+ * @since 3.5.2
+ */
+operator fun <E> Array<E>.minus(filterNot: Predicate<E>) = filterNot(filterNot)
 
 /**
  * Retrieves a subarray from the current array based on the specified range.

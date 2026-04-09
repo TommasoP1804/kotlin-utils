@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 
 import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -16,10 +20,10 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "3.5.1"
+version = "3.5.2"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260408T132432Z
+// Last update: Tommaso Pastorelli | 20260409T075934Z
 
 repositories {
     mavenCentral()
@@ -118,7 +122,7 @@ tasks.withType<KotlinCompile> {
 }
 
 mavenPublishing {
-    coordinates("dev.tommasop1804", "kotlin-utils", "3.5.1")
+    coordinates("dev.tommasop1804", "kotlin-utils", "3.5.2")
 
     pom {
         name.set("Kotlin Utils")

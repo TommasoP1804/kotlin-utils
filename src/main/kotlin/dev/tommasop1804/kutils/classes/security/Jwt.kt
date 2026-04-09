@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:Suppress("kutils_collection_declaration")
 
 package dev.tommasop1804.kutils.classes.security

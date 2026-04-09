@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("SequenceUtilsKt")
 @file:Suppress("unused", "kutils_collection_declaration", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "deprecation")
 @file:Since("1.0.0")
@@ -221,6 +225,15 @@ fun <E> Sequence<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = fir
 inline fun <E> Sequence<E>.peek(block: Consumer<E>) = apply {
     for (element in this@peek) block(element)
 }
+
+/**
+ * Returns a sequence containing all elements of the original sequence except those that match the given predicate.
+ *
+ * @param filterNot The predicate used to test elements for exclusion from the resulting sequence.
+ * @return A sequence with elements that do not match the specified predicate.
+ * @since 3.5.2
+ */
+operator fun <E> Sequence<E>.minus(filterNot: Predicate<E>) = filterNot(filterNot)
 
 /**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].

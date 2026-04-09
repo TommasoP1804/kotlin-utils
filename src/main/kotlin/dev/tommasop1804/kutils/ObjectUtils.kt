@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("ObjectUtilsKt")
 @file:Suppress("unused", "kutils_null_check", "kutils_collection_declaration", "kutils_map_declaration", "deprecation", "kutils_tuple_declaration",
     "UseExpressionBody",

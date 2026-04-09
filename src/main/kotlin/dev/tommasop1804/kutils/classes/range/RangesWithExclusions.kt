@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("RangesWithExclusionsKt")
 @file:Suppress("unused", "unchecked_cast")
 @file:Since("1.0.0")

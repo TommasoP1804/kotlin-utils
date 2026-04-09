@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("StringUtilsKt")
 @file:Suppress("unused", "kutils_indexof_as_char_invoke", "kutils_ignorecase_function", "kutils_drop_as_int_invoke", "kutils_substring_as_int_invoke",
     "kutils_take_as_int_invoke", "kutils_null_check"

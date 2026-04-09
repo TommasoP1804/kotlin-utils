@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
 @file:JvmName("TablesKt")
 @file:Suppress("unused", "localVariableName", "kutils_collection_declaration", "kutils_map_declaration",
     "RETURN_VALUE_NOT_USED_COERCION"
