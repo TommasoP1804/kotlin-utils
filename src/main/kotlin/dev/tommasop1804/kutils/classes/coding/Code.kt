@@ -1126,6 +1126,37 @@ open class Code(open val value: String, val language: Language) : CharSequence {
     operator fun component2() = language
 
     /**
+     * Compares this object with the specified object for equality.
+     *
+     * @param other The object to be compared with this instance.
+     * @return `true` if the specified object is equal to this instance, `false` otherwise.
+     * @since 3.5.4
+     */
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Code
+
+        if (value != other.value) return false
+        if (language != other.language) return false
+
+        return true
+    }
+
+    /**
+     * Calculates the hash code for the Code object based on its properties.
+     *
+     * @return An integer value representing the hash code of the object.
+     * @since 3.5.4
+     */
+    override fun hashCode(): Int {
+        var result = value.hashCode()
+        result = 31 * result + language.hashCode()
+        return result
+    }
+
+    /**
      * Represents a Java source file provided as a string. This class extends `SimpleJavaFileObject`
      * to enable the dynamic creation and manipulation of Java source files in memory.
      *
