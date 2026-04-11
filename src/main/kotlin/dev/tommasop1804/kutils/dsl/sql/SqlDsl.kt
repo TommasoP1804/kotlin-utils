@@ -2003,10 +2003,3 @@ class SqlBatchScope @PublishedApi internal constructor() {
     @PublishedApi
     internal fun build() = queries.joinToString(";\n") { it.value }
 }
-
-/**
- * Extension on [SqlQuery.Companion] for backwards compatibility.
- *
- * @since 3.6.0
- */
-fun SqlQuery.Companion.build() = SqlDsl()
