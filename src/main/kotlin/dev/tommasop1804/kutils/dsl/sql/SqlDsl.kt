@@ -972,8 +972,12 @@ class SqlDsl @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun where(@Language("sql") condition: String) {
-        whereParts += condition
+    fun where(@Language("sql") condition: String, autoApplyOperator: LogicOperator? = LogicOperator.AND) {
+        whereParts += if (whereParts.isEmpty()) condition else when(autoApplyOperator) {
+            LogicOperator.AND -> "AND $condition"
+            LogicOperator.OR -> "OR $condition"
+            null -> condition
+        }
     }
 
     // -- Order by / Limit / Offset --
