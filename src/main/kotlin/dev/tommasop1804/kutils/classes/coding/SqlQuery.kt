@@ -337,6 +337,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
             .replace(" LEFT JOIN ", "\nLEFT JOIN ")
             .replace(" RIGHT JOIN ", "\nRIGHT JOIN ")
             .replace(" INNER JOIN ", "\nINNER JOIN ")
+            .replace(" LIMIT ", "\nLIMIT ")
+            .replace(" OFFSET ", "\nOFFSET ")
             .trim()
             .let(::SqlQuery)
 

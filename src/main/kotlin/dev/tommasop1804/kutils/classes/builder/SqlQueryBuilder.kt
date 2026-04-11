@@ -11,9 +11,6 @@ import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * A builder class for generating SQL queries dynamically.
@@ -1128,7 +1125,7 @@ class SqlQueryBuilder {
      * @return An instance of the `SqlQueryBuilder` updated with the create sequence query.
      * @since 1.0.0
      */
-    fun createSequenece(name: String, ifNotExists: Boolean = false, @Language("sql") creationContent: String): SqlQueryBuilder {
+    fun createSequence(name: String, ifNotExists: Boolean = false, @Language("sql") creationContent: String): SqlQueryBuilder {
         type = QueryType.CREATE_SEQUENCE
         ddlClause += "CREATE SEQUENCE${if (ifNotExists) " IF NOT EXISTS" else String.EMPTY} $name $creationContent"
         return this
@@ -1143,7 +1140,7 @@ class SqlQueryBuilder {
      * @return Returns an instance of `SqlQueryBuilder` with the altered sequence SQL statement.
      * @since 1.0.0
      */
-    fun alterSequenece(name: String, ifExists: Boolean = false, @Language("sql") alterationContent: String): SqlQueryBuilder {
+    fun alterSequence(name: String, ifExists: Boolean = false, @Language("sql") alterationContent: String): SqlQueryBuilder {
         type = QueryType.ALTER_SEQUENCE
         ddlClause += "ALTER SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $alterationContent"
         return this
@@ -2061,33 +2058,3 @@ class SqlQueryBuilder {
  * @since 1.0.0
  */
 fun SqlQuery.Companion.builder() = SqlQueryBuilder()
-
-/**
- * Constructs an SQL query using the provided builder action.
- *
- * This method initializes an SQLQueryBuilder, applies the given builder action to it,
- * and then constructs the query code.
- *
- * @param builderAction A lambda that defines how the SQLQueryBuilder should construct the query.
- * @return A constructed SQL query.
- * @since 1.0.0
- */
-@OptIn(ExperimentalContracts::class)
-fun buildSqlQuery(builderAction: ReceiverConsumer<SqlQueryBuilder>): SqlQuery {
-    contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
-    return SqlQueryBuilder().apply(builderAction).build()
-}
-
-/**
- * Constructs an SQL query by applying the specified action to the provided SQLQueryBuilder.
- *
- * @param builder The SQLQueryBuilder instance used to build the SQL query.
- * @param builderAction A lambda function that defines modifications and configurations to be applied to the SQLQueryBuilder.
- * @return An object representing the built SQL query.
- * @since 1.0.0
- */
-@OptIn(ExperimentalContracts::class)
-fun buildSqlQuery(builder: SqlQueryBuilder, builderAction: ReceiverConsumer<SqlQueryBuilder>): SqlQuery {
-    contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
-    return builder.apply(builderAction).build()
-}
