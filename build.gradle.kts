@@ -121,10 +121,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-println("group=${project.group}")
-println("name=${project.name}")
-println("version=${project.version}")
-
 mavenPublishing {
     coordinates(project.group.toString(), project.name, project.version.toString())
 
