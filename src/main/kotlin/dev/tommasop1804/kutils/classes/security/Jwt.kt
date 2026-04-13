@@ -128,7 +128,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
      *
      * @since 3.0.0
      */
-    val hd_x509CertificateChain get() = tryOr({ Json(header["x5c"] as String).toList<String>()() }) { header["x5c"] as? StringList }
+    val hd_x509CertificateChain get() = tryOr({ Json(header["x5c"] as String).toList<String>()() }) { header["x5c"] as? List<String> }
     /**
      * [RFC 7515#4.1.7](https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1.7)
      *
@@ -158,7 +158,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
      *
      * @since 3.0.0
      */
-    val hd_critical get() = tryOr({ Json(header["crit"] as String).toList<String>()() }) { header["crit"] as? StringList }
+    val hd_critical get() = tryOr({ Json(header["crit"] as String).toList<String>()() }) { header["crit"] as? List<String> }
 
     /**
      * [RFC 7519#4.1.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1)
@@ -249,7 +249,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
      *
      * @since 3.0.0
      */
-    val pl_kc_realmAccessRoles get() = pl_kc_realmAccess?.get("roles") as? StringList
+    val pl_kc_realmAccessRoles get() = pl_kc_realmAccess?.get("roles") as? List<String>
     /**
      * KeyCloak claim.
      *

@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.classes.translators
 
-import dev.tommasop1804.kutils.StringList
 import dev.tommasop1804.kutils.annotations.Beta
 import dev.tommasop1804.kutils.classes.coding.Json
 import dev.tommasop1804.kutils.classes.coding.Yaml
@@ -98,7 +97,7 @@ open class Translator(
          * @since 1.0.0
          */
         @OptIn(Beta::class)
-        infix fun Iterable<String>.translatedWith(translator: Translator): StringList = map { it.translatedWith(translator) }
+        infix fun Iterable<String>.translatedWith(translator: Translator): List<String> = map { it.translatedWith(translator) }
         /**
          * Translates the specified enumeration entries to their corresponding values
          * by reading the content of a configuration file in YAML or JSON format.
@@ -112,7 +111,7 @@ open class Translator(
          * @since 1.0.0
          */
         @OptIn(Beta::class)
-        infix fun EnumEntries<*>.translatedWith(translator: Translator): StringList = map { it.translatedWith(translator) }
+        infix fun EnumEntries<*>.translatedWith(translator: Translator): List<String> = map { it.translatedWith(translator) }
     }
 
     /**
@@ -157,7 +156,7 @@ open class Translator(
      * @since 1.0.0
      */
     @OptIn(Beta::class)
-    infix fun translate(keys: Iterable<String>): StringList = keys.map { translate(it) }
+    infix fun translate(keys: Iterable<String>): List<String> = keys.map { translate(it) }
     /**
      * Translates the specified enumeration entries to their corresponding values
      * by reading the content of a configuration file in YAML or JSON format.
@@ -172,5 +171,5 @@ open class Translator(
      * @since 1.0.0
      */
     @OptIn(Beta::class)
-    infix fun translate(keys: EnumEntries<*>): StringList = keys.map { translate(it.name) }
+    infix fun translate(keys: EnumEntries<*>): List<String> = keys.map { translate(it.name) }
 }

@@ -706,7 +706,7 @@ class DependentRequiredBuilder {
      * specify the list of fields that are required when the key field is present.
      * @since 3.3.0
      */
-    private val deps = linkedMapOf<String, StringList>()
+    private val deps = linkedMapOf<String, List<String>>()
 
     /**
      * Specifies that the current string (representing a field) requires the provided list of fields
@@ -717,7 +717,7 @@ class DependentRequiredBuilder {
      * @param fields The list of fields that are dependencies for the current field.
      * @since 3.3.0
      */
-    infix fun String.requires(fields: StringList) { deps[this] = fields }
+    infix fun String.requires(fields: List<String>) { deps[this] = fields }
     /**
      * Adds a dependency mapping between the specified field and the required fields.
      *

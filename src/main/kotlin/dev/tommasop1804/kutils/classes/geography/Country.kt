@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.classes.geography
 
-import dev.tommasop1804.kutils.StringList
 import dev.tommasop1804.kutils.classes.time.TimeZone
 import dev.tommasop1804.kutils.classes.time.TimeZoneDesignator
 import dev.tommasop1804.kutils.classes.time.ZoneIdent
@@ -45,10 +44,10 @@ enum class Country(
 	val numeric: String,
 	val countryName: String,
 	val officialName: String,
-	val tlds: StringList,
+	val tlds: List<String>,
 	val locale: Locale,
 	val timeZones: List<ZoneIdent>,
-	val phoneCodes: StringList
+	val phoneCodes: List<String>
 ) {
     AFGHANISTAN("AF", "AFG", "004", "Afghanistan", "The Islamic Republic of Afghanistan", listOf(".af"), Locale.of("fa", "AF"), listOf(TimeZone.AFT), listOf("93")),
 	ALAND_ISLAND("AX", "ALA", "248", "Åland Islands", "Åland", listOf(".ax"), Locale.of("sv", "AX"), listOf(TimeZone.EET), listOf("358 (18)")),
@@ -336,7 +335,7 @@ enum class Country(
 	 * @return A list of unique UTC offsets as strings.
 	 * @since 1.0.0
 	 */
-	val zoneUtcOffsets: StringList
+	val zoneUtcOffsets: List<String>
 		get() = timeZones.map { it.utcOffset }.distinct()
 
 
@@ -577,13 +576,13 @@ enum class Country(
 	 * - `countryName` - The name of the state associated with the country. - TYPE: [String]
 	 * - `officialName` - The official name associated with the country. - TYPE: [String]
 	 * - `enumName` - The name of the country as an enum entry. - TYPE: [String]
-	 * - `tlds` - The list of top-level domain names associated with the country. - TYPE: [StringList]
+	 * - `tlds` - The list of top-level domain names associated with the country. - TYPE: [List<String>]
 	 * - `locale` - The locale associated with the country. - TYPE: [Locale]
 	 * - `timeZones` - The list of time zones associated with the country. - TYPE: `List<TimeZone>`
-	 * - `phoneCodes` - The list of phone codes associated with the country. - TYPE: [StringList]
+	 * - `phoneCodes` - The list of phone codes associated with the country. - TYPE: [List<String>]
 	 * - `timeZoneDesignators` - The list of military time zones associated with the country. - TYPE: `List<TimeZoneDesignator>`
 	 * - `zoneOffsets` - The list of zone offsets associated with the country. - TYPE: `List<ZoneOffset>`
-	 * - `zoneUtcOffsets` - The list of zone UTC offsets associated with the country. - TYPE: [StringList]
+	 * - `zoneUtcOffsets` - The list of zone UTC offsets associated with the country. - TYPE: [List<String>]
 	 *
 	 * @param thisRef an optional reference to the object this property is bound to; can be null in some cases.
 	 * @param property the metadata for the property for which the value is being retrieved.

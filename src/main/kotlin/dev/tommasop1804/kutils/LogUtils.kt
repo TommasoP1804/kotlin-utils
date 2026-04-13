@@ -38,8 +38,6 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      * Represents the WARN log level, commonly used to indicate potentially harmful situations
      * that may require attention but are not immediately critical.
      * 
-     * @property levelInt The integer value associated with the WARN log level.
-     * @property levelName The string representation of the WARN log level.
      * @since 1.0.0
      */
     WARN(30, "WARN"), 
@@ -48,8 +46,6 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * This log level is used to indicate informational messages that highlight the progress of the application at a coarse-grained level.
      *
-     * @property levelInt The integer value associated with the INFO log level, used for comparison and filtering.
-     * @property levelName The string representation of the INFO log level, utilized in logging frameworks or external integrations.
      * @since 1.0.0
      */
     INFO(20, "INFO"), 
@@ -57,8 +53,6 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      * Represents the DEBUG log level, typically used for detailed diagnostic messages 
      * that are useful during software development and debugging.
      * 
-     * @property levelInt The integer value associated with this log level (10).
-     * @property levelName The name of this log level ("DEBUG").
      * @since 1.0.0
      */
     DEBUG(10, "DEBUG"), 
@@ -68,8 +62,6 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      * TRACE is used to log fine-grained informational events that are primarily
      * useful for debugging and provide detailed insight into the application's behavior.
      *
-     * @property levelInt The numeric representation of the TRACE level.
-     * @property levelName The string representation of the TRACE level.
      * @since 1.0.0
      */
     TRACE(0, "TRACE");

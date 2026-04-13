@@ -213,7 +213,7 @@ fun Uuid(version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>) = 
  * @return A list of UUIDs of the specified version, ensuring all UUIDs in the list are distinct.
  * @since 3.0.0
  */
-fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<Uuid, String>? = null, timestamp: Instant? = null): UuidList {
+fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<Uuid, String>? = null, timestamp: Instant? = null): List<Uuid> {
     val result = mutableListOf<Uuid>()
     for (i in 1..number.toLong())
         result += Uuid(version, namespaceAndName, timestamp)
@@ -237,7 +237,7 @@ fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<Uuid, Stri
  * @since 3.0.0
  */
 @JvmName("UuidNumberUuidVersionUuidNamespaceString")
-fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>): UuidList {
+fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>): List<Uuid> {
     val result = mutableListOf<UUID>()
     for (i in 1..number.toLong())
         result += Uuid(version, namespaceAndName)

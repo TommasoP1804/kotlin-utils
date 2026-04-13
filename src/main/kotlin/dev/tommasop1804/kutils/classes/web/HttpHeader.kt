@@ -61,7 +61,7 @@ import kotlin.text.Charsets.ISO_8859_1
 
 /**
  * Represents an HTTP header consisting of a name and associated values, implemented as a key-value pair
- * where the key is the header name, and the value is a [StringList] of associated values.
+ * where the key is the header name, and the value is a [List<String>] of associated values.
  *
  * Common use cases include managing, processing, and serializing HTTP headers for requests and responses.
  *
@@ -74,7 +74,7 @@ import kotlin.text.Charsets.ISO_8859_1
 @JsonDeserialize(using = HttpHeader.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = HttpHeader.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = HttpHeader.Companion.OldDeserializer::class)
-class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values.map(Any::toString) {
+class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by values.map(Any::toString) {
     /**
      * A transformed list containing string representations of the elements
      * from the original `values` collection. Each element in the original
@@ -82,7 +82,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      *
      * @since 2.1.0
      */
-    val values: StringList = values.map(Any::toString)
+    val values: List<String> = values.map(Any::toString)
 
     /**
      * Indicates whether the current HTTP header represents an authentication-related header.
@@ -191,7 +191,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      * the object using an existing Map.Entry instance.
      *
      * @param entry The Map.Entry containing a header name as the key and
-     *              a StringList representing the header values as the value.
+     *              a List<String> representing the header values as the value.
      * @since 2.1.0
      */
     constructor(entry: Map.Entry<String, Any>) : this(from(entry))
@@ -396,7 +396,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
          *
          * @receiver A Pair where the `first` represents the header name and the `second` represents the list of header values.
          * @return An `HttpHeader` instance constructed using the given*/
-        fun Pair<String, StringList>.toHttpHeader() = HttpHeader(this)
+        fun Pair<String, List<String>>.toHttpHeader() = HttpHeader(this)
         /**
          * Converts the current String2 instance into an HttpHeader object.
          * The first element of the String2 represents the header name, and the second
@@ -410,15 +410,15 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
         fun Pair<String, Any>.toHttpHeader() = HttpHeader(first, second.toString().asSingleList())
         /**
          * Converts the current Map.Entry instance into an HttpHeader object.
-         * The Map.Entry key represents the header name, and the StringList value
+         * The Map.Entry key represents the header name, and the List<String> value
          * represents the associated header values.
          *
          * This method leverages the secondary constructor of the HttpHeader class to
          * initialize an HttpHeader object with the key-value pair provided in the Map.Entry.
          *
-         * @receiver The Map.Entry containing a key as the header name and a StringList
+         * @receiver The Map.Entry containing a key as the header name and a List<String>
          */
-        fun Map.Entry<String, StringList>.toHttpHeader() = HttpHeader(this)
+        fun Map.Entry<String, List<String>>.toHttpHeader() = HttpHeader(this)
         /**
          * Converts the current map entry into an instance of `HttpHeader`.
          * The map entry's key is treated as the header name, and its value is used as the header value.
@@ -464,7 +464,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
      * @return A Pair consisting of the header name and its corresponding values.
      * @since 2.1.0
      */
-    fun toPair(): Pair<String, StringList> = name to values
+    fun toPair(): Pair<String, List<String>> = name to values
     /**
      * Converts the current `HttpHeader` instance into a `Pair` representation, where the key
      * is the header name and the value is deserialized to the specified type [T].
@@ -481,12 +481,12 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
     inline fun <reified T> toTypedPair(): Pair<String, T> = name to values.first().deserialize<T>()()
     /**
      * Converts the current HttpHeader instance into a Map.Entry representation,
-     * where the key is the header name and the value is the associated StringList.
+     * where the key is the header name and the value is the associated List<String>.
      *
-     * @return A Map.Entry consisting of the header name as the key and StringList as the value.
+     * @return A Map.Entry consisting of the header name as the key and List<String> as the value.
      * @since 2.1.0
      */
-    fun toMapEntry(): Map.Entry<String, StringList> = toPair().toMapEntry()
+    fun toMapEntry(): Map.Entry<String, List<String>> = toPair().toMapEntry()
     /**
      * Converts the current `HttpHeader` instance into a `Map.Entry` representation,
      * where the key is the header name and the value is deserialized to the specified type [T].
@@ -644,15 +644,15 @@ class HttpHeader(val name: String, values: Iterable<Any>) : StringList by values
     fun valueEquals(other: Any) = values == other.toString().asSingleList()
     /**
      * Compares the `values` collection of the current `HttpHeader` instance to the content
-     * of another `StringList` instance to check for equality.
+     * of another `List<String>` instance to check for equality.
      *
-     * The comparison is performed by converting the given `StringList` to a single list
+     * The comparison is performed by converting the given `List<String>` to a single list
      * and then comparing it to the `values` collection of the `HttpHeader` instance.
      *
-     * @param other The `StringList` instance to compare against the `values` collection.
+     * @param other The `List<String>` instance to compare against the `values` collection.
      * @since 2.1.0
      */
-    fun valueEquals(other: StringList) = values == other.asSingleList()
+    fun valueEquals(other: List<String>) = values == other.asSingleList()
 
     /**
      * Operator function `component1` for destructuring declarations.
@@ -707,10 +707,10 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * @since 2.1.0
      */
-    override val keys: StringSet
+    override val keys: Set<String>
         get() = headers.map(HttpHeader::name).toSet()
     /**
-     * A collection of `StringList` objects representing the values of all headers 
+     * A collection of `List<String>` objects representing the values of all headers 
      * contained in the `HttpHeaders` instance.
      *
      * This property is derived by mapping each header's `values` through the `headers` collection.
@@ -718,18 +718,18 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * @since 2.1.0
      */
-    override val values: Collection<StringList>
+    override val values: Collection<List<String>>
         get() = headers.map(HttpHeader::values)
     /**
      * A set containing all the entries in the `HttpHeaders` collection, where each entry maps 
-     * a header name to its associated `StringList` values.
+     * a header name to its associated `List<String>` values.
      *
      * The entries are derived by mapping the underlying `headers` collection into a set of 
      * key-value pairs using the `toMapEntry` extension function of `HttpHeader`.
      *
      * @since 2.1.0
      */
-    override val entries: Set<Map.Entry<String, StringList>>
+    override val entries: Set<Map.Entry<String, List<String>>>
         get() = headers.map(HttpHeader::toMapEntry).toSet()
 
     constructor() : this(emptyMSet())
@@ -790,7 +790,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * explicitly create an `HttpHeader` object.
      *
      * @param name The name of the HTTP header to include in the collection.
-     * @param values The values associated with the header name, encapsulated in a `StringList`.
+     * @param values The values associated with the header name, encapsulated in a `List<String>`.
      * @since 2.1.0
      */
     constructor(name: String, values: Iterable<Any>) : this(HttpHeader(name, values))
@@ -930,11 +930,11 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
 
     /**
      * Checks whether any `HttpHeader` instance contained in the `HttpHeaders` object
-     * has values equal to the specified `StringList`.
+     * has values equal to the specified `List<String>`.
      *
      * The comparison is performed using the `valueEquals` method of each `HttpHeader` instance,
      * which compares the `values` collection*/
-    override fun containsValue(value: StringList) = headers.any { it.valueEquals(value) }
+    override fun containsValue(value: List<String>) = headers.any { it.valueEquals(value) }
 
     /**
      * Retrieves the values associated with the specified key from the headers.
@@ -943,7 +943,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return A list of values associated with the given key, or `null` if the key is not found.
      * @since 2.1.0
      */
-    override fun get(key: String): StringList? = headers.find { it.nameEquals(key) }?.values
+    override fun get(key: String): List<String>? = headers.find { it.nameEquals(key) }?.values
 
     /**
      * Retrieves the value associated with the specified key or throws an exception if the key is not present.

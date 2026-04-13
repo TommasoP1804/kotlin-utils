@@ -7,7 +7,6 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.StringList
 import dev.tommasop1804.kutils.isNotNull
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -96,7 +95,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @since 1.0.0
      */
     @Suppress("contains_as_in_operator")
-    constructor(callable: KFunction<*>, parametersName: StringList? = null, valuesInConflict: Set<Any?>? = null) : super(
+    constructor(callable: KFunction<*>, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null) : super(
         $$"<parameters of `$${callable.name}`>$${if (parametersName.isNotNull()) $$"$$${
             callable.parameters.filter { parametersName.distinct().contains(it.name) }
                 .joinToString { "`${it.name}` of type `${it.type}`" }
@@ -135,7 +134,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param valuesInConflict The set of conflicting values, or `null` if conflict details are not specified.
      * @since 1.0.0
      */
-    constructor(callableName: String, parametersName: StringList? = null, valuesInConflict: Set<Any?>? = null) : super(
+    constructor(callableName: String, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null) : super(
         $$"<parameters of `$$callableName`>$${if (parametersName.isNotNull()) $$"$$${parametersName.distinct().joinToString { "`$it`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
     
@@ -168,7 +167,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param cause The underlying cause of the conflict, or null if not specified.
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>, parametersName: StringList? = null, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
+    constructor(callable: KFunction<*>, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
         $$"<parameters of `$${callable.name}`>$${if (parametersName.isNotNull()) $$"$$${
             callable.parameters.filter { parametersName.distinct().contains(it.name) }
                 .joinToString { "`${it.name}` of type `${it.type}`" }
@@ -211,7 +210,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param cause The cause of this exception, or `null` if no specific cause is provided.
      * @since 1.0.0
      */
-    constructor(callableName: String, parametersName: StringList? = null, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
+    constructor(callableName: String, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
         $$"<parameters of `$$callableName`>$${if (parametersName.isNotNull()) $$"$$${parametersName.distinct().joinToString { "`$it`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
 

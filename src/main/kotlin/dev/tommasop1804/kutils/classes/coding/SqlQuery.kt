@@ -7,11 +7,9 @@ package dev.tommasop1804.kutils.classes.coding
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.AnyList
 import dev.tommasop1804.kutils.COLON
 import dev.tommasop1804.kutils.DataMap
 import dev.tommasop1804.kutils.MList
-import dev.tommasop1804.kutils.StringList
 import dev.tommasop1804.kutils.ThrowableTransformer
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.invoke
@@ -207,7 +205,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *
      * @since 1.0.0
      */
-    val tables: StringList = run {
+    val tables: List<String> = run {
         val regex = Regex("\\bFROM\\s+([a-zA-Z0-9_.]+)|\\bJOIN\\s+([a-zA-Z0-9_.]+)", RegexOption.IGNORE_CASE)
         regex.findAll(value)
             .flatMap { match -> (-1)(match.groupValues).filter { it.isNotEmpty() } }
@@ -507,7 +505,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      */
     context(entityManager: EntityManager)
     fun executeCount(
-        parameters: AnyList = emptyList(),
+        parameters: List<Any> = emptyList(),
         defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
         specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
         includeCause: Boolean = true,
@@ -578,7 +576,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      */
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectSingleResult(
-        parameters: AnyList = emptyList(),
+        parameters: List<Any> = emptyList(),
         noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
         specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
         includeCause: Boolean = true,
@@ -689,7 +687,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      */
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectMultipleResult(
-        parameters: AnyList = emptyList(),
+        parameters: List<Any> = emptyList(),
         noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
         specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
         includeCause: Boolean = true,
@@ -770,7 +768,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      */
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectMultipleResultToSet(
-        parameters: AnyList = emptyList(),
+        parameters: List<Any> = emptyList(),
         noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
         specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
         includeCause: Boolean = true,
@@ -853,7 +851,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any, C : MutableCollection<T>> executeSelectMultipleResultTo(
         collection: C,
-        parameters: AnyList = emptyList(),
+        parameters: List<Any> = emptyList(),
         noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
         specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
         includeCause: Boolean = true,
@@ -936,7 +934,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      */
     context(entityManager: EntityManager)
     fun executeUpdate(
-        parameters: AnyList = emptyList(),
+        parameters: List<Any> = emptyList(),
         defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
         specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
         includeCause: Boolean = true,

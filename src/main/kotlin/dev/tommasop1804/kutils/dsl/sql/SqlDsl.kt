@@ -172,7 +172,7 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      *
      * @since 3.6.0
      */
-    infix fun String.`in`(values: StringCollection) {
+    infix fun String.`in`(values: Collection<String>) {
         condition("$this IN (${values.joinToString(", ")})")
     }
 
@@ -181,7 +181,7 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      *
      * @since 3.6.0
      */
-    infix fun String.notIn(values: StringCollection) {
+    infix fun String.notIn(values: Collection<String>) {
         condition("$this NOT IN (${values.joinToString(", ")})")
     }
 

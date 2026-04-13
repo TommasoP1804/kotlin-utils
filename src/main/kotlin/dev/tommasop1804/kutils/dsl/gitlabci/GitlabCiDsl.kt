@@ -36,7 +36,7 @@ annotation class GitlabCiDslMarker
  * @author Tommaso Pastorelli
  */
 data class Pipeline(
-    val stages: StringList,
+    val stages: List<String>,
     val variables: Map<String, VariableEntry>,
     val workflow: WorkflowConfig?,
     val defaults: DefaultsConfig?,
@@ -61,7 +61,7 @@ data class Pipeline(
 data class VariableEntry(
     val value: String,
     val description: String? = null,
-    val options: StringList? = null,
+    val options: List<String>? = null,
     val expand: Boolean = true,
 )
 
@@ -198,9 +198,9 @@ enum class WhenPolicy(val yaml: String) {
  */
 data class DefaultsConfig(
     val image: String?,
-    val beforeScript: StringList,
-    val afterScript: StringList,
-    val tags: StringList,
+    val beforeScript: List<String>,
+    val afterScript: List<String>,
+    val tags: List<String>,
     val retry: RetryConfig?,
     val timeout: Duration?,
     val interruptible: Boolean?,
@@ -272,18 +272,18 @@ data class IncludeEntry(
 data class Job(
     val stage: String?,
     val image: String?,
-    val script: StringList,
-    val beforeScript: StringList,
-    val afterScript: StringList,
+    val script: List<String>,
+    val beforeScript: List<String>,
+    val afterScript: List<String>,
     val variables: StringMap,
     val rules: List<JobRule>,
     val only: OnlyExcept?,
     val except: OnlyExcept?,
-    val tags: StringList,
+    val tags: List<String>,
     val services: List<ServiceConfig>,
     val artifacts: ArtifactsConfig?,
     val cache: CacheConfig?,
-    val dependencies: StringList,
+    val dependencies: List<String>,
     val needs: List<NeedConfig>,
     val environment: EnvironmentConfig?,
     val retry: RetryConfig?,
@@ -317,8 +317,8 @@ data class Job(
  */
 data class JobRule(
     val ifCondition: String?,
-    val changes: StringList,
-    val exists: StringList,
+    val changes: List<String>,
+    val exists: List<String>,
     val `when`: WhenPolicy?,
     val allowFailure: Boolean?,
     val variables: StringMap,
@@ -334,9 +334,9 @@ data class JobRule(
  * @author Tommaso Pastorelli
  */
 data class OnlyExcept(
-    val refs: StringList = emptyList(),
-    val variables: StringList = emptyList(),
-    val changes: StringList = emptyList(),
+    val refs: List<String> = emptyList(),
+    val variables: List<String> = emptyList(),
+    val changes: List<String> = emptyList(),
 )
 
 /**
@@ -352,7 +352,7 @@ data class OnlyExcept(
 data class ServiceConfig(
     val name: String,
     val alias: String?,
-    val command: StringList,
+    val command: List<String>,
     val variables: StringMap,
 )
 
@@ -370,13 +370,13 @@ data class ServiceConfig(
  * @author Tommaso Pastorelli
  */
 data class ArtifactsConfig(
-    val paths: StringList,
+    val paths: List<String>,
     val reports: StringMap,
     val expireIn: Duration?,
     val `when`: WhenPolicy?,
     val name: String?,
     val untracked: Boolean,
-    val exclude: StringList,
+    val exclude: List<String>,
 )
 
 /**
@@ -409,13 +409,13 @@ data class ArtifactsConfig(
  */
 data class CacheConfig(
     val key: String?,
-    val keyFiles: StringList,
-    val paths: StringList,
+    val keyFiles: List<String>,
+    val paths: List<String>,
     val policy: CachePolicy?,
     val untracked: Boolean,
     val unprotect: Boolean,
     val `when`: WhenPolicy?,
-    val fallbackKeys: StringList,
+    val fallbackKeys: List<String>,
 )
 
 /**
@@ -573,7 +573,7 @@ data class KubernetesConfig(val namespace: String?)
  */
 data class RetryConfig(
     val max: Int,
-    val `when`: StringList,
+    val `when`: List<String>,
 )
 
 /**
@@ -691,13 +691,13 @@ class RuleBuilder {
      * Defaults to an empty list, indicating no change-based conditions are initially specified.
      * @since 3.3.0
      */
-    var changes: StringList = emptyList()
+    var changes: List<String> = emptyList()
     /**
      * A variable representing a list of strings.
      * This list is initialized as empty by default.
      * @since 3.3.0
      */
-    var exists: StringList = emptyList()
+    var exists: List<String> = emptyList()
     /**
      * Specifies the execution policy that determines under which conditions a rule or job should run.
      *
@@ -1063,7 +1063,7 @@ class ArtifactsBuilder {
      * list is mutable and can be dynamically updated.
      * @since 3.3.0
      */
-    val paths: StringMList = emptyMList()
+    val paths: MList<String> = emptyMList()
     /**
      * Stores a mutable map of report types to their associated file paths.
      *
@@ -1131,7 +1131,7 @@ class ArtifactsBuilder {
      * By default, the list is empty, indicating that no exclusions are applied.
      * @since 3.3.0
      */
-    val exclude: StringMList = emptyMList()
+    val exclude: MList<String> = emptyMList()
 
     /**
      * Adds one or more paths to the artifacts collection.
@@ -1270,7 +1270,7 @@ class CacheBuilder {
      * that are sensitive to file-based changes.
      * @since 3.3.0
      */
-    val keyFiles: StringMList = emptyMList()
+    val keyFiles: MList<String> = emptyMList()
     /**
      * Represents a collection of file or directory paths that should be considered
      * when configuring caching in a GitLab CI/CD pipeline.
@@ -1286,7 +1286,7 @@ class CacheBuilder {
      *
      * @since 3.3.0
      */
-    val paths: StringMList = emptyMList()
+    val paths: MList<String> = emptyMList()
     /**
      * Defines the caching policy for managing how cache artifacts are pulled and pushed in a CI/CD pipeline.
      *
@@ -1349,7 +1349,7 @@ class CacheBuilder {
      * methods that add new fallback keys to the collection.
      * @since 3.3.0
      */
-    val fallbackKeys: StringMList = emptyMList()
+    val fallbackKeys: MList<String> = emptyMList()
 
     /**
      * Adds the specified file paths to the list of key files used for caching.
@@ -1455,7 +1455,7 @@ class ServiceBuilder(private val name: String) {
      * The list's final state is used when building the service via the `build()` function.
      * @since 3.3.0
      */
-    val command: StringMList = emptyMList()
+    val command: MList<String> = emptyMList()
     /**
      * A mutable map that holds key-value pairs representing environment variables for the service.
      *
@@ -1697,7 +1697,7 @@ class JobBuilder(val name: String) {
      * This variable can be used to store and manipulate a collection of strings dynamically.
      * @since 3.3.0
      */
-    val script: StringMList = emptyMList()
+    val script: MList<String> = emptyMList()
     /**
      * Holds a list of commands to be executed as part of the `before_script` section of a job.
      *
@@ -1706,7 +1706,7 @@ class JobBuilder(val name: String) {
      * It is populated using the `beforeScript` function.
      * @since 3.3.0
      */
-    val beforeScript: StringMList = emptyMList()
+    val beforeScript: MList<String> = emptyMList()
     /**
      * Defines the list of commands to be executed after the main script completes.
      *
@@ -1718,7 +1718,7 @@ class JobBuilder(val name: String) {
      * `afterScript(vararg cmds: String)` function.
      * @since 3.3.0
      */
-    val afterScript: StringMList = emptyMList()
+    val afterScript: MList<String> = emptyMList()
     /**
      * A map-like data structure where the keys are strings, and the values are sets of strings.
      * This variable is initialized as an empty map and can be populated as needed.
@@ -1756,7 +1756,7 @@ class JobBuilder(val name: String) {
      * equipped to handle jobs requiring the specified tags.
      * @since 3.3.0
      */
-    val tags: StringMList = emptyMList()
+    val tags: MList<String> = emptyMList()
     /**
      * A mutable list of service configurations used in the CI/CD pipeline.
      *
@@ -1798,7 +1798,7 @@ class JobBuilder(val name: String) {
      * typically describes the name or identifier of a single dependency.
      * @since 3.3.0
      */
-    val dependencies: StringMList = emptyMList()
+    val dependencies: MList<String> = emptyMList()
     /**
      * Holds a collection of dependency configurations that define the jobs
      * required for the current job to execute. Each dependency is represented
@@ -2240,21 +2240,21 @@ class DefaultsBuilder {
      * This can be used for initialization or pre-processing tasks.
      * @since 3.3.0
      */
-    val beforeScript: StringMList = emptyMList()
+    val beforeScript: MList<String> = emptyMList()
     /**
      * A mutable list of strings initialized as an empty list.
      * Represents a collection of scripts or commands that may be
      * executed after a specific process or operation completes.
      * @since 3.3.0
      */
-    val afterScript: StringMList = emptyMList()
+    val afterScript: MList<String> = emptyMList()
     /**
-     * Represents a mutable list of tags as a custom type `StringMList`.
+     * Represents a mutable list of tags as a custom type `MList<String>`.
      * This variable is initialized as an empty mutable list.
      * It can be used to store and manage a collection of string-based tags.
      * @since 3.3.0
      */
-    val tags: StringMList = emptyMList()
+    val tags: MList<String> = emptyMList()
     /**
      * Configuration for retry mechanism.
      *
@@ -2492,7 +2492,7 @@ class PipelineBuilder {
      * incrementally built using the provided methods in the `PipelineBuilder`.
      * @since 3.3.0
      */
-    private val stages: StringMList = emptyMList()
+    private val stages: MList<String> = emptyMList()
     /**
      * Stores a mutable map of variables, where each entry consists of a key
      * and a `VariableEntry` that defines the value, an optional description,
@@ -2568,7 +2568,7 @@ class PipelineBuilder {
      * @param options An optional list of strings representing additional options for the variable.
      * @since 3.3.0
      */
-    fun variable(key: String, value: String, description: String? = null, options: StringList? = null) {
+    fun variable(key: String, value: String, description: String? = null, options: List<String>? = null) {
         variables[key] = VariableEntry(value, description, options)
     }
 
@@ -2764,7 +2764,7 @@ fun Pipeline.toYaml() = Yaml(buildString {
         appendLine("  rules:")
         wf.rules.forEach { rule ->
             append("    - ")
-            val parts: StringMList = emptyMList()
+            val parts: MList<String> = emptyMList()
             rule.ifCondition?.let { parts += "if: '$it'" }
             rule.`when`?.let { parts += "when: ${it.yaml}" }
             appendLine(parts.joinToString("\n      "))
@@ -2889,7 +2889,7 @@ private fun StringBuilder.renderJob(name: String, job: Job) {
         appendLine("  rules:")
         job.rules.forEach { rule ->
             append("    - ")
-            val parts: StringMList = emptyMList()
+            val parts: MList<String> = emptyMList()
             rule.ifCondition?.let { parts += "if: '$it'" }
             rule.`when`?.let { parts += "when: ${it.yaml}" }
             rule.allowFailure?.let { parts += "allow_failure: $it" }

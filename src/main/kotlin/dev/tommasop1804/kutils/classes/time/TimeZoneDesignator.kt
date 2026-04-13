@@ -403,7 +403,7 @@ enum class TimeZoneDesignator(
          * @return A list of strings, each representing a formatted military time zone entry.
          * @since 1.0.0
          */
-        fun valuesPrettyPrint(): StringList {
+        fun valuesPrettyPrint(): List<String> {
             val result = mutableListOf<String>()
             for (entry in entries) {
                 result.add(entry.prettyPrint())

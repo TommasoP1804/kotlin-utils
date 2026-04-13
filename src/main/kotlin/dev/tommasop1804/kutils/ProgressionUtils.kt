@@ -18,7 +18,7 @@ import dev.tommasop1804.kutils.annotations.Since
  * @return an `IntList` containing the modified sequence based on the invoking integer
  * @since 1.0.0
  */
-operator fun Int.invoke(progression: IntProgression): IntList {
+operator fun Int.invoke(progression: IntProgression): List<Int> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
 }
@@ -31,7 +31,7 @@ operator fun Int.invoke(progression: IntProgression): IntList {
  * @return a CharList containing the result of the operation
  * @since 1.0.0
  */
-operator fun Int.invoke(progression: CharProgression): CharList {
+operator fun Int.invoke(progression: CharProgression): List<Char> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
 }
@@ -41,10 +41,10 @@ operator fun Int.invoke(progression: CharProgression): CharList {
  * from the given [LongProgression], based on the receiver's value.
  *
  * @param progression the [LongProgression] from which elements are taken or dropped.
- * @return a [LongList] containing the resulting elements after taking or dropping.
+ * @return a [List<Long>] containing the resulting elements after taking or dropping.
  * @since 1.0.0
  */
-operator fun Int.invoke(progression: LongProgression): LongList {
+operator fun Int.invoke(progression: LongProgression): List<Long> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
 }

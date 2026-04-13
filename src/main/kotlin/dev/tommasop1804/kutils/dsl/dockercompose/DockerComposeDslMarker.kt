@@ -80,31 +80,31 @@ data class ComposeFile(
 data class Service(
     val image: String?,
     val build: BuildConfig?,
-    val command: StringList,
+    val command: List<String>,
     val entrypoint: String?,
     val containerName: String?,
     val restart: RestartPolicy?,
-    val ports: StringList,
-    val expose: StringList,
+    val ports: List<String>,
+    val expose: List<String>,
     val environment: StringMap,
-    val envFile: StringList,
-    val volumes: StringList,
+    val envFile: List<String>,
+    val volumes: List<String>,
     val dependsOn: Map<String, DependsOnCondition>,
     val healthcheck: Healthcheck?,
-    val networks: StringList,
+    val networks: List<String>,
     val labels: StringMap,
     val deploy: DeployConfig?,
     val workingDir: String?,
     val user: String?,
-    val extraHosts: StringList,
+    val extraHosts: List<String>,
     val logging: LoggingConfig?,
-    val secrets: StringList,
-    val profiles: StringList,
-    val tmpfs: StringList,
+    val secrets: List<String>,
+    val profiles: List<String>,
+    val tmpfs: List<String>,
     val ulimits: Map<String, UlimitConfig>,
     val sysctls: StringMap,
-    val capAdd: StringList,
-    val capDrop: StringList,
+    val capAdd: List<String>,
+    val capDrop: List<String>,
     val privileged: Boolean,
     val readOnly: Boolean,
     val stdinOpen: Boolean,
@@ -133,7 +133,7 @@ data class BuildConfig(
     val dockerfile: String?,
     val args: StringMap,
     val target: String?,
-    val cacheFrom: StringList
+    val cacheFrom: List<String>
 )
 
 /**
@@ -148,7 +148,7 @@ data class BuildConfig(
  * @author Tommaso Pastorelli
  */
 data class Healthcheck(
-    val test: StringList,
+    val test: List<String>,
     val interval: Duration,
     val timeout: Duration,
     val retries: Int,
@@ -450,7 +450,7 @@ class HealthcheckBuilder {
      * for services in a Docker Compose configuration.
      * @since 3.3.0
      */
-    var test: StringMList = emptyMList()
+    var test: MList<String> = emptyMList()
     /**
      * The time to wait between health check executions.
      *
@@ -806,7 +806,7 @@ class BuildConfigBuilder(private val context: String) {
      * This property is mutable and can be updated through the `cacheFrom(vararg images: String)` function.
      * @since 3.3.0
      */
-    val cacheFrom: StringMList = emptyMList()
+    val cacheFrom: MList<String> = emptyMList()
 
     /**
      * Adds a build-time argument to the Docker build process.
@@ -877,7 +877,7 @@ class ServiceBuilder(val name: String) {
      * Setting this variable to null uses the default command from the image.
      * @since 3.3.0
      */
-    var command: StringMList = emptyMList()
+    var command: MList<String> = emptyMList()
     /**
      * Specifies the custom entry point for the service container.
      *
@@ -996,7 +996,7 @@ class ServiceBuilder(val name: String) {
      * dynamically through methods such as `ports` and `port`.
      * @since 3.3.0
      */
-    private val ports: StringMList = emptyMList()
+    private val ports: MList<String> = emptyMList()
     /**
      * A list of container ports to be exposed by the service.
      *
@@ -1009,7 +1009,7 @@ class ServiceBuilder(val name: String) {
      * through the `expose` function.
      * @since 3.3.0
      */
-    private val expose: StringMList = emptyMList()
+    private val expose: MList<String> = emptyMList()
     /**
      * A private variable that represents the environment configuration.
      *
@@ -1029,7 +1029,7 @@ class ServiceBuilder(val name: String) {
      * The contents of this list are incorporated when building the service configuration.
      * @since 3.3.0
      */
-    private val envFiles: StringMList = emptyMList()
+    private val envFiles: MList<String> = emptyMList()
     /**
      * A mutable list that holds volume mappings for the service configuration.
      *
@@ -1041,7 +1041,7 @@ class ServiceBuilder(val name: String) {
      * and managing multiple volume mappings for the service.
      * @since 3.3.0
      */
-    private val volumeMappings: StringMList = emptyMList()
+    private val volumeMappings: MList<String> = emptyMList()
     /**
      * Represents a mapping of dependent services and their associated conditions required for starting these services.
      *
@@ -1076,7 +1076,7 @@ class ServiceBuilder(val name: String) {
      * the service. It defaults to an empty mutable list.
      * @since 3.3.0
      */
-    private val networksList: StringMList = emptyMList()
+    private val networksList: MList<String> = emptyMList()
     /**
      * A mutable map representing the labels associated with a service.
      *
@@ -1108,7 +1108,7 @@ class ServiceBuilder(val name: String) {
      * each host and IP address pair is formatted as `<hostname>:<ip>`.
      * @since 3.3.0
      */
-    private val extraHosts: StringMList = emptyMList()
+    private val extraHosts: MList<String> = emptyMList()
     /**
      * Configuration for logging options used in the `ServiceBuilder`.
      *
@@ -1129,13 +1129,13 @@ class ServiceBuilder(val name: String) {
      * contents are included when building the final service configuration.
      * @since 3.3.0
      */
-    private val secretsList: StringMList = emptyMList()
+    private val secretsList: MList<String> = emptyMList()
     /**
      * A mutable list of profiles initialized as empty.
      * The list is intended to hold profile-related data represented as strings.
      * @since 3.3.0
      */
-    private val profiles: StringMList = emptyMList()
+    private val profiles: MList<String> = emptyMList()
     /**
      * Represents a mutable list of paths for `tmpfs` mounts in the service configuration.
      *
@@ -1144,7 +1144,7 @@ class ServiceBuilder(val name: String) {
      * The list can be modified by invoking the `tmpfs(vararg paths: String)` function.
      * @since 3.3.0
      */
-    private val tmpfs: StringMList = emptyMList()
+    private val tmpfs: MList<String> = emptyMList()
     /**
      * Maintains a mapping of ulimit configurations for the service.
      *
@@ -1180,7 +1180,7 @@ class ServiceBuilder(val name: String) {
      * as empty and can be modified as needed.
      * @since 3.3.0
      */
-    private val capAdd: StringMList = emptyMList()
+    private val capAdd: MList<String> = emptyMList()
     /**
      * Holds a list of Linux capabilities to be dropped from the container.
      *
@@ -1190,7 +1190,7 @@ class ServiceBuilder(val name: String) {
      * when it is built using the `ServiceBuilder`.
      * @since 3.3.0
      */
-    private val capDrop: StringMList = emptyMList()
+    private val capDrop: MList<String> = emptyMList()
     /**
      * Builds the configuration using the provided context and configuration block.
      *

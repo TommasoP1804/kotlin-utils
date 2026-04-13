@@ -63,7 +63,7 @@ data class Contact(
     var jobs: Set<Job> = emptySet(),
     var phoneNumbers: Map<String, PhoneNumber> = emptyMap(),
     var emails: Map<String, Email> = emptyMap(),
-    var groups: StringSet = emptySet(),
+    var groups: Set<String> = emptySet(),
     var addresses: Map<String, Address> = emptyMap(),
     var importantDates: Map<String, TemporalAdjuster> = emptyMap(),
     var relationships: DataMap = emptyMap(),

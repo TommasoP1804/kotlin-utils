@@ -113,7 +113,7 @@ data class MdCodeBlock(val language: String, val code: String) : MdElement {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-data class MdBlockquote(val lines: StringList) : MdElement {
+data class MdBlockquote(val lines: List<String>) : MdElement {
     /**
      * Renders the blockquote as a string by prepending each line with a `>` character
      * followed by a single space, and joins the lines using a newline separator.
@@ -218,13 +218,13 @@ data class MdListItem(val text: String, val children: List<MdListItem> = emptyLi
  * - Rows: A list of rows where each row is a list of string values.
  * - Alignments: An optional list specifying the alignment for each column (left, center, right). Defaults to left-aligned if not specified.
  *
- * @property headers A `StringList` representing the column headers of the table.
- * @property rows A list of `StringList` representing the rows of the table.
+ * @property headers A `List<String>` representing the column headers of the table.
+ * @property rows A list of `List<String>` representing the rows of the table.
  * @property alignments A list of `Align` representing the alignment for each column. Defaults to an empty list.
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-data class MdTable(val headers: StringList, val rows: List<StringList>, val alignments: List<Align> = emptyList()) : MdElement {
+data class MdTable(val headers: List<String>, val rows: List<List<String>>, val alignments: List<Align> = emptyList()) : MdElement {
     /**
      * Renders a Markdown table as a string.
      *
@@ -831,13 +831,13 @@ class TableBuilder {
      * Holds the data rows of the table being built.
      *
      * Each entry in the list represents a single row of the table, with the row being
-     * represented as a list of string values (`StringList`). Rows are added using the
+     * represented as a list of string values (`List<String>`). Rows are added using the
      * `row` function, which appends the provided cells as a new row to this list.
      *
      * The rows are included in the final Markdown table produced by the `build` function.
      * @since 3.3.0
      */
-    private val rows = emptyMList<StringList>()
+    private val rows = emptyMList<List<String>>()
     /**
      * Specifies the alignment settings for the columns of the Markdown table being built.
      *

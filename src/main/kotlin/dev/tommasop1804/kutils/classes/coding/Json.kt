@@ -103,7 +103,7 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @return A set of strings representing the field names in the parsed JSON.
      * @since 3.0.0
      */
-    val fieldsNames: StringSet
+    val fieldsNames: Set<String>
         get() = MAPPER.readTree(value).propertyNames().toSet()
     
     /**

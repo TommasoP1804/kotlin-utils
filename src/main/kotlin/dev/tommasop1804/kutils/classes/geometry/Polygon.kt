@@ -156,7 +156,7 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
      * @return A list of Double values, each representing the length of a side of the polygon.
      * @since 1.0.0
      */
-    val sideLengths: DoubleList
+    val sideLengths: List<Double>
         get() {
             val lengths = mListOf<Double>()
             val n = vertices.size

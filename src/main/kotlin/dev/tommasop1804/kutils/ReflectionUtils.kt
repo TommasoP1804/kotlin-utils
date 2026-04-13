@@ -214,7 +214,7 @@ inline infix fun <reified T : Any> KClass<T>.hasProperty(propertyName: String): 
  * @return A set containing all public property names.
  * @since 1.0.0
  */
-inline fun <reified T : Any> T.getPropertyNames(): StringSet =
+inline fun <reified T : Any> T.getPropertyNames(): Set<String> =
     T::class.memberProperties
         .filter { it.visibility == KVisibility.PUBLIC }
         .map { it.name }
@@ -226,7 +226,7 @@ inline fun <reified T : Any> T.getPropertyNames(): StringSet =
  * @return A set containing all public property names.
  * @since 1.0.0
  */
-inline fun <reified T : Any> KClass<T>.getPropertyNames(): StringSet =
+inline fun <reified T : Any> KClass<T>.getPropertyNames(): Set<String> =
     memberProperties
         .filter { it.visibility == KVisibility.PUBLIC }
         .map { it.name }

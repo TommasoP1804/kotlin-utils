@@ -35,6 +35,7 @@ import kotlin.time.Instant
  * @see List
  * @see Any
  */
+@Deprecated("Use List<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Any>"))
 typealias AnyList = List<Any>
 /**
  * A type alias for `MList<Any?>`, representing a mutable list that can hold elements of any type, including null.
@@ -45,7 +46,8 @@ typealias AnyList = List<Any>
  * @see MutableList
  * @see Any
  */
-typealias AnyMList = MList<Any>
+@Deprecated("Use MList<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Any>"))
+typealias AnyMList = MutableList<Any>
 
 /**
  * A type alias for `List<Int>`, representing a list containing integer values.
@@ -57,6 +59,7 @@ typealias AnyMList = MList<Any>
  * @see List
  * @see Int
  */
+@Deprecated("Use List<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Int>"))
 typealias IntList = List<Int>
 /**
  * A type alias representing a mutable list of integers.
@@ -66,6 +69,7 @@ typealias IntList = List<Int>
  * @see MutableList
  * @see Int
  */
+@Deprecated("Use MList<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Int>"))
 typealias IntMList = MutableList<Int>
 
 /**
@@ -76,6 +80,7 @@ typealias IntMList = MutableList<Int>
  * @see List
  * @see Long
  */
+@Deprecated("Use List<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Long>"))
 typealias LongList = List<Long>
 /**
  * A type alias for a mutable list of long integers (`MutableList<Long>`).
@@ -87,6 +92,7 @@ typealias LongList = List<Long>
  * @see MutableList
  * @see Long
  */
+@Deprecated("Use MList<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Long>"))
 typealias LongMList = MutableList<Long>
 
 /**
@@ -99,6 +105,7 @@ typealias LongMList = MutableList<Long>
  * @see List
  * @see Double
  */
+@Deprecated("Use List<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Double>"))
 typealias DoubleList = List<Double>
 /**
  * A type alias representing a mutable list of doubles.
@@ -113,6 +120,7 @@ typealias DoubleList = List<Double>
  * @see MutableList
  * @see Double
  */
+@Deprecated("Use MList<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Double>"))
 typealias DoubleMList = MutableList<Double>
 
 /**
@@ -120,6 +128,7 @@ typealias DoubleMList = MutableList<Double>
  * This can include integers, floating-point numbers, or any other subclass of Number.
  * @since 3.4.0
  */
+@Deprecated("Use List<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Number>"))
 typealias NumberList = List<Number>
 /**
  * A type alias representing a mutable list of elements of type Number.
@@ -127,6 +136,7 @@ typealias NumberList = List<Number>
  * when dealing with collections of numeric values.
  * @since 3.4.0
  */
+@Deprecated("Use MList<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Number>"))
 typealias NumberMList = MutableList<Number>
 
 /**
@@ -138,6 +148,7 @@ typealias NumberMList = MutableList<Number>
  * @see List
  * @see String
  */
+@Deprecated("Use List<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<String>"))
 typealias StringList = List<String>
 /**
  * A type alias for a mutable list of strings.
@@ -149,6 +160,7 @@ typealias StringList = List<String>
  * @see MutableList
  * @see String
  */
+@Deprecated("Use MList<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<String>"))
 typealias StringMList = MutableList<String>
 
 /**
@@ -161,6 +173,7 @@ typealias StringMList = MutableList<String>
  * @see List
  * @see Char
  */
+@Deprecated("Use List<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Char>"))
 typealias CharList = List<Char>
 /**
  * A typealias representing a mutable list of characters.
@@ -171,6 +184,7 @@ typealias CharList = List<Char>
  * @see MutableList
  * @see Char
  */
+@Deprecated("Use MList<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Char>"))
 typealias CharMList = MutableList<Char>
 
 /**
@@ -183,6 +197,7 @@ typealias CharMList = MutableList<Char>
  * @see List
  * @see UUID
  */
+@Deprecated("Use List<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Uuid>"))
 typealias UuidList = List<UUID>
 /**
  * A typealias representing a mutable list of UUIDs.
@@ -195,6 +210,7 @@ typealias UuidList = List<UUID>
  * @see MutableList
  * @see UUID
  */
+@Deprecated("Use MList<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Uuid>"))
 typealias UuidMList = MutableList<UUID>
 
 /**
@@ -205,6 +221,7 @@ typealias UuidMList = MutableList<UUID>
  *
  * @since 3.0.0
  */
+@Deprecated("Use List<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("List<Ulid>"))
 typealias UlidList = List<Ulid>
 /**
  * A type alias for a mutable list of ULID objects.
@@ -213,6 +230,7 @@ typealias UlidList = List<Ulid>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MList<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MList<Ulid>"))
 typealias UlidMList = MutableList<Ulid>
 
 /**
@@ -254,6 +272,7 @@ typealias MultiMList<E> = MList<MList<E>>
  * @see Set
  * @see Any
  */
+@Deprecated("Use Set<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Any>"))
 typealias AnySet = Set<Any>
 /**
  * A type alias for the MSet collection class which allows the storage of any type of nullable objects.
@@ -265,6 +284,7 @@ typealias AnySet = Set<Any>
  * @see MutableSet
  * @see Any
  */
+@Deprecated("Use MSet<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Any>"))
 typealias AnyMSet = MSet<Any>
 
 /**
@@ -278,6 +298,7 @@ typealias AnyMSet = MSet<Any>
  * @see Set
  * @see Int
  */
+@Deprecated("Use Set<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Int>"))
 typealias IntSet = Set<Int>
 /**
  * A typealias representing a mutable set of integers.
@@ -289,6 +310,7 @@ typealias IntSet = Set<Int>
  * @see MutableSet
  * @see Int
  */
+@Deprecated("Use MSet<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Int>"))
 typealias IntMSet = MutableSet<Int>
 
 /**
@@ -301,6 +323,7 @@ typealias IntMSet = MutableSet<Int>
  * @see Set
  * @see Long
  */
+@Deprecated("Use Set<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Long>"))
 typealias LongSet = Set<Long>
 /**
  * A type alias representing a mutable set of Long values.
@@ -312,6 +335,7 @@ typealias LongSet = Set<Long>
  * @see MutableSet
  * @see Long
  */
+@Deprecated("Use MSet<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Long>"))
 typealias LongMSet = MutableSet<Long>
 
 /**
@@ -322,6 +346,7 @@ typealias LongMSet = MutableSet<Long>
  * @see Set
  * @see Double
  */
+@Deprecated("Use Set<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Double>"))
 typealias DoubleSet = Set<Double>
 /**
  * A typealias for a `MutableSet` that specifically holds `Double` values.
@@ -331,6 +356,7 @@ typealias DoubleSet = Set<Double>
  * @see MutableSet
  * @see Double
  */
+@Deprecated("Use MSet<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Double>"))
 typealias DoubleMSet = MutableSet<Double>
 
 /**
@@ -340,12 +366,14 @@ typealias DoubleMSet = MutableSet<Double>
  * contain elements of type Number or its subtypes, such as Int, Double, etc.
  * @since 3.4.0
  */
+@Deprecated("Use Set<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Number>"))
 typealias NumberSet = Set<Number>
 /**
  * A type alias representing a mutable set of Number objects.
  * This can include any type that is a subclass of Number, such as Int, Float, Double, etc.
  * @since 3.4.0
  */
+@Deprecated("Use MSet<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Number>"))
 typealias NumberMSet = MutableSet<Number>
 
 /**
@@ -356,6 +384,7 @@ typealias NumberMSet = MutableSet<Number>
  * @see Set
  * @see String
  */
+@Deprecated("Use Set<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<String>"))
 typealias StringSet = Set<String>
 /**
  * A type alias representing a mutable set of strings.
@@ -365,6 +394,7 @@ typealias StringSet = Set<String>
  * @see MutableSet
  * @see String
  */
+@Deprecated("Use MSet<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<String>"))
 typealias StringMSet = MutableSet<String>
 
 /**
@@ -375,6 +405,7 @@ typealias StringMSet = MutableSet<String>
  * @see Set
  * @see Char
  */
+@Deprecated("Use Set<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Char>"))
 typealias CharSet = Set<Char>
 /**
  * A type alias for a mutable set of characters.
@@ -385,6 +416,7 @@ typealias CharSet = Set<Char>
  * @see MutableSet
  * @see Char
  */
+@Deprecated("Use MSet<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Char>"))
 typealias CharMSet = MutableSet<Char>
 
 /**
@@ -395,6 +427,7 @@ typealias CharMSet = MutableSet<Char>
  * @see Set
  * @see UUID
  */
+@Deprecated("Use Set<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Uuid>"))
 typealias UuidSet = Set<UUID>
 /**
  * A typealias for a mutable set that holds UUID objects.
@@ -407,6 +440,7 @@ typealias UuidSet = Set<UUID>
  * @see MutableSet
  * @see UUID
  */
+@Deprecated("Use MSet<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Uuid>"))
 typealias UuidMSet = MutableSet<UUID>
 
 /**
@@ -417,6 +451,7 @@ typealias UuidMSet = MutableSet<UUID>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Set<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Set<Ulid>"))
 typealias UlidSet = Set<Ulid>
 /**
  * Represents a type alias for a mutable set of ULID objects.
@@ -425,6 +460,7 @@ typealias UlidSet = Set<Ulid>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MSet<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MSet<Ulid>"))
 typealias UlidMSet = MutableSet<Ulid>
 
 /**
@@ -464,6 +500,7 @@ typealias MultiMSet<E> = MSet<MSet<E>>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Any>"))
 typealias AnyCollection = Collection<Any>
 /**
  * A type alias representing a mutable collection that can hold elements of any type.
@@ -472,6 +509,7 @@ typealias AnyCollection = Collection<Any>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Any>"))
 typealias AnyMCollection = MutableCollection<Any>
 
 /**
@@ -482,6 +520,7 @@ typealias AnyMCollection = MutableCollection<Any>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Int>"))
 typealias IntCollection = Collection<Int>
 /**
  * A typealias representing a MutableCollection of Integers.
@@ -492,6 +531,7 @@ typealias IntCollection = Collection<Int>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Int>"))
 typealias IntMCollection = MutableCollection<Int>
 
 /**
@@ -501,6 +541,7 @@ typealias IntMCollection = MutableCollection<Int>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Long>"))
 typealias LongCollection = Collection<Long>
 /**
  * A typealias for a mutable collection of `Long` values.
@@ -510,6 +551,7 @@ typealias LongCollection = Collection<Long>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Long>"))
 typealias LongMCollection = MutableCollection<Long>
 
 /**
@@ -518,6 +560,7 @@ typealias LongMCollection = MutableCollection<Long>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Double>"))
 typealias DoubleCollection = Collection<Double>
 /**
  * A type alias for a mutable collection of Double values.
@@ -526,6 +569,7 @@ typealias DoubleCollection = Collection<Double>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Double>"))
 typealias DoubleMCollection = MutableCollection<Double>
 
 /**
@@ -533,12 +577,14 @@ typealias DoubleMCollection = MutableCollection<Double>
  * Allows for more readable and concise code when working with collections of numeric values.
  * @since 3.4.0
  */
+@Deprecated("Use Collection<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Number>"))
 typealias NumberCollection = Collection<Number>
 /**
  * A type alias for `MutableCollection<Number>`, representing a mutable collection
  * that can hold elements of type `Number` or its subtypes.
  * @since 3.4.0
  */
+@Deprecated("Use MCollection<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Number>"))
 typealias NumberMCollection = MutableCollection<Number>
 
 /**
@@ -549,6 +595,7 @@ typealias NumberMCollection = MutableCollection<Number>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<String>"))
 typealias StringCollection = Collection<String>
 /**
  * A typealias representing a mutable collection of strings. This allows for simplifying the usage of 
@@ -556,6 +603,7 @@ typealias StringCollection = Collection<String>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<String>"))
 typealias StringMCollection = MutableCollection<String>
 
 /**
@@ -566,6 +614,7 @@ typealias StringMCollection = MutableCollection<String>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Char>"))
 typealias CharCollection = Collection<Char>
 /**
  * A typealias representing a mutable collection of characters.
@@ -576,6 +625,7 @@ typealias CharCollection = Collection<Char>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Char>"))
 typealias CharMCollection = MutableCollection<Char>
 
 /**
@@ -587,6 +637,7 @@ typealias CharMCollection = MutableCollection<Char>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Uuid>"))
 typealias UuidCollection = Collection<UUID>
 /**
  * A type alias representing a mutable collection of UUIDs.
@@ -596,6 +647,7 @@ typealias UuidCollection = Collection<UUID>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Uuid>"))
 typealias UuidMCollection = MutableCollection<UUID>
 
 /**
@@ -607,6 +659,7 @@ typealias UuidMCollection = MutableCollection<UUID>
  * 
  * @since 3.0.0
  */
+@Deprecated("Use Collection<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Collection<Ulid>"))
 typealias UlidCollection = Collection<Ulid>
 /**
  * A type alias for a mutable collection of ULID instances.
@@ -616,6 +669,7 @@ typealias UlidCollection = Collection<Ulid>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MCollection<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MCollection<Ulid>"))
 typealias UlidMCollection = MutableCollection<Ulid>
 
 /**
@@ -634,6 +688,7 @@ typealias MCollection<E> = MutableCollection<E>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Any>"))
 typealias AnyIterable = Iterable<Any>
 /**
  * A type alias for a mutable iterable collection of elements of type `Any`.
@@ -643,6 +698,7 @@ typealias AnyIterable = Iterable<Any>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Any>"))
 typealias AnyMIterable = MutableIterable<Any>
 
 /**
@@ -652,6 +708,7 @@ typealias AnyMIterable = MutableIterable<Any>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Int>"))
 typealias IntIterable = Iterable<Int>
 /**
  * A typealias for a `MutableIterable` of integers.
@@ -661,6 +718,7 @@ typealias IntIterable = Iterable<Int>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Int>"))
 typealias IntMIterable = MutableIterable<Int>
 
 /**
@@ -671,6 +729,7 @@ typealias IntMIterable = MutableIterable<Int>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Long>"))
 typealias LongIterable = Iterable<Long>
 /**
  * A type alias for `MutableIterable<Long>`, representing a mutable iterable collection of `Long` values.
@@ -680,6 +739,7 @@ typealias LongIterable = Iterable<Long>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Long>"))
 typealias LongMIterable = MutableIterable<Long>
 
 /**
@@ -691,6 +751,7 @@ typealias LongMIterable = MutableIterable<Long>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Double>"))
 typealias DoubleIterable = Iterable<Double>
 /**
  * A type alias representing a `MutableIterable` of `Double` values.
@@ -700,6 +761,7 @@ typealias DoubleIterable = Iterable<Double>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Double>"))
 typealias DoubleMIterable = MutableIterable<Double>
 
 /**
@@ -708,6 +770,7 @@ typealias DoubleMIterable = MutableIterable<Double>
  * that iterates over numbers.
  * @since 3.4.0
  */
+@Deprecated("Use Iterable<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Number>"))
 typealias NumberIterable = Iterable<Number>
 /**
  * A typealias for a `MutableIterable` of `Number`.
@@ -715,6 +778,7 @@ typealias NumberIterable = Iterable<Number>
  * that can be modified (e.g., addition or removal of elements).
  * @since 3.4.0
  */
+@Deprecated("Use MIterable<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Number>"))
 typealias NumberMIterable = MutableIterable<Number>
 
 /**
@@ -725,6 +789,7 @@ typealias NumberMIterable = MutableIterable<Number>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<String>"))
 typealias StringIterable = Iterable<String>
 /**
  * A typealias for a [MutableIterable] of [String].
@@ -733,6 +798,7 @@ typealias StringIterable = Iterable<String>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<String>"))
 typealias StringMIterable = MutableIterable<String>
 
 /**
@@ -742,6 +808,7 @@ typealias StringMIterable = MutableIterable<String>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Char>"))
 typealias CharIterable = Iterable<Char>
 /**
  * A typealias representing a mutable iterable collection of characters.
@@ -750,6 +817,7 @@ typealias CharIterable = Iterable<Char>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Char> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Char>"))
 typealias CharMIterable = MutableIterable<Char>
 
 /**
@@ -760,6 +828,7 @@ typealias CharMIterable = MutableIterable<Char>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Uuid>"))
 typealias UuidIterable = Iterable<UUID>
 /**
  * A typealias representing a mutable iterable collection of UUID elements.
@@ -770,6 +839,7 @@ typealias UuidIterable = Iterable<UUID>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Uuid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Uuid>"))
 typealias UuidMIterable = MutableIterable<UUID>
 
 /**
@@ -783,6 +853,7 @@ typealias UuidMIterable = MutableIterable<UUID>
  *
  * @since 3.0.0
  */
+@Deprecated("Use Iterable<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Iterable<Ulid>"))
 typealias UlidIterable = Iterable<Ulid>
 /**
  * A type alias representing a mutable iterable collection of ULID instances.
@@ -792,6 +863,7 @@ typealias UlidIterable = Iterable<Ulid>
  *
  * @since 3.0.0
  */
+@Deprecated("Use MIterable<Ulid> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("MIterable<Ulid>"))
 typealias UlidMIterable = MutableIterable<Ulid>
 
 /**
@@ -1109,6 +1181,7 @@ typealias MMapEntry<K, V> = MutableMap.MutableEntry<K, V>
  *
  * @since 1.0.0
  */
+@Deprecated("Use Sequence<Any> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Sequence<Any>"))
 typealias AnySequence = Sequence<Any>
 /**
  * A typealias for a sequence of integers. Represents a lazily evaluated collection of integer values.
@@ -1117,6 +1190,7 @@ typealias AnySequence = Sequence<Any>
  *
  * @since 1.0.0
  */
+@Deprecated("Use Sequence<Int> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Sequence<Int>"))
 typealias IntSequence = Sequence<Int>
 /**
  * A typealias for a sequence of Long values.
@@ -1124,6 +1198,7 @@ typealias IntSequence = Sequence<Int>
  *
  * @since 1.0.0
  */
+@Deprecated("Use Sequence<Long> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Sequence<Long>"))
 typealias LongSequence = Sequence<Long>
 /**
  * A typealias representing a sequence of Double values.
@@ -1133,6 +1208,7 @@ typealias LongSequence = Sequence<Long>
  *
  * @since 1.0.0
  */
+@Deprecated("Use Sequence<Double> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Sequence<Double>"))
 typealias DoubleSequence = Sequence<Double>
 /**
  * A type alias for a sequence of Number objects.
@@ -1142,6 +1218,7 @@ typealias DoubleSequence = Sequence<Double>
  * such as Int, Double, or Float.
  * @since 3.4.0
  */
+@Deprecated("Use Sequence<Number> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Sequence<Number>"))
 typealias NumberSequence = Sequence<Number>
 /**
  * A type alias that represents a sequence of strings.
@@ -1151,6 +1228,7 @@ typealias NumberSequence = Sequence<Number>
  *
  * @since 1.0.0
  */
+@Deprecated("Use Sequence<String> instead. This alias will be removed in the future.", replaceWith = ReplaceWith("Sequence<String>"))
 typealias StringSequence = Sequence<String>
 
 /**

@@ -407,7 +407,7 @@ enum class TimeZone(
          * @return A list of strings where each string represents the pretty-printed output of an entry.
          * @since 1.0.0
          */
-        fun valuesPrettyPrint(): StringList {
+        fun valuesPrettyPrint(): List<String> {
             val result = mutableListOf<String>()
             for (timeZone in entries) {
                 result.add(timeZone.prettyPrint())

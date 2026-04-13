@@ -834,7 +834,7 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
 class IntRangeWithExclusions(
     override val start: Int,
     override val endInclusive: Int,
-    val excluded: IntMList = emptyMList()
+    val excluded: MList<Int> = emptyMList()
 ) : ClosedRange<Int>, OpenEndRange<Int>, Iterable<Int> {
 
     /**
@@ -1462,7 +1462,7 @@ class IntRangeWithConditions(
 class LongRangeWithExclusions(
     override val start: Long,
     override val endInclusive: Long,
-    val excluded: LongMList = emptyMList()
+    val excluded: MList<Long> = emptyMList()
 ) : ClosedRange<Long>, OpenEndRange<Long>, Iterable<Long> {
     
     /**

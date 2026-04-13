@@ -10,8 +10,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Double2
-import dev.tommasop1804.kutils.DoubleList
-import dev.tommasop1804.kutils.StringList
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isNull
 import jakarta.persistence.AttributeConverter
@@ -222,7 +220,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
          */
         infix fun parse(string: String) = runCatching {
             val s = string.trim()
-            val values: StringList = if (s.startsWith("(") || s.startsWith("[")) s.substring(1, s.length - 1)
+            val values: List<String> = if (s.startsWith("(") || s.startsWith("[")) s.substring(1, s.length - 1)
                 .split((if ("," in s) "," else (if (";" in s) ";" else "{2}")).toRegex())
                 .dropLastWhile { it.isEmpty() }
             else s.split((if ("," in s) "," else (if (";" in s) ";" else "{2}")).toRegex())
@@ -607,7 +605,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
      * @return A list containing the x, y, and z coordinates of the point in order.
      * @since 1.0.0
      */
-    fun toList(): DoubleList = listOf(x, y, z)
+    fun toList(): List<Double> = listOf(x, y, z)
 
     /**
      * Converts the properties `x`, `y`, and `z` into a map where the keys

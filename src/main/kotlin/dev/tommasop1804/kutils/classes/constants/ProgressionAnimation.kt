@@ -4,8 +4,6 @@
 
 package dev.tommasop1804.kutils.classes.constants
 
-import dev.tommasop1804.kutils.StringList
-
 /**
  * Represents a type of progression animation with defined steps and pragmata properties.
  *
@@ -18,7 +16,7 @@ import dev.tommasop1804.kutils.StringList
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-enum class ProgressionAnimation(val steps: StringList, val alternativeSteps: StringList? = null) {
+enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: List<String>? = null) {
     BAR(listOf(
         "░░░░░░░░░░░░░░░░░░░░",
         "█░░░░░░░░░░░░░░░░░░░",

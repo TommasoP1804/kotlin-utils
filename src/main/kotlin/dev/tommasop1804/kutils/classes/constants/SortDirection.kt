@@ -13,7 +13,7 @@ import dev.tommasop1804.kutils.*
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-enum class SortDirection(val operators: StringSet, val symbol: Char) {
+enum class SortDirection(val operators: Set<String>, val symbol: Char) {
     /**
      * Represents an ascending sorting order within the SortDirection enumeration.
      *

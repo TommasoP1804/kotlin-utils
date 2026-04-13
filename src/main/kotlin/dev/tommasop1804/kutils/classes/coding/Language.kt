@@ -26,8 +26,8 @@ import java.time.Year
 enum class Language(
     val displayName: String,
     val yearCreated: Year,
-    val paradigms: StringList,
-    val fileExtensions: StringList,
+    val paradigms: List<String>,
+    val fileExtensions: List<String>,
     val description: String,
     val category: Category
 ) {
@@ -893,8 +893,8 @@ enum class Language(
     constructor(
         displayName: String,
         yearCreated: Int,
-        paradigms: StringList,
-        fileExtensions: StringList,
+        paradigms: List<String>,
+        fileExtensions: List<String>,
         description: String,
         category: Category
     ) : this(
@@ -919,7 +919,7 @@ enum class Language(
          * @return A list of strings representing the display names of all languages.
          * @since 1.0.0
          */
-        val nameList: StringList
+        val nameList: List<String>
             get() = entries.map(Language::displayName)
 
         /**

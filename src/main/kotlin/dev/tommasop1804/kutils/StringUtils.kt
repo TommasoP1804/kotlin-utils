@@ -1076,7 +1076,7 @@ fun String.join(delimiter: Char? = ' ', elements: Iterable<*>): String {
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.splitAndTrim(regex: Regex, limit: Int = 0): StringList = split(regex, limit).map { it.trim() }
+fun String.splitAndTrim(regex: Regex, limit: Int = 0): List<String> = split(regex, limit).map { it.trim() }
 
 /**
  * Splits the nullable string using the provided `Pattern` and trims each resulting substring.
@@ -1091,7 +1091,7 @@ fun String.splitAndTrim(regex: Regex, limit: Int = 0): StringList = split(regex,
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.splitAndTrim(regex: Pattern, limit: Int = 0): StringList =
+fun String.splitAndTrim(regex: Pattern, limit: Int = 0): List<String> =
     splitAndTrim(regex.toRegex(), limit)
 
 /**
@@ -1107,7 +1107,7 @@ fun String.splitAndTrim(regex: Pattern, limit: Int = 0): StringList =
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.splitAndTrim(vararg delimiters: String, ignoreCase: Boolean = false, limit: Int = 0): StringList =
+fun String.splitAndTrim(vararg delimiters: String, ignoreCase: Boolean = false, limit: Int = 0): List<String> =
     split(delimiters = delimiters, ignoreCase, limit).map { it.trim() }
 
 /**
@@ -1120,7 +1120,7 @@ fun String.splitAndTrim(vararg delimiters: String, ignoreCase: Boolean = false, 
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.splitAndTrim(vararg delimiters: Char, ignoreCase: Boolean = false, limit: Int = 0): StringList =
+fun String.splitAndTrim(vararg delimiters: Char, ignoreCase: Boolean = false, limit: Int = 0): List<String> =
     split(delimiters = delimiters, ignoreCase, limit).map { it.trim() }
 
 /**
@@ -1801,13 +1801,13 @@ operator fun String.div(delimiter: Pair<String, Int>) = splitAndTrim(delimiter.f
 operator fun String.div(delimiter: Triple<String, Boolean, Int>) = splitAndTrim(delimiter.first, ignoreCase = delimiter.second, limit = delimiter.third)
 
 /**
- * Splits the string into chunks of the specified size and returns the result as a StringList.
+ * Splits the string into chunks of the specified size and returns the result as a List<String>.
  *
  * @param n The size of each chunk. Must be a positive integer.
- * @return StringList containing chunks of the original string.
+ * @return List<String> containing chunks of the original string.
  * @since 1.0.0
  */
-operator fun String.rem(n: Int): StringList = chunked(n)
+operator fun String.rem(n: Int): List<String> = chunked(n)
 
 /**
  * Checks whether the CharSequence is null or blank.

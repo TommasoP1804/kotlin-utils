@@ -18,6 +18,7 @@ import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.exceptions.*
+import tools.jackson.databind.node.LongNode
 import java.util.*
 import java.util.stream.Collector
 import kotlin.contracts.ExperimentalContracts
@@ -1444,126 +1445,12 @@ fun <E, R> Iterable<E>.legacyCollect(
 ): R = toList().stream().collect(supplier, accumulator, combiner)
 
 /**
- * Converts the collection of integers into an `IntMList`.
- *
- * @return a mutable list containing the integers from the original collection.
- * @since 1.0.0
- */
-@JvmName("intIterableToMList")
-fun Iterable<Int>.toMList(): IntMList = toMutableList()
-/**
- * Converts the current collection of Longs into a LongMList.
- *
- * @return a new LongMList containing the elements of the collection.
- * @since 1.0.0
- */
-@JvmName("longIterableToMList")
-fun Iterable<Long>.toMList(): LongMList = toMutableList()
-/**
- * Converts a Collection of Doubles into a DoubleMList.
- *
- * @return A new DoubleMList containing the elements of the original collection.
- * @since 1.0.0
- */
-@JvmName("doubleIterableToMList")
-fun Iterable<Double>.toMList(): DoubleMList = toMutableList()
-/**
- * Converts a Collection of Strings into a StringMList.
- *
- * @return a mutable list of strings as a StringMList.
- * @since 1.0.0
- */
-@JvmName("stringIterableToMList")
-fun Iterable<String>.toMList(): StringMList = toMutableList()
-/**
- * Converts an [Iterable] of [Char] to a [CharMList], which is a mutable list of characters.
- *
- * @return A new instance of [CharMList], containing all the characters from the original iterable.
- * @since 1.0.0
- */
-@JvmName("charIterableToMList")
-fun Iterable<Char>.toMList(): CharMList = toMutableList()
-/**
- * Converts a collection of UUIDs into a mutable list represented by UUIDMList.
- *
- * @return a UUIDMList containing all elements of the original collection.
- * @since 1.0.0
- */
-@JvmName("uuidIterableToMList")
-fun Iterable<UUID>.toMList(): UuidMList = toMutableList()
-/**
- * Converts a collection of ULIDs into a mutable list represented by ULIDMList.
- *
- * @return a ULIDMList containing all elements of the original collection.
- * @since 3.0.0
- */
-@JvmName("ulidIterableToMList")
-fun Iterable<Ulid>.toMList(): UlidMList = toMutableList()
-/**
  * Converts the current collection into a mutable list of the same type.
  *
  * @return A new mutable list containing all elements of the original collection.
  * @since 1.0.0
  */
 fun <E> Iterable<E>.toMList(): MList<E> = toMutableList()
-
-/**
- * Converts the collection to a mutable set (MSet).
- *
- * @return A mutable set containing the unique elements of the collection.
- * @since 1.0.0
- */
-@JvmName("intIterableToMSet")
-fun Iterable<Int>.toMSet(): IntMSet = toMutableSet()
-/**
- * Converts the collection of Long values into a mutable set (MSet).
- *
- * @return a mutable set containing all the elements of the collection.
- * @since 1.0.0
- */
-@JvmName("longIterableToMSet")
-fun Iterable<Long>.toMSet(): LongMSet = toMutableSet()
-/**
- * Converts a collection of Double elements into an MSet.
- *
- * @return a mutable set (MSet) containing all unique elements from the collection.
- * @since 1.0.0
- */
-@JvmName("doubleIterableToMSet")
-fun Iterable<Double>.toMSet(): DoubleMSet = toMutableSet()
-/**
- * Converts the collection of strings into a mutable set, preserving unique elements.
- *
- * @return A mutable set containing all the distinct elements of the collection.
- * @since 1.0.0
- */
-@JvmName("stringIterableToMSet")
-fun Iterable<String>.toMSet(): StringMSet = toMutableSet()
-/**
- * Converts an [Iterable] of [Char] elements into a [CharMSet] by creating a mutable set
- * containing the unique characters from the iterable.
- *
- * @return a [CharMSet] containing unique characters from the original iterable.
- * @since 1.0.0
- */
-@JvmName("charIterableToMSet")
-fun Iterable<Char>.toMSet(): CharMSet = toMutableSet()
-/**
- * Converts the collection of UUIDs into a mutable set (MSet).
- *
- * @return A mutable set containing all unique elements from the collection.
- * @since 1.0.0
- */
-@JvmName("uuidIterableToMSet")
-fun Iterable<Uuid>.toMSet(): UuidMSet = toMutableSet()
-/**
- * Converts the collection of ULIDs into a mutable set (MSet).
- *
- * @return A mutable set containing all unique elements from the collection.
- * @since 3.0.0
- */
-@JvmName("ulidIterableToMSet")
-fun Iterable<Ulid>.toMSet(): UlidMSet = toMutableSet()
 /**
  * Converts the given collection into a mutable set, preserving unique elements and discarding duplicates.
  *
@@ -1573,62 +1460,6 @@ fun Iterable<Ulid>.toMSet(): UlidMSet = toMutableSet()
 fun <E> Iterable<E>.toMSet(): MSet<E> = toMutableSet()
 
 /**
- * Creates a mutable list of integers from the provided elements.
- *
- * @param elements a variable number of integer elements to include in the list
- * @return a mutable list containing the provided integer elements
- * @since 1.0.0
- */
-fun mListOf(vararg elements: Int): IntMList = mutableListOf(*elements.toTypedArray())
-/**
- * Creates a mutable list containing specified elements.
- *
- * @param elements A variable number of Long values to populate the list.
- * @return A mutable list containing the specified elements.
- * @since 1.0.0
- */
-fun mListOf(vararg elements: Long): LongMList = mutableListOf(*elements.toTypedArray())
-/**
- * Creates a mutable list of doubles from the given vararg elements.
- *
- * @param elements A variable number of double values to include in the list.
- * @return A `DoubleMList` containing the specified elements.
- * @since 1.0.0
- */
-fun mListOf(vararg elements: Double): DoubleMList = mutableListOf(*elements.toTypedArray())
-/**
- * Constructs a new mutable list of strings and initializes it with the given elements.
- *
- * @param elements The strings to be included in the mutable list.
- * @return A new instance of StringMList containing the provided elements.
- * @since 1.0.0
- */
-fun mListOf(vararg elements: String): StringMList = mutableListOf(*elements)
-/**
- * Creates a mutable list of characters containing the given elements.
- *
- * @param elements The characters to include in the mutable list. These elements are passed as vararg arguments.
- * @return A `CharMList` containing the specified elements.
- * @since 1.0.0
- */
-fun mListOf(vararg elements: Char): CharMList = mutableListOf(*elements.toTypedArray())
-/**
- * Creates a mutable list containing the specified UUID elements.
- *
- * @param elements A variable number of UUID elements to be added to the list.
- * @return A mutable list of UUIDs containing the provided elements.
- * @since 1.0.0
- */
-fun mListOf(vararg elements: Uuid): UuidMList = mutableListOf(*elements)
-/**
- * Creates a mutable list containing the specified ULID elements.
- *
- * @param elements A variable number of ULID elements to be added to the list.
- * @return A mutable list of ULIDs containing the provided elements.
- * @since 3.0.0
- */
-fun mListOf(vararg elements: Ulid): UlidMList = mutableListOf(*elements)
-/**
  * Creates a new instance of an MList containing the specified elements.
  *
  * @param E the type of elements in the list.
@@ -1637,63 +1468,6 @@ fun mListOf(vararg elements: Ulid): UlidMList = mutableListOf(*elements)
  * @since 1.0.0
  */
 fun <E> mListOf(vararg elements: E): MList<E> = mutableListOf(*elements)
-
-/**
- * Creates a mutable set of integers containing the specified elements.
- *
- * @param elements The integers to be included in the set.
- * @return A mutable set containing the provided integers.
- * @since 1.0.0
- */
-fun mSetOf(vararg elements: Int): IntMSet = mutableSetOf(*elements.toTypedArray())
-/**
- * Creates a mutable set containing the specified elements.
- *
- * @param elements the elements to include in the mutable set.
- * @return a mutable set containing the specified elements.
- * @since 1.0.0
- */
-fun mSetOf(vararg elements: Long): LongMSet = mutableSetOf(*elements.toTypedArray())
-/**
- * Creates a mutable set of unique double values from the provided elements.
- *
- * @param elements The double values to be added to the set.
- * @return A mutable set of unique double values.
- * @since 1.0.0
- */
-fun mSetOf(vararg elements: Double): DoubleMSet = mutableSetOf(*elements.toTypedArray())
-/**
- * Creates a mutable set of strings containing the provided elements.
- *
- * @param elements The vararg parameter representing the string elements to include in the set.
- * @return A mutable set of strings containing the specified elements.
- * @since 1.0.0
- */
-fun mSetOf(vararg elements: String): StringMSet = mutableSetOf(*elements)
-/**
- * Creates a mutable set of characters containing the specified elements.
- *
- * @param elements The characters to include in the set.
- * @return A mutable set of characters containing the given elements.
- * @since 1.0.0
- */
-fun mSetOf(vararg elements: Char): CharMSet = mutableSetOf(*elements.toTypedArray())
-/**
- * Creates a mutable set of UUID elements.
- *
- * @param elements A variable number of UUID elements to include in the set.
- * @return A mutable set containing the provided UUID elements.
- * @since 1.0.0
- */
-fun mSetOf(vararg elements: Uuid): UuidMSet = mutableSetOf(*elements)
-/**
- * Creates a mutable set of ULID elements.
- *
- * @param elements A variable number of ULID elements to include in the set.
- * @return A mutable set containing the provided ULID elements.
- * @since 3.0.0
- */
-fun mSetOf(vararg elements: Ulid): UlidMSet = mutableSetOf(*elements)
 /**
  * Creates a mutable set containing the specified elements.
  *
@@ -1703,38 +1477,6 @@ fun mSetOf(vararg elements: Ulid): UlidMSet = mutableSetOf(*elements)
  */
 fun <E> mSetOf(vararg elements: E): MSet<E> = mutableSetOf(*elements)
 
-/**
- * Converts the current array to a mutable list.
- *
- * @return A mutable list representation of the elements in the array.
- * @since 1.0.0
- */
-@JvmName("anyArrayToMList")
-fun <T> Array<Any>.toMList(): AnyMList = toMutableList()
-/**
- * Converts an array of strings into a mutable list.
- *
- * @return A mutable list containing the elements of the array.
- * @since 1.0.0
- */
-@JvmName("anyArrayToMList")
-fun <T> Array<String>.toMList(): StringMList = toMutableList()
-/**
- * Converts an array of UUID objects into a mutable list of UUID objects.
- *
- * @return a mutable list containing all the elements of the original array.
- * @since 1.0.0
- */
-@JvmName("uuidArrayToMList")
-fun <T> Array<UUID>.toMList(): UuidMList = toMutableList()
-/**
- * Converts an array of ULID objects into a mutable list of ULID objects.
- *
- * @return a mutable list containing all the elements of the original array.
- * @since 3.0.0
- */
-@JvmName("ulidArrayToMList")
-fun <T> Array<Ulid>.toMList(): UlidMList = toMutableList()
 /**
  * Converts the array into a mutable list.
  *
@@ -1748,14 +1490,14 @@ fun <T> Array<T>.toMList(): MList<T> = toMutableList()
  * @return a mutable list containing all elements of the original IntArray.
  * @since 1.0.0
  */
-fun IntArray.toMList(): IntMList = toMutableList() 
+fun IntArray.toMList(): MList<Int> = toMutableList()
 /**
  * Converts the LongArray to a LongMList, which is a mutable list structure.
  *
  * @return A LongMList containing elements from the original LongArray.
  * @since 1.0.0
  */
-fun LongArray.toMList(): LongMList = toMutableList() 
+fun LongArray.toMList(): MList<Long> = toMutableList()
 /**
  * Converts the DoubleArray to a DoubleMList, which is a mutable list representation
  * of the array's elements.
@@ -1763,7 +1505,7 @@ fun LongArray.toMList(): LongMList = toMutableList()
  * @return A DoubleMList containing all the elements of the DoubleArray.
  * @since 1.0.0
  */
-fun DoubleArray.toMList(): DoubleMList = toMutableList() 
+fun DoubleArray.toMList(): MList<Double> = toMutableList()
 /**
  * Converts the CharArray to a mutable list of characters (CharMList).
  *
@@ -1773,42 +1515,8 @@ fun DoubleArray.toMList(): DoubleMList = toMutableList()
  * @return a mutable list of characters (CharMList) representing the input CharArray
  * @since 1.0.0
  */
-fun CharArray.toMList(): CharMList = toMutableList()
+fun CharArray.toMList(): MList<Char> = toMutableList()
 
-/**
- * Converts an array of any type to an instance of AnyMList by transforming it into a mutable list.
- *
- * @return An AnyMList representation of the array.
- * @since 1.0.0
- */
-@JvmName("anyArrayToMSet")
-fun <T> Array<Any>.toMSet(): AnyMSet = toMutableSet()
-/**
- * Converts an Array of Strings to a mutable list of strings (StringMList).
- * This extension function allows for a simple transformation from an
- * array to a mutable list for further modifications.
- *
- * @return A mutable list of strings (StringMList) containing the elements of the input array.
- * @since 1.0.0
- */
-@JvmName("stringArrayToMSet")
-fun <T> Array<String>.toMSet(): StringMSet = toMutableSet()
-/**
- * Converts an array of UUIDs into a mutable list of UUIDs.
- *
- * @return a UUIDMList containing all elements of the original array.
- * @since 1.0.0
- */
-@JvmName("uuidArrayToMSet")
-fun <T> Array<Uuid>.toMSet(): UuidMSet = toMutableSet()
-/**
- * Converts an array of ULIDs into a mutable list of ULIDs.
- *
- * @return a ULIDMList containing all elements of the original array.
- * @since 3.0.0
- */
-@JvmName("ulidArrayToMSet")
-fun <T> Array<Ulid>.toMSet(): UlidMSet = toMutableSet()
 /**
  * Converts the array into a mutable set.
  *
@@ -1825,14 +1533,14 @@ fun <T> Array<T>.toMSet(): MSet<T> = toMutableSet()
  * @return a mutable set containing all unique integers from the original array.
  * @since 1.0.0
  */
-fun IntArray.toMSet(): IntMSet = toMutableSet()
+fun IntArray.toMSet(): MSet<Int> = toMutableSet()
 /**
  * Converts the `LongArray` to a `LongMSet` by transforming it into a mutable set.
  *
  * @return a `LongMSet` containing the unique elements of the original `LongArray`.
  * @since 1.0.0
  */
-fun LongArray.toMSet(): LongMSet = toMutableSet()
+fun LongArray.toMSet(): MSet<Long> = toMutableSet()
 /**
  * Converts a DoubleArray into a DoubleMSet. The resulting set will contain
  * all unique elements from the original array.
@@ -1840,14 +1548,14 @@ fun LongArray.toMSet(): LongMSet = toMutableSet()
  * @return a DoubleMSet containing all unique elements from the DoubleArray.
  * @since 1.0.0
  */
-fun DoubleArray.toMSet(): DoubleMSet = toMutableSet()
+fun DoubleArray.toMSet(): MSet<Double> = toMutableSet()
 /**
  * Converts the array of characters into a mutable set of characters.
  *
  * @return A mutable set containing the unique characters from the array.
  * @since 1.0.0
  */
-fun CharArray.toMSet(): CharMSet = toMutableSet()
+fun CharArray.toMSet(): MSet<Char> = toMutableSet()
 
 /**
  * Creates and returns an empty mutable list of type `MList<E>`.

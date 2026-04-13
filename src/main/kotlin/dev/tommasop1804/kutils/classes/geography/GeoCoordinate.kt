@@ -600,9 +600,9 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      *
      * - `latitude` - TYPE: [Double]
      * - `longitude` - TYPE: [Double]
-     * - `listDMS` - TYPE: [dev.tommasop1804.kutils.StringList]
+     * - `listDMS` - TYPE: [dev.tommasop1804.kutils.List<String>]
      * - `listNumericDMS` - TYPE: `List<DoubleArray>`
-     * - `listDM` - TYPE: [dev.tommasop1804.kutils.StringList]
+     * - `listDM` - TYPE: [dev.tommasop1804.kutils.List<String>]
      * - `listNumericDM` - TYPE: `List<DoubleArray>`
      * - `utm` - TYPE: `Triple<String, Double, Double>`
      * - `wkt` - TYPE: [String]
@@ -802,7 +802,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * @return a list of two strings containing the latitude and longitude in DMS format.
      * @since 1.0.0
      */
-    fun toListDMS(): StringList = listOf(convertToDMS(latitude, true), convertToDMS(longitude, false))
+    fun toListDMS(): List<String> = listOf(convertToDMS(latitude, true), convertToDMS(longitude, false))
 
     /**
      * Converts the latitude and longitude values of the `GeoCoordinate` object into a list of numeric Degree, Minute, and Second (DMS) components.
@@ -861,12 +861,12 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * values and "S" for negative values, whereas longitude uses "E" and "W" respectively.
      *
      * 
-     * @return a `StringList` where:
+     * @return a `List<String>` where:
      * - The first element is the formatted latitude in DM with directional indicator.
      * - The second element is the formatted longitude in DM with directional indicator.
      * @since 1.0.0
      */
-    fun toListDM(): StringList = listOf(convertToDM(latitude, true), convertToDM(longitude, false))
+    fun toListDM(): List<String> = listOf(convertToDM(latitude, true), convertToDM(longitude, false))
 
     /**
      * Converts the geographical coordinates (latitude and longitude) of the current `GeoCoordinate`
