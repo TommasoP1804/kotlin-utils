@@ -9,10 +9,11 @@ package dev.tommasop1804.kutils.dsl.uischema
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.coding.Json
 import dev.tommasop1804.kutils.dsl.jsonschema.*
 
 @DslMarker
-annotation class UiSchemaDsl
+annotation class UiSchemaDslMarker
 
 // --- CORE ELEMENT MODEL ---
 
@@ -31,7 +32,7 @@ annotation class UiSchemaDsl
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@UiSchemaDsl
+@UiSchemaDslMarker
 sealed class UiElement {
     /**
      * Constructs and returns a DataMap instance configured with the current state of the builder.
@@ -589,7 +590,7 @@ class RawElement(private val data: DataMap) : UiElement() {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@UiSchemaDsl
+@UiSchemaDslMarker
 class OptionsBuilder {
     /**
      * A mutable map used internally to store key-value pairs representing configuration options.
@@ -638,7 +639,7 @@ class OptionsBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@UiSchemaDsl
+@UiSchemaDslMarker
 class RuleBuilder {
     /**
      * Represents the current visual or functional effect for a UI rule.
@@ -751,7 +752,7 @@ class RuleBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@UiSchemaDsl
+@UiSchemaDslMarker
 class UiSchemaBuilder {
     /**
      * Represents the root UI element of the schema being constructed.
@@ -877,5 +878,18 @@ class UiSchemaBuilder {
  * @return The configured `UiSchemaBuilder` instance after applying the provided block.
  * @since 3.3.0
  */
-fun buildUiSchema(block: UiSchemaBuilder.() -> Unit): UiSchemaBuilder =
+fun buildUiSchema(block: UiSchemaBuilder.() -> Unit): Json =
+    UiSchemaBuilder().apply(block).toJson(2)
+
+/**
+ * Initializes a new UI schema builder and applies the provided block to configure it.
+ *
+ * This function creates an instance of `UiSchemaBuilder` and applies the given configuration lambda to it.
+ * The resulting builder instance can be used to further modify or retrieve the constructed UI schema.
+ *
+ * @param block A DSL block that defines the configuration for the `UiSchemaBuilder`.
+ * @return The configured instance of `UiSchemaBuilder`.
+ * @since 3.6.4
+ */
+fun initUiSchema(block: UiSchemaBuilder.() -> Unit): UiSchemaBuilder =
     UiSchemaBuilder().apply(block)

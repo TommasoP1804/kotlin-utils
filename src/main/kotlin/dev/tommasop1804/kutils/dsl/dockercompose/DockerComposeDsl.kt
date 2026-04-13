@@ -1904,6 +1904,10 @@ class DockerComposeBuilder {
 fun buildDockerCompose(block: ReceiverConsumer<DockerComposeBuilder>): ComposeFile =
     DockerComposeBuilder().apply(block).build()
 
+@Beta
+fun initDockerCompose(block: ReceiverConsumer<DockerComposeBuilder>) =
+    DockerComposeBuilder().apply(block)
+
 // --- YAML RENDER ---
 
 /**

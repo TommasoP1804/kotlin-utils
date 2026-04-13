@@ -12,7 +12,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
 
 @DslMarker
-annotation class JsonSchemaDsl
+annotation class JsonSchemaDslMarker
 
 /**
  * A builder class for constructing JSON Schema objects using a DSL-like syntax.
@@ -20,7 +20,7 @@ annotation class JsonSchemaDsl
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@JsonSchemaDsl
+@JsonSchemaDslMarker
 class SchemaBuilder {
     /**
      * A mutable container that holds the properties of a JSON schema being constructed.
@@ -518,7 +518,7 @@ class SchemaBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@JsonSchemaDsl
+@JsonSchemaDslMarker
 class PropertiesBuilder {
     /**
      * A map that associates property names with their corresponding `DataMap` schema representations.
@@ -650,7 +650,7 @@ class PropertiesBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@JsonSchemaDsl
+@JsonSchemaDslMarker
 class SchemaListBuilder {
     /**
      * Internal mutable list utilized for managing a collection of `DataMap` elements.
@@ -697,7 +697,7 @@ class SchemaListBuilder {
  * where one field's presence necessitates the presence of other specified fields.
  * @since 3.3.0
  */
-@JsonSchemaDsl
+@JsonSchemaDslMarker
 class DependentRequiredBuilder {
     /**
      * A mapping of fields to their respective lists of required fields.
@@ -812,7 +812,20 @@ fun SchemaBuilder.array(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
  * @return The configured SchemaBuilder instance representing the JSON schema.
  * @since 3.3.0
  */
-fun buildJsonSchema(block: ReceiverConsumer<SchemaBuilder>): SchemaBuilder =
+fun buildJsonSchema(block: ReceiverConsumer<SchemaBuilder>) =
+    SchemaBuilder().apply {
+        schema()
+        block()
+    }.toJson()
+
+/**
+ * Initializes a JSON schema by applying a provided block to a SchemaBuilder instance.
+ *
+ * @param block A lambda function that operates on a SchemaBuilder to define the schema structure.
+ * @return A configured SchemaBuilder instance representing the constructed JSON schema.
+ * @since 3.6.4
+ */
+fun initJsonSchema(block: ReceiverConsumer<SchemaBuilder>): SchemaBuilder =
     SchemaBuilder().apply {
         schema()
         block()

@@ -2698,6 +2698,20 @@ class PipelineBuilder {
 fun buildGitlabCi(block: ReceiverConsumer<PipelineBuilder>): Pipeline =
     PipelineBuilder().apply(block).build()
 
+/**
+ * Initializes a GitLab CI pipeline by building and configuring it using the specified configuration block.
+ * This method is annotated with `@Beta`, indicating it is in the beta stage of development and subject
+ * to potential changes in the future.
+ *
+ * @param block A lambda function used to configure the `PipelineBuilder` instance. The `PipelineBuilder`
+ * is passed as a receiver to the lambda, allowing for direct configuration.
+ * @return The configured `PipelineBuilder` instance.
+ * @since 3.6.4
+ */
+@Beta
+fun initGitlabCi(block: ReceiverConsumer<PipelineBuilder>): PipelineBuilder =
+    PipelineBuilder().apply(block)
+
 // --- YAML RENDERER ---
 
 /**

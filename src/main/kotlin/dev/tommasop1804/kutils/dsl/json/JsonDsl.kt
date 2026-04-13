@@ -13,7 +13,7 @@ import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.dsl.jsonschema.*
 
 @DslMarker
-annotation class JsonDsl
+annotation class JsonDslMarker
 
 // --- VALUE TYPES ---
 
@@ -262,7 +262,7 @@ fun Any?.toJsonValue(): JsonValue = when (this) {
  * insertion order.
  * @since 3.3.0
  */
-@JsonDsl
+@JsonDslMarker
 class JsonObjectBuilder {
     /**
      * A map storing entries for building a JSON object.
@@ -391,7 +391,7 @@ class JsonObjectBuilder {
  * The resulting JSON array can be built using the [build] function.
  * @since 3.3.0
  */
-@JsonDsl
+@JsonDslMarker
 class JsonArrayBuilder {
     /**
      * A mutable list holding JSON values that are components of a JSON array being constructed.
@@ -483,6 +483,21 @@ fun buildJson(block: ReceiverConsumer<JsonObjectBuilder>): Json =
     JsonObjectBuilder().apply(block).build().toJson()
 
 /**
+ * Initializes a JSON object using the specified DSL block.
+ *
+ * This function provides a builder-based approach to construct a JSON object.
+ * The block parameter allows defining the content (key-value pairs) of the JSON
+ * object using DSL syntax. The resulting JSON object is built using a [JsonObjectBuilder]
+ * and returned as an immutable [JsonObject].
+ *
+ * @param block A DSL block used to configure a [JsonObjectBuilder]. Within this block,
+ *              you can define key-value pairs for the JSON object being constructed.
+ * @since 3.6.4
+ */
+fun initJson(block: ReceiverConsumer<JsonObjectBuilder>) =
+    JsonObjectBuilder().apply(block).build()
+
+/**
  * Creates a JSON object using the provided block of operations defined on a [JsonObjectBuilder].
  *
  * This function provides a DSL for building JSON objects in a structured manner. The [block]
@@ -527,6 +542,20 @@ fun jsonArray(block: ReceiverConsumer<JsonArrayBuilder>) =
  */
 fun buildJsonArray(block: ReceiverConsumer<JsonArrayBuilder>): Json =
     JsonArrayBuilder().apply(block).build().toJson()
+
+/**
+ * Initializes and constructs a JSON array using a DSL block.
+ *
+ * This function creates a new instance of `JsonArrayBuilder`, applies the provided
+ * block to configure the JSON array, and returns the configured builder instance.
+ *
+ * @param block A DSL block to configure the `JsonArrayBuilder` instance. The block provides
+ *              access to the builder, allowing the caller to add elements to the JSON array
+ *              using DSL-style syntax.
+ * @since 3.6.4
+ */
+fun initJsonArray(block: ReceiverConsumer<JsonArrayBuilder>) =
+    JsonArrayBuilder().apply(block)
 
 /**
  * Creates and returns a [JsonObject] by executing the specified [block] on a [JsonObjectBuilder].

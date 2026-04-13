@@ -9,10 +9,11 @@ package dev.tommasop1804.kutils.dsl.markdown
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.coding.Code
 import org.intellij.lang.annotations.Language
 
 @DslMarker
-annotation class MarkdownDsl
+annotation class MarkdownDslMarker
 
 // --- BLOCK ELEMENTS ---
 
@@ -640,7 +641,7 @@ private fun renderOrderedList(items: List<MdListItem>, depth: Int): String {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@MarkdownDsl
+@MarkdownDslMarker
 class InlineBuilder {
     /**
      * Internal mutable list of inline Markdown elements that are used to construct
@@ -752,7 +753,7 @@ class InlineBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@MarkdownDsl
+@MarkdownDslMarker
 class ListBuilder {
     /**
      * A mutable list of Markdown list items that represents the container for constructing Markdown list structures.
@@ -811,7 +812,7 @@ class ListBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@MarkdownDsl
+@MarkdownDslMarker
 class TableBuilder {
     /**
      * Holds the list of column headers for the Markdown table being constructed.
@@ -907,7 +908,7 @@ class TableBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@MarkdownDsl
+@MarkdownDslMarker
 class TaskListBuilder {
     /**
      * Holds a mutable list of markdown tasks (`MdTask`) within a `TaskListBuilder`.
@@ -968,7 +969,7 @@ class TaskListBuilder {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-@MarkdownDsl
+@MarkdownDslMarker
 class MarkdownBuilder {
     /**
      * A mutable list of `MdElement` instances that represents the internal structure of the Markdown content.
@@ -1224,6 +1225,14 @@ class MarkdownBuilder {
      * @since 3.3.0
      */
     fun render(): String = elements.joinToString("\n\n") { it.render() }
+
+    /**
+     * Converts the rendered Markdown content into a `Code` instance in markdown format.
+     *
+     * @return An instance of `Code` representing the current Markdown content rendered as a markdown code block.
+     * @since 3.6.4
+     */
+    fun toCode(): Code = Code.markdown(render())
 }
 
 // --- ENTRY POINT ---
@@ -1242,4 +1251,14 @@ class MarkdownBuilder {
  * @since 3.3.0
  */
 fun buildMarkdown(block: ReceiverConsumer<MarkdownBuilder>) =
-    MarkdownBuilder().apply(block).render()
+    MarkdownBuilder().apply(block).toCode()
+
+/**
+ * Initializes a MarkdownBuilder instance and applies the given block to it.
+ *
+ * @param block A lambda function that receives a MarkdownBuilder instance,
+ * which is used to build and configure the markdown content.
+ * @since 3.6.4
+ */
+fun initMarkdown(block: ReceiverConsumer<MarkdownBuilder>) =
+    MarkdownBuilder().apply(block)

@@ -734,7 +734,7 @@ class TableColumnsScope @PublishedApi internal constructor() {
  * @author Tommaso Pastorelli
  */
 @SqlDslMarker
-class SqlDsl @PublishedApi internal constructor() {
+class SqlBuilder @PublishedApi internal constructor() {
 
     @PublishedApi internal var queryType: QueryType? = null
 
@@ -1137,8 +1137,8 @@ class SqlDsl @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    inline fun fromSelect(block: SqlDsl.() -> Unit) {
-        insertSelectQuery = SqlDsl().apply(block).peek()
+    inline fun fromSelect(block: SqlBuilder.() -> Unit) {
+        insertSelectQuery = SqlBuilder().apply(block).peek()
     }
 
     // -- Update --
@@ -1233,8 +1233,8 @@ class SqlDsl @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    inline fun createView(viewName: String, orReplace: Boolean = false, block: SqlDsl.() -> Unit) {
-        createView(viewName, orReplace, SqlDsl().apply(block).peek())
+    inline fun createView(viewName: String, orReplace: Boolean = false, block: SqlBuilder.() -> Unit) {
+        createView(viewName, orReplace, SqlBuilder().apply(block).peek())
     }
 
     /**
@@ -1277,8 +1277,8 @@ class SqlDsl @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    inline fun createMaterializedView(viewName: String, orReplace: Boolean = false, withData: Boolean = true, block: SqlDsl.() -> Unit) {
-        createMaterializedView(viewName, orReplace, withData, SqlDsl().apply(block).peek())
+    inline fun createMaterializedView(viewName: String, orReplace: Boolean = false, withData: Boolean = true, block: SqlBuilder.() -> Unit) {
+        createMaterializedView(viewName, orReplace, withData, SqlBuilder().apply(block).peek())
     }
 
     /**
@@ -1890,7 +1890,7 @@ class SqlDsl @PublishedApi internal constructor() {
  * Main DSL entry point. Constructs an [SqlQuery] from the DSL block.
  *
  * ```kotlin
- * val query = sql {
+ * val query = buildSql {
  *     select("u.id", "u.name", "o.total")
  *     from("users u")
  *     joins {
@@ -1917,16 +1917,16 @@ class SqlDsl @PublishedApi internal constructor() {
  * @since 3.6.0
  */
 @OptIn(ExperimentalContracts::class)
-fun buildSql(block: SqlDsl.() -> Unit): SqlQuery {
+fun buildSql(block: SqlBuilder.() -> Unit): SqlQuery {
     contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
-    return SqlDsl().apply(block).build()
+    return SqlBuilder().apply(block).build()
 }
 
 /**
  * Main DSL entry point. Constructs an [SqlQuery] from the DSL block.
  *
  * ```kotlin
- * val query = sql {
+ * val query = buildSql {
  *     select("u.id", "u.name", "o.total")
  *     from("users u")
  *     joins {
@@ -1953,9 +1953,45 @@ fun buildSql(block: SqlDsl.() -> Unit): SqlQuery {
  * @since 3.6.0
  */
 @OptIn(ExperimentalContracts::class)
-fun buildSqlAsCode(block: SqlDsl.() -> Unit): Code {
+fun buildSqlAsCode(block: SqlBuilder.() -> Unit): Code {
     contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
-    return SqlDsl().apply(block).build().toCode()
+    return SqlBuilder().apply(block).build().toCode()
+}
+
+/**
+ * Main DSL entry point. Constructs an [SqlQuery] from the DSL block.
+ *
+ * ```kotlin
+ * val query = initSql {
+ *     select("u.id", "u.name", "o.total")
+ *     from("users u")
+ *     joins {
+ *         inner("orders o", "o.user_id = u.id")
+ *         left("payments p", "p.order_id = o.id")
+ *     }
+ *     where {
+ *         condition("u.status = 'ACTIVE'")
+ *         and("o.total > 100")
+ *         orGroup {
+ *             condition("u.vip = true")
+ *             and("u.tier = 'GOLD'")
+ *         }
+ *     }
+ *     orderBy {
+ *         desc("o.total")
+ *         nullsLast("u.name")
+ *     }
+ *     limit(50)
+ *     offset(10)
+ * }
+ * ```
+ *
+ * @since 3.6.0
+ */
+@OptIn(ExperimentalContracts::class)
+fun initSql(block: SqlBuilder.() -> Unit): SqlBuilder {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    return SqlBuilder().apply(block)
 }
 
 /**
@@ -2000,7 +2036,7 @@ class SqlBatchScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun query(block: SqlDsl.() -> Unit) {
+    fun query(block: SqlBuilder.() -> Unit) {
         queries += buildSql(block)
     }
 
