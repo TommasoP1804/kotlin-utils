@@ -1478,7 +1478,6 @@ inline fun <C : CharSequence> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C {
     }
     return if (isNullOrEmpty()) defaultValue() else this
 }
-
 /**
  * Returns this character sequence if it is not null and not blank; otherwise, evaluates and returns
  * the result of the [defaultValue] function.
@@ -1500,6 +1499,83 @@ inline fun <C : CharSequence> C?.ifNullOrBlank(defaultValue: Supplier<C>): C {
         (this@ifNullOrBlank == null) holdsIn defaultValue
     }
     return if (isNullOrBlank()) defaultValue() else this
+}
+/**
+ * Executes the given [block] if the calling [CharSequence] is not empty.
+ * If the [CharSequence] is empty, it returns itself cast to the expected return type.
+ *
+ * @param block The transformation block to be executed if the [CharSequence] is not empty.
+ * @return The result of the [block] if the [CharSequence] is not empty, otherwise the original [CharSequence] cast to the expected return type.
+ * @since 3.6.5
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <C : CharSequence, R> C.ifNotEmpty(block: ReceiverTransformer<C, R>): R {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (isNotEmpty()) this.block() else this as R
+}
+/**
+ * Executes the given [block] if the character sequence is not blank.
+ *
+ * A character sequence is considered not blank if it is not empty
+ * and contains at least one non-whitespace character.
+ *
+ * @param block A lambda that will be executed with the character sequence as the receiver
+ *              if it is not blank.
+ * @return The result of the [block] if the character sequence is not blank; otherwise,
+ *         the original character sequence cast to the expected result type.
+ * @since 3.6.5
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <C : CharSequence, R> C.ifNotBlank(block: ReceiverTransformer<C, R>): R {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (isNotBlank()) this.block() else this as R
+}
+/**
+ * Executes the given block of code if the CharSequence is not null and not empty.
+ *
+ * The function uses Kotlin contracts to provide enhanced null-safety inference.
+ *
+ * @param block The transformation or action to execute if the CharSequence is not null and not empty.
+ *              The provided block receives the non-null and non-empty CharSequence as its receiver.
+ * @return The value returned by the block if the CharSequence is not null and not empty;
+ *         otherwise, it returns the CharSequence itself cast to the specified type.
+ * @since 3.6.5
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <C : CharSequence, R> C?.ifNotNullOrEmpty(block: ReceiverTransformer<C, R>): R? {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) holdsIn block
+        (this@ifNotNullOrEmpty != null) implies returnsNotNull()
+    }
+    return if (isNotNullOrEmpty()) this.block() else this as R
+}
+/**
+ * Executes the given [block] if the CharSequence is not null and not blank.
+ *
+ * This function checks if the receiver CharSequence is neither null nor blank. If the condition is met,
+ * the provided [block] is invoked with the receiver as its parameter. If the condition is not met,
+ * the receiver is returned as the result cast to the expected type [R].
+ *
+ * @param block A lambda function to execute if the CharSequence is not null and not blank. The receiver
+ *              of the lambda is the non-null, non-blank CharSequence.
+ * @since 3.6.5
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <C : CharSequence, R> C?.ifNotNullOrBlank(block: ReceiverTransformer<C, R>): R {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrBlank != null) holdsIn block
+    }
+    return if (isNotNullOrBlank()) this.block() else this as R
 }
 
 /**
