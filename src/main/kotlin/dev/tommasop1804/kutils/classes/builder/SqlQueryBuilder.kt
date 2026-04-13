@@ -2,7 +2,7 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
-@file:Suppress("unused", "kutils_collection_declaration", "SqlNoDatasourceInspection")
+@file:Suppress("unused", "kutils_collection_declaration", "SqlNoDatasourceInspection", "DEPRECATION")
 
 package dev.tommasop1804.kutils.classes.builder
 
@@ -26,6 +26,7 @@ import org.intellij.lang.annotations.Language
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
+@Deprecated("Use SqlDsl instead.")
 class SqlQueryBuilder {
 
     private lateinit var type: QueryType
@@ -1540,6 +1541,7 @@ class SqlQueryBuilder {
      *
      * @since 1.0.0
      */
+    @Deprecated("Use SqlDsl instead.")
     enum class QueryType {
         /**
          * Represents a query type used to retrieve data from a database.
@@ -1930,6 +1932,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      * @author Tommaso Pastorelli
      */
+    @Deprecated("Use SqlDsl instead.")
     enum class DropType {
         /**
          * Represents a drop type where the removal of an entity will also
@@ -1960,6 +1963,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     @Suppress("SqlNoDataSourceInspection", "unused")
+    @Deprecated("Use SqlDsl instead.")
     enum class JoinType(@param:Language("sql") val sqlKeyWord: String) {
         /**
          * Represents an inner join type in SQL, where only the matching rows from the joined tables
@@ -2041,6 +2045,7 @@ class SqlQueryBuilder {
      *
      * @since 1.0.0
      */
+    @Deprecated("Use SqlDsl instead.")
     enum class LogicOperator {
         AND, OR
     }
@@ -2057,4 +2062,5 @@ class SqlQueryBuilder {
  * @return A new [SqlQueryBuilder] instance for constructing SQL query objects.
  * @since 1.0.0
  */
+@Deprecated("Use SqlDsl instead.")
 fun SqlQuery.Companion.builder() = SqlQueryBuilder()

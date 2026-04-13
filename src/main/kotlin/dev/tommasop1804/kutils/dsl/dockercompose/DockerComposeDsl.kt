@@ -1904,6 +1904,14 @@ class DockerComposeBuilder {
 fun buildDockerCompose(block: ReceiverConsumer<DockerComposeBuilder>): ComposeFile =
     DockerComposeBuilder().apply(block).build()
 
+/**
+ * Initializes a Docker Compose configuration using the provided builder function.
+ *
+ * @param block A lambda function with a receiver that operates on a [DockerComposeBuilder].
+ *              This block allows the caller to define the desired Docker Compose setup
+ *              by configuring the provided builder instance.
+ * @since 3.6.4
+ */
 @Beta
 fun initDockerCompose(block: ReceiverConsumer<DockerComposeBuilder>) =
     DockerComposeBuilder().apply(block)

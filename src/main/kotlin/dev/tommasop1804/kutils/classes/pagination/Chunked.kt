@@ -6,10 +6,10 @@ package dev.tommasop1804.kutils.classes.pagination
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
-import dev.tommasop1804.kutils.classes.builder.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator.*
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator.Category.*
+import dev.tommasop1804.kutils.dsl.sql.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.EntityManager
 import net.sf.jsqlparser.parser.feature.Feature
@@ -48,11 +48,12 @@ data class Chunked<T>(
          * Generates a paginated dataset (`Chunked`) based on the given SQL query and parameters for filtering, sorting, and pagination.
          * Utilizes various filtering and transformation mechanisms to construct the result.
          *
+         * Require a SqlDsl context, that can be created using [initSql] method.
+         *
          * @param T The type of elements being returned in the resulting `Chunked` object.
-         * @param callable The invoking function reference, used for validation error reporting.
+         * @param callableName The invoking function reference, used for validation error reporting.
          * @param logger A logger instance used to log debug information.
          * @param entityManager The `EntityManager` instance used for executing SQL queries.
-         * @param initialQuery The initial SQL query builder object to construct the main query.
          * @param offset The offset or page index for pagination (default is 0).
          * @param limit The maximum number of elements per page (default is 10).
          * @param filter A collection of filter strings to apply for dataset refinement (default is an empty list).
@@ -71,11 +72,11 @@ data class Chunked<T>(
          */
         @OptIn(ConditionNotPreventingExceptions::class)
         @Suppress("SqlNoDataSourceInspection")
+        context(context: SqlBuilder)
         inline fun <reified M : Any, T> generateFromQuery(
             callableName: String? = null,
             logger: Logger = Logger(),
             entityManager: EntityManager,
-            initialQuery: SqlQueryBuilder,
             offset: Int = 0,
             limit: Int? = null,
             filter: List<String> = emptyList(),
@@ -127,7 +128,7 @@ data class Chunked<T>(
                     .map { dbDictionary[it]!! }
                     .joinToString(transform = getCondition, separator = " OR ")
 
-                initialQuery.where("($generalFiltrable)")
+                context.where("($generalFiltrable)")
             }
 
             // OTHERS
@@ -167,27 +168,26 @@ data class Chunked<T>(
                         )
                     }
                 }
-                initialQuery.where("(${orFilters.onlyElementOr { orFilters.joinToString(" OR ") } })")
+                context.where("(${orFilters.onlyElementOr { orFilters.joinToString(" OR ") } })")
             }
 
             if (sorting.isNotEmpty()) {
-                initialQuery.orderBy(*sorting.map {
+                context.orderBy(*sorting.map {
                     val splitted = it / separatorSymbol
                     (dbDictionary[splitted.first()] ?: splitted.first()) to ((SortDirection ofOperator splitted[1])
                         ?: throw exceptionForInvalid("Invalid sorting direction"))
                 }.toTypedArray())
             }
-            val query = if (limit == -1) initialQuery.build() else initialQuery
-                .range(limit * offset ..< limit * offset + limit)
-                .build()
+            val query = if (limit == -1) context.build() else context.apply {
+                range(limit * offset ..< limit * offset + limit)
+            }.build()
 
             val totalElements = (limit == -1)(onTrue = {
                 with(entityManager) {
-                    SqlQueryBuilder()
-                        .selectCount()
-                        .from("(${query.value.replaceAfter("LIMIT", String.EMPTY) - "LIMIT".length})")
-                        .build()
-                        .executeCount()
+                    buildSql {
+                        selectCount()
+                        from("(${query.value.replaceAfter("LIMIT", String.EMPTY) - "LIMIT".length})")
+                    }.executeCount()
                 }
             })
 
@@ -332,16 +332,16 @@ data class Chunked<T>(
 
         @InternalScope
         fun filter(value: String, fliterOption: FilterOption, exceptionForInvalid: Transformer<String, Throwable>) = when (fliterOption.operator) {
-            FilterOperator.EQUALS -> value equalsIgnoreCase fliterOption.value.toString()
-            FilterOperator.NOT_EQUALS -> value notEqualsIgnoreCase fliterOption.value.toString()
-            FilterOperator.IN -> tryOr({ false }) { value inIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
-            FilterOperator.NOT_IN -> tryOr({ false }) { value notInIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
-            FilterOperator.STARTS_WITH -> value startsWithIgnoreCase fliterOption.value.toString()
-            FilterOperator.NOT_STARTS_WITH -> value startsWithIgnoreCase fliterOption.value.toString()
-            FilterOperator.ENDS_WITH -> value endsWithIgnoreCase fliterOption.value.toString()
-            FilterOperator.NOT_ENDS_WITH -> value endsWithIgnoreCase fliterOption.value.toString()
-            FilterOperator.CONTAINS -> value containsIgnoreCase fliterOption.value.toString()
-            FilterOperator.NOT_CONTAINS -> value notContainsIgnoreCase fliterOption.value.toString()
+            EQUALS -> value equalsIgnoreCase fliterOption.value.toString()
+            NOT_EQUALS -> value notEqualsIgnoreCase fliterOption.value.toString()
+            IN -> tryOr({ false }) { value inIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
+            NOT_IN -> tryOr({ false }) { value notInIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
+            STARTS_WITH -> value startsWithIgnoreCase fliterOption.value.toString()
+            NOT_STARTS_WITH -> value startsWithIgnoreCase fliterOption.value.toString()
+            ENDS_WITH -> value endsWithIgnoreCase fliterOption.value.toString()
+            NOT_ENDS_WITH -> value endsWithIgnoreCase fliterOption.value.toString()
+            CONTAINS -> value containsIgnoreCase fliterOption.value.toString()
+            NOT_CONTAINS -> value notContainsIgnoreCase fliterOption.value.toString()
             else -> throw exceptionForInvalid("Operator ${fliterOption.operator} not supported.")
         }
     }
