@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.Beta
+import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.measure.*
 import dev.tommasop1804.kutils.classes.measure.RMeasurement.Companion.ofUnit
@@ -430,6 +430,19 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
          */
         @JvmName("mapEntryToHttpHeaderAny")
         fun Map.Entry<String, Any>.toHttpHeader() = HttpHeader(key, value.toString().asSingleList())
+
+        /**
+         * Creates an HTTP header using the provided key-value pair.
+         *
+         * @param value The value associated with the header key. It can be `null`, an `Iterable`, or any other object.
+         * @since 3.6.6
+         */
+        @Suppress("UNCHECKED_CAST")
+        infix fun String.headerTo(value: Any?) = when (value) {
+            null -> HttpHeader(this, "null")
+            is Iterable<*> -> HttpHeader(this, value as Iterable<Any>)
+            else -> HttpHeader(this, value)
+        }
 
         class Serializer : ValueSerializer<HttpHeader>() {
             override fun serialize(value: HttpHeader, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
