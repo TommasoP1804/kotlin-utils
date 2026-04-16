@@ -477,7 +477,7 @@ inline fun <T, R> T.letUnlessOr(condition: Boolean, default: Supplier<R>, block:
  * @return the result of the block if successful, or null if an exception occurs
  * @since 1.0.0
  */
-fun <T> tryOrNull(
+inline fun <T> tryOrNull(
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
@@ -501,7 +501,7 @@ fun <T> tryOrNull(
  * @return the result of the block if successful, or null if an exception occurs
  * @since 1.0.0
  */
-fun <T> tryOrNull(
+inline fun <T> tryOrNull(
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
@@ -520,7 +520,7 @@ fun <T> tryOrNull(
  * @return the result of the block if successful, or null if an exception occurs, considering the filter criteria
  * @since 1.0.0
  */
-fun <T> tryOrNull(
+inline fun <T> tryOrNull(
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: KClass<out Throwable>?,
     block: Supplier<T>
@@ -535,7 +535,7 @@ fun <T> tryOrNull(
  * @param block the lambda function to be executed
  * @since 1.0.0
  */
-fun <T> tryOrNull(
+inline fun <T> tryOrNull(
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: KClass<out Throwable>?,
     block: Supplier<T>
@@ -565,7 +565,7 @@ fun <T> tryOrNull(
  * `notOverwrite`, or `specificCases`.
  * @since 1.0.0
  */
-fun <T> tryOrLog(
+inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
     specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -621,7 +621,7 @@ fun <T> tryOrLog(
  * @return The result of the block of code, or `null` if an exception is handled and not rethrown.
  * @since 1.0.0
  */
-fun <T> tryOrLog(
+inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
     specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -651,7 +651,7 @@ fun <T> tryOrLog(
  * @return The result of the execution block or `null` if an exception is caught and not rethrown.
  * @since 1.0.0
  */
-fun <T> tryOrLog(
+inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
     specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -684,7 +684,7 @@ fun <T> tryOrLog(
  * `notOverwrite`, or `specificCases`.
  * @since 1.0.0
  */
-fun <T> tryOrLog(
+inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
     specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -714,7 +714,7 @@ fun <T> tryOrLog(
  *                                       or if `specificCases` keys intersect with `notOverwrite`.
  * @since 1.0.0
  */
-fun <T> tryOr(
+inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
@@ -762,7 +762,7 @@ fun <T> tryOr(
  *                                        lists or between `specificCases` and `notOverwrite`.
  * @since 1.0.0
  */
-fun <T> tryOr(
+inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
@@ -784,7 +784,7 @@ fun <T> tryOr(
  * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` contain intersecting exception classes, or if `specificCases` and `notOverwrite` have conflicts.
  * @since 1.0.0
  */
-fun <T> tryOr(
+inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
@@ -806,7 +806,7 @@ fun <T> tryOr(
  * @param block The block of code to be executed that might throw exceptions.
  * @since 1.0.0
  */
-fun <T> tryOr(
+inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
@@ -835,7 +835,7 @@ fun <T> tryOr(
  * Throws the exception if it does not meet any handling conditions.
  * @since 1.0.0
  */
-fun tryTrueOrFalse(
+inline fun tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
@@ -880,7 +880,7 @@ fun tryTrueOrFalse(
  * classes, or if `specificCases` and `notOverwrite` overlap.
  * @since 1.0.0
  */
-fun tryTrueOrFalse(
+inline fun tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
@@ -906,7 +906,7 @@ fun tryTrueOrFalse(
  * @throws Throwable Rethrows any exception not caught or specified by the handling rules.
  * @since 1.0.0
  */
-fun <T> tryTrueOrFalse(
+inline fun <T> tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: KClass<out Throwable>?,
@@ -931,7 +931,7 @@ fun <T> tryTrueOrFalse(
  *                                       rules between `overwriteOnly`, `notOverwrite`, and `specificCases`.
  * @since 1.0.0
  */
-fun <T> tryTrueOrFalse(
+inline fun <T> tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: KClass<out Throwable>?,
@@ -964,7 +964,7 @@ fun <T> tryTrueOrFalse(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1019,7 +1019,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1050,7 +1050,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1080,7 +1080,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1116,7 +1116,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1171,7 +1171,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1202,7 +1202,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1232,7 +1232,7 @@ fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
-fun <T> tryOrThrow(
+inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeCause: Boolean = true,
@@ -1251,9 +1251,9 @@ fun <T> tryOrThrow(
  * @return Nothing, since this function always throws an exception.
  * @since 1.0.0
  */
-private fun throwWithOrWithoutCause(laxyException: ThrowableSupplier, includeCause: Boolean, e: Throwable): Nothing =
+@PublishedApi
+internal inline fun throwWithOrWithoutCause(laxyException: ThrowableSupplier, includeCause: Boolean, e: Throwable): Nothing =
     throw if (includeCause) laxyException() causedBy e else laxyException()
-
 
 /**
  * Throws an exception supplied by the provided `laxyException` function.
@@ -1265,7 +1265,8 @@ private fun throwWithOrWithoutCause(laxyException: ThrowableSupplier, includeCau
  * @return Nothing, since this function always throws an exception.
  * @since 1.0.0
  */
-private fun throwWithOrWithoutCause(laxyException: ThrowableTransformer, includeCause: Boolean, e: Throwable): Nothing =
+@PublishedApi
+internal inline fun throwWithOrWithoutCause(laxyException: ThrowableTransformer, includeCause: Boolean, e: Throwable): Nothing =
     throw if (includeCause) laxyException(e) causedBy e else laxyException(e)
 
 /**
@@ -1278,7 +1279,8 @@ private fun throwWithOrWithoutCause(laxyException: ThrowableTransformer, include
  * @param e the exception to include in the log if `includeException` is true
  * @since 1.0.0
  */
-private fun logWithOrWithoutException(logger: Logger, level: LogLevel, message: String?, includeException: Boolean, e: Throwable) {
+@PublishedApi
+internal fun logWithOrWithoutException(logger: Logger, level: LogLevel, message: String?, includeException: Boolean, e: Throwable) {
     if (includeException) log(logger, level, message ?: e.message ?: String.EMPTY, e)
     else log(logger, level, message ?: e.message ?: String.EMPTY)
 }

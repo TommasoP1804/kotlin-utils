@@ -20,10 +20,10 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "3.6.6"
+version = "3.7.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260415T121635Z
+// Last update: Tommaso Pastorelli | 20260416T114557Z
 
 repositories {
     mavenCentral()

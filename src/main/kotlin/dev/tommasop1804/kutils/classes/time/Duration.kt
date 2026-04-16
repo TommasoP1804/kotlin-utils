@@ -19,6 +19,7 @@ import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isDecimal
 import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.tryOrThrow
 import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
@@ -329,65 +330,65 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
             var text = a
             if (text.isBlank()) duration
             else {
-
                 val negative = text.startsWith("-")
-
                 validateInputFormat(!((text.contains("H") || text.contains("S")) && !text.contains("T"))) { "Text must contain 'T' if it contains 'H' or 'S'" }
                 if (text.startsWith("P") || text.startsWith("-P")) {
-                    text = if (text.startsWith("-P")) text.substring(2) else text.substring(1)
-                    if (text.contains("Y")) {
-                        val y = (text before "Y").toLong()
-                        duration = duration.plusYears(if (negative) -y else y)
-                        text = text.substring(text.indexOf("Y") + 1)
-                    }
-                    if (if (text.contains("T")) (text before "T")
-                            .contains("M") else text.contains("M")
-                    ) {
-                        val m = (text before "M").toLong()
-                        duration = duration.plusMonths(if (negative) -m else m)
-                        text = text.substring(text.indexOf("M") + 1)
-                    }
-                    if (text.contains("W")) {
-                        val w = (text before "W").toLong()
-                        duration = duration.plusDays(if (negative) (-w * 7) else (w * 7))
-                        text = text.substring(text.indexOf("W") + 1)
-                    }
-                    if (text.contains("D")) {
-                        val d = (text before "D").toLong()
-                        duration = duration.plusDays(if (negative) -d else d)
-                        text = text.substring(text.indexOf("D") + 1)
-                    }
-                    if (text.contains("T")) {
-                        text = text.substring(text.indexOf("T") + 1)
-                        if (text.contains("H")) {
-                            val h = (text before "H").toLong()
-                            duration = duration.plusHours(if (negative) -h else h)
-                            text = text.substring(text.indexOf("H") + 1)
+                    tryOrThrow({ -> MalformedInputException(Duration::class) }) {
+                        text = if (text.startsWith("-P")) text.substring(2) else text.substring(1)
+                        if (text.contains("Y")) {
+                            val y = (text before "Y").toLong()
+                            duration = duration.plusYears(if (negative) -y else y)
+                            text = text.substring(text.indexOf("Y") + 1)
                         }
-                        if (text.contains("M")) {
+                        if (if (text.contains("T")) (text before "T")
+                                .contains("M") else text.contains("M")
+                        ) {
                             val m = (text before "M").toLong()
-                            duration = duration.plusMinutes(if (negative) -m else m)
+                            duration = duration.plusMonths(if (negative) -m else m)
                             text = text.substring(text.indexOf("M") + 1)
                         }
-                        if (text.contains("S")) {
-                            if (text.contains(".")) {
-                                val s = if ((text before ".").isEmpty()) 0 else (text before ".").toLong()
-                                duration = duration.plusSeconds(if (negative) -s else s)
-                                text = text.substring(text.indexOf(".") + 1)
-                                val n = if (text.isEmpty()) 0 else (text before "S")
-                                    .replace("0*$".toRegex(), "").toLong()
-                                val missingZeros = 9 - n.toString().length
-                                val nanosWithZeros = StringBuilder(n.toString())
-                                for (i in 0..<missingZeros) {
-                                    nanosWithZeros.append("0")
+                        if (text.contains("W")) {
+                            val w = (text before "W").toLong()
+                            duration = duration.plusDays(if (negative) (-w * 7) else (w * 7))
+                            text = text.substring(text.indexOf("W") + 1)
+                        }
+                        if (text.contains("D")) {
+                            val d = (text before "D").toLong()
+                            duration = duration.plusDays(if (negative) -d else d)
+                            text = text.substring(text.indexOf("D") + 1)
+                        }
+                        if (text.contains("T")) {
+                            text = text.substring(text.indexOf("T") + 1)
+                            if (text.contains("H")) {
+                                val h = (text before "H").toLong()
+                                duration = duration.plusHours(if (negative) -h else h)
+                                text = text.substring(text.indexOf("H") + 1)
+                            }
+                            if (text.contains("M")) {
+                                val m = (text before "M").toLong()
+                                duration = duration.plusMinutes(if (negative) -m else m)
+                                text = text.substring(text.indexOf("M") + 1)
+                            }
+                            if (text.contains("S")) {
+                                if (text.contains(".")) {
+                                    val s = if ((text before ".").isEmpty()) 0 else (text before ".").toLong()
+                                    duration = duration.plusSeconds(if (negative) -s else s)
+                                    text = text.substring(text.indexOf(".") + 1)
+                                    val n = if (text.isEmpty()) 0 else (text before "S")
+                                        .replace("0*$".toRegex(), "").toLong()
+                                    val missingZeros = 9 - n.toString().length
+                                    val nanosWithZeros = StringBuilder(n.toString())
+                                    for (i in 0..<missingZeros) {
+                                        nanosWithZeros.append("0")
+                                    }
+                                    duration = duration.plusNanos(
+                                        if (negative) -nanosWithZeros.toString().toLong() else nanosWithZeros.toString()
+                                            .toLong()
+                                    )
+                                } else {
+                                    val n = (text before "S").toLong()
+                                    duration = duration.plusSeconds(if (negative) -n else n)
                                 }
-                                duration = duration.plusNanos(
-                                    if (negative) -nanosWithZeros.toString().toLong() else nanosWithZeros.toString()
-                                        .toLong()
-                                )
-                            } else {
-                                val n = (text before "S").toLong()
-                                duration = duration.plusSeconds(if (negative) -n else n)
                             }
                         }
                     }
