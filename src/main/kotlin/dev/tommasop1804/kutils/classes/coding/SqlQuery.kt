@@ -100,6 +100,18 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @since 1.0.0
      */
     val hasLimit = Regex("\\bLIMIT\\b", RegexOption.IGNORE_CASE).containsMatchIn(value)
+
+    /**
+     * Indicates whether the SQL query contains a "OFFSET" clause.
+     *
+     * The presence of the "OFFSET" keyword is determined using a case-insensitive regular expression
+     * match within the SQL query string.
+     *
+     * This property is useful for identifying queries that limit the number of results returned.
+     *
+     * @since 3.7.1
+     */
+    val hasOffset = Regex("\\bOFFSET\\b", RegexOption.IGNORE_CASE).containsMatchIn(value)
     
     /**
      * Indicates whether the SQL query represented by this instance includes the keyword "DISTINCT".
@@ -973,6 +985,33 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
             parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
             nativeQuery.executeUpdate()
         }
+    }
+
+    /**
+     * Removes LIMIT and OFFSET clauses from the SQL query string, effectively
+     * eliminating pagination constraints.
+     *
+     * This method processes scenarios where the query contains any of the following:
+     * - LIMIT <number>, <number>
+     * - LIMIT <number> OFFSET <number>
+     * - OFFSET <number> LIMIT <number>
+     * - LIMIT <number> or OFFSET <number>
+     *
+     * If no pagination-related keywords are detected, the original query is returned unmodified.
+     *
+     * @return A new `SqlQuery` instance without pagination clauses if present, or the original instance if none are found.
+     * @since 3.7.1
+     */
+    fun withoutPagination() = SqlQuery(this.value).let {
+        if (it.hasLimit || it.hasOffset) {
+            val number = """(\?|:\w+|\$\d+|\d+)"""
+            val patterns = listOf(
+                Regex("""\s+LIMIT\s+$number\s*,\s*$number""", RegexOption.IGNORE_CASE),
+                Regex("""\s+LIMIT\s+$number(\s+OFFSET\s+$number)?""", RegexOption.IGNORE_CASE),
+                Regex("""\s+OFFSET\s+$number(\s+LIMIT\s+$number)?""", RegexOption.IGNORE_CASE),
+            )
+            SqlQuery(patterns.fold(value) { acc, re -> acc.replace(re, "") }.trim())
+        } else this
     }
 
     /**

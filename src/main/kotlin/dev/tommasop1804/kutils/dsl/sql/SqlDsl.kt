@@ -1053,6 +1053,17 @@ class SqlBuilder @PublishedApi internal constructor() {
         offsetValue = range.first
     }
 
+    /**
+     * Applies pagination to a dataset by specifying the range of items to retrieve based on the given page index and limit.
+     *
+     * @param pageIndex The index of the current page, starting from 0. Defaults to 0 if not provided.
+     * @param limit The maximum number of items per page. Defaults to 10 if not provided.
+     * @since 3.7.1
+     */
+    fun pagination(pageIndex: Int = 0, limit: Int = 10) {
+        range((pageIndex * limit)..<(pageIndex * limit + limit))
+    }
+
     // -- Insert --
 
     /**
