@@ -10,6 +10,116 @@ import dev.tommasop1804.kutils.*
 import kotlin.reflect.KProperty
 
 /**
+ * A class that represents a value validated against one or more predicates. The value can only be
+ * set if it satisfies all provided predicates. If the validation fails, an exception is thrown.
+ *
+ * @param T The type of the value being validated.
+ * @property value The value to be validated. This can initially be null.
+ * @property predicates A collection of predicate functions used to validate the value.
+ * @since 3.7.2
+ * @author Tommaso Pastorelli
+ */
+class Validated<T : Any>(private var value: T? = null, private val predicates: Iterable<Predicate<T>>) {
+    /**
+     * Secondary constructor for the Validated class that accepts a nullable value and a variable number
+     * of predicates as input. Converts the vararg predicates into a list and delegates to the
+     * primary constructor.
+     *
+     * @param value The nullable value of type T to be validated.
+     * @param predicates A variable number of Predicate instances used for validation of the value.
+     * @since 3.7.2
+     */
+    constructor(value: T?, vararg predicates: Predicate<T>) : this(value, predicates.toList())
+    /**
+     * Secondary constructor that initializes a `Validated` instance with a single predicate.
+     *
+     * @param value The initial value to be validated.
+     * @param predicate A predicate to validate the value against.
+     * @since 3.7.2
+     */
+    constructor(value: T?, predicate: Predicate<T>) : this(value, listOf(predicate))
+
+    /**
+     * Retrieves the value of the property delegate.
+     *
+     * @param thisRef The object for which the property was delegated. May be null if the delegate is used in a non-bound context.
+     * @param property The metadata of the property on which this delegate is applied.
+     * @return The value of type T associated with the property.
+     * @throws IllegalStateException if the value has not been initialized.
+     * @since 3.7.2
+     */
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value ?: throw IllegalStateException("Property ${property.name} not initialized")
+    /**
+     * Sets the value of the property while performing validation checks using the provided predicates.
+     *
+     * @param thisRef The reference to the object that owns the property. Can be null if the property is not associated with a specific object.
+     * @param property The Kotlin property ([KProperty]) whose value is being set.
+     * @param newValue The new value to be assigned to the property. This value will be validated using the predicates before assignment.
+     * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If any of the predicates return false during validation.
+     * @since 3.7.2
+     */
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
+        predicates.forEach { newValue.validate(property, predicate = it) }
+        value = newValue
+    }
+}
+/**
+ * A wrapper class around a nullable value of type [T], providing validation capabilities
+ * via [Predicate]s. This class ensures that the value being set adheres to all specified
+ * validation rules.
+ *
+ * @param T The type of the value, constrained to non-null types.
+ * @property value The nullable value of type [T] to be validated and stored.
+ * @property predicates A collection of [Predicate]s used for validating the value.
+ * @since 3.7.2
+ * @author Tommaso Pastorelli
+ */
+class NullableValidated<T>(private var value: T? = null, private val predicates: Iterable<Predicate<T>>) {
+    /**
+     * Secondary constructor for NullableValidated that accepts a value and a variable number of predicates.
+     *
+     * This constructor initializes the NullableValidated instance by converting the provided vararg predicates
+     * into a list and passing them, along with the value, to the primary constructor.
+     *
+     * @param value The nullable initial value to be validated.
+     * @param predicates A variable number of Predicate objects used to validate the value.
+     * @since 3.7.2
+     */
+    constructor(value: T?, vararg predicates: Predicate<T>) : this(value, predicates.toList())
+    /**
+     * Constructs a NullableValidated instance with a single predicate.
+     *
+     * @param value The initial value to be validated, which can be null.
+     * @param predicate A single predicate used for validating the value.
+     * @since 3.7.2
+     */
+    constructor(value: T?, predicate: Predicate<T>) : this(value, listOf(predicate))
+
+    /**
+     * Retrieves the value of the delegated property.
+     *
+     * @param thisRef the reference to the object for which the property is being accessed
+     * @param property the metadata of the property being accessed
+     * @return the value of the property, or null if the value is not set
+     * @since 3.7.2
+     */
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T? = value
+    /**
+     * Sets a new value for the property after validating it against a set of predicates.
+     * If the new value is not null, it is validated using each predicate in the provided list.
+     *
+     * @param thisRef The reference to the object for which this property is being delegated.
+     * @param property The metadata for the property being assigned a value.
+     * @param newValue The new value to assign to the property, which may be null.
+     * @since 3.7.2
+     */
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T?) {
+        newValue.ifNotNull { predicates.forEach { validate(property, predicate = it) } }
+        value = newValue
+    }
+}
+
+/**
  * A delegator class that provides a default value if the current value is null. It uses a list of suppliers
  * to determine the default value in case no explicit value is set.
  *
