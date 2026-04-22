@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SpecVersion
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
@@ -163,7 +165,7 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @since 3.0.0
      */
     constructor(@Language("json") json: CharSequence) : this(
-        tryOrThrow({ -> MalformedInputException(Json::class) }) {
+        tryOrThrow({ -> MalformedInputException("Input is not a valid JSON") }) {
             MAPPER.writeValueAsString(MAPPER.readTree(json.toString()))
     })
 
@@ -769,6 +771,13 @@ class Json private constructor(@param:Language("json") override val value: Strin
     fun toDataMMapNN(): Result<DataMMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN
     }
+    /**
+     * Converts the provided value to a JsonNode representation using the predefined object mapper.
+     *
+     * @return a JsonNode representation of the given value.
+     * @since 3.8.0
+     */
+    fun toJsonNode(): JsonNode = MAPPER.readTree(value)
 
     /**
      * Writes the current object to the specified file in JSON format using the configured mapper.
@@ -1417,4 +1426,65 @@ class Json private constructor(@param:Language("json") override val value: Strin
         return current to tokens.last()
     }
 
+    /**
+     * Validates a JSON object against a given JSON schema and schema version.
+     * Returns the validated JSON object wrapped in a `Result` if it passes validation, or a
+     * failure containing validation errors if the schema validation fails.
+     *
+     * @param jsonSchema The JSON representation of the schema to validate against.
+     * @return A `Result` containing the validated JSON object if validation is successful,
+     *         or a failure with the validation errors if validation fails.
+     * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
+     * @since 3.8.0
+     */
+    infix fun validateWithSchema(jsonSchema: Json) = validateWithSchema(jsonSchema, JsonSchemaVersion.V2020_12)
+    /**
+     * Validates a JSON object against a given JSON schema and schema version.
+     * Returns the validated JSON object wrapped in a `Result` if it passes validation, or a
+     * failure containing validation errors if the schema validation fails.
+     *
+     * @param jsonSchema The JSON representation of the schema to validate against.
+     * @param version The version of the JSON Schema standard to use for validation.
+     * @return A `Result` containing the validated JSON object if validation is successful,
+     *         or a failure with the validation errors if validation fails.
+     * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
+     * @since 3.8.0
+     */
+    fun validateWithSchema(jsonSchema: Json, version: JsonSchemaVersion): Result<Json> {
+        try {
+            val schema = JsonSchemaFactory
+                .getInstance(SpecVersion.VersionFlag.V202012)
+                .getSchema(OLD_MAPPER.readTree(jsonSchema.value))
+
+            val validationMessages = schema.validate(OLD_MAPPER.readTree(value))
+            if (validationMessages.isEmpty()) return Result.success(this)
+
+            val errors = validationMessages.map {
+                JsonSchemaValidationException.SchemaError(
+                    it.evaluationPath?.toString() ?: "$",
+                    it.message,
+                    it.details
+                )
+            }
+            return Result.failure(JsonSchemaValidationException(errors))
+        } catch (e: Exception) {
+            throw MalformedInputException("Malformed JSON schema", e)
+        }
+    }
+
+    enum class JsonSchemaVersion {
+        V4,
+        V6,
+        V7,
+        V2019_09,
+        V2020_12;
+
+        internal fun toVersionFlag() = when (this) {
+            V4 -> SpecVersion.VersionFlag.V4
+            V6 -> SpecVersion.VersionFlag.V6
+            V7 -> SpecVersion.VersionFlag.V7
+            V2019_09 -> SpecVersion.VersionFlag.V201909
+            V2020_12 -> SpecVersion.VersionFlag.V202012
+        }
+    }
 }

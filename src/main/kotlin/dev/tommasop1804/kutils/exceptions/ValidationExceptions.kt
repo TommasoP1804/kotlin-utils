@@ -1397,3 +1397,35 @@ open class NumberSignException : ValidationFailedException {
      */
     constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
 }
+
+/**
+ * Exception representing a failure to validate a JSON schema.
+ *
+ * This exception is thrown when a JSON schema does not conform to expected rules
+ * or has other validation issues. It provides details about the specific validation errors
+ * encountered during schema processing.
+ *
+ * @constructor Creates a new `JsonSchemaValidationException`.
+ * @property errors A set of `SchemaError` objects detailing the specific schema validation errors.
+ * @since 3.8.0
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class JsonSchemaValidationException(errors: Iterable<SchemaError>, cause: Throwable? = null) : ValidationFailedException("Invalid JSON Schema:\n${errors.joinToString(";\n")}", cause = cause) {
+    val errors: Set<SchemaError> = errors.toSet()
+
+    /**
+     * Represents an error encountered during schema validation or processing.
+     *
+     * @property path The location or identifier within the schema where the error occurred.
+     * @property message A descriptive message detailing the nature of the error.
+     * @property details Additional contextual information about the error, if available.
+     * @since 3.8.0
+     * @author Tommaso Pastorelli
+     */
+    data class SchemaError(
+        val path: String,
+        val message: String,
+        val details: Map<String, Any>? = null
+    )
+}

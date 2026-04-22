@@ -122,6 +122,33 @@ class SchemaBuilder {
     fun type(vararg types: String) {
         props["type"] = if (types.size == 1) types[0] else types.toList()
     }
+    /**
+     * Sets the `type` keyword of the schema. This can specify one or more data types
+     * that the schema can validate against. If a single type is provided, it is set
+     * as a string. If multiple types are provided, they are stored as a list.
+     *
+     * @param types One or more string values representing the data types for the schema.
+     * @since 3.8.0
+     */
+    fun type(vararg types: Type) {
+        type(*types.map { it.name.lowercase() }.toTypedArray())
+    }
+
+    /**
+     * Represents a set of data types used for defining various types of values or structures.
+     *
+     * STRING: Represents textual data.
+     * INTEGER: Represents whole numbers.
+     * NUMBER: Represents numeric values, including floating-point numbers.
+     * OBJECT: Represents a structured collection of key-value pairs.
+     * ARRAY: Represents a collection of ordered values.
+     * BOOLEAN: Represents a binary value of true or false.
+     * NULL: Represents the absence of a value or a null value.
+     * @since 3.8.0
+     */
+    enum class Type {
+        STRING, INTEGER, NUMBER, OBJECT, ARRAY, BOOLEAN, NULL
+    }
 
     /**
      * Sets a constant value in the schema. The value provided will constrain the data to be 

@@ -20,10 +20,10 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "3.7.2"
+version = "3.8.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260417T231017Z
+// Last update: Tommaso Pastorelli | 20260422T143752Z
 
 repositories {
     mavenCentral()
@@ -65,15 +65,6 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.13")
     implementation("ch.qos.logback:logback-classic:1.5.32")
     implementation("org.slf4j:jul-to-slf4j:2.0.13")
-    /*implementation("org.geotools:gt-referencing:26.1") {
-        exclude(group = "javax.media", module = "jai_core")
-    }
-    implementation("org.geotools:gt-main:26.1") {
-        exclude(group = "javax.media", module = "jai_core")
-    }
-    implementation("org.geotools:gt-epsg-hsql:26.1") {
-        exclude(group = "javax.media", module = "jai_core")
-    }*/
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.google.zxing:javase:3.5.3")
     implementation("com.github.jsqlparser:jsqlparser:5.3")
@@ -82,19 +73,8 @@ dependencies {
     implementation("org.yaml:snakeyaml:2.5")
     implementation("jakarta.mail:jakarta.mail-api:2.0.1")
     implementation("com.sun.mail:jakarta.mail:2.0.2")
+    implementation("com.networknt:json-schema-validator:1.3.3")
 }
-
-
-/*configurations.all {
-    resolutionStrategy {
-        eachDependency {
-            if (requested.group == "org.geotools") {
-                useTarget("org.geotools:${requested.name}:26.1")
-                because("GeoTools dependencies are only in OSGeo repository")
-            }
-        }
-    }
-}*/
 
 kotlin {
     jvmToolchain(21)
