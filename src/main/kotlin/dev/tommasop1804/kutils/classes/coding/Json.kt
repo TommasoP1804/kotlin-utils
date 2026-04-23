@@ -1481,7 +1481,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
      * @since 3.8.0
      */
-    infix fun validateWithSchema(jsonSchema: Json) = validateWithSchema(jsonSchema, JsonSchema.Version.V2020_12)
+    infix fun validateWithSchema(jsonSchema: JsonSchema) = validateWithSchema(jsonSchema, JsonSchema.Version.V2020_12)
     /**
      * Validates a JSON object against a given JSON schema and schema version.
      * Returns the validated JSON object wrapped in a `Result` if it passes validation, or a
@@ -1494,7 +1494,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
      * @since 3.8.0
      */
-    fun validateWithSchema(jsonSchema: Json, version: JsonSchema.Version): Result<Json> {
+    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version): Result<Json> {
         try {
             val schema = JsonSchemaFactory
                 .getInstance(version.toVersionFlag())
