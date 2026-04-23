@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.tommasop1804:kotlin-utils:3.8.2")
+    implementation("dev.tommasop1804:kotlin-utils:3.9.0")
 }
 ```
 

@@ -1411,8 +1411,12 @@ open class NumberSignException : ValidationFailedException {
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-open class JsonSchemaValidationException(errors: Iterable<SchemaError>, cause: Throwable? = null) : ValidationFailedException("Invalid JSON Schema:\n${errors.joinToString(";\n")}", cause = cause) {
+open class JsonSchemaValidationException(errors: Iterable<SchemaError>, cause: Throwable? = null, internalErrorCode: String? = null) :
+    ValidationFailedException("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Invalid JSON Schema:\n${errors.joinToString(";\n")}", cause = cause) {
+
     val errors: Set<SchemaError> = errors.toSet()
+    val internalErrorCode: String?
+        get() = message?.before(" @@@ ")?.ifBlank { null }
 
     /**
      * Represents an error encountered during schema validation or processing.
@@ -1428,4 +1432,56 @@ open class JsonSchemaValidationException(errors: Iterable<SchemaError>, cause: T
         val message: String,
         val details: Map<String, Any>? = null
     )
+}
+
+/**
+ * Exception thrown to indicate that XML schema validation has failed.
+ *
+ * This exception extends the `ValidationFailedException` to provide additional context
+ * specific to XML schema validation errors. It supports initialization with an error message,
+ * an optional cause, or both.
+ * @since 3.9.0
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class XmlSchemaValidationException : ValidationFailedException {
+    /**
+     * Constructs an instance of XmlSchemaValidationException by calling the constructor of its superclass.
+     * @since 3.9.0
+     */
+    constructor() : super()
+    /**
+     * Constructs an `XmlSchemaValidationException` with a message and an optional internal error code.
+     *
+     * The message is prefixed with the internal error code if it is not null.
+     * This constructor is useful when there is a need to include additional context
+     * about the error using the internal error code.
+     *
+     * @param message The detailed error message describing the reason for the exception.
+     * @param internalErrorCode An optional code representing the internal error context. Defaults to null.
+     * @since 3.9.0
+     */
+    constructor(message: String, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message")
+    /**
+     * Constructs a new `XmlSchemaValidationException` with the specified message and an optional cause
+     * and/or internal error code.
+     *
+     * @param message The detailed message describing the validation failure.
+     * @param cause The underlying cause of the exception (optional, defaults to `null`).
+     * @param internalErrorCode An optional internal error code providing additional context about the failure (defaults to `null`).
+     * @since 3.9.0
+     */
+    constructor(message: String, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
+    /**
+     * Constructs an instance of `XmlSchemaValidationException` with an optional cause and an optional internal error code.
+     *
+     * If an internal error code is provided, it is appended with a separator (e.g., "@@@")
+     * and set as the exception's message. If the internal error code is null, no message is set.
+     * The optional cause can be used to include information about an underlying exception.
+     *
+     * @param cause The original exception that caused this exception to be thrown, or null if no cause is provided.
+     * @param internalErrorCode An optional error code string to provide additional context about the error, or null if not applicable.
+     * @since 3.9.0
+     */
+    constructor(cause: Throwable? = null, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else null, cause)
 }
