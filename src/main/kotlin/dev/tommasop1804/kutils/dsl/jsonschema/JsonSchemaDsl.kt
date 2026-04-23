@@ -10,6 +10,7 @@ package dev.tommasop1804.kutils.dsl.jsonschema
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.coding.JsonSchema.Companion.toJsonSchema
 
 @DslMarker
 annotation class JsonSchemaDslMarker
@@ -130,24 +131,8 @@ class SchemaBuilder {
      * @param types One or more string values representing the data types for the schema.
      * @since 3.8.0
      */
-    fun type(vararg types: Type) {
-        type(*types.map { it.name.lowercase() }.toTypedArray())
-    }
-
-    /**
-     * Represents a set of data types used for defining various types of values or structures.
-     *
-     * STRING: Represents textual data.
-     * INTEGER: Represents whole numbers.
-     * NUMBER: Represents numeric values, including floating-point numbers.
-     * OBJECT: Represents a structured collection of key-value pairs.
-     * ARRAY: Represents a collection of ordered values.
-     * BOOLEAN: Represents a binary value of true or false.
-     * NULL: Represents the absence of a value or a null value.
-     * @since 3.8.0
-     */
-    enum class Type {
-        STRING, INTEGER, NUMBER, OBJECT, ARRAY, BOOLEAN, NULL
+    fun type(vararg types: JsonSchema.Type) {
+        type(*types.map { it.value }.toTypedArray())
     }
 
     /**
@@ -536,6 +521,14 @@ class SchemaBuilder {
      * @since 3.3.0
      */
     fun toJson(indent: Int = 2) = mapToJson(build(), indent, 0)
+    /**
+     * Converts the data structure to its JSON string representation.
+     *
+     * @param indent The number of spaces to use for indentation in the JSON output. Defaults to 2.
+     * @return The JSON string representation of the data structure.
+     * @since 3.8.1
+     */
+    fun toJsonSchema(indent: Int = 2) = mapToJson(build(), indent, 0).toJsonSchema()()
 }
 
 /**
@@ -843,7 +836,7 @@ fun buildJsonSchema(block: ReceiverConsumer<SchemaBuilder>) =
     SchemaBuilder().apply {
         schema()
         block()
-    }.toJson()
+    }.toJsonSchema()
 
 /**
  * Initializes a JSON schema by applying a provided block to a SchemaBuilder instance.

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.networknt.schema.JsonSchemaFactory
-import com.networknt.schema.SpecVersion
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
@@ -49,7 +48,7 @@ import java.nio.file.Path
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Json.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Json.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration", "kutils_getorthrow_as_invoke", "RedundantSuppression")
-class Json private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.JSON) {
+open class Json private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.JSON) {
 
     /**
      * Represents the length of the underlying string value.
@@ -150,7 +149,7 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @since 3.0.0
      */
     constructor(code: Code) : this(code.value) {
-        code.length.expect(dev.tommasop1804.kutils.classes.coding.Language.JSON)
+        code.language.expect(dev.tommasop1804.kutils.classes.coding.Language.JSON)
     }
 
     /**
@@ -242,9 +241,9 @@ class Json private constructor(@param:Language("json") override val value: Strin
          *
          * @receiver The string to be checked for validity as JSON.
          * @return `true` if the string is a valid JSON object or array, `false` otherwise.
-         * @since 3.0.0
+         * @since 3.8.1
          */
-        fun String.isValidJSON() =  try {
+        fun String.isValidJson() =  try {
             val node = MAPPER.readTree(this)
             node.isObject || node.isArray
         } catch (_: Exception) {
@@ -474,10 +473,30 @@ class Json private constructor(@param:Language("json") override val value: Strin
          * into its string representation.
          *
          * @return a Result wrapping the JSON object, or an exception if the conversion fails.
+         * @since 3.8.1
+         */
+        fun com.fasterxml.jackson.databind.JsonNode.asJson(): Result<Json> = runCatching {
+            Json(OLD_MAPPER.writeValueAsString(this))
+        }
+        /**
+         * Converts the current JsonNode into a JSON object by serializing it
+         * into its string representation.
+         *
+         * @return a Result wrapping the JSON object, or an exception if the conversion fails.
          * @since 3.0.0
          */
         fun JsonNode.asPrettyJson(): Result<Json> = runCatching {
             Json(MAPPER.writeValueAsString(this)).pretty
+        }
+        /**
+         * Converts the current JsonNode into a JSON object by serializing it
+         * into its string representation.
+         *
+         * @return a Result wrapping the JSON object, or an exception if the conversion fails.
+         * @since 3.8.1
+         */
+        fun com.fasterxml.jackson.databind.JsonNode.asPrettyJson(): Result<Json> = runCatching {
+            Json(OLD_MAPPER.writeValueAsString(this)).pretty
         }
 
         /**
@@ -778,6 +797,13 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @since 3.8.0
      */
     fun toJsonNode(): JsonNode = MAPPER.readTree(value)
+    /**
+     * Converts the provided value to a JsonNode representation using the predefined object mapper.
+     *
+     * @return a JsonNode representation of the given value.
+     * @since 3.8.1
+     */
+    fun toFasterXmlJsonNode(): com.fasterxml.jackson.databind.JsonNode = OLD_MAPPER.readTree(value)
 
     /**
      * Writes the current object to the specified file in JSON format using the configured mapper.
@@ -793,14 +819,32 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @param keyPath The string representing the nested path to the desired value, separated by the specified regex separator.
      * @param regexSeparator The regex used to split the key path into individual keys. If null mapped to `DEFAULT_SEPARATOR`.
      * @return The nested JSON node at the specified key path, or `null` if the path does not exist.
-     * @since 3.0.0
+     * @since 3.8.1
      */
-    operator fun get(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR): JsonNode? {
+    operator fun get(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR) = getAsNode(keyPath, regexSeparator)?.toJson()
+
+    /**
+     * Invokes the operator function to retrieve a nested value from a JSON tree using a key path.
+     *
+     * @param keyPath The string representing the nested path to the desired value, separated by the specified regex separator.
+     * @param regexSeparator The regex used to split the key path into individual keys. If null mapped to `DEFAULT_SEPARATOR`.
+     * @return The nested JSON node at the specified key path, or `null` if the path does not exist.
+     * @since 3.8.1
+     */
+    fun getAsNode(keyPath: String, regexSeparator: Regex): JsonNode? {
         var node = MAPPER.readTree(value)
         for (key in keyPath.split(regexSeparator))
             if (node.has(key)) node = node.get(key) else return null
         return node
     }
+    /**
+     * Retrieves a nested JsonNode from the given key path using the specified separator.
+     *
+     * @param keyPath The string representing the path to the desired JsonNode, with keys separated by the default separator.
+     * @return The JsonNode at the specified key path, or null if no corresponding node is found.
+     * @since 3.8.1
+     */
+    infix fun getAsNode(keyPath: String): JsonNode? = getAsNode(keyPath, DEFAULT_SEPARATOR)
 
     /**
      * Finds and returns a list of JSON nodes from the current value where the specified property matches the given value.
@@ -1437,7 +1481,7 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
      * @since 3.8.0
      */
-    infix fun validateWithSchema(jsonSchema: Json) = validateWithSchema(jsonSchema, JsonSchemaVersion.V2020_12)
+    infix fun validateWithSchema(jsonSchema: Json) = validateWithSchema(jsonSchema, JsonSchema.Version.V2020_12)
     /**
      * Validates a JSON object against a given JSON schema and schema version.
      * Returns the validated JSON object wrapped in a `Result` if it passes validation, or a
@@ -1450,10 +1494,10 @@ class Json private constructor(@param:Language("json") override val value: Strin
      * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
      * @since 3.8.0
      */
-    fun validateWithSchema(jsonSchema: Json, version: JsonSchemaVersion): Result<Json> {
+    fun validateWithSchema(jsonSchema: Json, version: JsonSchema.Version): Result<Json> {
         try {
             val schema = JsonSchemaFactory
-                .getInstance(SpecVersion.VersionFlag.V202012)
+                .getInstance(version.toVersionFlag())
                 .getSchema(OLD_MAPPER.readTree(jsonSchema.value))
 
             val validationMessages = schema.validate(OLD_MAPPER.readTree(value))
@@ -1469,22 +1513,6 @@ class Json private constructor(@param:Language("json") override val value: Strin
             return Result.failure(JsonSchemaValidationException(errors))
         } catch (e: Exception) {
             throw MalformedInputException("Malformed JSON schema", e)
-        }
-    }
-
-    enum class JsonSchemaVersion {
-        V4,
-        V6,
-        V7,
-        V2019_09,
-        V2020_12;
-
-        internal fun toVersionFlag() = when (this) {
-            V4 -> SpecVersion.VersionFlag.V4
-            V6 -> SpecVersion.VersionFlag.V6
-            V7 -> SpecVersion.VersionFlag.V7
-            V2019_09 -> SpecVersion.VersionFlag.V201909
-            V2020_12 -> SpecVersion.VersionFlag.V202012
         }
     }
 }

@@ -4,12 +4,10 @@
 
 package dev.tommasop1804.kutils.classes.translators
 
-import dev.tommasop1804.kutils.annotations.Beta
-import dev.tommasop1804.kutils.classes.coding.Json
-import dev.tommasop1804.kutils.classes.coding.Yaml
-import dev.tommasop1804.kutils.exceptions.ConfigurationException
-import dev.tommasop1804.kutils.exceptions.TranslationException
-import dev.tommasop1804.kutils.tryOrThrow
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.exceptions.*
 import java.io.File
 import java.nio.file.Path
 import kotlin.enums.EnumEntries
@@ -63,11 +61,11 @@ open class Translator(
         infix fun String.translatedWith(translator: Translator): String {
             if (translator.file.extension == "yaml" || translator.file.extension == "yml") {
                 val yaml = tryOrThrow({ -> ConfigurationException("Not a valid YAML") }) { Yaml(translator.file) }
-                return yaml[this].asString() ?: throw TranslationException("Key '$this' not found in YAML file")
+                return yaml.getAsNode(this).asString() ?: throw TranslationException("Key '$this' not found in YAML file")
             }
             else if (translator.file.extension == "json") {
                 val json = tryOrThrow({ -> ConfigurationException("Not a valid JSON") }) { Json(translator.file) }
-                return json[this]?.asString() ?: throw TranslationException("Key '$this' not found in JSON file")
+                return json.getAsNode(this)?.asString() ?: throw TranslationException("Key '$this' not found in JSON file")
             }
             throw ConfigurationException("Unsupported file extension: ${translator.file.extension}")
         }

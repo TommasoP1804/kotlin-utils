@@ -540,9 +540,18 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @param dotPath The dot-separated string representing the path to the desired YAML node.
      * @return The YAMLNode corresponding to the specified path.
-     * @since 3.0.0
+     * @since 3.8.1
      */
-    operator fun get(dotPath: String) =
+    operator fun get(dotPath: String) = Yaml(getAsNode(dotPath))
+
+    /**
+     * Retrieves a YAML node based on the provided dot-separated path.
+     *
+     * @param dotPath The dot-separated string representing the path to the desired YAML node.
+     * @return The YAMLNode corresponding to the specified path.
+     * @since 3.8.1
+     */
+    infix fun getAsNode(dotPath: String) =
         if (Char.DOT !in dotPath) YamlNode(toDataMap()()[dotPath])
         else YamlNode(toDataMap()()[dotPath before Char.DOT])[dotPath after Char.DOT]
 

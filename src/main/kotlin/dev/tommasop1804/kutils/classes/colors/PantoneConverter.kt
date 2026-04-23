@@ -9255,8 +9255,8 @@ internal object PantoneConverter {
     """.trimIndent()
 
     fun byCode(code: String): String2? {
-        val first = Json(json)["$code.name", Json.DEFAULT_SEPARATOR] ?: return null
-        return first.toString().replace("\"", "") to Json(json)["$code.hex", Json.DEFAULT_SEPARATOR]!!.toString().replace("\"", "")
+        val first = Json(json).getAsNode("$code.name", Json.DEFAULT_SEPARATOR) ?: return null
+        return first.toString().replace("\"", "") to Json(json).getAsNode("$code.hex", Json.DEFAULT_SEPARATOR)!!.toString().replace("\"", "")
     }
 
     fun byName(name: String): String? {

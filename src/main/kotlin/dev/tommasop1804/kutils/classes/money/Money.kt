@@ -358,7 +358,7 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
             .let(::Json)
 
         return Pair(
-            Money(response["rates"]!![currency.currencyCode].asDecimal().toBigDecimal(), currency),
+            Money(response.getAsNode("rates")!![currency.currencyCode].asDecimal().toBigDecimal(), currency),
             TimeZoneDesignator.Z.convert(
                 if (OffsetTime().isAfter(OffsetTime(16, 0, zoneOffset = TimeZone.CET)))
                     OffsetDateTime(TimeZone.CET).withHour(16).withMinute(0).withSecond(0).withNano(0)
