@@ -146,18 +146,22 @@ class SqlQueryBuilder {
     /**
      * Adds a lateral join clause to the SQL query under construction.
      *
+     * WARNING: If `alias` parameter is provided, automatically the method puts parentheses around the query with the alias after `)`.
+     * Else, the query is added directly without parentheses.
+     *
      * @param query the SQL query to be joined laterally.
      * @param joinType the type of join operation to be performed (e.g., INNER, OUTER).
+     * @param alias the alias for the joined table.
      * @param onCondition the condition to specify how the tables are joined.
      * @return the current instance of SQLQueryBuilder with the updated join clause.
-     * @since 1.0.0
+     * @since 3.9.3
      */
-    fun lateralJoin(@Language("sql") query: String, joinType: JoinType, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
+    fun lateralJoin(@Language("sql") query: String, joinType: JoinType, alias: String? = null, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
         if (joinType.onCondition && onCondition.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $joinType without onCondition. Please provide onCondition to join table with type $joinType")
         if (!joinType.onCondition && onCondition.isNotNullOrBlank())
             throw IllegalOperationException("Cannot join with type $joinType with onCondition. Please provide onCondition to join table with type $joinType")
-        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL ($query)${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
+        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "($query) $alias" else query}${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
         return this
     }
 
@@ -165,8 +169,12 @@ class SqlQueryBuilder {
      * Performs a lateral join operation on the current SQL query. A lateral join allows joining a table
      * expression which depends on columns of preceding joins in the query.
      *
+     * WARNING: If `alias` parameter is provided, automatically the method puts parentheses around the query with the alias after `)`.
+     * Else, the query is added directly without parentheses.
+     *
      * @param query the SQL code block representing the join table or subquery. It must be in SQL language.
      * @param joinType the type of join to perform, such as INNER, LEFT, or RIGHT, represented by the JoinType enum.
+     * @param alias the alias for the joined table.
      * @param onCondition the condition used to join the tables, specified as a string.
      *
      * @return the updated SQLQueryBuilder instance containing the added lateral join clause.
@@ -174,14 +182,14 @@ class SqlQueryBuilder {
      * @throws UnsupportedOperationException if the method is called before a SELECT operation has been specified.
      * @throws IllegalArgumentException if the provided code block is not in SQL language.
      *
-     * @since 1.0.0
+     * @since 3.9.3
      */
-    fun lateralJoin(query: SqlQuery, joinType: JoinType, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
+    fun lateralJoin(query: SqlQuery, joinType: JoinType, alias: String? = null, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
         if (joinType.onCondition && onCondition.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $joinType without onCondition. Please provide onCondition to join table with type $joinType")
         if (!joinType.onCondition && onCondition.isNotNullOrBlank())
             throw IllegalOperationException("Cannot join with type $joinType with onCondition. Please provide onCondition to join table with type $joinType")
-        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL (${query.value})${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
+        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "($query) $alias" else query}${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
         return this
     }
 

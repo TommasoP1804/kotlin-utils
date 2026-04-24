@@ -334,29 +334,51 @@ class JoinScope @PublishedApi internal constructor() {
     }
 
     /**
-     * Adds a LATERAL JOIN using a raw SQL subquery string and [JoinType].
+     * Adds a lateral join clause to the current SQL construct.
      *
-     * @since 3.6.0
+     * A lateral join allows a subquery to refer to columns from the outer query's scope.
+     * If the `type` of join requires an ON condition, the `on` parameter must be provided;
+     * otherwise, the `on` parameter must be null or blank.
+     *
+     * WARNING: If `alias` parameter is provided, automatically the method puts parentheses around the query with the alias after `)`.
+     * Else, the query is added directly without parentheses.
+     *
+     * @param query The SQL query to be joined laterally.
+     * @param type The type of the lateral join, determined by the `JoinType` enum.
+     * @param alias An optional alias for the lateral query. If provided, the query will be
+     *              wrapped in parentheses and the alias will be added after the closing parenthesis.
+     * @param on An optional SQL condition for the join. It must be specified if the `type` of
+     *           the join requires a condition and omitted otherwise.
+     * @throws IllegalOperationException If an invalid combination of `type` and `on` is provided.
+     * @since 3.9.3
      */
-    fun lateral(@Language("sql") query: String, type: JoinType, @Language("sql") on: String? = null) {
+    fun lateral(@Language("sql") query: String, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joins += " ${+type.sqlKeyword} JOIN LATERAL ($query)${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joins += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "($query) $alias" else query}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
-     * Adds a LATERAL JOIN using a [SqlQuery] object and [JoinType].
+     * Performs a lateral join operation with the given SQL query, join type, alias, and optional ON condition.
      *
-     * @since 3.6.0
+     * WARNING: If `alias` parameter is provided, automatically the method puts parentheses around the query with the alias after `)`.
+     * Else, the query is added directly without parentheses.
+     *
+     * @param query The SQL query to be used in the lateral join.
+     * @param type The type of join to perform. This determines whether an ON condition is required.
+     * @param alias An optional alias to use for the joined query. Defaults to null.
+     * @param on An optional ON condition for the join. Must be provided if the join type requires it, otherwise must be null.
+     * @throws IllegalOperationException Thrown if the provided ON condition does not satisfy the requirements of the specified join type.
+     * @since 3.9.3
      */
-    fun lateral(query: SqlQuery, type: JoinType, @Language("sql") on: String? = null) {
+    fun lateral(query: SqlQuery, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joins += " ${+type.sqlKeyword} JOIN LATERAL (${query.value})${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joins += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "(${query.value}) $alias" else query.value}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 }
 
@@ -872,27 +894,33 @@ class SqlBuilder @PublishedApi internal constructor() {
     /**
      * Adds a lateral join clause.
      *
-     * @since 3.6.0
+     * WARNING: If `alias` parameter is provided, automatically the method puts parentheses around the query with the alias after `)`.
+     * Else, the query is added directly without parentheses.
+     *
+     * @since 3.9.3
      */
-    fun lateralJoin(@Language("sql") query: String, type: JoinType, @Language("sql") on: String? = null) {
+    fun lateralJoin(@Language("sql") query: String, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ($query)${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "($query) $alias" else query}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
      * Adds a lateral join clause using a [SqlQuery].
      *
-     * @since 3.6.0
+     * WARNING: If `alias` parameter is provided, automatically the method puts parentheses around the query with the alias after `)`.
+     * Else, the query is added directly without parentheses.
+     *
+     * @since 3.9.3
      */
-    fun lateralJoin(query: SqlQuery, type: JoinType, @Language("sql") on: String? = null) {
+    fun lateralJoin(query: SqlQuery, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joinParts += " ${+type.sqlKeyword} JOIN LATERAL (${query.value})${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "(${query.value}) $alias" else query.value}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
