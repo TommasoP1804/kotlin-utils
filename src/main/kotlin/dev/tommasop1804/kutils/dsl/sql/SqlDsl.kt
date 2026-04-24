@@ -11,6 +11,7 @@ package dev.tommasop1804.kutils.dsl.sql
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -25,14 +26,14 @@ import kotlin.contracts.contract
  * @author Tommaso Pastorelli
  */
 @Suppress("SqlNoDataSourceInspection")
-enum class JoinType(@param:Language("sql") val sqlKeyword: String) {
+enum class JoinType(@param:Language("sql") val sqlKeyword: String, val onCondition: Boolean = true) {
     INNER("INNER"),
     LEFT_OUTER("LEFT"),
     RIGHT_OUTER("RIGHT"),
     FULL_OUTER("FULL"),
-    CROSS("CROSS"),
+    CROSS("CROSS", false),
     SELF("SELF"),
-    NATURAL("NATURAL")
+    NATURAL("NATURAL", false)
 }
 
 /**
@@ -273,17 +274,13 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String) {
-        joins += " ${+type.sqlKeyword} JOIN $table ON $on"
-    }
+    fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String? = null) {
+        if (type.onCondition && on.isNullOrBlank())
+            throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
+        if (!type.onCondition && on.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join table $table with type $type with onCondition. Please provide onCondition to join table $table with type $type")
 
-    /**
-     * Adds a join clause using a raw join type string.
-     *
-     * @since 3.6.0
-     */
-    fun join(@Language("sql") table: String, @Language("sql") type: String, @Language("sql") on: String) {
-        joins += " ${+type} JOIN $table ON $on"
+        joins += " ${+type.sqlKeyword} JOIN $table${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -292,7 +289,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun inner(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.INNER, on)
+        join(table, JoinType.INNER, on.validate("inner", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a LEFT JOIN.
@@ -300,7 +297,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun left(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.LEFT_OUTER, on)
+        join(table, JoinType.LEFT_OUTER, on.validate("left", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a RIGHT JOIN.
@@ -308,7 +305,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun right(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.RIGHT_OUTER, on)
+        join(table, JoinType.RIGHT_OUTER, on.validate("right", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a FULL OUTER JOIN.
@@ -316,7 +313,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun full(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.FULL_OUTER, on)
+        join(table, JoinType.FULL_OUTER, on.validate("full", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a CROSS JOIN.
@@ -341,17 +338,12 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun lateral(@Language("sql") query: String, type: JoinType, @Language("sql") on: String) {
-        joins += " ${+type.sqlKeyword} JOIN LATERAL ($query) ON $on"
-    }
-
-    /**
-     * Adds a LATERAL JOIN using a raw SQL subquery string and raw join type string.
-     *
-     * @since 3.6.0
-     */
-    fun lateral(@Language("sql") query: String, @Language("sql") type: String, @Language("sql") on: String) {
-        joins += " ${+type} JOIN LATERAL ($query) ON $on"
+    fun lateral(@Language("sql") query: String, type: JoinType, @Language("sql") on: String? = null) {
+        if (type.onCondition && on.isNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
+        if (!type.onCondition && on.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
+        joins += " ${+type.sqlKeyword} JOIN LATERAL ($query)${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -359,17 +351,12 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun lateral(query: SqlQuery, type: JoinType, @Language("sql") on: String) {
-        joins += " ${+type.sqlKeyword} JOIN LATERAL (${query.value}) ON $on"
-    }
-
-    /**
-     * Adds a LATERAL JOIN using a [SqlQuery] object and raw join type string.
-     *
-     * @since 3.6.0
-     */
-    fun lateral(query: SqlQuery, @Language("sql") type: String, @Language("sql") on: String) {
-        joins += " ${+type} JOIN LATERAL (${query.value}) ON $on"
+    fun lateral(query: SqlQuery, type: JoinType, @Language("sql") on: String? = null) {
+        if (type.onCondition && on.isNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
+        if (!type.onCondition && on.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
+        joins += " ${+type.sqlKeyword} JOIN LATERAL (${query.value})${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 }
 
@@ -875,16 +862,11 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String) {
-        joinParts += " ${+type.sqlKeyword} JOIN $table ON $on"
-    }
-
-    /**
-     * Adds a single join clause with a raw join type string.
-     *
-     * @since 3.6.0
-     */
-    fun join(@Language("sql") table: String, @Language("sql") type: String, @Language("sql") on: String) {
-        joinParts += " ${+type} JOIN $table ON $on"
+        if (type.onCondition && on.isNullOrBlank())
+            throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
+        if (!type.onCondition && on.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join table $table with type $type with onCondition. Please provide onCondition to join table $table with type $type")
+        joinParts += " ${+type.sqlKeyword} JOIN $table${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -893,16 +875,11 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun lateralJoin(@Language("sql") query: String, type: JoinType, @Language("sql") on: String) {
-        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ($query) ON $on"
-    }
-
-    /**
-     * Adds a lateral join clause with a raw join type string.
-     *
-     * @since 3.6.0
-     */
-    fun lateralJoin(@Language("sql") query: String, @Language("sql") type: String, @Language("sql") on: String) {
-        joinParts += " ${+type} JOIN LATERAL ($query) ON $on"
+        if (type.onCondition && on.isNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
+        if (!type.onCondition && on.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
+        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ($query)${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -911,16 +888,11 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun lateralJoin(query: SqlQuery, type: JoinType, @Language("sql") on: String) {
-        joinParts += " ${+type.sqlKeyword} JOIN LATERAL (${query.value}) ON $on"
-    }
-
-    /**
-     * Adds a lateral join clause using a [SqlQuery] and raw join type string.
-     *
-     * @since 3.6.0
-     */
-    fun lateralJoin(query: SqlQuery, @Language("sql") type: String, @Language("sql") on: String) {
-        joinParts += " ${+type} JOIN LATERAL (${query.value}) ON $on"
+        if (type.onCondition && on.isNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
+        if (!type.onCondition && on.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
+        joinParts += " ${+type.sqlKeyword} JOIN LATERAL (${query.value})${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
     }
 
     /**

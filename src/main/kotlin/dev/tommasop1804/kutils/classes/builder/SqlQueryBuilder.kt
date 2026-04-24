@@ -120,22 +120,6 @@ class SqlQueryBuilder {
     }
 
     /**
-     * Adds a join clause to the current SQL query.
-     * This method allows specifying the type of join, the table to join with,
-     * and the condition for the join operation. It can only be used after calling `select()`.
-     *
-     * @param table The name of the table to be joined.
-     * @param joinType The type of join (e.g., "INNER", "LEFT", "RIGHT", "FULL").
-     * @param onCondition The condition on which the join will be based.
-     * @return The current instance of `SQLQueryBuilder` with the join clause appended.
-     * @since 1.0.0
-     */
-    fun join(@Language("sql") table: String, @Language("sql") joinType: String, @Language("sql") onCondition: String): SqlQueryBuilder {
-        joinClause += " ${+joinType} JOIN $table ON $onCondition"
-        return this
-    }
-
-    /**
      * Adds a join clause to the SQL query builder for combining rows from two tables
      * based on a related column between them.
      *
@@ -150,27 +134,12 @@ class SqlQueryBuilder {
      * the query type is set to SELECT.
      * @since 1.0.0
      */
-    fun join(@Language("sql") table: String, joinType: JoinType, @Language("sql") onCondition: String): SqlQueryBuilder {
-        joinClause += " ${+joinType.sqlKeyWord} JOIN $table ON $onCondition"
-        return this
-    }
-
-    /**
-     * Adds a lateral join clause to the current SQL query.
-     *
-     * The lateral join allows joining a result set produced by a subquery
-     * with the current query. The type of join and the on-condition specify
-     * how the rows from the two data sources should be combined.
-     *
-     * @param query The query representing the subquery to join laterally.
-     * @param joinType The type of join to perform (e.g., INNER, OUTER).
-     * @param onCondition The condition specifying how rows from the two data
-     * sources should be matched.
-     * @return An instance of `SQLQueryBuilder` with the updated lateral join clause.
-     * @since 1.0.0
-     */
-    fun lateralJoin(@Language("sql") query: String, @Language("sql") joinType: String, @Language("sql") onCondition: String): SqlQueryBuilder {
-        joinClause += " ${+joinType} JOIN LATERAL ($query) ON $onCondition"
+    fun join(@Language("sql") table: String, joinType: JoinType, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
+        if (joinType.onCondition && onCondition.isNullOrBlank())
+            throw IllegalOperationException("Cannot join table $table with type $joinType without onCondition. Please provide onCondition to join table $table with type $joinType")
+        if (!joinType.onCondition && onCondition.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join table $table with type $joinType with onCondition. Please provide onCondition to join table $table with type $joinType")
+        joinClause += " ${+joinType.sqlKeyWord} JOIN $table${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
         return this
     }
 
@@ -183,28 +152,12 @@ class SqlQueryBuilder {
      * @return the current instance of SQLQueryBuilder with the updated join clause.
      * @since 1.0.0
      */
-    fun lateralJoin(@Language("sql") query: String, joinType: JoinType, @Language("sql") onCondition: String): SqlQueryBuilder {
-        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL ($query) ON $onCondition"
-        return this
-    }
-
-    /**
-     * Adds a lateral join clause to the current SQL query.
-     *
-     * This method modifies the current SQL query by adding a lateral join clause
-     * with the specified join type and condition on a subquery.
-     *
-     * @param query the SQL subquery, represented as a `Code` object, to be used in the lateral join.
-     *              The subquery must be in SQL language.
-     * @param joinType the type of join to include (e.g., INNER, LEFT, RIGHT).
-     * @param onCondition the condition that specifies how the tables are joined.
-     * @return the updated `SQLQueryBuilder` instance with the lateral join clause added.
-     * @throws UnsupportedOperationException if the current query type is not SELECT.
-     * @throws IllegalArgumentException if the provided subquery is not in SQL language.
-     * @since 1.0.0
-     */
-    fun lateralJoin(query: SqlQuery, @Language("sql") joinType: String, @Language("sql") onCondition: String): SqlQueryBuilder {
-        joinClause += " ${+joinType} JOIN LATERAL (${query.value}) ON $onCondition"
+    fun lateralJoin(@Language("sql") query: String, joinType: JoinType, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
+        if (joinType.onCondition && onCondition.isNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $joinType without onCondition. Please provide onCondition to join table with type $joinType")
+        if (!joinType.onCondition && onCondition.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $joinType with onCondition. Please provide onCondition to join table with type $joinType")
+        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL ($query)${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
         return this
     }
 
@@ -223,8 +176,12 @@ class SqlQueryBuilder {
      *
      * @since 1.0.0
      */
-    fun lateralJoin(query: SqlQuery, joinType: JoinType, @Language("sql") onCondition: String): SqlQueryBuilder {
-        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL (${query.value}) ON $onCondition"
+    fun lateralJoin(query: SqlQuery, joinType: JoinType, @Language("sql") onCondition: String? = null): SqlQueryBuilder {
+        if (joinType.onCondition && onCondition.isNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $joinType without onCondition. Please provide onCondition to join table with type $joinType")
+        if (!joinType.onCondition && onCondition.isNotNullOrBlank())
+            throw IllegalOperationException("Cannot join with type $joinType with onCondition. Please provide onCondition to join table with type $joinType")
+        joinClause += " ${+joinType.sqlKeyWord} JOIN LATERAL (${query.value})${if (onCondition.isNotNullOrBlank()) " ON $onCondition" else String.EMPTY}"
         return this
     }
 
@@ -1964,7 +1921,7 @@ class SqlQueryBuilder {
      */
     @Suppress("SqlNoDataSourceInspection", "unused")
     @Deprecated("Use SqlDsl instead.")
-    enum class JoinType(@param:Language("sql") val sqlKeyWord: String) {
+    enum class JoinType(@param:Language("sql") val sqlKeyWord: String, val onCondition: Boolean = true) {
         /**
          * Represents an inner join type in SQL, where only the matching rows from the joined tables
          * are included in the result set.
@@ -2016,7 +1973,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        CROSS("CROSS"),
+        CROSS("CROSS", false),
         /**
          * Represents a join type in which a table is joined with itself.
          *
@@ -2033,7 +1990,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        NATURAL("NATURAL")
+        NATURAL("NATURAL", false)
     }
     
     /**
