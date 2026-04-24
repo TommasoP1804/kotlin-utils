@@ -861,7 +861,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String) {
+    fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -874,7 +874,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun lateralJoin(@Language("sql") query: String, type: JoinType, @Language("sql") on: String) {
+    fun lateralJoin(@Language("sql") query: String, type: JoinType, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -887,7 +887,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun lateralJoin(query: SqlQuery, type: JoinType, @Language("sql") on: String) {
+    fun lateralJoin(query: SqlQuery, type: JoinType, @Language("sql") on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
