@@ -188,7 +188,7 @@ data class Contact(
      * @since 1.0.0
      */
     @Suppress("unchecked_cast")
-    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
     
     /**
      * Represents a person's name with various components and optional phonetic details.
@@ -328,7 +328,7 @@ data class Contact(
          * @since 1.0.0
          */
         @Suppress("unchecked_cast")
-        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
         /**
          * Returns the string representation of an instance of the class.
@@ -426,7 +426,7 @@ data class Contact(
          * @since 1.0.0
          */
         @Suppress("unchecked_cast")
-        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
     }
     /**
      * Represents an address with details such as street, civic number, city, neighbourhood, state,
@@ -594,7 +594,7 @@ data class Contact(
          * @since 1.0.0
          */
         @Suppress("unchecked_cast")
-        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
     }
 
     /**
@@ -1004,7 +1004,6 @@ data class Contact(
          * This property is evaluated dynamically using a `when` expression to determine the list of
          * countries based on the provided `countryCode`.
          *
-         * @property country Provides the list of countries associated with a given country code.
          * @see Country
          * @since 1.0.0
          */

@@ -11,13 +11,10 @@ package dev.tommasop1804.kutils.classes.pagination
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.constants.SortDirection
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.onlyElement
-import dev.tommasop1804.kutils.splitAndTrim
-import dev.tommasop1804.kutils.toReflectionMap
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonSerialize
@@ -164,7 +161,7 @@ data class SortOption(
      * @since 1.0.0
      */
     @Suppress("unchecked_cast")
-    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
     /**
      * Returns a string representation of the SortOption instance.

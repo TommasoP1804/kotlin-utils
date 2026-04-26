@@ -3642,16 +3642,13 @@ fun Boolean.print() = apply { print(this) }
  */
 fun CharArray.print() = apply { print(toSafeString()) }
 /**
- * Prints the string representation of the nullable receiver object to the standard output.
- * If the receiver is `null`, it prints the string `"null"`.
+ * Prints the result of applying the specified transformer to the current object.
  *
- * This function provides a shorthand for printing any object, including `null`, without explicit null checks.
- *
- * @receiver The nullable object to be printed.
- * @since 1.0.0
+ * @param transfor A transformer function that converts the current object into a string representation.
+ * @since 3.10.0
  */
 @JvmName("printGeneric")
-fun <T> T.print() = apply { print(toSafeString()) }
+fun <T> T.print(transfor: Transformer<T, String> = { it.toSafeString() }) = apply { print(transfor(this)) }
 
 /**
  * Prints the integer receiver to the standard output followed by a newline.
@@ -3744,16 +3741,18 @@ fun Boolean.println() = apply { println(this) }
  */
 fun CharArray.println() = apply { println(toSafeString()) }
 /**
- * Prints the string representation of the object to the standard output, followed by a newline.
+ * Prints the string representation of the receiver object to the standard output.
+ * A custom transformation function can be provided to define how the object is
+ * converted into a string before printing. By default, a safe string representation
+ * is used.
  *
- * If the object is `null`, it prints "null".
- * This function utilizes the platform default implementation of `println` for printing.
- *
- * @receiver Any? The object to be printed. Can be nullable.
- * @since 1.0.0
+ * @param transfor A transformation function that converts the receiver object into
+ *                 a string before printing. The default behavior converts the object
+ *                 to a safe string representation.
+ * @since 3.10.0
  */
 @JvmName("printlnGeneric")
-fun <T> T.println() = apply { println(toSafeString()) }
+fun <T> T.println(transfor: Transformer<T, String> = { it.toSafeString() }) = apply { println(transfor(this)) }
 
 /**
  * Prints the integer value to the standard error stream.
@@ -3841,17 +3840,16 @@ fun Boolean.printErr() = apply { System.err.print(this) }
  */
 fun CharArray.printErr() = apply { System.err.print(toSafeString()) }
 /**
- * Prints the string representation of the object to the standard error output stream.
- * If the object is `null`, "null" will be printed.
+ * Prints the string representation of the receiver object to the standard error stream.
+ * The transformation of the receiver object to a string is handled by the provided transformer function.
  *
- * This method is an extension function for all types, allowing any object or nullable object
- * to use it for logging or debugging purposes to the error output.
- *
- * @receiver The object whose string representation is to be printed to the standard error output stream.
- * @since 1.0.0
+ * @param transform A lambda function that converts the receiver object to a string.
+ *                  The default transformer uses `toSafeString()` to generate a safe string representation.
+ * @since 3.10.0
  */
 @JvmName("printErrGeneric")
-fun <T> T.printErr() = apply { System.err.println(toSafeString()) }
+fun <T> T.printErr(transform: Transformer<T, String> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
+
 /**
  * Extension function for the [Int] type that outputs the integer
  * to the standard error stream.
@@ -3944,16 +3942,12 @@ fun Boolean.printlnErr() = apply { System.err.println(this) }
  */
 fun CharArray.printlnErr() = apply { System.err.println(toSafeString()) }
 /**
- * Prints the string representation of the receiver object to the standard error stream.
+ * Prints the current object to the standard error stream after applying the specified transformation.
  *
- * If the receiver is `null`, the string "null" will be printed.
- *
- * This method is a convenience function for printing error messages or diagnostic information
- * to the error output stream.
- *
- * @receiver The object whose string representation will be printed to the error stream.
- *
- * @since 1.0.0
+ * @param transform A lambda or function that transforms the current object of type [T]
+ *                  into a string representation. Defaults to a safe string conversion.
+ * @return The current object of type [T], allowing method chaining.
+ * @since 3.10.0
  */
 @JvmName("printlnErrGeneric")
-fun <T> T.printlnErr() = apply { System.err.println(toSafeString()) }
+fun <T> T.printlnErr(transform: Transformer<T, String> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }

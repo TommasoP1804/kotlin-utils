@@ -214,7 +214,7 @@ data class FilterOption(
      * @since 1.0.0
      */
     @Suppress("unchecked_cast")
-    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
     /**
      * Returns a string representation of the FilterOption instance.

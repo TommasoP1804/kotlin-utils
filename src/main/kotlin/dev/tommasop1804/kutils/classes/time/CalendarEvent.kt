@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.LocalTime
 import dev.tommasop1804.kutils.Uri
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.asSet
-import dev.tommasop1804.kutils.classes.colors.Color
-import dev.tommasop1804.kutils.classes.registry.Contact
+import dev.tommasop1804.kutils.classes.colors.*
+import dev.tommasop1804.kutils.classes.registry.*
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalTo
 import dev.tommasop1804.kutils.expectClass
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNotDecimal
 import dev.tommasop1804.kutils.isNull
-import dev.tommasop1804.kutils.toReflectionMap
+import dev.tommasop1804.kutils.memberPropertiesMap
 import dev.tommasop1804.kutils.validate
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -324,7 +324,7 @@ data class CalendarEvent(
      * @since 1.0.0
      */
     @Suppress("unchecked_cast")
-    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
     /**
      * Returns a string representation of the CalendarEvent object. The string includes all relevant
@@ -444,7 +444,7 @@ data class CalendarEvent(
          * @since 1.0.0
          */
         @Suppress("unchecked_cast")
-        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
         /**
          * Converts the `Repeat` instance into its string representation.
@@ -638,7 +638,7 @@ data class CalendarEvent(
          * @since 1.0.0
          */
         @Suppress("unchecked_cast")
-        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+        operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
         /**
          * Converts the `EventPartecipation` instance into a string representation,
@@ -675,7 +675,6 @@ data class CalendarEvent(
              * Represents a "No" participation status with a default color of red.
              * This status indicates a negative response in the context of participation.
              *
-             * @param defaultColor The default color associated with the "No" status.
              * @since 1.0.0
              */
             NO(Color.RED), 
@@ -685,7 +684,6 @@ data class CalendarEvent(
              * This status corresponds to a "maybe" response in the context of participation or decision-making scenarios.
              * It is associated with the color LIGHT_ORANGE as its default visual representation.
              *
-             * @param defaultColor The default color representation of the "MAYBE" status.
              * @since 1.0.0
              */
             MAYBE(Color.LIGHT_ORANGE)

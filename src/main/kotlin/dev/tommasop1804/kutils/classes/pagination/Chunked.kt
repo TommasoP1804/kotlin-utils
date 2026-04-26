@@ -4,6 +4,9 @@
 
 package dev.tommasop1804.kutils.classes.pagination
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
@@ -14,6 +17,9 @@ import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.EntityManager
 import net.sf.jsqlparser.parser.feature.Feature
 import org.slf4j.Logger
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.math.ceil
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.NoSuchPropertyException
@@ -34,13 +40,15 @@ import kotlin.reflect.full.memberProperties
  * @since 1.0.0
  */
 @Suppress("unused")
+@JsonSerialize(using = Chunked.Companion.Serializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Chunked.Companion.OldSerializer::class)
 data class Chunked<T>(
-    val totalPages: Int,
-    val pageIndex: Int,
-    @param:Since("2.10.7") val totalElements: Int,
+    val totalPages: Int? = null,
+    val pageIndex: Int? = null,
+    @param:Since("2.10.7") val totalElements: Int? = null,
     val limit: Int? = null,
-    val appliedFilters: Collection<FilterOption>,
-    val sort: Collection<SortOption>,
+    val appliedFilters: Collection<FilterOption> = emptyList(),
+    val sort: Collection<SortOption> = emptyList(),
     val data: List<T>?
 ) {
     companion object {
@@ -344,6 +352,46 @@ data class Chunked<T>(
             NOT_CONTAINS -> value notContainsIgnoreCase fliterOption.value.toString()
             else -> throw exceptionForInvalid("Operator ${fliterOption.operator} not supported.")
         }
+
+        class Serializer : ValueSerializer<Chunked<*>>() {
+            override fun serialize(value: Chunked<*>, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeStartObject()
+                value.totalElements.ifNotNull { gen.writeNumberProperty("totalElements", this) }
+                value.totalPages.ifNotNull { gen.writeNumberProperty("totalPages", this) }
+                value.pageIndex.ifNotNull { gen.writeNumberProperty("pageIndex", this) }
+                value.limit.ifNotNull { gen.writeNumberProperty("limit", this) }
+                gen.writeArrayPropertyStart("appliedFilters")
+                value.appliedFilters.forEach { gen.writePOJO(it) }
+                gen.writeEndArray()
+                gen.writeArrayPropertyStart("sort")
+                value.sort.forEach { gen.writePOJO(it) }
+                gen.writeEndArray()
+                gen.writeArrayPropertyStart("data")
+                value.data?.forEach { gen.writePOJO(it) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class OldSerializer : JsonSerializer<Chunked<*>>() {
+            override fun serialize(value: Chunked<*>, gen: JsonGenerator, serializers: SerializerProvider?) {
+                gen.writeStartObject()
+                value.totalElements.ifNotNull { gen.writeNumberField("totalElements", this) }
+                value.totalPages.ifNotNull { gen.writeNumberField("totalPages", this) }
+                value.pageIndex.ifNotNull { gen.writeNumberField("pageIndex", this) }
+                value.limit.ifNotNull { gen.writeNumberField("limit", this) }
+                gen.writeArrayFieldStart("appliedFilters")
+                value.appliedFilters.forEach { gen.writePOJO(it) }
+                gen.writeEndArray()
+                gen.writeArrayFieldStart("sort")
+                value.sort.forEach { gen.writePOJO(it) }
+                gen.writeEndArray()
+                gen.writeArrayFieldStart("data")
+                value.data?.forEach { gen.writePOJO(it) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
     }
 
     /**
@@ -362,7 +410,7 @@ data class Chunked<T>(
      * @since 1.0.0
      */
     @Suppress("unchecked_cast")
-    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = toReflectionMap().getValue(property.name) as R
+    operator fun <R> getValue(thisRef: Any?, property: KProperty<*>) = memberPropertiesMap.toDataMap().getValue(property.name) as R
 
     /**
      * Returns a string representation of the current Chunked instance.
