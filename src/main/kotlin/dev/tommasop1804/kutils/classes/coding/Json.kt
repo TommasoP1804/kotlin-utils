@@ -269,7 +269,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          * @return A `Result` containing the parsed JSON object or an exception if parsing fails.
          * @since 3.0.0
          */
-        fun String.toJson() = runCatching { Json(this) }
+        fun @receiver:Language("json") String.toJson() = runCatching { Json(this) }
         /**
          * Converts a YAML object to its JSON representation.
          *
@@ -316,7 +316,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          * if the input string is not a valid JSON.
          * @since 3.0.0
          */
-        fun String.toPrettyJson() = runCatching { Json(this).pretty }
+        fun @receiver:Language("json") String.toPrettyJson() = runCatching { Json(this).pretty }
         /**
          * Converts a YAML object to its JSON representation.
          *

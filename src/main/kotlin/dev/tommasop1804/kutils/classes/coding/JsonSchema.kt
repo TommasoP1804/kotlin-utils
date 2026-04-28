@@ -742,7 +742,7 @@ class JsonSchema(val json: Json) : Json(json) {
          *         or an exception if parsing fails.
          * @since 3.8.1
          */
-        fun String.toJsonSchema() = runCatching { JsonSchema(this) }
+        fun @receiver:Language("json") String.toJsonSchema() = runCatching { JsonSchema(this) }
         /**
          * Converts a `JsonNode` into a `JsonSchema` object wrapped in a `Result`.
          *

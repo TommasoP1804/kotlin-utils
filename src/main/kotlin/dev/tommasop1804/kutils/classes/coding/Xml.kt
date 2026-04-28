@@ -320,7 +320,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          * @return A [Result] containing the parsed [Xml] or an exception if parsing fails.
          * @since 3.9.0
          */
-        fun String.toXml() = runCatching { Xml(this) }
+        fun @receiver:IJLanguage("XML") String.toXml() = runCatching { Xml(this) }
         /**
          * Converts a JSON object to its XML representation.
          *

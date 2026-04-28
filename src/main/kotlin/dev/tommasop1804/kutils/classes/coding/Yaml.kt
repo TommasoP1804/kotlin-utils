@@ -206,7 +206,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @return A `Result` that either contains the parsed YAML object or an exception if parsing fails.
          * @since 3.0.0
          */
-        fun String.toYaml() = runCatching { Yaml(this) }
+        fun @receiver:IJLanguage("yaml") String.toYaml() = runCatching { Yaml(this) }
         /**
          * Converts the current `JSON` instance into its equivalent `YAML` representation.
          *

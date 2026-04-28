@@ -402,7 +402,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          *         or the exception encountered during the attempt.
          * @since 1.0.0
          */
-        fun String.toSqlQuery() = runCatching { SqlQuery(this) }
+        fun @receiver:Language("sql") String.toSqlQuery() = runCatching { SqlQuery(this) }
 
         /**
          * Converts the current instance of `Code` to an `SqlQuery` object if the language is SQL.
