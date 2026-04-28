@@ -6,7 +6,7 @@
 @file:Since("1.0.0")
 @file:Suppress("unused")
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 
 @Deprecated("Use breakLoop() instead", ReplaceWith("breakLoop()", "dev.tommasop1804.kutils.breakLoop"))
 class Break(val result: Any? = null) : Throwable()

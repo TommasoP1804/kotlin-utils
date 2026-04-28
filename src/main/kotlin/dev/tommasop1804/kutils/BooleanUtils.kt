@@ -9,9 +9,8 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.exceptions.ExpectationMismatchException
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
@@ -139,7 +138,25 @@ fun countFalse(values: Iterable<Boolean?>) = values.count { it == false }
  *
  * @since 1.0.0
  */
-val Boolean?.isTrue get() = this == true
+val Boolean?.isTrue: Boolean get() {
+    contract {
+        returns(true) implies (this@isTrue != null)
+    }
+    return this == true
+}
+/**
+ * Extension property that evaluates to `true` if the Boolean value is `true`.
+ *
+ * This property acts as a utility to explicitly confirm the truthiness of a Boolean value
+ * and enforces a contract to infer conditions where this property will return `true`.
+ * @since 3.10.1
+ */
+val Boolean.isTrue: Boolean get() {
+    contract {
+        returns(true) implies (this@isTrue)
+    }
+    return this
+}
 /**
  * Extension property to determine if a nullable Boolean is explicitly `false`.
  *
@@ -150,7 +167,27 @@ val Boolean?.isTrue get() = this == true
  * @return `true` if the receiver is `false`, otherwise `false`.
  * @since 1.0.0
  */
-val Boolean?.isFalse get() = this == false
+val Boolean?.isFalse: Boolean get() {
+    contract {
+        returns(true) implies (this@isFalse != null)
+    }
+    return this == false
+}
+/**
+ * Extension property for the `Boolean` type that evaluates whether the value is `false`.
+ *
+ * This property leverages Kotlin's contract system to indicate that when the property
+ * returns `true`, the boolean value is guaranteed to be `false`.
+ *
+ * @return `true` if the boolean value is `false`, otherwise returns `false`.
+ * @since 3.10.1
+ */
+val Boolean.isFalse: Boolean get() {
+    contract {
+        returns(true) implies (!this@isFalse)
+    }
+    return !this
+}
 /**
  * Extension property for nullable Boolean values that checks if the value is either `true` or `null`.
  * This can be used to simplify conditional checks involving nullable Booleans.
@@ -159,14 +196,80 @@ val Boolean?.isFalse get() = this == false
  * @return `true` if the Boolean is either `true` or `null`, otherwise `false`.
  * @since 1.0.0
  */
-val Boolean?.isNullOrTrue get() = this == null || this
+val Boolean?.isNullOrTrue: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrTrue != null)
+    }
+    return this == null || this
+}
 /**
  * Extension property to determine if a nullable Boolean is either `null` or `false`.
  *
  * @return `true` if the Boolean is `null` or `false`; `false` otherwise.
  * @since 1.0.0
  */
-val Boolean?.isNullOrFalse get() = this == null || !this
+val Boolean?.isNullOrFalse: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrFalse != null)
+    }
+    return this == null || !this
+}
+
+/**
+ * Executes the given [action] if the Boolean value is `true`.
+ *
+ * @param action A lambda function to be executed if the boolean is `true`.
+ * @return The result of the [action] if executed, or `null` otherwise.
+ * @since 3.10.1
+ */
+inline fun <R> Boolean.ifTrue(action: ReceiverTransformer<Boolean, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifTrue) holdsIn action
+    }
+    return if (isTrue) this.action() else null
+}
+/**
+ * Executes the given action if the Boolean receiver is either null or evaluates to true.
+ *
+ * @param action A lambda function that will be executed if the receiver is null or true.
+ * @return The result of the action if the condition is met, or `null` otherwise.
+ * @since 3.10.1
+ */
+inline fun <R> Boolean?.ifNullOrTrue(action: ReceiverTransformer<Boolean?, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (isNullOrTrue) this.action() else null
+}
+/**
+ * Executes the given action if the Boolean is false.
+ *
+ * @param action The action to be executed if the Boolean is false. It receives the Boolean as a receiver
+ * and returns a result of type R.
+ * @return The result of the action if the Boolean is false; otherwise, null.
+ * @since 3.10.1
+ */
+inline fun <R> Boolean.ifFalse(action: ReceiverTransformer<Boolean, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (!this@ifFalse) holdsIn action
+    }
+    return if (isFalse) this.action() else null
+}
+/**
+ * Executes the given action if the Boolean receiver is either `null` or `false`.
+ *
+ * @param action A lambda function to be executed when the Boolean receiver is `null` or `false`.
+ * @return The result of the action if the Boolean receiver is `null` or `false`, or `null` otherwise.
+ * @since 3.10.1
+ */
+inline fun <R> Boolean?.ifNullOrFalse(action: ReceiverTransformer<Boolean?, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (isNullOrFalse) this.action() else null
+}
 
 /**
  * Invokes one of the provided lambda expressions based on the boolean value.
