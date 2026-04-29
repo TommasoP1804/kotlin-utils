@@ -5,10 +5,14 @@
 @file:JvmName("ResultUtilsKt")
 @file:Suppress("unused")
 @file:Since("1.0.0")
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Invokes the given lambda functions based on the success or failure state of the `Result`.
@@ -24,7 +28,13 @@ import dev.tommasop1804.kutils.annotations.Since
 inline operator fun <T, R> Result<T>.invoke(
     onSuccess: Transformer<T, R>,
     onFailure: Transformer<Throwable, R>
-): R = fold(onSuccess, onFailure)
+): R {
+    contract {
+        callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
+    }
+    return fold(onSuccess, onFailure)
+}
 /**
  * Invokes the `Result` to extract and return the encapsulated value if it is successful,
  * or throws the encapsulated exception if the result is a failure.

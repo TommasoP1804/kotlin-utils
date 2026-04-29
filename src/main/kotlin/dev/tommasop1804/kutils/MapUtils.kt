@@ -648,6 +648,16 @@ inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transform: Transformer<Map.Entr
  * @since 2.0.0
  */
 inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transformKeys: Transformer<Map.Entry<K1, V1>, K2>, trasnformValues: Transformer<Map.Entry<K1, V1>, V2>) = entries.associate { transformKeys(it) to trasnformValues(it) }
+/**
+ * Transforms the entries of the original map using the provided transform function and
+ * creates a new map containing only the non-null results.
+ *
+ * @param transform A function that maps each entry of the original map to a nullable pair of a new key and value.
+ *                  If the function returns a non-null pair, it is included in the resulting map.
+ * @return A new map containing transformed entries that are not null.
+ * @since 3.10.3
+ */
+inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMapNotNull(transform: Transformer<Map.Entry<K1, V1>, Pair<K2, V2>?>) = entries.mapNotNull { transform(it) }.toMap()
 
 /**
  * Returns the first key-value pair of the map as a [Map.Entry] instance.

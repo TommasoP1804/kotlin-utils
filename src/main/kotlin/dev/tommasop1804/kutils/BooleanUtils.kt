@@ -285,6 +285,7 @@ inline operator fun <T> Boolean.invoke(onTrue: Supplier<T?> = { null }, onFalse:
     contract {
         callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
         this@invoke holdsIn onTrue
+        !this@invoke holdsIn onFalse
     }
     return if (this) onTrue() else onFalse()
 }

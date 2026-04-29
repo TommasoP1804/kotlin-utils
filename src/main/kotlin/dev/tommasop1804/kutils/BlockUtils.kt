@@ -12,13 +12,11 @@ package dev.tommasop1804.kutils
 
 import Break
 import Continue
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.memoization.LRUCache
-import dev.tommasop1804.kutils.classes.memoization.TTLCache
-import dev.tommasop1804.kutils.classes.time.Duration
-import dev.tommasop1804.kutils.classes.tuples.Quadruple
-import dev.tommasop1804.kutils.classes.tuples.Quintuple
-import dev.tommasop1804.kutils.exceptions.RetryLimitExceededException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.memoization.*
+import dev.tommasop1804.kutils.classes.time.*
+import dev.tommasop1804.kutils.classes.tuples.*
+import dev.tommasop1804.kutils.exceptions.*
 import java.util.concurrent.*
 import kotlin.reflect.KClass
 import kotlin.system.measureNanoTime
@@ -353,6 +351,19 @@ fun <T> withDelayOf(delay: Duration, block: Supplier<T>): T {
     Thread.sleep(delay.toNanos() / 1_000_000L)
     return block()
 }
+
+/**
+ * Causes the current thread to sleep for the specified duration. This method pauses execution
+ * of the thread for approximately the duration provided.
+ *
+ * Note: This function uses a risky approximation of temporal values and requests caution
+ * while being used.
+ *
+ * @param duration The amount of time for which the current thread is to be put to sleep.
+ * @since 3.10.3
+ */
+@OptIn(RiskyApproximationOfTemporal::class)
+fun sleep(duration: Duration) = Thread.sleep(duration.toMillis().toLong())
 
 /**
  * Executes the calling lambda function and monitors its execution time.
