@@ -292,6 +292,22 @@ open class Json private constructor(@param:Language("json") override val value: 
             return obj.toJson()
         }
         /**
+         * Converts the current TOML instance into its JSON representation.
+         *
+         * This method processes the TOML structure and transforms it into a JSON format,
+         * providing an equivalent representation of the data.
+         *
+         * @return the JSON representation of the TOML instance. If the TOML is blank,
+         * it returns an empty JSON object.
+         * @since 3.11.0
+         */
+        @JvmName("tomToJson")
+        @OptIn(Beta::class)
+        fun Toml.toJson(): Json {
+            if (isBlank()) return EMPTY_JSON
+            return toDataMap()().toJson()
+        }
+        /**
          * Converts the given object to a JSON representation using a predefined object mapper.
          *
          * This method serializes the object into a JSON string and wraps it in a `JSON` instance.

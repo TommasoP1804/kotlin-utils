@@ -119,3 +119,50 @@ open class NoSuchYamlPathException : NoSuchPathException {
      */
     constructor(cause: Throwable?) : super(cause)
 }
+
+/**
+ * Exception thrown when a specified TOML path cannot be found.
+ *
+ * This exception is a specialized version of `NoSuchPathException` and is
+ * used to indicate that a specific path in a TOML configuration file
+ * does not exist or cannot be accessed. It can encapsulate additional
+ * details about the path or the underlying cause of the issue.
+ * @since 3.11.0
+ * @author Tommaso Pastorelli
+ */
+open class NoSuchTomlPathException : NoSuchPathException {
+    /**
+     * Constructs a new instance of `NoSuchTomlPathException`.
+     *
+     * This default constructor initializes the exception with no specific
+     * path or cause, serving as a general indication of a missing TOML path.
+     * @since 3.11.0
+     */
+    constructor() : super()
+    /**
+     * Constructs a new `NoSuchTomlPathException` with the specified path.
+     *
+     * @param path The TOML path that could not be found. This can be of any type
+     *             that provides information about the unreachable path.
+     * @since 3.11.0
+     */
+    constructor(path: Any) : super(path)
+    /**
+     * Constructs a new `NoSuchTomlPathException` with the specified path and an optional cause.
+     *
+     * @param path The TOML path that was not found.
+     * @param cause The underlying cause of the exception, or null if there is no specific cause.
+     * @since 3.11.0
+     */
+    constructor(path: Any, cause: Throwable?) : super(path, cause)
+    /**
+     * Constructs a new instance of `NoSuchTomlPathException` with the specified cause.
+     *
+     * This constructor allows the creation of an exception instance by wrapping another
+     * throwable as the cause, providing additional context for debugging and error handling.
+     *
+     * @param cause The throwable that caused this exception to be thrown, or null if there is no specific cause.
+     * @since 3.11.0
+     */
+    constructor(cause: Throwable?) : super(cause)
+}

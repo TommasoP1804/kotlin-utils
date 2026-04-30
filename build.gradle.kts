@@ -20,10 +20,10 @@ noArg {
 }
 
 group = "dev.tommasop1804"
-version = "3.10.3"
+version = "3.11.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260429T103938Z
+// Last update: Tommaso Pastorelli | 20260430T130059Z
 
 repositories {
     mavenCentral()
@@ -40,7 +40,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
-
     implementation("tools.jackson.core:jackson-databind:3.1.1")
     implementation("tools.jackson.core:jackson-core:3.1.1")
     implementation("tools.jackson.module:jackson-module-kotlin:2.21.2")
@@ -50,7 +49,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.2")
-
+    implementation("org.tomlj:tomlj:1.1.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.18.2")
     implementation("io.hypersistence:hypersistence-tsid:2.1.4")
     implementation("org.locationtech.jts:jts-core:1.19.0")
     implementation("org.locationtech.jts.io:jts-io-common:1.19.0")

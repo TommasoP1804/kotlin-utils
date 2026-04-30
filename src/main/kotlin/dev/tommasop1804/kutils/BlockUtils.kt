@@ -17,6 +17,7 @@ import dev.tommasop1804.kutils.classes.memoization.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.tuples.*
 import dev.tommasop1804.kutils.exceptions.*
+import kotlinx.coroutines.delay
 import java.util.concurrent.*
 import kotlin.reflect.KClass
 import kotlin.system.measureNanoTime
@@ -364,6 +365,20 @@ fun <T> withDelayOf(delay: Duration, block: Supplier<T>): T {
  */
 @OptIn(RiskyApproximationOfTemporal::class)
 fun sleep(duration: Duration) = Thread.sleep(duration.toMillis().toLong())
+
+/**
+ * Suspends the coroutine for a given duration.
+ *
+ * This method converts the provided duration to milliseconds and uses it
+ * to suspend execution. Note that the conversion from `Duration` to milliseconds
+ * may result in a loss of precision.
+ *
+ * @param duration The amount of time to suspend the coroutine.
+ * @since 3.11.0
+ */
+@Suppress("ConvertLongToDuration")
+@OptIn(RiskyApproximationOfTemporal::class)
+suspend fun delay(duration: Duration) = delay(duration.toMillis().toLong())
 
 /**
  * Executes the calling lambda function and monitors its execution time.
@@ -780,3 +795,58 @@ fun <T> retry(
     dontCatch: KClass<out Throwable>,
     supplier: Supplier<T>
 ) = supplier.retry(duration, lazyException, catchOnly, dontCatch.asSingleSet())
+
+/**
+ * Executes the given [action] and expects it to throw an exception. If the [action] completes
+ * successfully, an [UnexpectedSuccessException] is thrown. If the [action] throws an exception,
+ * that exception is returned.
+ *
+ * @param action The action to be executed, which is expected to fail by throwing an exception.
+ * @return The exception thrown by the [action].
+ * @since 3.11.0
+ */
+inline fun expectFailure(action: Action): Throwable = runCatching(action)(
+    { throw UnexpectedSuccessException("Expected failure but action succeeded") },
+    { return it }
+)
+/**
+ * Executes the given action and expects it to throw an exception. If the action completes
+ * successfully, an [UnexpectedSuccessException] is thrown. If the action throws an exception,
+ * that exception is returned.
+ *
+ * @receiver The action to be executed, which is expected to fail by throwing an exception.
+ * @return The exception thrown by the action.
+ * @since 3.11.0
+ */
+@JvmName("expectFailureReceiver")
+fun Supplier<*>.expectFailure(): Throwable = runCatching(this)(
+    { throw UnexpectedSuccessException("Expected failure but action succeeded") },
+    { return it }
+)
+
+/**
+ * Executes the provided `action` and returns its result if successful, or throws a lazily
+ * provided exception if the action fails.
+ *
+ * @param lazyException a supplier function that provides the exception to throw in case of failure
+ * @param action a lambda representing the operation to execute
+ * @return the exception thrown if the action fails, or the result of the action if it succeeds
+ * @since 3.11.0
+ */
+inline fun expectFailureOrThrow(lazyException: ThrowableSupplier, action: Action): Throwable = runCatching(action)(
+    { throw lazyException() },
+    { return it }
+)
+/**
+ * Expects the execution of the supplier to fail and returns the exception if it occurs.
+ * If the supplier executes successfully, the provided `lazyException` is thrown.
+ *
+ * @param lazyException a supplier that lazily provides the exception to be thrown if the execution succeeds
+ * @return the exception that caused the supplier to fail, or throws the provided `lazyException` if successful
+ * @since 3.11.0
+ */
+@JvmName("expectFailureOrThrowReceiver")
+fun Supplier<*>.expectFailure(lazyException: ThrowableSupplier): Throwable = runCatching(this)(
+    { throw lazyException() },
+    { return it }
+)

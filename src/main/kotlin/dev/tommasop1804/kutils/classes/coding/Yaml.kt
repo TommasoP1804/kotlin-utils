@@ -222,6 +222,19 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
             return obj.toYaml()
         }
         /**
+         * Converts the contents of the Toml object to a YAML string representation.
+         *
+         * This method transforms the TOML structure into a map representation
+         * using the `toDataMap` method, and subsequently serializes it to YAML
+         * format by invoking the `toYaml` method on the resulting map.
+         *
+         * @receiver The Toml object to be converted.
+         * @return A YAML string representation of the TOML data.
+         * @since 3.11.0
+         */
+        @JvmName("tomlToYaml")
+        fun Toml.toYaml() = toDataMap().toYaml()
+        /**
          * Converts the given object to its YAML representation.
          *
          * @param includeTag Specifies whether to include the YAML type tag in the generated output. 

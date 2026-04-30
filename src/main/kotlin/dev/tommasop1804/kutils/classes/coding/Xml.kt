@@ -338,6 +338,15 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             return Xml(MAPPER.writer().withRootName(rootName).writeValueAsString(obj))
         }
         /**
+         * Converts the current TOML data to its XML representation.
+         *
+         * @param rootName The name to be used for the root element in the resulting XML. Defaults to "root" if not specified.
+         * @return The XML representation of the TOML data.
+         * @since 3.11.0
+         */
+        @JvmName("tomlToXml")
+        fun Toml.toXml(rootName: String = "root"): Xml = toJson().toXml(rootName)
+        /**
          * Converts a YAML object to its XML representation.
          *
          * @receiver The YAML object to be converted to XML.
