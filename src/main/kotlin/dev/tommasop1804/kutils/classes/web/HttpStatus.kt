@@ -70,7 +70,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
     EXPECTATION_FAILED(417, Family.CLIENT_ERROR, "Expectation Failed"),
     @Deprecated("Deprecated status code", level = DeprecationLevel.ERROR) I_AM_A_TEAPOT(418, Family.CLIENT_ERROR, "I'm a teapot"),
     MISDIRECTED_REQUEST(421, Family.CLIENT_ERROR, "Misdirected Request"),
-    UNPROCESSABLE_ENTITY(422, Family.CLIENT_ERROR, "Unprocessable Entity"),
+    UNPROCESSABLE_CONTENT(422, Family.CLIENT_ERROR, "Unprocessable Content"),
     LOCKED(423, Family.CLIENT_ERROR, "Locked"),
     FAILED_DEPENDENCY(424, Family.CLIENT_ERROR, "Failed Dependency"),
     TOO_EARLY(425, Family.CLIENT_ERROR, "Too Early"),
