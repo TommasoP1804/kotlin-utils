@@ -104,6 +104,21 @@ inline fun <T, R> T?.ifNotNull(action: ReceiverTransformer<T, R>): R? {
     }
     return if (this != null) this.action() else null
 }
+/**
+ * Executes the given [action] if the current nullable receiver is null.
+ *
+ * @param action A lambda function that acts on the nullable receiver when it is null.
+ * @return The result of the [action] if the receiver is null, or the non-null receiver cast as [R] otherwise.
+ * @since 3.11.2
+ */
+@Suppress("UNCHECKED_CAST")
+inline fun <T, R> T?.ifNull(action: ReceiverTransformer<T?, R>): R {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNull != null) holdsIn action
+    }
+    return if (this == null) this.action() else this as R
+}
 
 /**
  * Checks if the object instance is castable to the specified class type.
