@@ -6,6 +6,12 @@
 import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+group = "dev.tommasop1804"
+version = "3.11.3"
+// Kotlin-Utils
+// Tommaso Pastorelli
+// Last update: Tommaso Pastorelli | 20260506T105415Z
+
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.20"
     kotlin("plugin.noarg") version "2.3.20"
@@ -18,12 +24,6 @@ plugins {
 noArg {
     annotation("dev.tommasop1804.kutils.annotations.NoArgs")
 }
-
-group = "dev.tommasop1804"
-version = "3.11.2"
-// Kotlin-Utils
-// Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260506T091451Z
 
 repositories {
     mavenCentral()

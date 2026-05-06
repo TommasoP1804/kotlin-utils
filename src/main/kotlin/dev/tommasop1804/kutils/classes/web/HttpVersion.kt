@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.web
 
+import dev.tommasop1804.kutils.*
+
 /**
  * Represents the different versions of the HTTP protocol supported in the application.
  *
@@ -63,7 +65,13 @@ enum class HttpVersion(val notation: String, val version: Double) {
          * @return The matching entry, or null if no match is found.
          * @since 3.0.0
          */
-        infix fun of(notation: String) = entries.find { it.notation == notation }
+        infix fun of(notation: String) = when (notation) {
+            "HTTP/1.0", "http/1.0", "HTTP/1", "http/1" -> HTTP_1_0
+            "HTTP/1.1", "http/1.1" -> HTTP_1_1
+            "HTTP/2.0", "http/2.0", "HTTP/2", "http/2" -> HTTP_2
+            "HTTP/3.0", "http/3.0", "HTTP/3", "http/3" -> HTTP_3
+            else -> entries.find { it.notation.equalsIgnoreCase(notation) }
+        }
         /**
          * Finds an entry in the collection where the version matches the provided value.
          *
