@@ -9,6 +9,7 @@ import dev.tommasop1804.kutils.*
 /**
  * Represents the various types of authentication mechanisms supported.
  * @since 3.12.0
+ * @author Tommaso Pastorelli
  */
 enum class AuthType {
     /**
