@@ -39,10 +39,10 @@ import java.time.temporal.TemporalUnit
  * @author Tommaso Pastorelli
  */
 @Suppress("UNCHECKED_CAST", "RedundantValueArgument")
-@JsonSerialize(using = RTemporalInterval.Companion.Serialize::class)
-@JsonDeserialize(using = RTemporalInterval.Companion.Deserialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RTemporalInterval.Companion.OldSerialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RTemporalInterval.Companion.OldDeserialize::class)
+@JsonSerialize(using = RTemporalInterval.Companion.Serializer::class)
+@JsonDeserialize(using = RTemporalInterval.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RTemporalInterval.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RTemporalInterval.Companion.OldDeserializer::class)
 class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
     override val start: T1,
     override val end: T2,
@@ -158,7 +158,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             }
         }
 
-        class Serialize : ValueSerializer<TemporalInterval>() {
+        class Serializer : ValueSerializer<TemporalInterval>() {
             override fun serialize(
                 value: TemporalInterval,
                 gen: JsonGenerator,
@@ -168,7 +168,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             }
         }
 
-        class Deserialize : ValueDeserializer<RTemporalInterval<*, *>>() {
+        class Deserializer : ValueDeserializer<RTemporalInterval<*, *>>() {
             private var startType: Class<*>? = null
             private var endType: Class<*>? = null
 
@@ -177,7 +177,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
                 property: BeanProperty?
             ): ValueDeserializer<*> {
                 val javaType = property?.type ?: ctxt.contextualType
-                val copy = Deserialize()
+                val copy = Deserializer()
                 if (javaType.isNotNull() && javaType.containedTypeCount() >= 2) {
                     copy.startType = javaType.containedType(0).rawClass
                     copy.endType = javaType.containedType(1).rawClass
@@ -200,19 +200,19 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             }
         }
 
-        class OldSerialize : JsonSerializer<RTemporalInterval<*, *>>() {
+        class OldSerializer : JsonSerializer<RTemporalInterval<*, *>>() {
             override fun serialize(value: RTemporalInterval<*, *>, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
                 gen.writeString(value.toString())
             }
         }
 
-        class OldDeserialize : JsonDeserializer<RTemporalInterval<*, *>>(), ContextualDeserializer {
+        class OldDeserializer : JsonDeserializer<RTemporalInterval<*, *>>(), ContextualDeserializer {
             private var startType: Class<*>? = null
             private var endType: Class<*>? = null
 
             override fun createContextual(ctxt: com.fasterxml.jackson.databind.DeserializationContext, property: com.fasterxml.jackson.databind.BeanProperty?): JsonDeserializer<*> {
                 val javaType = property?.type ?: ctxt.contextualType
-                val copy = OldDeserialize()
+                val copy = OldDeserializer()
                 if (javaType.isNotNull() && javaType.containedTypeCount() >= 2) {
                     copy.startType = javaType.containedType(0).rawClass
                     copy.endType = javaType.containedType(1).rawClass

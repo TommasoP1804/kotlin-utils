@@ -41,10 +41,10 @@ import java.time.temporal.TemporalUnit
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = RepeatedTemporalInterval.Companion.Serialize::class)
-@JsonDeserialize(using = RepeatedTemporalInterval.Companion.Deserialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserialize::class)
+@JsonSerialize(using = RepeatedTemporalInterval.Companion.Serializer::class)
+@JsonDeserialize(using = RepeatedTemporalInterval.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke")
 interface RepeatedTemporalInterval : TemporalInterval, Serializable {
     /**
@@ -319,7 +319,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
             } else throw MalformedInputException("Invalid time interval: $s")
         }
 
-        class Serialize : ValueSerializer<RepeatedTemporalInterval>() {
+        class Serializer : ValueSerializer<RepeatedTemporalInterval>() {
             override fun serialize(
                 value: RepeatedTemporalInterval,
                 gen: tools.jackson.core.JsonGenerator,
@@ -329,17 +329,17 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
             }
         }
 
-        class Deserialize : ValueDeserializer<RepeatedTemporalInterval>() {
+        class Deserializer : ValueDeserializer<RepeatedTemporalInterval>() {
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext)= parse(p.string).getOrThrow()
         }
 
-        class OldSerialize : JsonSerializer<RepeatedTemporalInterval>() {
+        class OldSerializer : JsonSerializer<RepeatedTemporalInterval>() {
             override fun serialize(value: RepeatedTemporalInterval, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeString(value.toString())
             }
         }
 
-        class OldDeserialize : JsonDeserializer<RepeatedTemporalInterval>() {
+        class OldDeserializer : JsonDeserializer<RepeatedTemporalInterval>() {
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext?) = parse(p.text).getOrThrow()
         }
 

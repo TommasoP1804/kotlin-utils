@@ -35,10 +35,10 @@ import kotlin.reflect.KProperty
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = TemporalInterval.Companion.Serialize::class)
-@JsonDeserialize(using = TemporalInterval.Companion.Deserialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TemporalInterval.Companion.OldSerialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TemporalInterval.Companion.OldDeserialize::class)
+@JsonSerialize(using = TemporalInterval.Companion.Serializer::class)
+@JsonDeserialize(using = TemporalInterval.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TemporalInterval.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke")
 interface TemporalInterval : Serializable {
     /**
@@ -219,7 +219,7 @@ interface TemporalInterval : Serializable {
             }
         }
 
-        class Serialize : ValueSerializer<TemporalInterval>() {
+        class Serializer : ValueSerializer<TemporalInterval>() {
             override fun serialize(
                 value: TemporalInterval,
                 gen: tools.jackson.core.JsonGenerator,
@@ -229,17 +229,17 @@ interface TemporalInterval : Serializable {
             }
         }
 
-        class Deserialize : ValueDeserializer<TemporalInterval>() {
+        class Deserializer : ValueDeserializer<TemporalInterval>() {
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = parse(p.string).getOrThrow()
         }
 
-        class OldSerialize : JsonSerializer<TemporalInterval>() {
+        class OldSerializer : JsonSerializer<TemporalInterval>() {
             override fun serialize(value: TemporalInterval, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeString(value.toString())
             }
         }
 
-        class OldDeserialize : JsonDeserializer<TemporalInterval>() {
+        class OldDeserializer : JsonDeserializer<TemporalInterval>() {
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext?) = parse(p.text).getOrThrow()
         }
 

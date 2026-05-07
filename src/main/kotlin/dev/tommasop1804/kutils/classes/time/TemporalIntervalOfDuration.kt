@@ -32,10 +32,10 @@ import kotlin.math.abs
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = RepeatedTemporalInterval.Companion.Serialize::class)
-@JsonDeserialize(using = RepeatedTemporalInterval.Companion.Deserialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserialize::class)
+@JsonSerialize(using = RepeatedTemporalInterval.Companion.Serializer::class)
+@JsonDeserialize(using = RepeatedTemporalInterval.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused")
 internal class TemporalIntervalOfDuration(
     override val duration: Duration,

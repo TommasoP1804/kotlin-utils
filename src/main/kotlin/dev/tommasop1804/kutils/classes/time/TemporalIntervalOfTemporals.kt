@@ -31,10 +31,10 @@ import java.time.temporal.TemporalUnit
  * @property end the ending [Temporal] of this interval, exclusive.
  * @since 1.0.0
  */
-@JsonSerialize(using = TemporalInterval.Companion.Serialize::class)
-@JsonDeserialize(using = TemporalInterval.Companion.Deserialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TemporalInterval.Companion.OldSerialize::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TemporalInterval.Companion.OldDeserialize::class)
+@JsonSerialize(using = TemporalInterval.Companion.Serializer::class)
+@JsonDeserialize(using = TemporalInterval.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TemporalInterval.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused")
 internal class TemporalIntervalOfTemporals (
     override val start: Temporal,

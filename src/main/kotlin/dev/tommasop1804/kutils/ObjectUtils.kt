@@ -3663,7 +3663,7 @@ fun CharArray.print() = apply { print(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printGeneric")
-fun <T> T.print(transfor: Transformer<T, String> = { it.toSafeString() }) = apply { print(transfor(this)) }
+fun <T> T.print(transfor: Transformer<T, Any?> = { it.toSafeString() }) = apply { print(transfor(this)) }
 
 /**
  * Prints the integer receiver to the standard output followed by a newline.
@@ -3767,7 +3767,7 @@ fun CharArray.println() = apply { println(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printlnGeneric")
-fun <T> T.println(transfor: Transformer<T, String> = { it.toSafeString() }) = apply { println(transfor(this)) }
+fun <T> T.println(transfor: Transformer<T, Any?> = { it.toSafeString() }) = apply { println(transfor(this)) }
 
 /**
  * Prints the integer value to the standard error stream.
@@ -3863,7 +3863,7 @@ fun CharArray.printErr() = apply { System.err.print(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printErrGeneric")
-fun <T> T.printErr(transform: Transformer<T, String> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
+fun <T> T.printErr(transform: Transformer<T, Any?> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
 
 /**
  * Extension function for the [Int] type that outputs the integer
@@ -3965,4 +3965,4 @@ fun CharArray.printlnErr() = apply { System.err.println(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printlnErrGeneric")
-fun <T> T.printlnErr(transform: Transformer<T, String> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
+fun <T> T.printlnErr(transform: Transformer<T, Any?> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
