@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.web
 
+import dev.tommasop1804.kutils.*
+
 /**
  * Represents the HTTP methods defined in the HTTP/1.1 standard.
  *
@@ -149,6 +151,18 @@ enum class HttpMethod(
      * @since 1.0.0
      */
     TRACE(canHasResponseBody = true, secure = true, idempotent = true);
+
+    companion object {
+        /**
+         * Finds and returns the first entry in the list whose name matches the provided name,
+         * ignoring case differences.
+         *
+         * @param name The name to search for in the entries.
+         * @return The first matching entry, or `null` if no match is found.
+         * @since 3.12.0
+         */
+        infix fun of(name: String) = entries.find { it.name equalsIgnoreCase name }
+    }
 
     /**
      * Destructures the `HttpMethod` instance to retrieve the `canHasRequestBody` property.
