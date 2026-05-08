@@ -3565,6 +3565,81 @@ fun <T> T.asSelfMap(): Map<T, T> = mapOf(this to this)
 fun <T> T.asSelfMMap(): MMap<T, T> = mMapOf(this to this)
 
 /**
+ * Creates a StringMap by associating the current string as a key with the provided value string.
+ *
+ * @param value The string value to map with the current string key.
+ * @return A StringMap containing the current string as the key and the provided value as the associated value.
+ * @since 3.12.2
+ */
+infix fun String.mapWith(value: String): StringMap = mapOf(this to value)
+/**
+ * Creates a map containing the receiver as the key and the provided value as the associated value.
+ *
+ * @param value The value to associate with the receiver key in the resulting map.
+ * @return A map containing a single entry with the receiver as the key and the provided value as its value.
+ * @since 3.12.2
+ */
+@JvmName("mapWithGeneric")
+infix fun <K, V> K.mapWith(value: V): Map<K, V> = mapOf(this to value)
+/**
+ * Creates a `StringMMap` containing a single key-value pair with the provided string as the key
+ * and the specified value.
+ *
+ * @param value the value to be associated with the key (this string)
+ * @return a `StringMMap` containing the key-value pair
+ * @since 3.12.2
+ */
+infix fun String.mMapWith(value: String): StringMMap = mMapOf(this to value)
+/**
+ * Creates a new mutable map entry by associating the given key with the specified value.
+ *
+ * This infix function provides a convenient way to create a `MMap` instance
+ * containing a single key-value pair.
+ *
+ * @param value the value to be associated with the key
+ * @return a new `MMap` containing the provided key-value pair
+ * @since 3.12.2
+ */
+@JvmName("mMapWithGeneric")
+infix fun <K, V> K.mMapWith(value: V): MMap<K, V> = mMapOf(this to value)
+/**
+ * Creates a map with the provided key and the string as the value.
+ *
+ * @param key The key to associate with the string in the resulting map.
+ * @return A map containing the given key and this string as the key-value pair.
+ * @since 3.12.2
+ */
+infix fun String.mapWithKey(key: String): StringMap = mapOf(key to this)
+/**
+ * Creates a map containing a single key-value pair, where the key is provided as a parameter
+ * and the value is the instance on which this method is called.
+ *
+ * @param key The key to associate with the value in the map.
+ * @return A map containing the specified key and the instance as the value.
+ * @since 3.12.2
+ */
+@JvmName("mapWithKeyGeneric")
+infix fun <K, V> V.mapWithKey(key: K): Map<K, V> = mapOf(key to this)
+/**
+ * Creates a new `StringMMap` by associating the provided key with the current string value.
+ *
+ * @param key the key to associate with the current string
+ * @return a `StringMMap` containing a single key-value pair where the key is the provided key and
+ *         the value is the current string
+ * @since 3.12.2
+ */
+infix fun String.mMapWithKey(key: String): StringMMap = mMapOf(key to this)
+/**
+ * Associates the provided key with the calling value and returns a new mutable map containing this key-value pair.
+ *
+ * @param key the key to associate with the calling value
+ * @return a new mutable map containing the provided key-value pair
+ * @since 3.12.2
+ */
+@JvmName("mMapWithKeyGeneric")
+infix fun <K, V> V.mMapWithKey(key: K): MMap<K, V> = mMapOf(key to this)
+
+/**
  * Prints the integer value to the standard output.
  *
  * This extension function allows you to directly print an integer
