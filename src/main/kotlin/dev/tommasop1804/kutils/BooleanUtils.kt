@@ -279,8 +279,28 @@ inline fun <R> Boolean?.ifNullOrFalse(action: ReceiverTransformer<Boolean?, R>):
  * @param onTrue the lambda expression to execute if the boolean is `true`
  * @param onFalse the lambda expression to execute if the boolean is `false`
  * @return the result of evaluating either `onTrue` or `onFalse`
+ * @since 3.12.1
+ */
+
+inline operator fun <T : Any> Boolean.invoke(onTrue: Supplier<T>, onFalse: Supplier<T>): T {
+    contract {
+        callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
+        this@invoke holdsIn onTrue
+        !this@invoke holdsIn onFalse
+    }
+    return if (this) onTrue() else onFalse()
+}
+/**
+ * Invokes one of the provided lambda expressions based on the boolean value.
+ * If the boolean is `true`, it executes the `onTrue` lambda; otherwise, it executes the `onFalse` lambda.
+ *
+ * @param T the generic return type of the lambda expressions
+ * @param onTrue the lambda expression to execute if the boolean is `true`
+ * @param onFalse the lambda expression to execute if the boolean is `false`
+ * @return the result of evaluating either `onTrue` or `onFalse`
  * @since 1.0.0
  */
+@JvmName("invokeWithDefault")
 inline operator fun <T> Boolean.invoke(onTrue: Supplier<T?> = { null }, onFalse: Supplier<T?> = { null }): T? {
     contract {
         callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
@@ -297,8 +317,22 @@ inline operator fun <T> Boolean.invoke(onTrue: Supplier<T?> = { null }, onFalse:
  * @param onTrue the value returned if the Boolean is true.
  * @param onFalse the value returned if the Boolean is false.
  * @return the value of `onTrue` if the Boolean is true, otherwise the value of `onFalse`.
+ * @since 3.12.1
+ */
+operator fun <T : Any> Boolean.invoke(onTrue: T, onFalse: T): T =
+    if (this) onTrue else onFalse
+
+/**
+ * Invokes the Boolean as a functional operator to return one of the two provided values
+ * based on the Boolean's value.
+ *
+ * @param T the type of the values being returned.
+ * @param onTrue the value returned if the Boolean is true.
+ * @param onFalse the value returned if the Boolean is false.
+ * @return the value of `onTrue` if the Boolean is true, otherwise the value of `onFalse`.
  * @since 1.0.0
  */
+@JvmName("invokeWithDefault")
 operator fun <T> Boolean.invoke(onTrue: T? = null, onFalse: T? = null) = if (this) onTrue else onFalse
 
 /**
