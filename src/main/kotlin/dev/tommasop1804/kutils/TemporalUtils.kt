@@ -19,7 +19,7 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.time.*
 import java.time.*
 import java.time.chrono.ChronoLocalDateTime
@@ -2404,6 +2404,17 @@ fun OffsetMonthDayTime(cs: CharSequence) = OffsetMonthDayTime.parse(cs)
  */
 fun ZonedMonthDayTime(cs: CharSequence) = ZonedMonthDayTime.parse(cs)
 
+/**
+ * Creates an instance of the current year.
+ *
+ * This method utilizes the system clock to retrieve the current year
+ * and returns it as a `Year` object. The result is guaranteed to be
+ * non-null.
+ *
+ * @return The current year as a `Year` instance.
+ * @since 3.12.3
+ */
+fun Year() = Year.now()!!
 /**
  * Creates an instance of the Year class using the given integer value.
  *
