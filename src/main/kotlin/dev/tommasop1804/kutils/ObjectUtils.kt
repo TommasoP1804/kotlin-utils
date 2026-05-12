@@ -277,7 +277,7 @@ infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
  * @return the transformed value if the predicate is true, otherwise this value unchanged
  * @since 2.0.0
  */
-fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
+inline fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -294,7 +294,7 @@ fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
  * @return The transformed value of type [R] if the predicate returns true, otherwise null.
  * @since 2.0.0
  */
-fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
+inline fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -312,7 +312,7 @@ fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R
  * @return the result of applying the transformation block when the predicate evaluates to true, or the result of the default supplier when the predicate evaluates to false
  * @since 2.0.0
  */
-fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
+inline fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -390,7 +390,7 @@ inline fun <T, R> T.letWhenOr(condition: Boolean, default: Supplier<R>, block: T
  * @return the transformed value if predicate returns false, or this value unchanged if predicate returns true
  * @since 2.0.0
  */
-fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T {
+inline fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -407,7 +407,7 @@ fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T {
  * @return The result of the [block] if the [predicate] evaluates to false, or null otherwise.
  * @since 2.0.0
  */
-fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
+inline fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -427,7 +427,7 @@ fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<T, R>):
  *         or the result of the [default] supplier if the [predicate] evaluates to true. Returns `null` if neither function is executed.
  * @since 2.0.0
  */
-fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
+inline fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -446,7 +446,7 @@ fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, block: T
  * @return the transformed receiver if the condition is false, otherwise the original receiver unchanged
  * @since 2.0.0
  */
-inline fun <T, R> T.letUnless(condition: Boolean, block: Transformer<T, T>): T {
+inline  fun <T, R> T.letUnless(condition: Boolean, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         !condition holdsIn block
