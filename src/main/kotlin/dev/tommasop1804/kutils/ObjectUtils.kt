@@ -196,7 +196,13 @@ inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = 
  * @param condition The condition to evaluate. If true, the receiver object is returned; if false, null is returned.
  * @since 1.0.0
  */
-infix fun <T> Supplier<T>.whenTrue(condition: Boolean) = if (condition) this() else null
+infix fun <T> Supplier<T>.whenTrue(condition: Boolean): T? {
+    contract {
+        callsInPlace(this@whenTrue, InvocationKind.AT_MOST_ONCE)
+        condition holdsIn this@whenTrue
+    }
+    return if (condition) this() else null
+}
 /**
  * Provides a conditional extension function that returns the receiver object only
  * if it satisfies a given predicate. Otherwise, it returns null.
@@ -228,7 +234,13 @@ infix fun <T> T.whenTrue(condition: Boolean) = if (condition) this else null
  * If the condition evaluates to false, the receiver object is returned; otherwise, null is returned.
  * @since 1.0.0
  */
-infix fun <T> Supplier<T>.whenFalse(condition: Boolean) = if (!condition) this() else null
+infix fun <T> Supplier<T>.whenFalse(condition: Boolean): T? {
+    contract {
+        callsInPlace(this@whenFalse, InvocationKind.AT_MOST_ONCE)
+        !condition holdsIn this@whenFalse
+    }
+    return if (!condition) this() else null
+}
 /**
  * Returns the current instance if the given predicate evaluates to false. If the predicate evaluates to true, null is returned.
  *

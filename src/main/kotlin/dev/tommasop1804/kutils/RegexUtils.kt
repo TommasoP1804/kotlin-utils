@@ -8,10 +8,9 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.coding.Code
-import dev.tommasop1804.kutils.classes.coding.Language
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Creates a [Regex] instance from the provided [Code] object.
@@ -44,3 +43,12 @@ operator fun Regex.invoke(s: CharSequence) = this matches s
  * @since 1.0.0
  */
 fun Regex.toCode() = Code(pattern, Language.REGEX)
+
+/**
+ * Checks if the given character sequence contains a match for this regular expression.
+ *
+ * @param cs The character sequence to check for a match.
+ * @return `true` if the character sequence contains a match, `false` otherwise.
+ * @since 3.12.4
+ */
+operator fun Regex.contains(cs: CharSequence) = containsMatchIn(cs)
