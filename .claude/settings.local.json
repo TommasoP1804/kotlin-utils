@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Utente\\\\workProjects\\\\libraries\\\\kotlin-utils\\\\src\\\\main\\\\kotlin\\\\dev\\\\tommasop1804\\\\kutils\\\\dsl\\\\csv\")",
+      "Bash(./gradlew compileKotlin)"
+    ]
+  }
+}

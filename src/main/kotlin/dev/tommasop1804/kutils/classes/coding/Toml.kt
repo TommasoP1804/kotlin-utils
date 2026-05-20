@@ -88,7 +88,12 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @param file The file whose content will be read and used to initialize the instance.
      * @since 3.11.0
      */
-    constructor(file: File) : this(file.readText())
+    constructor(file: File) : this(file.readText()) {
+        file.exists().expect(true)
+        file.isFile.expect(true)
+        file.canRead().expect(true)
+        file.extension.validate(file::extension, "file") { it equalsIgnoreCase "toml" }
+    }
     /**
      * Creates an instance by reading the content of the specified file and passing it as a
      * parameter to the primary constructor.
@@ -96,7 +101,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @param path The path of the file whose content will be read and used to initialize the instance.
      * @since 3.11.0
      */
-    constructor(path: Path) : this(path.toFile().readText())
+    constructor(path: Path) : this(path.toFile())
 
     init {
         val parsed: TomlParseResult = TomlJ.parse(value)
@@ -131,6 +136,17 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         fun String.isValidToml() = runCatching { Toml(this) }
 
+        /**
+         * Converts the current file to a `Toml` instance encapsulated within a `Result`.
+         *
+         * This method parses the content of the file on which it is called and attempts to create an instance
+         * of the `Toml` class with the file as input. The operation is performed within a `Result` context,
+         * meaning it captures any exception that occurs during the parsing process.
+         *
+         * @return A `Result` wrapping the `Toml` instance if the parsing succeeds, or an exception if it fails.
+         * @since 3.13.0
+         */
+        fun File.toToml() = runCatching { Toml(this) }
         /**
          * Converts the current `String` into a TOML representation and wraps the operation in a `Result`.
          *
@@ -178,6 +194,14 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         @JvmName("xmlToToml")
         fun Xml.toToml() = toJson().toToml()
+        /**
+         * Converts the current CSV instance into its equivalent TOML representation.
+         *
+         * @return A TOML instance representing the tabular data of the original CSV input.
+         * @since 3.13.0
+         */
+        @JvmName("csvToToml")
+        fun Csv.toToml(): Toml = toJson().toToml()
         /**
          * Converts the given object to its TOML representation.
          *

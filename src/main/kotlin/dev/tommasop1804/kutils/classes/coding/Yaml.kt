@@ -122,7 +122,12 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param file The file whose content will be read and used to initialize the instance.
      * @since 3.0.0
      */
-    constructor(file: File) : this(file.readText())
+    constructor(file: File) : this(file.readText()) {
+        file.exists().expect(true)
+        file.isFile.expect(true)
+        file.canRead().expect(true)
+        file.extension.validate(file::extension, "file") { it equalsIgnoreCase "yaml" || it equalsIgnoreCase "yml" }
+    }
     /**
      * Creates an instance by reading the content of the specified file and passing it as a
      * parameter to the primary constructor.
@@ -130,7 +135,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @param path The path of the file whose content will be read and used to initialize the instance.
      * @since 3.0.0
      */
-    constructor(path: Path) : this(path.toFile().readText())
+    constructor(path: Path) : this(path.toFile())
 
     init {
         try {
@@ -197,6 +202,31 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
         fun String.isValidYaml() = runCatching { Yaml(this) }
 
         /**
+         * Converts the contents of the current file into a YAML representation.
+         *
+         * This method attempts to parse the file contents and represents it as a YAML object.
+         * Any errors encountered during the parsing process are captured within the `Result` object
+         * returned by this function.
+         *
+         * @receiver File object whose contents are to be converted.
+         * @return A `Result` wrapping the parsed YAML object if successful, or an exception if an error occurs.
+         * @since 3.13.0
+         */
+        fun File.toYaml() = runCatching { Yaml(this) }
+        /**
+         * Converts the content of the given file path to its YAML representation.
+         *
+         * This function reads the file located at the invoked Path and attempts to parse it into a YAML format.
+         * The operation is wrapped in a `Result` to handle any potential errors gracefully during parsing or
+         * file access.
+         *
+         * @receiver The file path to be read and converted into YAML format.
+         * @return A `Result` containing the YAML representation of the file content, or an error if the
+         *         operation fails.
+         * @since 3.13.0
+         */
+        fun Path.toYaml() = runCatching { Yaml(this) }
+        /**
          * Converts the current `String` into a YAML representation and wraps the operation in a `Result`.
          * 
          * This method attempts to parse the content of the `String` as YAML, creating an instance of the `YAML` class.
@@ -234,6 +264,15 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          */
         @JvmName("tomlToYaml")
         fun Toml.toYaml() = toDataMap().toYaml()
+        /**
+         * Converts the current CSV instance into its YAML representation.
+         *
+         * @return A YAML instance representing the tabular data of the original CSV input.
+         * @since 3.13.0
+         */
+        @JvmName("csvToYaml")
+        @OptIn(Beta::class)
+        fun Csv.toYaml(): Yaml = toJson().toYaml()
         /**
          * Converts the given object to its YAML representation.
          *
@@ -564,7 +603,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @return The YAMLNode corresponding to the specified path.
      * @since 3.8.1
      */
-    infix fun getAsNode(dotPath: String) =
+    fun getAsNode(dotPath: String) =
         if (Char.DOT !in dotPath) YamlNode(toDataMap()()[dotPath])
         else YamlNode(toDataMap()()[dotPath before Char.DOT])[dotPath after Char.DOT]
 

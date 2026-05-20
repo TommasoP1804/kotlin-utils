@@ -177,7 +177,12 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @param file The file whose content will be read and used to initialize the instance.
      * @since 3.9.0
      */
-    constructor(file: File) : this(file.readText())
+    constructor(file: File) : this(file.readText()) {
+        file.exists().expect(true)
+        file.isFile.expect(true)
+        file.canRead().expect(true)
+        file.extension.validate(file::extension, "file") { it equalsIgnoreCase "xml" }
+    }
 
     /**
      * Creates an instance by reading the content of the specified path.
@@ -185,7 +190,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @param path The path of the file whose content will be read and used to initialize the instance.
      * @since 3.9.0
      */
-    constructor(path: Path) : this(path.toFile().readText())
+    constructor(path: Path) : this(path.toFile())
 
     init {
         tryOrThrow({ -> MalformedInputException(Xml::class) }) {
@@ -314,6 +319,25 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
         fun prettify(@IJLanguage("XML") xml: String): String = documentToString(parseDocument(xml), pretty = true)
 
         /**
+         * Converts the current file into an instance of `Xml`.
+         * The operation is wrapped in a `Result` to handle any potential exceptions that
+         * may occur during the conversion process.
+         *
+         * @return A `Result` containing the `Xml` representation of the file if successful,
+         * or an exception if an error occurs during processing.
+         * @since 3.13.0
+         */
+        fun File.toXml() = runCatching { Xml(this) }
+        /**
+         * Converts the current Path object to an XML representation.
+         *
+         * Returns a Result object that contains the XML representation of
+         * the Path if the operation is successful, or an exception if an
+         * error occurs during the conversion.
+         * @since 3.13.0
+         */
+        fun Path.toXml() = runCatching { Xml(this) }
+        /**
          * Converts a String into an [Xml] object, wrapping the operation in a [Result].
          *
          * @receiver The string to be converted into XML.
@@ -358,6 +382,16 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
         @OptIn(Beta::class)
         fun Yaml.toXml(rootName: String = "root"): Xml = toJson().toXml(rootName)
         /**
+         * Converts the current CSV instance into its XML representation.
+         *
+         * @param rootName The name of the XML root element (default: `"root"`).
+         * @return An [Xml] instance representing the data structure of the CSV input.
+         * @since 3.13.0
+         */
+        @JvmName("csvToXml")
+        @OptIn(Beta::class)
+        fun Csv.toXml(rootName: String = "root"): Xml = toJson().toXml(rootName)
+        /**
          * Converts the Iterable into an XML representation.
          *
          * @param rootName The name of the root element in the generated XML. Defaults to "items".
@@ -398,13 +432,117 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             Xml(MAPPER.writer().withRootName(rootName).writeValueAsString(this))
 
         /**
-         * Converts an XML string into a formatted, pretty-printed XML string wrapped in a [Result].
+         * Converts the current file into an instance of `Xml`.
+         * The operation is wrapped in a `Result` to handle any potential exceptions that
+         * may occur during the conversion process.
          *
-         * @receiver A string representation of an XML document.
-         * @return A [Result] containing the pretty-printed [Xml], or an error if the input is malformed.
-         * @since 3.9.0
+         * @return A `Result` containing the `Xml` representation of the file if successful,
+         * or an exception if an error occurs during processing.
+         * @since 3.13.0
          */
-        fun String.toPrettyXml() = runCatching { Xml(this).pretty }
+        fun File.toPrettyXml() = runCatching { Xml(this).pretty }
+        /**
+         * Converts the current Path object to an XML representation.
+         *
+         * Returns a Result object that contains the XML representation of
+         * the Path if the operation is successful, or an exception if an
+         * error occurs during the conversion.
+         * @since 3.13.0
+         */
+        fun Path.toPrettyXml() = runCatching { Xml(this).pretty }
+        /**
+         * Converts a String into an [Xml] object, wrapping the operation in a [Result].
+         *
+         * @receiver The string to be converted into XML.
+         * @return A [Result] containing the parsed [Xml] or an exception if parsing fails.
+         * @since 3.13.0
+         */
+        fun @receiver:IJLanguage("XML") String.toPrettyXml() = runCatching { Xml(this).pretty }
+        /**
+         * Converts a JSON object to its XML representation.
+         *
+         * The root element name defaults to `"root"` and can be customized.
+         *
+         * @receiver The JSON object to be converted to XML.
+         * @param rootName The name of the XML root element (default: `"root"`).
+         * @return An [Xml] instance representing the data structure of the JSON input.
+         * @since 3.13.0
+         */
+        @JvmName("jsonToPrettyXml")
+        fun Json.toPrettyXml(rootName: String = "root"): Xml {
+            val tree = Json.MAPPER.readTree(value)
+            val obj = Json.MAPPER.convertValue(tree, object : TypeReference<Any>() {})
+            return Xml(MAPPER.writer().withRootName(rootName).writeValueAsString(obj)).pretty
+        }
+        /**
+         * Converts the current TOML data to its XML representation.
+         *
+         * @param rootName The name to be used for the root element in the resulting XML. Defaults to "root" if not specified.
+         * @return The XML representation of the TOML data.
+         * @since 3.13.0
+         */
+        @JvmName("tomlToPrettyXml")
+        fun Toml.toPrettyXml(rootName: String = "root"): Xml = toJson().toXml(rootName).pretty
+        /**
+         * Converts a YAML object to its XML representation.
+         *
+         * @receiver The YAML object to be converted to XML.
+         * @param rootName The name of the XML root element (default: `"root"`).
+         * @return An [Xml] instance representing the data structure of the YAML input.
+         * @since 3.13.0
+         */
+        @JvmName("yamlToPrettyXml")
+        @OptIn(Beta::class)
+        fun Yaml.toPrettyXml(rootName: String = "root"): Xml = toJson().toXml(rootName).pretty
+        /**
+         * Converts the current CSV instance into its XML representation.
+         *
+         * @param rootName The name of the XML root element (default: `"root"`).
+         * @return An [Xml] instance representing the data structure of the CSV input.
+         * @since 3.13.0
+         */
+        @JvmName("csvToPrettyXml")
+        @OptIn(Beta::class)
+        fun Csv.toPrettyXml(rootName: String = "root"): Xml = toJson().toXml(rootName).pretty
+        /**
+         * Converts the Iterable into an XML representation.
+         *
+         * @param rootName The name of the root element in the generated XML. Defaults to "items".
+         * @param itemName The name of each item element in the generated XML. Defaults to "item".
+         * @return An XML object representing the Iterable's contents as XML.
+         * @since 3.13.0
+         */
+        fun Iterable<*>.toPrettyXml(rootName: String = "items", itemName: String = "item"): Xml {
+            val items = toList()
+            val inner = items.joinToString(String.EMPTY) { el ->
+                if (el == null) "<$itemName/>"
+                else {
+                    val serialized = MAPPER.writer().withRootName(itemName).writeValueAsString(el)
+                    serialized
+                }
+            }
+            return Xml("<$rootName>$inner</$rootName>").pretty
+        }
+        /**
+         * Converts the array into an XML representation.
+         *
+         * @param rootName The name of the root element in the generated XML. Defaults to "items".
+         * @param itemName The name of each item element in the generated XML. Defaults to "item".
+         * @return An XML object representing the array's contents as XML.
+         * @since 3.13.0
+         */
+        fun Array<*>.toPrettyXml(rootName: String = "items", itemName: String = "item") = toList().toXml(rootName, itemName).pretty
+        /**
+         * Converts the given object to an XML representation using the predefined XML mapper.
+         *
+         * @receiver The object to be converted into XML.
+         * @param rootName The name of the XML root element (default: `"root"`).
+         * @return An [Xml] instance containing the serialized XML string.
+         * @since 3.13.0
+         */
+        @JvmName("anyToPrettyXml")
+        fun Any.toPrettyXml(rootName: String = "root"): Xml =
+            Xml(MAPPER.writer().withRootName(rootName).writeValueAsString(this)).pretty
 
         /**
          * Reads an XML file and deserializes its content into an object of the specified type.

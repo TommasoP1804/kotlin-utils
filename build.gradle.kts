@@ -7,10 +7,10 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "dev.tommasop1804"
-version = "3.12.5"
+version = "3.13.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260512T172803Z
+// Last update: Tommaso Pastorelli | 20260520T133735Z
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.20"
@@ -51,6 +51,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.2")
     implementation("org.tomlj:tomlj:1.1.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.18.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.21.2")
     implementation("io.hypersistence:hypersistence-tsid:2.1.4")
     implementation("org.locationtech.jts:jts-core:1.19.0")
     implementation("org.locationtech.jts.io:jts-io-common:1.19.0")
@@ -60,7 +61,7 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.github.lalyos:jfiglet:0.0.8")
     implementation("commons-codec:commons-codec:1.16.0")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.84")
     implementation(kotlin("scripting-jsr223"))
     implementation("org.openjdk.nashorn:nashorn-core:15.3")
     implementation("org.aspectj:aspectjrt:1.9.24")

@@ -175,7 +175,12 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @param file The file whose content will be read and used to initialize the instance.
      * @since 3.0.0
      */
-    constructor(file: File) : this(file.readText())
+    constructor(file: File) : this(file.readText()) {
+        file.exists().expect(true)
+        file.isFile.expect(true)
+        file.canRead().expect(true)
+        file.extension.validate(file::extension, "file") { it equalsIgnoreCase "json" }
+    }
     /**
      * Creates an instance by reading the content of the specified file and passing it as a
      * parameter to the primary constructor.
@@ -183,7 +188,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @param path The path of the file whose content will be read and used to initialize the instance.
      * @since 3.0.0
      */
-    constructor(path: Path) : this(path.toFile().readText())
+    constructor(path: Path) : this(path.toFile())
 
     init {
         tryOrThrow({ -> MalformedInputException(Json::class) }) {
@@ -260,6 +265,32 @@ open class Json private constructor(@param:Language("json") override val value: 
         fun prettify(@Language("json") json: String) = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(MAPPER.readTree(json))!!
 
         /**
+         * Converts the current File instance to a JSON representation.
+         *
+         * This method attempts to parse the file content into a JSON object.
+         * If the operation is successful, the result is wrapped in a `Result` object.
+         * In case of any failure during parsing, the exception is captured and also wrapped
+         * in the `Result` object.
+         *
+         * @return A `Result` containing the parsed JSON object if successful, or an exception
+         * if parsing fails.
+         * @since 3.13.0
+         */
+        fun File.toJson() = runCatching { Json(this) }
+        /**
+         * Converts the current Path object to a JSON representation.
+         *
+         * The method attempts to create a JSON object from the Path and returns the
+         * result as a `Result` object. If the conversion fails, the error details
+         * are captured in the `Result` for further processing.
+         *
+         * @receiver Path instance to be converted to JSON.
+         * @return A `Result` wrapping the JSON representation of the Path, or
+         * an error if the operation fails.
+         * @since 3.13.0
+         */
+        fun Path.toJson() = runCatching { Json(this) }
+        /**
          * Converts the string into a JSON object representation.
          * The method attempts to parse the string as JSON and returns the result
          * encapsulated within a `Result` object. If the parsing fails, the exception
@@ -301,11 +332,27 @@ open class Json private constructor(@param:Language("json") override val value: 
          * it returns an empty JSON object.
          * @since 3.11.0
          */
-        @JvmName("tomToJson")
+        @JvmName("tomlToJson")
         @OptIn(Beta::class)
         fun Toml.toJson(): Json {
             if (isBlank()) return EMPTY_JSON
             return toDataMap()().toJson()
+        }
+        /**
+         * Converts the current CSV instance into its JSON representation
+         * (a JSON array of objects, where each row becomes an object keyed by headers).
+         *
+         * @return The JSON representation of the CSV instance. If the CSV is blank,
+         * it returns an empty JSON array.
+         * @since 3.13.0
+         */
+        @JvmName("csvToJson")
+        @OptIn(Beta::class)
+        fun Csv.toJson(): Json {
+            if (isBlank()) return EMPTY_JSON_ARRAY
+            val rows = toListOfMaps()
+            if (rows.isEmpty()) return EMPTY_JSON_ARRAY
+            return (if (!hasHeaders && rows.all { it.keys.size == 1 }) rows.map { it.values.first() } else rows).toJson()
         }
         /**
          * Converts the given object to a JSON representation using a predefined object mapper.
@@ -319,6 +366,28 @@ open class Json private constructor(@param:Language("json") override val value: 
         @JvmName("anyToJson")
         fun Any.toJson() = Json(MAPPER.writeValueAsString(this))
 
+        /**
+         * Converts the contents of the file to a prettified JSON string representation.
+         *
+         * @receiver The File instance whose contents are to be converted.
+         * @return A Result containing the prettified JSON string if the operation is successful,
+         * or the exception if an error occurs during processing.
+         * @since 3.13.0
+         */
+        fun File.toPrettyJson() = runCatching { Json(this).pretty }
+        /**
+         * Converts the content of the specified file path to a formatted JSON string.
+         *
+         * This function reads the file content using the provided path, parses it as JSON,
+         * and returns a human-readable, indented JSON string. It uses `runCatching` to
+         * safely handle exceptions that may occur during file reading or parsing.
+         *
+         * @receiver The file path pointing to the JSON file to be formatted.
+         * @return The formatted JSON string if the operation is successful.
+         *         Otherwise, the function captures and handles any exceptions internally.
+         * @since 3.13.0
+         */
+        fun Path.toPrettyJson() = runCatching { Json(this).pretty }
         /**
          * Converts a JSON string into a formatted, pretty-printed JSON string.
          * This method parses the input string as JSON and ensures that the output
@@ -349,6 +418,36 @@ open class Json private constructor(@param:Language("json") override val value: 
             val obj = toObject<Any>()
             return obj.toJson().pretty
         }
+        /**
+         * Converts the current TOML object to a pretty-printed JSON string.
+         *
+         * This method transforms the TOML data structure into its equivalent JSON representation
+         * and formats the output with indentation for readability.
+         *
+         * @receiver Toml The TOML object to be converted.
+         * @return A pretty-printed JSON string representation of the TOML object.
+         * @since 3.13.0
+         */
+        @JvmName("tomlToPrettyJson")
+        @OptIn(Beta::class)
+        fun Toml.toPrettyJson() = toJson().pretty
+        /**
+         * Converts the `Csv` object to a well-formatted, pretty-printed JSON string.
+         *
+         * This method uses the `toJson` function to transform the `Csv` object
+         * into its JSON representation and formats it with indentation
+         * for better readability.
+         *
+         * The method applies certain experimental or beta-level functionality,
+         * as it is annotated with the `@OptIn(Beta::class)` annotation.
+         *
+         * @receiver The `Csv` object to be converted and formatted.
+         * @return A string containing the pretty-printed JSON representation of the `Csv` object.
+         * @since 3.13.0
+         */
+        @JvmName("csvToPrettyJson")
+        @OptIn(Beta::class)
+        fun Csv.toPrettyJson() = toJson().pretty
         /**
          * Converts the given object to a JSON string formatted with indentation for better readability.
          * This method utilizes a predefined JSON mapper with a pretty printing feature.
