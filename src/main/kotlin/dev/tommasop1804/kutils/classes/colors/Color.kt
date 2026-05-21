@@ -59,6 +59,42 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
     val luminosity
         get() = toHSL().third
 
+    /**
+     * Constructs a color instance from a given hexadecimal color string.
+     *
+     * @param hex The hexadecimal color code string (e.g., "#RRGGBB" or "#RRGGBBAA").
+     * @since 3.13.1
+     */
+    constructor(hex: String) : this(Color ofHEX hex)
+    /**
+     * Constructs a new instance of the class based on a given Hex color.
+     *
+     * @param hex The Hex color value to initialize the Color object with.
+     * @since 3.13.1
+     */
+    constructor(hex: Hex) : this(Color ofHEX hex)
+    /**
+     * Constructs a color object from an integer representation of an RGB color.
+     * The integer should encode the red, green, and blue components of the color.
+     *
+     * @param rgb The RGB color represented as a single integer value.
+     *            The format should combine the red, green, and blue components into a 32-bit integer.
+     * @since 3.13.1
+     */
+    constructor(rgb: Int) : this(Color ofRGBInt rgb)
+    /**
+     * Secondary constructor that initializes the color from a single Long value
+     * representing the RGBA components.
+     *
+     * @param rgba A Long value containing the RGBA components packed into a
+     *             64-bit integer. The format is expected to be 0xRRGGBBAA,
+     *             where each component (red, green, blue, alpha) is 8 bits.
+     * @since 3.13.1
+     */
+    constructor(rgba: Long) : this(Color ofRGBAInt rgba)
+
+    private constructor(color: Color) : this(color.red, color.green, color.blue, color.alpha)
+
     companion object {
         /**
          * A unique identifier for serializable classes used to verify compatibility
@@ -1636,7 +1672,19 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @return A new Color instance with the specified components.
          * @since 1.0.0
          */
-        infix fun ofRGBInt(rgb: Int): Color = Color(((rgb shr 16) and 0xFF), ((rgb shr 8) and 0xFF), (rgb and 0xFF), Percentage(((rgb shr 24) and 0xFF) / 255.0, true))
+        infix fun ofRGBInt(rgb: Int): Color = Color(((rgb shr 16) and 0xFF), ((rgb shr 8) and 0xFF), (rgb and 0xFF), FULL)
+
+        /**
+         * Creates a Color instance from a 32-bit integer representing RGBA values.
+         *
+         * @param rgb A 32-bit long integer where the red, green, blue, and alpha (opacity) components
+         *            are encoded in the order of bits 24-31 (red), 16-23 (green), 8-15 (blue),
+         *            and 0-7 (alpha). Each component is represented using 8 bits.
+         * @return A Color object initialized with the red, green, blue, and alpha values extracted
+         *         from the provided integer.
+         * @since 3.13.1
+         */
+        infix fun ofRGBAInt(rgb: Long): Color = Color(((rgb shr 24) and 0xFF).toInt(), ((rgb shr 16) and 0xFF).toInt(), ((rgb shr 8) and 0xFF).toInt(), Percentage((rgb and 0xFF) / 255.0, true))
 
         /**
          * Converts a given Java AWT Color instance to a Color instance.
