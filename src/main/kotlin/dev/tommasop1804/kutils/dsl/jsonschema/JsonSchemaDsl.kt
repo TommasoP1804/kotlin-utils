@@ -2,7 +2,7 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
-@file:Suppress("unused", "UnusedReceiverParameter")
+@file:Suppress("unused", "UnusedReceiverParameter", "UNCHECKED_CAST")
 @file:Since("3.3.0")
 
 package dev.tommasop1804.kutils.dsl.jsonschema
@@ -10,7 +10,11 @@ package dev.tommasop1804.kutils.dsl.jsonschema
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON_ARRAY
 import dev.tommasop1804.kutils.classes.coding.JsonSchema.Companion.toJsonSchema
+import dev.tommasop1804.kutils.classes.web.*
+import org.intellij.lang.annotations.Language
 
 @DslMarker
 annotation class JsonSchemaDslMarker
@@ -30,88 +34,117 @@ class SchemaBuilder {
      * to store the schema's attributes and metadata dynamically.
      * @since 3.3.0
      */
-    private val props = linkedMapOf<String, Any?>()
+    val props = linkedMapOf<String, Any?>()
 
-    // ── Meta ──
+    // -- Meta --
     /**
      * Sets the `$schema` property in the JSON Schema to define the schema's version or dialect.
      * This property is used to specify the meta-schema against which the JSON Schema is validated.
      *
-     * @param uri The URI representing the meta-schema. Defaults to "https://json-schema.org/draft/2020-12/schema".
+     * @since 3.13.2
+     */
+    var schema
+        get() = props[$$"$schema"]?.toString()?.toUri()?.getOrThrow()
+        set(value) { props[$$"$schema"] = value }
+    /**
+     * Sets the `$schema` property to the given URI for JSON schema validation.
+     *
+     * @param uri The URI to be set as the `$schema` property. Defaults to "https://json-schema.org/draft/2020-12/schema".
      * @since 3.3.0
      */
-    fun schema(uri: Uri = Uri("https://json-schema.org/draft/2020-12/schema")) { props[$$"$schema"] = uri }
+    fun schema(uri: Uri = Uri("https://json-schema.org/draft/2020-12/schema")) {
+        props[$$"$schema"] = uri
+    }
     /**
      * Sets the `$id` keyword of the JSON Schema to the given URI.
      *
      * The `$id` keyword is used to define a unique identifier for the schema, allowing
      * for referencing and reuse within other schemas or documents.
      *
-     * @param uri The URI that represents the unique identifier for the schema.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun id(uri: Uri) { props[$$"$id"] = uri }
+    var id
+        get() = props[$$"$id"]?.toString()?.toUri()?.getOrThrow()
+        set(value) { props[$$"$id"] = value }
     /**
      * Adds a `$ref` property to the schema with the specified URI reference.
      *
-     * @param uri The URI reference to be assigned to the `$ref` property.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun ref(uri: Uri) { props[$$"$ref"] = uri }
+    var ref
+        get() = props[$$"$ref"]?.toString()?.toUri()?.getOrThrow()
+        set(value) { props[$$"$ref"] = value }
     /**
      * Sets the title of the schema.
      *
-     * @param value The title to assign to the schema.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun title(value: String) { props["title"] = value }
+    var title
+        get() = props["title"]?.toString()
+        set(value) { props["title"] = value }
     /**
      * Sets the description property in the `props` map to the specified value.
      *
-     * @param value The description to be set in the `props` map.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun description(value: String) { props["description"] = value }
+    var description
+        get() = props["description"]?.toString()
+        set(value) { props["description"] = value }
     /**
      * Sets a comment for the schema definition.
      *
-     * @param value The comment to be associated with the schema.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun comment(value: String) { props[$$"$comment"] = value }
+    var comment
+        get() = props[$$"$comment"]?.toString()
+        set(value) { props[$$"$comment"] = value }
     /**
      * Marks the schema as deprecated.
      *
-     * @param value Indicates whether the schema is deprecated. Defaults to `true`.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun deprecated(value: Boolean = true) { props["deprecated"] = value }
+    var deprecated
+        get() = props["deprecated"]?.let { bool -> tryOr({ it.toString().toBoolean() }) { bool as Boolean } }
+        set(value) { props["deprecated"] = value }
     /**
      * Sets the `readOnly` property in the JSON Schema to the specified value.
      *
-     * @param value Indicates whether the property is read-only. Defaults to `true`.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun readOnly(value: Boolean = true) { props["readOnly"] = value }
+    var readOnly
+        get() = props["readOnly"]?.let { bool -> tryOr({ it.toString().toBoolean() }) { bool as Boolean } }
+        set(value) { props["readOnly"] = value }
     /**
      * Sets the `writeOnly` property to the specified value within the schema being built.
      *
-     * The `writeOnly` property, when set to `true`, indicates that the data is intended to be written 
+     * The `writeOnly` property, when set to `true`, indicates that the data is intended to be written
      * and not read. This is commonly used to designate sensitive information such as passwords.
      *
-     * @param value A boolean indicating whether the property should be marked as write-only. Defaults to `true`.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun writeOnly(value: Boolean = true) { props["writeOnly"] = value }
+    var writeOnly
+        get() = props["writeOnly"]?.let { bool -> tryOr({ it.toString().toBoolean() }) { bool as Boolean } }
+        set(value) { props["writeOnly"] = value }
     /**
      * Adds example values to the schema. These are used to provide illustrative examples of the expected data.
      *
-     * @param values The example values to associate with the schema, provided as a vararg of any type.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun examples(vararg values: Any?) { props["examples"] = values.toList() }
+    var examples
+        get() = props["examples"]?.let { list -> list as List<Any?> }
+        set(value) { props["examples"] = value }
 
     // ── Type ──
+    /**
+     * Sets the `type` keyword of the schema. This can specify one or more data types
+     * that the schema can validate against. If a single type is provided, it is set
+     * as a string. If multiple types are provided, they are stored as a list.
+     *
+     * @since 3.13.2
+     */
+    var types
+        get() = props["type"]?.let { list -> list as List<JsonSchema.Type> }
+        set(value) { props["type"] = value }
     /**
      * Sets the `type` keyword of the schema. This can specify one or more data types 
      * that the schema can validate against. If a single type is provided, it is set 
@@ -134,7 +167,6 @@ class SchemaBuilder {
     fun type(vararg types: JsonSchema.Type) {
         type(*types.map { it.value }.toTypedArray())
     }
-
     /**
      * Sets a constant value in the schema. The value provided will constrain the data to be 
      * exactly equal to the given value.
@@ -153,95 +185,127 @@ class SchemaBuilder {
     /**
      * Sets the "default" property in the `props` map to the specified value.
      *
-     * @param value The value to assign to the "default" property. Can be any type, including null.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun default(value: Any?) { props["default"] = value }
+    var default
+        get() = props["default"]
+        set(value) { props["default"] = value }
 
     // ── String ──
     /**
      * Specifies the minimum number of characters that a string value must contain.
      *
-     * @param value The minimum length of the string. Must be a non-negative integer.
      * @since 3.3.0
      */
-    fun minLength(value: Int) { props["minLength"] = value }
+    var minLength
+        get() = props["minLength"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) { props["minLength"] = value }
     /**
      * Sets the maximum length constraint for a string value.
      *
-     * @param value The maximum allowed length for the string. Must be a non-negative integer.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun maxLength(value: Int) { props["maxLength"] = value }
+    var maxLength
+        get() = props["maxLength"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) { props["maxLength"] = value }
     /**
      * Sets a regular expression pattern to be used for validation or matching.
      *
-     * @param regex The regular expression pattern to be applied.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun pattern(regex: Regex) { props["pattern"] = regex.toString() }
+    var pattern
+        get() = props["pattern"]?.let { pattern -> tryOr({ pattern.toString().toRegex() }) { pattern as Regex } }
+        set(value) { props["pattern"] = value }
     /**
      * Sets the format string for the underlying properties map.
      *
-     * @param fmt The format string to be assigned.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun format(fmt: String) { props["format"] = fmt }
+    var format
+        get() = props["format"]?.let { list -> list as List<JsonSchema.Format> }
+        set(value) { props["format"] = value }
+    /**
+     * Assigns a list of specified formats to the "format" property in the `props` map.
+     *
+     * @param formats Vararg parameter representing the JSON schema formats to be added.
+     * @since 3.13.2
+     */
+    fun format(vararg formats: JsonSchema.Format) {
+        props["format"] = if (formats.size == 1) formats[0] else formats.map { it.value }.toList()
+    }
+    /**
+     * Assigns a list of specified formats to the "format" property in the `props` map.
+     *
+     * @param formats Vararg parameter representing the JSON schema formats to be added.
+     * @since 3.13.2
+     */
+    fun format(vararg formats: String) {
+        props["format"] = if (formats.size == 1) formats[0] else formats.toList()
+    }
     /**
      * Sets the media type for the content associated with this schema.
+     * It is a string representation of a MIME type (e.g., "application/json", "text/plain").
      *
-     * @param value The media type to be assigned. It is typically a string representation of a MIME type 
-     *              (e.g., "application/json", "text/plain").
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun contentMediaType(value: String) { props["contentMediaType"] = value }
+    var contentMediaType
+        get() = props["contentMediaType"]?.let { mt -> tryOr({ MediaType.parse(mt.toString())() }) { mt as MediaType } }
+        set(value) { props["contentMediaType"] = value }
     /**
      * Sets the content encoding for the schema being built.
      *
-     * @param value The encoding value to be applied (e.g., "base64"). It specifies how the content within the schema
+     * The value is the encoding value to be applied (e.g., "base64"). It specifies how the content within the schema
      * should be encoded when transmitted or processed.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun contentEncoding(value: String) { props["contentEncoding"] = value }
+    var contentEncoding
+        get() = props["contentEncoding"]?.toString()
+        set(value) { props["contentEncoding"] = value }
 
     // ── Numeric ──
     /**
      * Sets the minimum value constraint for a numeric type in the schema.
-     * 
-     * @param value The minimum value to be applied.
-     * @since 3.3.0
+     *
+     * @since 3.13.2
      */
-    fun minimum(value: Number) { props["minimum"] = value }
+    var minimum
+        get() = props["minimum"]?.let { num -> tryOr({ num.toString().toDouble() }) { num as Number } }
+        set(value) { props["minimum"] = value }
+
     /**
      * Sets the maximum value constraint for a numeric schema.
      *
-     * @param value The maximum allowable value for the schema element.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun maximum(value: Number) { props["maximum"] = value }
+    var maximum
+        get() = props["maximum"]?.let { num -> tryOr({ num.toString().toDouble() }) { num as Number } }
+        set(value) { props["maximum"] = value }
     /**
      * Specifies an exclusive minimum value for a numeric property in the schema.
      * The value defined must be strictly less than the input number for the schema validation to pass.
      *
-     * @param value The exclusive minimum numeric value to be set.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun exclusiveMinimum(value: Number) { props["exclusiveMinimum"] = value }
+    var exclusiveMinimum
+        get() = props["exclusiveMinimum"]?.let { num -> tryOr({ num.toString().toDouble() }) { num as Number } }
+        set(value) { props["exclusiveMinimum"] = value }
     /**
      * Sets the `exclusiveMaximum` constraint for the schema. This specifies an upper limit
      * for a numeric value that must not be equal to or exceed the given number.
      *
-     * @param value The upper limit that the numeric value must be strictly less than.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun exclusiveMaximum(value: Number) { props["exclusiveMaximum"] = value }
+    var exclusiveMaximum
+        get() = props["exclusiveMaximum"]?.let { num -> tryOr({ num.toString().toDouble() }) { num as Number } }
+        set(value) { props["exclusiveMaximum"] = value }
     /**
      * Specifies that a numeric instance must be a multiple of the provided value.
      *
-     * @param value The numeric value that the instance must be a multiple of.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun multipleOf(value: Number) { props["multipleOf"] = value }
+    var multipleOf
+        get() = props["multipleOf"]?.let { num -> tryOr({ num.toString().toDouble() }) { num as Number } }
+        set(value) { props["multipleOf"] = value }
 
     // ── Object ──
     /**
@@ -271,11 +335,13 @@ class SchemaBuilder {
     /**
      * Configures whether additional properties are allowed in the schema.
      *
-     * @param allowed A boolean indicating whether additional properties are permitted. 
+     * The value is A boolean indicating whether additional properties are permitted.
      *                If true, additional properties are allowed; otherwise, they are not.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun additionalProperties(allowed: Boolean) { props["additionalProperties"] = allowed }
+    var additionalProperties
+        get() = props["additionalProperties"]?.let { bool -> tryOr({ it.toString().toBoolean() }) { bool as Boolean } }
+        set(value) { props["additionalProperties"] = value }
     /**
      * Configures the `additionalProperties` schema for the current JSON schema being built.
      * This method allows for the specification of additional properties in the schema
@@ -292,6 +358,16 @@ class SchemaBuilder {
      * Defines a set of properties that are required for the schema.
      * The names of the required properties are passed as vararg parameters.
      *
+     * @since 3.13.2
+     */
+    var required
+        get() = props["required"]?.let { list -> list as Iterable<String> }
+        set(value) { props["required"] = value?.toList() }
+
+    /**
+     * Defines a set of properties that are required for the schema.
+     * The names of the required properties are passed as vararg parameters.
+     *
      * @param names The names of the properties that are required.
      * @since 3.3.0
      */
@@ -299,17 +375,26 @@ class SchemaBuilder {
     /**
      * Sets the minimum number of properties that an object must have to satisfy the schema.
      *
-     * @param value The minimum number of properties required. Must be a non-negative integer.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun minProperties(value: Int) { props["minProperties"] = value }
+    var minProperties
+        get() = props["minProperties"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) {
+            value?.validateNotNegative(::minProperties)
+            props["minProperties"] = value
+        }
     /**
      * Sets the maximum number of properties that an object can have.
      *
-     * @param value The maximum number of properties allowed for the object.
-     * @since 3.3.0
+     * @since 3.13.2
      */
-    fun maxProperties(value: Int) { props["maxProperties"] = value }
+    var maxProperties
+        get() = props["maxProperties"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) {
+            value?.validateNotNegative(::minProperties)
+            props["maxProperties"] = value
+        }
+
     /**
      * Configures the `propertyNames` constraint in the JSON Schema.
      * This constraint is used to validate the names of the properties of an object
@@ -346,12 +431,13 @@ class SchemaBuilder {
         props["dependentSchemas"] = PropertiesBuilder().apply(block).build()
     }
 
+    // ── Array ──
     /**
      * Sets the schema for items in an array.
      *
      * @param schema The schema definition to be applied to each item in the array.
+     * @since 3.3.0
      */
-// ── Array ──
     fun items(schema: DataMap) { props["items"] = schema }
     /**
      * Configures items for a JSON schema array. The `block` parameter allows customization of the schema
@@ -360,12 +446,14 @@ class SchemaBuilder {
      *
      * @param block A lambda that defines the schema for the array items using a `SchemaBuilder`. The schema
      *              is constructed and applied to the `items` property of the JSON schema being built.
+     * @since 3.3.0
      */
     fun items(block: ReceiverConsumer<SchemaBuilder>) { props["items"] = SchemaBuilder().apply(block).build() }
     /**
      * Adds the provided schemas to the `prefixItems` property of the underlying properties map.
      *
      * @param schemas A variable number of DataMap objects to be set as the value for `prefixItems`.
+     * @since 3.3.0
      */
     fun prefixItems(vararg schemas: DataMap) { props["prefixItems"] = schemas.toList() }
     /**
@@ -375,41 +463,59 @@ class SchemaBuilder {
      * conforming to the schema defined within the block.
      *
      * @param block A lambda function used to configure the SchemaBuilder for the "contains" constraint.
+     * @since 3.3.0
      */
     fun contains(block: ReceiverConsumer<SchemaBuilder>) { props["contains"] = SchemaBuilder().apply(block).build() }
     /**
      * Sets the minimum number of items allowed.
      *
-     * @param value The minimum number of items to be set.
+     * @since 3.13.2
      */
-    fun minItems(value: Int) { props["minItems"] = value }
+    var minItems
+        get() = props["minItems"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) {
+            value?.validateNotNegative(::minItems)
+            props["minItems"] = value
+        }
     /**
      * Sets the maximum number of items allowed.
      *
-     * @param value The maximum number of items to be set.
+     * @since 3.13.2
      */
-    fun maxItems(value: Int) { props["maxItems"] = value }
+    var maxItems
+        get() = props["maxItems"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) {
+            value?.validateNotNegative(::maxItems)
+            props["maxItems"] = value
+        }
     /**
      * Sets whether array items in the schema must be unique.
      *
-     * @param value a Boolean indicating whether the items in the array should be unique. Defaults to `true`.
+     * @since 3.13.2
      */
-    fun uniqueItems(value: Boolean = true) { props["uniqueItems"] = value }
+    var uniqueItems
+        get() = props["uniqueItems"]?.let { bool -> tryOr({ it.toString().toBoolean() }) { bool as Boolean } }
+        set(value) { props["uniqueItems"] = value }
     /**
      * Sets the minimum number of occurrences of the item that must satisfy the `contains` condition
      * within an array. This is part of JSON Schema validation for arrays.
      *
-     * @param value The minimum number of items required. Must be a non-negative integer.
+     *  @since 3.13.2
      */
-    fun minContains(value: Int) { props["minContains"] = value }
+    var minContains
+        get() = props["minContains"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) { value?.validateNotNegative(::minContains); props["minContains"] = value }
     /**
      * Sets the maximum number of occurrences of schema-defined elements that must be present 
      * in an array for the array to be considered valid.
      *
-     * @param value The maximum number of occurrences.
+     * @since 3.13.2
      */
-    fun maxContains(value: Int) { props["maxContains"] = value }
+    var maxContains
+        get() = props["maxContains"]?.let { int -> tryOr({ int.toString().toInt() }) { int as Int } }
+        set(value) { value?.validateNotNegative(::maxContains); props["maxContains"] = value }
 
+    // ── Composition ──
     /**
      * Adds a composition constraint where all of the provided schemas must be valid.
      * The `allOf` keyword is used to combine multiple schema definitions, and an
@@ -418,7 +524,6 @@ class SchemaBuilder {
      * @param schemas A variable number of schema definitions represented as `DataMap` 
      *                instances. These schemas are combined under the `allOf` keyword.
      */
-// ── Composition ──
     fun allOf(vararg schemas: DataMap) { props["allOf"] = schemas.toList() }
     /**
      * Adds all the schemas defined in the provided configuration block to the "allOf" property.
@@ -462,13 +567,13 @@ class SchemaBuilder {
      */
     fun not(block: ReceiverConsumer<SchemaBuilder>) { props["not"] = SchemaBuilder().apply(block).build() }
 
+    // ── Conditional ──
     /**
      * Defines a conditional schema using the "if" keyword in JSON Schema. The provided block allows
      * customization of the schema by using the fluent DSL provided by the `SchemaBuilder` class.
      *
      * @param block A lambda with `SchemaBuilder` as the receiver, enabling the construction of a conditional schema.
      */
-// ── Conditional ──
     fun ifSchema(block: ReceiverConsumer<SchemaBuilder>) { props["if"] = SchemaBuilder().apply(block).build() }
     /**
      * Assigns a schema to the "then" property after applying the provided consumer block to a new SchemaBuilder instance.
@@ -494,16 +599,6 @@ class SchemaBuilder {
     fun defs(block: ReceiverConsumer<PropertiesBuilder>) {
         props[$$"$defs"] = PropertiesBuilder().apply(block).build()
     }
-
-    // ── Raw extension ──
-    /**
-     * Adds or updates a key-value pair in the `props` collection.
-     *
-     * @param key The key associated with the value to be added or updated.
-     * @param value The value to associate with the given key. If null, the key is set with a null value.
-     * @since 3.3.0
-     */
-    fun raw(key: String, value: Any?) { props[key] = value }
 
     /**
      * Builds and returns a DataMap instance based on the current state of properties.
@@ -560,7 +655,7 @@ class PropertiesBuilder {
      * @param schema The DataMap to associate with the current string.
      * @since 3.3.0
      */
-    infix fun String.to(schema: DataMap) { schemas[this] = schema }
+    infix fun @receiver:Language("regex") String.to(schema: DataMap) { schemas[this] = schema }
     /**
      * Maps the current string to a schema built using the provided block.
      *
@@ -568,7 +663,7 @@ class PropertiesBuilder {
      *              allowing the schema to be configured and built.
      * @since 3.3.0
      */
-    infix fun String.to(block: ReceiverConsumer<SchemaBuilder>) { schemas[this] = SchemaBuilder().apply(block).build() }
+    infix fun @receiver:Language("regex") String.to(block: ReceiverConsumer<SchemaBuilder>) { schemas[this] = SchemaBuilder().apply(block).build() }
 
     // ── Shorthand type constructors ──
     /**
@@ -582,6 +677,17 @@ class PropertiesBuilder {
      */
     fun string(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
         SchemaBuilder().apply { type("string"); block() }.build()
+    /**
+     * Creates a schema definition that allows either a string type or null, and applies additional configurations
+     * using the provided block, if specified.
+     *
+     * @param block An optional lambda with a receiver of type `SchemaBuilder`. This block allows further customization
+     *              of the schema definition by configuring the `SchemaBuilder` instance.
+     * @return A `DataMap` representing the constructed schema with type "string" or "null".
+     * @since 3.13.2
+     */
+    fun stringOrNull(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
+        SchemaBuilder().apply { type("string", "null"); block() }.build()
 
     /**
      * Constructs a schema definition for an integer type.
@@ -592,6 +698,16 @@ class PropertiesBuilder {
      */
     fun integer(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
         SchemaBuilder().apply { type("integer"); block() }.build()
+    /**
+     * Constructs a schema definition that allows either an "integer" type or "null" type.
+     *
+     * @param block A lambda with a receiver of type `SchemaBuilder` to further customize the schema definition.
+     *              The lambda is optional and defaults to an empty configuration.
+     * @return A `DataMap` representing the constructed schema with types "integer" and "null".
+     * @since 3.13.2
+     */
+    fun integerOrNull(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
+        SchemaBuilder().apply { type("integer", "null"); block() }.build()
 
     /**
      * Creates a schema definition for the "number" type and applies the provided configuration.
@@ -603,6 +719,16 @@ class PropertiesBuilder {
      */
     fun number(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
         SchemaBuilder().apply { type("number"); block() }.build()
+    /**
+     * Constructs a schema definition that allows either a "number" type or "null" type and applies the provided configuration.
+     *
+     * @param block A lambda with a receiver of type `SchemaBuilder` to customize the schema definition.
+     *              This block is optional and defaults to an empty configuration if not provided.
+     * @return A `DataMap` representing the schema with types "number" and "null".
+     * @since 3.13.2
+     */
+    fun numberOrNull(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
+        SchemaBuilder().apply { type("number", "null"); block() }.build()
 
     /**
      * Constructs a schema with type "boolean" and applies the given configuration block.
@@ -613,6 +739,15 @@ class PropertiesBuilder {
      */
     fun boolean(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
         SchemaBuilder().apply { type("boolean"); block() }.build()
+    /**
+     * Constructs a schema definition that allows either a "boolean" type or "null" type, applying the given configuration block.
+     *
+     * @param block A lambda with a receiver of type `SchemaBuilder` that configures the schema definition. The lambda is optional and defaults to an empty configuration block.
+     * @return A `DataMap` representing the constructed schema with types "boolean" and "null".
+     * @since 3.13.2
+     */
+    fun booleanOrNull(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
+        SchemaBuilder().apply { type("boolean", "null"); block() }.build()
 
     /**
      * Constructs a schema of type "object" and allows further customization through a builder block.
@@ -623,6 +758,16 @@ class PropertiesBuilder {
      */
     fun obj(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
         SchemaBuilder().apply { type("object"); block() }.build()
+    /**
+     * Constructs a schema definition that allows either an "object" type or "null" type and applies the provided configuration block.
+     *
+     * @param block A lambda with a receiver of type `SchemaBuilder` that configures the schema definition.
+     *              This block is optional and defaults to an empty configuration if not provided.
+     * @return A `DataMap` representing the constructed schema with types "object" and "null".
+     * @since 3.13.2
+     */
+    fun objOrNull(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
+        SchemaBuilder().apply { type("object", "null"); block() }.build()
 
     /**
      * Creates a JSON Schema definition for an array type.
@@ -633,6 +778,16 @@ class PropertiesBuilder {
      */
     fun array(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
         SchemaBuilder().apply { type("array"); block() }.build()
+    /**
+     * Creates a schema definition that allows either an "array" type or "null" type and applies additional configuration.
+     *
+     * @param block A lambda with a receiver of type `SchemaBuilder` to customize the schema definition.
+     *              This block is optional and defaults to an empty configuration if not provided.
+     * @return A `DataMap` representing the constructed schema with types "array" and "null".
+     * @since 3.13.2
+     */
+    fun arrayOrNull(block: ReceiverConsumer<SchemaBuilder> = {}): DataMap =
+        SchemaBuilder().apply { type("array", "null"); block() }.build()
 
     /**
      * Creates a `DataMap` representation of an enum with the specified values.
@@ -643,6 +798,14 @@ class PropertiesBuilder {
      * @since 3.3.0
      */
     fun enum(vararg values: Any?): DataMap = ("enum" to values.toList()).asSingleMap()
+    /**
+     * Constructs a schema definition for an enum type that allows either the specified enum values or a null value.
+     *
+     * @param values The possible values of the enum. These can be of any type.
+     * @return A `DataMap` representing the schema with type "enum" and "null", including the specified enum values.
+     * @since 3.13.2
+     */
+    fun enumOrNull(vararg values: Any?): DataMap = SchemaBuilder().apply { type("string", "null"); enum(*values) }.build()
 
     /**
      * Creates a `$ref` reference in the JSON Schema and maps it to the specified URI.
@@ -875,14 +1038,14 @@ internal fun mapToJson(value: Any?, indent: Int, depth: Int): Json {
             is Number -> value.toString()
             is String -> "\"${escapeJson(value)}\""
             is Map<*, *> -> {
-                if (value.isEmpty()) "{}"
+                if (value.isEmpty()) EMPTY_JSON
                 else value.entries.joinToString(",$nl", "{$nl", "$nl$padClose}") { [k, v] ->
                     "$pad\"${escapeJson(k.toString())}\": ${mapToJson(v, indent, depth + 1)}"
                 }
             }
 
             is List<*> -> {
-                if (value.isEmpty()) "[]"
+                if (value.isEmpty()) EMPTY_JSON_ARRAY
                 else if (value.all { it is String || it is Number || it is Boolean || it.isNull() }) {
                     // Compact for simple arrays
                     value.joinToString(sep, "[", "]") { mapToJson(it, 0, 0) }

@@ -8,7 +8,7 @@ A comprehensive Kotlin/JVM utility library providing extensions, helpers, and re
 
 ## Installation
 
-### Gradle (Kotlin DSL)
+### Gradle (Kotlin DSL)~~~~
 
 ```kotlin
 repositories {
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.tommasop1804:kotlin-utils:3.13.1")
+    implementation("dev.tommasop1804:kotlin-utils:3.13.2")
 }
 ```
 

@@ -948,6 +948,104 @@ class JsonSchema(val json: Json) : Json(json) {
     }
 
     /**
+     * Represents a set of predefined formats commonly used for validation and data representation.
+     *
+     * Each format corresponds to a specific type of data structure or format pattern,
+     * such as dates, times, URIs, email addresses, and network-related identifiers.
+     *
+     * @since 3.13.2
+     * @author Tommaso Pastorelli
+     */
+    enum class Format(val value: String) {
+        /**
+         * Represents the "date-time" format as defined by the format enumeration.
+         * Commonly used for specifying date and time values in string form adhering to ISO 8601 standards.
+         *
+         * @since 3.13.2
+         */
+        DATE_TIME("date-time"),
+        /**
+         * Represents a format type for date values.
+         * Typically used to specify a standard date format in string representations.
+         *
+         * @since 3.13.2
+         */
+        DATE("date"),
+        /**
+         * Represents the `time` format type typically used to validate or represent time values
+         * in a standardized string format such as `HH:mm:ss`.
+         *
+         * @since 3.13.2
+         */
+        TIME("time"),
+        /**
+         * Represents an email type used for categorization or identification purposes.
+         *
+         * @constructor Creates an instance of EMAIL with a specified type identifier.
+         * @since 3.13.2
+         */
+        EMAIL("email"),
+        /**
+         * Represents a Universally Unique Identifier (UUID).
+         *
+         * @constructor Creates a new instance of the UUID class with the specified identifier.
+         * @since 3.13.2
+         */
+        UUID("uuid"),
+        /**
+         * Represents a format type for a URI.
+         *
+         * Used to define and identify strings that conform to a Uniform Resource Identifier (URI) structure.
+         * @since 3.13.2
+         */
+        URI("uri"),
+        /**
+         * Represents the IPv4 address format.
+         *
+         * This format is used to denote an Internet Protocol version 4 (IPv4) address,
+         * which consists of four decimal numbers separated by dots. Each number
+         * (octet) is in the range of 0 to 255.
+         *
+         * @since 3.13.2
+         */
+        IPV4("ipv4"),
+        /**
+         * Represents the IPv6 format in the context of the `Format` enumeration.
+         * Commonly used to validate or identify IPv6 address syntax.
+         *
+         * @since 3.13.2
+         */
+        IPV6("ipv6"),
+        /**
+         * Represents the hostname format.
+         * This format defines a valid hostname as per the RFC 1034 and RFC 1123 specifications.
+         *
+         * @since 3.13.2
+         */
+        HOSTNAME("hostname"),
+        /**
+         * Represents the `json-pointer` format as defined in the associated standard.
+         * This format is used to reference specific keys or elements within a JSON document
+         * using a string syntax.
+         *
+         * @since 3.13.2
+         */
+        JSON_POINTER("json-pointer");
+
+        companion object {
+            /**
+             * Finds an entry in the `Format.entries` list where the `value` matches the provided string
+             * ignoring case sensitivity.
+             *
+             * @param value The string to be compared against the `value` of entries in the `Format.entries` list.
+             * @return The matching entry from `Format.entries`, or `null` if no match is found.
+             * @since 3.13.2
+             */
+            infix fun of(value: String) = Format.entries.find { it.value equalsIgnoreCase value }
+        }
+    }
+
+    /**
      * Enumerates the supported versions of a JSON schema specification.
      * @since 3.8.1
      * @author Tommaso Pastorelli
