@@ -668,25 +668,25 @@ data class CalendarEvent(
              * This status is typically associated with the color green,
              * signifying agreement or positive confirmation.
              *
-             * @since 1.0.0
+             * @since 4.0.0
              */
-            YES(Color.GREEN), 
+            Yes(Color.GREEN),
             /**
              * Represents a "No" participation status with a default color of red.
              * This status indicates a negative response in the context of participation.
              *
-             * @since 1.0.0
+             * @since 4.0.0
              */
-            NO(Color.RED), 
+            No(Color.RED),
             /**
              * Represents a participation status option where the answer is uncertain.
              *
              * This status corresponds to a "maybe" response in the context of participation or decision-making scenarios.
              * It is associated with the color LIGHT_ORANGE as its default visual representation.
              *
-             * @since 1.0.0
+             * @since 4.0.0
              */
-            MAYBE(Color.LIGHT_ORANGE)
+            Maybe(Color.LIGHT_ORANGE)
         }
     }
 }

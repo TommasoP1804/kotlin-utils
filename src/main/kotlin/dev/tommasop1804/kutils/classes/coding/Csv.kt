@@ -42,7 +42,7 @@ import java.nio.file.Path
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Csv.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
 @Beta(since = "3.13.0")
-class Csv(override var value: String, val separator: Char = Char.COMMA, val hasHeaders: Boolean = true) : CharSequence, Code(value, Language.CSV) {
+class Csv(override var value: String, val separator: Char = Char.COMMA, val hasHeaders: Boolean = true) : CharSequence, Code(value, Language.Csv) {
 
     /**
      * Retrieves a version of the CSV content without its headers.
@@ -64,7 +64,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
      * @since 3.13.0
      */
     constructor(code: Code, separator: Char = Char.COMMA, hasHeaders: Boolean = true) : this(code.value, separator, hasHeaders) {
-        code.language.expect(Language.CSV)
+        code.language.expect(Language.Csv)
     }
 
     /**

@@ -94,7 +94,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun select(@Language("sql") vararg columns: String, distinct: Boolean = false): SqlQueryBuilder {
-        type = QueryType.SELECT
+        type = QueryType.Select
         if ("SELECT " notInIgnoreCase selectClause) selectClause += "SELECT "
         if (distinct && "DISTINCT " notInIgnoreCase selectClause) selectClause += "DISTINCT "
         selectClause += (if (selectClause.last() != Char.SPACE) ", " else String.EMPTY) + (if (columns.isEmpty()) "*" else columns.joinToString(", "))
@@ -242,7 +242,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun selectCount(@Language("sql") expression: String = "*"): SqlQueryBuilder {
-        type = QueryType.SELECT
+        type = QueryType.Select
         selectClause += "SELECT COUNT($expression)"
         return this
     }
@@ -256,7 +256,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun insertInto(table: String): SqlQueryBuilder {
-        type = QueryType.INSERT
+        type = QueryType.Insert
         insertClause += "INSERT INTO $table"
         return this
     }
@@ -302,7 +302,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun update(table: String): SqlQueryBuilder {
-        type = QueryType.UPDATE
+        type = QueryType.Update
         updateClause += "UPDATE $table"
         return this
     }
@@ -331,7 +331,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun deleteFrom(table: String): SqlQueryBuilder {
-        type = QueryType.DELETE
+        type = QueryType.Delete
         deleteClause += "DELETE FROM $table"
         return this
     }
@@ -350,9 +350,9 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun where(@Language("sql") condition: String, autoApplyOperator: LogicOperator? = LogicOperator.AND): SqlQueryBuilder {
-        (type == QueryType.DELETE
-                || type == QueryType.UPDATE
-                || type == QueryType.SELECT) || throw IllegalOperationException("You can't call where() method before calling from() method.")
+        (type == QueryType.Delete
+                || type == QueryType.Update
+                || type == QueryType.Select) || throw IllegalOperationException("You can't call where() method before calling from() method.")
 
         whereClause += if (whereClause.isEmpty()) " WHERE $condition" else when (autoApplyOperator) {
             LogicOperator.AND -> " AND $condition"
@@ -378,9 +378,9 @@ class SqlQueryBuilder {
      */
     fun and(@Language("sql") condition: String): SqlQueryBuilder {
         hasWhere || throw IllegalOperationException("You can't call and() method before calling where() method.")
-        (type == QueryType.DELETE
-                || type == QueryType.UPDATE
-                || type == QueryType.SELECT
+        (type == QueryType.Delete
+                || type == QueryType.Update
+                || type == QueryType.Select
                 ) || throw IllegalOperationException("You can't call and() method before calling from() method.")
         whereClause += " AND $condition"
         return this
@@ -397,9 +397,9 @@ class SqlQueryBuilder {
      */
     fun or(@Language("sql") condition: String): SqlQueryBuilder {
         hasWhere || throw IllegalOperationException("You can't call or() method before calling where() method.")
-        (type == QueryType.DELETE
-                || type == QueryType.UPDATE
-                || type == QueryType.SELECT
+        (type == QueryType.Delete
+                || type == QueryType.Update
+                || type == QueryType.Select
                 ) || throw IllegalOperationException("You can't call or() method before calling from() method.")
         whereClause += " OR $condition"
         return this
@@ -418,9 +418,9 @@ class SqlQueryBuilder {
      */
     fun not(@Language("sql") condition: String, logicOperator: LogicOperator? = null): SqlQueryBuilder {
         hasWhere || throw IllegalOperationException("You can't call or() method before calling where() method.")
-        (type == QueryType.DELETE
-                || type == QueryType.UPDATE
-                || type == QueryType.SELECT
+        (type == QueryType.Delete
+                || type == QueryType.Update
+                || type == QueryType.Select
                 ) || throw IllegalOperationException("You can't call not() method before calling from() method.")
         whereClause += " ${if (logicOperator.isNotNull()) "${logicOperator.name} " else String.EMPTY}NOT ($condition)"
         return this
@@ -439,7 +439,7 @@ class SqlQueryBuilder {
     fun orderBy(vararg columns: Pair<String, SortDirection>): SqlQueryBuilder {
         orderByClause += " ORDER BY "
         columns.forEachIndexed { i, it ->
-            orderByClause += it.first + (if (it.second == SortDirection.ASCENDING) String.EMPTY else " DESC") + (if (i == columns.size - 1) String.EMPTY else ", ")
+            orderByClause += it.first + (if (it.second == SortDirection.Ascending) String.EMPTY else " DESC") + (if (i == columns.size - 1) String.EMPTY else ", ")
         }
         return this
     }
@@ -453,10 +453,10 @@ class SqlQueryBuilder {
      * @throws UnsupportedOperationException if called before invoking the `from()` method on a SELECT query.
      * @since 1.0.0
      */
-    fun orderBy(@Language("sql") vararg columns: String, direction: SortDirection = SortDirection.ASCENDING): SqlQueryBuilder {
+    fun orderBy(@Language("sql") vararg columns: String, direction: SortDirection = SortDirection.Ascending): SqlQueryBuilder {
         orderByClause += " ORDER BY "
         columns.forEachIndexed { i, it ->
-            orderByClause += it + (if (direction == SortDirection.ASCENDING) String.EMPTY else " DESC") + (if (i == columns.size - 1) String.EMPTY else ", ")
+            orderByClause += it + (if (direction == SortDirection.Ascending) String.EMPTY else " DESC") + (if (i == columns.size - 1) String.EMPTY else ", ")
         }
         return this
     }
@@ -517,7 +517,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun truncate(@Language("sql") table: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT): SqlQueryBuilder {
-        type = QueryType.TRUNCATE
+        type = QueryType.Truncate
         ddlClause += "TRUNCATE TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $table"
         ddlClause += " $dropType"
         return this
@@ -534,7 +534,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun createView(viewName: String, orReplace: Boolean = false, @Language("sql") selectSQL: String): SqlQueryBuilder {
-        type = QueryType.CREATE_VIEW
+        type = QueryType.CreateView
         ddlClause += ("CREATE" + (if (orReplace) " OR REPLACE" else String.EMPTY) +  " VIEW $viewName AS $selectSQL")
         return this
     }
@@ -550,7 +550,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun alterView(viewName: String, ifExists: Boolean = false, @Language("sql") selectSQL: String): SqlQueryBuilder {
-        type = QueryType.ALTER_VIEW
+        type = QueryType.AlterView
         ddlClause += "ALTER VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName AS $selectSQL"
         return this
     }
@@ -565,7 +565,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun dropView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT): SqlQueryBuilder {
-        type = QueryType.DROP_VIEW
+        type = QueryType.DropView
         ddlClause += "DROP VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName"
         ddlClause += " $dropType"
         return this
@@ -585,7 +585,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun createMaterializedView(viewName: String, orReplace: Boolean = false, withData: Boolean = true, @Language("sql") selectSQL: String): SqlQueryBuilder {
-        type = QueryType.CREATE_MATERIALIZED_VIEW
+        type = QueryType.CreateMaterializedView
         ddlClause += ("CREATE" + (if (orReplace) " OR REPLACE" else String.EMPTY) +  " MATERIALIZED VIEW $viewName AS $selectSQL WITH ${if (!withData) "NO " else String.EMPTY}DATA")
         return this
     }
@@ -600,7 +600,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun refreshMaterializedView(viewName: String, concurrently: Boolean = false): SqlQueryBuilder {
-        type = QueryType.REFRESH_MATERIALIZED_VIEW
+        type = QueryType.RefreshMaterializedView
         ddlClause += "REFRESH MATERIALIZED VIEW${if (concurrently) " CONCURRENTLY" else String.EMPTY} $viewName$"
         return this
     }
@@ -616,7 +616,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun alterMaterializedView(viewName: String, ifExists: Boolean = false, @Language("sql") action: String): SqlQueryBuilder {
-        type = QueryType.ALTER_MATERIALIZED_VIEW
+        type = QueryType.AlterMaterializedView
         ddlClause += "ALTER MATERIALIZED VIEW ${if (ifExists) "IF EXISTS " else String.EMPTY}$viewName $action"
         return this
     }
@@ -634,7 +634,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun dropMaterializedView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT): SqlQueryBuilder {
-        type = QueryType.DROP_MATERIALIZED_VIEW
+        type = QueryType.DropMaterializedView
         ddlClause += "DROP MATERIALIZED VIEW ${if (ifExists) "IF EXISTS " else String.EMPTY}$viewName"
         ddlClause += " $dropType"
         return this
@@ -698,7 +698,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun createIndex(indexName: String, table: String, @Language("sql") columns: String): SqlQueryBuilder {
-        type = QueryType.CREATE_INDEX
+        type = QueryType.CreateIndex
         ddlClause += "CREATE INDEX $indexName ON $table ($columns)"
         return this
     }
@@ -713,7 +713,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun dropIndex(indexName: String, ifExists: Boolean = false, tableName: String): SqlQueryBuilder {
-        type = QueryType.DROP_INDEX
+        type = QueryType.DropIndex
         ddlClause += "DROP INDEX${if (ifExists) " IF EXISTS" else String.EMPTY} $indexName ON $tableName"
         return this
     }
@@ -1092,7 +1092,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun createSequence(name: String, ifNotExists: Boolean = false, @Language("sql") creationContent: String): SqlQueryBuilder {
-        type = QueryType.CREATE_SEQUENCE
+        type = QueryType.CreateSequence
         ddlClause += "CREATE SEQUENCE${if (ifNotExists) " IF NOT EXISTS" else String.EMPTY} $name $creationContent"
         return this
     }
@@ -1107,7 +1107,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun alterSequence(name: String, ifExists: Boolean = false, @Language("sql") alterationContent: String): SqlQueryBuilder {
-        type = QueryType.ALTER_SEQUENCE
+        type = QueryType.AlterSequence
         ddlClause += "ALTER SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $alterationContent"
         return this
     }
@@ -1122,7 +1122,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun dropSequence(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT): SqlQueryBuilder {
-        type = QueryType.DROP_SEQUENCE
+        type = QueryType.DropSequence
         ddlClause += "DROP SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name"
         ddlClause += " $dropType"
         return this
@@ -1140,7 +1140,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun createSchema(name: String, ifNotExists: Boolean = false, authorization: String? = null): SqlQueryBuilder {
-        type = QueryType.CREATE_SCHEMA
+        type = QueryType.CreateSchema
         ddlClause += "CREATE SCHEMA${if (ifNotExists) " IF NOT EXISTS" else String.EMPTY} $name"
         if (authorization.isNotNull()) ddlClause += "AUTHORIZATION $authorization"
         return this
@@ -1157,7 +1157,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun alterSchema(name: String, ifExists: Boolean = false, authorization: String? = null, rename: String? = null): SqlQueryBuilder {
-        type = QueryType.ALTER_SCHEMA
+        type = QueryType.AlterSchema
         ddlClause += "ALTER SCHEMA ${if (ifExists) "IF EXISTS " else String.EMPTY}$name"
         if (authorization.isNotNull()) ddlClause += " AUTHORIZATION $authorization"
         if (rename.isNotNull()) ddlClause += " RENAME TO $rename"
@@ -1174,7 +1174,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun dropSchema(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT): SqlQueryBuilder {
-        type = QueryType.DROP_SCHEMA
+        type = QueryType.DropSchema
         ddlClause += "DROP SCHEMA${if (ifExists) " IF EXISTS" else String.EMPTY} $name"
         ddlClause += " $dropType"
         return this
@@ -1395,7 +1395,7 @@ class SqlQueryBuilder {
      * @since 1.0.0
      */
     fun peek() = when(type) {
-        QueryType.SELECT -> buildString {
+        QueryType.Select -> buildString {
             append(selectClause)
             append(fromClause)
             append(joinClause.joinToString(String.EMPTY))
@@ -1406,7 +1406,7 @@ class SqlQueryBuilder {
             append(limitClause)
             append(offsetClause)
         }
-        QueryType.INSERT -> buildString {
+        QueryType.Insert -> buildString {
             append(insertClause)
             append(" (")
             append(insertColumns.joinToString(", "))
@@ -1414,12 +1414,12 @@ class SqlQueryBuilder {
             append(formatValue(insertValues))
             append(")")
         }
-        QueryType.UPDATE -> buildString {
+        QueryType.Update -> buildString {
             append(updateClause)
             append(setClause)
             append(whereClause)
         }
-        QueryType.DELETE -> buildString {
+        QueryType.Delete -> buildString {
             append(deleteClause)
             append(whereClause)
         }
@@ -1518,14 +1518,14 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        SELECT,
+        Select,
         /**
          * Represents the INSERT query type in the SQL language.
          * This type is used to add new rows to a table.
          *
          * @since 1.0.0
          */
-        INSERT,
+        Insert,
         /**
          * Represents an UPDATE operation in the query type enumeration.
          *
@@ -1533,14 +1533,14 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        UPDATE,
+        Update,
         /**
          * Represents a DELETE operation in the context of database queries.
          * This query type is used to delete records from a table.
          *
          * @since 1.0.0
          */
-        DELETE,
+        Delete,
         /**
          * Represents the TRUNCATE operation, typically used for removing all rows from a table
          * in database operations while maintaining the structure of the table.
@@ -1549,7 +1549,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        TRUNCATE,
+        Truncate,
         /**
          * Represents the query type for creating a view in a database.
          *
@@ -1558,14 +1558,14 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        CREATE_VIEW,
+        CreateView,
         /**
          * Represents the query type for altering an existing database view.
          * This operation allows modifications to the definition of a database view.
          *
          * @since 1.0.0
          */
-        ALTER_VIEW,
+        AlterView,
         /**
          * Represents a query type for dropping a view in a database.
          *
@@ -1573,7 +1573,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        DROP_VIEW,
+        DropView,
         /**
          * Represents the type of SQL command used to create a materialized view in a database.
          *
@@ -1586,7 +1586,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        CREATE_MATERIALIZED_VIEW,
+        CreateMaterializedView,
         /**
          * Enum value that represents an operation to refresh a materialized view in the database.
          * This is typically used to trigger updates on materialized views to ensure they reflect
@@ -1597,7 +1597,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        REFRESH_MATERIALIZED_VIEW,
+        RefreshMaterializedView,
         /**
          * Represents an operation type for altering an existing materialized view
          * within a database schema. This typically includes modifying the structure,
@@ -1610,7 +1610,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        ALTER_MATERIALIZED_VIEW,
+        AlterMaterializedView,
         /**
          * Represents an enumeration constant for dropping a materialized view in the context
          * of database query types. This is typically used to signify the operation of
@@ -1618,7 +1618,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        DROP_MATERIALIZED_VIEW,
+        DropMaterializedView,
         /**
          * Represents the database operation to create a new schema. This operation allows 
          * defining a namespace or organizational structure for a collection of tables, views, 
@@ -1629,7 +1629,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        CREATE_SCHEMA,
+        CreateSchema,
         /**
          * Represents an enumerated value used to specify operations related to schema alteration
          * within the context of a database query. This value is part of the QueryType class
@@ -1638,7 +1638,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        ALTER_SCHEMA,
+        AlterSchema,
         /**
          * Represents an operation for dropping a database schema.
          *
@@ -1647,7 +1647,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        DROP_SCHEMA,
+        DropSchema,
         /**
          * Represents a query type for generating a sequence of data or items.
          * This query type is primarily used in database operations or other scenarios 
@@ -1655,7 +1655,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        CREATE_SEQUENCE,
+        CreateSequence,
         /**
          * Represents a specific query type that alters the properties of a database sequence.
          * This type is typically used when modifying the behavior or structure of an existing sequence,
@@ -1666,7 +1666,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        ALTER_SEQUENCE,
+        AlterSequence,
         /**
          * Represents a query type used to drop a sequence in a database.
          *
@@ -1675,7 +1675,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        DROP_SEQUENCE,
+        DropSequence,
         /**
          * Represents a query type for creating an index in a database.
          *
@@ -1684,7 +1684,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        CREATE_INDEX,
+        CreateIndex,
         /**
          * Represents the operation for removing an existing index from a table or view.
          *
@@ -1693,7 +1693,7 @@ class SqlQueryBuilder {
          *
          * @since 1.0.0
          */
-        DROP_INDEX,
+        DropIndex, // -<<<< BREAKPOINT
         /**
          * Represents the SQL operation for creating a database trigger.
          *

@@ -409,7 +409,7 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
                 owner: Any?
             ): Ksuid? = (cached as? ByteArray)?.let { Ksuid(ksuidBytes = it) }
 
-            override fun toSqlLiteral(value: Ksuid?): String? = value?.let { "E'\\\\x${it.toHex().toString(symbol = Hex.HexSymbol.NONE)}'" }
+            override fun toSqlLiteral(value: Ksuid?): String? = value?.let { "E'\\\\x${it.toHex().toString(symbol = Hex.HexSymbol.None)}'" }
 
             override fun toString(value: Ksuid?): String? = value?.toString()
 

@@ -27,13 +27,13 @@ import kotlin.contracts.contract
  */
 @Suppress("SqlNoDataSourceInspection")
 enum class JoinType(@param:Language("sql") val sqlKeyword: String, val onCondition: Boolean = true) {
-    INNER("INNER"),
-    LEFT_OUTER("LEFT"),
-    RIGHT_OUTER("RIGHT"),
-    FULL_OUTER("FULL"),
-    CROSS("CROSS", false),
-    SELF("SELF"),
-    NATURAL("NATURAL", false)
+    Inner("INNER"),
+    LeftOuter("LEFT"),
+    RightOuter("RIGHT"),
+    FullOuter("FULL"),
+    Cross("CROSS", false),
+    Self("SELF"),
+    Natural("NATURAL", false)
 }
 
 /**
@@ -42,7 +42,7 @@ enum class JoinType(@param:Language("sql") val sqlKeyword: String, val onConditi
  * @since 3.6.0
  * @author Tommaso Pastorelli
  */
-enum class LogicOperator { AND, OR }
+enum class LogicOperator { And, Or }
 
 /**
  * Represents drop behavior for DDL operations.
@@ -50,7 +50,7 @@ enum class LogicOperator { AND, OR }
  * @since 3.6.0
  * @author Tommaso Pastorelli
  */
-enum class DropType { CASCADE, RESTRICT }
+enum class DropType { Cascade, Restrict }
 
 /**
  * Represents trigger timing events.
@@ -59,9 +59,9 @@ enum class DropType { CASCADE, RESTRICT }
  * @author Tommaso Pastorelli
  */
 enum class TriggerEvent {
-    BEFORE_INSERT, AFTER_INSERT,
-    BEFORE_UPDATE, AFTER_UPDATE,
-    BEFORE_DELETE, AFTER_DELETE;
+    BeforeInsert, AfterInsert,
+    BeforeUpdate, AfterUpdate,
+    BeforeDelete, AfterDelete;
 
     val sql: String get() = name.replace('_', ' ')
 }
@@ -100,8 +100,8 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      */
     fun condition(@Language("sql") expr: String, autoApplyOperator: LogicOperator? = this.autoApplyOperator) {
         parts += if (parts.isEmpty()) expr else when (autoApplyOperator) {
-            LogicOperator.AND -> "AND $expr"
-            LogicOperator.OR -> "OR $expr"
+            LogicOperator.And -> "AND $expr"
+            LogicOperator.Or -> "OR $expr"
             null -> expr
         }
     }
@@ -289,7 +289,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun inner(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.INNER, on.validate("inner", "on", predicate = String::isNotBlank))
+        join(table, JoinType.Inner, on.validate("inner", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a LEFT JOIN.
@@ -297,7 +297,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun left(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.LEFT_OUTER, on.validate("left", "on", predicate = String::isNotBlank))
+        join(table, JoinType.LeftOuter, on.validate("left", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a RIGHT JOIN.
@@ -305,7 +305,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun right(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.RIGHT_OUTER, on.validate("right", "on", predicate = String::isNotBlank))
+        join(table, JoinType.RightOuter, on.validate("right", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a FULL OUTER JOIN.
@@ -313,7 +313,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun full(@Language("sql") table: String, @Language("sql") on: String) =
-        join(table, JoinType.FULL_OUTER, on.validate("full", "on", predicate = String::isNotBlank))
+        join(table, JoinType.FullOuter, on.validate("full", "on", predicate = String::isNotBlank))
 
     /**
      * Adds a CROSS JOIN.
@@ -399,8 +399,8 @@ class OrderByScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun column(@Language("sql") name: String, direction: SortDirection = SortDirection.ASCENDING) {
-        columns += name + if (direction == SortDirection.DESCENDING) " DESC" else String.EMPTY
+    fun column(@Language("sql") name: String, direction: SortDirection = SortDirection.Ascending) {
+        columns += name + if (direction == SortDirection.Descending) " DESC" else String.EMPTY
     }
 
     /**
@@ -408,22 +408,22 @@ class OrderByScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun asc(@Language("sql") name: String) = column(name, SortDirection.ASCENDING)
+    fun asc(@Language("sql") name: String) = column(name, SortDirection.Ascending)
 
     /**
      * Shorthand: descending column.
      *
      * @since 3.6.0
      */
-    fun desc(@Language("sql") name: String) = column(name, SortDirection.DESCENDING)
+    fun desc(@Language("sql") name: String) = column(name, SortDirection.Descending)
 
     /**
      * Adds a column with NULLS FIRST directive.
      *
      * @since 3.6.0
      */
-    fun nullsFirst(@Language("sql") name: String, direction: SortDirection = SortDirection.ASCENDING) {
-        columns += name + (if (direction == SortDirection.DESCENDING) " DESC" else String.EMPTY) + " NULLS FIRST"
+    fun nullsFirst(@Language("sql") name: String, direction: SortDirection = SortDirection.Ascending) {
+        columns += name + (if (direction == SortDirection.Descending) " DESC" else String.EMPTY) + " NULLS FIRST"
     }
 
     /**
@@ -431,8 +431,8 @@ class OrderByScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun nullsLast(@Language("sql") name: String, direction: SortDirection = SortDirection.ASCENDING) {
-        columns += name + (if (direction == SortDirection.DESCENDING) " DESC" else String.EMPTY) + " NULLS LAST"
+    fun nullsLast(@Language("sql") name: String, direction: SortDirection = SortDirection.Ascending) {
+        columns += name + (if (direction == SortDirection.Descending) " DESC" else String.EMPTY) + " NULLS LAST"
     }
 }
 
@@ -460,17 +460,17 @@ class TriggerScope @PublishedApi internal constructor() {
     }
 
     /** @since 3.6.0 */
-    fun beforeInsert() { event = TriggerEvent.BEFORE_INSERT }
+    fun beforeInsert() { event = TriggerEvent.BeforeInsert }
     /** @since 3.6.0 */
-    fun afterInsert() { event = TriggerEvent.AFTER_INSERT }
+    fun afterInsert() { event = TriggerEvent.AfterInsert }
     /** @since 3.6.0 */
-    fun beforeUpdate() { event = TriggerEvent.BEFORE_UPDATE }
+    fun beforeUpdate() { event = TriggerEvent.BeforeUpdate }
     /** @since 3.6.0 */
-    fun afterUpdate() { event = TriggerEvent.AFTER_UPDATE }
+    fun afterUpdate() { event = TriggerEvent.AfterUpdate }
     /** @since 3.6.0 */
-    fun beforeDelete() { event = TriggerEvent.BEFORE_DELETE }
+    fun beforeDelete() { event = TriggerEvent.BeforeDelete }
     /** @since 3.6.0 */
-    fun afterDelete() { event = TriggerEvent.AFTER_DELETE }
+    fun afterDelete() { event = TriggerEvent.AfterDelete }
 
     /**
      * Sets the table on which the trigger fires.
@@ -961,7 +961,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    inline fun where(autoApplyOperator: LogicOperator? = LogicOperator.AND, block: WhereScope.() -> Unit) {
+    inline fun where(autoApplyOperator: LogicOperator? = LogicOperator.And, block: WhereScope.() -> Unit) {
         val scope = WhereScope(autoApplyOperator).apply(block)
         whereParts += if (whereParts.isEmpty()) scope.parts
         else scope.parts.mapIndexed { index, string -> if (index.isPositive) string else autoApplyOperator?.let { "$it $string" } ?: string }
@@ -972,10 +972,10 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun where(@Language("sql") condition: String, autoApplyOperator: LogicOperator? = LogicOperator.AND) {
+    fun where(@Language("sql") condition: String, autoApplyOperator: LogicOperator? = LogicOperator.And) {
         whereParts += if (whereParts.isEmpty()) condition else when(autoApplyOperator) {
-            LogicOperator.AND -> "AND $condition"
-            LogicOperator.OR -> "OR $condition"
+            LogicOperator.And -> "AND $condition"
+            LogicOperator.Or -> "OR $condition"
             null -> condition
         }
     }
@@ -1010,7 +1010,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      */
     fun orderBy(vararg columns: Pair<String, SortDirection>) {
         columns.forEach { [col, dir] ->
-            orderByParts += col + if (dir == SortDirection.DESCENDING) " DESC" else String.EMPTY
+            orderByParts += col + if (dir == SortDirection.Descending) " DESC" else String.EMPTY
         }
     }
 
@@ -1019,9 +1019,9 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun orderBy(@Language("sql") vararg columns: String, direction: SortDirection = SortDirection.ASCENDING) {
+    fun orderBy(@Language("sql") vararg columns: String, direction: SortDirection = SortDirection.Ascending) {
         columns.forEach { col ->
-            orderByParts += col + if (direction == SortDirection.DESCENDING) " DESC" else String.EMPTY
+            orderByParts += col + if (direction == SortDirection.Descending) " DESC" else String.EMPTY
         }
     }
 
@@ -1210,7 +1210,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun truncate(@Language("sql") table: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun truncate(@Language("sql") table: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.TRUNCATE
         ddlParts.clear()
         ddlParts += "TRUNCATE TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $table $dropType"
@@ -1264,7 +1264,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_VIEW
         ddlParts.clear()
         ddlParts += "DROP VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName $dropType"
@@ -1319,7 +1319,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropMaterializedView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropMaterializedView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_MATERIALIZED_VIEW
         ddlParts.clear()
         ddlParts += "DROP MATERIALIZED VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName $dropType"
@@ -1375,7 +1375,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropTable(tableName: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropTable(tableName: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_TABLE
         ddlParts.clear()
         ddlParts += "DROP TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $tableName $dropType"
@@ -1464,7 +1464,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropTrigger(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropTrigger(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_TRIGGER
         ddlParts.clear()
         ddlParts += "DROP TRIGGER${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
@@ -1501,7 +1501,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropFunction(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropFunction(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_FUNCTION
         ddlParts.clear()
         ddlParts += "DROP FUNCTION${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
@@ -1536,7 +1536,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropProcedure(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropProcedure(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_PROCEDURE
         ddlParts.clear()
         ddlParts += "DROP PROCEDURE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
@@ -1571,7 +1571,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropSequence(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropSequence(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_SEQUENCE
         ddlParts.clear()
         ddlParts += "DROP SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
@@ -1613,7 +1613,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropSchema(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropSchema(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_SCHEMA
         ddlParts.clear()
         ddlParts += "DROP SCHEMA${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
@@ -1713,7 +1713,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropType(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropType(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_TYPE
         ddlParts.clear()
         ddlParts += "DROP TYPE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
@@ -1748,7 +1748,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun dropDomain(name: String, ifExists: Boolean = false, dropType: DropType = DropType.RESTRICT) {
+    fun dropDomain(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.DROP_DOMAIN
         ddlParts.clear()
         ddlParts += "DROP DOMAIN${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"

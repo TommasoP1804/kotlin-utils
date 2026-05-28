@@ -616,12 +616,12 @@ inline fun <T> tryOrLog(
     } catch (e: Throwable) {
         val message = message(e)
         if (e::class in specificCases)
-            logWithOrWithoutException(logger, specificCases[e::class]!!.second ?: message.second ?: LogLevel.ERROR, specificCases[e::class]!!.first ?: e.message, includeException, e)
+            logWithOrWithoutException(logger, specificCases[e::class]!!.second ?: message.second ?: LogLevel.Error, specificCases[e::class]!!.first ?: e.message, includeException, e)
         else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty())
-            logWithOrWithoutException(logger, message.second ?: LogLevel.ERROR, message.first ?: e.message, includeException, e)
+            logWithOrWithoutException(logger, message.second ?: LogLevel.Error, message.first ?: e.message, includeException, e)
         else {
             if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            logWithOrWithoutException(logger, message.second ?: LogLevel.ERROR, message.first ?: e.message, includeException, e)
+            logWithOrWithoutException(logger, message.second ?: LogLevel.Error, message.first ?: e.message, includeException, e)
         }
         null
     }
@@ -3442,19 +3442,25 @@ fun Any?.serialize() = MAPPER.writeValueAsString(this)!!
 // deserialize method is in StringUtils
 
 /**
- * Attempts to convert a string to an enum value using valueOf.
+ * Attempts to convert a string to an enum value.
+ *
+ * Case insensitive.
  *
  * @receiver The string to be converted
  * @param enumClass The enum class to convert to
  * @return The enum value if successful, null otherwise
  * @since 1.0.0
  */
-inline infix fun <reified T : Enum<T>> String.like(enumClass: Class<T>): T? = try {
-    java.lang.Enum.valueOf(enumClass, convertCase(to = TextCase.UPPER_SNAKE_CASE))
-} catch (e: Exception) { null }
-
+inline infix fun <reified T : Enum<T>> String.like(enumClass: Class<T>): T? {
+    val candidates = matchedCases.ifEmpty { listOf(TextCase.Standard) }
+    return enumValues<T>().firstOrNull { entry ->
+        candidates.any { case -> convertCase(from = case, to = TextCase.PascalCase) == entry.name }
+    }
+}
 /**
- * Attempts to convert a string to an enum value using valueOf.
+ * Attempts to convert a string to an enum value.
+ *
+ * Case insensitive.
  *
  * @receiver The string to be converted
  * @param enumClass The enum class to convert to
@@ -3462,9 +3468,12 @@ inline infix fun <reified T : Enum<T>> String.like(enumClass: Class<T>): T? = tr
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline infix fun <reified T : Enum<T>> String.like(enumClass: KClass<T>): T? = try {
-    java.lang.Enum.valueOf(enumClass.java, convertCase(to = TextCase.UPPER_SNAKE_CASE))
-} catch (e: Exception) { null }
+inline infix fun <reified T : Enum<T>> String.like(enumClass: KClass<T>): T? {
+    val candidates = matchedCases.ifEmpty { listOf(TextCase.Standard) }
+    return enumValues<T>().firstOrNull { entry ->
+        candidates.any { case -> convertCase(from = case, to = TextCase.PascalCase) == entry.name }
+    }
+}
 
 /**
  * Attempts to convert a string to an enum value using valueOf.
@@ -3474,9 +3483,12 @@ inline infix fun <reified T : Enum<T>> String.like(enumClass: KClass<T>): T? = t
  * @throws NoSuchEntryException if the string does not match any enum value.
  * @since 1.0.0
  */
-inline fun <reified T : Enum<T>> String.toEnumConst(): T = try {
-    java.lang.Enum.valueOf(T::class.java, convertCase(to = TextCase.UPPER_SNAKE_CASE))
-} catch (e: IllegalArgumentException) { throw NoSuchEntryException(T::class, this) }
+inline fun <reified T : Enum<T>> String.toEnumConst(): T {
+    val candidates = matchedCases.ifEmpty { listOf(TextCase.Standard) }
+    return enumValues<T>().firstOrThrow({ NoSuchEntryException(T::class, this) }) { entry ->
+        candidates.any { case -> convertCase(from = case, to = TextCase.PascalCase) equalsIgnoreCase entry.name }
+    }
+}
 
 /**
  * Wraps the given value into a singleton list.

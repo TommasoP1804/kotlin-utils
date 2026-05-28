@@ -664,22 +664,22 @@ fun <E> Sequence<E>.getOrThrow(index: Int, lazyException: ThrowableSupplier = { 
  * @since 1.0.0
  */
 fun <E: Comparable<E>> Sequence<E>.sorted(direction: SortDirection) = when (direction) {
-    SortDirection.ASCENDING -> sorted()
-    SortDirection.DESCENDING -> sortedDescending()
+    SortDirection.Ascending -> sorted()
+    SortDirection.Descending -> sortedDescending()
 }
 
 /**
  * Sorts elements in the sequence based on the specified sorting direction and a selector function.
  * Returns a sequence sorted in ascending or descending order as per the provided direction and selector.
  *
- * @param direction The direction to sort the sequence, either [SortDirection.ASCENDING] or [SortDirection.DESCENDING].
+ * @param direction The direction to sort the sequence, either [SortDirection.Ascending] or [SortDirection.Descending].
  * @param selector A lambda function to transform sequence elements into values used for sorting.
  *                 These values must be comparable or nullable comparable.
  * @since 1.0.0
  */
 inline fun <E, R : Comparable<R>> Sequence<E>.sortedBy(direction: SortDirection, crossinline selector: Transformer<E, R?>) = when (direction) {
-    SortDirection.ASCENDING -> sortedBy(selector)
-    SortDirection.DESCENDING -> sortedByDescending(selector)
+    SortDirection.Ascending -> sortedBy(selector)
+    SortDirection.Descending -> sortedByDescending(selector)
 }
 
 /**

@@ -31,53 +31,53 @@ enum class Language(
     val description: String,
     val category: Category
 ) {
-    JAVA(
+    Java(
         "Java",
         1995,
         listOf("Object-Oriented", "Imperative", "Generic"),
         listOf("java", "class", "jar"),
         "A general-purpose, class-based, object-oriented language designed for portability and cross-platform compatibility.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    KOTLIN(
+    Kotlin(
         "Kotlin",
         2011,
         listOf("Object-Oriented", "Functional", "Imperative"),
         listOf("kt", "kts", "ktm"),
         "A cross-platform, statically typed, general-purpose language with type inference, designed to interoperate with Java.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    PYTHON(
+    Python(
         "Python",
         1991,
         listOf("Object-Oriented", "Imperative", "Functional", "Procedural"),
         listOf("py", "pyc", "pyd", "pyo"),
         "An interpreted, high-level, general-purpose language emphasizing code readability with significant indentation.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    JAVASCRIPT(
+    Javascript(
         "JavaScript",
         1995,
         listOf("Object-Oriented", "Functional", "Event-Driven"),
         listOf("js", "mjs", "cjs"),
         "A high-level, interpreted scripting language that conforms to the ECMAScript specification, primarily used for web development.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    TYPESCRIPT(
+    Typescript(
         "TypeScript",
         2012,
         listOf("Object-Oriented", "Functional", "Static Typing"),
         listOf("ts", "tsx"),
         "A strict syntactical superset of JavaScript that adds optional static typing and class-based object-oriented programming.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    CSHARP(
+    CSharp(
         "C#",
         2000,
         listOf("Object-Oriented", "Structured", "Functional", "Generic"),
         listOf("cs"),
         "A multi-paradigm language developed by Microsoft as part of the .NET initiative, designed for the Common Language Infrastructure.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
     CPP(
         "C++",
@@ -85,7 +85,7 @@ enum class Language(
         listOf("Object-Oriented", "Procedural", "Generic"),
         listOf("cpp", "cc", "cxx", "h", "hpp"),
         "An extension of the C language that adds object-oriented features, used for systems programming, game development, and performance-critical applications.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
     C(
         "C",
@@ -93,71 +93,71 @@ enum class Language(
         listOf("Procedural", "Imperative", "Structured"),
         listOf("c", "h"),
         "A general-purpose, procedural language supporting structured programming, lexical variable scope, and recursion.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    PHP(
+    Php(
         "PHP",
         1995,
         listOf("Object-Oriented", "Procedural", "Functional"),
         listOf("php"),
         "A server-side scripting language designed primarily for web development but also used as a general-purpose programming language.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    RUBY(
+    Ruby(
         "Ruby",
         1995,
         listOf("Object-Oriented", "Functional", "Imperative"),
         listOf("rb", "rbw"),
         "A dynamic, open source programming language with a focus on simplicity and productivity, with an elegant syntax.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SWIFT(
+    Swift(
         "Swift",
         2014,
         listOf("Object-Oriented", "Functional", "Protocol-Oriented"),
         listOf("swift"),
         "A general-purpose, multi-paradigm language developed by Apple for iOS, macOS, watchOS, and tvOS development.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    GO(
+    Go(
         "Go",
         2009,
         listOf("Concurrent", "Imperative", "Structured"),
         listOf("go"),
         "A statically typed, compiled language designed at Google, syntactically similar to C but with memory safety, garbage collection, and CSP-style concurrency.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    RUST(
+    Rust(
         "Rust",
         2010,
         listOf("Concurrent", "Functional", "Imperative", "Structured"),
         listOf("rs"),
         "A multi-paradigm language focused on performance and safety, especially safe concurrency, supporting functional and imperative-procedural paradigms.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SCALA(
+    Scala(
         "Scala",
         2004,
         listOf("Object-Oriented", "Functional"),
         listOf("scala", "sc"),
         "A strong statically typed language that combines object-oriented and functional programming, designed to be concise and elegant.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    HASKELL(
+    Haskell(
         "Haskell",
         1990,
         listOf("Functional", "Pure", "Lazy"),
         listOf("hs", "lhs"),
         "A purely functional language with strong static typing, type inference, and lazy evaluation.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SQL(
+    Sql(
         "SQL",
         1974,
         listOf("Declarative"),
         listOf("sql"),
         "A domain-specific language used for managing data in relational database management systems.",
-        Category.QUERY
+        Category.Query
     ),
     R(
         "R",
@@ -165,223 +165,223 @@ enum class Language(
         listOf("Functional", "Object-Oriented", "Procedural"),
         listOf("r", "R"),
         "A language and environment for statistical computing and graphics, widely used among statisticians and data miners.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    PERL(
+    Perl(
         "Perl",
         1987,
         listOf("Procedural", "Object-Oriented", "Functional"),
         listOf("pl", "pm", "t"),
         "A family of high-level, general-purpose, interpreted, dynamic programming languages, known for text processing capabilities.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    DART(
+    Dart(
         "Dart",
         2011,
         listOf("Object-Oriented", "Functional"),
         listOf("dart"),
         "A client-optimized language for fast apps on any platform, developed by Google and used for Flutter framework.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    GROOVY(
+    Groovy(
         "Groovy",
         2003,
         listOf("Object-Oriented", "Functional", "Dynamic"),
         listOf("groovy", "gvy", "gy", "gsh"),
         "An optionally typed and dynamic language for the Java platform, designed to enhance developer productivity with a concise, familiar, and easy-to-learn syntax.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ASSEMBLY(
+    Assembly(
         "Assembly",
         1949,
         listOf("Procedural", "Low-Level"),
         listOf("asm", "s"),
         "A low-level programming language in which there is a strong correspondence between the instructions and the architecture's machine code.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    OBJECTIVE_C(
+    ObjectiveC(
         "Objective-C",
         1984,
         listOf("Object-Oriented", "Reflective"),
         listOf("m", "h"),
         "An object-oriented programming language that adds Smalltalk-style messaging to the C programming language, primarily used for iOS and macOS development before Swift.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    COBOL(
+    Cobol(
         "COBOL",
         1959,
         listOf("Procedural", "Imperative"),
         listOf("cob", "cbl", "cpy"),
         "A compiled English-like computer programming language designed for business use, still widely used in legacy applications deployed on mainframe computers.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    FORTRAN(
+    Fortran(
         "Fortran",
         1957,
         listOf("Procedural", "Imperative", "Array-based"),
         listOf("f", "for", "f90", "f95", "f03", "f08"),
         "A general-purpose, compiled language especially suited to numeric computation and scientific computing, the first commercially available high-level programming language.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    LISP(
+    Lisp(
         "Lisp",
         1958,
         listOf("Functional", "Procedural", "Reflective"),
         listOf("lisp", "lsp", "l", "cl", "el"),
         "The second-oldest high-level programming language still in use, with fully parenthesized prefix notation and known for its powerful macro system.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    CLOJURE(
+    Clojure(
         "Clojure",
         2007,
         listOf("Functional", "Dynamic", "Concurrent"),
         listOf("clj", "cljs", "cljc", "edn"),
         "A modern dialect of Lisp that targets the Java Virtual Machine, emphasizing functional programming and designed for concurrency.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ERLANG(
+    Erlang(
         "Erlang",
         1986,
         listOf("Functional", "Concurrent", "Distributed"),
         listOf("erl", "hrl"),
         "A general-purpose, concurrent, functional language used to build massively scalable soft real-time systems with high availability requirements.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ELIXIR(
+    Elixir(
         "Elixir",
         2011,
         listOf("Functional", "Concurrent", "Process-oriented"),
         listOf("ex", "exs"),
         "A functional, concurrent, general-purpose language that runs on the BEAM virtual machine used to implement the Erlang language.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    JULIA(
+    Julia(
         "Julia",
         2012,
         listOf("Multiple Dispatch", "Procedural", "Functional", "Meta"),
         listOf("jl"),
         "A high-level, high-performance language for technical computing, with syntax similar to MATLAB and performance comparable to C.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    MATLAB(
+    Matlab(
         "MATLAB",
         1984,
         listOf("Array", "Object-Oriented", "Procedural"),
         listOf("m", "mat"),
         "A proprietary multi-paradigm programming language and numeric computing environment, widely used for matrix manipulations, plotting of functions and data, and algorithm implementation.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    PASCAL(
+    Pascal(
         "Pascal",
         1970,
         listOf("Imperative", "Procedural", "Structured"),
         listOf("pas", "pp"),
         "An imperative and procedural programming language designed to encourage good programming practices using structured programming and data structuring.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    DELPHI(
+    Delphi(
         "Delphi",
         1995,
         listOf("Object-Oriented", "Event-Driven", "Visual"),
         listOf("pas", "dpr", "dpk"),
         "An integrated development environment for rapid application development of desktop, mobile, web, and console software, using a dialect of Object Pascal.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    BASH(
+    Bash(
         "Bash",
         1989,
         listOf("Scripting", "Command Line"),
         listOf("sh", "bash"),
         "A Unix shell and command language written by Brian Fox for the GNU Project as a free software replacement for the Bourne shell.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    POWERSHELL(
+    Powershell(
         "PowerShell",
         2006,
         listOf("Scripting", "Object-Oriented", "Functional"),
         listOf("ps1", "psm1", "psd1"),
         "A task automation and configuration management framework from Microsoft, consisting of a command-line shell and associated scripting language.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    VBA(
+    Vba(
         "VBA",
         1993,
         listOf("Event-Driven", "Object-Oriented", "Procedural"),
         listOf("bas", "cls", "frm"),
         "Visual Basic for Applications, an implementation of Microsoft's event-driven programming language Visual Basic embedded in Microsoft Office applications.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    LUA(
+    Lua(
         "Lua",
         1993,
         listOf("Procedural", "Object-Oriented", "Functional"),
         listOf("lua"),
         "A lightweight, high-level, multi-paradigm programming language designed primarily for embedded use in applications, known for its efficiency and simplicity.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    PROLOG(
+    Prolog(
         "Prolog",
         1972,
         listOf("Logic", "Declarative"),
         listOf("pl", "pro", "p"),
         "A logic programming language associated with artificial intelligence and computational linguistics, based on formal logic.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ADA(
+    Ada(
         "Ada",
         1980,
         listOf("Multi-paradigm", "Structured", "Object-Oriented", "Concurrent"),
         listOf("ada", "ads", "adb"),
         "A structured, statically typed, imperative, and object-oriented high-level programming language, designed for large, long-lived applications where reliability and efficiency are essential.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SCHEME(
+    Scheme(
         "Scheme",
         1975,
         listOf("Functional", "Procedural"),
         listOf("scm", "ss"),
         "A dialect of Lisp that follows a minimalist design philosophy, emphasizing the use of functional programming where feasible.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    FSHARP(
+    FSharp(
         "F#",
         2005,
         listOf("Functional", "Object-Oriented", "Imperative"),
         listOf("fs", "fsi", "fsx"),
         "A functional-first, general purpose, strongly typed, multi-paradigm programming language that encompasses functional, imperative, and object-oriented programming methods.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    VISUAL_BASIC(
+    VisualBasic(
         "Visual Basic .NET",
         2001,
         listOf("Object-Oriented", "Event-Driven", "Declarative"),
         listOf("vb"),
         "An object-oriented programming language implemented on the .NET Framework, known for its simple syntax and used for developing Windows applications.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ABAP(
+    Abap(
         "ABAP",
         1983,
         listOf("Procedural", "Object-Oriented"),
         listOf("abap"),
         "A high-level programming language created by SAP for developing business applications in the SAP environment.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    APEX(
+    Apex(
         "Apex",
         2007,
         listOf("Object-Oriented", "Procedural"),
         listOf("cls", "trigger"),
         "A proprietary programming language developed by Salesforce.com for their Force.com platform, syntactically similar to Java.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    CRYSTAL(
+    Crystal(
         "Crystal",
         2014,
         listOf("Object-Oriented", "Concurrent"),
         listOf("cr"),
         "A programming language with Ruby-like syntax and static type checking, designed for high performance and safety.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
     D(
         "D",
@@ -389,505 +389,505 @@ enum class Language(
         listOf("Multi-paradigm", "Object-Oriented", "Imperative", "Functional"),
         listOf("d"),
         "A general-purpose programming language with static typing, systems-level access, and C-like syntax, designed to combine the power and high performance of C and C++ with the programmer productivity of modern languages.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    HACK(
+    Hack(
         "Hack",
         2014,
         listOf("Gradual Typing", "Object-Oriented"),
         listOf("php", "hh"),
         "A programming language for HHVM (HipHop Virtual Machine) created by Facebook as a dialect of PHP with static typing features.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    OCAML(
+    Ocaml(
         "OCaml",
         1996,
         listOf("Functional", "Imperative", "Object-Oriented"),
         listOf("ml", "mli"),
         "A general-purpose, multi-paradigm programming language which extends the Caml dialect of ML with object-oriented features.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    RACKET(
+    Racket(
         "Racket",
         1994,
         listOf("Functional", "Procedural", "Object-Oriented"),
         listOf("rkt"),
         "A general-purpose, multi-paradigm programming language in the Lisp/Scheme family, designed as a platform for programming language design and implementation.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SMALLTALK(
+    Smalltalk(
         "Smalltalk",
         1972,
         listOf("Object-Oriented", "Reflective"),
         listOf("st"),
         "One of the first object-oriented programming languages, known for its elegant and simple syntax, and pioneering the MVC software pattern.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SOLIDITY(
+    Solidity(
         "Solidity",
         2014,
         listOf("Object-Oriented", "Contract-Oriented"),
         listOf("sol"),
         "A statically-typed programming language designed for developing smart contracts that run on the Ethereum Virtual Machine.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    COFFEESCRIPT(
+    Coffeescript(
         "CoffeeScript",
         2009,
         listOf("Functional", "Object-Oriented"),
         listOf("coffee"),
         "A programming language that transcompiles to JavaScript, adding syntactic sugar inspired by Ruby, Python and Haskell to enhance JavaScript's brevity and readability.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    VHDL(
+    Vhdl(
         "VHDL",
         1983,
         listOf("Dataflow", "Procedural"),
         listOf("vhd", "vhdl"),
         "VHSIC (Very High Speed Integrated Circuit) Hardware Description Language, used in electronic design automation to describe digital and mixed-signal systems.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    VERILOG(
+    Verilog(
         "Verilog",
         1984,
         listOf("Procedural", "Dataflow", "Structural"),
         listOf("v", "vh"),
         "A hardware description language used to model electronic systems, particularly digital circuits and systems.",
-        Category.HARDWARE_DESCRIPTION
+        Category.HardwareDescription
     ),
-    ACTIONSCRIPT(
+    Actionscript(
         "ActionScript",
         1998,
         listOf("Object-Oriented", "Imperative"),
         listOf("as"),
         "An object-oriented programming language originally developed for controlling Adobe Flash animations and applications.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    BASIC(
+    Basic(
         "BASIC",
         1964,
         listOf("Procedural", "Imperative"),
         listOf("bas", "basic"),
         "Beginner's All-purpose Symbolic Instruction Code, a family of high-level programming languages designed to be easy to learn and use.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    LOGO(
+    Logo(
         "Logo",
         1967,
         listOf("Functional", "Educational"),
         listOf("logo"),
         "An educational programming language designed to teach programming concepts, known for its 'turtle graphics' used for drawing pictures on screen.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    SCRATCH(
+    Scratch(
         "Scratch",
         2003,
         listOf("Visual", "Educational", "Event-Driven"),
         listOf("sb", "sb2", "sb3"),
         "A block-based visual programming language and website targeted primarily at children to help learn programming concepts without needing to worry about syntax.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    FORTH(
+    Forth(
         "Forth",
         1970,
         listOf("Stack-Oriented", "Procedural", "Reflective"),
         listOf("fth", "4th"),
         "A structured, imperative, reflective, stack-based programming language and environment, used in embedded systems and boot loaders.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ALGOL(
+    Algol(
         "ALGOL",
         1958,
         listOf("Imperative", "Procedural", "Structured"),
         listOf("alg", "algol"),
         "One of the earliest high-level programming languages that greatly influenced many other languages, known for its use of block structure and nested scopes.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    EIFFEL(
+    Eiffel(
         "Eiffel",
         1986,
         listOf("Object-Oriented", "Contract-Based"),
         listOf("e"),
         "An object-oriented programming language designed by Bertrand Meyer that emphasizes software quality, reusability, and the design by contract methodology.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    IDRIS(
+    Idris(
         "Idris",
         2009,
         listOf("Functional", "Dependent Types"),
         listOf("idr"),
         "A purely functional programming language with dependent types, designed for general purpose programming with a focus on correctness and verification.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    TURING(
+    Turing(
         "Turing",
         1982,
         listOf("Imperative", "Procedural"),
         listOf("t", "tu"),
         "A Pascal-like programming language developed for teaching programming, named after computer scientist Alan Turing.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    REBOL(
+    Rebol(
         "REBOL",
         1997,
         listOf("Functional", "Object-Oriented", "Metaprogramming"),
         listOf("r", "reb", "rebol"),
         "Relative Expression-Based Object Language, a lightweight, reflective language designed for distributed computing and network communications.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    TCLTK(
+    TclTk(
         "Tcl/Tk",
         1988,
         listOf("Imperative", "Procedural", "Event-Driven"),
         listOf("tcl", "tk"),
         "Tool Command Language with its graphical user interface toolkit, designed to be embedded into applications and for rapid prototyping.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    POSTSCRIPT(
+    Postscript(
         "PostScript",
         1982,
         listOf("Stack-Based", "Concatenative"),
         listOf("ps", "eps"),
         "A page description language in electronic and desktop publishing, known for its use in defining the appearance of text and graphics on printed pages.",
-        Category.PAGE_DESCRIPTION
+        Category.PageDescription
     ),
-    APPLESCRIPT(
+    Applescript(
         "AppleScript",
         1993,
         listOf("Scripting", "Event-Driven"),
         listOf("applescript", "scpt"),
         "A scripting language created by Apple to control and automate applications on macOS, designed to use natural language elements for ease of use.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    LABVIEW(
+    Labview(
         "LabVIEW",
         1986,
         listOf("Dataflow", "Visual", "Graphical"),
         listOf("vi", "lvproj"),
         "Laboratory Virtual Instrument Engineering Workbench, a visual programming language from National Instruments used for data acquisition, instrument control, and industrial automation.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
 
     // Non-programming languages (markup, data serialization, etc.)
-    HTML(
+    Html(
         "HTML",
         1993,
         listOf("Markup", "Declarative"),
         listOf("html", "htm"),
         "HyperText Markup Language, the standard markup language for documents designed to be displayed in a web browser.",
-        Category.MARKUP
+        Category.Markup
     ),
-    CSS(
+    Css(
         "CSS",
         1996,
         listOf("Style Sheet", "Declarative"),
         listOf("css"),
         "Cascading Style Sheets, a style sheet language used for describing the presentation of a document written in HTML or XML.",
-        Category.STYLE
+        Category.Style
     ),
-    XML(
+    Xml(
         "XML",
         1998,
         listOf("Markup", "Declarative"),
         listOf("xml"),
         "Extensible Markup Language, a markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.",
-        Category.MARKUP
+        Category.Markup
     ),
-    JSON(
+    Json(
         "JSON",
         2001,
         listOf("Data Serialization", "Declarative"),
         listOf("json"),
         "JavaScript Object Notation, an open standard file format and data interchange format that uses human-readable text to store and transmit data objects.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    YAML(
+    Yaml(
         "YAML",
         2001,
         listOf("Data Serialization", "Declarative"),
         listOf("yaml", "yml"),
         "YAML Ain't Markup Language, a human-readable data serialization language commonly used for configuration files and data exchange between languages with different data structures.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    MARKDOWN(
+    Markdown(
         "Markdown",
         2004,
         listOf("Markup", "Lightweight"),
         listOf("md", "markdown"),
         "A lightweight markup language with plain text formatting syntax designed to be converted to HTML and other formats.",
-        Category.MARKUP
+        Category.Markup
     ),
-    TOML(
+    Toml(
         "TOML",
         2013,
         listOf("Data Serialization", "Configuration"),
         listOf("toml"),
         "Tom's Obvious, Minimal Language, a configuration file format designed to be easy to read and write with a simple key-value syntax.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    SVG(
+    Svg(
         "SVG",
         2001,
         listOf("Vector Graphics", "XML-based"),
         listOf("svg"),
         "Scalable Vector Graphics, an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.",
-        Category.MARKUP
+        Category.Markup
     ),
 
     // Additional less common programming languages
-    BRAINFUCK(
+    Brainfuck(
         "Brainfuck",
         1993,
         listOf("Esoteric", "Minimalist"),
         listOf("bf"),
         "An esoteric programming language created to challenge and amuse programmers, notable for its extreme minimalism with only eight commands.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    WHITESPACE(
+    Whitespace(
         "Whitespace",
         2003,
         listOf("Esoteric"),
         listOf("ws"),
         "An esoteric programming language that uses only whitespace characters (space, tab, and line feed) as syntax, making programs appear invisible when viewed with most text editors.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    INTERCAL(
+    Intercal(
         "INTERCAL",
         1972,
         listOf("Esoteric"),
         listOf("i", "int"),
         "Compiler Language With No Pronounceable Acronym, one of the first esoteric programming languages, designed to be completely different from any other programming language.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    MALBOLGE(
+    Malbolge(
         "Malbolge",
         1998,
         listOf("Esoteric"),
         listOf("mal"),
         "An esoteric programming language designed to be as difficult to program in as possible, named after the eighth circle of hell in Dante's Inferno.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    BEFUNGE(
+    Befunge(
         "Befunge",
         1993,
         listOf("Esoteric", "Two-dimensional"),
         listOf("bf"),
         "A two-dimensional esoteric programming language where programs are laid out on a grid and execution can proceed in any cardinal direction.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    PIET(
+    Piet(
         "Piet",
         2001,
         listOf("Esoteric", "Visual"),
         listOf("ppm"),
         "An esoteric programming language in which programs look like abstract paintings, with program flow determined by changes in hue and brightness between adjacent pixels.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    LOLCODE(
+    Lolcode(
         "LOLCODE",
         2007,
         listOf("Esoteric"),
         listOf("lol"),
         "An esoteric programming language inspired by lolcat memes, with syntax designed to resemble the language used in image macros featuring cats.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    CHEF(
+    Chef(
         "Chef",
         2002,
         listOf("Esoteric"),
         listOf("chef"),
         "An esoteric programming language designed to make programs look like cooking recipes, with ingredients as variables and cooking instructions as operations.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    COW(
+    Cow(
         "COW",
         2003,
         listOf("Esoteric"),
         listOf("cow"),
         "An esoteric programming language whose programs consist of variations of the word 'moo', inspired by the distinctive sound made by bovines.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
-    UNLAMBDA(
+    Unlambda(
         "Unlambda",
         1999,
         listOf("Esoteric", "Functional"),
         listOf("unl"),
         "An esoteric functional programming language based on combinatory logic, designed to be as impractical as possible while still being Turing-complete.",
-        Category.ESOTERIC
+        Category.Esoteric
     ),
 
     // Additional modern programming languages
-    HAXE(
+    Haxe(
         "Haxe",
         2005,
         listOf("Object-Oriented", "Functional", "Cross-platform"),
         listOf("hx"),
         "A high-level, cross-platform programming language that can compile to multiple target languages including JavaScript, PHP, C++, Java, and Python.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    NIM(
+    Nim(
         "Nim",
         2008,
         listOf("Imperative", "Functional", "Object-Oriented"),
         listOf("nim"),
         "A statically typed compiled systems programming language with a focus on efficiency, expressiveness, and elegance, drawing inspiration from Python, Ada, and Modula.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ZIG(
+    Zig(
         "Zig",
         2016,
         listOf("Imperative", "Procedural"),
         listOf("zig"),
         "A general-purpose programming language designed for robustness, optimality, and maintainability, with a focus on providing direct access to low-level features.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    PURESCRIPT(
+    Purescript(
         "PureScript",
         2013,
         listOf("Functional", "Strongly-typed"),
         listOf("purs"),
         "A strongly-typed functional programming language that compiles to JavaScript, similar to Haskell but designed for the web platform.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    ELM(
+    Elm(
         "Elm",
         2012,
         listOf("Functional", "Declarative"),
         listOf("elm"),
         "A domain-specific programming language for declaratively creating web browser-based graphical user interfaces, focused on usability, performance, and robustness.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    REASON(
+    Reason(
         "Reason",
         2016,
         listOf("Functional", "Object-Oriented"),
         listOf("re", "rei"),
         "A syntax extension for OCaml created by Facebook, designed to make OCaml more accessible to JavaScript programmers.",
-        Category.PROGRAMMING
+        Category.Programming
     ),
-    WASM(
+    Wasm(
         "WebAssembly",
         2017,
         listOf("Low-level", "Assembly"),
         listOf("wasm", "wat"),
         "A binary instruction format for a stack-based virtual machine, designed as a portable target for compilation of high-level languages like C, C++, and Rust.",
-        Category.INSTRUCTION_FORMAT
+        Category.InstructionFormat
     ),
 
     // Additional markup and data formats
-    GRAPHQL(
+    GraphQl(
         "GraphQL",
         2015,
         listOf("Query Language", "Data Manipulation"),
         listOf("graphql", "gql"),
         "A query language for APIs and a runtime for executing those queries with existing data, providing a more efficient and powerful alternative to REST.",
-        Category.QUERY
+        Category.Query
     ),
-    LATEX(
+    Latex(
         "LaTeX",
         1984,
         listOf("Markup", "Document Preparation"),
         listOf("tex", "latex"),
         "A document preparation system especially suited for scientific and mathematical documents, based on the TeX typesetting system.",
-        Category.MARKUP
+        Category.Markup
     ),
-    RESTRUCTUREDTEXT(
+    RestructuredText(
         "reStructuredText",
         2002,
         listOf("Markup", "Lightweight"),
         listOf("rst"),
         "A lightweight markup language designed to be both readable in plain text form and convertible to other formats like HTML, PDF, and ePub.",
-        Category.MARKUP
+        Category.Markup
     ),
-    ASCIIDOC(
+    AsciiDoc(
         "AsciiDoc",
         2002,
         listOf("Markup", "Lightweight"),
         listOf("adoc", "asciidoc"),
         "A lightweight markup language for writing documentation, articles, books, web pages, and presentations, similar to Markdown but with more features.",
-        Category.MARKUP
+        Category.Markup
     ),
-    INI(
+    Ini(
         "INI",
         1985,
         listOf("Configuration", "Key-Value"),
         listOf("ini", "cfg", "conf"),
         "A simple configuration file format consisting of key-value pairs organized into sections, commonly used in Windows and many other systems.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    CSV(
+    Csv(
         "CSV",
         1972,
         listOf("Data", "Tabular"),
         listOf("csv"),
         "Comma-Separated Values, a simple file format used to store tabular data where each line represents a row and fields are separated by commas.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    TSV(
+    Tsv(
         "TSV",
         1993,
         listOf("Data", "Tabular"),
         listOf("tsv", "tab"),
         "Tab-Separated Values, a simple file format similar to CSV but using tabs as field separators, which can handle data containing commas more easily.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    PROTOBUF(
+    ProtoBuf(
         "Protocol Buffers",
         2008,
         listOf("Data Serialization", "Interface Definition"),
         listOf("proto"),
         "A language-neutral, platform-neutral, extensible mechanism for serializing structured data, developed by Google for efficient data storage and interchange.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    THRIFT(
+    Thrift(
         "Thrift",
         2007,
         listOf("Interface Definition", "RPC"),
         listOf("thrift"),
         "A software framework for scalable cross-language services development, originally developed at Facebook, allowing definition of data types and service interfaces.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    AVRO(
+    Avro(
         "Avro",
         2009,
         listOf("Data Serialization", "Schema-based"),
         listOf("avro", "avsc"),
         "A data serialization system developed within Apache's Hadoop project, providing rich data structures, compact binary format, and container files for storing persistent data.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    PARQUET(
+    Parquet(
         "Parquet",
         2013,
         listOf("Columnar Storage", "Data Format"),
         listOf("parquet"),
         "A columnar storage file format designed for efficient data storage and retrieval, part of the Apache Hadoop ecosystem and optimized for use with complex data processing frameworks.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
-    ORC(
+    Orc(
         "ORC",
         2013,
         listOf("Columnar Storage", "Data Format"),
         listOf("orc"),
         "Optimized Row Columnar, a columnar storage file format providing efficient compression and improved performance when processing large data sets in Apache Hive.",
-        Category.DATA_SERIALIZATION
+        Category.DataSerialization
     ),
 
-    REGEX(
+    Regex(
         "RegEx",
         1951,
         listOf("Pattern Matching", "Text Processing"),
         listOf("regex", "regexp"),
         "Regular Expressions, a sequence of characters that define a search pattern, mainly for use in pattern matching with strings.",
-        Category.PATTERN_MATCHING
+        Category.PatternMatching
     ),
 
-    KATEX(
+    Katex(
         "KaTeX",
         2013,
         listOf("Markup", "Mathematical Notation"),
         listOf("tex", "katex"),
         "A fast, easy-to-use JavaScript library for TeX math rendering on the web, developed by Khan Academy as a faster alternative to MathJax.",
-        Category.MARKUP
+        Category.Markup
     );
 
     constructor(
@@ -952,12 +952,12 @@ enum class Language(
          * languages and non-programming languages (markup, data serialization, etc.).
          *
          * @param name the input string representing the language name to search for (e.g., "Java", "HTML", "JSON")
-         * @param textCase the text case to consider when searching for a match, defaults to [dev.tommasop1804.kutils.classes.constants.TextCase.STANDARD]
+         * @param textCase the text case to consider when searching for a match, defaults to [dev.tommasop1804.kutils.classes.constants.TextCase.Standard]
          * @return the matching language entry if found, or `null` otherwise
          * @since 1.0.0
          */
-        fun ofName(name: String, textCase: TextCase = TextCase.STANDARD) =
-            entries.find { +it.displayName == name.convertCase(textCase, TextCase.UPPER_CASE) }
+        fun ofName(name: String, textCase: TextCase = TextCase.Standard) =
+            entries.find { +it.displayName == name.convertCase(textCase, TextCase.UpperCase) }
 
         /**
          * Filters the entries of the class to include only those that belong to the specified category.
@@ -1047,15 +1047,15 @@ enum class Language(
      * @since 1.0.0
      */
     enum class Category {
-        PROGRAMMING,
-        PAGE_DESCRIPTION,
-        INSTRUCTION_FORMAT,
-        MARKUP,
-        STYLE,
-        DATA_SERIALIZATION,
-        QUERY,
-        HARDWARE_DESCRIPTION,
-        ESOTERIC,
-        PATTERN_MATCHING
+        Programming,
+        PageDescription,
+        InstructionFormat,
+        Markup,
+        Style,
+        DataSerialization,
+        Query,
+        HardwareDescription,
+        Esoteric,
+        PatternMatching
     }
 }

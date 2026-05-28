@@ -33,81 +33,81 @@ enum class TextCase(
 ) {
     /**
      * LOREM IPSUM DOLOR SIT AMET
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    UPPER_CASE(String::isUpperCase, String::uppercase, " "),
+    UpperCase(String::isUpperCase, String::uppercase, " "),
 
     /**
      * lorem ipsum dolor sit amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    LOWER_CASE(String::isLowerCase, String::lowercase, " "),
+    LowerCase(String::isLowerCase, String::lowercase, " "),
 
     /**
      * Lorem ipsum dolor sit amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    SENTENCE_CASE(String::isSentenceCase, String::sentenceCase, " "),
+    SentenceCase(String::isSentenceCase, String::sentenceCase, " "),
 
     /**
      * Lorem Ipsum Dolor Sit Amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    TITLE_CASE(String::isTitleCase, String::titleCase, " "),
+    TitleCase(String::isTitleCase, String::titleCase, " "),
 
     /**
      * LOREM_IPSUM_DOLOR_SIT_AMET
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    UPPER_SNAKE_CASE(String::isUpperSnakeCase, String::upperSnakeCase, "_"),
+    UpperSnakeCase(String::isUpperSnakeCase, String::upperSnakeCase, "_"),
 
     /**
      * lorem_ipsum_dolor_sit_amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    SNAKE_CASE(String::isSnakeCase, String::snakeCase, "_"),
+    SnakeCase(String::isSnakeCase, String::snakeCase, "_"),
 
     /**
      * Lorem_Ipsum_Dolor_Sit_Amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    TITLE_SNAKE_CASE(String::isTitleSnakeCase, String::titleSnakeCase, "_"),
+    TitleSnakeCase(String::isTitleSnakeCase, String::titleSnakeCase, "_"),
 
     /**
      * LOREM-IPSUM-DOLOR-SIT-AMET
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    UPPER_KEBAB_CASE(String::isUpperKebabCase, String::upperKebabCase, "-"),
+    UpperKebabCase(String::isUpperKebabCase, String::upperKebabCase, "-"),
 
     /**
      * lorem-ipsum-dolor-sit-amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    KEBAB_CASE(String::isKebabCase, String::kebabCase, "-"),
+    KebabCase(String::isKebabCase, String::kebabCase, "-"),
 
     /**
      * Lorem-Ipsum-Dolor-Sit-Amet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    TITLE_KEBAB_CASE(String::isTitleKebabCase, String::titleKebabCase, "-"),
+    TitleKebabCase(String::isTitleKebabCase, String::titleKebabCase, "-"),
 
     /**
      * loremIpsumDolorSitAmet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    CAMEL_CASE(String::isCamelCase, String::camelCase, ""),
+    CamelCase(String::isCamelCase, String::camelCase, ""),
 
     /**
      * LoremIpsumDolorSitAmet
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    PASCAL_CASE(String::isPascalCase, String::pascalCase, ""),
+    PascalCase(String::isPascalCase, String::pascalCase, ""),
 
     /**
      * lorem Ipsum doLor Sit ameT
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    STANDARD({ true }, { it }, " ");
+    Standard({ true }, { it }, " ");
 
     companion object {
         /**
@@ -120,9 +120,9 @@ enum class TextCase(
          * @throws ConversionException if conversion failed.
          * @since 1.0.0
         */
-        fun String.convertCase(from: TextCase = STANDARD, to: TextCase): String {
+        fun String.convertCase(from: TextCase = Standard, to: TextCase): String {
             try {
-                if (from == CAMEL_CASE || from == PASCAL_CASE) {
+                if (from == CamelCase || from == PascalCase) {
                     val sb = StringBuilder()
                     for ([i, c] in withIndex()) {
                         if (i != 0 && (c.isUpperCase() || (c.isDigit() && !this[i-1].isDigit()))) {
@@ -132,7 +132,7 @@ enum class TextCase(
                             sb.append(c)
                         }
                     }
-                    return sb.toString().convertCase(LOWER_CASE, to)
+                    return sb.toString().convertCase(LowerCase, to)
                 }
                 return to.converter(replace(from.separator, " "))
             } catch (e: Exception) {

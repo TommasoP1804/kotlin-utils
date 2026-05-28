@@ -643,7 +643,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BLACK(30),
+        Black(30),
 
         /**
          * Represents the ANSI color code for red text in terminal output.
@@ -660,7 +660,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        RED(31),
+        Red(31),
 
         /**
          * Represents the green text color according to the ANSI color code (32).
@@ -678,7 +678,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        GREEN(32),
+        Green(32),
 
         /**
          * Represents the ANSI color code for yellow text in terminal output.
@@ -697,7 +697,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        YELLOW(33),
+        Yellow(33),
 
         /**
          * Represents the color blue in the ANSI text color coding system.
@@ -713,7 +713,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BLUE(34),
+        Blue(34),
 
         /**
          * Represents the ANSI color code for magenta text.
@@ -733,7 +733,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        MAGENTA(35),
+        Magenta(35),
 
         /**
          * Represents the ANSI color code for cyan text.
@@ -748,7 +748,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        CYAN(36),
+        Cyan(36),
 
         /**
          * Represents the ANSI color code for the WHITE text color.
@@ -763,7 +763,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        WHITE(37),
+        White(37),
 
         /**
          * Represents the default text color according to ANSI color codes.
@@ -779,7 +779,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        DEFAULT(39),
+        Default(39),
 
         /**
          * Represents the bright black text color in the ANSI escape code system.
@@ -793,7 +793,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_BLACK(90),
+        BrightBlack(90),
 
         /**
          * Represents the bright red text color in the ANSI escape codes.
@@ -804,7 +804,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_RED(91),
+        BrightRed(91),
 
         /**
          * Represents the ANSI escape code for bright green text color.
@@ -819,7 +819,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_GREEN(92),
+        BrightGreen(92),
 
         /**
          * Represents the ANSI escape code for the bright variant of the yellow text color.
@@ -834,7 +834,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_YELLOW(93),
+        BrightYellow(93),
 
         /**
          * Represents the bright blue text color in ANSI escape codes.
@@ -847,7 +847,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_BLUE(94),
+        BrightBlue(94),
 
         /**
          * Bright magenta text color represented in ANSI escape codes.
@@ -859,7 +859,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_MAGENTA(95),
+        BrightMagenta(95),
 
         /**
          * Represents the bright cyan text color in ANSI escape codes.
@@ -871,7 +871,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_CYAN(96),
+        BrightCyan(96),
 
         /**
          * Represents the bright white text color in ANSI escape codes.
@@ -882,7 +882,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_WHITE(97),
+        BrightWhite(97),
 
         /**
          * Represents the default terminal text color in the ANSI bright color set.
@@ -898,7 +898,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_DEFAULT(99);
+        BrightDefault(99);
     }
 
     /**
@@ -950,7 +950,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BLACK(40),
+        Black(40),
 
         /**
          * Represents the ANSI background color code for red in terminal text styling.
@@ -971,7 +971,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        RED(41),
+        Red(41),
 
         /**
          * Represents the ANSI escape code for setting the background color to green
@@ -983,7 +983,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        GREEN(42),
+        Green(42),
 
         /**
          * Represents the ANSI background color code for yellow.
@@ -1007,7 +1007,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        YELLOW(43),
+        Yellow(43),
 
         /**
          * Represents the ANSI background color code for blue in terminal text styling.
@@ -1023,7 +1023,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BLUE(44),
+        Blue(44),
 
         /**
          * Represents the ANSI background color code for MAGENTA.
@@ -1044,7 +1044,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        MAGENTA(45),
+        Magenta(45),
 
         /**
          * Represents the ANSI code for the cyan background color used in terminal text styling.
@@ -1056,7 +1056,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        CYAN(46),
+        Cyan(46),
 
         /**
          * Represents the ANSI background color code for white.
@@ -1072,7 +1072,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        WHITE(47),
+        White(47),
 
         /**
          * Represents the ANSI escape code for resetting the terminal text background
@@ -1090,7 +1090,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        DEFAULT(49),
+        Default(49),
 
         /**
          * Represents the BRIGHT_BLACK color with an intensity level of 100.
@@ -1099,7 +1099,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_BLACK(100),
+        BrightBlack(100),
 
         /**
          * Represents a high-intensity red color constant, indicated by the value `101`.
@@ -1108,7 +1108,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_RED(101),
+        BrightRed(101),
 
         /**
          * Represents a bright green color with its corresponding intensity value.
@@ -1116,7 +1116,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_GREEN(102),
+        BrightGreen(102),
 
         /**
          * Constant representing the bright yellow color with the associated code 103.
@@ -1124,7 +1124,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_YELLOW(103),
+        BrightYellow(103),
 
         /**
          * Represents a bright blue color with a value of 104. Typically used for text styling
@@ -1132,7 +1132,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_BLUE(104),
+        BrightBlue(104),
 
         /**
          * Constant representing the color bright magenta with an associated code value of 105.
@@ -1140,7 +1140,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_MAGENTA(105),
+        BrightMagenta(105),
 
         /**
          * Represents the color code for bright cyan.
@@ -1150,7 +1150,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_CYAN(106),
+        BrightCyan(106),
 
         /**
          * Represents the bright white color with its corresponding code.
@@ -1158,7 +1158,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_WHITE(107),
+        BrightWhite(107),
 
         /**
          * Default brightness level setting used across the application.
@@ -1168,7 +1168,7 @@ object Ansi {
          *
          * @since 3.2.0
          */
-        BRIGHT_DEFAULT(109);
+        BrightDefault(109);
     }
     
     /**

@@ -17,29 +17,29 @@ enum class AuthType {
      * This authentication mechanism involves sending the user's
      * credentials (username and password) encoded as a base64 string
      * within the HTTP request's `Authorization` header.
-     * @since 3.12.0
+     * @since 4.0.0
      */
-    BASIC,
+    Basic,
     /**
      * Represents the FORM authentication type within the AuthType enum.
      * Typically used when authentication is performed via a form submission.
-     * @since 3.12.0
+     * @since 4.0.0
      */
-    FORM,
+    Form,
     /**
      * Represents the client certificate-based authentication type.
      * This is used when the authentication mechanism relies on client certificates
      * for verifying the identity of the client.
-     * @since 3.12.0
+     * @since 4.0.0
      */
-    CLIENT_CERT,
+    ClientCert,
     /**
      * Represents the DIGEST authentication type used in the `AuthType` enum.
      * This authentication mechanism is typically used for HTTP Digest Access Authentication
      * to enhance security compared to basic authentication.
-     * @since 3.12.0
+     * @since 4.0.0
      */
-    DIGEST;
+    Digest;
 
     companion object {
         /**
@@ -50,6 +50,6 @@ enum class AuthType {
          * @return The matching entry from the `entries` collection, or null if no match is found.
          * @since 3.12.0
          */
-        infix fun of(type: String) = entries.find { it.name equalsIgnoreCase (type - "_AUTH") }
+        infix fun of(type: String) = entries.find { it.name equalsIgnoreCase (type - "_AUTH" - "Auth") }
     }
 }

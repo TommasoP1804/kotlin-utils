@@ -341,7 +341,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
                     .GET()
                     .build()
                 val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-                if (response.statusCode() != 200) throw HttpResponseException(response.statusCode(), uri, HttpMethod.GET)
+                if (response.statusCode() != 200) throw HttpResponseException(response.statusCode(), uri, HttpMethod.Get)
                 return MAPPER.readTree(response.body())
             }
 

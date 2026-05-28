@@ -17,7 +17,7 @@ package dev.tommasop1804.kutils.classes.constants
  */
 @Suppress("unused")
 enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: List<String>? = null) {
-    BAR(listOf(
+    Bar(listOf(
         "░░░░░░░░░░░░░░░░░░░░",
         "█░░░░░░░░░░░░░░░░░░░",
         "██░░░░░░░░░░░░░░░░░░",
@@ -62,7 +62,7 @@ enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: L
         "",
         ""
     )),
-    BAR_INVERTED(listOf(
+    InvertedBar(listOf(
         "░░░░░░░░░░░░░░░░░░░░",
         "░░░░░░░░░░░░░░░░░░░█",
         "░░░░░░░░░░░░░░░░░░██",
@@ -107,7 +107,7 @@ enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: L
         "",
         ""
     )),
-    BAR_FROM_CENTER(listOf(
+    BarFromCenter(listOf(
         "░░░░░░░░░░░░░░░░░░░░",
         "░░░░░░░░░██░░░░░░░░░",
         "░░░░░░░░████░░░░░░░░",
@@ -132,7 +132,7 @@ enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: L
         "",
         ""
     )),
-    BAR_TO_CENTER(listOf(
+    BarToCenter(listOf(
         "░░░░░░░░░░░░░░░░░░░░",
         "█░░░░░░░░░░░░░░░░░░█",
         "██░░░░░░░░░░░░░░░░██",
@@ -157,7 +157,7 @@ enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: L
         "",
         ""
     )),
-    BAR_LOADING(listOf(
+    BarLoading(listOf(
         "░░░░░░░░░░░░░░░░░░░░",
         "█░░░░░░░░░░░░░░░░░░░",
         "██░░░░░░░░░░░░░░░░░░",
@@ -210,25 +210,25 @@ enum class ProgressionAnimation(val steps: List<String>, val alternativeSteps: L
         "",
         ""
     )),
-    SPINNER_1("←↖↑↗→↘↓↙"),
-    SPINNER_2("▁▃▄▅▆▇█▇▆▅▄▃"),
-    SPINNER_3("▉▊▋▌▍▎▏▎▍▌▋▊▉"),
-    SPINNER_4("▖▘▝▗"),
-    SPINNER_5("▌▀▐▄"),
-    SPINNER_6("┤┘┴└├┌┬┐"),
-    SPINNER_7("◣◤◥◢"),
-    SPINNER_8("◰◳◲◱"),
-    SPINNER_9("◴◷◶◵"),
-    SPINNER_10("◐◓◑◒"),
-    SPINNER_11("|/-\\"),
-    SPINNER_12(".oO@*"),
-    SPINNER_13(listOf("◡", "⊙", "◠")),
-    SPINNER_14(listOf("◜ ", " ◝", " ◞", "◟ "), listOf("\uEE06", "\uEE07", "\uEE08", "\uEE09", "\uEE0A", "\uEE0B")),
-    SPINNER_15("◇◈◆"),
-    SPINNER_16("⣾⣽⣻⢿⡿⣟⣯⣷"),
-    SPINNER_17("⡀⡁⡂⡃⡄⡅⡆⡇⡈⡉⡊⡋⡌⡍⡎⡏⡐⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡟⡠⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡯⡰⡱⡲⡳⡴⡵⡶⡷⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⢈⢉⢊⢋⢌⢍⢎⢏⢐⢑⢒⢓⢔⢕⢖⢗⢘⢙⢚⢛⢜⢝⢞⢟⢠⢡⢢⢣⢤⢥⢦⢧⢨⢩⢪⢫⢬⢭⢮⢯⢰⢱⢲⢳⢴⢵⢶⢷⢸⢹⢺⢻⢼⢽⢾⢿⣀⣁⣂⣃⣄⣅⣆⣇⣈⣉⣊⣋⣌⣍⣎⣏⣐⣑⣒⣓⣔⣕⣖⣗⣘⣙⣚⣛⣜⣝⣞⣟⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿"),
-    SPINNER_18("⠁⠂⠄⡀⢀⠠⠐⠈"),
-    SPINNER_19(listOf(">))'>", " >))'>", "  >))'>", "   >))'>", "    >))'>", "   <'((<", "  <'((<", " <'((<"));
+    Spinner1("←↖↑↗→↘↓↙"),
+    Spinner2("▁▃▄▅▆▇█▇▆▅▄▃"),
+    Spinner3("▉▊▋▌▍▎▏▎▍▌▋▊▉"),
+    Spinner4("▖▘▝▗"),
+    Spinner5("▌▀▐▄"),
+    Spinner6("┤┘┴└├┌┬┐"),
+    Spinner7("◣◤◥◢"),
+    Spinner8("◰◳◲◱"),
+    Spinner9("◴◷◶◵"),
+    Spinner10("◐◓◑◒"),
+    Spinner11("|/-\\"),
+    Spinner12(".oO@*"),
+    Spinner13(listOf("◡", "⊙", "◠")),
+    Spinner14(listOf("◜ ", " ◝", " ◞", "◟ "), listOf("\uEE06", "\uEE07", "\uEE08", "\uEE09", "\uEE0A", "\uEE0B")),
+    Spinner15("◇◈◆"),
+    Spinner16("⣾⣽⣻⢿⡿⣟⣯⣷"),
+    Spinner17("⡀⡁⡂⡃⡄⡅⡆⡇⡈⡉⡊⡋⡌⡍⡎⡏⡐⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡟⡠⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡯⡰⡱⡲⡳⡴⡵⡶⡷⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⢈⢉⢊⢋⢌⢍⢎⢏⢐⢑⢒⢓⢔⢕⢖⢗⢘⢙⢚⢛⢜⢝⢞⢟⢠⢡⢢⢣⢤⢥⢦⢧⢨⢩⢪⢫⢬⢭⢮⢯⢰⢱⢲⢳⢴⢵⢶⢷⢸⢹⢺⢻⢼⢽⢾⢿⣀⣁⣂⣃⣄⣅⣆⣇⣈⣉⣊⣋⣌⣍⣎⣏⣐⣑⣒⣓⣔⣕⣖⣗⣘⣙⣚⣛⣜⣝⣞⣟⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿"),
+    Spinner18("⠁⠂⠄⡀⢀⠠⠐⠈"),
+    Spinner19(listOf(">))'>", " >))'>", "  >))'>", "   >))'>", "    >))'>", "   <'((<", "  <'((<", " <'((<"));
 
     constructor(string: String) : this(string.toList().map(Char::toString))
 }

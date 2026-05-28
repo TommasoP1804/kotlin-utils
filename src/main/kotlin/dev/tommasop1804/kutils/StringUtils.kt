@@ -15,6 +15,7 @@ import com.github.lalyos.jfiglet.FigletFont
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.base.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.EMAIL_REGEX
 import dev.tommasop1804.kutils.exceptions.*
 import org.apache.commons.codec.binary.Base32
@@ -441,7 +442,7 @@ val String.isSnakeCase get() = isNotEmpty() && toCharArray().all { it == '_' || 
  * @return `true` if the string adheres to title snake case format; otherwise, `false`.
  * @since 1.0.0
  */
-val String.isTitleSnakeCase get() = isNotEmpty() && toCharArray().all { (it == '_' || it.isLetter() || it.isDigit()) && replace('-', ' ').isTitleCase }
+val String.isTitleSnakeCase get() = isNotEmpty() && toCharArray().all { (it == '_' || it.isLetter() || it.isDigit()) && replace('_', ' ').isTitleCase }
 
 /**
  * Checks if the string is in upper kebab case format.
@@ -763,6 +764,19 @@ val String.isUrl get() = matches(Regex("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=
  * @since 2.1.0
  */
 val String.isAscii get() = all { it.code < 128 }
+
+/**
+ * Computes the text case of the string based on predefined [TextCase] enum values.
+ *
+ * This property attempts to match the string against various text case validators in
+ * [TextCase.entries] (excluding [TextCase.Standard]) and determines the appropriate
+ * text case. If no match is found, the default case [TextCase.Standard] is returned.
+ *
+ * @receiver The string for which the text case needs to be determined.
+ * @return The matching [TextCase] of the string, or [TextCase.Standard] if no match is found.
+ * @since 4.0.0
+ */
+val String.matchedCases get() = TextCase.entries { it != TextCase.Standard && it(this) }
 
 /**
  * Checks if the string contains all the specified substrings.
@@ -2113,7 +2127,7 @@ fun String.toAsciiArt(font: File) = FigletFont.convertOneLine(font, this)!!
  */
 fun String.toAsciiArt(font: AsciiArtFont): String {
     var s = FigletFont.convertOneLine(font.inputStream(), this)!!
-    if (font == AsciiArtFont.SLANT_RELIEF)
+    if (font == AsciiArtFont.SlantRelief)
         s = s.replace(Regex("_ {2,}_"), "")
     return s
 }
@@ -2133,9 +2147,9 @@ enum class AsciiArtFont(val inputStream: Supplier<InputStream>) {
      * Throws:
      * - FileNotFoundException if the font resource file `larry3d.flf` is not found in the classpath.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    LARRY3D({
+    Larry3D({
         FigletFont::class.java.getResourceAsStream("/larry3d.flf")
             ?: throw FileNotFoundException("Resource larry3d.flf not found")
     }),
@@ -2148,9 +2162,9 @@ enum class AsciiArtFont(val inputStream: Supplier<InputStream>) {
      * The associated resource file must be available in the classpath. If it is not found,
      * a FileNotFoundException is thrown during instantiation.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    SLANT_RELIEF({
+    SlantRelief({
         FigletFont::class.java.getResourceAsStream("/Slant_Relief.flf")
             ?: throw FileNotFoundException("Resource Slant_Relief.flf not found")
     })
