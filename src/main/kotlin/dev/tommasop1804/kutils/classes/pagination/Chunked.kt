@@ -123,7 +123,7 @@ data class Chunked<T>(
             if (generalFilterString.isNotNull()) {
                 val generalFilter = FilterOption.parse(generalFilterString).onlyElement()
                 generalFilter.operator.validate(
-                    lazyMessage = { "General filter operator in ${((FilterOperator byCategory String) + (FilterOperator byCategory Equality)).map(FilterOperator::operator)}" },
+                    lazyMessage = { "General filter operator in ${((FilterOperator byCategory Category.String) + (FilterOperator byCategory Equality)).map(FilterOperator::operator)}" },
                     causeOf = exceptionForInvalid("General filter operator is invalid")
                 ) { it.category in arrayOf(String, Equality) }
 
@@ -157,7 +157,7 @@ data class Chunked<T>(
                                 "LOWER(CAST(${(dbDictionary[it.field] ?: it.field)} AS TEXT))"
                             else (dbDictionary[it.field] ?: it.field),
                             when (it.operator.category)  {
-                                String, Equality -> "'${it.value?.toString()?.lowercase()}'"
+                                Category.String, Equality -> "'${it.value?.toString()?.lowercase()}'"
                                 Comparison if it.field in dateFields -> {
                                     if (YearMonth(it.value!!.toString()).isSuccess)
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
