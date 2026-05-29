@@ -732,9 +732,6 @@ class TableColumnsScope @PublishedApi internal constructor() {
 /**
  * A DSL-based builder for generating SQL queries dynamically.
  *
- * Replaces the fluent-API [dev.tommasop1804.kutils.classes.builder.SqlQueryBuilder] with idiomatic Kotlin DSL scopes,
- * `@DslMarker` safety, and nested lambda support.
- *
  * Supports SELECT, INSERT, UPDATE, DELETE, TRUNCATE, and all DDL operations
  * (tables, views, materialized views, indexes, triggers, functions, procedures,
  * sequences, schemas, types, domains).
