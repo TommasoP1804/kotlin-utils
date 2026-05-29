@@ -126,7 +126,7 @@ enum class Country(
 	Finland("FI", "FIN", "246", "Finland", "The Republic of Finland", listOf(".fi"), Locale.of("fi", "FI"), listOf(TimeZone.EET), listOf("358")),
 	France("FR", "FRA", "250", "France", "The French Republic", listOf(".fr"), Locale.of("fr", "FR"), listOf(TimeZone.CET), listOf("33")),
 	FrenchGuiana("GF", "GUF", "254", "French Guiana", "Guyane", listOf(".gf"), Locale.of("fr", "GF"), listOf(TimeZone.GFT), listOf("594")),
-	FrenchPolynesia("PF", "PYF", "258", "French Polynesia", "Overseas Lands of French Polynesia", listOf(".pf"), Locale.of("fr", "PF"), listOf(TimeZoneDesignator.W, TimeZoneDesignator.V_DAGGER, TimeZoneDesignator.V), listOf("689")),
+	FrenchPolynesia("PF", "PYF", "258", "French Polynesia", "Overseas Lands of French Polynesia", listOf(".pf"), Locale.of("fr", "PF"), listOf(TimeZoneDesignator.W, TimeZoneDesignator.VDagger, TimeZoneDesignator.V), listOf("689")),
 	FrenchSouthernTerritories("TF", "ATF", "260", "French Southern Territories", "The French Southern and Antarctic Lands", listOf(".tf"), Locale.of("fr", "TF"), listOf(TimeZone.TFT), listOf()),
 	Gabon("GA", "GAB", "266", "Gabon", "The Gabonese Republic", listOf(".ga"), Locale.of("fr", "GA"), listOf(TimeZone.WAT), listOf("241")),
 	Gambia("GM", "GMB", "270", "Gambia", "The Republic of The Gambia", listOf(".gm"), Locale.of("en", "GM"), listOf(TimeZone.GMT), listOf("220")),
@@ -297,7 +297,7 @@ enum class Country(
 	WesternSahara("EH", "ESH", "732", "Western Sahara", "The Sahrawi Arab Democratic Republic", emptyList(), Locale.of("ar", "EH"), listOf(TimeZone.WAT), listOf("212")),
 	Yemen("YE", "YEM", "887", "Yemen", "The Republic of Yemen", listOf(".ye"), Locale.of("ar", "YE"), listOf(TimeZone.AST_3), listOf("967")),
 	Zambia("ZM", "ZMB", "894", "Zambia", "The Republic of Zambia", listOf(".zm"), Locale.of("en", "ZM"), listOf(TimeZone.CAT), listOf("260")),
-	ZIMBABWE("ZW", "ZWE", "716", "Zimbabwe", "The Republic of Zimbabwe", listOf(".zw"), Locale.of("en", "ZW"), listOf(TimeZone.CAT), listOf("263"));
+	Zimbabwe("ZW", "ZWE", "716", "Zimbabwe", "The Republic of Zimbabwe", listOf(".zw"), Locale.of("en", "ZW"), listOf(TimeZone.CAT), listOf("263"));
 
 	/**
 	 * A list of distinct military time zones derived from the existing time zones.

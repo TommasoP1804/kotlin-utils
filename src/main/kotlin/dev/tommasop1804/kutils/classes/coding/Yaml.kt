@@ -62,7 +62,6 @@ import org.yaml.snakeyaml.Yaml as SnakeYaml
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Yaml.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Yaml.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
-@Beta(since = "6.11.0")
 class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence, Code(value, Language.Yaml) {
 
     /**
@@ -271,7 +270,6 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @since 3.13.0
          */
         @JvmName("csvToYaml")
-        @OptIn(Beta::class)
         fun Csv.toYaml(): Yaml = toJson().toYaml()
         /**
          * Converts the given object to its YAML representation.
@@ -701,7 +699,6 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration", "UNCHECKED_CAST")
-@Beta(since = "8.0.0")
 class YamlNode(val rawValue: Any?) {
     /**
      * Indicates whether the current YAMLNode is missing a value.

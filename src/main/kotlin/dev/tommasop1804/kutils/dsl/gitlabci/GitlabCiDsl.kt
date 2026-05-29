@@ -178,7 +178,7 @@ enum class WhenPolicy(val yaml: String) {
      * execution policies are specified, such as `RuleBuilder` and `WorkflowBuilder`.
      * @since 4.0.0
      */
-    Never("never"),
+    Never("never")
 }
 
 /**
@@ -550,7 +550,7 @@ enum class EnvironmentAction(val yaml: String) {
      *
      * @since 4.0.0
      */
-    Access("access"),
+    Access("access")
 }
 
 /**

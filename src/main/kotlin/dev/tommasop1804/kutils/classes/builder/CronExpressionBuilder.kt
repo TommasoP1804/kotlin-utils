@@ -4,9 +4,7 @@
 
 package dev.tommasop1804.kutils.classes.builder
 
-import dev.tommasop1804.kutils.Int2
-import dev.tommasop1804.kutils.unaryPlus
-import dev.tommasop1804.kutils.validate
+import dev.tommasop1804.kutils.*
 import java.time.DayOfWeek
 import java.time.Month
 
@@ -123,7 +121,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun second(vararg values: Int): CronExpressionBuilder {
-        if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
+        if (type == Type.Unix || type == Type.Cron4j) throw UnsupportedOperationException("Second is not supported by $type")
 
         values.forEach { value -> value.validate(lazyMessage = { "Invalid range of second" }) { it in 0..59 } }
 
@@ -152,7 +150,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("secondIntRangeStep")
     fun second(vararg rangeAndStep: Pair<IntRange, Int>): CronExpressionBuilder {
-        if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
+        if (type == Type.Unix || type == Type.Cron4j) throw UnsupportedOperationException("Second is not supported by $type")
 
         rangeAndStep.forEach { pair ->
             pair.validate(lazyMessage = { "Invalid range of second" }) { it.first.first in 0..59 && it.first.last in 0..59 }
@@ -177,7 +175,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun second(vararg range: IntRange): CronExpressionBuilder {
-        if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
+        if (type == Type.Unix || type == Type.Cron4j) throw UnsupportedOperationException("Second is not supported by $type")
 
         range.forEach { range ->
             range.validate(lazyMessage = { "Invalid range of second" }) { it.first in 0..59 && it.last in 0..59 }
@@ -204,7 +202,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("secondIntStep")
     fun second(vararg secondAndStep: Int2): CronExpressionBuilder {
-        if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
+        if (type == Type.Unix || type == Type.Cron4j) throw UnsupportedOperationException("Second is not supported by $type")
 
         secondAndStep.forEach { pair -> pair.validate(lazyMessage = { "Invalid second" }) { it.first in 0..59 && it.second in 1..59 } }
 
@@ -225,7 +223,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allSeconds(step: Int = 1): CronExpressionBuilder {
-        if (type == Type.UNIX || type == Type.CRON4J) throw UnsupportedOperationException("Second is not supported by $type")
+        if (type == Type.Unix || type == Type.Cron4j) throw UnsupportedOperationException("Second is not supported by $type")
         step.validate(lazyMessage = { "Invalid range of step" }) { it in 1..59 }
 
         seconds = "*" + if (step > 1) "/$step" else ""
@@ -550,7 +548,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun lastDayOfMonth(): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.CRON4J || type == Type.SPRING || throw UnsupportedOperationException("Last day of month is not supported by $type")
+        type == Type.Quartz || type == Type.Cron4j || type == Type.Spring || throw UnsupportedOperationException("Last day of month is not supported by $type")
         daysOfMonth = "L"
         return this
     }
@@ -564,7 +562,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun undefinedDayOfMonth(): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.CRON4J || type == Type.SPRING || type == Type.SPRING_BEFORE_5_3 || throw UnsupportedOperationException(
+        type == Type.Quartz || type == Type.Cron4j || type == Type.Spring || type == Type.SpringBefore5_3 || throw UnsupportedOperationException(
             "Undefined day of month is not supported by $type"
         )
         daysOfMonth = "?"
@@ -584,7 +582,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun nearestWeekday(day: DayOfWeek): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.SPRING || throw UnsupportedOperationException("Nearest weekday of is not supported by $type")
+        type == Type.Quartz || type == Type.Spring || throw UnsupportedOperationException("Nearest weekday of is not supported by $type")
         daysOfMonth = "${day.value}W"
         return this
     }
@@ -601,7 +599,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun lastWeekdayOfMonth(): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.SPRING || throw UnsupportedOperationException("Last weekday of month is not supported by $type")
+        type == Type.Quartz || type == Type.Spring || throw UnsupportedOperationException("Last weekday of month is not supported by $type")
         daysOfMonth = "LW"
         return this
     }
@@ -859,7 +857,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun undefinedDayOfWeek(): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.SPRING_BEFORE_5_3 || type == Type.SPRING || throw UnsupportedOperationException(
+        type == Type.Quartz || type == Type.SpringBefore5_3 || type == Type.Spring || throw UnsupportedOperationException(
             "Undefined day of week is not supported by $type"
         )
         daysOfWeek = "?"
@@ -877,7 +875,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun nOccuranceOfWeekday(n: Int, dayOfWeek: DayOfWeek): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.SPRING_BEFORE_5_3 || type == Type.SPRING || throw UnsupportedOperationException(
+        type == Type.Quartz || type == Type.SpringBefore5_3 || type == Type.Spring || throw UnsupportedOperationException(
             "Nth occurence of day of week is not supported by $type"
         )
         n.validate(lazyMessage = { "Invalid nth occurrence of day of week" }) { it in 1..5 }
@@ -898,7 +896,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun lastOccuranceOfWeekday(dayOfWeek: DayOfWeek): CronExpressionBuilder {
-        type == Type.QUARTZ || type == Type.SPRING || throw UnsupportedOperationException("Last day of week is not supported by $type")
+        type == Type.Quartz || type == Type.Spring || throw UnsupportedOperationException("Last day of week is not supported by $type")
         daysOfWeek = "${+dayOfWeek.name.take(3)}L"
         return this
     }
@@ -915,7 +913,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun year(vararg values: Int): CronExpressionBuilder {
-        type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
+        type == Type.Quartz || throw UnsupportedOperationException("Year is not supported by $type")
 
         values.forEach { value -> value.validate(lazyMessage = { "Invalid range of years" }) { it in 1970..2099 } }
 
@@ -937,7 +935,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("yearIntRangeStep")
     fun year(vararg values: Pair<IntRange, Int>): CronExpressionBuilder {
-        type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
+        type == Type.Quartz || throw UnsupportedOperationException("Year is not supported by $type")
 
         values.forEach { value ->
             value.validate(lazyMessage = { "Invalid range of years" }) { it.first.first in 1970..2099 && it.first.last in 1970..2099 }
@@ -963,7 +961,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun year(vararg values: IntRange): CronExpressionBuilder {
-        type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
+        type == Type.Quartz || throw UnsupportedOperationException("Year is not supported by $type")
 
         values.forEach { value ->
             value.validate(lazyMessage = { "Invalid range of years" }) { it.first in 1970..2099 && it.last in 1970..2099 }
@@ -992,7 +990,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     @JvmName("yearIntStep")
     fun year(vararg yearAndStep: Int2): CronExpressionBuilder {
-        type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
+        type == Type.Quartz || throw UnsupportedOperationException("Year is not supported by $type")
 
         yearAndStep.forEach { pair -> pair.validate(lazyMessage = { "Invalid years" }) { it.first in 1970..2099 && it.second in 1..130 } }
 
@@ -1018,7 +1016,7 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     fun allYears(step: Int = 1): CronExpressionBuilder {
-        type == Type.QUARTZ || throw UnsupportedOperationException("Year is not supported by $type")
+        type == Type.Quartz || throw UnsupportedOperationException("Year is not supported by $type")
 
         step.validate(lazyMessage = { "Invalid range of years" }) { it in 1..130 }
 
@@ -1042,7 +1040,7 @@ class CronExpressionBuilder(private val type: Type) {
      */
     fun build() = buildString {
         append(seconds)
-        append(if (type == Type.QUARTZ || type == Type.SPRING_BEFORE_5_3 || type == Type.SPRING) { if (seconds.isEmpty()) "* " else " " } else " ")
+        append(if (type == Type.Quartz || type == Type.SpringBefore5_3 || type == Type.Spring) { if (seconds.isEmpty()) "* " else " " } else " ")
         append(minutes)
         append(if (minutes.isEmpty()) "* " else " ")
         append(hours)
@@ -1066,10 +1064,11 @@ class CronExpressionBuilder(private val type: Type) {
      * @since 1.0.0
      */
     enum class Type {
-        UNIX,
-        CRON4J,
-        QUARTZ,
-        SPRING_BEFORE_5_3,
-        SPRING
+        Unix,
+        Cron4j,
+        Quartz,
+        @Suppress("EnumEntryName")
+        SpringBefore5_3,
+        Spring
     }
 }

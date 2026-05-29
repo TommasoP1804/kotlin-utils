@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.registry.*
 import dev.tommasop1804.kutils.classes.registry.Contact.*
 import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
@@ -662,7 +661,7 @@ sealed interface PaymentMethod {
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = DigitalWallet.Companion.OldDeserializer::class)
     data class DigitalWallet(
         val provider: Provider = Provider.Other,
-        val email: Contact.Email? = null
+        val email: Email? = null
     ) : PaymentMethod {
         /**
          * The display name of the digital wallet. Combines the provider's display name and the email
@@ -688,7 +687,7 @@ sealed interface PaymentMethod {
             class Deserializer : ValueDeserializer<DigitalWallet>() {
                 override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): DigitalWallet {
                     val node = p.objectReadContext().readTree<ObjectNode>(p)
-                    val email = node.get("email")?.asString()?.let { Contact.Email(it) }
+                    val email = node.get("email")?.asString()?.let { Email(it) }
                     return DigitalWallet(
                         provider = Provider.ofName(node.get("provider").asString()),
                         email = email
@@ -708,7 +707,7 @@ sealed interface PaymentMethod {
             class OldDeserializer : JsonDeserializer<DigitalWallet>() {
                 override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): DigitalWallet {
                     val node = p.codec.readTree<com.fasterxml.jackson.databind.node.ObjectNode>(p)
-                    val email = node.get("email")?.asText()?.let { Contact.Email(it) }
+                    val email = node.get("email")?.asText()?.let { Email(it) }
                     return DigitalWallet(
                         provider = Provider.ofName(node.get("provider").asText()),
                         email = email

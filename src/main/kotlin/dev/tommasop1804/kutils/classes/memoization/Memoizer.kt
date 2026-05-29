@@ -4,8 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.memoization
 
-import dev.tommasop1804.kutils.Transformer
-import dev.tommasop1804.kutils.classes.time.Duration
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.time.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -32,10 +32,10 @@ class Memoizer<T, R>(
      *
      * - If the strategy is [CacheStrategy.Unlimited], the cache is implemented as a
      *   [ConcurrentHashMap], supporting unlimited entries.
-     * - If the strategy is [CacheStrategy.LRU], an LRU (Least Recently Used) caching policy is applied,
-     *   with a limit defined by [CacheStrategy.LRU.maxSize].
-     * - If the strategy is [CacheStrategy.TTL], the cache applies a Time-To-Live policy, where entries
-     *   expire after a duration specified by [CacheStrategy.TTL.defaultTTL].
+     * - If the strategy is [CacheStrategy.Lru], an LRU (Least Recently Used) caching policy is applied,
+     *   with a limit defined by [CacheStrategy.Lru.maxSize].
+     * - If the strategy is [CacheStrategy.Ttl], the cache applies a Time-To-Live policy, where entries
+     *   expire after a duration specified by [CacheStrategy.Ttl.defaultTtl].
      *
      * This variable is used for storing the cached results of computations, enabling efficient
      * memoization based on the selected strategy.
@@ -44,8 +44,8 @@ class Memoizer<T, R>(
      */
     private val cache = when (cacheStrategy) {
         is CacheStrategy.Unlimited -> ConcurrentHashMap<T, R>()
-        is CacheStrategy.LRU -> LRUCache<T, R>(cacheStrategy.maxSize)
-        is CacheStrategy.TTL -> TTLCache<T, R>(cacheStrategy.defaultTTL)
+        is CacheStrategy.Lru -> LruCache<T, R>(cacheStrategy.maxSize)
+        is CacheStrategy.Ttl -> TtlCache<T, R>(cacheStrategy.defaultTtl)
     }
     
     /**
@@ -60,8 +60,8 @@ class Memoizer<T, R>(
      */
     operator fun invoke(input: T): R = when (cache) {
         is ConcurrentHashMap<*, *> -> (cache as ConcurrentHashMap<T, R>).getOrPut(input) { transformer(input) }
-        is LRUCache<*, *> -> (cache as LRUCache<T, R>).getOrPut(input) { transformer(input) }
-        is TTLCache<*, *> -> (cache as TTLCache<T, R>).getOrPut(input) { transformer(input) }
+        is LruCache<*, *> -> (cache as LruCache<T, R>).getOrPut(input) { transformer(input) }
+        is TtlCache<*, *> -> (cache as TtlCache<T, R>).getOrPut(input) { transformer(input) }
         else -> throw IllegalStateException("Unknown cache type")
     }
     
@@ -79,8 +79,8 @@ class Memoizer<T, R>(
     fun clear() {
         when (cache) {
             is ConcurrentHashMap<*, *> -> (cache as ConcurrentHashMap<T, R>).clear()
-            is LRUCache<*, *> -> (cache as LRUCache<T, R>).clear()
-            is TTLCache<*, *> -> (cache as TTLCache<T, R>).clear()
+            is LruCache<*, *> -> (cache as LruCache<T, R>).clear()
+            is TtlCache<*, *> -> (cache as TtlCache<T, R>).clear()
         }
     }
     
@@ -94,8 +94,8 @@ class Memoizer<T, R>(
     fun invalidate(input: T) {
         when (cache) {
             is ConcurrentHashMap<*, *> -> (cache as ConcurrentHashMap<T, R>).remove(input)
-            is LRUCache<*, *> -> (cache as LRUCache<T, R>).remove(input)
-            is TTLCache<*, *> -> (cache as TTLCache<T, R>).remove(input)
+            is LruCache<*, *> -> (cache as LruCache<T, R>).remove(input)
+            is TtlCache<*, *> -> (cache as TtlCache<T, R>).remove(input)
         }
     }
 
@@ -124,17 +124,17 @@ class Memoizer<T, R>(
          *
          * @property maxSize The maximum number of items the cache can hold. Once the limit is exceeded, the least recently used entries will be evicted.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          * @author Tommaso Pastorelli
          */
-        data class LRU(val maxSize: Int) : CacheStrategy()
+        data class Lru(val maxSize: Int) : CacheStrategy()
         /**
          * Represents a cache strategy where cached items have a defined time-to-live (TTL).
          *
-         * @property defaultTTL The default duration after which items in the cache will expire.
-         * @since 1.0.0
+         * @property defaultTtl The default duration after which items in the cache will expire.
+         * @since 4.0.0
          * @author Tommaso Pastorelli
          */
-        data class TTL(val defaultTTL: Duration) : CacheStrategy()
+        data class Ttl(val defaultTtl: Duration) : CacheStrategy()
     }
 }

@@ -1123,7 +1123,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * @param latinChars if `true` the result will be in Latin characters. If `false` the result will be in Roman numeral characters.
      * @param upperCase if `true` the result will be in upper case. If `false` the result will be in lower case.
      * @param multiplesSuffixes if `true` the multiples suffixes will be used. If `false` the multiples suffixes will not be used.
-     * @param altChars the priority of alternative characters. See [dev.tommasop1804.kutils.AltCharsPriority]
+     * @param altChars the priority of alternative characters. See [AltCharsPriority]
      * @return the number as a `String` in Roman numerals.
      * @since 1.0.0
      */

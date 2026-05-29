@@ -190,7 +190,7 @@ enum class Currency (
 	YER("Yemeni rial", "886", Pair("Rl", "Rls"), "Fils", 100, 2, setOf(Country.Yemen)),
 	ZAR("South African rand", "710", "R", "Cent", setOf(Country.SouthAfrica, Country.Eswatini, Country.Lesotho, Country.Namibia)),
 	ZMW("Zambian kwatcha", "967", "K", "Ngwee", setOf(Country.Zambia)),
-	ZWG("Zimbabwe Gold", "924", "ZiG", "Cent", setOf(Country.ZIMBABWE));
+	ZWG("Zimbabwe Gold", "924", "ZiG", "Cent", setOf(Country.Zimbabwe));
 
     constructor(currencyName: String, numericCode: String, symbol: String, fractionalUnit: String?, numberOfFractionalUnits: Int, digitsAfterDecimalPoint: Int, countries: Set<Country>) :
             this(currencyName, numericCode, Pair(symbol, symbol), fractionalUnit, numberOfFractionalUnits, digitsAfterDecimalPoint, countries)

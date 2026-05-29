@@ -1002,7 +1002,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @return A new `SqlQuery` instance without pagination clauses if present, or the original instance if none are found.
      * @since 3.7.1
      */
-    fun withoutPagination() = SqlQuery(this.value).let {
+    fun withoutPagination() = SqlQuery(value).let {
         if (it.hasLimit || it.hasOffset) {
             val number = """(\?|:\w+|\$\d+|\d+)"""
             val patterns = listOf(

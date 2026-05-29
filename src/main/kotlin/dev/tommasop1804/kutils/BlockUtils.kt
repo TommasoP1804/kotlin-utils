@@ -255,7 +255,7 @@ fun <T1, T2, T3, T4, T5, R> ((T1, T2, T3, T4, T5) -> R).memoize(): (T1, T2, T3, 
  * @since 1.0.0
  */
 fun <T, R> ((T) -> R).memoizeLRU(maxSize: Int = 100): (T) -> R {
-    val cache = LRUCache<T, R>(maxSize)
+    val cache = LruCache<T, R>(maxSize)
     return { input ->
         cache.getOrPut(input) { this(input) }
     }
@@ -271,7 +271,7 @@ fun <T, R> ((T) -> R).memoizeLRU(maxSize: Int = 100): (T) -> R {
  * @since 1.0.0
  */
 fun <T, R> ((T) -> R).memoizeTTL(ttl: Duration = Duration(minutes = 5)): (T) -> R {
-    val cache = TTLCache<T, R>(ttl)
+    val cache = TtlCache<T, R>(ttl)
     return { input ->
         cache.getOrPut(input, ttl) { this(input) }
     }

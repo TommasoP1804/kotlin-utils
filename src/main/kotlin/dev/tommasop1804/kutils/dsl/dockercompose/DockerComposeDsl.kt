@@ -390,7 +390,7 @@ enum class RestartPolicy(val yaml: String) {
      * automatic restarts unless the container was stopped unintentionally.
      * @since 4.0.0
      */
-    UnlessStopped("unless-stopped"),
+    UnlessStopped("unless-stopped")
 }
 
 /**
@@ -428,7 +428,7 @@ enum class DependsOnCondition(val yaml: String) {
      * completion of a service is required.
      * @since 4.0.0
      */
-    ServiceCompletedSuccessfully("service_completed_successfully"),
+    ServiceCompletedSuccessfully("service_completed_successfully")
 }
 
 // --- BUILDERS ---

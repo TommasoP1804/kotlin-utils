@@ -792,20 +792,20 @@ class SqlBuilder @PublishedApi internal constructor() {
     @PublishedApi internal var setSchemaValue: String? = null
 
     enum class QueryType {
-        SELECT, INSERT, UPDATE, DELETE, TRUNCATE,
-        CREATE_VIEW, ALTER_VIEW, DROP_VIEW,
-        CREATE_MATERIALIZED_VIEW, REFRESH_MATERIALIZED_VIEW, ALTER_MATERIALIZED_VIEW, DROP_MATERIALIZED_VIEW,
-        CREATE_TABLE, ALTER_TABLE, DROP_TABLE,
-        CREATE_INDEX, DROP_INDEX,
-        SHOW_TABLES, SHOW_TABLE, SHOW_COLUMNS_FROM_TABLE, SHOW_INDEX_FROM_TABLE,
-        CREATE_TRIGGER, DROP_TRIGGER,
-        CREATE_FUNCTION, DROP_FUNCTION,
-        CREATE_PROCEDURE, DROP_PROCEDURE,
-        CREATE_SEQUENCE, ALTER_SEQUENCE, DROP_SEQUENCE,
-        CREATE_SCHEMA, ALTER_SCHEMA, DROP_SCHEMA, SET_SCHEMA,
-        CREATE_TYPE, ALTER_TYPE, DROP_TYPE,
-        CREATE_DOMAIN, ALTER_DOMAIN, DROP_DOMAIN,
-        RAW
+        Select, Insert, Update, Delete, Truncate,
+        CreateView, AlterView, DropView,
+        CreateMaterializedView, RefreshMaterializedView, AlterMaterializedView, DropMaterializedView,
+        CreateTable, AlterTable, DropTable,
+        CreateIndex, DropIndex,
+        ShowTables, ShowTable, ShowColumnsFromTable, ShowIndexFromTable,
+        CreateTrigger, DropTrigger,
+        CreateFunction, DropFunction,
+        CreateProcedure, DropProcedure,
+        CreateSequence, AlterSequence, DropSequence,
+        CreateSchema, AlterSchema, DropSchema, SetSchema,
+        CreateType, AlterType, DropType,
+        CreateDomain, ALterDomain, DropDomain,
+        Raw
     }
 
     // -- Select --
@@ -824,7 +824,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun select(@Language("sql") vararg columns: String, distinct: Boolean = false) {
-        queryType = QueryType.SELECT
+        queryType = QueryType.Select
         this.distinct = this.distinct || distinct
         if (columns.isEmpty()) {
             if (selectColumns.isEmpty()) selectColumns += "*"
@@ -841,7 +841,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun selectCount(@Language("sql") expression: String = "*") {
-        queryType = QueryType.SELECT
+        queryType = QueryType.Select
         selectColumns += "COUNT($expression)"
     }
 
@@ -1080,7 +1080,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun insertInto(table: String) {
-        queryType = QueryType.INSERT
+        queryType = QueryType.Insert
         insertTable = table
     }
 
@@ -1165,7 +1165,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun update(table: String) {
-        queryType = QueryType.UPDATE
+        queryType = QueryType.Update
         updateTable = table
     }
 
@@ -1196,7 +1196,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun deleteFrom(table: String) {
-        queryType = QueryType.DELETE
+        queryType = QueryType.Delete
         deleteTable = table
     }
 
@@ -1208,7 +1208,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun truncate(@Language("sql") table: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.TRUNCATE
+        queryType = QueryType.Truncate
         ddlParts.clear()
         ddlParts += "TRUNCATE TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $table $dropType"
     }
@@ -1221,7 +1221,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createView(viewName: String, orReplace: Boolean = false, @Language("sql") selectSQL: String) {
-        queryType = QueryType.CREATE_VIEW
+        queryType = QueryType.CreateView
         ddlParts.clear()
         ddlParts += "CREATE${if (orReplace) " OR REPLACE" else String.EMPTY} VIEW $viewName AS $selectSQL"
     }
@@ -1251,7 +1251,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun alterView(viewName: String, ifExists: Boolean = false, @Language("sql") selectSQL: String) {
-        queryType = QueryType.ALTER_VIEW
+        queryType = QueryType.AlterView
         ddlParts.clear()
         ddlParts += "ALTER VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName AS $selectSQL"
     }
@@ -1262,7 +1262,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_VIEW
+        queryType = QueryType.DropView
         ddlParts.clear()
         ddlParts += "DROP VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName $dropType"
     }
@@ -1275,7 +1275,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createMaterializedView(viewName: String, orReplace: Boolean = false, withData: Boolean = true, @Language("sql") selectSQL: String) {
-        queryType = QueryType.CREATE_MATERIALIZED_VIEW
+        queryType = QueryType.CreateMaterializedView
         ddlParts.clear()
         ddlParts += "CREATE${if (orReplace) " OR REPLACE" else String.EMPTY} MATERIALIZED VIEW $viewName AS $selectSQL WITH ${if (!withData) "NO " else String.EMPTY}DATA"
     }
@@ -1295,7 +1295,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun refreshMaterializedView(viewName: String, concurrently: Boolean = false) {
-        queryType = QueryType.REFRESH_MATERIALIZED_VIEW
+        queryType = QueryType.RefreshMaterializedView
         ddlParts.clear()
         ddlParts += "REFRESH MATERIALIZED VIEW${if (concurrently) " CONCURRENTLY" else String.EMPTY} $viewName"
     }
@@ -1306,7 +1306,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun alterMaterializedView(viewName: String, ifExists: Boolean = false, @Language("sql") action: String) {
-        queryType = QueryType.ALTER_MATERIALIZED_VIEW
+        queryType = QueryType.AlterMaterializedView
         ddlParts.clear()
         ddlParts += "ALTER MATERIALIZED VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName $action"
     }
@@ -1317,7 +1317,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropMaterializedView(viewName: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_MATERIALIZED_VIEW
+        queryType = QueryType.DropMaterializedView
         ddlParts.clear()
         ddlParts += "DROP MATERIALIZED VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName $dropType"
     }
@@ -1330,7 +1330,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createTable(tableName: String, @Language("sql") body: String) {
-        queryType = QueryType.CREATE_TABLE
+        queryType = QueryType.CreateTable
         ddlParts.clear()
         ddlParts += "CREATE TABLE $tableName ($body)"
     }
@@ -1362,7 +1362,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun alterTable(tableName: String, ifExists: Boolean = false, @Language("sql") alteration: String) {
-        queryType = QueryType.ALTER_TABLE
+        queryType = QueryType.AlterTable
         ddlParts.clear()
         ddlParts += "ALTER TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $tableName $alteration"
     }
@@ -1373,7 +1373,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropTable(tableName: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_TABLE
+        queryType = QueryType.DropTable
         ddlParts.clear()
         ddlParts += "DROP TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $tableName $dropType"
     }
@@ -1386,7 +1386,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createIndex(indexName: String, table: String, @Language("sql") columns: String, unique: Boolean = false) {
-        queryType = QueryType.CREATE_INDEX
+        queryType = QueryType.CreateIndex
         ddlParts.clear()
         ddlParts += "CREATE${if (unique) " UNIQUE" else String.EMPTY} INDEX $indexName ON $table ($columns)"
     }
@@ -1397,7 +1397,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropIndex(indexName: String, ifExists: Boolean = false, tableName: String) {
-        queryType = QueryType.DROP_INDEX
+        queryType = QueryType.DropIndex
         ddlParts.clear()
         ddlParts += "DROP INDEX${if (ifExists) " IF EXISTS" else String.EMPTY} $indexName ON $tableName"
     }
@@ -1406,28 +1406,28 @@ class SqlBuilder @PublishedApi internal constructor() {
 
     /** @since 3.6.0 */
     fun showTables() {
-        queryType = QueryType.SHOW_TABLES
+        queryType = QueryType.ShowTables
         ddlParts.clear()
         ddlParts += "SHOW TABLES"
     }
 
     /** @since 3.6.0 */
     fun showTable(tableName: String) {
-        queryType = QueryType.SHOW_TABLE
+        queryType = QueryType.ShowTable
         ddlParts.clear()
         ddlParts += "SHOW CREATE TABLE $tableName"
     }
 
     /** @since 3.6.0 */
     fun showColumnsFromTable(tableName: String) {
-        queryType = QueryType.SHOW_COLUMNS_FROM_TABLE
+        queryType = QueryType.ShowColumnsFromTable
         ddlParts.clear()
         ddlParts += "SHOW COLUMNS FROM $tableName"
     }
 
     /** @since 3.6.0 */
     fun showIndexFromTable(tableName: String) {
-        queryType = QueryType.SHOW_INDEX_FROM_TABLE
+        queryType = QueryType.ShowIndexFromTable
         ddlParts.clear()
         ddlParts += "SHOW INDEX FROM $tableName"
     }
@@ -1451,7 +1451,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     inline fun createTrigger(name: String, block: TriggerScope.() -> Unit) {
-        queryType = QueryType.CREATE_TRIGGER
+        queryType = QueryType.CreateTrigger
         triggerName = name
         triggerScope = TriggerScope().apply(block)
     }
@@ -1462,7 +1462,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropTrigger(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_TRIGGER
+        queryType = QueryType.DropTrigger
         ddlParts.clear()
         ddlParts += "DROP TRIGGER${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1487,7 +1487,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     inline fun createFunction(name: String, ifNotExists: Boolean = false, block: FunctionScope.() -> Unit) {
-        queryType = QueryType.CREATE_FUNCTION
+        queryType = QueryType.CreateFunction
         functionName = name
         functionIfNotExists = ifNotExists
         functionScope = FunctionScope().apply(block)
@@ -1499,7 +1499,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropFunction(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_FUNCTION
+        queryType = QueryType.DropFunction
         ddlParts.clear()
         ddlParts += "DROP FUNCTION${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1522,7 +1522,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     inline fun createProcedure(name: String, ifNotExists: Boolean = false, block: ProcedureScope.() -> Unit) {
-        queryType = QueryType.CREATE_PROCEDURE
+        queryType = QueryType.CreateProcedure
         procedureName = name
         procedureIfNotExists = ifNotExists
         procedureScope = ProcedureScope().apply(block)
@@ -1534,7 +1534,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropProcedure(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_PROCEDURE
+        queryType = QueryType.DropProcedure
         ddlParts.clear()
         ddlParts += "DROP PROCEDURE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1547,7 +1547,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createSequence(name: String, ifNotExists: Boolean = false, @Language("sql") definition: String) {
-        queryType = QueryType.CREATE_SEQUENCE
+        queryType = QueryType.CreateSequence
         ddlParts.clear()
         ddlParts += "CREATE SEQUENCE${if (ifNotExists) " IF NOT EXISTS" else String.EMPTY} $name $definition"
     }
@@ -1558,7 +1558,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun alterSequence(name: String, ifExists: Boolean = false, @Language("sql") alteration: String) {
-        queryType = QueryType.ALTER_SEQUENCE
+        queryType = QueryType.AlterSequence
         ddlParts.clear()
         ddlParts += "ALTER SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $alteration"
     }
@@ -1569,7 +1569,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropSequence(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_SEQUENCE
+        queryType = QueryType.DropSequence
         ddlParts.clear()
         ddlParts += "DROP SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1582,7 +1582,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createSchema(name: String, ifNotExists: Boolean = false, authorization: String? = null) {
-        queryType = QueryType.CREATE_SCHEMA
+        queryType = QueryType.CreateSchema
         ddlParts.clear()
         ddlParts += buildString {
             append("CREATE SCHEMA${if (ifNotExists) " IF NOT EXISTS" else String.EMPTY} $name")
@@ -1596,7 +1596,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun alterSchema(name: String, ifExists: Boolean = false, authorization: String? = null, rename: String? = null) {
-        queryType = QueryType.ALTER_SCHEMA
+        queryType = QueryType.AlterSchema
         ddlParts.clear()
         ddlParts += buildString {
             append("ALTER SCHEMA${if (ifExists) " IF EXISTS" else String.EMPTY} $name")
@@ -1611,7 +1611,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropSchema(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_SCHEMA
+        queryType = QueryType.DropSchema
         ddlParts.clear()
         ddlParts += "DROP SCHEMA${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1622,7 +1622,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun setSchema(@Language("sql") searchPath: String, vararg schemas: String) {
-        queryType = QueryType.SET_SCHEMA
+        queryType = QueryType.SetSchema
         setSchemaValue = "SET $searchPath TO ${schemas.joinToString()}"
     }
 
@@ -1634,7 +1634,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createType(name: String, vararg entries: String) {
-        queryType = QueryType.CREATE_TYPE
+        queryType = QueryType.CreateType
         ddlParts.clear()
         ddlParts += "CREATE TYPE $name AS ENUM (${entries.joinToString { "'$it'" }})"
     }
@@ -1645,7 +1645,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createCompositeType(name: String, @Language("sql") vararg columns: String) {
-        queryType = QueryType.CREATE_TYPE
+        queryType = QueryType.CreateType
         ddlParts.clear()
         ddlParts += "CREATE TYPE $name AS (${columns.joinToString()})"
     }
@@ -1656,7 +1656,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun addEntriesToType(typeName: String, vararg entries: String) {
-        queryType = QueryType.ALTER_TYPE
+        queryType = QueryType.AlterType
         ddlParts.clear()
         ddlParts += "ALTER TYPE $typeName ADD VALUE (${entries.joinToString { "'$it'" }})"
     }
@@ -1667,7 +1667,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun addEntryBeforeOtherToType(typeName: String, entry: String, otherEntry: String) {
-        queryType = QueryType.ALTER_TYPE
+        queryType = QueryType.AlterType
         ddlParts.clear()
         ddlParts += "ALTER TYPE $typeName ADD VALUE '$entry' BEFORE $otherEntry"
     }
@@ -1678,7 +1678,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun addEntryToType(typeName: String, entry: String, ifNotExists: Boolean = false) {
-        queryType = QueryType.ALTER_TYPE
+        queryType = QueryType.AlterType
         ddlParts.clear()
         ddlParts += "ALTER TYPE $typeName ADD VALUE IF NOT EXISTS '$entry'"
     }
@@ -1689,7 +1689,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun renameEntryInType(typeName: String, names: String2) {
-        queryType = QueryType.ALTER_TYPE
+        queryType = QueryType.AlterType
         ddlParts.clear()
         ddlParts += "ALTER TYPE $typeName RENAME VALUE ${names.first} TO ${names.second}"
     }
@@ -1700,7 +1700,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun renameType(typeName: String, newName: String) {
-        queryType = QueryType.ALTER_TYPE
+        queryType = QueryType.AlterType
         ddlParts.clear()
         ddlParts += "ALTER TYPE $typeName RENAME TO $newName"
     }
@@ -1711,7 +1711,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropType(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_TYPE
+        queryType = QueryType.DropType
         ddlParts.clear()
         ddlParts += "DROP TYPE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1724,7 +1724,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun createDomain(name: String, @Language("sql") `as`: String, @Language("sql") check: String) {
-        queryType = QueryType.CREATE_DOMAIN
+        queryType = QueryType.CreateDomain
         ddlParts.clear()
         ddlParts += "CREATE DOMAIN $name AS $`as` CHECK ($check)"
     }
@@ -1735,7 +1735,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun alterDomain(name: String, ifExists: Boolean = false, @Language("sql") operation: String) {
-        queryType = QueryType.ALTER_DOMAIN
+        queryType = QueryType.ALterDomain
         ddlParts.clear()
         ddlParts += "ALTER DOMAIN${if (ifExists) " IF EXISTS" else String.EMPTY} $name $operation"
     }
@@ -1746,7 +1746,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun dropDomain(name: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
-        queryType = QueryType.DROP_DOMAIN
+        queryType = QueryType.DropDomain
         ddlParts.clear()
         ddlParts += "DROP DOMAIN${if (ifExists) " IF EXISTS" else String.EMPTY} $name $dropType"
     }
@@ -1759,7 +1759,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun raw(@Language("sql") sql: String) {
-        queryType = QueryType.RAW
+        queryType = QueryType.Raw
         ddlParts.clear()
         ddlParts += sql
     }
@@ -1772,7 +1772,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun peek(): String = when (queryType) {
-        QueryType.SELECT -> buildString {
+        QueryType.Select -> buildString {
             append("SELECT ")
             if (distinct) append("DISTINCT ")
             append(selectColumns.joinToString(", "))
@@ -1786,7 +1786,7 @@ class SqlBuilder @PublishedApi internal constructor() {
             offsetValue?.let { append(" OFFSET $it") }
         }
 
-        QueryType.INSERT -> buildString {
+        QueryType.Insert -> buildString {
             append("INSERT INTO $insertTable")
             if (insertColumns.isNotEmpty()) append(" (${insertColumns.joinToString(", ")})")
             if (insertSelectQuery.isNotNull()) {
@@ -1797,21 +1797,21 @@ class SqlBuilder @PublishedApi internal constructor() {
             }
         }
 
-        QueryType.UPDATE -> buildString {
+        QueryType.Update -> buildString {
             append("UPDATE $updateTable SET ${setExpressions.joinToString(", ")}")
             if (whereParts.isNotEmpty()) append(" WHERE ${whereParts.joinToString(" ")}")
         }
 
-        QueryType.DELETE -> buildString {
+        QueryType.Delete -> buildString {
             append("DELETE FROM $deleteTable")
             if (whereParts.isNotEmpty()) append(" WHERE ${whereParts.joinToString(" ")}")
         }
 
-        QueryType.CREATE_TRIGGER -> buildTrigger()
-        QueryType.CREATE_FUNCTION -> buildFunction()
-        QueryType.CREATE_PROCEDURE -> buildProcedure()
+        QueryType.CreateTrigger -> buildTrigger()
+        QueryType.CreateFunction -> buildFunction()
+        QueryType.CreateProcedure -> buildProcedure()
 
-        QueryType.SET_SCHEMA -> setSchemaValue ?: error("SET SCHEMA not configured")
+        QueryType.SetSchema -> setSchemaValue ?: error("SET SCHEMA not configured")
 
         else -> ddlParts.joinToString(String.EMPTY)
     }

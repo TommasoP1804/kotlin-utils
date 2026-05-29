@@ -506,6 +506,66 @@ val Number.signum
     get() = sign(toDouble())
 
 /**
+ * Converts the current Long value into its corresponding word representation.
+ *
+ * This property provides a human-readable string representation of the Long value
+ * in words. It is achieved by utilizing the `toWords` function, which handles
+ * the logic for converting numbers to their equivalent textual format, including
+ * support for large numbers and negative values.
+ *
+ * For example, `123L.words` would return "one hundred twenty-three" as a representation.
+ * @since 4.0.0
+ */
+val Long.words get() = NumberWords.toWords(this)
+/**
+ * Extension property that converts an integer to its word representation.
+ * For example, the integer value `123` would be converted to the string "one hundred twenty-three".
+ *
+ * This property leverages the `toWords` function from the `NumberWords` utility,
+ * which processes the number and outputs its textual equivalent.
+ * @since 4.0.0
+ */
+val Int.words get() = NumberWords.toWords(toLong())
+/**
+ * Extension property that converts a [Short] value to its equivalent word representation.
+ *
+ * The conversion uses the `toWords` function to transform the numeric value of the [Short]
+ * into a human-readable word format. The word representation will include the number
+ * broken down by scales (e.g., thousands, millions) and will handle negative values
+ * appropriately.
+ *
+ * This property is useful for generating textual representations of numbers that may
+ * be displayed in user interfaces, reports, or other scenarios where human-readable
+ * content is required.
+ * @since 4.0.0
+ */
+val Short.words get() = NumberWords.toWords(toLong())
+/**
+ * Extension property that converts the value of a Byte into its equivalent English words representation.
+ * This is particularly useful for representing numeric values in human-readable text format.
+ *
+ * The property utilizes the `NumberWords.toWords` function, which handles the logic of
+ * converting numeric values to words, supporting numbers of various sizes and handling edge
+ * cases like zero or negative values.
+ * @since 4.0.0
+ */
+val Byte.words get() = NumberWords.toWords(toLong())
+
+/**
+ * Parses the content of the CharSequence as a numeric value represented in words and returns the result as a [Result].
+ *
+ * The method attempts to convert textual numeric representations (e.g., "one hundred twenty-three") into a numerical value.
+ * It utilizes the `NumberWords.parse` function for the underlying parsing logic.
+ * If the parsing succeeds, a [Result] containing the parsed [Long] value is returned.
+ * If parsing fails (e.g., due to invalid input), the resulting object contains the exception encountered.
+ *
+ * @receiver The input [CharSequence] containing the number words to parse.
+ * @return A [Result] holding either the parsed numeric value as a [Long], or an exception if parsing fails.
+ * @since 4.0.0
+ */
+fun CharSequence.parseNumberWords() = runCatching { NumberWords.parse(toString()) }
+
+/**
  * Checks if the current [CharSequence] represents a valid numeric value.
  *
  * A numeric value can include:
@@ -1508,4 +1568,120 @@ fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: Str
 fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is negative", cause) else causeOf.initCause(NumberSignException(callableName, parameter, message ?: "is negative", cause))
     return this
+}
+
+private object NumberWords {
+
+    private val UNITS = listOf(
+        "zero", "one", "two", "three", "four", "five", "six", "seven",
+        "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+        "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
+    )
+
+    private val TENS = listOf(
+        "", "", "twenty", "thirty", "forty", "fifty",
+        "sixty", "seventy", "eighty", "ninety"
+    )
+
+    // index = power of 1000
+    private val SCALES = listOf(
+        "", "thousand", "million", "billion", "trillion",
+        "quadrillion", "quintillion"
+    )
+
+    // ---------- NUMBER -> WORDS ----------
+
+    fun toWords(value: Long): String {
+        if (value == 0L) return UNITS[0]
+        val negative = value < 0
+        var n = abs(value)
+
+        val groups = ArrayDeque<Int>()
+        while (n > 0) {
+            groups.addFirst((n % 1000).toInt())
+            n /= 1000
+        }
+        groups.size.validate(lazyMessage = { "Number too large" }) { groups.size <= SCALES.size }
+
+        val parts = mutableListOf<String>()
+        val scaleBase = groups.size - 1
+        groups.forEachIndexed { i, group ->
+            if (group == 0) return@forEachIndexed
+            val scale = SCALES[scaleBase - i]
+            val chunk = threeDigitsToWords(group)
+            parts += if (scale.isEmpty()) chunk else "$chunk $scale"
+        }
+
+        val result = parts.joinToString(" ")
+        return if (negative) "negative $result" else result
+    }
+
+    private fun threeDigitsToWords(n: Int): String {
+        require(n in 0..999)
+        val parts = mutableListOf<String>()
+        val hundreds = n / 100
+        val rest = n % 100
+        if (hundreds > 0) parts += "${UNITS[hundreds]} hundred"
+        if (rest > 0) parts += twoDigitsToWords(rest)
+        return parts.joinToString(" ")
+    }
+
+    private fun twoDigitsToWords(n: Int): String = when {
+        n < 20 -> UNITS[n]
+        n % 10 == 0 -> TENS[n / 10]
+        else -> "${TENS[n / 10]}-${UNITS[n % 10]}"
+    }
+
+    // ---------- WORDS -> NUMBER ----------
+
+    private val WORD_VALUES: Map<String, Long> = buildMap {
+        UNITS.forEachIndexed { i, w -> put(w, i.toLong()) }
+        TENS.forEachIndexed { i, w -> if (w.isNotEmpty()) put(w, (i * 10).toLong()) }
+    }
+
+    private val SCALE_VALUES: Map<String, Long> = buildMap {
+        put("hundred", 100L)
+        SCALES.forEachIndexed { i, w -> if (w.isNotEmpty()) put(w, pow1000(i)) }
+    }
+
+    private fun pow1000(exp: Int): Long {
+        var r = 1L
+        kotlin.repeat(exp) { r *= 1000L }
+        return r
+    }
+
+    fun parse(text: String): Long {
+        val tokens = text.lowercase()
+            .replace("-", " ")
+            .replace(",", " ")
+            .split(Regex("\\s+"))
+            .filter { it.isNotBlank() && it != "and" }
+
+        if (tokens.isEmpty()) throw ValidationFailedException("Empty input")
+
+        var negative = false
+        var idx = 0
+        if (tokens[0] == "negative" || tokens[0] == "minus") {
+            negative = true; idx = 1
+        }
+
+        var total = 0L      // accumulated full result
+        var current = 0L    // current group being built (< 1000 before scale applied)
+
+        for (i in idx until tokens.size) {
+            val token = tokens[i]
+            when {
+                WORD_VALUES.containsKey(token) -> current += WORD_VALUES[token]!!
+                token == "hundred" -> current *= 100
+                SCALE_VALUES.containsKey(token) -> {
+                    val scale = SCALE_VALUES[token]!!
+                    total += current * scale
+                    current = 0
+                }
+                else -> throw IllegalArgumentException("Unknown token: '$token'")
+            }
+        }
+        val result = total + current
+        return if (negative) -result else result
+    }
 }

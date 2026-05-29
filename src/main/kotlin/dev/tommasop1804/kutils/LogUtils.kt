@@ -31,14 +31,14 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      * This logging level is used to indicate serious issues that need immediate attention.
      * It corresponds to the integer value 40 and the string representation "ERROR".
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     Error(40, "ERROR"),
     /**
      * Represents the WARN log level, commonly used to indicate potentially harmful situations
      * that may require attention but are not immediately critical.
      * 
-     * @since 1.0.0
+     * @since 4.0.0
      */
     Warn(30, "WARN"),
     /**
@@ -46,14 +46,14 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * This log level is used to indicate informational messages that highlight the progress of the application at a coarse-grained level.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     Info(20, "INFO"),
     /**
      * Represents the DEBUG log level, typically used for detailed diagnostic messages 
      * that are useful during software development and debugging.
      * 
-     * @since 1.0.0
+     * @since 4.0.0
      */
     Debug(10, "DEBUG"),
     /**
@@ -62,7 +62,7 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      * TRACE is used to log fine-grained informational events that are primarily
      * useful for debugging and provide detailed insight into the application's behavior.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     Trace(0, "TRACE");
 

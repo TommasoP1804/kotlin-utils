@@ -1082,7 +1082,7 @@ data class Contact(
                 "261" -> listOf(Country.Madagascar)
                 "262" -> listOf(Country.Reunion)
                 "262 (269)", "262(269)", "262 (639)", "262(639)" -> listOf(Country.Mayotte)
-                "263" -> listOf(Country.ZIMBABWE)
+                "263" -> listOf(Country.Zimbabwe)
                 "264" -> listOf(Country.Namibia)
                 "265" -> listOf(Country.Malawi)
                 "266" -> listOf(Country.Lesotho)

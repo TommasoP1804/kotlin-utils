@@ -4,8 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.memoization
 
-import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.classes.time.Duration
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.time.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -126,11 +126,11 @@ sealed interface Cache<in K, V> {
  * @param K The type of keys the cache holds.
  * @param V The type of values the cache holds.
  * @property maxSize The maximum number of elements the cache is allowed to store.
- * @since 1.0.0
+ * @since 4.0.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
+class LruCache<K, V>(val maxSize: Int) : Cache<K, V> {
     /**
      * A private, customized `LinkedHashMap` implementation used to store a bounded cache of key-value pairs.
      * Maintains the order of access, enabling the least-recently-used (LRU) eviction policy.
@@ -138,9 +138,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      *
      * This implementation is part of the `LRUCache` class and ensures thread-safety with its containing class's mechanisms.
      *
-     * @property maxSize The maximum number of entries this cache can hold.
-     *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     private val cache = object : LinkedHashMap<K, V>(maxSize, 0.75f, true) {
         /**
@@ -153,7 +151,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
          * @param eldest the eldest entry currently present in the cache, or null if the
          *               cache is empty.
          * @return a boolean indicating whether the eldest entry should be removed.
-         * @since 1.0.0
+         * @since 4.0.0
          */
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<K, V>?) = size > maxSize
     }
@@ -163,7 +161,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * of the LRUCache. It prevents concurrent threads from interacting with the
      * cache in an unsafe manner, ensuring consistency and integrity of cached data.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     private val lock = ReentrantLock()
 
@@ -173,7 +171,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * is synchronized using a locking mechanism.
      *
      * @return The number of entries currently stored in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override val size
         get() = lock.withLock { cache.size }
@@ -183,7 +181,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      *
      * @param key The key to check for existence in the cache.
      * @return `true` if the key exists in the cache, `false` otherwise.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun contains(key: K): Boolean = lock.withLock { cache.containsKey(key) }
 
@@ -193,7 +191,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * @param keyAndValue the key-value pair to check for existence in the cache
      * @return true if the key exists in the cache and its associated value matches the specified value,
      *         false otherwise
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun contains(keyAndValue: Pair<K, V>): Boolean = lock.withLock {
         cache[keyAndValue.first] == keyAndValue.second
@@ -204,7 +202,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      *
      * @param key the key whose associated value is to be returned.
      * @return the value associated with the specified key, or `null` if the key is not present in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun get(key: K): V? = lock.withLock { cache[key] }
 
@@ -216,7 +214,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * @param defaultValue A lambda function providing a default value that will be stored in the cache
      * if the [key] is not already present.
      * @return The value associated with the given [key], or the value returned by invoking [defaultValue] if the [key] is not present in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun getOrPut(key: K, defaultValue: () -> V): V = lock.withLock {
         cache.getOrPut(key, defaultValue)
@@ -228,7 +226,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      *
      * @param key the key to add or update in the cache
      * @param value the value associated with the key
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun put(key: K, value: V) = lock.withLock {
         cache.put(key, value)
@@ -239,7 +237,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * the least recently used entry will be removed.
      *
      * @param keyAndValue A pair consisting of the key and value to be added to the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun plusAssign(keyAndValue: Pair<K, V>) = lock.withLock {
         cache.put(keyAndValue.first, keyAndValue.second)
@@ -252,7 +250,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      *
      * @param key The key of the entry to be inserted into the cache.
      * @param value The value to associate with the specified key.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun set(key: K, value: V) = lock.withLock {
         cache[key] = value
@@ -263,7 +261,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      *
      * @param key The key of the entry to be removed.
      * @return The value associated with the removed key, or null if the key was not found in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun remove(key: K): V? = lock.withLock { cache.remove(key) }
 
@@ -272,7 +270,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * This operation is performed thread-safely using the internal lock mechanism.
      *
      * @param key The key of the entry to be removed from the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun minusAssign(key: K) = lock.withLock {
         cache.remove(key)
@@ -286,7 +284,7 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
      * The operation is thread-safe and ensures that no concurrent modifications
      * will interfere with the clear process.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun clear() = lock.withLock { cache.clear() }
 }
@@ -298,12 +296,12 @@ class LRUCache<K, V>(val maxSize: Int) : Cache<K, V> {
  *
  * @param K Type for the keys used in the cache.
  * @param V Type for the values stored in the cache.
- * @param defaultTTL The default time-to-live duration for cache entries.
- * @since 1.0.0
+ * @param defaultTtl The default time-to-live duration for cache entries.
+ * @since 4.0.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "JavaCollectionWithNullableTypeArgument")
-class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) : Cache<K, V> {
+class TtlCache<K, V>(private val defaultTtl: Duration = Duration(minutes = 5)) : Cache<K, V> {
     /**
      * Represents an entry stored in the cache, containing a value and its expiration timestamp.
      *
@@ -313,7 +311,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      *
      * This is a data structure used internally by the `TTLCache` to manage cached items alongside their time-to-live (TTL) metadata.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     private data class CacheEntry<V>(
         val value: V,
@@ -327,7 +325,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * Keys are associated with `CacheEntry` objects, which encapsulate the cached value and its expiration timestamp.
      * The map allows efficient storage and retrieval of entries, ensuring proper synchronization across threads.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     private val cache = ConcurrentHashMap<K, CacheEntry<V>>()
 
@@ -338,7 +336,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * It dynamically reflects the current number of key-value pairs stored
      * and is updated automatically as entries are added or removed.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override val size = cache.size
 
@@ -351,7 +349,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * @param key The key whose associated value is to be retrieved.
      * @return The value associated with the specified key, or null if the key is not present
      *         or the entry has expired.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun get(key: K): V? {
         val entry = cache[key] ?: return null
@@ -370,10 +368,10 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * @param key The key associated with the value to insert or update in the cache.
      * @param value The value to associate with the specified key in the cache.
      * @return The value that was inserted or updated in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun put(key: K, value: V): V? {
-        val expiresAt = Instant().plus(defaultTTL)!!
+        val expiresAt = Instant().plus(defaultTtl)!!
         cache[key] = CacheEntry(value, expiresAt.toEpochMilli())
         return value
     }
@@ -385,7 +383,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * @param key The key associated with the value being put into the cache.
      * @param value The value to store in the cache.
      * @param ttl The time-to-live duration after which the entry will expire.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     fun put(key: K, value: V, ttl: Duration) {
         val expiresAt = Instant().plus(ttl)!!
@@ -401,12 +399,12 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * @param key The key whose associated value is to be retrieved or computed and added to the cache.
      * @param defaultValue A lambda function to compute the value to be associated with the [key] if it is not already present in the cache.
      * @return The value associated with the [key], either retrieved from the cache or computed and added to the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun getOrPut(key: K, defaultValue: () -> V): V {
         get(key)?.let { return it }
         val value = defaultValue()
-        put(key, value, defaultTTL)
+        put(key, value, defaultTtl)
         return value
     }
 
@@ -419,7 +417,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * @param ttl the duration for which the computed value should remain in the cache.
      * @param defaultValue the lambda function used to compute the value if it is not present in the cache.
      * @return the existing or newly computed value associated with the key.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     fun getOrPut(key: K, ttl: Duration, defaultValue: () -> V): V {
         get(key)?.let { return it }
@@ -433,7 +431,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      *
      * @param key The key whose presence in this cache is to be tested.
      * @return `true` if the cache contains the specified key, `false` otherwise.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun contains(key: K) = cache.containsKey(key)
 
@@ -441,7 +439,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * Checks if the cache contains the specified key-value pair.
      *
      * @param keyAndValue a pair consisting of a key and its associated value to check for in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun contains(keyAndValue: Pair<K, V>) = cache[keyAndValue.first] == keyAndValue.second
 
@@ -450,7 +448,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      *
      * @param key the key with which the specified value is to be associated, must not be null.
      * @param value the value to associate with the specified key, must not be null.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun set(key: K, value: V) {
         put(key, value)
@@ -460,7 +458,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * Adds the given key-value pair to the cache. Overwrites the existing value if the key already exists.
      *
      * @param keyAndValue A pair containing the key and the value to be added to the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun plusAssign(keyAndValue: Pair<K, V>) {
         put(keyAndValue.first, keyAndValue.second)
@@ -472,7 +470,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * This operator function allows you to use the `-=` syntax to remove an entry from the cache by its key.
      *
      * @param key the key to be removed from the cache
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override operator fun minusAssign(key: K) {
         remove(key)
@@ -483,7 +481,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      *
      * @param key the key whose associated entry is to be removed.
      * @return the value associated with the removed key, or null if the key was not present in the cache.
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun remove(key: K): V? = cache.remove(key)?.value
 
@@ -492,7 +490,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      *
      * This method removes all key-value pairs stored in the cache, effectively resetting it to an empty state.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     override fun clear() = cache.clear()
 
@@ -505,7 +503,7 @@ class TTLCache<K, V>(private val defaultTTL: Duration = Duration(minutes = 5)) :
      * It is typically used to clean up outdated entries to free memory
      * and maintain efficient cache operations.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
     fun cleanup() {
         val now = System.currentTimeMillis()

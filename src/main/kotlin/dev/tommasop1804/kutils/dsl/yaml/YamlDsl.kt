@@ -4,7 +4,6 @@
 
 @file:Suppress("unused", "UnusedReceiverParameter")
 @file:Since("3.7.0")
-@file:OptIn(Beta::class)
 
 package dev.tommasop1804.kutils.dsl.yaml
 

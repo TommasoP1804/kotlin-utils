@@ -18,7 +18,7 @@ import dev.tommasop1804.kutils.*
  * @property secure Indicates whether the HTTP method is considered secure for idempotent or safe operations.
  * @property idempotent Indicates whether the HTTP method guarantees the same result if called multiple times.
  * @property cacheable Specifies whether responses to the HTTP method are cacheable for subsequent requests.
- * @property canBeInHTMLModules Indicates whether the HTTP method can be used within HTML module contexts.
+ * @property canBeInHtmlModules Indicates whether the HTTP method can be used within HTML module contexts.
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
@@ -30,7 +30,7 @@ enum class HttpMethod(
     val secure: Boolean = false,
     val idempotent: Boolean = false,
     val cacheable: Boolean = false,
-    val canBeInHTMLModules: Boolean = false
+    val canBeInHtmlModules: Boolean = false
 ) {
     /**
      * Represents the HTTP CONNECT method.
@@ -64,7 +64,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Get("GET", canHasResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHTMLModules = true),
+    Get("GET", canHasResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHtmlModules = true),
     /**
      * Represents the HTTP HEAD method.
      *
@@ -215,7 +215,7 @@ enum class HttpMethod(
      * @return A Boolean value representing if the method can be included in HTML modules.
      * @since 3.1.0
      */
-    operator fun component6() = canBeInHTMLModules
+    operator fun component6() = canBeInHtmlModules
 
     /**
      * Returns a string representation of the `HttpMethod` instance.
