@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.Ean13.Companion.isValidEan13
 import dev.tommasop1804.kutils.classes.code.Ean13P2.Companion.isValidEan13P2
 import dev.tommasop1804.kutils.classes.code.Ean13P5.Companion.isValidEan13P5
@@ -21,12 +22,9 @@ import dev.tommasop1804.kutils.classes.code.ProductCode.Ean.Companion.toEan
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.toUpc
 import dev.tommasop1804.kutils.classes.code.UpcA.Companion.isValidUpcA
 import dev.tommasop1804.kutils.classes.code.UpcE.Companion.isValidUpcE
-import dev.tommasop1804.kutils.classes.geography.Country
+import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
-import dev.tommasop1804.kutils.exceptions.NoMatchingFormatException
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.isEven
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -139,7 +137,7 @@ interface ProductCode {
                 3(value).toInt() == 623 -> setOf(Brunei)
                 3(value).toInt() == 624 -> setOf(Libya)
                 3(value).toInt() == 625 -> setOf(Jordan)
-                3(value).toInt() == 626 -> setOf(IRAN)
+                3(value).toInt() == 626 -> setOf(Iran)
                 3(value).toInt() == 627 -> setOf(Kuwait)
                 3(value).toInt() == 628 -> setOf(SaudiArabia)
                 3(value).toInt() == 629 -> setOf(UnitedArabEmirates)

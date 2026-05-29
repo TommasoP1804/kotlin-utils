@@ -49,7 +49,7 @@ enum class TimeZoneDesignator(
      */
     override val offset: ZoneOffset
 ): ZoneIdent, TemporalAccessor, TemporalAdjuster {
-    	/**
+	/**
 	 * Coordinated Universal Time. Zulu Time Zone. UTC+0.
          * @since 1.0.0
 	 */
@@ -193,7 +193,7 @@ enum class TimeZoneDesignator(
 	 * Papa Dagger Time Zone. Newfoundland Standard Time. UTC-3:30.
      * @since 1.0.0
 	 */
-	P_DAGGER("P†", "Papa Dagger", ZoneOffset.ofHoursMinutes(-3, -30)),
+	PDagger("P†", "Papa Dagger", ZoneOffset.ofHoursMinutes(-3, -30)),
 	/**
 	 * Quebec Time Zone. Atlantic Standard Time. UTC-4.
      * @since 1.0.0
@@ -228,7 +228,7 @@ enum class TimeZoneDesignator(
 	 * Victor Dagger Time Zone. Marquesas Time. UTC-9:30.
      * @since 1.0.0
 	 */
-	V_DAGGER("V†", "Victor Dagger", ZoneOffset.ofHoursMinutes(-9, -30)),
+	VDagger("V†", "Victor Dagger", ZoneOffset.ofHoursMinutes(-9, -30)),
 	/**
 	 * Whiskey Time Zone. Hawaii-Aleutian Standard Time. UTC-10.
      * @since 1.0.0

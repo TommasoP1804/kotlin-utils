@@ -35,7 +35,7 @@ import kotlin.text.startsWith
  * as well as custom serialization and deserialization logic.
  *
  * @constructor Creates a [Hex] instance after validating the input string.
- * Throws [dev.tommasop1804.kutils.MalformedInputException] if the input string contains invalid hexadecimal characters.
+ * Throws [dev.tommasop1804.kutils.exceptions.MalformedInputException] if the input string contains invalid hexadecimal characters.
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */

@@ -455,51 +455,51 @@ object Ansi {
          * clearing any previously applied styles such as bold, italic,
          * underline, or color.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        RESET(0),
+        Reset(0),
 
         /**
          * Represents the ANSI effect code for bold text formatting.
          * This effect makes the text appear bold in terminal environments
          * where ANSI escape sequences are supported.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        BOLD(1),
+        Bold(1),
 
         /**
          * Represents the ANSI effect for rendering text in a dim or faint style.
          * The DIM effect makes the text appear less prominent compared to regular text.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        DIM(2),
+        Dim(2),
 
         /**
          * Represents the ANSI text effect for italicized text in terminal formatting.
          * When applied, the text appears in an italic style, depending on terminal support.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        ITALIC(3),
+        Italic(3),
 
         /**
          * Represents the ANSI text effect for underlining text in terminal environments.
          * The ANSI code associated with this effect is 4.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        UNDERLINE(4),
+        Underline(4),
 
         /**
          * Represents the ANSI text effect for blinking text.
          * This effect corresponds to the ANSI escape code that applies a slow
          * blinking effect to terminal text.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        BLINK(5),
+        Blink(5),
 
         /**
          * Represents the ANSI code for enabling rapid blinking of text in terminal environments.
@@ -507,9 +507,9 @@ object Ansi {
          * at a faster rate compared to standard blinking. Note that support for this effect may
          * vary across different terminal implementations.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        RAPID_BLINK(6),
+        RapidBlink(6),
 
         /**
          * Represents the ANSI text effect for reversing the foreground and background colors
@@ -519,51 +519,51 @@ object Ansi {
          *
          * Commonly used for creating visual emphasis or highlighting text in terminal applications.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        REVERSE(7),
+        Reverse(7),
 
         /**
          * Represents hidden text effect in ANSI terminal formatting.
          * This effect makes the text invisible but still occupies space in the terminal.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        HIDDEN(8),
+        Hidden(8),
 
         /**
          * Represents the ANSI effect code for rendering text as crossed out or strikethrough in terminal environments.
          * This effect is commonly used to indicate deleted or invalid text.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        CROSSED_OUT(9),
+        CrossedOut(9),
 
         /**
          * Represents the ANSI text effect code for selecting the primary font.
          * This effect is used in terminal text formatting to apply the primary font
          * style as specified in the terminal settings.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        PRIMARY_FONT(10),
+        PrimaryFont(10),
 
         /**
          * Represents the ANSI effect code for Fraktur text styling.
          * Fraktur is a text effect commonly used to render stylized, Gothic-like fonts in terminal environments.
          * This effect is part of ANSI text formatting options but may not be supported across all terminals.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        FRAKTUR(21),
+        Fraktur(21),
 
         /**
          * ANSI text effect representing "normal" or "intensity off" style.
          * This effect resets the text intensity to the default, removing the bold or dim effect.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        NORMAL(22),
+        Normal(22),
 
         /**
          * Represents the ANSI text effect for applying a framed style to text in terminal
@@ -573,26 +573,26 @@ object Ansi {
          *
          * This constant corresponds to the ANSI effect code 51.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        FRAMED(51),
+        Framed(51),
 
         /**
          * Represents the ANSI effect code for encircled text.
          * This constant is used to apply an encircled text effect in terminal environments
          * that support ANSI escape sequences.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        ENCIRCLED(52),
+        Encircled(52),
 
         /**
          * Represents the ANSI effect code for rendering text with an overlined appearance.
          * This effect adds a horizontal line above the text.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
-        OVERLINED(53);
+        Overlined(53);
     }
 
     /**
@@ -641,7 +641,7 @@ object Ansi {
          * text color to black in terminal output. It can be utilized to create ANSI
          * escape sequences for styling text color when supported by the terminal.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Black(30),
 
@@ -658,7 +658,7 @@ object Ansi {
          *  * ANSI Code: 31
          *
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Red(31),
 
@@ -676,7 +676,7 @@ object Ansi {
          *
          * @see TextColor
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Green(32),
 
@@ -695,7 +695,7 @@ object Ansi {
          *
          * @see TextColor
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Yellow(33),
 
@@ -711,7 +711,7 @@ object Ansi {
          * Blue is commonly used to emphasize informational or neutral
          * content in text output.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Blue(34),
 
@@ -731,7 +731,7 @@ object Ansi {
          *
          * @see TextColor
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Magenta(35),
 
@@ -746,7 +746,7 @@ object Ansi {
          *
          * @see ANSICodes
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Cyan(36),
 
@@ -761,7 +761,7 @@ object Ansi {
          *
          * @see TextColor
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         White(37),
 
@@ -777,7 +777,7 @@ object Ansi {
          * Can be used in combination with other ANSI codes to reset styled terminal output
          * to the terminal's predefined color scheme.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Default(39),
 
@@ -791,7 +791,7 @@ object Ansi {
          *
          * @see ANSICodes
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightBlack(90),
 
@@ -802,7 +802,7 @@ object Ansi {
          * This constant is used to format text with a bright red foreground color
          * in terminal environments supporting ANSI codes.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightRed(91),
 
@@ -817,7 +817,7 @@ object Ansi {
          *
          * Typically used to enhance text visibility or signify importance in terminal outputs.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightGreen(92),
 
@@ -832,7 +832,7 @@ object Ansi {
          * This constant is a part of the `TextBrightColor` enumeration, which supports the
          * integration of bright text colors into ANSI escape sequences for enhanced text styling.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightYellow(93),
 
@@ -845,7 +845,7 @@ object Ansi {
          * environments. This constant can be used to render text
          * in bright blue when constructing ANSI escape sequences.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightBlue(94),
 
@@ -857,7 +857,7 @@ object Ansi {
          *
          * Used for formatting text output in terminal environments.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightMagenta(95),
 
@@ -869,7 +869,7 @@ object Ansi {
          * for formatting text in terminal environments. It corresponds to the
          * numeric ANSI code `96`, which applies a bright cyan color to text.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightCyan(96),
 
@@ -880,7 +880,7 @@ object Ansi {
          * This constant corresponds to the ANSI numeric code `97`, which is
          * used to format text with a bright white foreground in terminal environments.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightWhite(97),
 
@@ -896,7 +896,7 @@ object Ansi {
          * or to reset to the terminal's default text color after applying other
          * color codes.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightDefault(99);
     }
@@ -948,7 +948,7 @@ object Ansi {
          * Part of the [BackgroundColor] enumeration, which provides a collection
          * of ANSI background color codes.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Black(40),
 
@@ -969,7 +969,7 @@ object Ansi {
          *
          * @see ANSICodes
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Red(41),
 
@@ -981,7 +981,7 @@ object Ansi {
          * When used in composing ANSI escape sequences, this color sets the
          * background of text to green in compatible terminal environments.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Green(42),
 
@@ -1005,7 +1005,7 @@ object Ansi {
          *
          * @see ANSICodes
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Yellow(43),
 
@@ -1021,7 +1021,7 @@ object Ansi {
          *
          * @see BackgroundColor
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Blue(44),
 
@@ -1042,7 +1042,7 @@ object Ansi {
          *
          * @see ANSICodes
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Magenta(45),
 
@@ -1054,7 +1054,7 @@ object Ansi {
          * Typically used to style terminal outputs by defining a cyan background,
          * enhancing readability or visual emphasis.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Cyan(46),
 
@@ -1070,7 +1070,7 @@ object Ansi {
          * Typically utilized in combination with other ANSI codes to produce
          * styled terminal output.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         White(47),
 
@@ -1088,7 +1088,7 @@ object Ansi {
          * required during terminal output customization, ensuring a clean
          * appearance or restoring default behavior.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         Default(49),
 
@@ -1097,7 +1097,7 @@ object Ansi {
          * It may be used in color-related operations or representations that
          * require extended color palettes.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightBlack(100),
 
@@ -1106,7 +1106,7 @@ object Ansi {
          *
          * This constant can be used in contexts where a strong or vibrant red tone is required.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightRed(101),
 
@@ -1114,7 +1114,7 @@ object Ansi {
          * Represents a bright green color with its corresponding intensity value.
          * This constant is likely used for color representation and rendering purposes.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightGreen(102),
 
@@ -1122,7 +1122,7 @@ object Ansi {
          * Constant representing the bright yellow color with the associated code 103.
          * It may be used in various contexts requiring a representation of bright yellow.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightYellow(103),
 
@@ -1130,7 +1130,7 @@ object Ansi {
          * Represents a bright blue color with a value of 104. Typically used for text styling
          * or enumeration purposes referencing color codes.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightBlue(104),
 
@@ -1138,7 +1138,7 @@ object Ansi {
          * Constant representing the color bright magenta with an associated code value of 105.
          * This value may be used for text or background color settings where bright magenta is required.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightMagenta(105),
 
@@ -1148,7 +1148,7 @@ object Ansi {
          * This predefined constant can be used for representing the bright cyan color
          * in contexts where numeric color codes are utilized.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightCyan(106),
 
@@ -1156,7 +1156,7 @@ object Ansi {
          * Represents the bright white color with its corresponding code.
          * This constant is typically used for color management or terminal coloring.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightWhite(107),
 
@@ -1166,7 +1166,7 @@ object Ansi {
          * This represents the standard brightness configuration
          * that is used when no specific brightness level is provided.
          *
-         * @since 3.2.0
+         * @since 4.0.0
          */
         BrightDefault(109);
     }

@@ -9,7 +9,8 @@ package dev.tommasop1804.kutils.dsl.markdown
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
-import dev.tommasop1804.kutils.classes.coding.Code
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.coding.Markdown.Companion.toMarkdown
 import org.intellij.lang.annotations.Language
 
 @DslMarker
@@ -90,7 +91,7 @@ data class MdParagraph(val segments: List<MdInline>) : MdElement {
  * @since 3.3.0
  * @author Tommaso Pastorelli
  */
-data class MdCodeBlock(val language: String, val code: String) : MdElement {
+data class MdCodeBlock(val language: dev.tommasop1804.kutils.classes.coding.Language? = null, val code: Code) : MdElement {
     /**
      * Renders the content of a Markdown code block by formatting it according to the specified language.
      *
@@ -100,7 +101,7 @@ data class MdCodeBlock(val language: String, val code: String) : MdElement {
      * @return A properly formatted Markdown code block as a string.
      * @since 3.3.0
      */
-    override fun render() = "```$language\n${code.trimEnd()}\n```"
+    override fun render() = "```${language?.displayName}\n${code.trimEnd()}\n```"
 }
 
 /**
@@ -244,11 +245,11 @@ data class MdTable(val headers: List<String>, val rows: List<List<String>>, val 
         val headerLine = headers.mapIndexed { i, h -> h.padEnd(colWidths[i]) }
             .joinToString(" | ", "| ", " |")
         val separatorLine = colWidths.mapIndexed { i, w ->
-            val align = alignments.getOrElse(i) { Align.LEFT }
+            val align = alignments.getOrElse(i) { Align.Left }
             when (align) {
-                Align.LEFT -> "-".repeat(w)
-                Align.CENTER -> ":${"-".repeat((w - 2).coerceAtLeast(1))}:"
-                Align.RIGHT -> "${"-".repeat((w - 1).coerceAtLeast(1))}:"
+                Align.Left -> "-".repeat(w)
+                Align.Center -> ":${"-".repeat((w - 2).coerceAtLeast(1))}:"
+                Align.Right -> "${"-".repeat((w - 1).coerceAtLeast(1))}:"
             }
         }.joinToString(" | ", "| ", " |")
         val dataLines = rows.map { row ->
@@ -274,9 +275,9 @@ enum class Align {
      * Represents left alignment for elements such as table columns.
      * Used in conjunction with other alignment types (CENTER, RIGHT)
      * to define text alignment within Markdown tables or similar structures.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    LEFT,
+    Left,
     /**
      * Represents center alignment within a table column.
      *
@@ -285,9 +286,9 @@ enum class Align {
      * is equally spaced from both the left and right edges of the column.
      *
      * Typically used in conjunction with the `Align` enum and associated table rendering functionality.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    CENTER,
+    Center,
     /**
      * Represents right alignment for elements in a Markdown table.
      *
@@ -297,9 +298,9 @@ enum class Align {
      *
      * Used in conjunction with rendering logic, it determines the visual
      * alignment in Markdown table generation.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    RIGHT
+    Right
 }
 
 /**
@@ -1061,7 +1062,7 @@ class MarkdownBuilder {
      * @param block a supplier that provides the content of the code block as a string.
      * @since 3.3.0
      */
-    fun code(language: String = String.EMPTY, block: Supplier<String>) {
+    fun code(language: dev.tommasop1804.kutils.classes.coding.Language? = null, block: Supplier<Code>) {
         elements += MdCodeBlock(language, block())
     }
 
@@ -1072,7 +1073,7 @@ class MarkdownBuilder {
      * @param code The code to be included within the code block.
      * @since 3.3.0
      */
-    fun code(language: String = String.EMPTY, code: String) {
+    fun code(language: dev.tommasop1804.kutils.classes.coding.Language? = null, code: Code) {
         elements += MdCodeBlock(language, code)
     }
 
@@ -1227,6 +1228,17 @@ class MarkdownBuilder {
     fun render(): String = elements.joinToString("\n\n") { it.render() }
 
     /**
+     * Converts the rendered content into its Markdown representation.
+     *
+     * This method processes the output from the `render` function and transforms it
+     * into a Markdown-formatted string using the appropriate conversion logic.
+     *
+     * @return The Markdown representation of the rendered content as a string.
+     * @since 4.0.0
+     */
+    fun toMarkdown() = render().toMarkdown()()
+
+    /**
      * Converts the rendered Markdown content into a `Code` instance in markdown format.
      *
      * @return An instance of `Code` representing the current Markdown content rendered as a markdown code block.
@@ -1251,7 +1263,7 @@ class MarkdownBuilder {
  * @since 3.3.0
  */
 fun buildMarkdown(block: ReceiverConsumer<MarkdownBuilder>) =
-    MarkdownBuilder().apply(block).toCode()
+    MarkdownBuilder().apply(block).toMarkdown()
 
 /**
  * Initializes a MarkdownBuilder instance and applies the given block to it.

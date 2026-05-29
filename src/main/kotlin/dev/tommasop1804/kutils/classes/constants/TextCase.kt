@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
  */
 @Suppress("unused")
 enum class TextCase(
-        /**
+    /**
      * The validator that checks if a [CharSequence] is in this case.
      * @since 1.0.0
      */
