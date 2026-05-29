@@ -79,7 +79,7 @@ import org.intellij.lang.annotations.Language as IJLanguage
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Xml.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration", "kutils_getorthrow_as_invoke", "RedundantSuppression")
 @Beta(since = "3.9.0")
-open class Xml private constructor(@param:IJLanguage("XML") override val value: String) : CharSequence, Code(value, Language.XML) {
+open class Xml private constructor(@param:IJLanguage("XML") override val value: String) : CharSequence, Code(value, Language.Xml) {
 
     /**
      * Represents the length of the underlying string value.
@@ -154,7 +154,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     constructor(code: Code) : this(code.value) {
-        code.language.expect(Language.XML)
+        code.language.expect(Language.Xml)
     }
 
     /**

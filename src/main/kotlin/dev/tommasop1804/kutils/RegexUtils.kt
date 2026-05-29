@@ -14,13 +14,13 @@ import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Creates a [Regex] instance from the provided [Code] object.
- * Ensures that the language of the code is [Language.REGEX].
+ * Ensures that the language of the code is [Language.Regex].
  *
  * @param code The [Code] object containing the regex value and its associated language.
- * @throws ValidationFailedException if the language of the provided code is not [Language.REGEX].
+ * @throws ValidationFailedException if the language of the provided code is not [Language.Regex].
  * @since 1.0.0
  */
-infix fun Regex.Companion.fromCode(code: Code) = if (code.language != Language.REGEX) throw ValidationFailedException("code must be a regex code") else Regex(code.value)
+infix fun Regex.Companion.fromCode(code: Code) = if (code.language != Language.Regex) throw ValidationFailedException("code must be a regex code") else Regex(code.value)
 
 /**
  * Checks whether the given string matches the regular expression.
@@ -42,7 +42,7 @@ operator fun Regex.invoke(s: CharSequence) = this matches s
  *         and the `Language.REGEX`.
  * @since 1.0.0
  */
-fun Regex.toCode() = Code(pattern, Language.REGEX)
+fun Regex.toCode() = Code(pattern, Language.Regex)
 
 /**
  * Checks if the given character sequence contains a match for this regular expression.

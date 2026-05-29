@@ -20,18 +20,18 @@ enum class SortDirection(val operators: Set<String>, val symbol: Char) {
      * This value is typically used to indicate that items should be sorted
      * in increasing order, from the smallest or earliest value to the largest or latest value.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    ASCENDING(setOf("as", "asc", "ascending"), symbol = '↑'),
+    Ascending(setOf("as", "asc", "ascending"), symbol = '↑'),
     /**
      * Represents the descending sorting order.
      *
      * This enum value is used for operations that require data to be sorted
      * in a descending manner, i.e., from largest to smallest or most recent to oldest.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    DESCENDING(setOf("de", "des", "desc", "descending"), symbol = '↓');
+    Descending(setOf("de", "des", "desc", "descending"), symbol = '↓');
 
     companion object {
         /**

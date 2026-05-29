@@ -58,7 +58,7 @@ import org.tomlj.Toml as TomlJ
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Toml.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
 @Beta(since = "3.11.0")
-class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence, Code(value, Language.TOML) {
+class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence, Code(value, Language.Toml) {
     /**
      * Constructs a new instance of the TOML class using a given [TomlNode].
      *
@@ -78,7 +78,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @since 3.11.0
      */
     constructor(code: Code) : this(code.value) {
-        code.language.expect(Language.TOML)
+        code.language.expect(Language.Toml)
     }
 
     /**

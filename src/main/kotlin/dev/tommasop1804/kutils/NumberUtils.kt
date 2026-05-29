@@ -883,61 +883,6 @@ infix fun BigDecimal.scientificNotation(decimals: Int = 3): String =
     DecimalFormat("0.${"#" * decimals}E0", DecimalFormatSymbols(Locale.US)).format(this)
 
 /**
- * Represents the priority levels used for alternative characters
- * in applications where content styling based on character variations is supported.
- *
- * This enum provides distinct priority levels for rendering or selecting
- * alternative characters in different scenarios. These priorities can
- * be applied depending on the context or the desired effect.
- *
- * @since 1.0.0
- */
-enum class AltCharsPriority {
-    /**
-     * Represents the standard priority level in the `AltCharsPriority` enum.
-     *
-     * It serves as the default configuration for cases requiring no alternative character prioritization.
-     * Use this when no special prioritization for ligatures or alternative characters is necessary.
-     *
-     * @since 1.0.0
-     */
-    STANDARD,
-    /**
-     * Specifies the default priority level for alternative ligature character handling.
-     * This priority categorization determines how ligature substitutions are applied
-     * relative to other alternative character handling mechanisms.
-     *
-     * @since 1.0.0
-     */
-    ALT_LIGA_PRIORITY_DEFAULT,
-    /**
-     * Represents the default priority setting for alternative characters.
-     * This is used when no specific priority is otherwise defined.
-     *
-     * Belongs to the `AltCharsPriority` enumeration.
-     *
-     * @since 1.0.0
-     */
-    ALT_PRIORITY_DEFAULT,
-    /**
-     * Represents an alternative ligature priority in the AltCharsPriority enum class.
-     * This value is used to handle cases where a specific priority is assigned to alternative ligatures.
-     *
-     * @since 1.0.0
-     */
-    ALT_LIGA,
-    /**
-     * Represents the `ALT` enum constant, which is a specific priority level defined in the `AltCharsPriority` enum.
-     *
-     * This constant can be utilized to indicate and manage alternate character handling logic when working with priority-based systems.
-     * It is specifically designed for contexts where this alternative ligature or priority handling is necessary.
-     *
-     * @since 1.0.0
-     */
-    ALT
-}
-
-/**
  * Converts the current String to a BigInt object.
  * Assumes the string represents a valid numeric value.
  *

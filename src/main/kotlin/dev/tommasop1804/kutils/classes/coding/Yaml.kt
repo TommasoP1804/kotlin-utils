@@ -63,7 +63,7 @@ import org.yaml.snakeyaml.Yaml as SnakeYaml
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Yaml.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
 @Beta(since = "6.11.0")
-class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence, Code(value, Language.YAML) {
+class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence, Code(value, Language.Yaml) {
 
     /**
      * Indicates whether the current YAML instance can be represented as an object-like structure (e.g., a map or dictionary).
@@ -112,7 +112,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @since 3.0.0
      */
     constructor(code: Code) : this(code.value) {
-        code.language.expect(Language.YAML)
+        code.language.expect(Language.Yaml)
     }
 
     /**

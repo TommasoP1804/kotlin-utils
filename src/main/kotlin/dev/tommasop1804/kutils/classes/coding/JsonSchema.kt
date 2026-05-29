@@ -890,50 +890,50 @@ class JsonSchema(val json: Json) : Json(json) {
          * Represents a string type for the enumeration.
          *
          * This type is used to define a specific category with the value "string".
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        STRING("string"),
+        String("string"),
         /**
          * Represents the "number" type in the enumeration.
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        NUMBER("number"),
+        Number("number"),
         /**
          * Represents the 'integer' type in the Type enumeration.
          * This type is used to indicate values that are whole numbers.
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        INTEGER("integer"),
+        Integer("integer"),
         /**
          * Represents a type corresponding to a boolean value.
          *
          * This type is commonly used to signify a true/false or yes/no state.
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        BOOLEAN("boolean"),
+        Boolean("boolean"),
         /**
          * Represents the `null` type in the enumeration.
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        NULL("null"),
+        Null("null"),
         /**
          * Represents the JSON array type in the Type enumeration.
          * This type is used to define or validate structures containing ordered collections of elements.
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        ARRAY("array"),
+        Array("array"),
         /**
          * Represents a type with the value "object".
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        OBJECT("object"),
+        Object("object"),
         /**
          * Represents a type that can accept any value.
          *
          * This type is used to signify flexibility or absence of constraints regarding the value type.
-         * @since 3.8.1
+         * @since 4.0.0
          */
-        ANY("any");
+        Any("any");
 
         companion object {
             /**
@@ -961,44 +961,44 @@ class JsonSchema(val json: Json) : Json(json) {
          * Represents the "date-time" format as defined by the format enumeration.
          * Commonly used for specifying date and time values in string form adhering to ISO 8601 standards.
          *
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        DATE_TIME("date-time"),
+        DateTime("date-time"),
         /**
          * Represents a format type for date values.
          * Typically used to specify a standard date format in string representations.
          *
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        DATE("date"),
+        Date("date"),
         /**
          * Represents the `time` format type typically used to validate or represent time values
          * in a standardized string format such as `HH:mm:ss`.
          *
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        TIME("time"),
+        Time("time"),
         /**
          * Represents an email type used for categorization or identification purposes.
          *
          * @constructor Creates an instance of EMAIL with a specified type identifier.
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        EMAIL("email"),
+        Email("email"),
         /**
          * Represents a Universally Unique Identifier (UUID).
          *
          * @constructor Creates a new instance of the UUID class with the specified identifier.
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        UUID("uuid"),
+        Uuid("uuid"),
         /**
          * Represents a format type for a URI.
          *
          * Used to define and identify strings that conform to a Uniform Resource Identifier (URI) structure.
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        URI("uri"),
+        Uri("uri"),
         /**
          * Represents the IPv4 address format.
          *
@@ -1006,16 +1006,16 @@ class JsonSchema(val json: Json) : Json(json) {
          * which consists of four decimal numbers separated by dots. Each number
          * (octet) is in the range of 0 to 255.
          *
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        IPV4("ipv4"),
+        Ipv4("ipv4"),
         /**
          * Represents the IPv6 format in the context of the `Format` enumeration.
          * Commonly used to validate or identify IPv6 address syntax.
          *
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        IPV6("ipv6"),
+        Ipv6("ipv6"),
         /**
          * Represents the hostname format.
          * This format defines a valid hostname as per the RFC 1034 and RFC 1123 specifications.
@@ -1028,9 +1028,9 @@ class JsonSchema(val json: Json) : Json(json) {
          * This format is used to reference specific keys or elements within a JSON document
          * using a string syntax.
          *
-         * @since 3.13.2
+         * @since 4.0.0
          */
-        JSON_POINTER("json-pointer");
+        JsonPointer("json-pointer");
 
         companion object {
             /**

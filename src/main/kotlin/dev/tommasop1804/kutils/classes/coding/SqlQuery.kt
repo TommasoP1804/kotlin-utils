@@ -52,7 +52,7 @@ import kotlin.text.endsWith
 @JsonDeserialize(using = SqlQuery.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = SqlQuery.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = SqlQuery.Companion.OldDeserializer::class)
-class SqlQuery(@param:Language("sql") override val value: String): CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.SQL) {
+class SqlQuery(@param:Language("sql") override val value: String): CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.Sql) {
     /**
      * Validates that the query does not contain obvious SQL injection patterns.
      *
@@ -77,14 +77,14 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     val type = run {
         val trimmed = value.trim()
         when {
-            trimmed startsWithIgnoreCase "SELECT" -> Type.SELECT
-            trimmed startsWithIgnoreCase "INSERT" -> Type.INSERT
-            trimmed startsWithIgnoreCase "UPDATE" -> Type.UPDATE
-            trimmed startsWithIgnoreCase "DELETE" -> Type.DELETE
-            trimmed startsWithIgnoreCase "CREATE" -> Type.CREATE
-            trimmed startsWithIgnoreCase "DROP" -> Type.DROP
-            trimmed startsWithIgnoreCase "ALTER" -> Type.ALTER
-            trimmed startsWithIgnoreCase "TRUNCATE" -> Type.TRUNCATE
+            trimmed startsWithIgnoreCase "SELECT" -> Type.Select
+            trimmed startsWithIgnoreCase "INSERT" -> Type.Insert
+            trimmed startsWithIgnoreCase "UPDATE" -> Type.Update
+            trimmed startsWithIgnoreCase "DELETE" -> Type.Delete
+            trimmed startsWithIgnoreCase "CREATE" -> Type.Create
+            trimmed startsWithIgnoreCase "DROP" -> Type.Drop
+            trimmed startsWithIgnoreCase "ALTER" -> Type.Alter
+            trimmed startsWithIgnoreCase "TRUNCATE" -> Type.Truncate
             else -> null
         }
     }
@@ -413,7 +413,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          * @since 1.0.0
          */
         fun Code.toSqlQuery() = runCatching {
-            if (language == dev.tommasop1804.kutils.classes.coding.Language.SQL) SqlQuery(value)
+            if (language == dev.tommasop1804.kutils.classes.coding.Language.Sql) SqlQuery(value)
             else throw ExpectationMismatchException("Language must be SQL")
         }
 
@@ -495,7 +495,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @return A `Code` object encapsulating the language and query value of this SqlQuery instance.
      * @since 1.0.0
      */
-    fun toCode() = Code(language = dev.tommasop1804.kutils.classes.coding.Language.SQL, value = value)
+    fun toCode() = Code(language = dev.tommasop1804.kutils.classes.coding.Language.Sql, value = value)
 
     /**
      * Executes a count query on the implemented code instance within the given context of an EntityManager.
@@ -594,8 +594,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
         includeCause: Boolean = true,
         overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
         notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-        noResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.RETURN_NULL,
-        tooManyResultsBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.THROW_EXCEPTION
+        noResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ReturnNull,
+        tooManyResultsBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ThrowException
     ): T? {
         return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
             val nativeQuery = entityManager.createNativeQuery(
@@ -607,17 +607,17 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 nativeQuery.singleResult as? T
             } catch (e: NoResultException) {
                 when(noResultBehaviour) {
-                    InvalidResultBehaviour.THROW_EXCEPTION -> throw NoResultsException(e.message)
-                    InvalidResultBehaviour.THROW_DEFAULT_EXCEPTION -> throw defaultException(e)
-                    InvalidResultBehaviour.THROW_ORIGINAL_EXCEPTION -> throw e
-                    InvalidResultBehaviour.RETURN_NULL -> null
+                    InvalidResultBehaviour.ThrowException -> throw NoResultsException(e.message)
+                    InvalidResultBehaviour.ThrowDefaultException -> throw defaultException(e)
+                    InvalidResultBehaviour.ThrowOriginalException -> throw e
+                    InvalidResultBehaviour.ReturnNull -> null
                 }
             } catch (e: NonUniqueResultException) {
                 when(tooManyResultsBehaviour) {
-                    InvalidResultBehaviour.THROW_EXCEPTION -> throw TooManyResultsException(e.message)
-                    InvalidResultBehaviour.THROW_DEFAULT_EXCEPTION -> throw defaultException(e)
-                    InvalidResultBehaviour.THROW_ORIGINAL_EXCEPTION -> throw e
-                    InvalidResultBehaviour.RETURN_NULL -> null
+                    InvalidResultBehaviour.ThrowException -> throw TooManyResultsException(e.message)
+                    InvalidResultBehaviour.ThrowDefaultException -> throw defaultException(e)
+                    InvalidResultBehaviour.ThrowOriginalException -> throw e
+                    InvalidResultBehaviour.ReturnNull -> null
                 }
             }
         }
@@ -646,8 +646,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
         includeCause: Boolean = true,
         overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
         notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-        noResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.RETURN_NULL,
-        tooManyResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.THROW_EXCEPTION
+        noResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ReturnNull,
+        tooManyResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ThrowException
     ): T? {
         return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
             val nativeQuery = entityManager.createNativeQuery(
@@ -659,17 +659,17 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 nativeQuery.singleResult as? T
             } catch (e: NoResultException) {
                 when(noResultBehaviour) {
-                    InvalidResultBehaviour.THROW_EXCEPTION -> throw NoResultsException(e.message)
-                    InvalidResultBehaviour.THROW_DEFAULT_EXCEPTION -> throw defaultException(e)
-                    InvalidResultBehaviour.THROW_ORIGINAL_EXCEPTION -> throw e
-                    InvalidResultBehaviour.RETURN_NULL -> null
+                    InvalidResultBehaviour.ThrowException -> throw NoResultsException(e.message)
+                    InvalidResultBehaviour.ThrowDefaultException -> throw defaultException(e)
+                    InvalidResultBehaviour.ThrowOriginalException -> throw e
+                    InvalidResultBehaviour.ReturnNull -> null
                 }
             } catch (e: NonUniqueResultException) {
                 when(tooManyResultBehaviour) {
-                    InvalidResultBehaviour.THROW_EXCEPTION -> throw TooManyResultsException(e.message)
-                    InvalidResultBehaviour.THROW_DEFAULT_EXCEPTION -> throw defaultException(e)
-                    InvalidResultBehaviour.THROW_ORIGINAL_EXCEPTION -> throw e
-                    InvalidResultBehaviour.RETURN_NULL -> null
+                    InvalidResultBehaviour.ThrowException -> throw TooManyResultsException(e.message)
+                    InvalidResultBehaviour.ThrowDefaultException -> throw defaultException(e)
+                    InvalidResultBehaviour.ThrowOriginalException -> throw e
+                    InvalidResultBehaviour.ReturnNull -> null
                 }
             }
         }
@@ -1029,40 +1029,40 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          *
          * SELECT is used to retrieve data from a database table.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        SELECT,
+        Select,
         /**
          * Represents an SQL INSERT operation.
          *
          * Used to define the insertion of new records into a database table.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        INSERT,
+        Insert,
         /**
          * Represents the UPDATE operation type, commonly associated with modifying existing data in a database table.
          *
          * This operation is used to change one or more records in a table based on a specified condition.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        UPDATE,
+        Update,
         /**
          * Represents the DELETE operation typically used for removing records 
          * from a database table.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        DELETE,
+        Delete,
         /**
          * Represents the `CREATE` operation in the SQL command type enumeration.
          *
          * Typically used to define or create new database objects such as tables, views, or indexes.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        CREATE,
+        Create,
         /**
          * Represents an operation to remove a database object such as a table, index, or view.
          *
@@ -1071,9 +1071,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          *
          * Use with caution as this operation is irreversible.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        DROP,
+        Drop,
         /**
          * Represents the `ALTER` operation which is part of the SQL statement types.
          *
@@ -1083,9 +1083,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          * This is typically used in database management systems to change table structures,
          * add or drop columns, modify data types, or apply constraints.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        ALTER,
+        Alter,
         /**
          * Represents the TRUNCATE operation, typically used in the context of database operations
          * to quickly remove all rows from a table while preserving the structure and data definitions.
@@ -1094,9 +1094,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          * and does not physically delete each row. However, it requires specific privileges and 
          * is irreversible.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        TRUNCATE
+        Truncate
     }
 
     /**
@@ -1112,25 +1112,25 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          * Represents a behavior where an exception is thrown when no result is available or retrievable.
          * Typically used to signal an error or unexpected condition in processes where a return value is mandatory.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        THROW_EXCEPTION,
+        ThrowException,
         /**
          * Indicates that the operation will return null when no result can be obtained.
          *
          * Typically used in scenarios where an absence of a result is considered acceptable behavior
          * instead of throwing an exception.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        RETURN_NULL,
+        ReturnNull,
         /**
          * Represents a behavior where a default exception is thrown when no result is available.
          * This is typically used to dictate behavior in scenarios where an expected result is missing.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        THROW_DEFAULT_EXCEPTION,
+        ThrowDefaultException,
         /**
          * Represents a behavior when no result is available and the original exception
          * [jakarta.persistence.NoResultException] should be thrown in response to such a scenario.
@@ -1139,8 +1139,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          * meant to ensure that the system reacts by rethrowing the original exception
          * encountered during execution or processing in the context where no result is deliverable.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        THROW_ORIGINAL_EXCEPTION
+        ThrowOriginalException
     }
 }

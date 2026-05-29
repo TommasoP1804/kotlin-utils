@@ -753,19 +753,19 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * @return A string representation of the object formatted with the specified symbol style, position, and locale.
      * @since 1.0.0
      */
-    fun toString(symbolStyle: SymbolStyle = SymbolStyle.CODE, symbolBefore: Boolean = (symbolStyle == SymbolStyle.CODE), locale: Locale = Locale.getDefault()) = buildString {
+    fun toString(symbolStyle: SymbolStyle = SymbolStyle.Code, symbolBefore: Boolean = (symbolStyle == SymbolStyle.Code), locale: Locale = Locale.getDefault()) = buildString {
         append(if (symbolBefore) "" else amount.toPlainString())
         when (symbolStyle) {
-            SymbolStyle.CODE -> append(if (symbolBefore) "" else " ").append(currency.currencyCode)
-            SymbolStyle.NAME -> append(if (symbolBefore) "" else " ").append(currency.displayName)
-            SymbolStyle.NAME_WITH_LOCALE -> append(if (symbolBefore) "" else " ").append(currency.getDisplayName(locale))
-            SymbolStyle.NUMERIC_CODE -> append(if (symbolBefore) "" else " ").append(currency.numericCode)
-            SymbolStyle.SYMBOL -> append(if (symbolBefore) "" else " ").append(currency.symbol)
-            SymbolStyle.SIMPLIFIED_SIMBOL -> append(if (symbolBefore) "" else " ").append(
+            SymbolStyle.Code -> append(if (symbolBefore) "" else " ").append(currency.currencyCode)
+            SymbolStyle.Name -> append(if (symbolBefore) "" else " ").append(currency.displayName)
+            SymbolStyle.NameWithLocale -> append(if (symbolBefore) "" else " ").append(currency.getDisplayName(locale))
+            SymbolStyle.NumericCode -> append(if (symbolBefore) "" else " ").append(currency.numericCode)
+            SymbolStyle.Symbol -> append(if (symbolBefore) "" else " ").append(currency.symbol)
+            SymbolStyle.SimplifiedSymbol -> append(if (symbolBefore) "" else " ").append(
                 if (amount.compareTo(BigDecimal.ONE) == 0) Currency.of(currency.currencyCode)?.symbol?.first
                 else Currency.of(currency.currencyCode)?.symbol?.second
             )
-            SymbolStyle.SYMBOL_WITH_LOCALE -> append(if (symbolBefore) "" else " ").append(currency.getSymbol(locale))
+            SymbolStyle.SymbolWithLocale -> append(if (symbolBefore) "" else " ").append(currency.getSymbol(locale))
         }
         append(if (symbolBefore) (" " + amount.toPlainString()) else "")
     }
@@ -780,45 +780,45 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
         /**
          * Represents an enumeration constant that is used to define the code representation of a symbol style.
          * This format typically refers to an alphanumeric identifier for a specific symbol or entity.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        CODE,
+        Code,
         /**
          * Represents the symbolic style for a name.
          * It is a label format typically used to identify or describe an entity by its name within a specific context.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        NAME,
+        Name,
         /**
          * Represents the name of a symbol along with its associated locale.
          * This is used to provide localized names for various symbols
          * in the context of the SymbolStyle enum.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        NAME_WITH_LOCALE,
+        NameWithLocale,
         /**
          * Represents the numeric code format style within the SymbolStyle enum.
          * This style is intended for usage where numeric codes are required to identify specific symbols.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        NUMERIC_CODE,
+        NumericCode,
         /**
          * Represents the symbol style for a specific context or usage.
          * This can be utilized to format and display the symbol of an object, entity, or system component.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        SYMBOL,
+        Symbol,
         /**
          * Represents a simplified version of a symbol, typically used
          * for more readable or concise display purposes.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        SIMPLIFIED_SIMBOL,
+        SimplifiedSymbol,
         /**
          * Represents a symbol associated with a specific locale for formatting or displaying purposes.
          * Typically used in scenarios requiring localization of symbols within the application.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        SYMBOL_WITH_LOCALE
+        SymbolWithLocale
     }
 }

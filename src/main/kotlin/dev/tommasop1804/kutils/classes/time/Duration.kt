@@ -1769,7 +1769,7 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
     @Suppress("RedundantValueArgument")
     override fun toString() = toString(true)
 
-    fun toString(weeks: Boolean = true, format: Format = Format.ISO): String = if (format == Format.ISO) {
+    fun toString(weeks: Boolean = true, format: Format = Format.Iso): String = if (format == Format.Iso) {
         if (this == Duration()) "PT0S" else buildString {
             append('P')
             if (years != 0L) append(years).append('Y')
@@ -1796,8 +1796,8 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
     } else {
         fun Number.fmt(full: String, short: String, format: Format): String =
             when (format) {
-                Format.SHORT -> (if (isDecimal) this else toLong()).run { "$this$short" }
-                Format.FULL -> (if (isDecimal) this else toLong()).run { if (toLong() == 1L) "$this $full" else "$this ${full}s" }
+                Format.Short -> (if (isDecimal) this else toLong()).run { "$this$short" }
+                Format.Full -> (if (isDecimal) this else toLong()).run { if (toLong() == 1L) "$this $full" else "$this ${full}s" }
                 else -> String.EMPTY
             }
 
@@ -1972,31 +1972,31 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
      * @author Tommaso Pastorelli
      */
     enum class Format {
-    /**
-     * Represents the ISO format within the Format enumeration.
-     *
-     * This enum constant is used to indicate that the ISO-specific format
-     * should be applied. Typically, it adheres to the standards defined by
-     * the International Organization for Standardization related to data formatting.
-     *
-     * Commonly used in contexts where an internationally recognized format
-     * is required for consistency and compatibility purposes.
-     * @since 3.2.0
-     */
-    ISO,
-    /**
-     * Represents the FULL format type as part of the Format enumeration.
-     * Typically used to denote a detailed or comprehensive representation of data.
-     * @since 3.2.0
-     */
-    FULL,
-    /**
-     * Represents a formatting style with concise representation.
-     *
-     * This enum constant is used to define short format style, often for representing
-     * data in a compact manner.
-     * @since 3.2.0
-     */
-    SHORT
+        /**
+         * Represents the ISO format within the Format enumeration.
+         *
+         * This enum constant is used to indicate that the ISO-specific format
+         * should be applied. Typically, it adheres to the standards defined by
+         * the International Organization for Standardization related to data formatting.
+         *
+         * Commonly used in contexts where an internationally recognized format
+         * is required for consistency and compatibility purposes.
+         * @since 4.0.0
+         */
+        Iso,
+        /**
+         * Represents the FULL format type as part of the Format enumeration.
+         * Typically used to denote a detailed or comprehensive representation of data.
+         * @since 4.0.0
+         */
+        Full,
+        /**
+         * Represents a formatting style with concise representation.
+         *
+         * This enum constant is used to define short format style, often for representing
+         * data in a compact manner.
+         * @since 4.0.0
+         */
+        Short
     }
 }

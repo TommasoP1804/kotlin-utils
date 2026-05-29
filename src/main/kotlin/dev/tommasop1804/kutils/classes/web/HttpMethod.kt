@@ -24,6 +24,7 @@ import dev.tommasop1804.kutils.*
  */
 @Suppress("unused")
 enum class HttpMethod(
+    val value: String,
     val canHasRequestBody: Boolean = false,
     val canHasResponseBody: Boolean = false,
     val secure: Boolean = false,
@@ -38,7 +39,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    CONNECT,
+    Connect("CONNECT"),
     /**
      * Represents the HTTP DELETE method.
      *
@@ -48,13 +49,9 @@ enum class HttpMethod(
      * 
      * This method is idempotent, meaning multiple identical requests have the same effect as a single request.
      *
-     * @property canHasRequestBody Indicates whether the method allows a request body.
-     * @property canHasResponseBody Indicates whether the method may return a response body.
-     * @property idempotent Indicates whether the method is idempotent.
-     * 
      * @since 1.0.0
      */
-    DELETE(canHasRequestBody = true, canHasResponseBody = true, idempotent = true),
+    Delete("DELETE", canHasRequestBody = true, canHasResponseBody = true, idempotent = true),
     /**
      * Represents the HTTP GET method.
      *
@@ -67,7 +64,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    GET(canHasResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHTMLModules = true),
+    Get("GET", canHasResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHTMLModules = true),
     /**
      * Represents the HTTP HEAD method.
      *
@@ -82,7 +79,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    HEAD(secure = true, idempotent = true, cacheable = true),
+    Head("HEAD", secure = true, idempotent = true, cacheable = true),
     /**
      * Represents the HTTP OPTIONS method.
      *
@@ -90,14 +87,9 @@ enum class HttpMethod(
      * for the target resource. It allows clients to determine the capabilities
      * and requirements of the server.
      *
-     * @property canHasRequestBody Indicates if the OPTIONS method can include a request body.
-     * @property canHasResponseBody Indicates if the OPTIONS method can include a response body.
-     * @property secure Indicates if the OPTIONS method is considered secure.
-     * @property idempotent Indicates if the OPTIONS method is idempotent.
-     *
      * @since 1.0.0
      */
-    OPTIONS(canHasRequestBody = true, canHasResponseBody = true, secure = true, idempotent = true),
+    Options("OPTIONS", canHasRequestBody = true, canHasResponseBody = true, secure = true, idempotent = true),
     /**
      * Represents the HTTP PATCH method used to apply partial modifications to a resource.
      *
@@ -111,7 +103,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    PATCH(canHasRequestBody = true, canHasResponseBody = true, cacheable = true),
+    Patch("PATCH", canHasRequestBody = true, canHasResponseBody = true, cacheable = true),
     /**
      * Represents the HTTP POST method, which is primarily used to submit data to a server
      * for processing. Unlike the GET method, POST requests typically include a request body.
@@ -125,7 +117,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    POST(canHasRequestBody = true, canHasResponseBody = true, cacheable = true),
+    Post("POST", canHasRequestBody = true, canHasResponseBody = true, cacheable = true),
     /**
      * The HTTP PUT method.
      *
@@ -135,7 +127,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    PUT(canHasRequestBody = true, canHasResponseBody = true, idempotent = true),
+    Put("PUT", canHasRequestBody = true, canHasResponseBody = true, idempotent = true),
     /**
      * Represents the TRACE HTTP method.
      *
@@ -150,7 +142,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    TRACE(canHasResponseBody = true, secure = true, idempotent = true);
+    Trace("TRACE", canHasResponseBody = true, secure = true, idempotent = true);
 
     companion object {
         /**
@@ -161,7 +153,7 @@ enum class HttpMethod(
          * @return The first matching entry, or `null` if no match is found.
          * @since 3.12.0
          */
-        infix fun of(name: String) = entries.find { it.name equalsIgnoreCase name }
+        infix fun of(name: String) = entries.find { it.value equalsIgnoreCase name }
     }
 
     /**
@@ -224,4 +216,18 @@ enum class HttpMethod(
      * @since 3.1.0
      */
     operator fun component6() = canBeInHTMLModules
+
+    /**
+     * Returns a string representation of the `HttpMethod` instance.
+     *
+     * The returned value corresponds to the underlying `value` property of the `HttpMethod` class,
+     * which typically represents the name of the HTTP method (e.g., GET, POST, PUT, etc.).
+     *
+     * This method is overridden to provide a more meaningful string representation for logging
+     * or debugging purposes.
+     *
+     * @return The `value` property of the `HttpMethod` instance as a string.
+     * @since 4.0.0
+     */
+    override fun toString() = value
 }

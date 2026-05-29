@@ -370,27 +370,27 @@ data class UlimitConfig(val soft: Long, val hard: Long)
 enum class RestartPolicy(val yaml: String) {
     /**
      * Represents a restart policy where no automatic restarts are performed.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    NO("no"),
+    No("no"),
     /**
      * Indicates that the service will always restart regardless of the exit status.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    ALWAYS("always"),
+    Always("always"),
     /**
      * Represents a restart policy where the service is restarted only if it exits with a non-zero status.
      * Typically used to ensure resiliency for tasks that may fail due to transient issues.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    ON_FAILURE("on-failure"),
+    OnFailure("on-failure"),
     /**
      * Represents a restart policy where the service will not restart
      * if it has been explicitly stopped. This policy is used to prevent
      * automatic restarts unless the container was stopped unintentionally.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    UNLESS_STOPPED("unless-stopped"),
+    UnlessStopped("unless-stopped"),
 }
 
 /**
@@ -408,9 +408,9 @@ enum class DependsOnCondition(val yaml: String) {
      *
      * Used in scenarios where the execution of a dependent service or resource
      * requires another service to reach the "started" state before proceeding.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    SERVICE_STARTED("service_started"),
+    ServiceStarted("service_started"),
     /**
      * Represents a condition where a dependent service is considered healthy.
      *
@@ -419,16 +419,16 @@ enum class DependsOnCondition(val yaml: String) {
      * within the system. It is a part of the `DependsOnCondition` enumeration
      * which defines various states that a dependent service can exhibit.
      *
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    SERVICE_HEALTHY("service_healthy"),
+    ServiceHealthy("service_healthy"),
     /**
      * Represents the condition where a service has completed successfully.
      * This is used as a dependency condition in scenarios where successful
      * completion of a service is required.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    SERVICE_COMPLETED_SUCCESSFULLY("service_completed_successfully"),
+    ServiceCompletedSuccessfully("service_completed_successfully"),
 }
 
 // --- BUILDERS ---
@@ -1302,7 +1302,7 @@ class ServiceBuilder(val name: String) {
      * @since 3.3.0
      */
     fun dependsOn(vararg services: String) {
-        services.forEach { dependsOn[it] = DependsOnCondition.SERVICE_STARTED }
+        services.forEach { dependsOn[it] = DependsOnCondition.ServiceStarted }
     }
     /**
      * Specifies that the current service depends on another service with an optional condition.
@@ -2079,7 +2079,7 @@ private fun StringBuilder.renderService(name: String, svc: Service) {
     }
 
     if (svc.dependsOn.isNotEmpty()) {
-        val allStarted = svc.dependsOn.values.all { it == DependsOnCondition.SERVICE_STARTED }
+        val allStarted = svc.dependsOn.values.all { it == DependsOnCondition.ServiceStarted }
         if (allStarted) {
             appendLine("    depends_on:")
             svc.dependsOn.keys.forEach { appendLine("      - $it") }

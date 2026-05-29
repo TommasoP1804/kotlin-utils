@@ -1150,7 +1150,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         infix fun ofHEX(hex: Hex): Color {
-            var hex = hex.toString(Hex.HexSymbol.NONE)
+            var hex = hex.toString(Hex.HexSymbol.None)
 
             if (hex.length == 3) hex = hex[0].toString() + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
 
@@ -1788,8 +1788,8 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          *         name cannot be converted to a valid color.
          * @since 1.0.0
          */
-        fun ofPantoneName(pantoneName: String, textCase: TextCase = TextCase.STANDARD): Color? {
-            val hex = PantoneConverter.byName(pantoneName.convertCase(textCase, TextCase.KEBAB_CASE))
+        fun ofPantoneName(pantoneName: String, textCase: TextCase = TextCase.Standard): Color? {
+            val hex = PantoneConverter.byName(pantoneName.convertCase(textCase, TextCase.KebabCase))
             return if (hex.isNull()) null else ofHEX(hex)
         }
 
@@ -2267,8 +2267,8 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
      * @return The Pantone color name as a string in the specified text case, or `null` if no matching Pantone name is found.
      * @since 1.0.0
      */
-    fun toPantoneName(textCase: TextCase = TextCase.LOWER_CASE): String? = PantoneConverter.byHexGiveName(toString())?.convertCase(
-        TextCase.KEBAB_CASE, textCase)
+    fun toPantoneName(textCase: TextCase = TextCase.LowerCase): String? = PantoneConverter.byHexGiveName(toString())?.convertCase(
+        TextCase.KebabCase, textCase)
 
     /**
      * Converts various color models into a map representation.

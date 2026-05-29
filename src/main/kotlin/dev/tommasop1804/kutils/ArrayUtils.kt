@@ -819,8 +819,8 @@ operator fun <E> Array<E>.get(index: Int, lazyException: ThrowableSupplier = { N
  * @since 2.1.0
  */
 infix fun <E: Comparable<E>> Array<E>.sorted(direction: SortDirection) = when (direction) {
-    SortDirection.ASCENDING -> sorted()
-    SortDirection.DESCENDING -> sortedDescending()
+    SortDirection.Ascending -> sorted()
+    SortDirection.Descending -> sortedDescending()
 }
 
 /**
@@ -829,14 +829,14 @@ infix fun <E: Comparable<E>> Array<E>.sorted(direction: SortDirection) = when (d
  * The direction determines whether the sorting is in ascending or descending order, while the selector
  * function is used to extract the comparable value from each element for sorting.
  *
- * @param direction The direction to sort the array in, either [SortDirection.ASCENDING] or [SortDirection.DESCENDING].
+ * @param direction The direction to sort the array in, either [SortDirection.Ascending] or [SortDirection.Descending].
  * @param selector A lambda function that transforms each element of the array into a value of type [R?],
  * which is used to determine the sort order.
  * @since 2.1.0
  */
 inline fun <E, R : Comparable<R>> Array<E>.sortedBy(direction: SortDirection, crossinline selector: Transformer<E, R?>) = when (direction) {
-    SortDirection.ASCENDING -> sortedBy(selector)
-    SortDirection.DESCENDING -> sortedByDescending(selector)
+    SortDirection.Ascending -> sortedBy(selector)
+    SortDirection.Descending -> sortedByDescending(selector)
 }
 
 /**

@@ -118,9 +118,9 @@ enum class WhenPolicy(val yaml: String) {
      *
      * This policy is often used to ensure that subsequent actions or stages are executed
      * under successful conditions, such as when a prior pipeline step completes without errors.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    ON_SUCCESS("on_success"),
+    OnSuccess("on_success"),
     /**
      * Represents the policy to execute an action only when the associated job has failed.
      *
@@ -132,9 +132,9 @@ enum class WhenPolicy(val yaml: String) {
      *
      * For instance, `ON_FAILURE` is commonly utilized in scenarios where recovery mechanisms
      * or logging of failure-specific data need to be executed.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    ON_FAILURE("on_failure"),
+    OnFailure("on_failure"),
     /**
      * Represents a policy that ensures the associated behavior is executed unconditionally, regardless of other conditions or outcomes.
      *
@@ -142,9 +142,9 @@ enum class WhenPolicy(val yaml: String) {
      * should be executed in every scenario. This can be beneficial in contexts where finalization,
      * cleanup, or guaranteed execution steps are required.
      *
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    ALWAYS("always"),
+    Always("always"),
     /**
      * Represents the `MANUAL` policy in the `WhenPolicy` enum.
      *
@@ -153,9 +153,9 @@ enum class WhenPolicy(val yaml: String) {
      *
      * This policy can be applied in scenarios where user intervention is required
      * to explicitly trigger the execution of the associated job or rule.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    MANUAL("manual"),
+    Manual("manual"),
     /**
      * Represents a delayed execution policy.
      *
@@ -164,9 +164,9 @@ enum class WhenPolicy(val yaml: String) {
      * condition needs to be satisfied before a job is executed.
      *
      * Associated YAML value: "delayed".
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    DELAYED("delayed"),
+    Delayed("delayed"),
     /**
      * Represents a policy that indicates an action should never be executed.
      *
@@ -176,9 +176,9 @@ enum class WhenPolicy(val yaml: String) {
      *
      * Typically used in DSL builders for rules and workflows where conditions and
      * execution policies are specified, such as `RuleBuilder` and `WorkflowBuilder`.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    NEVER("never"),
+    Never("never"),
 }
 
 /**
@@ -442,9 +442,9 @@ enum class CachePolicy(val yaml: String) {
      * The `PULL` policy is particularly useful for ensuring that builds or processes
      * depend solely on the previously stored cache state without generating or updating
      * new cache entries.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    PULL("pull"),
+    Pull("pull"),
     /**
      * Represents a cache policy that allows caching artifacts to be pushed to a remote server.
      *
@@ -452,9 +452,9 @@ enum class CachePolicy(val yaml: String) {
      * for later use, typically on a remote location accessible by subsequent jobs or pipelines.
      *
      * The `PUSH` policy ensures that the cache is uploaded to the configured remote cache storage.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    PUSH("push"),
+    Push("push"),
     /**
      * Represents a caching policy where both pull and push mechanisms are used.
      *
@@ -462,9 +462,9 @@ enum class CachePolicy(val yaml: String) {
      * updates to the cache as changes occur. It combines the features of both
      * pull and push strategies to maintain synchronized and up-to-date data within the system.
      *
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    PULL_PUSH("pull-push"),
+    PullPush("pull-push"),
 }
 
 /**
@@ -521,36 +521,36 @@ enum class EnvironmentAction(val yaml: String) {
     /**
      * Represents the action to initiate or launch an environment process.
      *
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    START("start"),
+    Start("start"),
     /**
      * Represents the action to stop an environment or process.
      * Corresponds to the "stop" value in YAML representation.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    STOP("stop"),
+    Stop("stop"),
     /**
      * Represents the action to prepare the environment before execution or deployment.
      * Typically used in scenarios where pre-configuration or setup is required.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    PREPARE("prepare"),
+    Prepare("prepare"),
     /**
      * Represents the `verify` action in the context of environment-related operations.
      *
      * This action is used to confirm or validate the state or conditions of an environment.
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    VERIFY("verify"),
+    Verify("verify"),
     /**
      * Represents the action of accessing an environment.
      * This action corresponds to operations that provide entry
      * or retrieval capabilities within the environment.
      *
-     * @since 3.3.0
+     * @since 4.0.0
      */
-    ACCESS("access"),
+    Access("access"),
 }
 
 /**
@@ -833,7 +833,7 @@ class RuleBuilder {
      * manual intervention to proceed.
      * @since 3.3.0
      */
-    fun whenManual() { whenPolicy = WhenPolicy.MANUAL }
+    fun whenManual() { whenPolicy = WhenPolicy.Manual }
     /**
      * Specifies that the `whenPolicy` for the current rule is set to `WhenPolicy.ALWAYS`.
      *
@@ -845,7 +845,7 @@ class RuleBuilder {
      * tasks, cleanup processes, or other operations that must occur in any case.
      * @since 3.3.0
      */
-    fun whenAlways() { whenPolicy = WhenPolicy.ALWAYS }
+    fun whenAlways() { whenPolicy = WhenPolicy.Always }
     /**
      * Sets the execution policy of a rule to `NEVER`, indicating that the associated
      * action or job should never be executed.
@@ -855,7 +855,7 @@ class RuleBuilder {
      * from being triggered under any circumstances.
      * @since 3.3.0
      */
-    fun whenNever() { whenPolicy = WhenPolicy.NEVER }
+    fun whenNever() { whenPolicy = WhenPolicy.Never }
     /**
      * Sets the execution policy of a rule to `DELAYED`.
      *
@@ -866,7 +866,7 @@ class RuleBuilder {
      * Modifies the `whenPolicy` property to `WhenPolicy.DELAYED` to reflect the delayed execution state.
      * @since 3.3.0
      */
-    fun whenDelayed() { whenPolicy = WhenPolicy.DELAYED }
+    fun whenDelayed() { whenPolicy = WhenPolicy.Delayed }
     /**
      * Sets the execution policy to `ON_SUCCESS`.
      *
@@ -878,7 +878,7 @@ class RuleBuilder {
      * This method updates the internal `whenPolicy` property to reflect this behavior.
      * @since 3.3.0
      */
-    fun whenOnSuccess() { whenPolicy = WhenPolicy.ON_SUCCESS }
+    fun whenOnSuccess() { whenPolicy = WhenPolicy.OnSuccess }
 
     /**
      * Adds a list of paths to the `changes` property, which represents the file or directory
@@ -1192,7 +1192,7 @@ class ArtifactsBuilder {
      * the associated steps are executed unconditionally in all scenarios.
      * @since 3.3.0
      */
-    fun whenAlways() { whenPolicy = WhenPolicy.ALWAYS }
+    fun whenAlways() { whenPolicy = WhenPolicy.Always }
     /**
      * Sets the `whenPolicy` property to `WhenPolicy.ON_SUCCESS`.
      *
@@ -1202,7 +1202,7 @@ class ArtifactsBuilder {
      * such as when all prior tasks complete without errors.
      * @since 3.3.0
      */
-    fun whenOnSuccess() { whenPolicy = WhenPolicy.ON_SUCCESS }
+    fun whenOnSuccess() { whenPolicy = WhenPolicy.OnSuccess }
     /**
      * Specifies that the `whenPolicy` for the current artifacts configuration
      * should be set to `ON_FAILURE`.
@@ -1218,7 +1218,7 @@ class ArtifactsBuilder {
      * control the behavior of the artifacts according to this policy.
      * @since 3.3.0
      */
-    fun whenOnFailure() { whenPolicy = WhenPolicy.ON_FAILURE }
+    fun whenOnFailure() { whenPolicy = WhenPolicy.OnFailure }
 
     /**
      * Constructs and returns an instance of `ArtifactsConfig` using the provided configuration data.
@@ -1380,7 +1380,7 @@ class CacheBuilder {
      * the existing cache state, without modifying or creating new cache entries.
      * @since 3.3.0
      */
-    fun pullOnly() { policy = CachePolicy.PULL }
+    fun pullOnly() { policy = CachePolicy.Pull }
     /**
      * Configures the cache policy to `PUSH`, indicating that only artifact uploads
      * to the caching system are allowed, without retrieving any pre-existing cached
@@ -1394,7 +1394,7 @@ class CacheBuilder {
      * cached data is not accessed during the operation.
      * @since 3.3.0
      */
-    fun pushOnly() { policy = CachePolicy.PUSH }
+    fun pushOnly() { policy = CachePolicy.Push }
     /**
      * Adds the specified fallback keys to the cache configuration.
      *
@@ -2450,11 +2450,11 @@ class WorkflowBuilder {
      * prevents the associated action or job from being executed under any circumstances.
      * It is useful for disabling specific steps or stages in a pipeline.
      *
-     * The rule is based on the [WhenPolicy.NEVER] value, which signifies that the
+     * The rule is based on the [WhenPolicy.Never] value, which signifies that the
      * action or job should never be triggered.
      * @since 3.3.0
      */
-    fun never() = rule(whenPolicy = WhenPolicy.NEVER)
+    fun never() = rule(whenPolicy = WhenPolicy.Never)
 
     /**
      * Constructs and returns an instance of `WorkflowConfig` using the current state

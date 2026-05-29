@@ -48,7 +48,7 @@ import java.nio.file.Path
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Json.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Json.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration", "kutils_getorthrow_as_invoke", "RedundantSuppression")
-open class Json private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.JSON) {
+open class Json private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.Json) {
 
     /**
      * Represents the length of the underlying string value.
@@ -149,7 +149,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     constructor(code: Code) : this(code.value) {
-        code.language.expect(dev.tommasop1804.kutils.classes.coding.Language.JSON)
+        code.language.expect(dev.tommasop1804.kutils.classes.coding.Language.Json)
     }
 
     /**
@@ -1219,7 +1219,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @return A new instance of JSON with the keys of the object sorted as specified, or the original JSON if it is not an object.
      * @since 3.0.0
      */
-    fun sortedKeys(direction: SortDirection = SortDirection.ASCENDING): Json {
+    fun sortedKeys(direction: SortDirection = SortDirection.Ascending): Json {
         val node = MAPPER.readTree(value)
         val sortedNode = sortKeysRecursively(node, direction)
         return Json(MAPPER.writeValueAsString(sortedNode))
@@ -1231,7 +1231,7 @@ open class Json private constructor(@param:Language("json") override val value: 
                 val sortedNode = MAPPER.createObjectNode()
                 val fields = node.properties().toMutableList()
 
-                if (direction == SortDirection.ASCENDING) fields.sortBy { it.key }
+                if (direction == SortDirection.Ascending) fields.sortBy { it.key }
                 else fields.sortByDescending { it.key }
 
                 for (entry in fields) {

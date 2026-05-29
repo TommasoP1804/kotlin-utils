@@ -71,9 +71,9 @@ enum class TimeZoneDesignator(
 	C("C", "Charlie", ZoneOffset.ofHours(3)),
 	/**
 	 * Charlie Dagger Time Zone. Iran Time. UTC+3:30.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	C_DAGGER("C†", "Charlie Dagger", ZoneOffset.ofHoursMinutes(3, 30)),
+	CDagger("C†", "Charlie Dagger", ZoneOffset.ofHoursMinutes(3, 30)),
 	/**
 	 * Delta Time Zone. Armenia Time. UTC+4.
      * @since 1.0.0
@@ -81,9 +81,9 @@ enum class TimeZoneDesignator(
 	D("D", "Delta", ZoneOffset.ofHours(4)),
 	/**
 	 * Delta Dagger Time Zone. Afghanistan Time. UTC+4:30.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	D_DAGGER("D†", "Delta Dagger", ZoneOffset.ofHoursMinutes(4, 30)),
+	DDagger("D†", "Delta Dagger", ZoneOffset.ofHoursMinutes(4, 30)),
 	/**
 	 * Echo Time Zone. Pakistan Time. UTC+5.
      * @since 1.0.0
@@ -91,14 +91,14 @@ enum class TimeZoneDesignator(
 	E("E", "Echo", ZoneOffset.ofHours(5)),
 	/**
 	 * Echo Dagger Time Zone. India Standard Time. UTC+5:30.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	E_DAGGER("E†", "Echo Dagger", ZoneOffset.ofHoursMinutes(5, 30)),
+	EDagger("E†", "Echo Dagger", ZoneOffset.ofHoursMinutes(5, 30)),
 	/**
 	 * Echo Double Dagger Time Zone. Nepal Time. UTC+5:45.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	E_DOUBLE_DAGGER("E‡", "Echo Double Dagger", ZoneOffset.ofHoursMinutes(5, 45)),
+	EDoubleDagger("E‡", "Echo Double Dagger", ZoneOffset.ofHoursMinutes(5, 45)),
 	/**
 	 * Foxtrot Time Zone. Bangladesh Time. UTC+6.
      * @since 1.0.0
@@ -106,9 +106,9 @@ enum class TimeZoneDesignator(
 	F("F", "Foxtrot", ZoneOffset.ofHours(6)),
 	/**
 	 * Foxtrot Dagger Time Zone. Cocos Islands Time. UTC+6:30.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	F_DAGGER("F†", "Foxtrot Dagger", ZoneOffset.ofHoursMinutes(6, 30)),
+	FDagger("F†", "Foxtrot Dagger", ZoneOffset.ofHoursMinutes(6, 30)),
 	/**
 	 * Golf Time Zone. Indochina Time. UTC+7.
      * @since 1.0.0
@@ -121,9 +121,9 @@ enum class TimeZoneDesignator(
 	H("H", "Hotel", ZoneOffset.ofHours(8)),
 	/**
 	 * Hotel Double Dagger Time Zone. Eucla Time. UTC+8:45.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	H_DOUBLE_DAGGER("H‡", "Hotel Double Dagger", ZoneOffset.ofHoursMinutes(8, 45)),
+	HDoubleDagger("H‡", "Hotel Double Dagger", ZoneOffset.ofHoursMinutes(8, 45)),
 	/**
 	 * India Time Zone. Japan Standard Time. UTC+9.
      * @since 1.0.0
@@ -131,9 +131,9 @@ enum class TimeZoneDesignator(
 	I("I", "India", ZoneOffset.ofHours(9)),
 	/**
 	 * India Dagger Time Zone. Australian Central Standard Time. UTC+9:30.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	I_DAGGER("I†", "India Dagger", ZoneOffset.ofHoursMinutes(9, 30)),
+	IDagger("I†", "India Dagger", ZoneOffset.ofHoursMinutes(9, 30)),
 	/**
 	 * Kilo Time Zone. Australian Eastern Standard Time. UTC+10.
      * @since 1.0.0
@@ -141,9 +141,9 @@ enum class TimeZoneDesignator(
 	K("K", "Kilo", ZoneOffset.ofHours(10)),
 	/**
 	 * Kilo Dagger Time Zone. Lord Howe Island Time. UTC+10:30.
-     * @since 1.0.0
+     * @since 4.0.0
 	 */
-	K_DAGGER("K†", "Kilo Dagger", ZoneOffset.ofHoursMinutes(10, 30)),
+	KDagger("K†", "Kilo Dagger", ZoneOffset.ofHoursMinutes(10, 30)),
 	/**
 	 * Lima Time Zone. Lord Howe Island Time. UTC+11.
      * @since 1.0.0
@@ -158,22 +158,22 @@ enum class TimeZoneDesignator(
 	 * Mike Dagger Time Zone. Chatham Islands Time. UTC+12:45.
      * @since 1.0.0
 	 */
-	M_DOUBLE_DAGGER("M‡", "Mike Double Dagger", ZoneOffset.ofHoursMinutes(12, 45)),
+	MDoubleDagger("M‡", "Mike Double Dagger", ZoneOffset.ofHoursMinutes(12, 45)),
 	/**
 	 * Mike Dagger Time Zone. Tonga Time. UTC+13.
      * @since 1.0.0
 	 */
-	M_DAGGER_13("M†", "Mike Dagger", ZoneOffset.ofHours(13)),
+	MDagger13("M†", "Mike Dagger", ZoneOffset.ofHours(13)),
 	/**
 	 * Mike Double Dagger Time Zone. Line Islands Time. UTC+13:45.
      * @since 1.0.0
 	 */
-	M_DOUBLE_DAGGER_13("M‡", "Mike Double Dagger", ZoneOffset.ofHoursMinutes(13, 45)),
+	MDoubleDagger13("M‡", "Mike Double Dagger", ZoneOffset.ofHoursMinutes(13, 45)),
 	/**
 	 * Mike Double Dagger Time Zone. Line Islands Time. UTC+14.
      * @since 1.0.0
 	 */
-	M_DOUBLE_DAGGER_14("M‡", "Mike Double Dagger", ZoneOffset.ofHours(14)),
+	MDoubleDagger14("M‡", "Mike Double Dagger", ZoneOffset.ofHours(14)),
 	/**
 	 * November Time Zone. Azores Time. UTC-1.
      * @since 1.0.0

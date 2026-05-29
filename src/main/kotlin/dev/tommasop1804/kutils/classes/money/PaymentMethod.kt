@@ -402,37 +402,37 @@ sealed interface PaymentMethod {
         @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Issuer.Companion.OldSerializer::class)
         @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Issuer.Companion.OldDeserializer::class)
         enum class Issuer(val displayName: String, private val rule: CardRule) {
-            AMERICAN_EXPRESS("American Express", CardRule(Regex("^3[47][0-9]{13}$"), 15..15)),
-            VISA("Visa", CardRule(Regex("^4[0-9]{12}(?:[0-9]{3})?(?:[0-9]{3})?$"), 13..19)),
-            MASTERCARD("Mastercard", CardRule(Regex("^(5[1-5][0-9]{14}|2(2[2-9][0-9]{12}|[3-6][0-9]{13}|7[01][0-9]{12}|720[0-9]{12}))$"), 16..16)),
-            DISCOVER("Discover", CardRule(Regex("^(6011[0-9]{12}|64[4-9][0-9]{13}|65[0-9]{14}|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[01][0-9]|92[0-5])[0-9]{10})$"), 16..19)),
-            UNIONPAY("UnionPay", CardRule(Regex("^62[0-9]{14,17}$"), 16..19)),
-            CHINA_UNIONPAY("China UnionPay", CardRule(Regex("^31[0-9]{17}$"), 19..19)),
-            JCB("JCB", CardRule(Regex("^35(2[89]|[3-8][0-9])[0-9]{12,15}$"), 16..19)),
-            DINERS_CLUB("Diners Club", CardRule(Regex("^3(0[0-5]|[68][0-9])[0-9]{11,16}$"), 14..19)),
-            DINERS_CLUB_US_CA("Diners Club US/CA", CardRule(Regex("^55[0-9]{14}$"), 16..16)),
-            MAESTRO("Maestro", CardRule(Regex("^(5018|5020|5038|5893|6304|6759|676[1-3])[0-9]{8,15}$"), 12..19)),
-            MAESTRO_UK("Maestro UK", CardRule(Regex("^(6759|676770|676774)[0-9]{8,15}$"), 12..19)),
-            MIR("Mir", CardRule(Regex("^220[0-4][0-9]{12,15}$"), 16..19)),
-            TROY("Troy", CardRule(Regex("^(65[0-9]{14}|9792[0-9]{12})$"), 16..16)),
-            UATP("UATP", CardRule(Regex("^1[0-9]{14}$"), 15..15)),
-            RUPAY("RuPay", CardRule(Regex("^(60|65|81|82|508)[0-9]{13}$"), 16..16)),
-            RUPAY_JCB("RuPay-JCB", CardRule(Regex("^35([36])[0-9]{13}$"), 16..16)),
-            INTERPAYMENT("Interpayment", CardRule(Regex("^636[0-9]{13,16}$"), 16..19)),
-            INSTAPAYMENT("Instapayment", CardRule(Regex("^63[7-9][0-9]{13}$"), 16..16)),
-            DANKORT("Dankort", CardRule(Regex("^5019[0-9]{12}$"), 16..16)),
-            DANKORT_VISA("Dankort-Visa", CardRule(Regex("^4571[0-9]{12}$"), 16..16)),
-            BORICA("Borica", CardRule(Regex("^2205[0-9]{12}$"), 16..16)),
-            UZCARD("Uzcard", CardRule(Regex("^(8600|5614)[0-9]{12}$"), 16..16)),
-            HUMO("HUMO", CardRule(Regex("^9860[0-9]{12}$"), 16..16)),
-            VERVE("Verne", CardRule(Regex("^(5060(99|[0-8][0-9])|6500(0[2-9]|1[0-9]|2[0-7])|5078(6[5-9]|[7-9][0-9]))[0-9]{10}$"), 16..19)),
-            GPN("GPN", CardRule(Regex("^(1946|50|56|58|6[0-3])[0-9]{10,17}$"), 16..19)),
-            NAPAS("Napas", CardRule(Regex("^9704[0-9]{12,15}$"), 16..19)),
-            @Deprecated("No more used") BANKCARD("Bankcard", CardRule(Regex("^(5610|56022[1-5])[0-9]{12}$"), 16..16)),
-            @Deprecated("No more used") LASER("Laser", CardRule(Regex("^(6304|6706|6771|6709)[0-9]{12,15}$"), 16..19)),
-            @Deprecated("No more used") SOLO("Solo", CardRule(Regex("^(6334|6767)[0-9]{12,15}$"), 16..19)),
-            @Deprecated("No more used") SWITCH("Switch", CardRule(Regex("^(4903|4905|4911|4936|564182|633110|6333|6759)[0-9]{10,15}$"), 16..19)),
-            @Deprecated("No more used") VISA_ELECTRON("Visa Electron", CardRule(Regex("4(026|17500|844|913|917)[0-9]{10,12}"), 16..16));
+            AmericanExpress("American Express", CardRule(Regex("^3[47][0-9]{13}$"), 15..15)),
+            Visa("Visa", CardRule(Regex("^4[0-9]{12}(?:[0-9]{3})?(?:[0-9]{3})?$"), 13..19)),
+            Mastercard("Mastercard", CardRule(Regex("^(5[1-5][0-9]{14}|2(2[2-9][0-9]{12}|[3-6][0-9]{13}|7[01][0-9]{12}|720[0-9]{12}))$"), 16..16)),
+            Discover("Discover", CardRule(Regex("^(6011[0-9]{12}|64[4-9][0-9]{13}|65[0-9]{14}|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[01][0-9]|92[0-5])[0-9]{10})$"), 16..19)),
+            Unionpay("UnionPay", CardRule(Regex("^62[0-9]{14,17}$"), 16..19)),
+            ChinaUnionpay("China UnionPay", CardRule(Regex("^31[0-9]{17}$"), 19..19)),
+            Jcb("JCB", CardRule(Regex("^35(2[89]|[3-8][0-9])[0-9]{12,15}$"), 16..19)),
+            DinersClub("Diners Club", CardRule(Regex("^3(0[0-5]|[68][0-9])[0-9]{11,16}$"), 14..19)),
+            DinersClubUsCa("Diners Club US/CA", CardRule(Regex("^55[0-9]{14}$"), 16..16)),
+            Maestro("Maestro", CardRule(Regex("^(5018|5020|5038|5893|6304|6759|676[1-3])[0-9]{8,15}$"), 12..19)),
+            MaestroUk("Maestro UK", CardRule(Regex("^(6759|676770|676774)[0-9]{8,15}$"), 12..19)),
+            Mir("Mir", CardRule(Regex("^220[0-4][0-9]{12,15}$"), 16..19)),
+            Troy("Troy", CardRule(Regex("^(65[0-9]{14}|9792[0-9]{12})$"), 16..16)),
+            Uatp("UATP", CardRule(Regex("^1[0-9]{14}$"), 15..15)),
+            Rupay("RuPay", CardRule(Regex("^(60|65|81|82|508)[0-9]{13}$"), 16..16)),
+            RupayJcb("RuPay-JCB", CardRule(Regex("^35([36])[0-9]{13}$"), 16..16)),
+            Interpayment("Interpayment", CardRule(Regex("^636[0-9]{13,16}$"), 16..19)),
+            Instapayment("Instapayment", CardRule(Regex("^63[7-9][0-9]{13}$"), 16..16)),
+            Dankort("Dankort", CardRule(Regex("^5019[0-9]{12}$"), 16..16)),
+            DankortVisa("Dankort-Visa", CardRule(Regex("^4571[0-9]{12}$"), 16..16)),
+            Borica("Borica", CardRule(Regex("^2205[0-9]{12}$"), 16..16)),
+            Uzcard("Uzcard", CardRule(Regex("^(8600|5614)[0-9]{12}$"), 16..16)),
+            Humo("HUMO", CardRule(Regex("^9860[0-9]{12}$"), 16..16)),
+            Verve("Verne", CardRule(Regex("^(5060(99|[0-8][0-9])|6500(0[2-9]|1[0-9]|2[0-7])|5078(6[5-9]|[7-9][0-9]))[0-9]{10}$"), 16..19)),
+            Gpn("GPN", CardRule(Regex("^(1946|50|56|58|6[0-3])[0-9]{10,17}$"), 16..19)),
+            Napas("Napas", CardRule(Regex("^9704[0-9]{12,15}$"), 16..19)),
+            @Deprecated("No more used") Bankcard("Bankcard", CardRule(Regex("^(5610|56022[1-5])[0-9]{12}$"), 16..16)),
+            @Deprecated("No more used") Laser("Laser", CardRule(Regex("^(6304|6706|6771|6709)[0-9]{12,15}$"), 16..19)),
+            @Deprecated("No more used") Solo("Solo", CardRule(Regex("^(6334|6767)[0-9]{12,15}$"), 16..19)),
+            @Deprecated("No more used") Switch("Switch", CardRule(Regex("^(4903|4905|4911|4936|564182|633110|6333|6759)[0-9]{10,15}$"), 16..19)),
+            @Deprecated("No more used") VisaElectron("Visa Electron", CardRule(Regex("4(026|17500|844|913|917)[0-9]{10,12}"), 16..16));
 
             companion object {
                 /**
@@ -661,7 +661,7 @@ sealed interface PaymentMethod {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = DigitalWallet.Companion.OldSerializer::class)
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = DigitalWallet.Companion.OldDeserializer::class)
     data class DigitalWallet(
-        val provider: Provider = Provider.OTHER,
+        val provider: Provider = Provider.Other,
         val email: Contact.Email? = null
     ) : PaymentMethod {
         /**
@@ -782,15 +782,15 @@ sealed interface PaymentMethod {
         @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Provider.Companion.OldSerializer::class)
         @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Provider.Companion.OldDeserializer::class)
         enum class Provider(val displayName: String) {
-            PAYPAL("PayPal"),
-            GOOGLE_PAY("Google Pay"),
-            APPLE_PAY("Apple Pay"),
-            SAMSUNG_PAY("Samsung Pay"),
-            SATISPAY("Satispay"),
-            AMAZON_PAY("Amazon Pay"),
-            CURVE_PAY("Curve Pay"),
-            STRIPE("Stripe"),
-            OTHER("Other");
+            Paypal("PayPal"),
+            GooglePay("Google Pay"),
+            ApplePay("Apple Pay"),
+            SamsungPay("Samsung Pay"),
+            Satispay("Satispay"),
+            AmazonPay("Amazon Pay"),
+            CurvePay("Curve Pay"),
+            Stripe("Stripe"),
+            Other("Other");
 
             companion object {
                 /**
@@ -801,7 +801,7 @@ sealed interface PaymentMethod {
                  * @return the matching entry if found; otherwise, returns `OTHER`
                  * @since 3.1.0
                  */
-                infix fun ofName(name: String) = entries.find { it.displayName equalsIgnoreCase name } ?: OTHER
+                infix fun ofName(name: String) = entries.find { it.displayName equalsIgnoreCase name } ?: Other
 
                 class Serializer : ValueSerializer<Provider>() {
                     override fun serialize(value: Provider, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

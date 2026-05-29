@@ -438,11 +438,11 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
      * formatted in the specified text case.
      *
      * @param textCase the desired text case format to apply to the resulting string.
-     *                 Defaults to [dev.tommasop1804.kutils.classes.constants.TextCase.UPPER_CASE] if not specified.
+     *                 Defaults to [dev.tommasop1804.kutils.classes.constants.TextCase.UpperCase] if not specified.
      * @return the string representation of the current instance formatted in the specified text case.
      * @since 1.0.0
      */
-    fun toString(textCase: TextCase) = value.convertCase(TextCase.UPPER_CASE, textCase)
+    fun toString(textCase: TextCase) = value.convertCase(TextCase.UpperCase, textCase)
 
     /**
      * Converts the value of this Base36 instance to uppercase.

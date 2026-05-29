@@ -21,17 +21,15 @@ enum class Sex(val symbol: Char) {
      * It is typically used to distinguish male gender in contexts
      * where a symbol or gender specification is required.
      *
-     * @property symbol The symbol associated with the male sex.
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    MALE('♂'),
+    Male('♂'),
     /**
      * Represents the female sex with the corresponding symbol.
      *
-     * @property symbol The symbol associated with the female sex.
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    FEMALE('♀');
+    Female('♀');
 
     companion object {
         /**
@@ -48,8 +46,8 @@ enum class Sex(val symbol: Char) {
          * @since 1.0.0
          */
         infix fun of(char: Char) = when (char) {
-            '♂', 'M', 'm' -> MALE
-            '♀', 'F', 'f' -> FEMALE
+            '♂', 'M', 'm' -> Male
+            '♀', 'F', 'f' -> Female
             else -> null
         }
     }

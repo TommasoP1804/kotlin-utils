@@ -8,7 +8,7 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -33,14 +33,14 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * @since 1.0.0
      */
-    ERROR(40, "ERROR"), 
+    Error(40, "ERROR"),
     /**
      * Represents the WARN log level, commonly used to indicate potentially harmful situations
      * that may require attention but are not immediately critical.
      * 
      * @since 1.0.0
      */
-    WARN(30, "WARN"), 
+    Warn(30, "WARN"),
     /**
      * Represents the INFO log level with a severity integer value of 20 and a name "INFO".
      *
@@ -48,14 +48,14 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * @since 1.0.0
      */
-    INFO(20, "INFO"), 
+    Info(20, "INFO"),
     /**
      * Represents the DEBUG log level, typically used for detailed diagnostic messages 
      * that are useful during software development and debugging.
      * 
      * @since 1.0.0
      */
-    DEBUG(10, "DEBUG"), 
+    Debug(10, "DEBUG"),
     /**
      * Represents the TRACE logging level with the lowest severity.
      *
@@ -64,8 +64,19 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * @since 1.0.0
      */
-    TRACE(0, "TRACE");
-    
+    Trace(0, "TRACE");
+
+    /**
+     * Returns the string representation of the `LogLevel` instance.
+     *
+     * This method retrieves the `levelName` property to represent the
+     * current logging level as a string.
+     *
+     * @return The string value of the `levelName` property.
+     * @since 4.0.0
+     */
+    override fun toString() = levelName
+
     /**
      * Converts the current `LogLevel` instance to its corresponding SLF4J `Level`.
      *
@@ -156,11 +167,11 @@ inline fun <reified T> T.log(level: LogLevel, message: Any? = null, throwable: T
  * @since 1.0.0
  */
 fun log(logger: Logger, level: LogLevel, message: Any?, throwable: Throwable) = when (level) {
-    LogLevel.TRACE -> logger.trace(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.DEBUG -> logger.debug(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.INFO -> logger.info(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.WARN -> logger.warn(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.ERROR -> logger.error(message?.toString() ?: String.EMPTY, throwable)
+    LogLevel.Trace -> logger.trace(message?.toString() ?: String.EMPTY, throwable)
+    LogLevel.Debug -> logger.debug(message?.toString() ?: String.EMPTY, throwable)
+    LogLevel.Info -> logger.info(message?.toString() ?: String.EMPTY, throwable)
+    LogLevel.Warn -> logger.warn(message?.toString() ?: String.EMPTY, throwable)
+    LogLevel.Error -> logger.error(message?.toString() ?: String.EMPTY, throwable)
 }
 
 /**
@@ -172,11 +183,11 @@ fun log(logger: Logger, level: LogLevel, message: Any?, throwable: Throwable) = 
  * @since 1.0.0
  */
 fun log(logger: Logger, level: LogLevel, message: Any) = when (level) {
-    LogLevel.TRACE -> logger.trace(message.toString())
-    LogLevel.DEBUG -> logger.debug(message.toString())
-    LogLevel.INFO -> logger.info(message.toString())
-    LogLevel.WARN -> logger.warn(message.toString())
-    LogLevel.ERROR -> logger.error(message.toString())
+    LogLevel.Trace -> logger.trace(message.toString())
+    LogLevel.Debug -> logger.debug(message.toString())
+    LogLevel.Info -> logger.info(message.toString())
+    LogLevel.Warn -> logger.warn(message.toString())
+    LogLevel.Error -> logger.error(message.toString())
 }
 
 /**

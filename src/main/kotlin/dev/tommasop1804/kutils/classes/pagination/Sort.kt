@@ -31,7 +31,7 @@ import kotlin.reflect.KProperty
  * This class is serializable but not deserializable.
  *
  * @param field The name of the field to sort by.
- * @param direction The direction of sorting to apply. Defaults to [SortDirection.ASCENDING].
+ * @param direction The direction of sorting to apply. Defaults to [SortDirection.Ascending].
  *
  * @author Tommaso Pastorelli
  * @since 1.0.0
@@ -40,7 +40,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = SortOption.Companion.OldSerializer::class)
 data class SortOption(
     var field: String,
-    var direction: SortDirection = SortDirection.ASCENDING
+    var direction: SortDirection = SortDirection.Ascending
 ) {
     /**
      * Constructs a SortOption instance based on the provided field and sorting direction.
@@ -50,10 +50,10 @@ data class SortOption(
      * the simple name is null, the field name is used directly without modification.
      *
      * @param field The property that defines what to sort. Must be of type [KProperty].
-     * @param direction The direction in which the sorting is to be performed. Defaults to [SortDirection.ASCENDING].
+     * @param direction The direction in which the sorting is to be performed. Defaults to [SortDirection.Ascending].
      * @since 1.0.0
      */
-    constructor(field: KProperty<*>, direction: SortDirection = SortDirection.ASCENDING) : this(
+    constructor(field: KProperty<*>, direction: SortDirection = SortDirection.Ascending) : this(
         field.run {
             val type1 = (parameters.firstOrNull()?.type?.classifier as? KClass<*>)?.simpleName
             if (type1.isNotNull()) "$type1$${field.name}" else name

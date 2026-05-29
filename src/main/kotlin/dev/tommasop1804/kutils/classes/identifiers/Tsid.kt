@@ -215,10 +215,10 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
      */
     constructor(factoryType: FactoryType) : this(
         when (factoryType) {
-            FactoryType.DEFAULT -> Factory.INSTANCE
-            FactoryType.NODES_256 -> Factory.INSTANCE_256
-            FactoryType.NODES_1024 -> Factory.INSTANCE_1024
-            FactoryType.NODES_4096 -> Factory.INSTANCE_4096
+            FactoryType.Default -> Factory.INSTANCE
+            FactoryType.Nodes256 -> Factory.INSTANCE_256
+            FactoryType.Nodes1024 -> Factory.INSTANCE_1024
+            FactoryType.Nodes4096 -> Factory.INSTANCE_4096
         }.generate().number
     )
 
@@ -760,7 +760,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
          *
          * @since 3.0.0
          */
-        DEFAULT,
+        Default,
         /**
          * Represents the NODES_256 type within the set of available factory types.
          * This type is typically used to configure or specify behavior involving a resource
@@ -768,7 +768,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
          *
          * @since 3.0.0
          */
-        NODES_256,
+        Nodes256,
         /**
          * Represents a specific type of factory node configuration
          * characterized by the use of 1024 nodes.
@@ -778,7 +778,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
          *
          * @since 3.0.0
          */
-        NODES_1024,
+        Nodes1024,
         /**
          * Represents a configuration type for a node-based system supporting up to 4096 nodes.
          * This enum constant is part of the `FactoryType` enumeration, which provides predefined configurations 
@@ -786,7 +786,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
          *
          * @since 3.0.0
          */
-        NODES_4096;
+        Nodes4096;
     }
 
     /**

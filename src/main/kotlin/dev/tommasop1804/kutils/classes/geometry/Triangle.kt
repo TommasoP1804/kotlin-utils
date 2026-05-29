@@ -136,15 +136,15 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
             val bc: Double = sides.second
             val ca: Double = sides.third
 
-            if (ab < TOLERANCE || bc < TOLERANCE || ca < TOLERANCE || area < TOLERANCE) return TriangleType.DEGENERATE
+            if (ab < TOLERANCE || bc < TOLERANCE || ca < TOLERANCE || area < TOLERANCE) return TriangleType.Degenerate
 
             val abEqBc = abs(ab - bc) < TOLERANCE
             val bcEqCa = abs(bc - ca) < TOLERANCE
             val caEqAb = abs(ca - ab) < TOLERANCE
 
-            if (abEqBc && bcEqCa) return TriangleType.EQUILATERAL
-            if (abEqBc || bcEqCa || caEqAb) return TriangleType.ISOSCELES
-            return TriangleType.SCALENE
+            if (abEqBc && bcEqCa) return TriangleType.Equilateral
+            if (abEqBc || bcEqCa || caEqAb) return TriangleType.Isosceles
+            return TriangleType.Scalene
         }
 
     /**
@@ -452,9 +452,9 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
          * is equal to the length of the third side. This results in a "collapsed" triangle, which
          * effectively forms a straight line.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        DEGENERATE,
+        Degenerate,
         /**
          * Represents a triangle where all three sides are of equal length.
          *
@@ -464,9 +464,9 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
          *
          * Belongs to the `TriangleType` enum, which categorizes triangles
          * based on their side lengths.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        EQUILATERAL,
+        Equilateral,
         /**
          * Represents a type of triangle where at least two sides have equal length.
          *
@@ -476,16 +476,16 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
          *  * The angles opposite these equal sides are also equal.
          *
          * This is one of the four primary classifications of triangles based on side lengths.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        ISOSCELES,
+        Isosceles,
         /**
          * Represents a triangle where all sides are of different lengths.
          *
          * A scalene triangle is characterized by having no equal sides and, consequently,
          * no equal angles. This classification is based solely on the distinctiveness of its side lengths.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        SCALENE
+        Scalene
     }
 }

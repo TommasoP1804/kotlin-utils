@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -1127,44 +1127,44 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * @return the number as a `String` in Roman numerals.
      * @since 1.0.0
      */
-    fun toString(latinChars: Boolean = true, upperCase: Boolean = true, multiplesSuffixes: Boolean = false, altChars: AltCharsPriority = AltCharsPriority.STANDARD): String {
+    fun toString(latinChars: Boolean = true, upperCase: Boolean = true, multiplesSuffixes: Boolean = false, altChars: AltCharsPriority = AltCharsPriority.Standard): String {
         val sb = StringBuilder()
 
         var number = toLong()
 
-        if (altChars != AltCharsPriority.STANDARD) {
+        if (altChars != AltCharsPriority.Standard) {
             if (number == 50L) {
-                return if (altChars == AltCharsPriority.ALT || altChars == AltCharsPriority.ALT_LIGA) "ↆ"
+                return if (altChars == AltCharsPriority.Alt || altChars == AltCharsPriority.AltLiga) "ↆ"
                 else if (latinChars) if (upperCase) "L" else "l"
                 else if (upperCase) "Ⅼ" else "ⅼ"
             }
             if (number == 1000L) {
-                return if (altChars == AltCharsPriority.ALT) "ⅭⅠↃ"
-                else if (altChars == AltCharsPriority.ALT_LIGA) "ↀ"
+                return if (altChars == AltCharsPriority.Alt) "ⅭⅠↃ"
+                else if (altChars == AltCharsPriority.AltLiga) "ↀ"
                 else if (latinChars) if (upperCase) "M" else "m"
                 else if (upperCase) "Ⅿ" else "ⅿ"
             }
             if (number == 2000L) {
-                return if (altChars == AltCharsPriority.ALT) "ⅭⅠↃⅭⅠↃ"
-                else if (altChars == AltCharsPriority.ALT_LIGA) "ↀↀ"
+                return if (altChars == AltCharsPriority.Alt) "ⅭⅠↃⅭⅠↃ"
+                else if (altChars == AltCharsPriority.AltLiga) "ↀↀ"
                 else if (latinChars) if (upperCase) "MM" else "mm"
                 else if (upperCase) "ⅯⅯ" else "ⅿ"
             }
             if (number == 5000L) {
-                if (altChars == AltCharsPriority.ALT || altChars == AltCharsPriority.ALT_PRIORITY_DEFAULT) return "ⅠↃↃ"
-                else if (altChars == AltCharsPriority.ALT_LIGA || altChars == AltCharsPriority.ALT_LIGA_PRIORITY_DEFAULT) return "ↁ"
+                if (altChars == AltCharsPriority.Alt || altChars == AltCharsPriority.AltPriorityDefault) return "ⅠↃↃ"
+                else if (altChars == AltCharsPriority.AltLiga || altChars == AltCharsPriority.AltLigaPriorityDefault) return "ↁ"
             }
             if (number == 10000L) {
-                if (altChars == AltCharsPriority.ALT || altChars == AltCharsPriority.ALT_PRIORITY_DEFAULT) return "ⅭⅭⅠↃↃ"
-                else if (altChars == AltCharsPriority.ALT_LIGA || altChars == AltCharsPriority.ALT_LIGA_PRIORITY_DEFAULT) return "ↂ"
+                if (altChars == AltCharsPriority.Alt || altChars == AltCharsPriority.AltPriorityDefault) return "ⅭⅭⅠↃↃ"
+                else if (altChars == AltCharsPriority.AltLiga || altChars == AltCharsPriority.AltLigaPriorityDefault) return "ↂ"
             }
             if (number == 50000L) {
-                if (altChars == AltCharsPriority.ALT || altChars == AltCharsPriority.ALT_PRIORITY_DEFAULT) return "ⅠↃↃↃ"
-                else if (altChars == AltCharsPriority.ALT_LIGA || altChars == AltCharsPriority.ALT_LIGA_PRIORITY_DEFAULT) return "ↇ"
+                if (altChars == AltCharsPriority.Alt || altChars == AltCharsPriority.AltPriorityDefault) return "ⅠↃↃↃ"
+                else if (altChars == AltCharsPriority.AltLiga || altChars == AltCharsPriority.AltLigaPriorityDefault) return "ↇ"
             }
             if (number == 100000L) {
-                if (altChars == AltCharsPriority.ALT || altChars == AltCharsPriority.ALT_PRIORITY_DEFAULT) return "ⅭⅭⅭⅠↃↃↃ"
-                else if (altChars == AltCharsPriority.ALT_LIGA || altChars == AltCharsPriority.ALT_LIGA_PRIORITY_DEFAULT) return "ↈ"
+                if (altChars == AltCharsPriority.Alt || altChars == AltCharsPriority.AltPriorityDefault) return "ⅭⅭⅭⅠↃↃↃ"
+                else if (altChars == AltCharsPriority.AltLiga || altChars == AltCharsPriority.AltLigaPriorityDefault) return "ↈ"
             }
         }
 
@@ -1274,7 +1274,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * @return the number as a `String` in Roman numerals.
      * @since 1.0.0
      */
-    override fun toString()= toString(altChars = AltCharsPriority.STANDARD)
+    override fun toString()= toString(altChars = AltCharsPriority.Standard)
 
     /**
      * Retrieves the character at the specified index from the string representation of the object.
@@ -1296,4 +1296,59 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * @since 1.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
+
+    /**
+     * Represents the priority levels used for alternative characters
+     * in applications where content styling based on character variations is supported.
+     *
+     * This enum provides distinct priority levels for rendering or selecting
+     * alternative characters in different scenarios. These priorities can
+     * be applied depending on the context or the desired effect.
+     *
+     * @since 4.0.0
+     */
+    enum class AltCharsPriority {
+        /**
+         * Represents the standard priority level in the `AltCharsPriority` enum.
+         *
+         * It serves as the default configuration for cases requiring no alternative character prioritization.
+         * Use this when no special prioritization for ligatures or alternative characters is necessary.
+         *
+         * @since 4.0.0
+         */
+        Standard,
+        /**
+         * Specifies the default priority level for alternative ligature character handling.
+         * This priority categorization determines how ligature substitutions are applied
+         * relative to other alternative character handling mechanisms.
+         *
+         * @since 4.0.0
+         */
+        AltLigaPriorityDefault,
+        /**
+         * Represents the default priority setting for alternative characters.
+         * This is used when no specific priority is otherwise defined.
+         *
+         * Belongs to the `AltCharsPriority` enumeration.
+         *
+         * @since 4.0.0
+         */
+        AltPriorityDefault,
+        /**
+         * Represents an alternative ligature priority in the AltCharsPriority enum class.
+         * This value is used to handle cases where a specific priority is assigned to alternative ligatures.
+         *
+         * @since 4.0.0
+         */
+        AltLiga,
+        /**
+         * Represents the `ALT` enum constant, which is a specific priority level defined in the `AltCharsPriority` enum.
+         *
+         * This constant can be utilized to indicate and manage alternate character handling logic when working with priority-based systems.
+         * It is specifically designed for contexts where this alternative ligature or priority handling is necessary.
+         *
+         * @since 4.0.0
+         */
+        Alt
+    }
 }

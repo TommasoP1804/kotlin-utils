@@ -113,108 +113,108 @@ value class Iban private constructor(val value: String) : CharSequence {
 
     init {
         (country.isNull() || value.length == when (country) {
-            ALBANIA -> 28
-            ANDORRA -> 24
-            AUSTRIA -> 20
-            AZERBAIJAN -> 28
-            BAHRAIN -> 22
-            BELARUS -> 28
-            BELGIUM -> 16
-            BOSNIA_AND_HERZEGOVINA -> 20
-            BRAZIL -> 29
-            BULGARIA -> 22
-            BURUNDI -> 21
-            COSTA_RICA -> 22
-            CROATIA -> 21
-            CYPRUS -> 28
-            CZECH_REPUBLIC -> 24
-            DENMARK -> 18
-            DJIBOUTI -> 27
-            DOMINICAN_REPUBLIC -> 28
-            TIMOR_LESTE -> 23
-            EGYPT -> 29
-            EL_SALVADOR -> 28
-            ESTONIA -> 20
-            FALKLAND_ISLANDS -> 18
-            FAROE_ISLANDS -> 18
-            FINLAND -> 18
-            FRANCE,
-            FRENCH_GUIANA,
-            FRENCH_POLYNESIA,
-            FRENCH_SOUTHERN_TERRITORIES,
-            GUADELOUPE,
-            MARTINIQUE,
-            MAYOTTE,
-            NEW_CALEDONIA,
-            REUNION,
-            SAINT_BARTHELEMY,
-            SAINT_MARTIN,
-            SAINT_PIERRE_AND_MIQUELON,
-            WALLIS_AND_FUTUNA -> 27
+            Albania -> 28
+            Andorra -> 24
+            Austria -> 20
+            Azerbaijan -> 28
+            Bahrain -> 22
+            Belarus -> 28
+            Belgium -> 16
+            BosniaAndHerzegovina -> 20
+            Brazil -> 29
+            Bulgaria -> 22
+            Burundi -> 21
+            CostaRica -> 22
+            Croatia -> 21
+            Cyprus -> 28
+            CzechRepublic -> 24
+            Denmark -> 18
+            Djibouti -> 27
+            DominicanRepublic -> 28
+            TimorLeste -> 23
+            Egypt -> 29
+            ElSalvador -> 28
+            Estonia -> 20
+            FalklandIslands -> 18
+            FaroeIslands -> 18
+            Finland -> 18
+            France,
+            FrenchGuiana,
+            FrenchPolynesia,
+            FrenchSouthernTerritories,
+            Guadeloupe,
+            Martinique,
+            Mayotte,
+            NewCaledonia,
+            Reunion,
+            SaintBarthelemy,
+            SaintMartin,
+            SaintPierreAndMiquelon,
+            WallisAndFutuna -> 27
 
-            GEORGIA -> 22
-            GERMANY -> 22
-            GIBRALTAR -> 23
-            GREECE -> 27
-            GREENLAND -> 18
-            GUATEMALA -> 28
-            HONDURAS -> 28
-            HUNGARY -> 28
-            ICELAND -> 26
-            IRAQ -> 23
-            IRELAND -> 22
-            ISRAEL -> 23
-            ITALY -> 27
-            JORDAN -> 30
-            KAZAKHSTAN -> 20
-            KOSOVO -> 20
-            KUWAIT -> 30
-            LATVIA -> 21
-            LEBANON -> 28
-            LIBYA -> 25
-            LIECHTENSTEIN -> 21
-            LITHUANIA -> 20
-            LUXEMBOURG -> 20
-            MALTA -> 31
-            MAURITANIA -> 27
-            MAURITIUS -> 30
-            MONACO -> 27
-            MOLDOVA -> 24
-            MONGOLIA -> 20
-            MONTENEGRO -> 22
-            NETHERLANDS -> 18
-            NICARAGUA -> 28
-            NORTH_MACEDONIA -> 19
-            NORWAY -> 15
-            OMAN -> 23
-            PAKISTAN -> 24
-            PALESTINE -> 29
-            POLAND -> 28
-            PORTUGAL -> 25
-            QATAR -> 29
-            ROMANIA -> 24
-            RUSSIAN_FEDERATION -> 33
-            SAINT_LUCIA -> 32
-            SAN_MARINO -> 27
-            SAO_TOME_AND_PRINCIPE -> 25
-            SAUDI_ARABIA -> 24
-            SERBIA -> 22
-            SEYCHELLES -> 31
-            SLOVAKIA -> 24
-            SLOVENIA -> 19
-            SOMALIA -> 23
-            SPAIN -> 24
-            SUDAN -> 18
-            SWEDEN -> 24
-            SWITZERLAND -> 21
-            TUNISIA -> 24
-            TURKEY -> 26
-            UKRAINE -> 29
-            UNITED_ARAB_EMIRATES -> 23
-            UNITED_KINGDOM, ISLE_OF_MAN, GUERNSEY, JERSEY -> 22
-            VATICAN_CITY -> 22
-            BRITISH_VIRGIN_ISLANDS -> 24
-            YEMEN -> 30
+            Georgia -> 22
+            Germany -> 22
+            Gibraltar -> 23
+            Greece -> 27
+            Greenland -> 18
+            Guatemala -> 28
+            Honduras -> 28
+            Hungary -> 28
+            Iceland -> 26
+            Iraq -> 23
+            Ireland -> 22
+            Israel -> 23
+            Italy -> 27
+            Jordan -> 30
+            Kazakhstan -> 20
+            Kosovo -> 20
+            Kuwait -> 30
+            Latvia -> 21
+            Lebanon -> 28
+            Libya -> 25
+            Liechtenstein -> 21
+            Lithuania -> 20
+            Luxembourg -> 20
+            Malta -> 31
+            Mauritania -> 27
+            Mauritius -> 30
+            Monaco -> 27
+            Moldova -> 24
+            Mongolia -> 20
+            Montenegro -> 22
+            Netherlands -> 18
+            Nicaragua -> 28
+            NorthMacedonia -> 19
+            Norway -> 15
+            Oman -> 23
+            Pakistan -> 24
+            Palestine -> 29
+            Poland -> 28
+            Portugal -> 25
+            Qatar -> 29
+            Romania -> 24
+            RussianFederation -> 33
+            SaintLucia -> 32
+            SanMarino -> 27
+            SaoTomeAndPrincipe -> 25
+            SaudiArabia -> 24
+            Serbia -> 22
+            Seychelles -> 31
+            Slovakia -> 24
+            Slovenia -> 19
+            Somalia -> 23
+            Spain -> 24
+            Sudan -> 18
+            Sweden -> 24
+            Switzerland -> 21
+            Tunisia -> 24
+            Turkey -> 26
+            Ukraine -> 29
+            UnitedArabEmirates -> 23
+            UnitedKingdom, IsleOfMan, Guernsey, Jersey -> 22
+            VaticanCity -> 22
+            BritishVirginIslands -> 24
+            Yemen -> 30
             else -> value.length
         }) && Regex("^[A-Z]{2}[0-9]{2}[0-9A-Z]{1,30}$")(value)
                 || throw MalformedInputException("Invalid IBAN format")
@@ -229,7 +229,7 @@ value class Iban private constructor(val value: String) : CharSequence {
         if (checkDigits.length == 1) checkDigits = "0$checkDigits"
         checkDigits.expect(value[2..3]) { "Invalid check digits for IBAN" }
 
-        if (country == ITALY) {
+        if (country == Italy) {
             Regex("^[A-Z]{2}[0-9]{2}[A-Z][0-9]{10}[0-9A-Z]{12}$")(value) || throw MalformedInputException("Invalid IBAN format for Italy")
             val odd = (-5)(value).filterIndexed { index, _ -> index.isEven }.map {
                 when (it) {

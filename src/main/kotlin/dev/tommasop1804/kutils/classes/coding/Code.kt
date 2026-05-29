@@ -69,7 +69,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code the Java source code to be processed
          * @since 1.0.0
          */
-        fun java(@org.intellij.lang.annotations.Language("java") code: String) = Code(code, Language.JAVA)
+        fun java(@org.intellij.lang.annotations.Language("java") code: String) = Code(code, Language.Java)
 
         /**
          * Constructs a Code object with the specified Kotlin source code.
@@ -78,7 +78,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new Code object containing the provided Kotlin source code.
          * @since 1.0.0
          */
-        fun kotlin(@org.intellij.lang.annotations.Language("kotlin") code: String) = Code(code, Language.KOTLIN)
+        fun kotlin(@org.intellij.lang.annotations.Language("kotlin") code: String) = Code(code, Language.Kotlin)
 
         /**
          * Creates an instance of the Code class initialized with the given Python code.
@@ -86,7 +86,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Python code to be represented as a Code object.
          * @since 1.0.0
          */
-        fun python(@org.intellij.lang.annotations.Language("Py") code: String) = Code(code, Language.PYTHON)
+        fun python(@org.intellij.lang.annotations.Language("Py") code: String) = Code(code, Language.Python)
 
         /**
          * Creates a new instance of the `Code` class with the specified JavaScript code and language set to JavaScript.
@@ -95,7 +95,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return An instance of `Code` with the provided JavaScript code.
          * @since 1.0.0
          */
-        fun javaScript(@org.intellij.lang.annotations.Language("JavaScript") code: String) = Code(code, Language.JAVASCRIPT)
+        fun javaScript(@org.intellij.lang.annotations.Language("JavaScript") code: String) = Code(code, Language.Javascript)
 
         /**
          * Creates an instance of the `Code` class with TypeScript as the specified language.
@@ -103,7 +103,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The TypeScript code to be encapsulated within the `Code` instance.
          * @since 1.0.0
          */
-        fun typeScript(@org.intellij.lang.annotations.Language("TypeScript") code: String) = Code(code, Language.TYPESCRIPT)
+        fun typeScript(@org.intellij.lang.annotations.Language("TypeScript") code: String) = Code(code, Language.Typescript)
 
         /**
          * Constructs a `Code` instance representing a string of C# code.
@@ -112,7 +112,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object containing the provided C# code and its associated metadata.
          * @since 1.0.0
          */
-        fun cSharp(@org.intellij.lang.annotations.Language("C#") code: String) = Code(code, Language.CSHARP)
+        fun cSharp(@org.intellij.lang.annotations.Language("C#") code: String) = Code(code, Language.CSharp)
 
         /**
          * Creates a representation of C++ code as an instance of the Code class.
@@ -137,7 +137,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object initialized with the given PHP code and specified language.
          * @since 1.0.0
          */
-        fun php(@org.intellij.lang.annotations.Language("PHP") code: String) = Code(code, Language.PHP)
+        fun php(@org.intellij.lang.annotations.Language("PHP") code: String) = Code(code, Language.Php)
 
         /**
          * Executes a given Ruby code snippet within the context of a defined language processing environment.
@@ -145,7 +145,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing the Ruby code to be executed or processed.
          * @since 1.0.0
          */
-        fun ruby(@org.intellij.lang.annotations.Language("Ruby") code: String) = Code(code, Language.RUBY)
+        fun ruby(@org.intellij.lang.annotations.Language("Ruby") code: String) = Code(code, Language.Ruby)
 
         /**
          * Creates a new instance of the `Code` class with the given Swift code and language set to Swift.
@@ -153,7 +153,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Swift source code as a string.
          * @since 1.0.0
          */
-        fun swift(@org.intellij.lang.annotations.Language("swift") code: String) = Code(code, Language.SWIFT)
+        fun swift(@org.intellij.lang.annotations.Language("swift") code: String) = Code(code, Language.Swift)
 
         /**
          * Creates a `Code` instance representing Go code with the provided string content.
@@ -162,7 +162,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new `Code` object with the specified Go code and its language set as Go.
          * @since 1.0.0
          */
-        fun go(@org.intellij.lang.annotations.Language("go") code: String) = Code(code, Language.GO)
+        fun go(@org.intellij.lang.annotations.Language("go") code: String) = Code(code, Language.Go)
 
         /**
          * Wraps the provided Rust code into a Code object with the specified Rust language context.
@@ -170,7 +170,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Rust code to be wrapped.
          * @since 1.0.0
          */
-        fun rust(@org.intellij.lang.annotations.Language("rust") code: String) = Code(code, Language.RUST)
+        fun rust(@org.intellij.lang.annotations.Language("rust") code: String) = Code(code, Language.Rust)
 
         /**
          * Creates an instance of the `Code` class with the provided Scala code and assigns the language as `SCALA`.
@@ -179,7 +179,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new `Code` object representing the provided Scala source code.
          * @since 1.0.0
          */
-        fun scala(@org.intellij.lang.annotations.Language("scala") code: String) = Code(code, Language.SCALA)
+        fun scala(@org.intellij.lang.annotations.Language("scala") code: String) = Code(code, Language.Scala)
 
         /**
          * Creates a Code object for the provided Haskell code snippet.
@@ -188,7 +188,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object representing the given Haskell code with its associated language metadata.
          * @since 1.0.0
          */
-        fun haskell(@org.intellij.lang.annotations.Language("Haskell") code: String) = Code(code, Language.HASKELL)
+        fun haskell(@org.intellij.lang.annotations.Language("Haskell") code: String) = Code(code, Language.Haskell)
 
         /**
          * Constructs a SQL-specific code representation.
@@ -196,7 +196,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The SQL code string to be represented by the `Code` object.
          * @since 1.0.0
          */
-        fun sql(@org.intellij.lang.annotations.Language("sql") code: String) = Code(code, Language.SQL)
+        fun sql(@org.intellij.lang.annotations.Language("sql") code: String) = Code(code, Language.Sql)
 
         /**
          * Constructs a Code object using the provided R language script.
@@ -215,7 +215,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object containing the provided Perl code and its associated language.
          * @since 1.0.0
          */
-        fun perl(@org.intellij.lang.annotations.Language("Perl") code: String) = Code(code, Language.PERL)
+        fun perl(@org.intellij.lang.annotations.Language("Perl") code: String) = Code(code, Language.Perl)
 
         /**
          * Creates a Dart code object from the provided source code.
@@ -224,7 +224,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new instance of the `Code` class representing the Dart code.
          * @since 1.0.0
          */
-        fun dart(@org.intellij.lang.annotations.Language("Dart") code: String) = Code(code, Language.DART)
+        fun dart(@org.intellij.lang.annotations.Language("Dart") code: String) = Code(code, Language.Dart)
 
         /**
          * Creates an instance of the Code class initialized with the provided Groovy code.
@@ -233,7 +233,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code instance containing the Groovy code and language type set to Groovy.
          * @since 1.0.0
          */
-        fun groovy(@org.intellij.lang.annotations.Language("Groovy") code: String) = Code(code, Language.GROOVY)
+        fun groovy(@org.intellij.lang.annotations.Language("Groovy") code: String) = Code(code, Language.Groovy)
 
         /**
          * Constructs a `Code` object encapsulating the provided assembly language code.
@@ -241,7 +241,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The assembly language code to be wrapped in the `Code` object.
          * @since 1.0.0
          */
-        fun assembly(@org.intellij.lang.annotations.Language("Assembly") code: String) = Code(code, Language.ASSEMBLY)
+        fun assembly(@org.intellij.lang.annotations.Language("Assembly") code: String) = Code(code, Language.Assembly)
 
         /**
          * Constructs a Code object containing Objective-C code with its associated language type.
@@ -250,7 +250,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object with the provided Objective-C source code and its language set to OBJECTIVE_C.
          * @since 1.0.0
          */
-        fun objectiveC(@org.intellij.lang.annotations.Language("Objective-C") code: String) = Code(code, Language.OBJECTIVE_C)
+        fun objectiveC(@org.intellij.lang.annotations.Language("Objective-C") code: String) = Code(code, Language.ObjectiveC)
 
         /**
          * Constructs a new instance of `Code` containing COBOL source code.
@@ -258,7 +258,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The COBOL source code to be encapsulated in the `Code` instance.
          * @since 1.0.0
          */
-        fun cobol(@org.intellij.lang.annotations.Language("COBOL") code: String) = Code(code, Language.COBOL)
+        fun cobol(@org.intellij.lang.annotations.Language("COBOL") code: String) = Code(code, Language.Cobol)
 
         /**
          * Constructs a Code object containing the specified Fortran source code.
@@ -266,7 +266,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Fortran source code to be encapsulated in the Code object.
          * @since 1.0.0
          */
-        fun fortran(@org.intellij.lang.annotations.Language("Fortran") code: String) = Code(code, Language.FORTRAN)
+        fun fortran(@org.intellij.lang.annotations.Language("Fortran") code: String) = Code(code, Language.Fortran)
 
         /**
          * Constructs a `Code` object using the provided Lisp code string.
@@ -275,7 +275,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object initialized with the specified Lisp code.
          * @since 1.0.0
          */
-        fun lisp(@org.intellij.lang.annotations.Language("Lisp") code: String) = Code(code, Language.LISP)
+        fun lisp(@org.intellij.lang.annotations.Language("Lisp") code: String) = Code(code, Language.Lisp)
 
         /**
          * Wraps the given Clojure code in a `Code` object with the `CLOJURE` language type.
@@ -284,7 +284,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` instance with the specified Clojure code and its language type set to `CLOJURE`.
          * @since 1.0.0
          */
-        fun clojure(@org.intellij.lang.annotations.Language("Clojure") code: String) = Code(code, Language.CLOJURE)
+        fun clojure(@org.intellij.lang.annotations.Language("Clojure") code: String) = Code(code, Language.Clojure)
 
         /**
          * Converts a given string of Erlang code to a `Code` object using the Erlang language context.
@@ -293,7 +293,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object encapsulating the provided code, identified as Erlang code.
          * @since 1.0.0
          */
-        fun erlang(@org.intellij.lang.annotations.Language("Erlang") code: String) = Code(code, Language.ERLANG)
+        fun erlang(@org.intellij.lang.annotations.Language("Erlang") code: String) = Code(code, Language.Erlang)
 
         /**
          * Creates a new instance of `Code` initialized with the given Elixir code string.
@@ -301,7 +301,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing the Elixir code to be wrapped.
          * @since 1.0.0
          */
-        fun elixir(@org.intellij.lang.annotations.Language("Elixir") code: String) = Code(code, Language.ELIXIR)
+        fun elixir(@org.intellij.lang.annotations.Language("Elixir") code: String) = Code(code, Language.Elixir)
 
         /**
          * Constructs an instance of the Code class with the specified Julia code input.
@@ -309,7 +309,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Julia code represented as a string.
          * @since 1.0.0
          */
-        fun julia(@org.intellij.lang.annotations.Language("Julia") code: String) = Code(code, Language.JULIA)
+        fun julia(@org.intellij.lang.annotations.Language("Julia") code: String) = Code(code, Language.Julia)
 
         /**
          * Constructs a MATLAB code representation with the specified code string.
@@ -317,7 +317,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing MATLAB code to be wrapped within a specified language construct.
          * @since 1.0.0
          */
-        fun matlab(@org.intellij.lang.annotations.Language("MATLAB") code: String) = Code(code, Language.MATLAB)
+        fun matlab(@org.intellij.lang.annotations.Language("MATLAB") code: String) = Code(code, Language.Matlab)
 
         /**
          * Wraps Pascal code into a `Code` instance with Pascal as the specified language.
@@ -325,7 +325,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The source code written in Pascal to be wrapped into a `Code` object.
          * @since 1.0.0
          */
-        fun pascal(@org.intellij.lang.annotations.Language("pascal") code: String) = Code(code, Language.PASCAL)
+        fun pascal(@org.intellij.lang.annotations.Language("pascal") code: String) = Code(code, Language.Pascal)
 
         /**
          * Converts a given Delphi code string into a `Code` object with the specified language type.
@@ -333,7 +333,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Delphi code as a string. It is expected to conform to the Delphi language syntax.
          * @since 1.0.0
          */
-        fun delphi(@org.intellij.lang.annotations.Language("delphi") code: String) = Code(code, Language.DELPHI)
+        fun delphi(@org.intellij.lang.annotations.Language("delphi") code: String) = Code(code, Language.Delphi)
 
         /**
          * Creates an instance of the `Code` class with the provided Bash script content.
@@ -341,7 +341,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing the Bash script to be wrapped as a `Code` object.
          * @since 1.0.0
          */
-        fun bash(@org.intellij.lang.annotations.Language("Bash") code: String) = Code(code, Language.BASH)
+        fun bash(@org.intellij.lang.annotations.Language("Bash") code: String) = Code(code, Language.Bash)
 
         /**
          * Executes the provided PowerShell code by wrapping it in a Code object with PowerShell language settings.
@@ -349,7 +349,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The PowerShell script to be executed as a String.
          * @since 1.0.0
          */
-        fun powershell(@org.intellij.lang.annotations.Language("PowerShell") code: String) = Code(code, Language.POWERSHELL)
+        fun powershell(@org.intellij.lang.annotations.Language("PowerShell") code: String) = Code(code, Language.Powershell)
 
         /**
          * Creates a `Code` object for the provided VBA (Visual Basic for Applications) code snippet.
@@ -358,7 +358,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object initialized with the provided VBA code and the VBA language.
          * @since 1.0.0
          */
-        fun vba(@org.intellij.lang.annotations.Language("vba") code: String) = Code(code, Language.VBA)
+        fun vba(@org.intellij.lang.annotations.Language("vba") code: String) = Code(code, Language.Vba)
 
         /**
          * Creates a new instance of the `Code` class with the specified Lua code and marks its language as Lua.
@@ -367,7 +367,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new `Code` object encapsulating the provided Lua code and its language.
          * @since 1.0.0
          */
-        fun lua(@org.intellij.lang.annotations.Language("Lua") code: String) = Code(code, Language.LUA)
+        fun lua(@org.intellij.lang.annotations.Language("Lua") code: String) = Code(code, Language.Lua)
 
         /**
          * Constructs a `Code` instance representing a Prolog program.
@@ -375,7 +375,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing the Prolog source code. The code is expected to adhere to the Prolog language syntax.
          * @since 1.0.0
          */
-        fun prolog(@org.intellij.lang.annotations.Language("Prolog") code: String) = Code(code, Language.PROLOG)
+        fun prolog(@org.intellij.lang.annotations.Language("Prolog") code: String) = Code(code, Language.Prolog)
 
         /**
          * Constructs an instance of the `Code` class containing the provided Ada programming
@@ -384,7 +384,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Ada source code to be encapsulated within the `Code` instance.
          * @since 1.0.0
          */
-        fun ada(@org.intellij.lang.annotations.Language("Ada") code: String) = Code(code, Language.ADA)
+        fun ada(@org.intellij.lang.annotations.Language("Ada") code: String) = Code(code, Language.Ada)
 
         /**
          * Constructs a `Code` object representing Scheme language code.
@@ -392,7 +392,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing the Scheme code to be encapsulated in the `Code` object.
          * @since 1.0.0
          */
-        fun scheme(@org.intellij.lang.annotations.Language("Scheme") code: String) = Code(code, Language.SCHEME)
+        fun scheme(@org.intellij.lang.annotations.Language("Scheme") code: String) = Code(code, Language.Scheme)
 
         /**
          * Constructs a `Code` instance with the provided F# code and associates it with the F# language type.
@@ -401,7 +401,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          *
          * @since 1.0.0
          */
-        fun fSharp(@org.intellij.lang.annotations.Language("F#") code: String) = Code(code, Language.FSHARP)
+        fun fSharp(@org.intellij.lang.annotations.Language("F#") code: String) = Code(code, Language.FSharp)
 
         /**
          * Creates a `Code` instance with the provided Visual Basic code and specifies the language as Visual Basic.
@@ -409,7 +409,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing the Visual Basic code to be wrapped in a `Code` object.
          * @since 1.0.0
          */
-        fun visualBasic(@org.intellij.lang.annotations.Language("Visual Basic") code: String) = Code(code, Language.VISUAL_BASIC)
+        fun visualBasic(@org.intellij.lang.annotations.Language("Visual Basic") code: String) = Code(code, Language.VisualBasic)
 
         /**
          * Constructs a new instance of `Code` with the provided ABAP code.
@@ -417,7 +417,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The ABAP code as a string to be encapsulated in the `Code` object.
          * @since 1.0.0
          */
-        fun abap(@org.intellij.lang.annotations.Language("ABAP") code: String) = Code(code, Language.ABAP)
+        fun abap(@org.intellij.lang.annotations.Language("ABAP") code: String) = Code(code, Language.Abap)
 
         /**
          * Creates a new instance of the `Code` object for the given Apex code string.
@@ -426,7 +426,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new `Code` object initialized with the provided Apex code.
          * @since 1.0.0
          */
-        fun apex(@org.intellij.lang.annotations.Language("Apex") code: String) = Code(code, Language.APEX)
+        fun apex(@org.intellij.lang.annotations.Language("Apex") code: String) = Code(code, Language.Apex)
 
         /**
          * Creates a `Code` object representing the provided Crystal language code.
@@ -434,7 +434,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Crystal code as a string.
          * @since 1.0.0
          */
-        fun crystal(@org.intellij.lang.annotations.Language("Crystal") code: String) = Code(code, Language.CRYSTAL)
+        fun crystal(@org.intellij.lang.annotations.Language("Crystal") code: String) = Code(code, Language.Crystal)
 
         /**
          * Creates a new D language code representation using the provided code string.
@@ -450,7 +450,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Hack language code snippet for which the Code object is created.
          * @since 1.0.0
          */
-        fun hack(@org.intellij.lang.annotations.Language("Hack") code: String) = Code(code, Language.HACK)
+        fun hack(@org.intellij.lang.annotations.Language("Hack") code: String) = Code(code, Language.Hack)
 
         /**
          * Constructs an instance of `Code` with the provided OCaml code string and specifies the language as OCaml.
@@ -458,7 +458,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The OCaml source code to be encapsulated in the `Code` instance.
          * @since 1.0.0
          */
-        fun ocaml(@org.intellij.lang.annotations.Language("OCaml") code: String) = Code(code, Language.OCAML)
+        fun ocaml(@org.intellij.lang.annotations.Language("OCaml") code: String) = Code(code, Language.Ocaml)
 
         /**
          * Creates a Racket code representation using the specified string and language.
@@ -466,7 +466,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Racket code to be represented as a string. It should adhere to the Racket syntax.
          * @since 1.0.0
          */
-        fun racket(@org.intellij.lang.annotations.Language("Racket") code: String) = Code(code, Language.RACKET)
+        fun racket(@org.intellij.lang.annotations.Language("Racket") code: String) = Code(code, Language.Racket)
 
         /**
          * Creates a new instance of the `Code` class using the provided Smalltalk code string.
@@ -475,7 +475,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * code snippet that adheres to the language syntax rules.
          * @since 1.0.0
          */
-        fun smalltalk(@org.intellij.lang.annotations.Language("Smalltalk") code: String) = Code(code, Language.SMALLTALK)
+        fun smalltalk(@org.intellij.lang.annotations.Language("Smalltalk") code: String) = Code(code, Language.Smalltalk)
 
         /**
          * Creates a Code object representing Solidity code.
@@ -484,7 +484,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object containing the provided Solidity code and its associated language information.
          * @since 1.0.0
          */
-        fun solidity(@org.intellij.lang.annotations.Language("Solidity") code: String) = Code(code, Language.SOLIDITY)
+        fun solidity(@org.intellij.lang.annotations.Language("Solidity") code: String) = Code(code, Language.Solidity)
 
         /**
          * Compiles and constructs a CoffeeScript code representation.
@@ -493,7 +493,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return Returns an instance of Code containing the provided CoffeeScript code and its metadata.
          * @since 1.0.0
          */
-        fun coffeeScript(@org.intellij.lang.annotations.Language("CoffeeScript") code: String) = Code(code, Language.COFFEESCRIPT)
+        fun coffeeScript(@org.intellij.lang.annotations.Language("CoffeeScript") code: String) = Code(code, Language.Coffeescript)
 
         /**
          * Constructs a VHDL code representation.
@@ -501,7 +501,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The VHDL code as a string. This parameter must contain valid VHDL code syntax.
          * @since 1.0.0
          */
-        fun vhdl(@org.intellij.lang.annotations.Language("VHDL") code: String) = Code(code, Language.VHDL)
+        fun vhdl(@org.intellij.lang.annotations.Language("VHDL") code: String) = Code(code, Language.Vhdl)
 
         /**
          * Creates a Code object with the specified Verilog code and assigns it the Verilog language type.
@@ -509,7 +509,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Verilog code as a string.
          * @since 1.0.0
          */
-        fun verilog(@org.intellij.lang.annotations.Language("Verilog") code: String) = Code(code, Language.VERILOG)
+        fun verilog(@org.intellij.lang.annotations.Language("Verilog") code: String) = Code(code, Language.Verilog)
 
         /**
          * Executes the provided ActionScript code and encapsulates it within a Code object.
@@ -517,7 +517,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The ActionScript code to be executed. Must be a valid ActionScript syntax.
          * @since 1.0.0
          */
-        fun actionScript(@org.intellij.lang.annotations.Language("ActionScript") code: String) = Code(code, Language.ACTIONSCRIPT)
+        fun actionScript(@org.intellij.lang.annotations.Language("ActionScript") code: String) = Code(code, Language.Actionscript)
 
         /**
          * Creates a new instance of the `Code` class with the specified Basic language code string.
@@ -525,7 +525,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Basic language source code as a string.
          * @since 1.0.0
          */
-        fun basic(@org.intellij.lang.annotations.Language("Basic") code: String) = Code(code, Language.BASIC)
+        fun basic(@org.intellij.lang.annotations.Language("Basic") code: String) = Code(code, Language.Basic)
 
         /**
          * Executes the given Forth code and returns a corresponding Code object.
@@ -534,7 +534,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return a Code object representing the given Forth code with the appropriate language setting
          * @since 1.0.0
          */
-        fun forth(@org.intellij.lang.annotations.Language("Forth") code: String) = Code(code, Language.FORTH)
+        fun forth(@org.intellij.lang.annotations.Language("Forth") code: String) = Code(code, Language.Forth)
 
         /**
          * Constructs a `Code` object specifically configured for the ALGOL programming language.
@@ -542,7 +542,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The source code written in the ALGOL programming language.
          * @since 1.0.0
          */
-        fun algol(@org.intellij.lang.annotations.Language("Algol") code: String) = Code(code, Language.ALGOL)
+        fun algol(@org.intellij.lang.annotations.Language("Algol") code: String) = Code(code, Language.Algol)
 
         /**
          * This method creates a `Code` object using the provided Eiffel source code.
@@ -552,7 +552,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return Returns a `Code` object initialized with the Eiffel source code.
          * @since 1.0.0
          */
-        fun eiffel(@org.intellij.lang.annotations.Language("Eiffel") code: String) = Code(code, Language.EIFFEL)
+        fun eiffel(@org.intellij.lang.annotations.Language("Eiffel") code: String) = Code(code, Language.Eiffel)
 
         /**
          * Creates a new instance of Code object with the given Idris code and associated language.
@@ -560,7 +560,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The string representing the Idris code to encapsulate.
          * @since 1.0.0
          */
-        fun idris(@org.intellij.lang.annotations.Language("Idris") code: String) = Code(code, Language.IDRIS)
+        fun idris(@org.intellij.lang.annotations.Language("Idris") code: String) = Code(code, Language.Idris)
 
         /**
          * Creates a `Code` object using the provided Turing code string and specifies the language as Turing.
@@ -568,7 +568,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The source code string written in the Turing programming language.
          * @since 1.0.0
          */
-        fun turing(@org.intellij.lang.annotations.Language("Turing") code: String) = Code(code, Language.TURING)
+        fun turing(@org.intellij.lang.annotations.Language("Turing") code: String) = Code(code, Language.Turing)
 
         /**
          * Creates a `Code` object representing Rebol code.
@@ -577,7 +577,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object initialized with the specified Rebol code and using the `REBOL` language type.
          * @since 1.0.0
          */
-        fun rebol(@org.intellij.lang.annotations.Language("Rebol") code: String) = Code(code, Language.REBOL)
+        fun rebol(@org.intellij.lang.annotations.Language("Rebol") code: String) = Code(code, Language.Rebol)
 
         /**
          * Executes the provided Tcl/Tk code.
@@ -585,7 +585,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The Tcl/Tk script to be executed.
          * @since 1.0.0
          */
-        fun tcltk(@org.intellij.lang.annotations.Language("Tcl/Tk") code: String) = Code(code, Language.TCLTK)
+        fun tcltk(@org.intellij.lang.annotations.Language("Tcl/Tk") code: String) = Code(code, Language.TclTk)
 
         /**
          * Constructs a `Code` object containing the provided PostScript code.
@@ -594,7 +594,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * This parameter must be a syntactically valid PostScript language fragment.
          * @since 1.0.0
          */
-        fun postScript(@org.intellij.lang.annotations.Language("PostScript") code: String) = Code(code, Language.POSTSCRIPT)
+        fun postScript(@org.intellij.lang.annotations.Language("PostScript") code: String) = Code(code, Language.Postscript)
 
         /**
          * Executes the given AppleScript code.
@@ -602,7 +602,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The AppleScript code to be executed. Must be a valid AppleScript language string.
          * @since 1.0.0
          */
-        fun appleScript(@org.intellij.lang.annotations.Language("AppleScript") code: String) = Code(code, Language.APPLESCRIPT)
+        fun appleScript(@org.intellij.lang.annotations.Language("AppleScript") code: String) = Code(code, Language.Applescript)
 
         /**
          * Creates a `Code` instance with the specified LabVIEW code and language type.
@@ -610,7 +610,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The string representation of the LabVIEW code.
          * @since 1.0.0
          */
-        fun labview(@org.intellij.lang.annotations.Language("LabVIEW") code: String) = Code(code, Language.LABVIEW)
+        fun labview(@org.intellij.lang.annotations.Language("LabVIEW") code: String) = Code(code, Language.Labview)
 
         /**
          * Compiles the provided Brainfuck code into an executable representation.
@@ -621,7 +621,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @since 1.0.0
          */
         // Additional less common programming languages
-        fun brainfuck(@org.intellij.lang.annotations.Language("Brainfuck") code: String) = Code(code, Language.BRAINFUCK)
+        fun brainfuck(@org.intellij.lang.annotations.Language("Brainfuck") code: String) = Code(code, Language.Brainfuck)
 
         /**
          * Constructs a `Code` instance using the provided Whitespace language source code.
@@ -629,7 +629,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The source code written in Whitespace language.
          * @since 1.0.0
          */
-        fun whitespace(@org.intellij.lang.annotations.Language("Whitespace") code: String) = Code(code, Language.WHITESPACE)
+        fun whitespace(@org.intellij.lang.annotations.Language("Whitespace") code: String) = Code(code, Language.Whitespace)
 
         /**
          * Parses and encapsulates the provided INTERCAL code into a `Code` object with INTERCAL as the specified language.
@@ -638,7 +638,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object encapsulating the provided code string and defining its language as INTERCAL.
          * @since 1.0.0
          */
-        fun intercal(@org.intellij.lang.annotations.Language("INTERCAL") code: String) = Code(code, Language.INTERCAL)
+        fun intercal(@org.intellij.lang.annotations.Language("INTERCAL") code: String) = Code(code, Language.Intercal)
 
         /**
          * Creates a Code object for the specified Malbolge code string.
@@ -647,7 +647,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object configured with the provided Malbolge code and set to use the Malbolge language.
          * @since 1.0.0
          */
-        fun malbolge(@org.intellij.lang.annotations.Language("Malbolge") code: String) = Code(code, Language.MALBOLGE)
+        fun malbolge(@org.intellij.lang.annotations.Language("Malbolge") code: String) = Code(code, Language.Malbolge)
 
         /**
          * Creates a new instance of the `Code` class with the specified Befunge code and language.
@@ -656,7 +656,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return An instance of the `Code` class representing the provided Befunge code.
          * @since 1.0.0
          */
-        fun befunge(@org.intellij.lang.annotations.Language("Befunge") code: String) = Code(code, Language.BEFUNGE)
+        fun befunge(@org.intellij.lang.annotations.Language("Befunge") code: String) = Code(code, Language.Befunge)
 
         /**
          * Executes the provided Piet programming language code.
@@ -664,7 +664,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code the Piet code to be processed
          * @since 1.0.0
          */
-        fun piet(@org.intellij.lang.annotations.Language("Piet") code: String) = Code(code, Language.PIET)
+        fun piet(@org.intellij.lang.annotations.Language("Piet") code: String) = Code(code, Language.Piet)
 
         /**
          * Parses a given LOLCODE snippet.
@@ -674,7 +674,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object containing the parsed source code and its language metadata.
          * @since 1.0.0
          */
-        fun lolcode(@org.intellij.lang.annotations.Language("LOLCODE") code: String) = Code(code, Language.LOLCODE)
+        fun lolcode(@org.intellij.lang.annotations.Language("LOLCODE") code: String) = Code(code, Language.Lolcode)
 
         /**
          * Interprets the provided Chef programming language code and initializes it into a `Code` object.
@@ -682,7 +682,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The input code written in the Chef programming language.
          * @since 1.0.0
          */
-        fun chef(@org.intellij.lang.annotations.Language("Chef") code: String) = Code(code, Language.CHEF)
+        fun chef(@org.intellij.lang.annotations.Language("Chef") code: String) = Code(code, Language.Chef)
 
         /**
          * Encodes the provided code in the COW esolang syntax and encapsulates it within a `Code` object.
@@ -690,7 +690,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The string containing the COW esolang code to be processed.
          * @since 1.0.0
          */
-        fun cow(@org.intellij.lang.annotations.Language("COW") code: String) = Code(code, Language.COW)
+        fun cow(@org.intellij.lang.annotations.Language("COW") code: String) = Code(code, Language.Cow)
 
         /**
          * Converts the given Unlambda code into a `Code` object associated with the `UNLAMBDA` language.
@@ -699,7 +699,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return a `Code` object containing the provided Unlambda code and its associated language
          * @since 1.0.0
          */
-        fun unlambda(@org.intellij.lang.annotations.Language("Unlambda") code: String) = Code(code, Language.UNLAMBDA)
+        fun unlambda(@org.intellij.lang.annotations.Language("Unlambda") code: String) = Code(code, Language.Unlambda)
 
         /**
          * Compiles the provided Haxe code and creates a `Code` object with it, specifying Haxe as the language.
@@ -708,7 +708,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @since 1.0.0
          */
         // Additional modern programming languages
-        fun haxe(@org.intellij.lang.annotations.Language("Haxe") code: String) = Code(code, Language.HAXE)
+        fun haxe(@org.intellij.lang.annotations.Language("Haxe") code: String) = Code(code, Language.Haxe)
 
         /**
          * Creates a Code object for the Nim programming language.
@@ -717,7 +717,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return a Code object containing the provided Nim source code.
          * @since 1.0.0
          */
-        fun nim(@org.intellij.lang.annotations.Language("Nim") code: String) = Code(code, Language.NIM)
+        fun nim(@org.intellij.lang.annotations.Language("Nim") code: String) = Code(code, Language.Nim)
 
         /**
          * Executes the provided Zig code and initializes it with the specified language context.
@@ -725,7 +725,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code the Zig code to be executed or processed
          * @since 1.0.0
          */
-        fun zig(@org.intellij.lang.annotations.Language("Zig") code: String) = Code(code, Language.ZIG)
+        fun zig(@org.intellij.lang.annotations.Language("Zig") code: String) = Code(code, Language.Zig)
 
         /**
          * Creates a `Code` object initialized with the provided PureScript source code string.
@@ -734,7 +734,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return a `Code` object initialized with the given source code and marked with the `Language.PURESCRIPT` identifier
          * @since 1.0.0
          */
-        fun pureScript(@org.intellij.lang.annotations.Language("PureScript") code: String) = Code(code, Language.PURESCRIPT)
+        fun pureScript(@org.intellij.lang.annotations.Language("PureScript") code: String) = Code(code, Language.Purescript)
 
         /**
          * A function to create a Code object with Elm language support.
@@ -743,7 +743,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object initialized with the provided Elm code and language type.
          * @since 1.0.0
          */
-        fun elm(@org.intellij.lang.annotations.Language("Elm") code: String) = Code(code, Language.ELM)
+        fun elm(@org.intellij.lang.annotations.Language("Elm") code: String) = Code(code, Language.Elm)
 
         /**
          * Constructs a `Code` object with the provided Reason language code.
@@ -751,7 +751,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The source code written in the Reason programming language.
          * @since 1.0.0
          */
-        fun reason(@org.intellij.lang.annotations.Language("Reason") code: String) = Code(code, Language.REASON)
+        fun reason(@org.intellij.lang.annotations.Language("Reason") code: String) = Code(code, Language.Reason)
 
         /**
          * Compiles and executes the given WebAssembly (WASM) code.
@@ -760,7 +760,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * .
          * @since 1.0.0
          */
-        fun wasm(@org.intellij.lang.annotations.Language("WebAssembly") code: String) = Code(code, Language.WASM)
+        fun wasm(@org.intellij.lang.annotations.Language("WebAssembly") code: String) = Code(code, Language.Wasm)
 
         /**
          * Compiles a given string written in the Logo programming language into a `Code` object.
@@ -769,7 +769,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @since 1.0.0
          */
         // Educational programming languages
-        fun logo(@org.intellij.lang.annotations.Language("Logo") code: String) = Code(code, Language.LOGO)
+        fun logo(@org.intellij.lang.annotations.Language("Logo") code: String) = Code(code, Language.Logo)
 
         /**
          * Constructs a Code object with the given Scratch programming language code.
@@ -778,7 +778,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code instance containing the provided Scratch code and associated language.
          * @since 1.0.0
          */
-        fun scratch(@org.intellij.lang.annotations.Language("Scratch") code: String) = Code(code, Language.SCRATCH)
+        fun scratch(@org.intellij.lang.annotations.Language("Scratch") code: String) = Code(code, Language.Scratch)
 
         /**
          * Converts the provided HTML code into a Code object with HTML language type.
@@ -787,7 +787,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @since 1.0.0
          */
         // Non-programming languages (markup, data serialization, etc.)
-        fun html(@org.intellij.lang.annotations.Language("HTML") code: String) = Code(code, Language.HTML)
+        fun html(@org.intellij.lang.annotations.Language("HTML") code: String) = Code(code, Language.Html)
 
         /**
          * Creates a code block with the specified CSS content.
@@ -796,7 +796,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * the CSS syntax.
          * @since 1.0.0
          */
-        fun css(@org.intellij.lang.annotations.Language("CSS") code: String) = Code(code, Language.CSS)
+        fun css(@org.intellij.lang.annotations.Language("CSS") code: String) = Code(code, Language.Css)
 
         /**
          * Creates a new instance of the `Code` class with the specified XML code and associates it with XML language syntax.
@@ -804,7 +804,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The XML code to be encapsulated in the `Code` and interpreted with XML syntax highlighting.
          * @since 1.0.0
          */
-        fun xml(@org.intellij.lang.annotations.Language("XML") code: String) = Code(code, Language.XML)
+        fun xml(@org.intellij.lang.annotations.Language("XML") code: String) = Code(code, Language.Xml)
 
         /**
          * Parses and processes the given JSON code.
@@ -813,7 +813,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A new Code object containing the processed JSON code and its associated language type.
          * @since 1.0.0
          */
-        fun json(@org.intellij.lang.annotations.Language("JSON") code: String) = Code(code, Language.JSON)
+        fun json(@org.intellij.lang.annotations.Language("JSON") code: String) = Code(code, Language.Json)
 
         /**
          * Creates a Code object with the provided YAML code string.
@@ -821,7 +821,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The YAML code string to be wrapped in the Code object.
          * @since 1.0.0
          */
-        fun yaml(@org.intellij.lang.annotations.Language("YAML") code: String) = Code(code, Language.YAML)
+        fun yaml(@org.intellij.lang.annotations.Language("YAML") code: String) = Code(code, Language.Yaml)
 
         /**
          * Converts a given Markdown-formatted string into a Code object initialized with the Markdown language.
@@ -830,7 +830,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object initialized with the given Markdown content and language.
          * @since 1.0.0
          */
-        fun markdown(@org.intellij.lang.annotations.Language("Markdown") code: String) = Code(code, Language.MARKDOWN)
+        fun markdown(@org.intellij.lang.annotations.Language("Markdown") code: String) = Code(code, Language.Markdown)
 
         /**
          * Constructs a `Code` object using the provided TOML-formatted string.
@@ -838,7 +838,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The TOML code as a string. This string should conform to the TOML standard.
          * @since 1.0.0
          */
-        fun toml(@org.intellij.lang.annotations.Language("TOML") code: String) = Code(code, Language.TOML)
+        fun toml(@org.intellij.lang.annotations.Language("TOML") code: String) = Code(code, Language.Toml)
 
         /**
          * Creates a `Code` instance with the provided SVG code and sets the language to SVG.
@@ -846,7 +846,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The SVG code as a string. The string should be written in valid SVG format.
          * @since 1.0.0
          */
-        fun svg(@org.intellij.lang.annotations.Language("SVG") code: String) = Code(code, Language.SVG)
+        fun svg(@org.intellij.lang.annotations.Language("SVG") code: String) = Code(code, Language.Svg)
 
         /**
          * Creates a `Code` object with Regex language support.
@@ -854,7 +854,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The input string that represents the regular expression.
          * @since 1.0.0
          */
-        fun regex(@org.intellij.lang.annotations.Language("RegExp") code: String) = Code(code, Language.REGEX)
+        fun regex(@org.intellij.lang.annotations.Language("RegExp") code: String) = Code(code, Language.Regex)
 
         /**
          * Constructs a `Code` instance using the supplied GraphQL code and sets the language to GraphQL.
@@ -864,7 +864,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @since 1.0.0
          */
         // Additional markup and data formats
-        fun graphql(@org.intellij.lang.annotations.Language("GraphQL") code: String) = Code(code, Language.GRAPHQL)
+        fun graphql(@org.intellij.lang.annotations.Language("GraphQL") code: String) = Code(code, Language.GraphQl)
 
         /**
          * Creates a new instance of `Code` with the provided LaTeX code and specifies the language as LaTeX.
@@ -872,7 +872,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The LaTeX-formatted string to be encapsulated in the `Code` instance.
          * @since 1.0.0
          */
-        fun latex(@org.intellij.lang.annotations.Language("LaTeX") code: String) = Code(code, Language.LATEX)
+        fun latex(@org.intellij.lang.annotations.Language("LaTeX") code: String) = Code(code, Language.Latex)
 
         /**
          * Constructs a `Code` instance with the provided KaTeX string.
@@ -881,7 +881,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The KaTeX code string to be wrapped in a `Code` object.
          * @since 1.0.0
          */
-        fun katex(@org.intellij.lang.annotations.Language("KaTeX") code: String) = Code(code, Language.KATEX)
+        fun katex(@org.intellij.lang.annotations.Language("KaTeX") code: String) = Code(code, Language.Katex)
 
         /**
          * Creates a representation of the given reStructuredText code as a `Code` object.
@@ -890,7 +890,8 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object encapsulating the provided reStructuredText code and its language type.
          * @since 1.0.0
          */
-        fun restructuredText(@org.intellij.lang.annotations.Language("reStructuredText") code: String) = Code(code, Language.RESTRUCTUREDTEXT)
+        fun restructuredText(@org.intellij.lang.annotations.Language("reStructuredText") code: String) =
+            Code(code, Language.RestructuredText)
 
         /**
          * Creates a Code instance representing the supplied AsciiDoc content.
@@ -899,7 +900,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          *             This parameter must be a valid AsciiDoc string.
          * @since 1.0.0
          */
-        fun asciidoc(@org.intellij.lang.annotations.Language("AsciiDoc") code: String) = Code(code, Language.ASCIIDOC)
+        fun asciidoc(@org.intellij.lang.annotations.Language("AsciiDoc") code: String) = Code(code, Language.AsciiDoc)
 
         /**
          * Creates a new instance of the `Code` class with the specified INI-formatted string.
@@ -907,7 +908,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code A string containing INI-formatted code. This argument should comply with the syntax rules for INI files.
          * @since 1.0.0
          */
-        fun ini(@org.intellij.lang.annotations.Language("INI") code: String) = Code(code, Language.INI)
+        fun ini(@org.intellij.lang.annotations.Language("INI") code: String) = Code(code, Language.Ini)
 
         /**
          * Parses the given CSV code and encapsulates it in a Code object along with the CSV language specifier.
@@ -915,7 +916,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code the input string containing CSV-formatted data
          * @since 1.0.0
          */
-        fun csv(@org.intellij.lang.annotations.Language("CSV") code: String) = Code(code, Language.CSV)
+        fun csv(@org.intellij.lang.annotations.Language("CSV") code: String) = Code(code, Language.Csv)
 
         /**
          * Parses the provided tab-separated values (TSV) content and creates a Code object.
@@ -923,7 +924,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code The TSV content to be parsed.
          * @since 1.0.0
          */
-        fun tsv(@org.intellij.lang.annotations.Language("TSV") code: String) = Code(code, Language.TSV)
+        fun tsv(@org.intellij.lang.annotations.Language("TSV") code: String) = Code(code, Language.Tsv)
 
         /**
          * Parses the provided Protocol Buffers (protobuf) code and returns a Code object
@@ -934,7 +935,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A Code object representing the given protobuf code in the specified language.
          * @since 1.0.0
          */
-        fun protobuf(@org.intellij.lang.annotations.Language("Protocol Buffers") code: String) = Code(code, Language.PROTOBUF)
+        fun protobuf(@org.intellij.lang.annotations.Language("Protocol Buffers") code: String) = Code(code, Language.ProtoBuf)
 
         /**
          * Creates a `Code` instance for the given Thrift code block.
@@ -943,7 +944,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          *             as it will be used to create a `Code` object associated with the Thrift language.
          * @since 1.0.0
          */
-        fun thrift(@org.intellij.lang.annotations.Language("Thrift") code: String) = Code(code, Language.THRIFT)
+        fun thrift(@org.intellij.lang.annotations.Language("Thrift") code: String) = Code(code, Language.Thrift)
 
         /**
          * Creates an instance of Code with the specified Avro code and language.
@@ -951,7 +952,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code the Avro code as a string to be wrapped in a Code object
          * @since 1.0.0
          */
-        fun avro(@org.intellij.lang.annotations.Language("Avro") code: String) = Code(code, Language.AVRO)
+        fun avro(@org.intellij.lang.annotations.Language("Avro") code: String) = Code(code, Language.Avro)
 
         /**
          * Compiles the given Parquet code into an instance of the `Code` class, with the specified
@@ -961,7 +962,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @return A `Code` object initialized with the provided Parquet code and language type.
          * @since 1.0.0
          */
-        fun parquet(@org.intellij.lang.annotations.Language("Parquet") code: String) = Code(code, Language.PARQUET)
+        fun parquet(@org.intellij.lang.annotations.Language("Parquet") code: String) = Code(code, Language.Parquet)
 
         /**
          * Creates a new instance of the `Code` class with the specified ORC code and language.
@@ -969,7 +970,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
          * @param code the ORC language code as a string
          * @since 1.0.0
          */
-        fun orc(@org.intellij.lang.annotations.Language("ORC") code: String) = Code(code, Language.ORC)
+        fun orc(@org.intellij.lang.annotations.Language("ORC") code: String) = Code(code, Language.Orc)
 
         class Serializer : ValueSerializer<Code>() {
             override fun serialize(value: Code, gen: JsonGenerator, ctxt: SerializationContext) {
@@ -1039,7 +1040,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
      * @since 1.0.0
      */
     private fun runJavaCode(className: String) {
-        language == Language.JAVA || throw UnsupportedOperationException("Only java is supported.")
+        language == Language.Java || throw UnsupportedOperationException("Only java is supported.")
 
         val compiler: JavaCompiler = ToolProvider.getSystemJavaCompiler()
         val diagnostics = StringWriter()
@@ -1062,7 +1063,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
             val method = clazz.getMethod("sayHello")
             method.invoke(null)
 
-        } else throw CompilationException(Language.JAVA, "Class: $className")
+        } else throw CompilationException(Language.Java, "Class: $className")
 
         fileManager.close()
     }
@@ -1080,13 +1081,13 @@ open class Code(open val value: String, val language: Language) : CharSequence {
      */
     fun runCode(className: String? = null) {
         when(language) {
-            Language.KOTLIN, Language.JAVASCRIPT, Language.GROOVY, Language.SCALA, Language.CLOJURE, Language.TCLTK -> {
+            Language.Kotlin, Language.Javascript, Language.Groovy, Language.Scala, Language.Clojure, Language.TclTk -> {
                 val engine = ScriptEngineManager().getEngineByName(when(language) {
-                    Language.KOTLIN -> "kotlin"
-                    Language.JAVASCRIPT -> "JavaScript"
-                    Language.GROOVY -> "groovy"
-                    Language.SCALA -> "scala"
-                    Language.CLOJURE -> "clojure"
+                    Language.Kotlin -> "kotlin"
+                    Language.Javascript -> "JavaScript"
+                    Language.Groovy -> "groovy"
+                    Language.Scala -> "scala"
+                    Language.Clojure -> "clojure"
                     else -> ""
                 })
                 try {
@@ -1095,7 +1096,7 @@ open class Code(open val value: String, val language: Language) : CharSequence {
                     throw CompilationException(language, e)
                 }
             }
-            Language.JAVA -> runJavaCode(className ?: throw RequiredParameterException("Class name cannot be null for Java."))
+            Language.Java -> runJavaCode(className ?: throw RequiredParameterException("Class name cannot be null for Java."))
             else -> throw UnsupportedOperationException("Only Kotlin, Java, JavaScript, Groovy, Scala, Clojure, TCL is supported.")
         }
     }

@@ -24,73 +24,73 @@ import dev.tommasop1804.kutils.*
  */
 @Suppress("unused")
 enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: String) {
-    CONTINUE(100, Family.INFORMATIONAL, "Continue"),
-    SWITCHING_PROTOCOLS(101, Family.INFORMATIONAL, "Switching Protocols"),
-    @Deprecated("Removed from WebDAV specification") PROCESSING(102, Family.INFORMATIONAL, "Processing"),
-    EARLY_HINTS(103, Family.INFORMATIONAL, "Early Hints"),
+    Continue(100, Family.Informational, "Continue"),
+    SwitchingProtocols(101, Family.Informational, "Switching Protocols"),
+    @Deprecated("Removed from WebDAV specification") Processing(102, Family.Informational, "Processing"),
+    EarlyHints(103, Family.Informational, "Early Hints"),
 
-    OK(200, Family.SUCCESSFUL, "OK"),
-    CREATED(201, Family.SUCCESSFUL, "Created"),
-    ACCEPTED(202, Family.SUCCESSFUL, "Accepted"),
-    NON_AUTHORITATIVE_INFORMATION(203, Family.SUCCESSFUL, "Non-Authoritative Information"),
-    NO_CONTENT(204, Family.SUCCESSFUL, "No Content"),
-    RESET_CONTENT(205, Family.SUCCESSFUL, "Reset Content"),
-    PARTIAL_CONTENT(206, Family.SUCCESSFUL, "Partial Content"),
-    MULTI_STATUS(207, Family.SUCCESSFUL, "Multi-Status"),
-    ALREADY_REPORTED(208, Family.SUCCESSFUL, "Already Reported"),
-    IM_USED(226, Family.SUCCESSFUL, "IM Used"),
+    Ok(200, Family.Successful, "OK"),
+    Created(201, Family.Successful, "Created"),
+    Accepted(202, Family.Successful, "Accepted"),
+    NonAuthoritativeInformation(203, Family.Successful, "Non-Authoritative Information"),
+    NoContent(204, Family.Successful, "No Content"),
+    ResetContent(205, Family.Successful, "Reset Content"),
+    PartialContent(206, Family.Successful, "Partial Content"),
+    MultiStatus(207, Family.Successful, "Multi-Status"),
+    AlreadyReported(208, Family.Successful, "Already Reported"),
+    ImUsed(226, Family.Successful, "IM Used"),
 
-    MULTIPLE_CHOICES(300, Family.REDIRECTION, "Multiple Choices"),
-    MOVED_PERMANENTLY(301, Family.REDIRECTION, "Moved Permanently"),
-    FOUND(302, Family.REDIRECTION, "Found"),
-    SEE_OTHER(303, Family.REDIRECTION, "See Other"),
-    NOT_MODIFIED(304, Family.REDIRECTION, "Not Modified"),
-    @Deprecated("Deprecated status code") USE_PROXY(305, Family.REDIRECTION, "Use Proxy"),
-    @Deprecated("Deprecated status code", level = DeprecationLevel.ERROR) SWITCH_PROXY(306, Family.REDIRECTION, "Switch Proxy"),
-    TEMPORARY_REDIRECT(307, Family.REDIRECTION, "Temporary Redirect"),
-    PERMANENT_REDIRECT(308, Family.REDIRECTION, "Permanent Redirect"),
+    MultipleChoices(300, Family.Redirection, "Multiple Choices"),
+    MovedPermanently(301, Family.Redirection, "Moved Permanently"),
+    Found(302, Family.Redirection, "Found"),
+    SeeOther(303, Family.Redirection, "See Other"),
+    NotModified(304, Family.Redirection, "Not Modified"),
+    @Deprecated("Deprecated status code") UseProxy(305, Family.Redirection, "Use Proxy"),
+    @Deprecated("Deprecated status code", level = DeprecationLevel.ERROR) SwitchProxy(306, Family.Redirection, "Switch Proxy"),
+    TemporaryRedirect(307, Family.Redirection, "Temporary Redirect"),
+    PermanentRedirect(308, Family.Redirection, "Permanent Redirect"),
 
-    BAD_REQUEST(400, Family.CLIENT_ERROR, "Bad Request"),
-    UNAUTHORIZED(401, Family.CLIENT_ERROR, "Unauthorized"),
-    PAYMENT_REQUIRED(402, Family.CLIENT_ERROR, "Payment Required"),
-    FORBIDDEN(403, Family.CLIENT_ERROR, "Forbidden"),
-    NOT_FOUND(404, Family.CLIENT_ERROR, "Not Found"),
-    METHOD_NOT_ALLOWED(405, Family.CLIENT_ERROR, "Method Not Allowed"),
-    NOT_ACCEPTABLE(406, Family.CLIENT_ERROR, "Not Acceptable"),
-    PROXY_AUTHENTICATION_REQUIRED(407, Family.CLIENT_ERROR, "Proxy Authentication Required"),
-    REQUEST_TIMEOUT(408, Family.CLIENT_ERROR, "Request Timeout"),
-    CONFLICT(409, Family.CLIENT_ERROR, "Conflict"),
-    GONE(410, Family.CLIENT_ERROR, "Gone"),
-    LENGTH_REQUIRED(411, Family.CLIENT_ERROR, "Length Required"),
-    PRECONDITION_FAILED(412, Family.CLIENT_ERROR, "Precondition Failed"),
-    CONTENT_TOO_LARGE(413, Family.CLIENT_ERROR, "Payload Too Large"),
-    URI_TOO_LONG(414, Family.CLIENT_ERROR, "URI Too Long"),
-    UNSUPPORTED_MEDIA_TYPE(415, Family.CLIENT_ERROR, "Unsupported Media Type"),
-    RANGE_NOT_SATISFIABLE(416, Family.CLIENT_ERROR, "Range Not Satisfiable"),
-    EXPECTATION_FAILED(417, Family.CLIENT_ERROR, "Expectation Failed"),
-    @Deprecated("Deprecated status code", level = DeprecationLevel.ERROR) I_AM_A_TEAPOT(418, Family.CLIENT_ERROR, "I'm a teapot"),
-    MISDIRECTED_REQUEST(421, Family.CLIENT_ERROR, "Misdirected Request"),
-    UNPROCESSABLE_CONTENT(422, Family.CLIENT_ERROR, "Unprocessable Content"),
-    LOCKED(423, Family.CLIENT_ERROR, "Locked"),
-    FAILED_DEPENDENCY(424, Family.CLIENT_ERROR, "Failed Dependency"),
-    TOO_EARLY(425, Family.CLIENT_ERROR, "Too Early"),
-    UPGRADE_REQUIRED(426, Family.CLIENT_ERROR, "Upgrade Required"),
-    PRECONDITION_REQUIRED(428, Family.CLIENT_ERROR, "Precondition Required"),
-    TOO_MANY_REQUESTS(429, Family.CLIENT_ERROR, "Too Many Requests"),
-    REQUEST_HEADER_FIELDS_TOO_LARGE(431, Family.CLIENT_ERROR, "Request Header Fields Too Large"),
-    UNAVAILABLE_FOR_LEGAL_REASONS(451, Family.CLIENT_ERROR, "Unavailable For Legal Reasons"),
+    BadRequest(400, Family.ClientError, "Bad Request"),
+    Unauthorized(401, Family.ClientError, "Unauthorized"),
+    PaymentRequired(402, Family.ClientError, "Payment Required"),
+    Forbidden(403, Family.ClientError, "Forbidden"),
+    NotFound(404, Family.ClientError, "Not Found"),
+    MethodNotAllowed(405, Family.ClientError, "Method Not Allowed"),
+    NotAcceptable(406, Family.ClientError, "Not Acceptable"),
+    ProxyAuthenticationRequired(407, Family.ClientError, "Proxy Authentication Required"),
+    RequestTimeout(408, Family.ClientError, "Request Timeout"),
+    Conflict(409, Family.ClientError, "Conflict"),
+    Gone(410, Family.ClientError, "Gone"),
+    LengthRequired(411, Family.ClientError, "Length Required"),
+    PreconditionFailed(412, Family.ClientError, "Precondition Failed"),
+    ContentTooLarge(413, Family.ClientError, "Payload Too Large"),
+    UriTooLong(414, Family.ClientError, "URI Too Long"),
+    UnsupportedMediaType(415, Family.ClientError, "Unsupported Media Type"),
+    RangeNotSatisfiable(416, Family.ClientError, "Range Not Satisfiable"),
+    ExpectationFailed(417, Family.ClientError, "Expectation Failed"),
+    @Deprecated("Deprecated status code", level = DeprecationLevel.ERROR) IAmATeapot(418, Family.ClientError, "I'm a teapot"),
+    MisdirectedRequest(421, Family.ClientError, "Misdirected Request"),
+    UnprocessableContent(422, Family.ClientError, "Unprocessable Content"),
+    Locked(423, Family.ClientError, "Locked"),
+    FailedDependency(424, Family.ClientError, "Failed Dependency"),
+    TooEarly(425, Family.ClientError, "Too Early"),
+    UpgradeRequired(426, Family.ClientError, "Upgrade Required"),
+    PreconditionRequired(428, Family.ClientError, "Precondition Required"),
+    TooManyRequests(429, Family.ClientError, "Too Many Requests"),
+    RequestHeaderFieldsTooLarge(431, Family.ClientError, "Request Header Fields Too Large"),
+    UnavailableForLegalReasons(451, Family.ClientError, "Unavailable For Legal Reasons"),
 
-    INTERNAL_SERVER_ERROR(500, Family.SERVER_ERROR, "Internal Server Error"),
-    NOT_IMPLEMENTED(501, Family.SERVER_ERROR, "Not Implemented"),
-    BAD_GATEWAY(502, Family.SERVER_ERROR, "Bad Gateway"),
-    SERVICE_UNAVAILABLE(503, Family.SERVER_ERROR, "Service Unavailable"),
-    GATEWAY_TIMEOUT(504, Family.SERVER_ERROR, "Gateway Timeout"),
-    HTTP_VERSION_NOT_SUPPORTED(505, Family.SERVER_ERROR, "HTTP Version Not Supported"),
-    VARIANT_ALSO_NEGOTIATES(506, Family.SERVER_ERROR, "Variant Also Negotiates"),
-    INSUFFICIENT_STORAGE(507, Family.SERVER_ERROR, "Insufficient Storage"),
-    LOOP_DETECTED(508, Family.SERVER_ERROR, "Loop Detected"),
-    NOT_EXTENDED(510, Family.SERVER_ERROR, "Not Extended"),
-    NETWORK_AUTHENTICATION_REQUIRED(511, Family.SERVER_ERROR, "Network Authentication Required");
+    InternalServerError(500, Family.ServerError, "Internal Server Error"),
+    NotImplemented(501, Family.ServerError, "Not Implemented"),
+    BadGateway(502, Family.ServerError, "Bad Gateway"),
+    ServiceUnavailable(503, Family.ServerError, "Service Unavailable"),
+    GatewayTimeout(504, Family.ServerError, "Gateway Timeout"),
+    HttpVersionNotSupported(505, Family.ServerError, "HTTP Version Not Supported"),
+    VariantAlsoNegotiates(506, Family.ServerError, "Variant Also Negotiates"),
+    InsufficientStorage(507, Family.ServerError, "Insufficient Storage"),
+    LoopDetected(508, Family.ServerError, "Loop Detected"),
+    NotExtended(510, Family.ServerError, "Not Extended"),
+    NetworkAuthenticationRequired(511, Family.ServerError, "Network Authentication Required");
 
     /**
      * Indicates whether the current HTTP status is marked as deprecated.
@@ -117,7 +117,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
      * This property evaluates to `true` if the status code's family is `INFORMATIONAL`, and `false` otherwise.
      * @since 2.0.0
      */
-    val isInformational get() = family == Family.INFORMATIONAL
+    val isInformational get() = family == Family.Informational
     /**
      * Indicates whether the HTTP status code belongs to the "SUCCESSFUL" category.
      *
@@ -127,7 +127,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
      * 201 (Created), and 204 (No Content).
      * @since 2.0.0
      */
-    val isSuccessful get() = family == Family.SUCCESSFUL
+    val isSuccessful get() = family == Family.Successful
     /**
      * Indicates whether the HTTP status code is classified under the redirection family.
      *
@@ -139,7 +139,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
      * as `Family.REDIRECTION`.
      * @since 2.0.0
      */
-    val isRedirection get() = family == Family.REDIRECTION
+    val isRedirection get() = family == Family.Redirection
     /**
      * Indicates whether the HTTP status code belongs to the client error category.
      *
@@ -148,7 +148,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
      * issues caused by the client, such as malformed requests, unauthorized access, or forbidden actions.
      * @since 2.0.0
      */
-    val isClientError get() = family == Family.CLIENT_ERROR
+    val isClientError get() = family == Family.ClientError
     /**
      * Indicates whether the HTTP status belongs to the server error category.
      *
@@ -157,7 +157,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
      * The property evaluates to `true` if the `family` of the HTTP status is `SERVER_ERROR`.
      * @since 2.0.0
      */
-    val isServerError get() = family == Family.SERVER_ERROR
+    val isServerError get() = family == Family.ServerError
 
     /**
      * Indicates whether the HTTP status represents an error condition.
@@ -307,9 +307,9 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          *
          * These responses are used to indicate provisional information about the status of the request,
          * often requiring the client to make further actions to complete the request.
-         * @since 2.0.0
+         * @since 4.0.0
          */
-        INFORMATIONAL("Informational", 1),
+        Informational("Informational", 1),
         /**
          * Represents the "SUCCESSFUL" category within the Family enum class.
          *
@@ -318,17 +318,17 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * successfully received, understood, and accepted by the server.
          *
          * Examples of successful status codes include 200 (OK), 201 (Created), and 204 (No Content).
-         * @since 2.0.0
+         * @since 4.0.0
          */
-        SUCCESSFUL("Successful", 2),
+        Successful("Successful", 2),
         /**
          * Represents the REDIRECTION status in the HTTP response status code categorization.
          *
          * REDIRECTION indicates that further action needs to be taken by the client in order to complete the request.
          * This category is typically used for redirecting the client to a different resource, as navigated by a Location header.
-         * @since 2.0.0
+         * @since 3.0.0
          */
-        REDIRECTION("Redirection", 3),
+        Redirection("Redirection", 3),
         /**
          * Represents the client error family of HTTP status codes.
          *
@@ -336,18 +336,18 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * These status codes indicate issues where the client seems to have made a
          * mistake in the request. Common scenarios include invalid syntax,
          * unauthorized access, forbidden access, or requests that cannot be fulfilled.
-         * @since 2.0.0
+         * @since 4.0.0
          */
-        CLIENT_ERROR("Client Error", 4),
+        ClientError("Client Error", 4),
         /**
          * Represents the server error family of HTTP response codes.
          *
          * This family indicates that the server encountered an error or is otherwise
          * incapable of performing the request. Responses in this family typically return
          * with status codes in the range of 500 to 599.
-         * @since 2.0.0
+         * @since 4.0.0
          */
-        SERVER_ERROR("Server Error", 5);
+        ServerError("Server Error", 5);
 
         companion object {
             infix fun of(code: Int) = entries.find { it.value == code }

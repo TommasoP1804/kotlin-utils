@@ -21,25 +21,25 @@ enum class QuantityLevel {
      * This enumeration constant is used to specify the lowest or minimum level
      * in contexts where quantity levels are represented.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    MIN,
+    Minimum,
     /**
      * Represents the maximum level of quantity.
      *
-     * The `MAX` constant is used to define situations where the maximum permissible
+     * The `Maximum` constant is used to define situations where the maximum permissible
      * or possible quantity level is required. This can be useful in scenarios
      * where upper bounds or limits need to be specified explicitly.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    MAX,
+    Maximum,
     /**
-     * Represents the EXACTLY quantity level within the `QuantityLevel` enumeration.
+     * Represents the Exactly quantity level within the `QuantityLevel` enumeration.
      *
      * This enum constant is used to indicate an exact or specific quantity level.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    EXACTLY
+    Exactly
 }

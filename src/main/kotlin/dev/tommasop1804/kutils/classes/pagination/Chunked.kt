@@ -123,9 +123,9 @@ data class Chunked<T>(
             if (generalFilterString.isNotNull()) {
                 val generalFilter = FilterOption.parse(generalFilterString).onlyElement()
                 generalFilter.operator.validate(
-                    lazyMessage = { "General filter operator in ${((FilterOperator byCategory STRING) + (FilterOperator byCategory EQUALITY)).map(FilterOperator::operator)}" },
+                    lazyMessage = { "General filter operator in ${((FilterOperator byCategory String) + (FilterOperator byCategory Equality)).map(FilterOperator::operator)}" },
                     causeOf = exceptionForInvalid("General filter operator is invalid")
-                ) { it.category in arrayOf(STRING, EQUALITY) }
+                ) { it.category in arrayOf(String, Equality) }
 
                 val getCondition = { it: String -> generalFilter.operator.sql(
                     "LOWER(CAST($it AS TEXT))",
@@ -153,23 +153,23 @@ data class Chunked<T>(
                     )
                     if (it.value.isNotNull()) {
                         orFilters += it.operator.sql(
-                            if (it.operator.category in arrayOf(STRING, EQUALITY))
+                            if (it.operator.category in arrayOf(String, Equality))
                                 "LOWER(CAST(${(dbDictionary[it.field] ?: it.field)} AS TEXT))"
                             else (dbDictionary[it.field] ?: it.field),
                             when (it.operator.category)  {
-                                STRING, EQUALITY -> "'${it.value?.toString()?.lowercase()}'"
-                                COMPARISON if it.field in dateFields -> {
+                                String, Equality -> "'${it.value?.toString()?.lowercase()}'"
+                                Comparison if it.field in dateFields -> {
                                     if (YearMonth(it.value!!.toString()).isSuccess)
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()}' AS DATE)"
                                 }
-                                COMPARISON if it.field in dateTimeFields -> {
+                                Comparison if it.field in dateTimeFields -> {
                                     if (YearMonth(it.value!!.toString()).isSuccess)
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
-                                    else "CAST('${it.value.toString()} ${if (it.operator in setOf(GREATER_THAN, GREATER_THAN_OR_EQUALS)) "00:00:00" else "23:59:59"}' AS TIMESTAMP)"
+                                    else "CAST('${it.value.toString()} ${if (it.operator in setOf(GreaterThan, GreaterThanOrEquals)) "00:00:00" else "23:59:59"}' AS TIMESTAMP)"
                                 }
-                                COMPARISON if it.field in dateTimeWithZoneFields -> {
-                                    "CAST('${it.value.toString()} ${if (it.operator in setOf(GREATER_THAN, GREATER_THAN_OR_EQUALS)) "00:00:00" else "23:59:59"}' AS TIMESTAMP WITH TIME ZONE)"
+                                Comparison if it.field in dateTimeWithZoneFields -> {
+                                    "CAST('${it.value.toString()} ${if (it.operator in setOf(GreaterThan, GreaterThanOrEquals)) "00:00:00" else "23:59:59"}' AS TIMESTAMP WITH TIME ZONE)"
                                 }
                                 else -> it.value.toString()
                             }
@@ -283,13 +283,13 @@ data class Chunked<T>(
             sorting.all { it.field in availSortingFields } || throw exceptionForInvalid("Sorting field not supported")
             if (sorting.isNotEmpty() && baseCollection.isNotEmpty()) {
                 val property = baseCollection.first()::class.memberProperties[{ it.name == sorting.first().field }] ?: throw NoSuchPropertyException()
-                var comparator = if (sorting.first().direction == SortDirection.DESCENDING)
+                var comparator = if (sorting.first().direction == SortDirection.Descending)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
                 for (sortOption in (-1)(sorting)) {
                     println(sortOption)
                     val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.field }] ?: throw NoSuchPropertyException()
-                    comparator = if (sortOption.direction == SortDirection.DESCENDING)
+                    comparator = if (sortOption.direction == SortDirection.Descending)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
                     else comparator.thenBy { property.call(it) as Comparable<*>? }
                 }
@@ -340,16 +340,16 @@ data class Chunked<T>(
 
         @InternalScope
         fun filter(value: String, fliterOption: FilterOption, exceptionForInvalid: Transformer<String, Throwable>) = when (fliterOption.operator) {
-            EQUALS -> value equalsIgnoreCase fliterOption.value.toString()
-            NOT_EQUALS -> value notEqualsIgnoreCase fliterOption.value.toString()
-            IN -> tryOr({ false }) { value inIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
-            NOT_IN -> tryOr({ false }) { value notInIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
-            STARTS_WITH -> value startsWithIgnoreCase fliterOption.value.toString()
-            NOT_STARTS_WITH -> value startsWithIgnoreCase fliterOption.value.toString()
-            ENDS_WITH -> value endsWithIgnoreCase fliterOption.value.toString()
-            NOT_ENDS_WITH -> value endsWithIgnoreCase fliterOption.value.toString()
-            CONTAINS -> value containsIgnoreCase fliterOption.value.toString()
-            NOT_CONTAINS -> value notContainsIgnoreCase fliterOption.value.toString()
+            Equals -> value equalsIgnoreCase fliterOption.value.toString()
+            NotEquals -> value notEqualsIgnoreCase fliterOption.value.toString()
+            In -> tryOr({ false }) { value inIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
+            NotIn -> tryOr({ false }) { value notInIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }
+            StartsWith -> value startsWithIgnoreCase fliterOption.value.toString()
+            NotStartsWith -> value startsWithIgnoreCase fliterOption.value.toString()
+            EndsWith -> value endsWithIgnoreCase fliterOption.value.toString()
+            NotEndsWith -> value endsWithIgnoreCase fliterOption.value.toString()
+            Contains -> value containsIgnoreCase fliterOption.value.toString()
+            NotContains -> value notContainsIgnoreCase fliterOption.value.toString()
             else -> throw exceptionForInvalid("Operator ${fliterOption.operator} not supported.")
         }
 

@@ -987,41 +987,41 @@ operator fun <E> List<E>.get(index: Int, lazyException: ThrowableSupplier = { No
  *
  * @param E the type of elements in the list.
  * @param R the type of the property to sort by, which must be comparable.
- * @param direction the sorting direction, either [SortDirection.ASCENDING] for increasing order or
- * [SortDirection.DESCENDING] for decreasing order.
+ * @param direction the sorting direction, either [SortDirection.Ascending] for increasing order or
+ * [SortDirection.Descending] for decreasing order.
  * @param selector a function that extracts the property to sort by from each element in the list.
  *
  * @since 1.0.0
  */
 inline fun <E, R : Comparable<R>> MList<E>.sortBy(direction: SortDirection, crossinline selector: Transformer<E, R?>) = when (direction) {
-    SortDirection.ASCENDING -> kSortBy(selector)
-    SortDirection.DESCENDING -> kSortByDescending(selector)
+    SortDirection.Ascending -> kSortBy(selector)
+    SortDirection.Descending -> kSortByDescending(selector)
 }
 
 /**
  * Sorts the elements of the list in the specified direction.
  *
- * @param direction The sorting order to apply. It can be either [SortDirection.ASCENDING] or [SortDirection.DESCENDING], indicating whether the list should be sorted in ascending or
+ * @param direction The sorting order to apply. It can be either [SortDirection.Ascending] or [SortDirection.Descending], indicating whether the list should be sorted in ascending or
  *  descending order, respectively.
  * @since 1.0.0
  */
 infix fun <E : Comparable<E>> MList<E>.sort(direction: SortDirection) = when (direction) {
-    SortDirection.ASCENDING -> sort()
-    SortDirection.DESCENDING -> sortDescending()
+    SortDirection.Ascending -> sort()
+    SortDirection.Descending -> sortDescending()
 }
 
 /**
  * Sorts the elements of an [Iterable] based on the specified sorting direction.
  *
  * @param direction The sorting order defined by the [SortDirection] enumeration.
- *                  Use [SortDirection.ASCENDING] for ascending order and
- *                  [SortDirection.DESCENDING] for descending order.
+ *                  Use [SortDirection.Ascending] for ascending order and
+ *                  [SortDirection.Descending] for descending order.
  * @return A list of elements sorted in the specified order.
  * @since 1.0.0
  */
 infix fun <E: Comparable<E>> Iterable<E>.sorted(direction: SortDirection) = when (direction) {
-    SortDirection.ASCENDING -> sorted()
-    SortDirection.DESCENDING -> sortedDescending()
+    SortDirection.Ascending -> sorted()
+    SortDirection.Descending -> sortedDescending()
 }
 
 /**
@@ -1033,14 +1033,14 @@ infix fun <E: Comparable<E>> Iterable<E>.sorted(direction: SortDirection) = when
  *
  * @param E The type of elements in the collection being sorted.
  * @param R The type of the property by which elements are compared; must implement [Comparable].
- * @param direction The sorting direction, either [SortDirection.ASCENDING] or [SortDirection.DESCENDING].
+ * @param direction The sorting direction, either [SortDirection.Ascending] or [SortDirection.Descending].
  * @param selector The selector function used to map elements to their comparable values.
  *
  * @since 1.0.0
  */
 inline fun <E, R : Comparable<R>> Iterable<E>.sortedBy(direction: SortDirection, crossinline selector: Transformer<E, R?>) = when (direction) {
-    SortDirection.ASCENDING -> kSortedBy(selector)
-    SortDirection.DESCENDING -> sortedByDescending(selector)
+    SortDirection.Ascending -> kSortedBy(selector)
+    SortDirection.Descending -> sortedByDescending(selector)
 }
 
 /**

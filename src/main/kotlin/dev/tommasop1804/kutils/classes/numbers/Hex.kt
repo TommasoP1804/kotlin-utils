@@ -9,11 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.classes.constants.TextCase
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.NumberSignException
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
+import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isOdd
 import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.unaryPlus
@@ -26,6 +24,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.text.startsWith
 
 /**
  * Represents a hexadecimal string value and enforces validation to ensure the string
@@ -433,7 +432,7 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
      * @return The hexadecimal string value.
      * @since 1.0.0
      */
-    override fun toString(): String = toString(HexSymbol.ZERO_X)
+    override fun toString(): String = toString(HexSymbol.ZeroX)
 
     /**
      * Converts the provided `symbol` and its associated value into a string representation based on the specified `textCase`.
@@ -443,9 +442,9 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
      * @return the string representation of the given `symbol` and its value in the specified text case.
      * @since 1.0.0
      */
-    fun toString(symbol: HexSymbol, textCase: TextCase = TextCase.UPPER_CASE) = buildString {
+    fun toString(symbol: HexSymbol, textCase: TextCase = TextCase.UpperCase) = buildString {
         append(symbol.symbol)
-        append(value.convertCase(TextCase.UPPER_CASE, textCase))
+        append(value.convertCase(TextCase.UpperCase, textCase))
     }
 
     /**
@@ -454,7 +453,7 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
      * @param textCase the case formatting to apply to the string representation, such as upper or lower case.
      * @since 1.0.0
      */
-    fun toString(textCase: TextCase) = toString(HexSymbol.ZERO_X, textCase)
+    fun toString(textCase: TextCase) = toString(HexSymbol.ZeroX, textCase)
 
     /**
      * Converts the hexadecimal string value to uppercase.
@@ -769,27 +768,25 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
          * This is a specific instance of the `HexSymbol` enumeration that indicates
          * no symbol or prefix is associated with the hexadecimal value.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        NONE(""),
+        None(""),
         /**
          * Represents the hex symbol "0x" used as a prefix for hexadecimal values.
          *
          * This is a component of the `HexSymbol` enumeration that defines various
          * symbols associated with hexadecimal formatting.
          *
-         * @property symbol The string representation of the hex symbol.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        ZERO_X("0x"),
+        ZeroX("0x"),
         /**
          * Represents the hash symbol "#" used within the HexSymbol enumeration.
          *
          * This symbol can be utilized in contexts requiring the '#' prefix format.
          *
-         * @property symbol The string representation of the hash symbol.
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        HASH("#")
+        Hash("#")
     }
 }

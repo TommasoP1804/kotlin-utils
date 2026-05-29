@@ -36,7 +36,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = FilterOption.Companion.OldSerializer::class)
 data class FilterOption(
     var field: String? = null,
-    var operator: FilterOperator = FilterOperator.EQUALS,
+    var operator: FilterOperator = FilterOperator.Equals,
     var value: Any?
 ) {
     /**
@@ -47,7 +47,7 @@ data class FilterOption(
      * @param value The value specified for the filtering condition.
      * @since 1.0.0
      */
-    constructor(field: KProperty<*>, operator: FilterOperator = FilterOperator.EQUALS, value: Any?) : this(
+    constructor(field: KProperty<*>, operator: FilterOperator = FilterOperator.Equals, value: Any?) : this(
         field.run {
             val type1 = ownerClass?.simpleName
             if (type1.isNotNull()) $$"$$type1$$${name}" else name
@@ -262,27 +262,27 @@ enum class FilterOperator(
      *
      * The SQL representation of this operator is defined as "{field} = {value}".
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    EQUALS("eq", "{field} = {value}", Category.EQUALITY, "="),
+    Equals("eq", "{field} = {value}", Category.Equality, "="),
     /**
      * Represents the "not equals" filter operator in a query.
      *
-     * The `NOT_EQUALS` operator is used to filter data where the value of a specified field
+     * The `NotEquals` operator is used to filter data where the value of a specified field
      * is not equal to a given value. This operator is commonly utilized in query-building
      * scenarios for data filtering purposes.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    NOT_EQUALS("ne", "{field} <> {value}", Category.EQUALITY, "≠"),
+    NotEquals("ne", "{field} <> {value}", Category.Equality, "≠"),
     /**
      * Represents the "in" operator used for filtering.
      *
-     * The `IN` operator is used to check if a value is present within a specific set of values provided in a filter.
+     * The `In` operator is used to check if a value is present within a specific set of values provided in a filter.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    IN("in", "{value} IN {field}", Category.ARRAY_SEARCH, "∈"),
+    In("in", "{value} IN {field}", Category.ArraySearch, "∈"),
     /**
      * Represents the `NOT IN` filter operator used to determine if a given value does not exist
      * within a specified set of values or collection.
@@ -293,108 +293,108 @@ enum class FilterOperator(
      * The `operator` ("nin") defines the symbolic representation of this filter operator, while
      * the `sql` pattern ("{value} NOT IN {field}") specifies how the operator should be formatted during translation to SQL or similar query languages.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    NOT_IN("nin", "{value} NOT IN {field}", Category.ARRAY_SEARCH, "∉"),
+    NotIn("nin", "{value} NOT IN {field}", Category.ArraySearch, "∉"),
     /**
      * Represents a "less than" filter operation in a query or filtering system.
      *
-     * The `LESS_THAN` operation is used to evaluate whether a specific field's value
+     * The `LessThan` operation is used to evaluate whether a specific field's value
      * is less than the given comparison value. It is typically utilized in filtering scenarios
      * to include only records that satisfy the specified "less than" condition.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    LESS_THAN("lt", "{field} < {value}", Category.COMPARISON, "<"),
+    LessThan("lt", "{field} < {value}", Category.Comparison, "<"),
     /**
      * Represents a "greater than" filter operator for use in filtering operations.
      *
-     * The `GREATER_THAN` filtering operator is used to identify and select records
+     * The `GreaterThan` filtering operator is used to identify and select records
      * where the value of a specified field is greater than a given comparison value.
      * This is particularly useful in query-building scenarios where conditional
      * filtering by field value is needed.
      *
      * The operator has a symbolic representation `>` for SQL and similar query languages.
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    GREATER_THAN("gt", "{field} > {value}", Category.COMPARISON, ">"),
+    GreaterThan("gt", "{field} > {value}", Category.Comparison, ">"),
     /**
-     * Represents a filtering operator for "less than or equal to" comparisons.
+     * Represents a filtering operator for "greater than or equal to" comparisons.
      *
-     * The `LESS_THAN_OR_EQUALS` filter operator is used to compare a field's value
-     * to a specified value, evaluating to true if the field's value is less than or equal
+     * The `GreaterThan` filter operator is used to compare a field's value
+     * to a specified value, evaluating to true if the field's value is greater than or equal
      * to the given value. It is commonly utilized in database queries or filtering mechanisms.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    LESS_THAN_OR_EQUALS("le", "{field} <= {value}", Category.COMPARISON, "≤"),
+    LessThanOrEquals("le", "{field} <= {value}", Category.Comparison, "≤"),
     /**
      * A filter operator representing the "greater than or equals" comparison.
      *
-     * The `GREATER_THAN_OR_EQUALS` operator is used to filter data where a field value is greater than or equal to a specified value.
+     * The `GreaterThanOrEquals` operator is used to filter data where a field value is greater than or equal to a specified value.
      * It is commonly employed in filtering criteria in data retrieval or query-building scenarios.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    GREATER_THAN_OR_EQUALS("ge", "{field} >= {value}", Category.COMPARISON, "≥"),
+    GreaterThanOrEquals("ge", "{field} >= {value}", Category.Comparison, "≥"),
     /**
-     * Represents a `STARTS_WITH` filter operation for querying datasets.
+     * Represents a `StartsWith` filter operation for querying datasets.
      *
-     * The `STARTS_WITH` filter checks if a field's value begins with the specified value.
+     * The `StartsWith` filter checks if a field's value begins with the specified value.
      * This operator generates an SQL `LIKE` expression using the format:
      * `{field} LIKE CONCAT({value}, '%')`.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    STARTS_WITH("startswith", "{field} LIKE CONCAT({value}, '%')", Category.STRING, "starts with"),
+    StartsWith("startswith", "{field} LIKE CONCAT({value}, '%')", Category.String, "starts with"),
     /**
      * Represents a filter operator that matches values where the specified field does not start with the given value.
      *
      * This operator constructs an SQL condition using the "NOT LIKE" clause with a wildcard (%) appended
      * to the provided value, ensuring that the field does not start with the specified pattern.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    NOT_STARTS_WITH("nstartswith", "{field} NOT LIKE CONCAT({value}, '%')", Category.STRING, "not starts with"),
+    NotStartsWith("nstartswith", "{field} NOT LIKE CONCAT({value}, '%')", Category.String, "not starts with"),
     /**
      * Represents a filter operator that checks if the field value ends with the specified value.
      *
-     * The `ENDS_WITH` operator is translated into a SQL `LIKE` clause that matches records
+     * The `EndsWith` operator is translated into a SQL `LIKE` clause that matches records
      * where the field's value ends with the given string. This allows for filtering data based
      * on string suffix matching.
      *
      * Operator: `endswith`
      * SQL Translation: `{field} LIKE CONCAT('%', {value})`
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    ENDS_WITH("endswith", "{field} LIKE CONCAT('%', {value})", Category.STRING, "ends with"),
+    EndsWith("endswith", "{field} LIKE CONCAT('%', {value})", Category.String, "ends with"),
     /**
      * Represents a filter operator that checks if a field's value does not end with the specified value.
      *
-     * The `NOT_ENDS_WITH` operator is used to construct an SQL condition using the "NOT LIKE" clause
+     * The `NotEndsWith` operator is used to construct an SQL condition using the "NOT LIKE" clause
      * with a wildcard (%) appended to the provided value, ensuring that the field's value does not end with the specified pattern.
      *
      * Operator: `notendwith`
      * SQL Translation: `{field} NOT LIKE CONCAT('%', {value})`
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    NOT_ENDS_WITH("nendswith", "{field} NOT LIKE CONCAT('%', {value})", Category.STRING, "not ends with"),
+    NotEndsWith("nendswith", "{field} NOT LIKE CONCAT('%', {value})", Category.String, "not ends with"),
     /**
      * An operator used for filtering data by checking if a field contains a specified value.
      *
-     * `CONTAINS` is used to construct SQL-like filter operations where the value
+     * `Contains` is used to construct SQL-like filter operations where the value
      * is checked to be a substring of the field's content. The operation format
      * is represented as `{field} LIKE CONCAT('%', {value}, '%')`.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    CONTAINS("contains", "{field} LIKE CONCAT('%', {value}, '%')", Category.STRING, "⊇"),
+    Contains("contains", "{field} LIKE CONCAT('%', {value}, '%')", Category.String, "⊇"),
     /**
      * Represents a filter operator that checks if a field does not contain a specified value.
      *
-     * The `NOT_CONTAINS` operator is used in filtering expressions to exclude records where
+     * The `NotContains` operator is used in filtering expressions to exclude records where
      * a specified field contains a particular substring. It constructs a SQL condition
      * using the `NOT LIKE` operator with wildcard patterns.
      *
@@ -404,28 +404,28 @@ enum class FilterOperator(
      * This is useful for scenarios where you need to filter out records based on
      * partial matches within string fields.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    NOT_CONTAINS("ncontains", "{field} NOT LIKE CONCAT('%', {value}, '%')", Category.STRING, "⊉"),
+    NotContains("ncontains", "{field} NOT LIKE CONCAT('%', {value}, '%')", Category.String, "⊉"),
     /**
      * Represents a SQL `LIKE` operator used for filtering data where a field matches a specified pattern.
      *
      * This operator is generally used in query conditions to perform pattern matching
      * against string data types. The comparison is case-sensitive in most SQL implementations.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    LIKE("like", "{field} LIKE {value}", Category.STRING, "~"),
+    Like("like", "{field} LIKE {value}", Category.String, "~"),
     /**
      * Represents an operator used for filtering entities based on a NOT LIKE condition.
      *
      * This class is part of the `FilterOperator` family, which defines various operations for data filtering.
-     * The `NOT_LIKE` operator determines whether a specified field's value does not match a given pattern
+     * The `NotLike` operator determines whether a specified field's value does not match a given pattern
      * using a SQL `NOT LIKE` expression.
      *
-     * @since 1.0.0
+     * @since 4.0.0
      */
-    NOT_LIKE("nlike", "{field} NOT LIKE {value}", Category.STRING, "≁");
+    NotLike("nlike", "{field} NOT LIKE {value}", Category.String, "≁");
 
     companion object {
         /**
@@ -527,9 +527,9 @@ enum class FilterOperator(
          * Usage of this category can denote operations or processes focusing on asserting
          * or evaluating equivalence between entities, values, or properties.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        EQUALITY,
+        Equality,
         /**
          * Represents the `COMPARISON` category used for comparing elements or entities.
          *
@@ -537,18 +537,18 @@ enum class FilterOperator(
          * comparing values, such as greater than, less than, or equality checks.
          * It is part of the `Category` enum class.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        COMPARISON,
+        Comparison,
         /**
          * Represents the type of a category linked specifically to string operations.
          *
          * The `STRING` category is part of an enumerated classification system
          * meant to define groups of operations or functionalities related to strings.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        STRING,
+        String,
         /**
          * Represents an operation or concept related to searching within arrays.
          *
@@ -556,9 +556,9 @@ enum class FilterOperator(
          * or operations that deal specifically with array-based search algorithms or processes. This can include
          * equality-based searches, range searches, or complex patterns applied to arrays or list-like data structures.
          *
-         * @since 1.0.0
+         * @since 4.0.0
          */
-        ARRAY_SEARCH
+        ArraySearch
     }
     
     /*    /*
