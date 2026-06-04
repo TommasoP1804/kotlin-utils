@@ -197,7 +197,12 @@ operator fun <E> Iterable<E>.contains(predicate: Predicate<E>) = any { predicate
  * @return the first element of the iterable
  * @since 1.0.0
  */
-fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrNull() ?: throw lazyException()
+fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: throw lazyException()
+}
 /**
  * Returns the first element in the iterable that matches the given [predicate].
  * If no such element is found, throws an exception provided by [lazyException].
@@ -208,7 +213,12 @@ fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrN
  * @return the first element that matches the predicate
  * @since 1.0.0
  */
-fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E = firstOrNull(predicate) ?: throw lazyException()
+fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: throw lazyException()
+}
 /**
  * Returns the first element of the iterable if it exists, otherwise returns the value produced by the provided [default] function.
  *
@@ -217,7 +227,12 @@ fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * @return the first element of the iterable or the value produced by the [default] function
  * @since 1.0.0
  */
-fun <E> Iterable<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default()
+fun <E> Iterable<E>.firstOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: default()
+}
 /**
  * Returns the first element matching the given [predicate], or the result of the [default] function
  * if no such element is found.
@@ -228,7 +243,12 @@ fun <E> Iterable<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default()
  * @return the first matching element if found, otherwise the result of the [default] function.
  * @since 1.0.0
  */
-fun <E> Iterable<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = firstOrNull(predicate) ?: default()
+fun <E> Iterable<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: default()
+}
 
 /**
  * Returns the second element of the list.
@@ -283,7 +303,13 @@ fun <E> List<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).second
  * @param lazyException A supplier function that produces the exception to be thrown if the list has fewer than two elements.
  * @since 2.1.0
  */
-fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier) = if (size < 2) throw lazyException() else this[1]
+fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    if (size < 2) throw lazyException()
+    return this[1]
+}
 /**
  * Returns the second element in the list that matches the given predicate or throws an exception
  * provided by the given `lazyException` supplier if no such element exists.
@@ -300,7 +326,12 @@ fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predi
  * @return The second element of the list, or the result of invoking the default supplier if the list has less than two elements.
  * @since 2.1.0
  */
-fun <E> List<E>.secondOr(default: Supplier<E>) = if (size < 2) default() else this[1]
+fun <E> List<E>.secondOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 2) default() else this[1]
+}
 /**
  * Returns the second element in the list that matches the given predicate, or the value provided by
  * the default supplier if no such element exists or there are less than two elements.
@@ -334,7 +365,7 @@ fun <E> List<E>.third() = if (size < 3) throw NoSuchElementException("List size 
  * @param predicate A predicate to filter the elements of the list.
  * @since 2.1.0
  */
-fun <E> List<E>.third(predicate: Predicate<E>) = filter(predicate).second()
+fun <E> List<E>.third(predicate: Predicate<E>) = filter(predicate).third()
 /**
  * Returns the third element of the list if the list contains at least three elements, or `null` otherwise.
  *
@@ -354,7 +385,7 @@ fun <E> List<E>.thirdOrNull() = if (size < 3) null else this[2]
  * @return the third element matching the [predicate], or `null` if there are less than three matching elements.
  * @since 2.1.0
  */
-fun <E> List<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+fun <E> List<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
 /**
  * Returns the third element of the list if it exists, otherwise throws an exception provided by the given supplier.
  *
@@ -363,7 +394,13 @@ fun <E> List<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).secondO
  * @return The third element of the list.
  * @since 2.1.0
  */
-fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier) = if (size < 3) throw lazyException() else this[2]
+fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    if (size < 3) throw lazyException()
+    return this[2]
+}
 /**
  * Returns the third element in the list that matches the given predicate or throws an exception
  * provided by the lazyException supplier if there are less than three matching elements.
@@ -372,7 +409,7 @@ fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier) = if (size < 3) t
  * @param predicate a condition to filter elements in the list
  * @since 2.1.0
  */
-fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
 /**
  * Returns the third element of the list if it exists; otherwise, evaluates and returns the
  * result of the provided default supplier.
@@ -383,7 +420,12 @@ fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predic
  * supplier.
  * @since 2.1.0
  */
-fun <E> List<E>.thirdOr(default: Supplier<E>) = if (size < 3) default() else this[2]
+fun <E> List<E>.thirdOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 3) default() else this[2]
+}
 /**
  * Returns the third element of the list that matches the given predicate if it exists; otherwise, returns the value supplied by the provided default supplier.
  * The matching elements are determined by filtering the list based on the given predicate.
@@ -393,7 +435,7 @@ fun <E> List<E>.thirdOr(default: Supplier<E>) = if (size < 3) default() else thi
  * @param predicate A predicate function used to filter the list.
  * @since 2.1.0
  */
-fun <E> List<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+fun <E> List<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
 
 /**
  * Splits the elements of this list into chunks where the consecutive elements in each chunk satisfy the given predicate.
@@ -479,7 +521,12 @@ fun <E> Iterable<E>.onlyElementOrNull() = toList().run { if (size == 1) first() 
  * @return the single element in the iterable if there is exactly one, or the value supplied by [default]
  * @since 1.0.0
  */
-infix fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>) = toList().run { if (size == 1) first() else default() }
+infix fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else default() }
+}
 /**
  * Returns the single element of the iterable if it contains exactly one element; otherwise, throws an exception provided by the given supplier.
  *
@@ -488,7 +535,13 @@ infix fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>) = toList().run { i
  * @throws Throwable the exception supplied by the `lazyException` if the iterable does not contain exactly one element
  * @since 1.0.0
  */
-infix fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier) = toList().run { if (size == 1) first() else throw lazyException() }
+infix fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else throw lazyException() }
+}
+
 /**
  * Filters the elements of an iterable based on a predicate and ensures that exactly one element
  * satisfies the predicate. If no elements or more than one element satisfy the predicate, an exception is thrown.
@@ -524,7 +577,12 @@ infix fun <E> Iterable<E>.onlyElementOrNull(predicate: Predicate<E>) = filter(pr
  * @param predicate A predicate to filter the elements in the iterable.
  * @since 1.0.0
  */
-fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else default() }
+fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).run { if (size == 1) first() else default() }
+}
 /**
  * Returns the single element matching the given [predicate] from the iterable or throws an exception
  * provided by [lazyException] if the condition is not met. The method ensures that exactly one element
@@ -537,7 +595,12 @@ fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>)
  * @throws Throwable the exception supplied by [lazyException] if no element or more than one element matches.
  * @since 1.0.0
  */
-fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else throw lazyException() }
+fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).run { if (size == 1) first() else throw lazyException() }
+}
 
 /**
  * Checks if the collection is not null and not empty.
@@ -939,7 +1002,12 @@ operator fun <E> Iterable<E>.get(find: Predicate<E>, lazyException: ThrowableSup
  * @throws Throwable if no element in the iterable matches the predicate
  * @since 1.0.0
  */
-fun <E> Iterable<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>) = find(find) ?: throw lazyException()
+fun <E> Iterable<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>): E & Any {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return find(find) ?: throw lazyException()
+}
 
 /**
  * Returns a new list containing elements at indices specified by the given progression.

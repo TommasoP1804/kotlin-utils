@@ -593,8 +593,8 @@ fun CharSequence.isNumber() = toString().matches("^[+-]?(\\d+(\\.\\d*)?|\\.\\d+)
 private fun Number.isNotDecimal(classBased: Boolean = false): Boolean {
     if (this is Int || this is Long || this is Short || this is Byte || this is BigInt) return true
     if (this is BigDecimal) return !classBased && (toDouble() % 1 == 0.0)
-    if (this is Double) return !classBased && (toDouble() % 1 == 0.0)
-    if (this is Float) return !classBased && (toFloat() % 1 == 0F)
+    if (this is Double) return !classBased && (this % 1 == 0.0)
+    if (this is Float) return !classBased && (this % 1 == 0F)
     return false
 }
 

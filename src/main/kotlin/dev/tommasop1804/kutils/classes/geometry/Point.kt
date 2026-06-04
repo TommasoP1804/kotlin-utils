@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Double2
 import dev.tommasop1804.kutils.exceptions.*
+import dev.tommasop1804.kutils.firstOr
 import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.secondOr
+import dev.tommasop1804.kutils.thirdOr
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -207,6 +210,25 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
          * @since 1.0.0
          */
         @Serial private const val serialVersionUID = 1L
+
+        /**
+         * Creates a `Point` instance from the provided numeric components.
+         * The components are mapped to the `Point`'s `x`, `y`, and `z` coordinates respectively.
+         * If a coordinate is not provided, a default value of `0.0` is used.
+         *
+         * @param components Variable number of numeric components used to construct the `Point`.
+         *                   The first component corresponds to the `x` coordinate,
+         *                   the second to the `y` coordinate, and the third to the `z` coordinate.
+         *                   Additional components are ignored.
+         * @return A new `Point` instance with the specified or default values.
+         */
+        operator fun of(vararg components: Number) = components.toList().let {
+            Point(
+                it.firstOr { 0.0 },
+                it.secondOr { 0.0 },
+                it.thirdOr { 0.0 }
+            )
+        }
 
         /**
          * Parses a string representation of a point and returns a [Point] object.

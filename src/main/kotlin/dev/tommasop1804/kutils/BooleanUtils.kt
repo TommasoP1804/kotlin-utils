@@ -226,6 +226,7 @@ inline fun <R> Boolean.ifTrue(action: ReceiverTransformer<Boolean, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (this@ifTrue) holdsIn action
+        returnsResultOf(action)
     }
     return if (isTrue) this.action() else null
 }
@@ -239,6 +240,7 @@ inline fun <R> Boolean.ifTrue(action: ReceiverTransformer<Boolean, R>): R? {
 inline fun <R> Boolean?.ifNullOrTrue(action: ReceiverTransformer<Boolean?, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        returnsResultOf(action)
     }
     return if (isNullOrTrue) this.action() else null
 }
@@ -254,6 +256,7 @@ inline fun <R> Boolean.ifFalse(action: ReceiverTransformer<Boolean, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (!this@ifFalse) holdsIn action
+        returnsResultOf(action)
     }
     return if (isFalse) this.action() else null
 }
@@ -267,6 +270,7 @@ inline fun <R> Boolean.ifFalse(action: ReceiverTransformer<Boolean, R>): R? {
 inline fun <R> Boolean?.ifNullOrFalse(action: ReceiverTransformer<Boolean?, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        returnsResultOf(action)
     }
     return if (isNullOrFalse) this.action() else null
 }

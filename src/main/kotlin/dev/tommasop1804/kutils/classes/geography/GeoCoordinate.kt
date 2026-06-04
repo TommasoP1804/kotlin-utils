@@ -10,14 +10,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.Json
-import dev.tommasop1804.kutils.classes.geometry.Point
-import dev.tommasop1804.kutils.classes.measure.MeasureUnit
-import dev.tommasop1804.kutils.classes.measure.RMeasurement
-import dev.tommasop1804.kutils.exceptions.ClassMismatchException
-import dev.tommasop1804.kutils.exceptions.ExpectationMismatchException
-import dev.tommasop1804.kutils.exceptions.LocationException
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.geometry.*
+import dev.tommasop1804.kutils.classes.measure.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.geolatte.geom.G2D
 import org.geolatte.geom.Geometries
@@ -157,6 +153,22 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          * @since 1.0.0
          */
         const val EARTH_RADIUS_KM: Int = 6371
+
+        /**
+         * Creates a new GeoCoordinate instance using the provided components.
+         * If fewer than two components are provided, a default value of 0.0 is used.
+         *
+         * @param components the variable number of coordinate components,
+         * where the first corresponds to the latitude and the second to the longitude.
+         * Additional components beyond the first two are ignored.
+         * @since 4.1.0
+         */
+        operator fun of(vararg components: Double) = components.toList().let {
+            GeoCoordinate(
+                it.firstOr { 0.0 },
+                it.secondOr { 0.0 }
+            )
+        }
 
         /**
          * Validates whether the given latitude and longitude values fall within their respective valid geographic ranges.

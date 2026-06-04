@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.colors.Color.Companion.ofRGB
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.classes.numbers.*
@@ -1000,6 +999,28 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          * @since 1.0.0
          */
         val LAVENDER_PURPLE: Color = ofRGB(230, 168, 230)
+
+        /**
+         * Creates a new color instance from the specified red, green, blue, and alpha components.
+         *
+         * @param components The components. R, G, B, Alpha.
+         * @return A new instance of the Color class with the specified RGBA components.
+         * @throws ValidationFailedException If any of the components is outside the allowed range [0, 255].
+         * @since 4.1.0
+         */
+        operator fun of(vararg components: Any): Color {
+            val size = components.size
+            var r = 0
+            var g = 0
+            var b = 0
+            var a = FULL
+
+            if (size >= 1) r = components[0] as Int
+            if (size >= 2) g = components[1] as Int
+            if (size >= 3) b = components[2] as Int
+            if (size >= 4) tryOr({ a = Percentage(components[4] as Int / 255.0, true) }) { a = components[3] as Percentage }
+            return ofRGBA(r, g, b, a)
+        }
 
         /**
          * Parses a string representation of a color into a `Color` object.

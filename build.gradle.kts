@@ -7,14 +7,14 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "dev.tommasop1804"
-version = "4.0.0"
+version = "4.1.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260529T085526Z
+// Last update: Tommaso Pastorelli | 20260604T124150Z
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.3.20"
-    kotlin("plugin.noarg") version "2.3.20"
+    id("org.jetbrains.kotlin.jvm") version "2.4.0"
+    kotlin("plugin.noarg") version "2.4.0"
     id("maven-publish")
     id("io.freefair.aspectj.post-compile-weaving") version "9.1.0" // AspectJ plugin
     id("com.vanniktech.maven.publish") version "0.30.0"
@@ -82,7 +82,9 @@ dependencies {
 kotlin {
     jvmToolchain(21)
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
+        freeCompilerArgs.add("-Xcollection-literals")
+        freeCompilerArgs.add("-Xallow-returns-result-of")
+        freeCompilerArgs.add("-Xreturn-value-checker=check")
         freeCompilerArgs.add("-Xname-based-destructuring=complete")
     }
 }

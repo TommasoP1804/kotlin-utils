@@ -291,9 +291,9 @@ data class Cell<R, C, V>(override val rowKey: R, override val columnKey: C, over
      * @since 1.0.0
      */
     override fun hashCode(): Int {
-        var result = rowKey?.hashCode() ?: 0
-        result = 31 * result + (columnKey?.hashCode() ?: 0)
-        result = 31 * result + (value?.hashCode() ?: 0)
+        var result = rowKey.hashCode()
+        result = 31 * result + columnKey.hashCode()
+        result = 31 * result + value.hashCode()
         return result
     }
 }
@@ -460,9 +460,9 @@ data class MCell<R, C, V>(override var rowKey: R, override var columnKey: C, ove
      * @since 1.0.0
      */
     override fun hashCode(): Int {
-        var result = rowKey?.hashCode() ?: 0
-        result = 31 * result + (columnKey?.hashCode() ?: 0)
-        result = 31 * result + (value?.hashCode() ?: 0)
+        var result = rowKey.hashCode()
+        result = 31 * result + columnKey.hashCode()
+        result = 31 * result + value.hashCode()
         return result
     }
 }
@@ -870,6 +870,21 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
     }
 
     companion object {
+        /**
+         * Constructs a table from the provided cell entries.
+         *
+         * This method takes a vararg parameter of `CellInterface` types and returns an
+         * immutable `Table` containing the entries. Each entry is converted into a `Cell`.
+         *
+         * @param R The type of the row key.
+         * @param C The type of the column key.
+         * @param V The type of the value stored in the cell.
+         * @param entries The cell entries to initialize the table with.
+         * @return A `Table` containing the provided cell entries.
+         * @since 4.0.0
+         */
+        operator fun <R, C, V> of(vararg entries: CellInterface<R, C, V?>) = tableOf(*entries)
+
         class Serializer : ValueSerializer<Table<Any, Any, Any?>>() {
             override fun serialize(
                 value: Table<Any, Any, Any?>,
@@ -1707,6 +1722,20 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
     }
 
     companion object {
+        /**
+         * Creates a new mutable table from the provided cell entries.
+         * Each entry represents a cell in the table containing a row key, column key, and value.
+         *
+         * @param R The type of the row keys in the table.
+         * @param C The type of the column keys in the table.
+         * @param V The type of the values in the table. The values can be nullable.
+         * @param entries A variable number of cell entries implementing the [CellInterface],
+         *                which define the rows, columns, and values to initialize the table.
+         * @return A new instance of [MTable] containing the given entries, where each cell is mutable.
+         * @since 4.1.0
+         */
+        operator fun <R, C, V> of(vararg entries: CellInterface<R, C, V?>) = mTableOf(*entries)
+
         class Serializer : ValueSerializer<MTable<Any, Any, Any?>>() {
             override fun serialize(
                 value: MTable<Any, Any, Any?>,

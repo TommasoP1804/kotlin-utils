@@ -7,7 +7,7 @@
     "kutils_take_as_int_invoke", "kutils_null_check"
 )
 @file:Since("1.0.0")
-@file:OptIn(ExperimentalExtendedContracts::class)
+@file:OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
@@ -786,10 +786,7 @@ val String.matchedCases get() = TextCase.entries { it != TextCase.Standard && it
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.containsAll(vararg substrings: CharSequence): Boolean {
-    if (isNull()) return false
-    return substrings.all { contains(it) }
-}
+fun String.containsAll(vararg substrings: CharSequence) = !isNull() && substrings.all { contains(it) }
 
 /**
  * Checks whether the nullable string contains all the specified characters.
@@ -800,10 +797,7 @@ fun String.containsAll(vararg substrings: CharSequence): Boolean {
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.containsAll(vararg subchars: Char): Boolean {
-    if (isNull()) return false
-    return subchars.all { contains(it) }
-}
+fun String.containsAll(vararg subchars: Char) = subchars.all { contains(it) }
 
 /**
  * Checks if the string contains any of the specified substrings.
@@ -814,10 +808,7 @@ fun String.containsAll(vararg subchars: Char): Boolean {
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.containsAny(vararg substrings: CharSequence): Boolean {
-    if (isNull()) return false
-    return substrings.any { contains(it) }
-}
+fun String.containsAny(vararg substrings: CharSequence) = substrings.any { contains(it) }
 
 /**
  * Checks if the string contains any of the specified characters.
@@ -827,10 +818,7 @@ fun String.containsAny(vararg substrings: CharSequence): Boolean {
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.containsAny(vararg subchars: Char): Boolean {
-    if (isNull()) return false
-    return subchars.any { contains(it) }
-}
+fun String.containsAny(vararg subchars: Char) = subchars.any { contains(it) }
 
 /**
  * Checks if the nullable string does not contain any of the provided substrings.
@@ -1379,7 +1367,12 @@ fun CharSequence.onlyCharOrNull() = toList().run { if (size == 1) first() else n
  *                does not contain exactly one character.
  * @since 1.0.0
  */
-fun CharSequence.onlyCharOr(default: Supplier<Char>) = toList().run { if (size == 1) first() else default() }
+fun CharSequence.onlyCharOr(default: Supplier<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else default() }
+}
 /**
  * Ensures that the given CharSequence contains exactly one character; otherwise, throws an exception.
  *
@@ -1387,7 +1380,12 @@ fun CharSequence.onlyCharOr(default: Supplier<Char>) = toList().run { if (size =
  * @throws Throwable The exception provided by lazyException if the CharSequence does not have exactly one character.
  * @since 1.0.0
  */
-fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier) = toList().run { if (size == 1) first() else throw lazyException() }
+fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else throw lazyException() }
+}
 /**
  * Filters the characters in the CharSequence based on the given predicate and ensures that exactly one result is returned.
  * If no characters match the predicate, a `NoSuchElementException` is thrown.
@@ -1424,7 +1422,12 @@ fun CharSequence.onlyCharOrNull(predicate: Predicate<Char>) = filter(predicate).
  * @return the single character matching the predicate or the default character from the supplier.
  * @since 1.0.0
  */
-fun CharSequence.onlyCharOr(default: Supplier<Char>, predicate: Predicate<Char>) = filter(predicate).toList().run { if (size == 1) first() else default() }
+fun CharSequence.onlyCharOr(default: Supplier<Char>, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).toList().run { if (size == 1) first() else default() }
+}
 /**
  * Filters the characters of the given CharSequence based on the provided predicate
  * and ensures there is exactly one matching character. If there is not exactly one,
@@ -1435,7 +1438,276 @@ fun CharSequence.onlyCharOr(default: Supplier<Char>, predicate: Predicate<Char>)
  * @param predicate a condition that each character in the CharSequence is tested against
  * @since 1.0.0
  */
-fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>) = filter(predicate).toList().run { if (size == 1) first() else throw lazyException() }
+fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).toList().run { if (size == 1) first() else throw lazyException() }
+}
+
+/**
+ * Returns the first character of the char sequence or throws an exception provided by the given lazy exception supplier
+ * if the char sequence is empty.
+ *
+ * @param lazyException A supplier function that provides the exception to throw when the char sequence is empty.
+ * @return The first character of the char sequence.
+ * @since 4.1.0
+ */
+infix fun CharSequence.firstCharOrThrow(lazyException: ThrowableSupplier): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: throw lazyException()
+}
+/**
+ * Returns the first character of the char sequence that matches the given [predicate].
+ * If no characters match the [predicate], the exception provided by [lazyException] is thrown.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if no character matches the [predicate].
+ * @param predicate A condition to be applied to each character to determine if it matches.
+ * @return The first character that matches the [predicate].
+ * @throws Throwable If no character matching the [predicate] is found.
+ * @since 4.1.0
+ */
+fun CharSequence.firstCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: throw lazyException()
+}
+/**
+ * Returns the first character of the char sequence or the result of [default] if the char sequence is empty.
+ *
+ * @param default a supplier function that provides a value to return if the char sequence is empty.
+ * @since 4.1.0
+ */
+infix fun CharSequence.firstCharOr(default: Supplier<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: default()
+}
+/**
+ * Returns the first character in the char sequence that matches the given [predicate].
+ * If no such character is found, returns the result of calling the [default] supplier.
+ *
+ * @param default a supplier function that provides a default value if no character matches the [predicate]
+ * @param predicate a function that defines the condition to match the characters in the char sequence
+ * @return the first character matching the [predicate], or the result of the [default] supplier if no match is found
+ * @since 4.1.0
+ */
+fun CharSequence.firstCharOr(default: Supplier<Char>, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: default()
+}
+
+/**
+ * Returns the second character of the char sequence.
+ *
+ * @receiver The char sequence from which the second character is to be accessed.
+ * @return The second character of the char sequence.
+ * @throws NoSuchElementException If the char sequence contains fewer than two characters.
+ * @since 4.1.0
+ */
+fun CharSequence.secondChar() = if (length < 2) throw NoSuchElementException("CharSequence length $length doesn't allow to get second character.") else this[1]
+/**
+ * Returns the second character of the char sequence that matches the given predicate.
+ *
+ * Filters the char sequence based on the provided predicate and retrieves the second character
+ * from the filtered result. If there are fewer than two characters matching the predicate,
+ * this function throws a [NoSuchElementException].
+ *
+ * @param predicate a condition to filter the characters in the char sequence.
+ * @return the second character that matches the predicate.
+ * @throws NoSuchElementException if there are fewer than two characters matching the predicate.
+ * @since 4.1.0
+ */
+fun CharSequence.secondChar(predicate: Predicate<Char>) = filter(predicate).secondChar()
+/**
+ * Returns the second character of the char sequence or `null` if it contains
+ * fewer than two characters.
+ *
+ * This function is a safe way to access the second character without causing an
+ * [IndexOutOfBoundsException]. If the char sequence is empty or contains only one
+ * character, it returns `null`.
+ *
+ * @receiver The char sequence from which the second character is to be accessed.
+ * @return The second character of the char sequence, or `null` if it contains
+ * fewer than two characters.
+ * @since 4.1.0
+ */
+fun CharSequence.secondCharOrNull() = if (length < 2) null else this[1]
+/**
+ * Returns the second character in the char sequence that matches the specified [predicate],
+ * or `null` if no such character is found or if there are fewer than two matching characters.
+ *
+ * @param predicate a function that defines the condition to filter the characters of the char sequence.
+ * @return the second character satisfying the given predicate, or `null` if no such character exists.
+ * @since 4.1.0
+ */
+fun CharSequence.secondCharOrNull(predicate: Predicate<Char>) = filter(predicate).secondCharOrNull()
+/**
+ * Returns the second character of the char sequence if it exists, or throws the exception provided by the
+ * given `lazyException` supplier if the char sequence contains fewer than two characters.
+ *
+ * @param lazyException A supplier function that produces the exception to be thrown if the char sequence has fewer than two characters.
+ * @since 4.1.0
+ */
+fun CharSequence.secondCharOrThrow(lazyException: ThrowableSupplier): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    if (length < 2) throw lazyException()
+    return this[1]
+}
+/**
+ * Returns the second character in the char sequence that matches the given predicate or throws an exception
+ * provided by the given `lazyException` supplier if no such character exists.
+ *
+ * @param lazyException a supplier for the exception to throw if there are not enough matching characters
+ * @param predicate a condition to filter characters of the char sequence
+ * @since 4.1.0
+ */
+fun CharSequence.secondCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).secondCharOrThrow(lazyException)
+}
+/**
+ * Returns the second character of the char sequence if it exists; otherwise, returns the value supplied by the given default supplier.
+ *
+ * @param default A supplier function that provides a default value when the char sequence does not contain at least two characters.
+ * @return The second character of the char sequence, or the result of invoking the default supplier if the char sequence has less than two characters.
+ * @since 4.1.0
+ */
+fun CharSequence.secondCharOr(default: Supplier<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (length < 2) default() else this[1]
+}
+/**
+ * Returns the second character in the char sequence that matches the given predicate, or the value provided by
+ * the default supplier if no such character exists or there are less than two characters.
+ *
+ * @param default A supplier function that provides a default value if the char sequence does not contain
+ *                a valid second character matching the predicate.
+ * @param predicate A function that determines whether a given character in the char sequence matches the criteria.
+ * @since 4.1.0
+ */
+fun CharSequence.secondCharOr(default: Supplier<Char>, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).secondCharOr(default)
+}
+
+/**
+ * Returns the third character of the char sequence.
+ *
+ * This function retrieves the character at index 2 of the char sequence if it
+ * contains at least three characters. If the length of the char sequence is less
+ * than three, a [NoSuchElementException] is thrown.
+ *
+ * @throws NoSuchElementException if the char sequence contains fewer than three characters.
+ * @return the third character of the char sequence.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdChar() = if (length < 3) throw NoSuchElementException("CharSequence length $length doesn't allow to get third character.") else this[2]
+/**
+ * Returns the third character in the char sequence matching the given predicate after filtering.
+ *
+ * The method first filters the characters of the char sequence using the provided predicate and
+ * then attempts to retrieve the third character from the filtered result. If the filtered
+ * result has less than three characters, this method throws a [NoSuchElementException].
+ *
+ * @param predicate A predicate to filter the characters of the char sequence.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdChar(predicate: Predicate<Char>) = filter(predicate).thirdChar()
+/**
+ * Returns the third character of the char sequence if it contains at least three characters, or `null` otherwise.
+ *
+ * This function is a safe way to access the third character without risking an [IndexOutOfBoundsException].
+ *
+ * @receiver The char sequence from which the third character is accessed.
+ * @return The third character of the char sequence, or `null` if it has fewer than three characters.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdCharOrNull() = if (length < 3) null else this[2]
+/**
+ * Returns the third character that matches the given [predicate], or `null` if no such character exists.
+ *
+ * The search for the matching character is performed by filtering the char sequence based on the given [predicate].
+ *
+ * @param predicate the condition used to filter the characters of the char sequence.
+ * @return the third character matching the [predicate], or `null` if there are less than three matching characters.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdCharOrNull(predicate: Predicate<Char>) = filter(predicate).thirdCharOrNull()
+/**
+ * Returns the third character of the char sequence if it exists, otherwise throws an exception provided by the given supplier.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if the char sequence has fewer than three characters.
+ * @throws Throwable The exception provided by the supplier if the char sequence length is less than three.
+ * @return The third character of the char sequence.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdCharOrThrow(lazyException: ThrowableSupplier): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    if (length < 3) throw lazyException()
+    return this[2]
+}
+/**
+ * Returns the third character in the char sequence that matches the given predicate or throws an exception
+ * provided by the lazyException supplier if there are less than three matching characters.
+ *
+ * @param lazyException a supplier that provides the exception to be thrown if the conditions are not met
+ * @param predicate a condition to filter characters in the char sequence
+ * @since 4.1.0
+ */
+fun CharSequence.thirdCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).thirdCharOrThrow(lazyException)
+}
+/**
+ * Returns the third character of the char sequence if it exists; otherwise, evaluates and returns the
+ * result of the provided default supplier.
+ *
+ * @param default A supplier function that provides a default value to return if the char sequence
+ * has fewer than three characters.
+ * @return The third character of the char sequence if present, or the default value provided by the
+ * supplier.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdCharOr(default: Supplier<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (length < 3) default() else this[2]
+}
+/**
+ * Returns the third character of the char sequence that matches the given predicate if it exists; otherwise, returns the value supplied by the provided default supplier.
+ * The matching characters are determined by filtering the char sequence based on the given predicate.
+ *
+ * @param default A supplier function that provides a default value when the char sequence does not contain at least three characters
+ *                matching the given predicate.
+ * @param predicate A predicate function used to filter the char sequence.
+ * @since 4.1.0
+ */
+fun CharSequence.thirdCharOr(default: Supplier<Char>, predicate: Predicate<Char>): Char {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).thirdCharOr(default)
+}
 
 /**
  * Applies the given action to each character of the string and

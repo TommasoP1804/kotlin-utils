@@ -209,6 +209,15 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
          */
         private const val TOLERANCE = 1e-9
 
+        /**
+         * Creates a polygon from a variable number of points.
+         *
+         * @param vertices The points that represent the vertices of the polygon.
+         * @return A new Polygon instance containing the specified vertices.
+         * @since 4.1.0
+         */
+        operator fun of(vararg vertices: Point) = Polygon(vertices.toMutableList())
+
         class Serializer : ValueSerializer<Polygon>() {
             override fun serialize(value: Polygon, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeStartArray()

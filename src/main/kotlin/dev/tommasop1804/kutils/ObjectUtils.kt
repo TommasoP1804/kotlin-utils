@@ -173,7 +173,12 @@ inline fun <reified T> Any?.safeCastOrNull(): T? = runCatching { this as T }.get
  * @param transform A transformation function that will be applied if the cast fails.
  * @since 1.0.0
  */
-inline fun <T1, reified T2> T1?.safeCastOr(transform: Transformer<T1?, T2>) = runCatching { this as T2 }.getOrNull() ?: transform(this)
+inline fun <T1, reified T2> T1?.safeCastOr(transform: Transformer<T1?, T2>): T2 {
+    contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+    }
+    return runCatching { this as T2 }.getOrNull() ?: transform(this)
+}
 /**
  * Attempts to cast the calling object to the specified type [T]. If the cast fails, the provided exception
  * supplied by [lazyException] is thrown.
@@ -3762,7 +3767,12 @@ fun CharArray.print() = apply { print(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printGeneric")
-fun <T> T.print(transfor: Transformer<T, Any?> = { it.toSafeString() }) = apply { print(transfor(this)) }
+fun <T> T.print(transfor: Transformer<T, Any?> = { it.toSafeString() }): T {
+    contract {
+        callsInPlace(transfor, InvocationKind.EXACTLY_ONCE)
+    }
+    return apply { print(transfor(this)) }
+}
 
 /**
  * Prints the integer receiver to the standard output followed by a newline.
@@ -3866,7 +3876,12 @@ fun CharArray.println() = apply { println(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printlnGeneric")
-fun <T> T.println(transfor: Transformer<T, Any?> = { it.toSafeString() }) = apply { println(transfor(this)) }
+fun <T> T.println(transfor: Transformer<T, Any?> = { it.toSafeString() }): T {
+    contract {
+        callsInPlace(transfor, InvocationKind.EXACTLY_ONCE)
+    }
+    return apply { println(transfor(this)) }
+}
 
 /**
  * Prints the integer value to the standard error stream.
@@ -3962,7 +3977,12 @@ fun CharArray.printErr() = apply { System.err.print(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printErrGeneric")
-fun <T> T.printErr(transform: Transformer<T, Any?> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
+fun <T> T.printErr(transform: Transformer<T, Any?> = { it.toSafeString() }): T {
+    contract {
+        callsInPlace(transform, InvocationKind.EXACTLY_ONCE)
+    }
+    return apply { System.err.println(transform(this)) }
+}
 
 /**
  * Extension function for the [Int] type that outputs the integer
@@ -4064,4 +4084,9 @@ fun CharArray.printlnErr() = apply { System.err.println(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printlnErrGeneric")
-fun <T> T.printlnErr(transform: Transformer<T, Any?> = { it.toSafeString() }) = apply { System.err.println(transform(this)) }
+fun <T> T.printlnErr(transform: Transformer<T, Any?> = { it.toSafeString() }): T {
+    contract {
+        callsInPlace(transform, InvocationKind.EXACTLY_ONCE)
+    }
+    return apply { System.err.println(transform(this)) }
+}

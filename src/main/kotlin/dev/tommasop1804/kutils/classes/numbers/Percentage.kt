@@ -532,6 +532,15 @@ value class Percentage private constructor(internal val value: Double) : Compara
          */
         val Number.clampedPercent : Percentage get() = Percentage(toDouble().coerceIn(0.0, 100.0))
 
+        /**
+         * Calculates the percentage representation of the current number.
+         *
+         * @param action An instance of the Action class that can be used to modify or handle the computation logic.
+         * @return A Percentage instance representing the computed percentage of the number.
+         * @since 4.1.0
+         */
+        operator fun Number.rem(action: Action) = Percentage(this)
+
         class Serializer : ValueSerializer<Percentage>() {
             override fun serialize(value: Percentage, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeNumber(value.value)

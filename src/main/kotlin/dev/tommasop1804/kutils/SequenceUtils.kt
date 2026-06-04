@@ -3,8 +3,11 @@
  */
 
 @file:JvmName("SequenceUtilsKt")
-@file:Suppress("unused", "kutils_collection_declaration", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "deprecation")
+@file:Suppress("unused", "kutils_collection_declaration", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "deprecation",
+    "RETURN_VALUE_NOT_USED_COERCION"
+)
 @file:Since("1.0.0")
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
@@ -120,7 +123,12 @@ inline operator fun <E> Sequence<E>.get(find: Predicate<E>, lazyException: Throw
  * @throws Throwable the exception provided by the [lazyException] supplier if no element matches the [predicate]
  * @since 1.1.1
  */
-inline fun <E> Sequence<E>.findOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E = find(predicate) ?: throw lazyException()
+inline fun <E> Sequence<E>.findOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return find(predicate) ?: throw lazyException()
+}
 
 /**
  * Merges the current sequence with additional sequences and returns the resulting sequence.
@@ -179,7 +187,12 @@ operator fun <E> Sequence<E>.contains(predicate: Predicate<E>) = any { predicate
  * @return The first element of the sequence.
  * @since 1.0.0
  */
-infix fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrNull() ?: throw lazyException()
+infix fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: throw lazyException()
+}
 /**
  * Returns the first element of the sequence that matches the given [predicate].
  * If no elements match the [predicate], the exception provided by [lazyException] is thrown.
@@ -190,7 +203,12 @@ infix fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier): E = fi
  * @throws Throwable If no element matching the [predicate] is found.
  * @since 1.0.0
  */
-fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E = firstOrNull(predicate) ?: throw lazyException()
+fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: throw lazyException()
+}
 
 /**
  * Returns the first element of the sequence or the result of [default] if the sequence is empty.
@@ -198,7 +216,12 @@ fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * @param default a supplier function that provides a value to return if the sequence is empty.
  * @since 1.0.0
  */
-infix fun <E> Sequence<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default()
+infix fun <E> Sequence<E>.firstOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: default()
+}
 /**
  * Returns the first element in the sequence that matches the given [predicate].
  * If no such element is found, returns the result of calling the [default] supplier.
@@ -210,7 +233,12 @@ infix fun <E> Sequence<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: defau
  *
  * @since 1.0.0
  */
-fun <E> Sequence<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = firstOrNull(predicate) ?: default()
+fun <E> Sequence<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: default()
+}
 
 /**
  * Iterates over each element in the sequence and applies the given [block] to it.
@@ -405,7 +433,12 @@ fun <E> Sequence<E>.onlyElementOrNull() = singleOrNull()
  * than one element.
  * @since 1.0.0
  */
-infix fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>) = singleOrNull() ?: default()
+infix fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return singleOrNull() ?: default()
+}
 /**
  * Returns the only element of the sequence or throws an exception provided by the given supplier
  * if the sequence contains zero or more than one element.
@@ -414,7 +447,12 @@ infix fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>) = singleOrNull() ?
  * does not contain exactly one element.
  * @since 1.0.0
  */
-infix fun <E> Sequence<E>.onlyElementOrThrow(lazyException: ThrowableSupplier) = singleOrNull() ?: throw lazyException()
+infix fun <E> Sequence<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E & Any {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return singleOrNull() ?: throw lazyException()
+}
 /**
  * Returns the only element in the sequence that matches the given predicate.
  * Throws an exception if there are no elements in the sequence, if no elements
@@ -450,7 +488,12 @@ infix fun <E> Sequence<E>.onlyElementOrNull(predicate: Predicate<E>) = singleOrN
  * @param predicate a predicate to determine the element that should be returned
  * @since 1.0.0
  */
-fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>) = singleOrNull(predicate) ?: default()
+fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return singleOrNull(predicate) ?: default()
+}
 /**
  * Returns the single element of the sequence matching the given [predicate], or throws the exception provided
  * by the [lazyException] if no such element exists or if more than one element matches the [predicate].
@@ -459,7 +502,264 @@ fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>)
  * @param predicate a condition that the element needs to satisfy
  * @since 1.0.0
  */
-fun <E> Sequence<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = singleOrNull(predicate) ?: throw lazyException()
+fun <E> Sequence<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E & Any {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return singleOrNull(predicate) ?: throw lazyException()
+}
+
+/**
+ * Returns the second element of the sequence.
+ *
+ * The sequence is iterated lazily through its iterator, consuming at most two elements.
+ *
+ * @receiver The sequence from which the second element is to be accessed.
+ * @return The second element of the sequence.
+ * @throws NoSuchElementException If the sequence contains fewer than two elements.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.second(): E {
+    val iterator = iterator()
+    kotlin.repeat(1) {
+        if (!iterator.hasNext()) throw NoSuchElementException("Sequence doesn't allow to get second element.")
+        iterator.next()
+    }
+    if (!iterator.hasNext()) throw NoSuchElementException("Sequence doesn't allow to get second element.")
+    return iterator.next()
+}
+/**
+ * Returns the second element of the sequence that matches the given predicate.
+ *
+ * Filters the sequence based on the provided predicate and retrieves the second element
+ * from the filtered sequence. If there are fewer than two elements matching the predicate,
+ * a [NoSuchElementException] is thrown.
+ *
+ * @param predicate a condition to filter the elements in the sequence.
+ * @return the second element that matches the predicate.
+ * @throws NoSuchElementException if there are fewer than two elements matching the predicate.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.second(predicate: Predicate<E>) = filter(predicate).second()
+/**
+ * Returns the second element of the sequence or `null` if the sequence contains
+ * fewer than two elements.
+ *
+ * The sequence is iterated lazily through its iterator, consuming at most two elements.
+ *
+ * @receiver The sequence from which the second element is to be accessed.
+ * @return The second element of the sequence, or `null` if it contains fewer than two elements.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.secondOrNull(): E? {
+    val iterator = iterator()
+    kotlin.repeat(1) {
+        if (!iterator.hasNext()) return null
+        iterator.next()
+    }
+    return if (iterator.hasNext()) iterator.next() else null
+}
+/**
+ * Returns the second element in the sequence that matches the specified [predicate],
+ * or `null` if no such element is found or if there are fewer than two matching elements.
+ *
+ * @param predicate a function that defines the condition to filter the elements of the sequence.
+ * @return the second element satisfying the given predicate, or `null` if no such element exists.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+/**
+ * Returns the second element of the sequence if it exists, or throws the exception provided by the
+ * given `lazyException` supplier if the sequence contains fewer than two elements.
+ *
+ * @param lazyException A supplier function that produces the exception to be thrown if the sequence has fewer than two elements.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    val iterator = iterator()
+    kotlin.repeat(1) {
+        if (!iterator.hasNext()) throw lazyException()
+        iterator.next()
+    }
+    if (!iterator.hasNext()) throw lazyException()
+    return iterator.next()
+}
+/**
+ * Returns the second element in the sequence that matches the given predicate or throws an exception
+ * provided by the given `lazyException` supplier if no such element exists.
+ *
+ * @param lazyException a supplier for the exception to throw if there are not enough matching elements
+ * @param predicate a condition to filter elements of the sequence
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).secondOrThrow(lazyException)
+}
+/**
+ * Returns the second element of the sequence if it exists; otherwise, returns the value supplied by the given default supplier.
+ *
+ * @param default A supplier function that provides a default value when the sequence does not contain at least two elements.
+ * @return The second element of the sequence, or the result of invoking the default supplier if the sequence has less than two elements.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.secondOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    val iterator = iterator()
+    kotlin.repeat(1) {
+        if (!iterator.hasNext()) return default()
+        iterator.next()
+    }
+    return if (iterator.hasNext()) iterator.next() else default()
+}
+/**
+ * Returns the second element in the sequence that matches the given predicate, or the value provided by
+ * the default supplier if no such element exists or there are less than two elements.
+ *
+ * @param default A supplier function that provides a default value if the sequence does not contain
+ *                a valid second element matching the predicate.
+ * @param predicate A function that determines whether a given element in the sequence matches the criteria.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.secondOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).secondOr(default)
+}
+
+/**
+ * Returns the third element of the sequence.
+ *
+ * The sequence is iterated lazily through its iterator, consuming at most three elements.
+ *
+ * @throws NoSuchElementException if the sequence contains fewer than three elements.
+ * @return the third element of the sequence.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.third(): E {
+    val iterator = iterator()
+    kotlin.repeat(2) {
+        if (!iterator.hasNext()) throw NoSuchElementException("Sequence doesn't allow to get third element.")
+        iterator.next()
+    }
+    if (!iterator.hasNext()) throw NoSuchElementException("Sequence doesn't allow to get third element.")
+    return iterator.next()
+}
+/**
+ * Returns the third element in the sequence matching the given predicate after filtering.
+ *
+ * The method first filters the elements of the sequence using the provided predicate and
+ * then attempts to retrieve the third element from the filtered sequence. If the filtered
+ * sequence has less than three elements, a [NoSuchElementException] is thrown.
+ *
+ * @param predicate A predicate to filter the elements of the sequence.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.third(predicate: Predicate<E>) = filter(predicate).third()
+/**
+ * Returns the third element of the sequence if it contains at least three elements, or `null` otherwise.
+ *
+ * The sequence is iterated lazily through its iterator, consuming at most three elements.
+ *
+ * @receiver The sequence from which the third element is accessed.
+ * @return The third element of the sequence, or `null` if it has fewer than three elements.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.thirdOrNull(): E? {
+    val iterator = iterator()
+    kotlin.repeat(2) {
+        if (!iterator.hasNext()) return null
+        iterator.next()
+    }
+    return if (iterator.hasNext()) iterator.next() else null
+}
+/**
+ * Returns the third element that matches the given [predicate], or `null` if no such element exists.
+ *
+ * The search for the matching element is performed by filtering the sequence based on the given [predicate].
+ *
+ * @param predicate the condition used to filter the elements of the sequence.
+ * @return the third element matching the [predicate], or `null` if there are less than three matching elements.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
+/**
+ * Returns the third element of the sequence if it exists, otherwise throws an exception provided by the given supplier.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if the sequence has fewer than three elements.
+ * @throws Throwable The exception provided by the supplier if the sequence size is less than three.
+ * @return The third element of the sequence.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    val iterator = iterator()
+    kotlin.repeat(2) {
+        if (!iterator.hasNext()) throw lazyException()
+        iterator.next()
+    }
+    if (!iterator.hasNext()) throw lazyException()
+    return iterator.next()
+}
+/**
+ * Returns the third element in the sequence that matches the given predicate or throws an exception
+ * provided by the lazyException supplier if there are less than three matching elements.
+ *
+ * @param lazyException a supplier that provides the exception to be thrown if the conditions are not met
+ * @param predicate a condition to filter elements in the sequence
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).thirdOrThrow(lazyException)
+}
+/**
+ * Returns the third element of the sequence if it exists; otherwise, evaluates and returns the
+ * result of the provided default supplier.
+ *
+ * @param default A supplier function that provides a default value to return if the sequence
+ * has fewer than three elements.
+ * @return The third element of the sequence if present, or the default value provided by the supplier.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.thirdOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    val iterator = iterator()
+    kotlin.repeat(2) {
+        if (!iterator.hasNext()) return default()
+        iterator.next()
+    }
+    return if (iterator.hasNext()) iterator.next() else default()
+}
+/**
+ * Returns the third element of the sequence that matches the given predicate if it exists; otherwise, returns the value supplied by the provided default supplier.
+ * The matching elements are determined by filtering the sequence based on the given predicate.
+ *
+ * @param default A supplier function that provides a default value when the sequence does not contain at least three elements
+ *                matching the given predicate.
+ * @param predicate A predicate function used to filter the sequence.
+ * @since 4.1.0
+ */
+fun <E> Sequence<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).thirdOr(default)
+}
 
 /**
  * Checks if the sequence is empty.

@@ -112,6 +112,25 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
 
     companion object {
         /**
+         * Creates a new instance of a BoundingBox using the provided GeoCoordinate components.
+         * The first component will represent the top-left corner and the second component
+         * will represent the bottom-right corner. If the components are not provided,
+         * default GeoCoordinate instances will be used.
+         *
+         * @param components A variable number of GeoCoordinate components to define the bounding box.
+         * The first component corresponds to the top-left corner, and the second corresponds
+         * to the bottom-right corner.
+         * @return A new BoundingBox instance based on the provided GeoCoordinate components.
+         * @since 4.1.0
+         */
+        operator fun of(vararg components: GeoCoordinate) = components.toList().let {
+            BoundingBox(
+                it.firstOr { GeoCoordinate() },
+                it.secondOr { GeoCoordinate() }
+            )
+        }
+
+        /**
          * A unique identifier for serializable classes used to verify compatibility
          * during the deserialization process. It ensures that a loaded class
          * is compatible with the serialized object.

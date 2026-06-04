@@ -5,10 +5,14 @@
 @file:JvmName("ExceptionUtilsKt")
 @file:Suppress("unused")
 @file:Since("1.0.0")
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 val Throwable.rootCause: Throwable
     get() {
@@ -69,7 +73,12 @@ inline infix fun <reified T : Throwable> T.causedBy(cause: Throwable? = null) = 
  *              for this throwable.
  * @since 1.0.0
  */
-inline infix fun <reified T : Throwable> T.causedBy(cause: ThrowableSupplier) = initCause(cause())!! as T
+inline infix fun <reified T : Throwable> T.causedBy(cause: ThrowableSupplier): T {
+    contract {
+        callsInPlace(cause, InvocationKind.EXACTLY_ONCE)
+    }
+    return initCause(cause())!! as T
+}
 /**
  * Sets the given throwable as the cause for the exception produced
  * by the `ThrowableSupplier`.
@@ -109,7 +118,12 @@ inline infix fun <T2 : Throwable, reified T1 : Throwable> T2.causeOf(main: T1) =
  *             to which the current Throwable (this) will be set as the cause.
  * @since 1.0.0
  */
-inline infix fun <T2 : Throwable, reified T1 : Throwable> T2.causeOf(main: Supplier<T1>) = main().initCause(this)!! as T1
+inline infix fun <T2 : Throwable, reified T1 : Throwable> T2.causeOf(main: Supplier<T1>): T1 {
+    contract {
+        callsInPlace(main, InvocationKind.EXACTLY_ONCE)
+    }
+    return main().initCause(this)!! as T1
+}
 /**
  * Sets the cause of the provided main throwable as the throwable supplied by the invoking ThrowableSupplier.
  *

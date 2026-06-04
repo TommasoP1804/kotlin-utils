@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geometry.Line.Companion.TOLERANCE
 import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
@@ -187,6 +188,21 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
         }
 
     companion object {
+        /**
+         * Creates a `Line` from a variable number of `Point` objects.
+         * If fewer than two points are provided, default `Point` instances are used.
+         *
+         * @param point Variable number of `Point` instances to define the line.
+         * @return A `Line` instance spanning between the first and second points in the input.
+         * @since 4.1.0
+         */
+        operator fun of(vararg point: Point) = point.toList().let {
+            Line(
+                it.firstOr { Point() },
+                it.secondOr { Point() }
+            )
+        }
+
         /**
          * A unique identifier for serializable classes used to verify compatibility
          * during the deserialization process. It ensures that a loaded class

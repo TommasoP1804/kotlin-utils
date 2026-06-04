@@ -156,7 +156,6 @@ inline fun <reified T> T.log(level: LogLevel, message: Any? = null, throwable: T
     message,
     throwable
 )
-
 /**
  * Logs a message and an optional throwable using the given logger at the specified log level.
  *
@@ -173,7 +172,6 @@ fun log(logger: Logger, level: LogLevel, message: Any?, throwable: Throwable) = 
     LogLevel.Warn -> logger.warn(message?.toString() ?: String.EMPTY, throwable)
     LogLevel.Error -> logger.error(message?.toString() ?: String.EMPTY, throwable)
 }
-
 /**
  * Logs a message at the specified log level using the provided logger.
  *
@@ -189,7 +187,6 @@ fun log(logger: Logger, level: LogLevel, message: Any) = when (level) {
     LogLevel.Warn -> logger.warn(message.toString())
     LogLevel.Error -> logger.error(message.toString())
 }
-
 /**
  * Logs a message with the specified logging level within the context of a `Logger` instance.
  *
@@ -203,7 +200,6 @@ fun log(logger: Logger, level: LogLevel, message: Any) = when (level) {
 @JvmName("logWithContext")
 context(logger: Logger)
 infix fun LogLevel.log(message: Any) = log(this, message)
-
 /**
  * Logs the string representation of the current object using the specified logger and log level.
  *
@@ -213,3 +209,95 @@ infix fun LogLevel.log(message: Any) = log(this, message)
  */
 @JvmName("logAnyReceiver")
 fun <T> T.log(logger: Logger, level: LogLevel) = apply { log(logger, level, toString()) }
+
+/**
+ * Logs a message at the specified logging level if the given condition is true.
+ *
+ * This function allows conditional logging based on a boolean predicate, helping to control
+ * when a log message should be emitted for the receiver type.
+ *
+ * @param condition A boolean condition that determines whether the log message should be emitted.
+ * @param level The logging level to use for the message. Supported levels include TRACE, DEBUG, INFO, WARN, and ERROR.
+ * @param message The message to be logged if the condition is true.
+ * @since 4.1.0
+ */
+inline fun <reified T> T.logIf(condition: Boolean, level: LogLevel, message: Any) {
+    if (condition) log(level, message)
+}
+/**
+ * Logs a message and throwable at the specified logging level if the given condition is true.
+ *
+ * @param condition A boolean value that determines whether the logging action should be executed.
+ *                  If true, the log will be recorded; otherwise, the method does nothing.
+ * @param level The logging level to use for the log entry. Specifies the severity of the log.
+ * @param message An optional message to log. If null, a default message may be used.
+ * @param throwable The throwable object to be logged along with the message.
+ * @since 4.1.0
+ */
+inline fun <reified T> T.logIf(condition: Boolean, level: LogLevel, message: Any? = null, throwable: Throwable) {
+    if (condition) log(level, message, throwable)
+}
+/**
+ * Logs a message and optional throwable at the specified log level if the given condition is true.
+ *
+ * @param condition A boolean value that determines whether the log operation will occur. If true, the message is logged at the specified level.
+ * @param logger The logger instance used to perform the logging.
+ * @param level The level of severity for the log message, represented by the `LogLevel` enum.
+ * @param message The message to log. If null, an empty string will be used.
+ * @param throwable The optional throwable to include in the log, providing context about an exception or error.
+ * @since 4.1.0
+ */
+fun logIf(condition: Boolean, logger: Logger, level: LogLevel, message: Any?, throwable: Throwable) {
+    if (condition) {
+        when (level) {
+            LogLevel.Trace -> logger.trace(message?.toString() ?: String.EMPTY, throwable)
+            LogLevel.Debug -> logger.debug(message?.toString() ?: String.EMPTY, throwable)
+            LogLevel.Info -> logger.info(message?.toString() ?: String.EMPTY, throwable)
+            LogLevel.Warn -> logger.warn(message?.toString() ?: String.EMPTY, throwable)
+            LogLevel.Error -> logger.error(message?.toString() ?: String.EMPTY, throwable)
+        }
+    }
+}
+/**
+ * Logs a message at the specified logging level if the given condition is true.
+ *
+ * @param condition A boolean value determining whether the message should be logged.
+ * @param logger An instance of Logger used to log the message.
+ * @param level The severity level at which the message will be logged.
+ * @param message The content to be logged, which will be converted to a string.
+ * @since 4.1.0
+ */
+fun logIf(condition: Boolean, logger: Logger, level: LogLevel, message: Any) {
+    if (condition) {
+        when (level) {
+            LogLevel.Trace -> logger.trace(message.toString())
+            LogLevel.Debug -> logger.debug(message.toString())
+            LogLevel.Info -> logger.info(message.toString())
+            LogLevel.Warn -> logger.warn(message.toString())
+            LogLevel.Error -> logger.error(message.toString())
+        }
+    }
+}
+/**
+ * Logs a message at a specified log level if the given condition is true, within the provided logging context.
+ *
+ * @param condition The condition that determines whether the message should be logged.
+ * @param message The message to log if the condition evaluates to true.
+ * @since 4.1.0
+ */
+@JvmName("logIfWithContext")
+context(logger: Logger)
+fun LogLevel.logIf(condition: Boolean, message: Any) {
+    if (condition) log(this, message)
+}
+/**
+ * Logs the current object using the provided logger and log level if the specified condition is met.
+ *
+ * @param condition A Boolean value that determines whether the object should be logged.
+ * @param logger The logger instance used to log the object.
+ * @param level The severity level of the log (TRACE, DEBUG, INFO, WARN, or ERROR).
+ * @return The current object after logging, if the condition is true.
+ * @since 4.1.0
+ */
+@JvmName("logIfAnyReceiver")
+fun <T> T.logIf(condition: Boolean, logger: Logger, level: LogLevel) = apply { if (condition) log(logger, level, toString()) }

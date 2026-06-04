@@ -188,6 +188,22 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
          */
         private const val TOLERANCE = 1e-9
 
+        /**
+         * Constructs a Triangle object from a variable number of Point instances.
+         * If fewer than three points are provided, the remaining points will default to new Point instances.
+         *
+         * @param points A variable number of Point instances used to construct the Triangle.
+         * @return A Triangle instance created from the provided points.
+         * @since 4.1.0
+         */
+        operator fun of(vararg points: Point) = points.toList().let {
+            Triangle(
+                it.firstOr { Point() },
+                it.secondOr { Point() },
+                it.thirdOr { Point() }
+            )
+        }
+
         class Serializer : ValueSerializer<Triangle>() {
             override fun serialize(value: Triangle, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeStartObject()

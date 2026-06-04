@@ -4,9 +4,10 @@
 
 @file:JvmName("BlockUtilsKt")
 @file:Suppress("unused", "kutils_collection_declaration", "JavaCollectionWithNullableTypeArgument",
-    "kutils_tuple_declaration", "deprecation"
+    "kutils_tuple_declaration", "deprecation", "RETURN_VALUE_NOT_USED_COERCION"
 )
 @file:Since("1.0.0")
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
@@ -19,6 +20,9 @@ import dev.tommasop1804.kutils.classes.tuples.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlinx.coroutines.delay
 import java.util.concurrent.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 import kotlin.system.measureNanoTime
 
@@ -38,7 +42,13 @@ operator fun Action.times(n: Int) = (1..n).forEach { _ -> this() }
  * @return The result provided by the supplier.
  * @since 1.0.0
  */
-fun <T> compute(supplier: Supplier<T>) = supplier()
+fun <T> compute(supplier: Supplier<T>): T {
+    contract {
+        callsInPlace(supplier, InvocationKind.EXACTLY_ONCE)
+        returnsResultOf(supplier)
+    }
+    return supplier()
+}
 
 /**
  * Repeatedly executes the given action until a `breakLoop()` is thrown.
@@ -50,6 +60,10 @@ fun <T> compute(supplier: Supplier<T>) = supplier()
  */
 @Suppress("UNCHECKED_CAST")
 inline fun loop(action: ReceiverConsumer<LoopContext>) {
+    contract {
+        callsInPlace(action, InvocationKind.UNKNOWN)
+    }
+
     with(LoopContext()) {
         while (true) {
             try {
@@ -77,6 +91,9 @@ inline fun loop(action: ReceiverConsumer<LoopContext>) {
  */
 @Suppress("UNCHECKED_CAST")
 inline fun <R> rLoop(action: ReceiverConsumer<LoopContext>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.UNKNOWN)
+    }
     with(LoopContext()) {
         while (true) {
             try {
@@ -287,14 +304,24 @@ fun <T, R> ((T) -> R).memoizeTTL(ttl: Duration = Duration(minutes = 5)): (T) -> 
  * @since 1.0.0
  */
 @JvmName("measureTimeWithReceiver")
-fun <T> Supplier<T>.measureTime() = Duration(nanos = measureNanoTime { this() })
+fun <T> Supplier<T>.measureTime(): Duration {
+    contract {
+        callsInPlace(this@measureTime, InvocationKind.EXACTLY_ONCE)
+    }
+    return Duration(nanos = measureNanoTime { this() })
+}
 /**
  * Measures the time taken to execute the given action function and returns the duration.
  *
  * @param action The block of code whose execution time is to be measured.
  * @since 1.0.0
  */
-fun <T> measureTime(action: Supplier<T>) = Duration(nanos = measureNanoTime { action() })
+fun <T> measureTime(action: Supplier<T>): Duration {
+    contract {
+        callsInPlace(action, InvocationKind.EXACTLY_ONCE)
+    }
+    return Duration(nanos = measureNanoTime { action() })
+}
 
 /**
  * Executes the supplier function and measures the time taken for its execution.
@@ -304,6 +331,9 @@ fun <T> measureTime(action: Supplier<T>) = Duration(nanos = measureNanoTime { ac
  */
 @JvmName("fetchAndMeasureTimeWithReceiver")
 fun <T> Supplier<T>.fetchAndMeasureTime(): Pair<T, Duration> {
+    contract {
+        callsInPlace(this@fetchAndMeasureTime, InvocationKind.EXACTLY_ONCE)
+    }
     val timestamp = System.nanoTime()
     val result = this()
     return result to Duration(nanos = System.nanoTime() - timestamp)
@@ -318,6 +348,9 @@ fun <T> Supplier<T>.fetchAndMeasureTime(): Pair<T, Duration> {
  * @since 1.0.0
  */
 fun <T> fetchAndMeasureTime(action: Supplier<T>): Pair<T, Duration> {
+    contract {
+        callsInPlace(action, InvocationKind.EXACTLY_ONCE)
+    }
     val timestamp = System.nanoTime()
     val result = action()
     return result to Duration(nanos = System.nanoTime() - timestamp)
@@ -334,6 +367,10 @@ fun <T> fetchAndMeasureTime(action: Supplier<T>): Pair<T, Duration> {
  */
 @OptIn(RiskyApproximationOfTemporal::class)
 infix fun <T> Supplier<T>.withDelayOf(delay: Duration): T {
+    contract {
+        callsInPlace(this@withDelayOf, InvocationKind.EXACTLY_ONCE)
+        returnsResultOf(this@withDelayOf)
+    }
     Thread.sleep(delay.toNanos() / 1_000_000L)
     return this()
 }
@@ -349,6 +386,10 @@ infix fun <T> Supplier<T>.withDelayOf(delay: Duration): T {
  */
 @OptIn(RiskyApproximationOfTemporal::class)
 fun <T> withDelayOf(delay: Duration, block: Supplier<T>): T {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        returnsResultOf(block)
+    }
     Thread.sleep(delay.toNanos() / 1_000_000L)
     return block()
 }
@@ -390,6 +431,10 @@ suspend fun delay(duration: Duration) = delay(duration.toMillis().toLong())
  */
 @OptIn(RiskyApproximationOfTemporal::class)
 fun <T> Supplier<T>.executeWithTimeLimit(timeLimit: Duration, lazyException: ThrowableSupplier = { RetryLimitExceededException("Execution time exceeded the limit ($timeLimit)") }): T {
+    contract {
+        returnsResultOf(this@executeWithTimeLimit)
+    }
+
     val executor = Executors.newSingleThreadExecutor()
     val future: Future<T> = executor.submit(this)
 
@@ -411,8 +456,12 @@ fun <T> Supplier<T>.executeWithTimeLimit(timeLimit: Duration, lazyException: Thr
  * @param block lambda function to execute
  * @since 1.0.0
  */
-fun <T> executeWithTimeLimit(timeLimit: Duration, lazyException: ThrowableSupplier = { RetryLimitExceededException("Execution time exceeded the limit ($timeLimit)") }, block: Supplier<T>) =
-    block.executeWithTimeLimit(timeLimit, lazyException)
+fun <T> executeWithTimeLimit(timeLimit: Duration, lazyException: ThrowableSupplier = { RetryLimitExceededException("Execution time exceeded the limit ($timeLimit)") }, block: Supplier<T>): T {
+    contract {
+        returnsResultOf(block)
+    }
+    return block.executeWithTimeLimit(timeLimit, lazyException)
+}
 
 /**
  * Retries the execution of an action a specified number of times, handling specific exceptions.
@@ -441,6 +490,11 @@ fun <T> Supplier<T>.retry(
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: Set<KClass<out Throwable>> = emptySet()
 ): T {
+    contract {
+        callsInPlace(this@retry, InvocationKind.AT_LEAST_ONCE)
+        returnsResultOf(this@retry)
+    }
+
     for (i in 1..times) {
         try {
             return this()
@@ -473,7 +527,12 @@ fun <T> Supplier<T>.retry(
     lazyException: ThrowableSupplier = { RetryLimitExceededException("Limit of retries ($times) reached") },
     catchOnly: KClass<out Throwable>,
     dontCatch: Set<KClass<out Throwable>> = emptySet()
-) = retry(times, lazyException, catchOnly.asSingleSet(), dontCatch)
+): T {
+    contract {
+        returnsResultOf(this@retry)
+    }
+    return retry(times, lazyException, catchOnly.asSingleSet(), dontCatch)
+}
 /**
  * Executes the action with a retry mechanism, allowing for a specified number of attempts and configurable
  * exception handling.
@@ -499,7 +558,12 @@ fun <T> Supplier<T>.retry(
     lazyException: ThrowableSupplier = { RetryLimitExceededException("Limit of retries ($times) reached") },
     catchOnly: KClass<out Throwable>,
     dontCatch: KClass<out Throwable>
-) = retry(times, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(this@retry)
+    }
+    return retry(times, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+}
 /**
  * Repeatedly attempts to invoke an action with specified retry conditions.
  *
@@ -524,7 +588,12 @@ fun <T> Supplier<T>.retry(
     lazyException: ThrowableSupplier = { RetryLimitExceededException("Limit of retries ($times) reached") },
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: KClass<out Throwable>
-) = retry(times, lazyException, catchOnly, dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(this@retry)
+    }
+    return retry(times, lazyException, catchOnly, dontCatch.asSingleSet())
+}
 /**
  * Retries the execution of a supplier function until it succeeds,
  * or the specified duration is exceeded. Provides configuration to
@@ -547,6 +616,10 @@ fun <T> Supplier<T>.retry(
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: Set<KClass<out Throwable>> = emptySet()
 ): T {
+    contract {
+        callsInPlace(this@retry, InvocationKind.AT_LEAST_ONCE)
+        returnsResultOf(this@retry)
+    }
     val startTime = System.currentTimeMillis()
     val endTime = startTime + duration.toMillis()
 
@@ -574,7 +647,11 @@ fun <T> Supplier<T>.retry(
     lazyException: ThrowableSupplier = { RetryLimitExceededException("Limit of retries ($duration) reached") },
     catchOnly: KClass<out Throwable>,
     dontCatch: Set<KClass<out Throwable>> = emptySet()
-) = retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch)
+): T {
+    contract {
+        returnsResultOf(this@retry)
+    }
+    return retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch) }
 /**
  * Retries the execution of an action within a specified duration, with the ability to define exception handling rules.
  *
@@ -589,7 +666,12 @@ fun <T> Supplier<T>.retry(
     lazyException: ThrowableSupplier = { RetryLimitExceededException("Limit of retries ($duration) reached") },
     catchOnly: KClass<out Throwable>,
     dontCatch: KClass<out Throwable>
-) = retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(this@retry)
+    }
+    return retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+}
 /**
  * Retries the execution of an action until the specified duration elapses or until success,
  * unless a specified exception is thrown. The conditions for retrying are configurable
@@ -606,7 +688,12 @@ fun <T> Supplier<T>.retry(
     lazyException: ThrowableSupplier = { RetryLimitExceededException("Limit of retries ($duration) reached") },
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: KClass<out Throwable>
-) = retry(duration, lazyException, catchOnly, dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(this@retry)
+    }
+    return retry(duration, lazyException, catchOnly, dontCatch.asSingleSet())
+}
 
 /**
  * Retries the execution of an action a specified number of times, handling specific exceptions.
@@ -636,7 +723,12 @@ fun <T> retry(
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: Set<KClass<out Throwable>> = emptySet(),
     supplier: Supplier<T>
-) = supplier.retry(times, lazyException, catchOnly, dontCatch)
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(times, lazyException, catchOnly, dontCatch)
+}
 /**
  * Retries the execution of an action a specified number of times with customizable exception handling.
  *
@@ -661,7 +753,12 @@ fun <T> retry(
     catchOnly: KClass<out Throwable>,
     dontCatch: Set<KClass<out Throwable>> = emptySet(),
     supplier: Supplier<T>
-) = supplier.retry(times, lazyException, catchOnly.asSingleSet(), dontCatch)
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(times, lazyException, catchOnly.asSingleSet(), dontCatch)
+}
 /**
  * Executes the action with a retry mechanism, allowing for a specified number of attempts and configurable
  * exception handling.
@@ -689,7 +786,12 @@ fun <T> retry(
     catchOnly: KClass<out Throwable>,
     dontCatch: KClass<out Throwable>,
     supplier: Supplier<T>
-) = supplier.retry(times, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(times, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+}
 /**
  * Repeatedly attempts to invoke an action with specified retry conditions.
  *
@@ -716,7 +818,12 @@ fun <T> retry(
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: KClass<out Throwable>,
     supplier: Supplier<T>
-) = supplier.retry(times, lazyException, catchOnly, dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(times, lazyException, catchOnly, dontCatch.asSingleSet())
+}
 /**
  * Retries the execution of a supplier function until it succeeds,
  * or the specified duration is exceeded. Provides configuration to
@@ -732,7 +839,6 @@ fun <T> retry(
  * @param supplier The action to be retried.
  * @since 1.0.0
  */
-@OptIn(RiskyApproximationOfTemporal::class)
 @Suppress("UNCHECKED_CAST")
 fun <T> retry(
     duration: Duration,
@@ -740,7 +846,12 @@ fun <T> retry(
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: Set<KClass<out Throwable>> = emptySet(),
     supplier: Supplier<T>
-) = supplier.retry(duration, lazyException, catchOnly, dontCatch)
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(duration, lazyException, catchOnly, dontCatch)
+}
 /**
  * Retries the execution of the action until the specified duration is exhausted.
  *
@@ -758,7 +869,13 @@ fun <T> retry(
     catchOnly: KClass<out Throwable>,
     dontCatch: Set<KClass<out Throwable>> = emptySet(),
     supplier: Supplier<T>
-) = supplier.retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch)
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch)
+}
+
 /**
  * Retries the execution of an action within a specified duration, with the ability to define exception handling rules.
  *
@@ -775,7 +892,12 @@ fun <T> retry(
     catchOnly: KClass<out Throwable>,
     dontCatch: KClass<out Throwable>,
     supplier: Supplier<T>
-) = supplier.retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(duration, lazyException, catchOnly.asSingleSet(), dontCatch.asSingleSet())
+}
 /**
  * Retries the execution of an action until the specified duration elapses or until success,
  * unless a specified exception is thrown. The conditions for retrying are configurable
@@ -794,7 +916,11 @@ fun <T> retry(
     catchOnly: Set<KClass<out Throwable>> = emptySet(),
     dontCatch: KClass<out Throwable>,
     supplier: Supplier<T>
-) = supplier.retry(duration, lazyException, catchOnly, dontCatch.asSingleSet())
+): T {
+    contract {
+        returnsResultOf(supplier)
+    }
+    return supplier.retry(duration, lazyException, catchOnly, dontCatch.asSingleSet()) }
 
 /**
  * Executes the given [action] and expects it to throw an exception. If the [action] completes

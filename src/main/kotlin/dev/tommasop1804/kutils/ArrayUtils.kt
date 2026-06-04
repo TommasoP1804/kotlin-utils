@@ -8,6 +8,7 @@
     "kutils_sublist_as_int_invoke", "RedundantSuppression", "deprecation", "kutils_take_as_int_invoke",
     "kutils_drop_as_int_invoke"
 )
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
@@ -143,7 +144,12 @@ operator fun <E> Array<E>.contains(predicate: Predicate<E>) = any { predicate(it
  * @throws Throwable The exception provided by the supplier if the array is empty.
  * @since 2.1.0
  */
-infix fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E = firstOrNull() ?: throw lazyException()
+infix fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: throw lazyException()
+}
 /**
  * Returns the first element in the array that matches the given [predicate]. 
  * If no such element is found, throws an exception provided by the [lazyException] supplier.
@@ -153,7 +159,12 @@ infix fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E = first
  * @return The first element that matches the [predicate].
  * @since 2.1.0
  */
-fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E = firstOrNull(predicate) ?: throw lazyException()
+fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: throw lazyException()
+}
 /**
  * Returns the first element of the array if it exists, or the provided default value
  * if the array is empty.
@@ -165,7 +176,12 @@ fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predi
  * @return The first element of the array or the value provided by the `default` supplier.
  * @since 2.1.0
  */
-infix fun <E> Array<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default()
+infix fun <E> Array<E>.firstOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull() ?: default()
+}
 /**
  * Returns the first element of the array that matches the given [predicate].
  * If no such element is found, returns the result of the [default] supplier.
@@ -174,7 +190,12 @@ infix fun <E> Array<E>.firstOr(default: Supplier<E>) = firstOrNull() ?: default(
  * @param predicate A predicate used to test elements of the array.
  * @since 2.1.0
  */
-fun <E> Array<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>) = firstOrNull(predicate) ?: default()
+fun <E> Array<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return firstOrNull(predicate) ?: default()
+}
 
 /**
  * Returns the second element of the array.
@@ -227,7 +248,12 @@ fun <E> Array<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).secon
  * @return The second element of the array.
  * @since 2.1.0
  */
-fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier) = if (size < 2) throw lazyException() else this[1]
+fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 2) throw lazyException() else this[1]
+}
 /**
  * Returns the second element of the array that matches the given predicate, or throws the exception
  * provided by the given `lazyException` supplier if fewer than two elements match.
@@ -246,7 +272,12 @@ fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Pred
  * @return the second element of the array or the default value provided by the supplier
  * @since 2.1.0
  */
-fun <E> Array<E>.secondOr(default: Supplier<E>) = if (size < 2) default() else this[1]
+fun <E> Array<E>.secondOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 2) default() else this[1]
+}
 /**
  * Returns the second element of the array that matches the given predicate, if such an element exists.
  * If no such element exists, the value provided by the given default supplier is returned.
@@ -284,7 +315,7 @@ fun <E> Array<E>.third() = if (size < 3) throw NoSuchElementException("List size
  * @throws NoSuchElementException if there are fewer than three matching elements.
  * @since 2.1.0
  */
-fun <E> Array<E>.third(predicate: Predicate<E>) = filter(predicate).second()
+fun <E> Array<E>.third(predicate: Predicate<E>) = filter(predicate).third()
 /**
  * Returns the third element of the array if the array contains at least three elements,
  * or `null` if the array has fewer than three elements.
@@ -308,7 +339,7 @@ fun <E> Array<E>.thirdOrNull() = if (size < 3) null else this[2]
  * @return The third element that matches the [predicate] or `null` if there are fewer than three matches.
  * @since 2.1.0
  */
-fun <E> Array<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+fun <E> Array<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
 /**
  * Returns the third element of the array if it exists; otherwise, throws an exception
  * provided by the supplied `lazyException`.
@@ -320,7 +351,12 @@ fun <E> Array<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).second
  * than three.
  * @since 2.1.0
  */
-fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier) = if (size < 3) throw lazyException() else this[2]
+fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 3) throw lazyException() else this[2]
+}
 /**
  * Returns the third element of the array that matches the given predicate, or throws the exception
  * provided by the given `lazyException` supplier if there are fewer than three matching elements.
@@ -329,7 +365,8 @@ fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier) = if (size < 3) 
  * @param predicate A predicate used to filter the elements of the array.
  * @since 2.1.0
  */
-fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
+
 /**
  * Returns the third element of the array if it exists, otherwise returns the value
  * supplied by the given default supplier.
@@ -339,7 +376,12 @@ fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predi
  * @return The third element of the array or the value returned by the default supplier.
  * @since 2.1.0
  */
-fun <E> Array<E>.thirdOr(default: Supplier<E>) = if (size < 3) default() else this[2]
+fun <E> Array<E>.thirdOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 3) default() else this[2]
+}
 /**
  * Returns the third element of the array that satisfies the given predicate if it exists; 
  * otherwise, returns the value supplied by the given default supplier.
@@ -351,7 +393,7 @@ fun <E> Array<E>.thirdOr(default: Supplier<E>) = if (size < 3) default() else th
  *         if the filtered array has less than three elements.
  * @since 2.1.0
  */
-fun <E> Array<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+fun <E> Array<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
 
 /**
  * Splits the array into chunks based on a predicate condition. Each chunk will end
@@ -439,7 +481,12 @@ fun <E> Array<E>.onlyElementOrNull() = toList().run { if (size == 1) first() els
  * @param default A supplier function to provide a default value if the array does not contain exactly one element.
  * @since 2.1.0
  */
-infix fun <E> Array<E>.onlyElementOr(default: Supplier<E>) = toList().run { if (size == 1) first() else default() }
+infix fun <E> Array<E>.onlyElementOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else default() }
+}
 /**
  * Returns the single element in the array if the array contains exactly one element.
  * Otherwise, throws the exception provided by the given supplier.
@@ -449,7 +496,12 @@ infix fun <E> Array<E>.onlyElementOr(default: Supplier<E>) = toList().run { if (
  * @throws Throwable If the array does not contain exactly one element.
  * @since 2.1.0
  */
-infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier) = toList().run { if (size == 1) first() else throw lazyException() }
+infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else throw lazyException() }
+}
 /**
  * Returns the single element in the array that matches the given predicate.
  * Throws an exception if no elements match the predicate or if more than one element matches.
@@ -484,7 +536,12 @@ infix fun <E> Array<E>.onlyElementOrNull(predicate: Predicate<E>) = filter(predi
  * @return The single matching element or the value provided by the default supplier.
  * @since 2.1.0
  */
-fun <E> Array<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else default() }
+fun <E> Array<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).run { if (size == 1) first() else default() }
+}
 /**
  * Returns the only element of the array that matches the given predicate or throws the exception provided
  * by the given `lazyException` supplier if the matching element count is not exactly one.
@@ -494,7 +551,12 @@ fun <E> Array<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>) = 
  * @throws Throwable When the array does not contain exactly one element that matches the predicate.
  * @since 2.1.0
  */
-fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else throw lazyException() }
+fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).run { if (size == 1) first() else throw lazyException() }
+}
 
 /**
  * Checks if the array is either null or empty.
@@ -768,8 +830,12 @@ operator fun <E> Array<E>.get(find: Predicate<E>, lazyException: ThrowableSuppli
  * @param find A predicate used to evaluate each element in the array.
  * @since 2.1.0
  */
-fun <E> Array<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>) =
-    find(find) ?: throw lazyException()
+fun <E> Array<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>): E & Any {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return find(find) ?: throw lazyException()
+}
 
 /**
  * Returns a new array containing elements of the original array that do not match

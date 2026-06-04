@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.asList
+import dev.tommasop1804.kutils.classes.collections.ConsList.Companion.cons
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -172,6 +173,14 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
     })
 
     companion object {
+        /**
+         * Inizializes an instance by constructing a linked list from the provided vararg elements.
+         *
+         * @param values The elements to be added to the list, provided as vararg.
+         * @since 4.1.0
+         */
+        operator fun <T> of(vararg values: T) = ConsList(*values)
+
         /**
          * Prepends the current element to the beginning of the given cons list, creating a new cons list.
          *
