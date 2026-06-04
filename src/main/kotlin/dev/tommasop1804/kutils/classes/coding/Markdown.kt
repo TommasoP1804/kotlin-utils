@@ -58,6 +58,7 @@ import org.intellij.lang.annotations.Language as IJLanguage
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Markdown.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Markdown.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
+@MustUseReturnValues
 class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharSequence, Code(value, Language.Markdown) {
 
     /**

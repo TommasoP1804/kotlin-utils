@@ -40,6 +40,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = TemporalInterval.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = TemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke")
+@MustUseReturnValues
 interface TemporalInterval : Serializable {
     /**
      * Represents the starting point of a temporal interval.

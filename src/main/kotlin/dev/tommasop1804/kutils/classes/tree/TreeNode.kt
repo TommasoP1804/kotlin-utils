@@ -21,6 +21,7 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration")
+@MustUseReturnValues
 class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: T?, children: MList<TreeNode<T>>)/*: Serializable*/ {
     /**
      * Represents the unique identifier for the TreeNode instance.

@@ -2,6 +2,8 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
+@file:MustUseReturnValues
+
 package dev.tommasop1804.kutils.classes.memoization
 
 import dev.tommasop1804.kutils.*

@@ -43,6 +43,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Line.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Line.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Line (var start: Point = Point(), var end: Point = Point()) : Serializable, Comparable<Line> {
     /**
      * The length of the line, calculated as the Euclidean distance between its start and end points.

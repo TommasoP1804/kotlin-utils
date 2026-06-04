@@ -14,9 +14,8 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -47,6 +46,7 @@ import java.nio.file.Path
 @JsonDeserialize(using = UpcA.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UpcA.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UpcA.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class UpcA private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Upc, PrintableBarcode {
     /**
      * Represents the length of the `value` field, which denotes the number of

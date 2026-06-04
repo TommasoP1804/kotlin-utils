@@ -53,6 +53,7 @@ import kotlin.text.startsWith
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Point.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Point.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke", "kutils_substring_as_get_intprogression")
+@MustUseReturnValues
 class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z: Double = 0.0) : Serializable, Comparable<Point> {
 
     /**

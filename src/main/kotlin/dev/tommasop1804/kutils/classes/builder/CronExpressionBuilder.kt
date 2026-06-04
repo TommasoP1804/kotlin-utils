@@ -34,6 +34,7 @@ import java.time.Month
  * @constructor Creates an empty Builder to begin constructing the cron expression.
  * @since 1.0.0
  */
+@MustUseReturnValues
 class CronExpressionBuilder(private val type: Type) {
     /**
      * Represents the seconds configuration for a builder.

@@ -7,10 +7,8 @@ package dev.tommasop1804.kutils.classes.web
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.DataMapNN
-import dev.tommasop1804.kutils.Uri
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.web.HttpStatus.Companion.toHttpStatus
-import dev.tommasop1804.kutils.ifNotNull
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -45,6 +43,7 @@ import java.net.URI
 @JsonDeserialize(using = ProblemDetail.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ProblemDetail.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ProblemDetail.Companion.OldDeserializer::class)
+@MustUseReturnValues
 data class ProblemDetail(
     val status: HttpStatus? = null,
     val type: Uri = DEFAULT_TYPE,

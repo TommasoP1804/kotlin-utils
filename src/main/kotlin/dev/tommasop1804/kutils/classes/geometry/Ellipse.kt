@@ -36,6 +36,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ellipse.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ellipse.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Ellipse (var center: Point = Point(), xRadius: Double = 0.0, yRadius: Double = 0.0) : Serializable, Comparable<Ellipse>, Shape2D {
 
     var xRadius = xRadius

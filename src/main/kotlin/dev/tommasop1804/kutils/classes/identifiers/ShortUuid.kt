@@ -51,6 +51,7 @@ import kotlin.uuid.toKotlinUuid
 @JsonDeserialize(using = ShortUuid.Companion.Deserializer::class)
 @JvmInline
 @Suppress("unused", "kutils_substring_as_get_intprogression", "kutils_take_as_int_invoke")
+@MustUseReturnValues
 value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
     /**

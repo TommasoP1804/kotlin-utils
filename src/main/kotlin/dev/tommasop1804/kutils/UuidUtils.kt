@@ -5,7 +5,7 @@
 @file:JvmName("UuidUtilsKt")
 @file:Suppress("unused", "functionName", "kutils_uuid_fromstring_as_uuid", "kutils_randomuuid_as_uuid", "kutils_collection_declaration", "kutils_temporal_now_as_temporal")
 @file:Since("3.0.0")
-@file:OptIn(ExperimentalUuidApi::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -18,7 +18,6 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
-import kotlin.uuid.ExperimentalUuidApi
 
 /**
  * Represents a UUID value where all bits are set to zero.

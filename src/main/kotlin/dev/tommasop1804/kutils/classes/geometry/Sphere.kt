@@ -38,6 +38,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Sphere.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Sphere.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Sphere (var center: Point = Point(), radius: Double = 0.0) : Serializable, Comparable<Sphere>, Shape3D {
     var radius = radius
         set(value) = if (value >= 0) field = value else throw GeometryException("Radius must be greater than zero.")

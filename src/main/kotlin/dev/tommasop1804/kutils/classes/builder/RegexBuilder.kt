@@ -3,6 +3,7 @@
  */
 
 @file:Suppress("unused")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils.classes.builder
 

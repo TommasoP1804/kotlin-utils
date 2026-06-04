@@ -30,6 +30,7 @@ import java.io.Serializable
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Cube.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Cube.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Cube (corner: Point = Point(), sideLength: Double = 0.0) : Cuboid(corner, sideLength, sideLength, sideLength), Serializable, Shape3D {
     /**
      * Represents the side length of a cube. Changing the side length automatically updates

@@ -5,10 +5,11 @@
 @file:JvmName("ProgressionUtilsKt")
 @file:Suppress("unused", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke")
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 
 /**
  * Invokes the Int as a function to process an `IntProgression` by either taking or dropping elements

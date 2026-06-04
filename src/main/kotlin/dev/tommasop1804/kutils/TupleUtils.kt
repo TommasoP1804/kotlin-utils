@@ -5,6 +5,7 @@
 @file:JvmName("TupleUtilsKt")
 @file:Since("1.1.0")
 @file:Suppress("unused")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 

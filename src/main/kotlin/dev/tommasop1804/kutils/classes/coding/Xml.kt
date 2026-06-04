@@ -4,6 +4,7 @@
 
 @file:Suppress("java_integer_as_kotlin_int")
 @file:OptIn(Beta::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils.classes.coding
 
@@ -15,7 +16,6 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
-import dev.tommasop1804.kutils.classes.coding.Xml.Companion.DEFAULT_SEPARATOR
 import dev.tommasop1804.kutils.classes.coding.Yaml.Companion.toYaml
 import dev.tommasop1804.kutils.exceptions.*
 import org.w3c.dom.Document

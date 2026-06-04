@@ -5,10 +5,11 @@
 @file:JvmName("CharUtilsKt")
 @file:Suppress("unused")
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 
 
 /**

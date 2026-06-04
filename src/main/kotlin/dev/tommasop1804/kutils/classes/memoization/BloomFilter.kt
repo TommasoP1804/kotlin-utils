@@ -41,6 +41,7 @@ import kotlin.math.roundToLong
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 class BloomFilter<T> private constructor(
     val expectedInsertions: Long,
     val falsePositiveRate: Percentage,

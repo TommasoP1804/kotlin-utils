@@ -45,6 +45,7 @@ import java.util.*
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RomanNumber.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RomanNumber.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, fiveHundred: Long, thousand: Long) : CharSequence, Number(), Comparable<Number>, Serializable {
     private var _one: Long = 0
     private var _five: Long = 0

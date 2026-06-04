@@ -2,11 +2,12 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
+@file:MustUseReturnValues
+
 package dev.tommasop1804.kutils.classes.web
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.EmailSendingException
-import dev.tommasop1804.kutils.exceptions.RequiredParameterException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.mail.*
 import jakarta.mail.internet.InternetAddress
 import jakarta.mail.internet.MimeBodyPart

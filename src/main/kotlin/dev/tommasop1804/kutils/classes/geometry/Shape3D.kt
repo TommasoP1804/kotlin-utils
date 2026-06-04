@@ -16,6 +16,7 @@ package dev.tommasop1804.kutils.classes.geometry
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 interface Shape3D {
     /**
      * Represents the outer surface area of a three-dimensional shape.

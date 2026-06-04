@@ -5,6 +5,7 @@
 @file:JvmName("ReflectionUtilsKt")
 @file:Suppress("unused", "DEPRECATION", "unchecked_cast")
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 

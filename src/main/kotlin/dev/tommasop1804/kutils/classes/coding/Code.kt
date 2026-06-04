@@ -41,6 +41,7 @@ import javax.tools.*
 @JsonDeserialize(using = Code.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Code.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Code.Companion.OldDeserializer::class)
+@MustUseReturnValues
 open class Code(open val value: String, val language: Language) : CharSequence {
     /**
      * Represents the length of the string stored in the `value` property of the Code class.

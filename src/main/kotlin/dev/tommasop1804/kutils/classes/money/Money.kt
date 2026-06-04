@@ -46,6 +46,7 @@ import kotlin.reflect.KProperty
 @JsonSerialize(using = Money.Companion.Serializer::class)
 @JsonDeserialize(using = Money.Companion.Deserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Currency) : Number(), Serializable, Comparable<Money> {
     /**
      * Represents the monetary amount for the Money class, automatically scaled

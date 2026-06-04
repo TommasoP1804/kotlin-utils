@@ -41,6 +41,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Triangle.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Triangle.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = Point()) : Serializable, Comparable<Triangle>, Shape2D {
     /**
      * Represents the area of the triangle calculated using the coordinates of its vertices.

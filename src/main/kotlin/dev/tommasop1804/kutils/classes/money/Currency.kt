@@ -26,6 +26,7 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration")
+@MustUseReturnValues
 enum class Currency (
 	val currencyName: String,
 	val numericCode: String,

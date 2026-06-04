@@ -16,6 +16,7 @@ package dev.tommasop1804.kutils.classes.geometry
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 interface Shape2D {
     /**
      * Represents the calculated area of a 2D shape.

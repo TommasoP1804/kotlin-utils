@@ -5,11 +5,12 @@
 @file:JvmName("RandomUtilsKt")
 @file:Suppress("unused", "kutils_temporal_of_as_temporal")
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.time.TimeZoneDesignator
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.time.*
 import java.time.*
 import kotlin.reflect.KClass
 

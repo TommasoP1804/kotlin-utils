@@ -43,6 +43,7 @@ import kotlin.reflect.KProperty
 @JsonDeserialize(using = Color.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Color.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Color.Companion.OldDeserializer::class)
+@MustUseReturnValues
 class Color internal constructor(var red: Int, var green: Int, var blue: Int, var alpha: Percentage = FULL): Serializable, Comparable<Color> {
     /**
      * Represents the luminosity component of a color in the HSL color model.

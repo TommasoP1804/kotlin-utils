@@ -32,6 +32,7 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration", "kutils_map_declaration")
+@MustUseReturnValues
 enum class TimeZoneDesignator(
     /**
      * Military identifier letter.

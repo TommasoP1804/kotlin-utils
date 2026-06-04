@@ -34,6 +34,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Circle.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Circle.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Circle(
     radius: Double = 0.0,
     var center: Point = Point()

@@ -8,6 +8,7 @@
 )
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -197,6 +198,7 @@ operator fun <E> Iterable<E>.contains(predicate: Predicate<E>) = any { predicate
  * @return the first element of the iterable
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -213,6 +215,7 @@ fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
  * @return the first element that matches the predicate
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -303,6 +306,7 @@ fun <E> List<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).second
  * @param lazyException A supplier function that produces the exception to be thrown if the list has fewer than two elements.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -318,6 +322,7 @@ fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
  * @param predicate a condition to filter elements of the list
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
 /**
  * Returns the second element of the list if it exists; otherwise, returns the value supplied by the given default supplier.
@@ -394,6 +399,7 @@ fun <E> List<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOr
  * @return The third element of the list.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -409,6 +415,7 @@ fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
  * @param predicate a condition to filter elements in the list
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
 /**
  * Returns the third element of the list if it exists; otherwise, evaluates and returns the
@@ -535,6 +542,7 @@ infix fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>): E {
  * @throws Throwable the exception supplied by the `lazyException` if the iterable does not contain exactly one element
  * @since 1.0.0
  */
+@IgnorableReturnValue
 infix fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -595,6 +603,7 @@ fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>)
  * @throws Throwable the exception supplied by [lazyException] if no element or more than one element matches.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -649,6 +658,7 @@ inline fun <C : Collection<E>, E> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C
  * @since 3.1.3
  */
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <C : Collection<E>, E, R> C.ifNotEmpty(action: ReceiverTransformer<C, R>): R {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -670,6 +680,7 @@ inline fun <C : Collection<E>, E, R> C.ifNotEmpty(action: ReceiverTransformer<C,
  */
 @OptIn(ExperimentalExtendedContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <C : Collection<E>?, E, R> C?.ifNotNullOrEmpty(block: ReceiverTransformer<C, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)

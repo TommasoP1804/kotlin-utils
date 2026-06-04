@@ -52,6 +52,7 @@ import com.auth0.jwt.algorithms.Algorithm as Auth0JwtAlgorithm
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Jwt.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Jwt.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "PropertyName")
+@MustUseReturnValues
 class Jwt private constructor(private val value: String) : CharSequence {
     /**
      * Represents the decoded JSON object of the JWT header.

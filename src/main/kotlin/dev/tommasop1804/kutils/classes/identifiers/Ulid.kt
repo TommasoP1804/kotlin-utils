@@ -78,6 +78,7 @@ import kotlin.time.ExperimentalTime
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ulid.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ulid.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_temporal_of_as_temporal")
+@MustUseReturnValues
 class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comparable<Ulid>, Serializable, CharSequence {
 
     /**

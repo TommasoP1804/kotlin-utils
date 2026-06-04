@@ -23,6 +23,7 @@ import dev.tommasop1804.kutils.*
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: String) {
     Continue(100, Family.Informational, "Continue"),
     SwitchingProtocols(101, Family.Informational, "Switching Protocols"),

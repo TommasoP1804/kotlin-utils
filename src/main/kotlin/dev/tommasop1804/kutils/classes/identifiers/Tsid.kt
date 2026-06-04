@@ -48,6 +48,7 @@ import kotlin.math.ln
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Tsid.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Tsid.Companion.OldDeserializer::class)
 @JvmInline
+@MustUseReturnValues
 value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequence {
     /**
      * Provides the length of the string representation of the TSID.

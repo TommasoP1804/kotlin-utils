@@ -64,6 +64,7 @@ import kotlin.toBigDecimal
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Duration.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Duration.Companion.OldDeserializer::class)
 @Suppress("unused", "LocalVariableName", "kutils_getorthrow_as_invoke", "contains_as_in_operator", "kutils_substring_as_int_invoke")
+@MustUseReturnValues
 open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, days: Number = 0, hours: Number = 0, minutes: Number = 0, seconds: Number = 0, nanos: Number = 0) :
     ChronoPeriod, TemporalAmount, Comparable<Duration>, Serializable
 {

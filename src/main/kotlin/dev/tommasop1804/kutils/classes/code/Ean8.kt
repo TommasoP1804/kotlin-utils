@@ -13,10 +13,7 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
-import dev.tommasop1804.kutils.afterLast
-import dev.tommasop1804.kutils.isOdd
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.core.JsonGenerator
 import tools.jackson.databind.DeserializationContext
@@ -55,6 +52,7 @@ import java.nio.file.Path
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean8.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean8.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 value class Ean8 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean, PrintableBarcode {
     /**
      * The length of the underlying string representation of the EAN-8 code.

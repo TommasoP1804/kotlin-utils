@@ -5,13 +5,12 @@
 @file:JvmName("FileUtilsKt")
 @file:Suppress("unused")
 @file:Since("1.0.0")
-
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.web.MediaType
-import dev.tommasop1804.kutils.classes.web.MimeType
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.web.*
 import java.io.File
 
 /**

@@ -40,6 +40,7 @@ import java.io.Serializable
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ScalarUnit.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ScalarUnit.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 interface ScalarUnit : Serializable {
     /**
      * Represents the unit of measurement associated with a specific scalar value.

@@ -46,6 +46,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = GeoCoordinate.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = GeoCoordinate.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_take_as_int_invoke", "kutils_ignorecase_function")
+@MustUseReturnValues
 class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializable, Comparable<GeoCoordinate> {
     /**
      * Represents the geographical latitude of a location in degrees.

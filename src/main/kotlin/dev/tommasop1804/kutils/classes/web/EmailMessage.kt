@@ -4,8 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.web
 
-import dev.tommasop1804.kutils.classes.registry.Contact
-import dev.tommasop1804.kutils.isNotNull
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.registry.*
 import java.io.File
 
 /**
@@ -25,6 +25,7 @@ import java.io.File
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 data class EmailMessage(
     val from: Contact.Email,
     val to: List<Contact.Email>,

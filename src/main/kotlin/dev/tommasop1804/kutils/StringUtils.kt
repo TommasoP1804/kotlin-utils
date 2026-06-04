@@ -8,6 +8,7 @@
 )
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -1380,6 +1381,7 @@ fun CharSequence.onlyCharOr(default: Supplier<Char>): Char {
  * @throws Throwable The exception provided by lazyException if the CharSequence does not have exactly one character.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1438,6 +1440,7 @@ fun CharSequence.onlyCharOr(default: Supplier<Char>, predicate: Predicate<Char>)
  * @param predicate a condition that each character in the CharSequence is tested against
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1453,6 +1456,7 @@ fun CharSequence.onlyCharOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * @return The first character of the char sequence.
  * @since 4.1.0
  */
+@IgnorableReturnValue
 infix fun CharSequence.firstCharOrThrow(lazyException: ThrowableSupplier): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1469,6 +1473,7 @@ infix fun CharSequence.firstCharOrThrow(lazyException: ThrowableSupplier): Char 
  * @throws Throwable If no character matching the [predicate] is found.
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun CharSequence.firstCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1555,6 +1560,7 @@ fun CharSequence.secondCharOrNull(predicate: Predicate<Char>) = filter(predicate
  * @param lazyException A supplier function that produces the exception to be thrown if the char sequence has fewer than two characters.
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun CharSequence.secondCharOrThrow(lazyException: ThrowableSupplier): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1570,6 +1576,7 @@ fun CharSequence.secondCharOrThrow(lazyException: ThrowableSupplier): Char {
  * @param predicate a condition to filter characters of the char sequence
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun CharSequence.secondCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1656,6 +1663,7 @@ fun CharSequence.thirdCharOrNull(predicate: Predicate<Char>) = filter(predicate)
  * @return The third character of the char sequence.
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun CharSequence.thirdCharOrThrow(lazyException: ThrowableSupplier): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1671,6 +1679,7 @@ fun CharSequence.thirdCharOrThrow(lazyException: ThrowableSupplier): Char {
  * @param predicate a condition to filter characters in the char sequence
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun CharSequence.thirdCharOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Char>): Char {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -1726,6 +1735,7 @@ fun String.peek(action: Consumer<Char>) = toList().peek(action).joinToString(Str
  * @param action the action to apply to each character of the string
  * @since 2.0.0
  */
+@IgnorableReturnValue
 fun String.cForEach(action: ReceiverBiConsumer<LoopContext, Char>) = toList().cForEach(action).joinToString(String.EMPTY)
 /**
  * Stands for `controlledEach`. You can use [breakLoop] and [continueLoop].
@@ -1741,6 +1751,7 @@ fun String.cForEach(action: ReceiverBiConsumer<LoopContext, Char>) = toList().cF
  * @return a new `String` formed by joining the processed characters.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 fun String.cForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, Char>) = toList().cForEachIndexed(action).joinToString(String.EMPTY)
 
 /**
@@ -1796,6 +1807,7 @@ inline fun <C : CharSequence> C?.ifNullOrBlank(defaultValue: Supplier<C>): C {
  */
 @OptIn(ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <C : CharSequence, R> C.ifNotEmpty(block: ReceiverTransformer<C, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -1816,6 +1828,7 @@ inline fun <C : CharSequence, R> C.ifNotEmpty(block: ReceiverTransformer<C, R>):
  */
 @OptIn(ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <C : CharSequence, R> C.ifNotBlank(block: ReceiverTransformer<C, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -1835,6 +1848,7 @@ inline fun <C : CharSequence, R> C.ifNotBlank(block: ReceiverTransformer<C, R>):
  */
 @OptIn(ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <C : CharSequence, R> C?.ifNotNullOrEmpty(block: ReceiverTransformer<C, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -1856,6 +1870,7 @@ inline fun <C : CharSequence, R> C?.ifNotNullOrEmpty(block: ReceiverTransformer<
  */
 @OptIn(ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <C : CharSequence, R> C?.ifNotNullOrBlank(block: ReceiverTransformer<C, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)

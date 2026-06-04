@@ -12,6 +12,7 @@ package dev.tommasop1804.kutils
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 object Ansi {
     /**
      * ANSI escape code for resetting text formatting in console output.

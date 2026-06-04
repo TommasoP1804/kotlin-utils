@@ -32,6 +32,7 @@ import java.time.temporal.TemporalUnit
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 internal class TemporalIntervalOfDurationTemporal(
     override val duration: Duration,
     override val end: Temporal,

@@ -32,6 +32,7 @@ import java.util.Currency
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 sealed interface PaymentMethod {
     /**
      * Represents the display name of an entity, such as a user, product, or any identifiable item.

@@ -20,6 +20,7 @@ import kotlin.concurrent.withLock
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 class Pool<T>(
     val maxSize: Int,
     private val factory: Supplier<T>,

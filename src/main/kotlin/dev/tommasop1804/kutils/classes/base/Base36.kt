@@ -10,10 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.constants.TextCase
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.NumberSignException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
 import org.bouncycastle.util.encoders.Hex
@@ -42,6 +41,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Base36.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Base36.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Base36.Companion.OldDeserializer::class)
+@MustUseReturnValues
 class Base36(private val value: String) : Number(), CharSequence, Comparable<Number> {
     /**
      * Represents the length of the `value` field in the `Base36` class.

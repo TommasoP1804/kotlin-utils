@@ -28,6 +28,7 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_collection_declaration", "kutils_map_declaration", "kutils_temporal_now_as_temporal")
+@MustUseReturnValues
 enum class TimeZone(
     val id: String,
     val zoneName: String,

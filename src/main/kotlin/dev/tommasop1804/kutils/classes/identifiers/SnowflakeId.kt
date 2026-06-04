@@ -37,9 +37,9 @@ import java.util.concurrent.ThreadLocalRandom
  * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@OptIn(RiskyApproximationOfTemporal::class)
 @JvmInline
 @Suppress("unused")
+@MustUseReturnValues
 value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable {
     /**
      * Represents the elapsed time portion of the Snowflake ID.

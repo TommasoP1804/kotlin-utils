@@ -39,6 +39,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Cone.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Cone.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Cone(
     var baseCenter: Point = Point(),
     radius: Double = 0.0,

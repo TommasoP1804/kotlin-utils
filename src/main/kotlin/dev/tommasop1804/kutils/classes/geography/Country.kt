@@ -37,6 +37,7 @@ import kotlin.text.startsWith
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class Country(
 	val alpha2: String,
 	val alpha3: String,

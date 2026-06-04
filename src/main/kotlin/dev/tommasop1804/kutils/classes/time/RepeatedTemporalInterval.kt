@@ -46,6 +46,7 @@ import java.time.temporal.TemporalUnit
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke")
+@MustUseReturnValues
 interface RepeatedTemporalInterval : TemporalInterval, Serializable {
     /**
      * Specifies the number of repetitions for a given temporal interval.

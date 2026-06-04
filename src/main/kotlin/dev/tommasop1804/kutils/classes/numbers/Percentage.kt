@@ -35,6 +35,7 @@ import kotlin.math.roundToLong
 @JsonDeserialize(using = Percentage.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Percentage.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Percentage.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Percentage private constructor(internal val value: Double) : Comparable<Percentage> {
     /**
      * Indicates whether the current percentage value exceeds a threshold considered 

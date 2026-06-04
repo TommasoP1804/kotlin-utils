@@ -2,6 +2,8 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
+@file:MustUseReturnValues
+
 package dev.tommasop1804.kutils.classes.code
 
 import com.fasterxml.jackson.core.JsonGenerator
@@ -45,6 +47,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = ProductCode.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ProductCode.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ProductCode.Companion.OldDeserializer::class)
+@MustUseReturnValues
 interface ProductCode {
     /**
      * Represents the unique code associated with a product.

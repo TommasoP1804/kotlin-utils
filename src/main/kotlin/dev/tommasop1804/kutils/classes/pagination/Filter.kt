@@ -5,6 +5,7 @@
 @file:JvmName("PaginationFilterKt")
 @file:Suppress("unused", "sqlDialectInspection")
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils.classes.pagination
 

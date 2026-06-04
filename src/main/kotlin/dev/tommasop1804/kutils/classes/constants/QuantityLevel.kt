@@ -14,6 +14,7 @@ package dev.tommasop1804.kutils.classes.constants
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class QuantityLevel {
     /**
      * Represents the minimum quantity level.

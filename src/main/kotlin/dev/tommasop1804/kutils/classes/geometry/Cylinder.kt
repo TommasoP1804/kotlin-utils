@@ -37,6 +37,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Cylinder.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Cylinder.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Cylinder (var baseCenter: Point = Point(), radius: Double = 0.0, height: Double = 0.0) : Serializable, Comparable<Cylinder>, Shape3D {
     var radius = radius
         set(value) = if (value >= 0) field = value else throw GeometryException("Radius must be greater than zero")

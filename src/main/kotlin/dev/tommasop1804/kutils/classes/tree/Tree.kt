@@ -5,7 +5,7 @@
 package dev.tommasop1804.kutils.classes.tree
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.IllegalOperationException
+import dev.tommasop1804.kutils.exceptions.*
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -23,6 +23,7 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_drop_as_int_invoke", "kutils_collection_declaration")
+@MustUseReturnValues
 class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/ {
     init {
         validate(checkValidIds()) { "Invalid node id" }

@@ -40,6 +40,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Pan.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Pan.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Pan.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Pan private constructor(val value: String) : CharSequence {
     /**
      * A normalized string representation of the underlying `value`, where all non-digit characters 

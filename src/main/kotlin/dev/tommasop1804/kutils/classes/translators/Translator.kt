@@ -22,6 +22,7 @@ import kotlin.enums.EnumEntries
  * @since 1.0.0
  */
 @Suppress("unused")
+@MustUseReturnValues
 open class Translator(
     val file: File
 ) {
@@ -57,7 +58,6 @@ open class Translator(
          * @throws TranslationException if the key is not found in the configuration file.
          * @since 1.0.0
          */
-        @OptIn(Beta::class)
         infix fun String.translatedWith(translator: Translator): String {
             if (translator.file.extension == "yaml" || translator.file.extension == "yml") {
                 val yaml = tryOrThrow({ -> ConfigurationException("Not a valid YAML") }) { Yaml(translator.file) }
@@ -80,7 +80,6 @@ open class Translator(
          * @throws TranslationException if the key is not found in the configuration file.
          * @since 1.0.0
          */
-        @OptIn(Beta::class)
         infix fun Enum<*>.translatedWith(translator: Translator) = name.translatedWith(translator)
         /**
          * Translates a collection of keys into their corresponding values from a configuration file.
@@ -94,7 +93,6 @@ open class Translator(
          * @throws TranslationException If any of the keys are not found in the configuration file.
          * @since 1.0.0
          */
-        @OptIn(Beta::class)
         infix fun Iterable<String>.translatedWith(translator: Translator): List<String> = map { it.translatedWith(translator) }
         /**
          * Translates the specified enumeration entries to their corresponding values
@@ -108,7 +106,6 @@ open class Translator(
          * @throws TranslationException If any of the keys derived from enumeration entries are not found in the configuration file.
          * @since 1.0.0
          */
-        @OptIn(Beta::class)
         infix fun EnumEntries<*>.translatedWith(translator: Translator): List<String> = map { it.translatedWith(translator) }
     }
 
@@ -124,7 +121,6 @@ open class Translator(
      * @throws TranslationException if the key is not found in the configuration file.
      * @since 1.0.0
      */
-    @OptIn(Beta::class)
     infix fun translate(key: String) = key.translatedWith(this)
     /**
      * Translates the specified key to its corresponding value by reading the content of a configuration
@@ -138,7 +134,6 @@ open class Translator(
      * @throws TranslationException if the key is not found in the configuration file.
      * @since 1.0.0
      */
-    @OptIn(Beta::class)
     infix fun translate(key: Enum<*>) = key.translatedWith(this)
     /**
      * Translates a collection of keys into their corresponding values from a configuration file.
@@ -153,7 +148,6 @@ open class Translator(
      * @throws TranslationException If any of the keys are not found in the configuration file.
      * @since 1.0.0
      */
-    @OptIn(Beta::class)
     infix fun translate(keys: Iterable<String>): List<String> = keys.map { translate(it) }
     /**
      * Translates the specified enumeration entries to their corresponding values
@@ -168,6 +162,5 @@ open class Translator(
      * @throws TranslationException If any of the keys derived from enumeration entries are not found in the configuration file.
      * @since 1.0.0
      */
-    @OptIn(Beta::class)
     infix fun translate(keys: EnumEntries<*>): List<String> = keys.map { translate(it.name) }
 }

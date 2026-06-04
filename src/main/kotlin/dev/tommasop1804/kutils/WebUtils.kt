@@ -5,6 +5,7 @@
 @file:JvmName("WebUtilsKt")
 @file:Since("1.0.0")
 @file:Suppress("unused")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 

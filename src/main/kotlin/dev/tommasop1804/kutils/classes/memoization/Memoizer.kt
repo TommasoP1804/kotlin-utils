@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "unchecked_cast", "JavaCollectionWithNullableTypeArgument")
+@MustUseReturnValues
 class Memoizer<T, R>(
     private val transformer: Transformer<T, R>,
     cacheStrategy: CacheStrategy = CacheStrategy.Unlimited

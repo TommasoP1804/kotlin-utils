@@ -31,6 +31,7 @@ import java.nio.charset.Charset
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = MediaType.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = MediaType.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 data class MediaType(
     val mimeType: MimeType,
     val parameters: StringMap = emptyMap(),

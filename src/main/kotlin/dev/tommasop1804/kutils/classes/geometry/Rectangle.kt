@@ -39,6 +39,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Rectangle.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Rectangle.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 open class Rectangle(var topLeft: Point = Point(), width: Double = 0.0, height: Double = 0.0) : Serializable, Comparable<Rectangle>, Shape2D {
     var width = width
         set(value) = if (value >= 0) field = value else throw GeometryException("Width must be greater than zero.")

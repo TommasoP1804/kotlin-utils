@@ -59,6 +59,7 @@ import kotlin.time.toJavaInstant
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ksuid.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ksuid.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_null_check")
+@MustUseReturnValues
 class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: ByteArray? = null) : Comparable<Ksuid>, Serializable, CharSequence {
 
     /**

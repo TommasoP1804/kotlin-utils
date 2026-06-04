@@ -8,6 +8,7 @@
 )
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -17,6 +18,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -187,6 +189,7 @@ operator fun <E> Sequence<E>.contains(predicate: Predicate<E>) = any { predicate
  * @return The first element of the sequence.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 infix fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -203,6 +206,7 @@ infix fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
  * @throws Throwable If no element matching the [predicate] is found.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <E> Sequence<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -272,6 +276,7 @@ operator fun <E> Sequence<E>.minus(filterNot: Predicate<E>) = filterNot(filterNo
  * @param block A callback function that takes a `LoopContext` and the current element of the sequence.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <E> Sequence<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
     with(LoopContext()) {
         for (element in this@cForEach) {
@@ -297,6 +302,7 @@ inline fun <E> Sequence<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) =
  * element, and the current element itself. Executed for each element in the sequence.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <E> Sequence<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
     with(LoopContext()) {
         for ([index, element] in withIndex()) {
@@ -502,6 +508,7 @@ fun <E> Sequence<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>)
  * @param predicate a condition that the element needs to satisfy
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <E> Sequence<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E & Any {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -575,6 +582,7 @@ fun <E> Sequence<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).se
  * @param lazyException A supplier function that produces the exception to be thrown if the sequence has fewer than two elements.
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun <E> Sequence<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -595,6 +603,7 @@ fun <E> Sequence<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
  * @param predicate a condition to filter elements of the sequence
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun <E> Sequence<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -699,6 +708,7 @@ fun <E> Sequence<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thi
  * @return The third element of the sequence.
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun <E> Sequence<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -719,6 +729,7 @@ fun <E> Sequence<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
  * @param predicate a condition to filter elements in the sequence
  * @since 4.1.0
  */
+@IgnorableReturnValue
 fun <E> Sequence<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -835,6 +846,46 @@ inline infix fun <S : Sequence<E>, E> S?.ifNullOrEmpty(defaultValue: Supplier<S>
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }
     return if (isNullOrEmpty()) defaultValue() else this
+}
+
+/**
+ * Invokes the given action if the sequence is not empty.
+ *
+ * This function checks whether the sequence contains at least one element.
+ * If the sequence is not empty, the provided action is executed with the sequence as its receiver.
+ * Otherwise, the sequence is returned unchanged.
+ *
+ * @param action A lambda function or receiver transformer to execute if the sequence is not empty.
+ * @return The result of the action if the sequence is not empty, otherwise the original sequence.
+ * @since 4.1.0
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
+inline fun <E, R> Sequence<E>.ifNotEmpty(action: ReceiverTransformer<Sequence<E>, R>): R {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return (if (isNotEmpty()) action(this) else this) as R
+}
+
+/**
+ * Executes the given action if the sequence is not null and not empty.
+ *
+ * @param action A functional operation to apply to the sequence if it is not null or empty.
+ *               The sequence itself is provided as the receiver of the `action`.
+ * @return The result of the `action` if the sequence is not null or empty, otherwise `null`.
+ * @since 4.1.0
+ */
+@OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
+inline fun <E, R> Sequence<E>?.ifNotNullOrEmpty(action: ReceiverTransformer<Sequence<E>, R>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) implies returnsNotNull()
+    }
+    return (if (isNotNullOrEmpty()) action(this) else this) as R
 }
 
 /**

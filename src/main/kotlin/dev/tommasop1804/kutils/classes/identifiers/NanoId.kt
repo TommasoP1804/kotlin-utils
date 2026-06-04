@@ -9,11 +9,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.classes.identifiers.NanoId.Companion.DEFAULT_ALPHABET
-import dev.tommasop1804.kutils.classes.identifiers.NanoId.Companion.DEFAULT_SIZE
-import dev.tommasop1804.kutils.exceptions.NumberSignException
-import dev.tommasop1804.kutils.validate
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
@@ -48,6 +45,7 @@ import kotlin.math.ln
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = NanoId.Companion.OldDeserializer::class)
 @Suppress("unused")
 @JvmInline
+@MustUseReturnValues
 value class NanoId(private val value: String) : CharSequence, Serializable {
 
     /**

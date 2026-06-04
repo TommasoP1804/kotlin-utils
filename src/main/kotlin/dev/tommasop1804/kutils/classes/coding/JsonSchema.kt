@@ -31,6 +31,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Json.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Json.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class JsonSchema(val json: Json) : Json(json) {
     /**
      * Provides a lazily evaluated JsonNode representation of the associated `json` field.

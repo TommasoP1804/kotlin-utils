@@ -43,6 +43,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Octal.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Octal.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Octal.Companion.OldDeserializer::class)
+@MustUseReturnValues
 class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
 
     /**

@@ -25,6 +25,7 @@ import kotlin.collections.filter as kFilter
  * @author Tommaso Pastorelli
  */
 @Suppress("UNCHECKED_CAST", "unused")
+@MustUseReturnValues
 class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) : Map<KProperty1<out T, *>, Any?> by map {
     /**
      * A read-only property that returns a new `PropertiesMap` containing only entries from the original map

@@ -14,6 +14,7 @@ package dev.tommasop1804.kutils.classes.identifiers
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class UuidVersion(val description: String) {
     /**
      * Represents a UUID of version 1, commonly referred to as "time-based UUID."

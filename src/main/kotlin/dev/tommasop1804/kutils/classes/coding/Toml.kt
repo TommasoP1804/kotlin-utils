@@ -4,6 +4,7 @@
 
 @file:Suppress("java_integer_as_kotlin_int")
 @file:OptIn(Beta::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils.classes.coding
 

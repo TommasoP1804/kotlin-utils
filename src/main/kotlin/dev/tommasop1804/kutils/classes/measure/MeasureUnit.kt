@@ -45,6 +45,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = MeasureUnit.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = MeasureUnit.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 open class MeasureUnit internal constructor(override val measure: String, override val unitName: String, override val isSIUnit: Boolean, override val isAcceptedBySI: Boolean, override val symbol: String?, override val knownSymbol: Boolean): ScalarUnit, Serializable {
     /**
      * Provides access to the current measurement unit instance. This property ensures

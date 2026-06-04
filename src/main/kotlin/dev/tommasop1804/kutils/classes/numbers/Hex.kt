@@ -44,6 +44,7 @@ import kotlin.text.startsWith
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Hex.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Hex.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_drop_as_int_invoke")
+@MustUseReturnValues
 class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
     /**
      * Represents a constant string value.

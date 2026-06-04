@@ -4,8 +4,7 @@
 
 package dev.tommasop1804.kutils.classes.base
 
-import dev.tommasop1804.kutils.BigInt
-import dev.tommasop1804.kutils.classes.base.Base62.BASE_62_CHARACTERS
+import dev.tommasop1804.kutils.*
 import java.util.stream.IntStream
 import kotlin.math.abs
 import kotlin.math.ceil

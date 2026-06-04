@@ -51,6 +51,7 @@ import java.nio.file.Path
 @JsonDeserialize(using = MimeType.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = MimeType.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = MimeType.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class MimeType private constructor(val value: String) : CharSequence {
 
     /**

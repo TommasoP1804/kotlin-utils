@@ -5,7 +5,7 @@
 package dev.tommasop1804.kutils.classes.time
 
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.durationTo
-import dev.tommasop1804.kutils.exceptions.TemporalException
+import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serial
@@ -45,6 +45,7 @@ import java.time.temporal.TemporalUnit
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 internal class TemporalIntervalOfTemporalDuration (
     override val start: Temporal,
     override val duration: Duration,

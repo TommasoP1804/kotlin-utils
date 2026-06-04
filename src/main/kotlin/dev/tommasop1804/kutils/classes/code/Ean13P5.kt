@@ -39,6 +39,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Ean13P5.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean13P5.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean13P5.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Ean13P5 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean {
     /**
      * Represents the length of the underlying string value of the `EAN13P5` instance.

@@ -9,11 +9,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.afterLast
-import dev.tommasop1804.kutils.classes.code.ProductCode.Ean
-import dev.tommasop1804.kutils.isEven
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.code.ProductCode.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -42,6 +39,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Ean14.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean14.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean14.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Ean14 private constructor(override val value: String) : CharSequence, ProductCode, Ean {
     /**
      * Returns the length of the value represented by this instance.

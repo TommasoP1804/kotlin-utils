@@ -9,6 +9,7 @@
     "kutils_drop_as_int_invoke"
 )
 @file:OptIn(ExperimentalContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -144,6 +145,7 @@ operator fun <E> Array<E>.contains(predicate: Predicate<E>) = any { predicate(it
  * @throws Throwable The exception provided by the supplier if the array is empty.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 infix fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -159,6 +161,7 @@ infix fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
  * @return The first element that matches the [predicate].
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -248,6 +251,7 @@ fun <E> Array<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).secon
  * @return The second element of the array.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -262,6 +266,7 @@ fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
  * @param predicate A predicate used to filter elements in the array before retrieving the second matching element.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
 /**
  * Returns the second element of the array if it exists; otherwise, returns the value provided
@@ -351,6 +356,7 @@ fun <E> Array<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdO
  * than three.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -365,6 +371,7 @@ fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
  * @param predicate A predicate used to filter the elements of the array.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
 
 /**
@@ -496,6 +503,7 @@ infix fun <E> Array<E>.onlyElementOr(default: Supplier<E>): E {
  * @throws Throwable If the array does not contain exactly one element.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -551,6 +559,7 @@ fun <E> Array<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E
  * @throws Throwable When the array does not contain exactly one element that matches the predicate.
  * @since 2.1.0
  */
+@IgnorableReturnValue
 fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
@@ -618,6 +627,7 @@ inline fun <E> Array<E>?.ifNullOrEmpty(defaultValue: Supplier<Array<E>>): Array<
  */
 @OptIn(ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <E, R> Array<E>.ifNotEmpty(action: ReceiverTransformer<Array<E>, R>): R {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -638,6 +648,7 @@ inline fun <E, R> Array<E>.ifNotEmpty(action: ReceiverTransformer<Array<E>, R>):
  */
 @OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <E, R> Array<E>?.ifNotNullOrEmpty(action: ReceiverTransformer<Array<E>, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1064,6 +1075,7 @@ inline fun <E> Array<E>.peek(block: Consumer<E>) = apply { for (element in this)
  * used for processing each element in the array
  * @since 2.1.0
  */
+@IgnorableReturnValue
 inline fun <E> Array<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
     with(LoopContext()) {
         for (element in this@cForEach) {
@@ -1087,6 +1099,7 @@ inline fun <E> Array<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = ap
  *
  * @since 2.1.0
  */
+@IgnorableReturnValue
 inline fun <E> Array<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
     with(LoopContext()) {
         for ([index, element] in withIndex()) {

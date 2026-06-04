@@ -7,6 +7,7 @@
     "RETURN_VALUE_NOT_USED_COERCION"
 )
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils.classes.collections
 

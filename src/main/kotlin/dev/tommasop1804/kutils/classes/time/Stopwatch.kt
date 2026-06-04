@@ -44,6 +44,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Stopwatch.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Stopwatch.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Serializable, Comparable<Duration>, TemporalAmount {
     var start: Instant?
         get() = startTime?.let { Instant(it) }

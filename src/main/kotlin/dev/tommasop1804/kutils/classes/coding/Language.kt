@@ -23,6 +23,7 @@ import java.time.Year
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class Language(
     val displayName: String,
     val yearCreated: Year,

@@ -49,6 +49,7 @@ import kotlin.time.toJavaInstant
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = LocalMonthDayTime.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = LocalMonthDayTime.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke", "kutils_temporal_now_as_temporal", "kutils_temporal_of_as_temporal", "kutils_temporal_parse_as_temporal", "kutils_take_as_int_invoke")
+@MustUseReturnValues
 class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temporal, TemporalAccessor, TemporalAdjuster, Comparable<LocalMonthDayTime>, Serializable {
     /**
      * Constructs an instance of `LocalMonthDayTime` using the provided `LocalDate` and `LocalTime`.

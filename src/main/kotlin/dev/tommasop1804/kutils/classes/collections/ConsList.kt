@@ -49,6 +49,7 @@ import tools.jackson.databind.node.ObjectNode
 @JsonDeserialize(using = ConsList.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ConsList.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ConsList.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T> {
     /**
      * Retrieves the first element of the list if it is not empty; otherwise, throws an `IndexOutOfBoundsException`.

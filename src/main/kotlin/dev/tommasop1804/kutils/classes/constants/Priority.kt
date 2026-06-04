@@ -11,6 +11,7 @@ package dev.tommasop1804.kutils.classes.constants
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class Priority {
     /**
      * Represents a low priority level in the `Priority` enum.

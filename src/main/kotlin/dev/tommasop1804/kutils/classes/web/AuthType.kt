@@ -11,6 +11,7 @@ import dev.tommasop1804.kutils.*
  * @since 3.12.0
  * @author Tommaso Pastorelli
  */
+@MustUseReturnValues
 enum class AuthType {
     /**
      * Represents the HTTP Basic authentication type.

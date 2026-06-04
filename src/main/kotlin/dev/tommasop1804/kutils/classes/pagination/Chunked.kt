@@ -10,8 +10,10 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.constants.SortDirection.Companion.ofOperator
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator.*
 import dev.tommasop1804.kutils.classes.pagination.FilterOperator.Category.*
+import dev.tommasop1804.kutils.classes.pagination.FilterOperator.Companion.byCategory
 import dev.tommasop1804.kutils.dsl.sql.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.EntityManager
@@ -42,6 +44,7 @@ import kotlin.reflect.full.memberProperties
 @Suppress("unused")
 @JsonSerialize(using = Chunked.Companion.Serializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Chunked.Companion.OldSerializer::class)
+@MustUseReturnValues
 data class Chunked<T>(
     val totalPages: Int? = null,
     val pageIndex: Int? = null,

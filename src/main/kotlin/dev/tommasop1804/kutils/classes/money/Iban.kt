@@ -43,6 +43,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Iban.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Iban.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 value class Iban private constructor(val value: String) : CharSequence {
     /**
      * Provides the length of the IBAN value.

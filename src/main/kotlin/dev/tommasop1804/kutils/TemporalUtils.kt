@@ -16,6 +16,7 @@
     "kutils_substring_as_int_invoke"
 )
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -1419,7 +1420,6 @@ fun LocalDate(instant: Instant, zone: ZoneIdent) = LocalDate.ofInstant(instant, 
  * @param zone The `ZoneId` specifying the time zone to use for the conversion.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun LocalDate(instant: kotlin.time.Instant, zone: ZoneId) = LocalDate.ofInstant(instant.toJavaInstant(), zone)!!
 /**
  * Converts the given Kotlin Instant and ZoneIdent to a LocalDate.
@@ -1428,7 +1428,6 @@ fun LocalDate(instant: kotlin.time.Instant, zone: ZoneId) = LocalDate.ofInstant(
  * @param zone The timezone information encapsulated in a ZoneIdent object.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun LocalDate(instant: kotlin.time.Instant, zone: ZoneIdent) = LocalDate.ofInstant(instant.toJavaInstant(), zone.zoneId)!!
 /**
  * Constructs an instance of `LocalDate` using the epoch day count,
@@ -1520,7 +1519,6 @@ fun LocalTime(instant: Instant, zone: ZoneIdent): LocalTime = LocalTime.ofInstan
  * @return The resulting `LocalTime` object derived from the provided [instant] and [zone].
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun LocalTime(instant: kotlin.time.Instant, zone: ZoneId): LocalTime = LocalTime.ofInstant(instant.toJavaInstant(), zone)
 /**
  * Converts a given `kotlin.time.Instant` to a `LocalTime` in the specified time zone.
@@ -1530,7 +1528,6 @@ fun LocalTime(instant: kotlin.time.Instant, zone: ZoneId): LocalTime = LocalTime
  * @return A `LocalTime` object representing the time derived from the provided instant and zone.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun LocalTime(instant: kotlin.time.Instant, zone: ZoneIdent): LocalTime = LocalTime.ofInstant(instant.toJavaInstant(), zone.zoneId)
 /**
  * Parses a character sequence to a [LocalTime] using the specified [DateTimeFormatter].
@@ -1647,7 +1644,6 @@ fun OffsetTime(instant: Instant, zone: ZoneIdent): OffsetTime = OffsetTime.ofIns
  * @return the `OffsetTime` calculated from the given instant and time zone
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun OffsetTime(instant: kotlin.time.Instant, zone: ZoneId): OffsetTime = OffsetTime.ofInstant(instant.toJavaInstant(), zone)
 /**
  * Converts the given instant and zone information into an OffsetTime instance.
@@ -1657,7 +1653,6 @@ fun OffsetTime(instant: kotlin.time.Instant, zone: ZoneId): OffsetTime = OffsetT
  * @return An OffsetTime instance representing the time adjusted to the specified zone.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun OffsetTime(instant: kotlin.time.Instant, zone: ZoneIdent): OffsetTime = OffsetTime.ofInstant(instant.toJavaInstant(), zone.zoneId)
 /**
  * Parses the given character sequence to an `OffsetTime` object using the specified formatter.
@@ -1790,7 +1785,6 @@ fun LocalDateTime(instant: Instant, zone: ZoneIdent): LocalDateTime = LocalDateT
  * @return A `LocalDateTime` instance representing the specified instant adjusted to the given time zone.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun LocalDateTime(instant: kotlin.time.Instant, zone: ZoneId): LocalDateTime = LocalDateTime.ofInstant(instant.toJavaInstant(), zone)
 /**
  * Creates a `LocalDateTime` from the provided `Instant` and `ZoneIdent`.
@@ -1800,7 +1794,6 @@ fun LocalDateTime(instant: kotlin.time.Instant, zone: ZoneId): LocalDateTime = L
  * @return The corresponding `LocalDateTime` in the specified time-zone.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun LocalDateTime(instant: kotlin.time.Instant, zone: ZoneIdent): LocalDateTime = LocalDateTime.ofInstant(instant.toJavaInstant(), zone.zoneId)
 /**
  * Parses the given character sequence to a `LocalDateTime` object using the provided `DateTimeFormatter`.
@@ -2055,7 +2048,6 @@ fun OffsetDateTime(instant: Instant, zone: ZoneIdent): OffsetDateTime = OffsetDa
  * @return An `OffsetDateTime` instance corresponding to the provided `Instant` and `ZoneId`.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun OffsetDateTime(instant: kotlin.time.Instant, zone: ZoneId): OffsetDateTime = OffsetDateTime.ofInstant(instant.toJavaInstant(), zone)
 /**
  * Creates an `OffsetDateTime` from the given `Instant` and `ZoneIdent`.
@@ -2065,7 +2057,6 @@ fun OffsetDateTime(instant: kotlin.time.Instant, zone: ZoneId): OffsetDateTime =
  * @return an `OffsetDateTime` representing the instant at the specified zone offset.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun OffsetDateTime(instant: kotlin.time.Instant, zone: ZoneIdent): OffsetDateTime = OffsetDateTime.ofInstant(instant.toJavaInstant(), zone.zoneId)
 /**
  * Parses the given character sequence into an OffsetDateTime object using the specified formatter.
@@ -2316,7 +2307,6 @@ fun ZonedDateTime(instant: Instant, zone: ZoneIdent): ZonedDateTime = ZonedDateT
  * @return A `ZonedDateTime` instance configured for the provided instant and time zone.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun ZonedDateTime(instant: kotlin.time.Instant, zone: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(instant.toJavaInstant(), zone)
 /**
  * Creates a ZonedDateTime instance from the given instant and time zone.
@@ -2326,7 +2316,6 @@ fun ZonedDateTime(instant: kotlin.time.Instant, zone: ZoneId): ZonedDateTime = Z
  * @return A ZonedDateTime object representing the given instant in the specified time zone.
  * @since 1.0.0
  */
-@OptIn(ExperimentalTime::class)
 fun ZonedDateTime(instant: kotlin.time.Instant, zone: ZoneIdent): ZonedDateTime = ZonedDateTime.ofInstant(instant.toJavaInstant(), zone.zoneId)
 /**
  * Parses the given character sequence into a ZonedDateTime using the specified formatter.

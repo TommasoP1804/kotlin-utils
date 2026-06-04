@@ -24,6 +24,7 @@ import kotlin.reflect.KClass
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
+@MustUseReturnValues
 enum class LogLevel(val levelInt: Int, val levelName: String) {
     /**
      * Represents the error logging level.

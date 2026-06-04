@@ -10,6 +10,7 @@
 )
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -37,6 +38,7 @@ import kotlin.reflect.*
  * @return the value contained within this `Optional` if present, or `null` if the `Optional` is empty.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 operator fun <T> Optional<T>.invoke(): T? = orElse(null)
 /**
  * Provides an operator function for the `Optional` type, allowing an alternative value
@@ -46,6 +48,7 @@ operator fun <T> Optional<T>.invoke(): T? = orElse(null)
  * @return the value contained within the optional if present, or `other` if empty
  * @since 1.0.0
  */
+@IgnorableReturnValue
 operator fun <T> Optional<T>.invoke(other: T): T = orElse(other)!!
 /**
  * Invokes the `Optional` instance, returning the contained value if present,
@@ -58,6 +61,7 @@ operator fun <T> Optional<T>.invoke(other: T): T = orElse(other)!!
  * @since 1.0.0
  */
 @JvmName("optionalInvokeThrowableSupplier")
+@IgnorableReturnValue
 operator fun <T> Optional<T>.invoke(lazyException: ThrowableSupplier): T = orElseThrow(lazyException)!!
 
 /**
@@ -97,6 +101,7 @@ fun Any?.isNull(): Boolean {
  * @param action The action to perform on the non-null receiver of type [T].
  * @since 3.1.3
  */
+@IgnorableReturnValue
 inline fun <T, R> T?.ifNotNull(action: ReceiverTransformer<T, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -112,6 +117,7 @@ inline fun <T, R> T?.ifNotNull(action: ReceiverTransformer<T, R>): R? {
  * @since 3.11.2
  */
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <T, R> T?.ifNull(action: ReceiverTransformer<T?, R>): R {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -193,6 +199,7 @@ inline fun <T1, reified T2> T1?.safeCastOr(transform: Transformer<T1?, T2>): T2 
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
+@IgnorableReturnValue
 inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = runCatching { this as T }.getOrThrow(lazyException = lazyException)
 
 /**
@@ -201,6 +208,7 @@ inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = 
  * @param condition The condition to evaluate. If true, the receiver object is returned; if false, null is returned.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 infix fun <T> Supplier<T>.whenTrue(condition: Boolean): T? {
     contract {
         callsInPlace(this@whenTrue, InvocationKind.AT_MOST_ONCE)
@@ -219,6 +227,7 @@ infix fun <T> Supplier<T>.whenTrue(condition: Boolean): T? {
  */
 @JvmName("whenTrueGeneric")
 @ConditionNotPreventingExceptions
+@IgnorableReturnValue
 inline infix fun <T> T.whenTrue(predicate: Predicate<T>) = if (predicate(this)) this else null
 /**
  * Returns the receiver object if the specified condition is true, otherwise returns null.
@@ -230,6 +239,7 @@ inline infix fun <T> T.whenTrue(predicate: Predicate<T>) = if (predicate(this)) 
  */
 @JvmName("whenTrueGeneric")
 @ConditionNotPreventingExceptions
+@IgnorableReturnValue
 infix fun <T> T.whenTrue(condition: Boolean) = if (condition) this else null
 
 /**
@@ -239,6 +249,7 @@ infix fun <T> T.whenTrue(condition: Boolean) = if (condition) this else null
  * If the condition evaluates to false, the receiver object is returned; otherwise, null is returned.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 infix fun <T> Supplier<T>.whenFalse(condition: Boolean): T? {
     contract {
         callsInPlace(this@whenFalse, InvocationKind.AT_MOST_ONCE)
@@ -256,6 +267,7 @@ infix fun <T> Supplier<T>.whenFalse(condition: Boolean): T? {
  */
 @JvmName("whenFalseGeneric")
 @ConditionNotPreventingExceptions
+@IgnorableReturnValue
 inline infix fun <T> T.whenFalse(predicate: Predicate<T>) = if (!predicate(this)) this else null
 /**
  * Returns the receiver object if the given condition is false; otherwise, returns null.
@@ -268,6 +280,7 @@ inline infix fun <T> T.whenFalse(predicate: Predicate<T>) = if (!predicate(this)
  */
 @JvmName("whenFalseGeneric")
 @ConditionNotPreventingExceptions
+@IgnorableReturnValue
 infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
 
 /**
@@ -282,6 +295,7 @@ infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
  * @return the transformed value if the predicate is true, otherwise this value unchanged
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -299,6 +313,7 @@ inline fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
  * @return The transformed value of type [R] if the predicate returns true, otherwise null.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -317,6 +332,7 @@ inline fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T,
  * @return the result of applying the transformation block when the predicate evaluates to true, or the result of the default supplier when the predicate evaluates to false
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -336,6 +352,7 @@ inline fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, blo
  * @return the transformed receiver if condition is true, otherwise the original receiver unchanged
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T> T.letWhen(condition: Boolean, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -352,6 +369,7 @@ inline fun <T> T.letWhen(condition: Boolean, block: Transformer<T, T>): T {
  * @return The result of the block if the condition is true, otherwise null.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letWhenOrNull(condition: Boolean, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -373,6 +391,7 @@ inline fun <T, R> T.letWhenOrNull(condition: Boolean, block: Transformer<T, R>):
  * @since 2.0.0
  */
 
+@IgnorableReturnValue
 inline fun <T, R> T.letWhenOr(condition: Boolean, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -395,6 +414,7 @@ inline fun <T, R> T.letWhenOr(condition: Boolean, default: Supplier<R>, block: T
  * @return the transformed value if predicate returns false, or this value unchanged if predicate returns true
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -412,6 +432,7 @@ inline fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T
  * @return The result of the [block] if the [predicate] evaluates to false, or null otherwise.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -432,6 +453,7 @@ inline fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<
  *         or the result of the [default] supplier if the [predicate] evaluates to true. Returns `null` if neither function is executed.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -451,6 +473,7 @@ inline fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, b
  * @return the transformed receiver if the condition is false, otherwise the original receiver unchanged
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline  fun <T, R> T.letUnless(condition: Boolean, block: Transformer<T, T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -471,6 +494,7 @@ inline  fun <T, R> T.letUnless(condition: Boolean, block: Transformer<T, T>): T 
  * @return Returns the result of the [block] if [condition] is `false`. Returns `null` otherwise.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letUnlessOrNull(condition: Boolean, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -492,6 +516,7 @@ inline fun <T, R> T.letUnlessOrNull(condition: Boolean, block: Transformer<T, R>
  * @return the result of the [block] when the [condition] is false or the result of [default] when the [condition] is true.
  * @since 2.0.0
  */
+@IgnorableReturnValue
 inline fun <T, R> T.letUnlessOr(condition: Boolean, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -509,6 +534,7 @@ inline fun <T, R> T.letUnlessOr(condition: Boolean, default: Supplier<R>, block:
  * @return the result of the block if successful, or null if an exception occurs
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrNull(
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
@@ -533,6 +559,7 @@ inline fun <T> tryOrNull(
  * @return the result of the block if successful, or null if an exception occurs
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrNull(
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
@@ -552,6 +579,7 @@ inline fun <T> tryOrNull(
  * @return the result of the block if successful, or null if an exception occurs, considering the filter criteria
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrNull(
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: KClass<out Throwable>?,
@@ -567,6 +595,7 @@ inline fun <T> tryOrNull(
  * @param block the lambda function to be executed
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrNull(
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: KClass<out Throwable>?,
@@ -597,6 +626,7 @@ inline fun <T> tryOrNull(
  * `notOverwrite`, or `specificCases`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
@@ -653,6 +683,7 @@ inline fun <T> tryOrLog(
  * @return The result of the block of code, or `null` if an exception is handled and not rethrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
@@ -683,6 +714,7 @@ inline fun <T> tryOrLog(
  * @return The result of the execution block or `null` if an exception is caught and not rethrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
@@ -716,6 +748,7 @@ inline fun <T> tryOrLog(
  * `notOverwrite`, or `specificCases`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrLog(
     logger: Logger,
     message: Transformer<Throwable, Pair<String?, LogLevel?>>,
@@ -746,6 +779,7 @@ inline fun <T> tryOrLog(
  *                                       or if `specificCases` keys intersect with `notOverwrite`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -794,6 +828,7 @@ inline fun <T> tryOr(
  *                                        lists or between `specificCases` and `notOverwrite`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -816,6 +851,7 @@ inline fun <T> tryOr(
  * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` contain intersecting exception classes, or if `specificCases` and `notOverwrite` have conflicts.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -838,6 +874,7 @@ inline fun <T> tryOr(
  * @param block The block of code to be executed that might throw exceptions.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOr(
     default: Transformer<Throwable, T>,
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -867,6 +904,7 @@ inline fun <T> tryOr(
  * Throws the exception if it does not meet any handling conditions.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
@@ -912,6 +950,7 @@ inline fun tryTrueOrFalse(
  * classes, or if `specificCases` and `notOverwrite` overlap.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
@@ -938,6 +977,7 @@ inline fun tryTrueOrFalse(
  * @throws Throwable Rethrows any exception not caught or specified by the handling rules.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: KClass<out Throwable>?,
@@ -963,6 +1003,7 @@ inline fun <T> tryTrueOrFalse(
  *                                       rules between `overwriteOnly`, `notOverwrite`, and `specificCases`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryTrueOrFalse(
     specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
@@ -996,6 +1037,7 @@ inline fun <T> tryTrueOrFalse(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1051,6 +1093,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1082,6 +1125,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1112,6 +1156,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableSupplier,
     specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1148,6 +1193,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1203,6 +1249,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1234,6 +1281,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1264,6 +1312,7 @@ inline fun <T> tryOrThrow(
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> tryOrThrow(
     lazyException: ThrowableTransformer,
     specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
@@ -1354,6 +1403,7 @@ fun Any?.toSafeString(): String = when (this) {
  * @since 1.0.0
  */
 @JvmName("receiverRequire")
+@IgnorableReturnValue
 fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause))
     return this
@@ -1372,6 +1422,7 @@ fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicat
  * @since 1.0.0
  */
 @JvmName("receiverRequire")
+@IgnorableReturnValue
 fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
     return this
@@ -1390,6 +1441,7 @@ fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMess
  * @since 1.0.0
  */
 @JvmName("receiverRequireOrThrow")
+@IgnorableReturnValue
 fun <T> T.requireOrThrow(lazyException: Transformer<T, Throwable>, predicate: Predicate<T>): T {
     if (!predicate(this)) throw lazyException(this)
     return this
@@ -1405,6 +1457,7 @@ fun <T> T.requireOrThrow(lazyException: Transformer<T, Throwable>, predicate: Pr
  * @since 1.0.0
  */
 @JvmName("receiverRequireNull")
+@IgnorableReturnValue
 fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@requireNull == null)
@@ -1423,6 +1476,7 @@ fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null): T?
  * @since 1.0.0
  */
 @JvmName("receiverRequireNull")
+@IgnorableReturnValue
 fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@requireNull == null)
@@ -1439,6 +1493,7 @@ fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null, laz
  * @since 1.0.0
  */
 @JvmName("receiverRequireNullOrThrow")
+@IgnorableReturnValue
 fun <T> T?.requireNullOrThrow(lazyException: ThrowableSupplier): T? {
     contract {
         returns() implies (this@requireNullOrThrow == null)
@@ -1458,6 +1513,7 @@ fun <T> T?.requireNullOrThrow(lazyException: ThrowableSupplier): T? {
  * @since 1.0.0
  */
 @JvmName("receiverRequireNotNull")
+@IgnorableReturnValue
 fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requireNotNull != null)
@@ -1477,6 +1533,7 @@ fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null):
  * @since 1.0.0
  */
 @JvmName("receiverRequireNotNull")
+@IgnorableReturnValue
 fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@requireNotNull != null)
@@ -1493,6 +1550,7 @@ fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null, 
  * @since 1.0.0
  */
 @JvmName("receiverRequireNotNullOrThrow")
+@IgnorableReturnValue
 fun <T> T?.requireNotNullOrThrow(lazyException: ThrowableSupplier): T {
     contract {
         returns() implies (this@requireNotNullOrThrow != null)
@@ -1513,6 +1571,7 @@ fun <T> T?.requireNotNullOrThrow(lazyException: ThrowableSupplier): T {
  * @since 1.0.0
  */
 @JvmName("receiverCheck")
+@IgnorableReturnValue
 fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause))
     return this
@@ -1531,6 +1590,7 @@ fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate:
  * @since 1.0.0
  */
 @JvmName("receiverCheck")
+@IgnorableReturnValue
 fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
     return this
@@ -1549,6 +1609,7 @@ fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessag
  * @since 1.0.0
  */
 @JvmName("receiverCheckNull")
+@IgnorableReturnValue
 fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@checkNull == null)
@@ -1568,6 +1629,7 @@ fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
  * @since 1.0.0
  */
 @JvmName("receiverCheckNull")
+@IgnorableReturnValue
 fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@checkNull == null)
@@ -1588,6 +1650,7 @@ fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyM
  * @since 1.0.0
  */
 @JvmName("receiverCheckNotNull")
+@IgnorableReturnValue
 fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@checkNotNull != null)
@@ -1607,6 +1670,7 @@ fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T
  * @since 1.0.0
  */
 @JvmName("receiverCheckNotNull")
+@IgnorableReturnValue
 fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@checkNotNull != null)
@@ -1631,6 +1695,7 @@ fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @since 1.0.0
  */
 @JvmName("receiverValidate")
+@IgnorableReturnValue
 fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause) else causeOf.initCause(ValidationFailedException("Validation failed.", cause))
     return this
@@ -1651,6 +1716,7 @@ fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predica
  * @since 1.0.0
  */
 @JvmName("receiverValidate")
+@IgnorableReturnValue
 fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
     return this
@@ -1669,6 +1735,7 @@ fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMes
  * @throws ValidationFailedException If the predicate returns false, with the provided details.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause) else causeOf.initCause(ValidationFailedException(property, variableName, message, cause))
     return this
@@ -1687,6 +1754,7 @@ fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, messag
  * @throws ValidationFailedException if the predicate evaluates to false
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause) else causeOf.initCause(ValidationFailedException(property, variable, message, cause))
     return this
@@ -1705,6 +1773,7 @@ fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: St
  * @throws ValidationFailedException if the predicate returns `false` and no `causeOf` is provided.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message, cause))
     return this
@@ -1724,6 +1793,7 @@ fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, messa
  * @throws ValidationFailedException if the predicate evaluates to `false`
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message, cause))
     return this
@@ -1741,6 +1811,7 @@ fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: Str
  * @return the receiver object if validation passes
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message, cause))
     return this
@@ -1760,6 +1831,7 @@ fun <T> T.validate(callableName: String?, parameterName: String? = null, message
  * @return The validated object if the predicate function returns true.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message, cause))
     return this
@@ -1778,6 +1850,7 @@ fun <T> T.validate(callableName: String?, parameter: KParameter?, message: Strin
  * @throws ValidationFailedException If the value is not null.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 @JvmName("receiverValidateNull")
 fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
@@ -1802,6 +1875,7 @@ fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null): T
  * @since 1.0.0
  */
 @JvmName("receiverValidateNull")
+@IgnorableReturnValue
 fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1821,7 +1895,7 @@ fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @throws ValidationFailedException if the object is not null. The exception includes detailed information such as the property, variable name, custom message, and causes.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1842,7 +1916,7 @@ fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, m
  * @return the receiver object if it is null; otherwise, an exception is thrown
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1866,7 +1940,7 @@ fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, messag
  *                                    the failed validation, including the optional parameters.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1886,7 +1960,7 @@ fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, 
  * @throws ValidationFailedException if the receiver is not null, providing the callable, parameter, message, and causes
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1907,7 +1981,7 @@ fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message
  * @throws ValidationFailedException if the object is not null
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1928,7 +2002,7 @@ fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, me
  * @return The validated object if it is null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
@@ -1949,6 +2023,7 @@ fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: 
  * @throws ValidationFailedException if the receiver is null.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 @JvmName("receiverValidateNotNull")
 fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
@@ -1972,6 +2047,7 @@ fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null)
  * @throws ValidationFailedException if the receiver object is null.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 @JvmName("receiverValidateNotNull")
 fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
@@ -1994,7 +2070,7 @@ fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null,
  * @throws ValidationFailedException If the receiver is null or the predicate fails validation.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNotNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2017,7 +2093,7 @@ fun <T> T?.validateNotNull(property: KProperty<*>?, variableName: String? = null
  * @return The validated object if it is not null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2040,6 +2116,7 @@ fun <T> T?.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, mes
  * @throws ValidationFailedException If the receiver is null, an exception with detailed context is thrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T?.validateNotNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2061,6 +2138,7 @@ fun <T> T?.validateNotNull(callable: KFunction<*>?, parameterName: String? = nul
  * @throws ValidationFailedException if the receiver is null
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T?.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2079,6 +2157,7 @@ fun <T> T?.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, mess
  * @return The receiver, if it is not null.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T?.validateNotNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2101,6 +2180,7 @@ fun <T> T?.validateNotNull(callableName: String?, parameterName: String? = null,
  * @return The current receiver (`this`) if the validation passes.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
@@ -2119,6 +2199,7 @@ fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, messag
  * @return the original input object if validation passes.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf.initCause(MalformedInputException(message))
     return this
@@ -2133,6 +2214,7 @@ fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = nul
  * @return the receiver object if validation passes.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf.initCause(MalformedInputException(`class`))
     return this
@@ -2148,6 +2230,7 @@ fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = 
  * @throws MalformedInputException if the input is null or its format does not meet the expected criteria.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.validateInputFormat(type: KType? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
     if (!predicate(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf.initCause(MalformedInputException(type))
     return this
@@ -2162,6 +2245,7 @@ fun <T> T.validateInputFormat(type: KType? = null, causeOf: Throwable? = null, p
  * @return The same `CharSequence` if validation passes successfully.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = null, causeOf: Throwable? = null): T {
     if (!regex(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf.initCause(MalformedInputException(message))
     return this
@@ -2178,6 +2262,7 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = nu
  * @throws MalformedInputException If the character sequence does not conform to the regular expression.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? = null, causeOf: Throwable? = null): T {
     if (!regex(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf.initCause(MalformedInputException(`class`))
     return this
@@ -2194,6 +2279,7 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? =
  * @throws MalformedInputException if the validation fails and the input does not conform to the regex.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, causeOf: Throwable? = null): T {
     if (!regex(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf.initCause(MalformedInputException(type))
     return this
@@ -2211,6 +2297,7 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, 
  * @throws ExpectationMismatchException if the current object equals the expected value.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw
         if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause)
@@ -2231,6 +2318,7 @@ fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? =
  * @throws ExpectationMismatchException If the current object equals the expected value.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ExpectationMismatchException(lazyMessage().toString(), cause))
     return this
@@ -2249,6 +2337,7 @@ fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? =
  * @throws ExpectationMismatchException if the current value matches the expectation.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(property, variableName, expectation, this, cause))
     return this
@@ -2266,6 +2355,7 @@ fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? 
  * @throws ExpectationMismatchException if the invoking object does not match the expected value
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(property, variable, expectation, this, cause))
     return this
@@ -2283,6 +2373,7 @@ fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>
  * @return The current object (`this`) if no mismatch is found.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause))
     return this
@@ -2303,6 +2394,7 @@ fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String?
  *     the provided expectation, with detailed context about the mismatch.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause))
     return this
@@ -2321,6 +2413,7 @@ fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?
  * @throws ExpectationMismatchException if the current value does not match the expected value
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause))
     return this
@@ -2338,6 +2431,7 @@ fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? =
  * @return The current value if it matches the expected value.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause))
     return this
@@ -2354,7 +2448,7 @@ fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, 
  * @throws ExpectationMismatchException If the variable is not null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2377,7 +2471,7 @@ fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T? 
  * @throws ExpectationMismatchException if the receiver is not null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2399,7 +2493,7 @@ fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazy
  * @throws ExpectationMismatchException if the value is not `null`.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2418,7 +2512,7 @@ fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, cau
  * @throws ExpectationMismatchException If the object is not null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2441,7 +2535,7 @@ fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf:
  * @throws ExpectationMismatchException If the receiver is not `null`.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2460,7 +2554,7 @@ fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, ca
  * @return The nullable object itself if it passes the validation (i.e., it is `null`).
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2478,7 +2572,7 @@ fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: 
  * @return the receiver object if it is `null`
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2501,7 +2595,7 @@ fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, caus
  * @return The caller object itself if it is null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
@@ -2525,6 +2619,7 @@ fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Th
  * @throws ClassMismatchException If the instance does not match the specified `expectationClass`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(expectationClass, this::class, cause)
     else causeOf.initCause(ClassMismatchException(expectationClass, this::class, cause))
@@ -2542,6 +2637,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = n
  * @return The calling object if it is an instance of the specified expectation class.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ClassMismatchException(lazyMessage().toString(), cause))
     return this
@@ -2558,6 +2654,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = n
  * @return The current object (`this`) if it is an instance of the specified class.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variableName, expectationClass, cause) else causeOf.initCause(ClassMismatchException(property, variableName, expectationClass, cause))
     return this
@@ -2573,6 +2670,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?
  * @return The original object if the validation passes.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variable, expectationClass, cause) else causeOf.initCause(ClassMismatchException(property, variable, expectationClass, cause))
     return this
@@ -2593,6 +2691,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?
  * @throws ClassMismatchException If the receiver object does not meet the type expectations.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameterName, expectationClass, cause) else causeOf.initCause(ClassMismatchException(callable, parameterName, expectationClass, cause))
     return this
@@ -2612,6 +2711,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?
  * @return The current instance if it conforms to the expected class type.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameter, expectationClass, cause) else causeOf.initCause(ClassMismatchException(callable, parameter, expectationClass, cause))
     return this
@@ -2629,6 +2729,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?
  * @throws ClassMismatchException If the instance is not of the expected type.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause) else causeOf.initCause(ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause))
     return this
@@ -2649,6 +2750,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, 
  * @throws ClassMismatchException If the current instance is not of the expected class type.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
     if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameter, expectationClass, cause) else causeOf.initCause(ClassMismatchException(callableName, parameter, expectationClass, cause))
     return this
@@ -2670,7 +2772,7 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, 
  * @throws RequiredPropertyException if the object is null.
  * @since 3.2.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredProperty != null)
@@ -2688,7 +2790,7 @@ fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null
  * @return the receiver instance if it is non-null.
  * @since 3.2.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@requiredProperty != null)
@@ -2713,7 +2815,7 @@ fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null
  * @throws RequiredPropertyException If the current object (`this`) is null, providing detailed error context.
  * @since 3.2.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredProperty(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredProperty != null)
@@ -2731,6 +2833,7 @@ fun <T> T?.requiredProperty(property: KProperty<*>?, variableName: String? = nul
  * @param cause an optional cause of the exception to be attached for debugging purposes. Nullable.
  * @since 3.2.0
  */
+@IgnorableReturnValue
 fun <T> KProperty0<T>.requiredProperty(variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
     if (this == null) throw
     if (causeOf == null) RequiredPropertyException(this@requiredProperty, variableName, cause)
@@ -2752,6 +2855,7 @@ fun <T> KProperty0<T>.requiredProperty(variableName: String? = null, causeOf: Th
  *         provided by `property`, `variable`, `causeOf`, or `cause`.
  * @since 3.2.0
  */
+@IgnorableReturnValue
 fun <T> T?.requiredProperty(property: KProperty<*>?, variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredProperty != null)
@@ -2769,6 +2873,7 @@ fun <T> T?.requiredProperty(property: KProperty<*>?, variable: KProperty<*>, cau
  * @param cause an optional cause of the exception to be attached for debugging purposes. Nullable.
  * @since 3.2.0
  */
+@IgnorableReturnValue
 fun <T> KProperty0<T>.requiredProperty(variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
     if (this == null) throw
     if (causeOf == null) RequiredPropertyException(this@requiredProperty, variable, cause)
@@ -2786,6 +2891,7 @@ fun <T> KProperty0<T>.requiredProperty(variable: KProperty<*>, causeOf: Throwabl
  * @throws RequiredParameterException If the parameter is null, this exception is thrown with an appropriate message and cause.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
@@ -2811,7 +2917,7 @@ fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = nul
  * @throws RequiredParameterException if the caller object (`this`) is `null`.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@requiredParameter != null)
@@ -2831,7 +2937,7 @@ fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = nul
  * @throws RequiredParameterException If the object is null, a descriptive exception is thrown.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredParameter(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
@@ -2854,7 +2960,7 @@ fun <T> T?.requiredParameter(callable: KFunction<*>?, parameterName: String? = n
  * @since 1.0.0
  * @throws RequiredParameterException if the parameter is null.
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredParameter(callable: KFunction<*>?, parameter: KParameter, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
@@ -2874,7 +2980,7 @@ fun <T> T?.requiredParameter(callable: KFunction<*>?, parameter: KParameter, cau
  * @throws RequiredParameterException If the receiver is null.
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredParameter(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
@@ -2897,7 +3003,7 @@ fun <T> T?.requiredParameter(callableName: String?, parameterName: String? = nul
  * @throws RequiredParameterException if this object is null
  * @since 1.0.0
  */
-
+@IgnorableReturnValue
 fun <T> T?.requiredParameter(callableName: String?, parameter: KParameter, causeOf: Throwable? = null, cause: Throwable? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
@@ -2914,7 +3020,6 @@ fun <T> T?.requiredParameter(callableName: String?, parameter: KParameter, cause
  * @param value The value to check for nullability. Must be null; otherwise, an exception is thrown.
  * @since 1.0.0
  */
-
 fun requireNull(value: Any?) {
     contract {
         returns() implies (value == null)
@@ -2932,7 +3037,6 @@ fun requireNull(value: Any?) {
  * @param lazyMessage A lambda that provides the error message to use if the validation fails.
  * @since 1.0.0
  */
-
 inline fun requireNull(value: Any?, lazyMessage: Supplier<Any>) {
     contract {
         returns() implies (value == null)
@@ -2953,7 +3057,6 @@ inline fun requireNull(value: Any?, lazyMessage: Supplier<Any>) {
  * The exception is instantiated only if the condition fails.
  * @since 1.0.0
  */
-
 @Deprecated("Use `value.isNull() || throw` instead", ReplaceWith("value.isNull() || throw lazyException()", "dev.tommasop1804.kutils.isNull"))
 inline fun requireNullOrThrow(value: Any?, lazyException: ThrowableSupplier) {
     contract {
@@ -2974,7 +3077,6 @@ inline fun requireNullOrThrow(value: Any?, lazyException: ThrowableSupplier) {
  * The exception is instantiated only if the condition fails.
  * @since 1.0.0
  */
-
 @Deprecated("Use `|| throw` instead", ReplaceWith("value || throw lazyException()"))
 inline fun requireOrThrow(value: Boolean, lazyException: ThrowableSupplier) {
     contract {
@@ -2990,7 +3092,6 @@ inline fun requireOrThrow(value: Boolean, lazyException: ThrowableSupplier) {
  * @param lazyException A lambda function that creates the exception to be thrown if the value is null.
  * @since 1.0.0
  */
-
 @Deprecated("Use `value.isNotNull() || throw` instead", ReplaceWith("value.isNotNull() || throw lazyException()", "dev.tommasop1804.kutils.isNotNull"))
 inline fun <T> requireNotNullOrThrow(value: T?, lazyException: ThrowableSupplier): T {
     contract {
@@ -3022,7 +3123,6 @@ fun checkNull(value: Any?) {
  * @param lazyMessage A lambda function to generate the exception message if the check fails.
  * @since 1.0.0
  */
-
 fun checkNull(value: Any?, lazyMessage: Supplier<Any>) {
     contract {
         returns() implies (value == null)
@@ -3041,7 +3141,6 @@ fun checkNull(value: Any?, lazyMessage: Supplier<Any>) {
  * @throws ValidationFailedException If the validation condition is not met.
  * @since 1.0.0
  */
-
 inline fun validate(value: Boolean, lazyMessage: Supplier<Any>) {
     contract {
         returns() implies value
@@ -3059,7 +3158,6 @@ inline fun validate(value: Boolean, lazyMessage: Supplier<Any>) {
  * @throws ValidationFailedException if the validation fails (i.e., the value is `false`).
  * @since 1.0.0
  */
-
 fun validate(value: Boolean) {
     contract {
         returns() implies value
@@ -3074,7 +3172,6 @@ fun validate(value: Boolean) {
  * @throws ValidationFailedException if the provided value is not null.
  * @since 1.0.0
  */
-
 fun validateNull(value: Any?) {
     contract {
         returns() implies (value == null)
@@ -3094,7 +3191,6 @@ fun validateNull(value: Any?) {
  *
  * @since 1.0.0
  */
-
 fun validateNull(value: Any?, lazyMessage: Supplier<Any>) {
     contract {
         returns() implies (value == null)
@@ -3111,7 +3207,6 @@ fun validateNull(value: Any?, lazyMessage: Supplier<Any>) {
  * @throws ValidationFailedException if the provided value is null.
  * @since 1.0.0
  */
-
 inline fun <T> validateNotNull(value: T?, lazyMessage: Supplier<Any>) {
     contract {
         returns() implies (value != null)
@@ -3129,7 +3224,6 @@ inline fun <T> validateNotNull(value: T?, lazyMessage: Supplier<Any>) {
  * @throws ValidationFailedException if the value is null.
  * @since 1.0.0
  */
-
 fun <T> validateNotNull(value: T?) {
     contract {
         returns() implies (value != null)
@@ -3148,7 +3242,6 @@ fun <T> validateNotNull(value: T?) {
  * @throws MalformedInputException if the input does not meet the expected format.
  * @since 1.0.0
  */
-
 fun validateInputFormat(value: Boolean) {
     contract {
         returns() implies value
@@ -3165,7 +3258,6 @@ fun validateInputFormat(value: Boolean) {
  * @param lazyMessage a supplier function that generates the exception message when the validation fails.
  * @since 1.0.0
  */
-
 fun validateInputFormat(value: Boolean, lazyMessage: Supplier<Any>) {
     contract {
         returns() implies value
@@ -3182,7 +3274,6 @@ fun validateInputFormat(value: Boolean, lazyMessage: Supplier<Any>) {
  *              Used to construct the exception message if validation fails.
  * @since 1.0.0
  */
-
 fun validateInputFormat(value: Boolean, `class`: KClass<*>) {
     contract {
         returns() implies value
@@ -3199,7 +3290,6 @@ fun validateInputFormat(value: Boolean, `class`: KClass<*>) {
  * @throws MalformedInputException If the input format is invalid (i.e., `value` is false).
  * @since 1.0.0
  */
-
 fun validateInputFormat(value: Boolean, type: KType) {
     contract {
         returns() implies value
@@ -3423,6 +3513,7 @@ fun <T> expectNull(value: T?, callable: KFunction<*>, parameterName: String) {
  * or the initial object if times is non-positive.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun <T> T.repeat(times: Int, transformer: Transformer<T, T>): T {
     if (times <= 0) return this
 
@@ -3677,6 +3768,7 @@ infix fun <K, V> V.mMapWithKey(key: K): MMap<K, V> = mMapOf(key to this)
  * @receiver The integer value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Int.print() = apply { print(this) }
 /**
  * Prints the value of the Byte to the standard output stream.
@@ -3687,6 +3779,7 @@ fun Int.print() = apply { print(this) }
  * @receiver The Byte value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Byte.print() = apply { print(this) }
 /**
  * Prints the character to the standard output.
@@ -3696,6 +3789,7 @@ fun Byte.print() = apply { print(this) }
  * @receiver The character to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Char.print() = apply { print(this) }
 /**
  * Prints the value of the Long instance to the standard output.
@@ -3706,6 +3800,7 @@ fun Char.print() = apply { print(this) }
  * @receiver Long value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Long.print() = apply { print(this) }
 /**
  * Prints the current `Float` value to the standard output.
@@ -3716,6 +3811,7 @@ fun Long.print() = apply { print(this) }
  * @receiver The `Float` value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Float.print() = apply { print(this) }
 /**
  * Prints the value of the current `Short` instance to the standard output.
@@ -3727,6 +3823,7 @@ fun Float.print() = apply { print(this) }
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Short.print() = apply { print(this) }
 /**
  * Prints the value of the Double instance to the standard output.
@@ -3737,6 +3834,7 @@ fun Short.print() = apply { print(this) }
  * @receiver The Double value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Double.print() = apply { print(this) }
 /**
  * Prints the Boolean value to the standard output.
@@ -3746,6 +3844,7 @@ fun Double.print() = apply { print(this) }
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.print() = apply { print(this) }
 /**
  * Prints the contents of the CharArray to the standard output.
@@ -3759,6 +3858,7 @@ fun Boolean.print() = apply { print(this) }
  * @receiver The CharArray whose content will be printed to the standard output.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun CharArray.print() = apply { print(toSafeString()) }
 /**
  * Prints the result of applying the specified transformer to the current object.
@@ -3767,6 +3867,7 @@ fun CharArray.print() = apply { print(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printGeneric")
+@IgnorableReturnValue
 fun <T> T.print(transfor: Transformer<T, Any?> = { it.toSafeString() }): T {
     contract {
         callsInPlace(transfor, InvocationKind.EXACTLY_ONCE)
@@ -3782,6 +3883,7 @@ fun <T> T.print(transfor: Transformer<T, Any?> = { it.toSafeString() }): T {
  * @receiver The integer to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Int.println() = apply { println(this) }
 /**
  * Prints the Byte value to the standard output followed by a newline.
@@ -3794,6 +3896,7 @@ fun Int.println() = apply { println(this) }
  * @receiver The Byte value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Byte.println() = apply { println(this) }
 /**
  * Prints the character value of the receiver to the standard output followed by a line break.
@@ -3804,6 +3907,7 @@ fun Byte.println() = apply { println(this) }
  * @receiver The character to be printed to the standard output.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Char.println() = apply { println(this) }
 /**
  * Prints the `Long` value to the standard output.
@@ -3814,6 +3918,7 @@ fun Char.println() = apply { println(this) }
  * @receiver The `Long` value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Long.println() = apply { println(this) }
 /**
  * Prints the float value to the standard output followed by a newline.
@@ -3824,6 +3929,7 @@ fun Long.println() = apply { println(this) }
  * @receiver The `Float` value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Float.println() = apply { println(this) }
 /**
  * Prints the value of the Short receiver to the standard output, followed by a newline.
@@ -3833,6 +3939,7 @@ fun Float.println() = apply { println(this) }
  * @receiver The Short value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Short.println() = apply { println(this) }
 /**
  * Prints the value of the Double to the standard output followed by a newline character.
@@ -3843,6 +3950,7 @@ fun Short.println() = apply { println(this) }
  * @receiver The Double value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Double.println() = apply { println(this) }
 /**
  * Prints the boolean value to the standard output followed by a newline.
@@ -3853,6 +3961,7 @@ fun Double.println() = apply { println(this) }
  * @receiver the boolean value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.println() = apply { println(this) }
 /**
  * Prints the contents of the CharArray to the standard output, followed by a newline character.
@@ -3863,6 +3972,7 @@ fun Boolean.println() = apply { println(this) }
  * @receiver The CharArray to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun CharArray.println() = apply { println(toSafeString()) }
 /**
  * Prints the string representation of the receiver object to the standard output.
@@ -3875,6 +3985,7 @@ fun CharArray.println() = apply { println(toSafeString()) }
  *                 to a safe string representation.
  * @since 3.10.0
  */
+@IgnorableReturnValue
 @JvmName("printlnGeneric")
 fun <T> T.println(transfor: Transformer<T, Any?> = { it.toSafeString() }): T {
     contract {
@@ -3892,6 +4003,7 @@ fun <T> T.println(transfor: Transformer<T, Any?> = { it.toSafeString() }): T {
  * @receiver The integer to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Int.printErr() = apply { System.err.print(this) }
 /**
  * Prints the byte value to the standard error stream without a newline.
@@ -3901,6 +4013,7 @@ fun Int.printErr() = apply { System.err.print(this) }
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Byte.printErr() = apply { System.err.print(this) }
 /**
  * Prints the character to the standard error output stream.
@@ -3912,6 +4025,7 @@ fun Byte.printErr() = apply { System.err.print(this) }
  * @receiver The character to be printed to the error output stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Char.printErr() = apply { System.err.print(this) }
 /**
  * Prints the value of the Long to the standard error stream.
@@ -3921,6 +4035,7 @@ fun Char.printErr() = apply { System.err.print(this) }
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Long.printErr() = apply { System.err.print(this) }
 /**
  * Prints the value of the Float to the standard error stream.
@@ -3930,6 +4045,7 @@ fun Long.printErr() = apply { System.err.print(this) }
  * @receiver The Float value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Float.printErr() = apply { System.err.print(this) }
 /**
  * Prints the value of the Short to the standard error output stream.
@@ -3939,6 +4055,7 @@ fun Float.printErr() = apply { System.err.print(this) }
  * @receiver The Short value to be printed to the error stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Short.printErr() = apply { System.err.print(this) }
 /**
  * Prints the double value to the standard error stream (`System.err`).
@@ -3949,6 +4066,7 @@ fun Short.printErr() = apply { System.err.print(this) }
  * @receiver The Double value to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Double.printErr() = apply { System.err.print(this) }
 /**
  * Prints the Boolean value to the standard error stream.
@@ -3959,6 +4077,7 @@ fun Double.printErr() = apply { System.err.print(this) }
  * @receiver The Boolean value to be printed to the error stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.printErr() = apply { System.err.print(this) }
 /**
  * Prints the contents of the `CharArray` to the standard error output stream.
@@ -3967,6 +4086,7 @@ fun Boolean.printErr() = apply { System.err.print(this) }
  * @receiver The `CharArray` whose contents are to be printed.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun CharArray.printErr() = apply { System.err.print(toSafeString()) }
 /**
  * Prints the string representation of the receiver object to the standard error stream.
@@ -3977,6 +4097,7 @@ fun CharArray.printErr() = apply { System.err.print(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printErrGeneric")
+@IgnorableReturnValue
 fun <T> T.printErr(transform: Transformer<T, Any?> = { it.toSafeString() }): T {
     contract {
         callsInPlace(transform, InvocationKind.EXACTLY_ONCE)
@@ -3993,6 +4114,7 @@ fun <T> T.printErr(transform: Transformer<T, Any?> = { it.toSafeString() }): T {
  * @receiver the integer value to be printed to the error stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Int.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the value of the Byte to the standard error output stream.
@@ -4003,6 +4125,7 @@ fun Int.printlnErr() = apply { System.err.println(this) }
  * @receiver The Byte value to be printed to the error output stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Byte.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the character to the standard error output stream followed by a line terminator.
@@ -4012,6 +4135,7 @@ fun Byte.printlnErr() = apply { System.err.println(this) }
  * @receiver The character to be printed to the standard error output stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Char.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the value of the `Long` to the standard error output stream.
@@ -4022,6 +4146,7 @@ fun Char.printlnErr() = apply { System.err.println(this) }
  * @receiver The `Long` value to be printed to the error stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Long.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the floating-point number to the standard error stream.
@@ -4032,6 +4157,7 @@ fun Long.printlnErr() = apply { System.err.println(this) }
  * @receiver The floating-point number to be printed to the error stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Float.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the value of the Short instance to the standard error stream.
@@ -4043,6 +4169,7 @@ fun Float.printlnErr() = apply { System.err.println(this) }
  * @receiver The Short value to be printed to the error output stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Short.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the double value of the current instance to the standard error stream.
@@ -4053,6 +4180,7 @@ fun Short.printlnErr() = apply { System.err.println(this) }
  * @receiver The double value to be printed to the error stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Double.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the value of the Boolean to the standard error stream.
@@ -4063,6 +4191,7 @@ fun Double.printlnErr() = apply { System.err.println(this) }
  * @receiver The Boolean value to be printed to the error output stream.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the content of the `CharArray` to the standard error output stream.
@@ -4074,6 +4203,7 @@ fun Boolean.printlnErr() = apply { System.err.println(this) }
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun CharArray.printlnErr() = apply { System.err.println(toSafeString()) }
 /**
  * Prints the current object to the standard error stream after applying the specified transformation.
@@ -4084,6 +4214,7 @@ fun CharArray.printlnErr() = apply { System.err.println(toSafeString()) }
  * @since 3.10.0
  */
 @JvmName("printlnErrGeneric")
+@IgnorableReturnValue
 fun <T> T.printlnErr(transform: Transformer<T, Any?> = { it.toSafeString() }): T {
     contract {
         callsInPlace(transform, InvocationKind.EXACTLY_ONCE)

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geography.*
+import dev.tommasop1804.kutils.classes.geography.Country.Companion.ofAlpha2
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
@@ -46,6 +47,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Bic.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Bic.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 value class Bic private constructor(val value: String) : CharSequence {
     /**
      * Represents the length of the BIC (Bank Identifier Code) string.

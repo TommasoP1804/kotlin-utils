@@ -9,10 +9,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.SPACE
-import dev.tommasop1804.kutils.insert
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -37,11 +34,12 @@ import tools.jackson.databind.annotation.JsonSerialize
  * @author Tommaso Pastorelli
  */
 @JvmInline
-@Suppress("unused", "functionName", "ClassName")
+@Suppress("unused", "functionName")
 @JsonSerialize(using = Ean8P5.Companion.Serializer::class)
 @JsonDeserialize(using = Ean8P5.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean8P5.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean8P5.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Ean8P5 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean {
     /**
      * Represents the length of the `value` string in the `EAN8P5` value class.

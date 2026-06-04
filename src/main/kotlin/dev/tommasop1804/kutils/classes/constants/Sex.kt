@@ -13,6 +13,7 @@ package dev.tommasop1804.kutils.classes.constants
  * @param symbol The Unicode character symbol representing the sex type.
  * @since 1.0.0
  */
+@MustUseReturnValues
 enum class Sex(val symbol: Char) {
     /**
      * Represents the male sex with its associated symbol.

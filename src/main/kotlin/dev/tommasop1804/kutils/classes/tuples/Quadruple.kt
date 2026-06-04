@@ -24,6 +24,7 @@ import java.io.Serializable
  * @since 1.1.0
  * @author Tommaso Pastorelli
  */
+@MustUseReturnValues
 data class Quadruple<out A, out B, out C, out D> (val first: A, val second: B, val third: C, val fourth: D) : Serializable {
     /**
      * Returns a string representation of the quadruple in the format (first, second, third, fourth).

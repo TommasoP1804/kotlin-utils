@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.toLocalMonthDayTime
-import dev.tommasop1804.kutils.firstOrThrow
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -37,6 +37,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ZoneIdent.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ZoneIdent.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
     /**
      * Represents the time-zone offset for this `ZoneIdent`.

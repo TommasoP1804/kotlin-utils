@@ -18,6 +18,7 @@ import kotlin.reflect.KProperty
  * @since 1.0.0
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class Measure(
 	val si: Boolean,
 	val siBase: Boolean,

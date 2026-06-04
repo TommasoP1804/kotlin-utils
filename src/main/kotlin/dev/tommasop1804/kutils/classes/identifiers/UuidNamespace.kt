@@ -4,7 +4,7 @@
 
 package dev.tommasop1804.kutils.classes.identifiers
 
-import dev.tommasop1804.kutils.Uuid
+import dev.tommasop1804.kutils.*
 import java.util.*
 
 /**
@@ -18,6 +18,7 @@ import java.util.*
  * @author Tommaso Pastorelli
  */
 @Suppress("unused", "kutils_uuid_fromstring_as_uuid")
+@MustUseReturnValues
 enum class UuidNamespace(val predefinedNamespace: Uuid) {
     /**
      * Represents the Domain Name System (DNS) namespace predefined in the UUID specification.

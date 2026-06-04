@@ -9,10 +9,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.SPACE
-import dev.tommasop1804.kutils.insert
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -47,6 +44,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 @JsonDeserialize(using = Ean13P2.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean13P2.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean13P2.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Ean13P2 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean {
     /**
      * Returns the length of the string representation of the EAN13P2 value.

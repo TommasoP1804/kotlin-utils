@@ -37,6 +37,7 @@ import tools.jackson.databind.node.ObjectNode
 @JsonDeserialize(using = MoneyTransfer.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = MoneyTransfer.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = MoneyTransfer.Companion.OldDeserializer::class)
+@MustUseReturnValues
 open class MoneyTransfer(val money: Money, val method: PaymentMethod) {
     /**
      * Retrieves the currency associated with the `money` field of the `MoneyTransfer` class.

@@ -37,6 +37,7 @@ import kotlin.math.abs
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RepeatedTemporalInterval.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RepeatedTemporalInterval.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 internal class TemporalIntervalOfDuration(
     override val duration: Duration,
     override val repetition: Int = 0,

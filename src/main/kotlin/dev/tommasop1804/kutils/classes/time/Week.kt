@@ -12,6 +12,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 
 @Suppress("unused", "kutils_temporal_now_as_temporal", "kutils_temporal_of_as_temporal")
+@MustUseReturnValues
 class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Comparable<Week> {
     /**
      * Represents the last day of a specific week, calculated as six days

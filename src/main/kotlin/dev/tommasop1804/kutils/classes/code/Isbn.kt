@@ -45,6 +45,7 @@ import java.nio.file.Path
 @JsonDeserialize(using = Isbn.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Isbn.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Isbn.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Isbn private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean, PrintableBarcode {
     /**
      * Provides the length of the `value` property, which represents the number of characters

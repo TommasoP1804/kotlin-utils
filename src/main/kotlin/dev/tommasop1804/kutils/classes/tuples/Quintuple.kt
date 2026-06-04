@@ -26,6 +26,7 @@ import java.io.Serializable
  * @author Tommaso Pastorelli
  * @since 1.1.0
  */
+@MustUseReturnValues
 data class Quintuple<out A, out B, out C, out D, out E> (val first: A, val second: B, val third: C, val fourth: D, val fifth: E) : Serializable {
     /**
      * Returns a string representation of the quintuple in the format (first, second, third, fourth, fifth).

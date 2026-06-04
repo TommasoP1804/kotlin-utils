@@ -38,6 +38,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Polygon.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Polygon.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration")
+@MustUseReturnValues
 class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<Polygon>, Shape2D {
     /**
      * Represents a mutable list of points that define the vertices of the polygon.

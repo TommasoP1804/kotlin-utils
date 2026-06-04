@@ -14,10 +14,7 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
-import dev.tommasop1804.kutils.afterLast
-import dev.tommasop1804.kutils.isEven
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -52,6 +49,7 @@ import java.nio.file.Path
 @JsonDeserialize(using = Ean13.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean13.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Ean13.Companion.OldDeserializer::class)
+@MustUseReturnValues
 value class Ean13 private constructor(override val value: String) : CharSequence, ProductCode, ProductCode.Ean, PrintableBarcode {
     /**
      * Returns the length of the underlying value representing the EAN-13 code.

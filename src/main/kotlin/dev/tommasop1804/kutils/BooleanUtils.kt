@@ -6,6 +6,7 @@
 @file:Suppress("unused", "kutils_null_check")
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -222,6 +223,7 @@ val Boolean?.isNullOrFalse: Boolean get() {
  * @return The result of the [action] if executed, or `null` otherwise.
  * @since 3.10.1
  */
+@IgnorableReturnValue
 inline fun <R> Boolean.ifTrue(action: ReceiverTransformer<Boolean, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -237,6 +239,7 @@ inline fun <R> Boolean.ifTrue(action: ReceiverTransformer<Boolean, R>): R? {
  * @return The result of the action if the condition is met, or `null` otherwise.
  * @since 3.10.1
  */
+@IgnorableReturnValue
 inline fun <R> Boolean?.ifNullOrTrue(action: ReceiverTransformer<Boolean?, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -252,6 +255,7 @@ inline fun <R> Boolean?.ifNullOrTrue(action: ReceiverTransformer<Boolean?, R>): 
  * @return The result of the action if the Boolean is false; otherwise, null.
  * @since 3.10.1
  */
+@IgnorableReturnValue
 inline fun <R> Boolean.ifFalse(action: ReceiverTransformer<Boolean, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -267,6 +271,7 @@ inline fun <R> Boolean.ifFalse(action: ReceiverTransformer<Boolean, R>): R? {
  * @return The result of the action if the Boolean receiver is `null` or `false`, or `null` otherwise.
  * @since 3.10.1
  */
+@IgnorableReturnValue
 inline fun <R> Boolean?.ifNullOrFalse(action: ReceiverTransformer<Boolean?, R>): R? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -285,7 +290,7 @@ inline fun <R> Boolean?.ifNullOrFalse(action: ReceiverTransformer<Boolean?, R>):
  * @return the result of evaluating either `onTrue` or `onFalse`
  * @since 3.12.1
  */
-
+@IgnorableReturnValue
 inline operator fun <T : Any> Boolean.invoke(onTrue: Supplier<T>, onFalse: Supplier<T>): T {
     contract {
         callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
@@ -305,6 +310,7 @@ inline operator fun <T : Any> Boolean.invoke(onTrue: Supplier<T>, onFalse: Suppl
  * @since 1.0.0
  */
 @JvmName("invokeWithDefault")
+@IgnorableReturnValue
 inline operator fun <T> Boolean.invoke(onTrue: Supplier<T?> = { null }, onFalse: Supplier<T?> = { null }): T? {
     contract {
         callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
@@ -350,6 +356,7 @@ operator fun <T> Boolean.invoke(onTrue: T? = null, onFalse: T? = null) = if (thi
  * @throws IllegalArgumentException if the current Boolean value is `false` and no custom throwable is provided.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@requireTrue
@@ -369,6 +376,7 @@ fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null): B
  * @return the boolean value `true` if the condition is met.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@requireTrue
@@ -383,6 +391,7 @@ fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @return the boolean value `true`, if the check passes
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.requireTrueOrThrow(lazyException: ThrowableSupplier): Boolean {
     contract {
         returns() implies this@requireTrueOrThrow
@@ -401,6 +410,7 @@ fun Boolean.requireTrueOrThrow(lazyException: ThrowableSupplier): Boolean {
  * @return Returns false if the Boolean is false.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@requireFalse
@@ -418,6 +428,7 @@ fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null): 
  * @return the boolean value `false` if the condition is satisfied
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@requireFalse
@@ -436,6 +447,7 @@ fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null, l
  * @throws Exception the exception provided by the `lazyException` supplier when the Boolean value is true
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.requireFalseOrThrow(lazyException: ThrowableSupplier): Boolean {
     contract {
         returns() implies !this@requireFalseOrThrow
@@ -456,6 +468,7 @@ fun Boolean.requireFalseOrThrow(lazyException: ThrowableSupplier): Boolean {
  * @throws Throwable if the invoking boolean value is `false` and a cause is provided, with its cause being initialized to an IllegalStateException.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@checkTrue
@@ -473,6 +486,7 @@ fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boo
  * @return `true` if the boolean value is `true`; otherwise, an exception is thrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@checkTrue
@@ -492,6 +506,7 @@ fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazy
  *  be false" message.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@checkFalse
@@ -509,6 +524,7 @@ fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null): Bo
  * @return Returns `false` if the check passes without throwing an exception.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@checkFalse
@@ -528,6 +544,7 @@ fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null, laz
  * @throws ValidationFailedException If the Boolean value is `false`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -550,6 +567,7 @@ fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null): 
  * @throws Throwable If the boolean value is `false`, throws the provided `causeOf` or a new [ValidationFailedException].
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -570,6 +588,7 @@ fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null, l
  * @throws ValidationFailedException if the boolean value is not true.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -588,6 +607,7 @@ fun Boolean.validateTrue(property: KProperty<*>?, variableName: String? = null, 
  * @return `true` if the validation passes (i.e., the boolean value is `true`)
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -607,6 +627,7 @@ fun Boolean.validateTrue(property: KProperty<*>?, variable: KProperty<*>?, messa
  * @throws ValidationFailedException If the Boolean value is `false`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -626,6 +647,7 @@ fun Boolean.validateTrue(callable: KFunction<*>?, parameterName: String? = null,
  * @return true if the Boolean value is valid (true), otherwise throws a [ValidationFailedException].
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -647,6 +669,7 @@ fun Boolean.validateTrue(callable: KFunction<*>?, parameter: KParameter? = null,
  * @throws ValidationFailedException if the Boolean value is false and validation fails.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -666,6 +689,7 @@ fun Boolean.validateTrue(callableName: String?, parameterName: String? = null, m
  * @throws ValidationFailedException If the Boolean is `false`, with additional context provided by parameters.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateTrue(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@validateTrue
@@ -685,6 +709,7 @@ fun Boolean.validateTrue(callableName: String?, parameter: KParameter? = null, m
  * @throws ValidationFailedException if the boolean value is true.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -707,6 +732,7 @@ fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null):
  * @return Always returns `false` if the receiver boolean is `false`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -731,6 +757,7 @@ fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null, 
  * @return `true` if the value is validated as `false`. If the value is `true`, an exception is thrown instead.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -750,6 +777,7 @@ fun Boolean.validateFalse(property: KProperty<*>?, variableName: String? = null,
  * @return Returns `true` if the receiver is `false`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -770,6 +798,7 @@ fun Boolean.validateFalse(property: KProperty<*>?, variable: KProperty<*>?, mess
  *
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -788,6 +817,7 @@ fun Boolean.validateFalse(callable: KFunction<*>?, parameterName: String? = null
  * @return `true` if the validation succeeds (i.e., the Boolean value is `false`)
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -807,6 +837,7 @@ fun Boolean.validateFalse(callable: KFunction<*>?, parameter: KParameter? = null
  * @return `true` if validation passes (i.e., the Boolean value is `false`)
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -827,6 +858,7 @@ fun Boolean.validateFalse(callableName: String?, parameterName: String? = null, 
  * @return `true` if the validation succeeds (i.e., the Boolean is `false`); otherwise, throws an exception.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.validateFalse(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
@@ -846,6 +878,7 @@ fun Boolean.validateFalse(callableName: String?, parameter: KParameter? = null, 
  * @throws Throwable if the value is `false` and a non-null `causeOf` is provided.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -865,6 +898,7 @@ fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null): Bo
  * @throws ExpectationMismatchException If the boolean value is `false` and no `causeOf` is provided.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -890,6 +924,7 @@ fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null, laz
  * @return Always returns `true` if the validation passes, as the input `Boolean` is expected to be `true`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -916,6 +951,7 @@ fun Boolean.expectTrue(property: KProperty<*>?, variableName: String? = null, ca
  * @return true if the receiver is `true`; otherwise, an exception is thrown
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -945,6 +981,7 @@ fun Boolean.expectTrue(property: KProperty<*>?, variable: KProperty<*>?, causeOf
  * @return `true` if the Boolean receiver is true. If the receiver is false, an exception is thrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -974,6 +1011,7 @@ fun Boolean.expectTrue(callable: KFunction<*>?, parameterName: String? = null, c
  * @return true if the Boolean value is true; otherwise, the method throws an exception and does not return
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -1000,6 +1038,7 @@ fun Boolean.expectTrue(callable: KFunction<*>?, parameter: KParameter?, causeOf:
  * @return `true` if the Boolean value is `true`
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -1027,6 +1066,7 @@ fun Boolean.expectTrue(callableName: String?, parameterName: String? = null, cau
  * @throws ExpectationMismatchException if the Boolean value is `false`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectTrue(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies this@expectTrue
@@ -1054,6 +1094,7 @@ fun Boolean.expectTrue(callableName: String?, parameter: KParameter?, causeOf: T
  * @throws ExpectationMismatchException if the Boolean value is `true`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1074,6 +1115,7 @@ fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null): B
  * @return Returns `false`, indicating the current value meets the expectation.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1098,6 +1140,7 @@ fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @throws ExpectationMismatchException If the current boolean value is `true`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1126,6 +1169,7 @@ fun Boolean.expectFalse(property: KProperty<*>?, variableName: String? = null, c
  * the provided `property`, `variable`, `expectation`, and `cause` parameters.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1152,6 +1196,7 @@ fun Boolean.expectFalse(property: KProperty<*>?, variable: KProperty<*>?, causeO
  * @return Always returns `false` if the receiver is `false`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1182,6 +1227,7 @@ fun Boolean.expectFalse(callable: KFunction<*>?, parameterName: String? = null, 
  * @throws ExpectationMismatchException if the receiver Boolean value is `true`
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1208,6 +1254,7 @@ fun Boolean.expectFalse(callable: KFunction<*>?, parameter: KParameter?, causeOf
  * @return `false` if the boolean value is already false
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
@@ -1238,6 +1285,7 @@ fun Boolean.expectFalse(callableName: String?, parameterName: String? = null, ca
  * @throws ExpectationMismatchException If the boolean value is `true`.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 fun Boolean.expectFalse(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
     contract {
         returns() implies !this@expectFalse

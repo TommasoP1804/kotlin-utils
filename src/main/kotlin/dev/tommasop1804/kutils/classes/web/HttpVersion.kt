@@ -18,6 +18,7 @@ import dev.tommasop1804.kutils.*
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class HttpVersion(val notation: String, val version: Double) {
     /**
      * Represents the HTTP/1.0 protocol version.
@@ -100,5 +101,17 @@ enum class HttpVersion(val notation: String, val version: Double) {
      * @return the `version` value of the current HttpVersion instance
      * @since 3.1.0
      */
-    operator fun component2() = version 
+    operator fun component2() = version
+
+    /**
+     * Returns a string representation of the `HttpVersion` instance.
+     *
+     * This method provides the value of the `notation` field,
+     * which represents the standardized string format of the HTTP version
+     * encapsulated by the `HttpVersion` class.
+     *
+     * @return the `notation` value as a string.
+     * @since 4.1.0
+     */
+    override fun toString() = notation
 }

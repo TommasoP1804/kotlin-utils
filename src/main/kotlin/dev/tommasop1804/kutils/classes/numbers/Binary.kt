@@ -35,6 +35,7 @@ import kotlin.math.pow
 @JsonDeserialize(using = Binary.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Binary.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Binary.Companion.OldDeserializer::class)
+@MustUseReturnValues
 class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
     /**
      * A string value that can be assigned or used within the application scope.

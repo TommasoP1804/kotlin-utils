@@ -23,6 +23,7 @@ import java.nio.file.Path
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 interface PrintableBarcode {
     companion object {
         /**

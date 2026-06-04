@@ -58,6 +58,7 @@ import kotlin.text.startsWith
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = CalendarEvent.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = CalendarEvent.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_getorthrow_as_invoke")
+@MustUseReturnValues
 data class CalendarEvent(
     var name: String,
     var period: TemporalInterval,

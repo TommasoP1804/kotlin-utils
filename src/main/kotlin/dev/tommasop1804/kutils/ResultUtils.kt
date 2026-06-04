@@ -6,6 +6,7 @@
 @file:Suppress("unused")
 @file:Since("1.0.0")
 @file:OptIn(ExperimentalContracts::class)
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 
@@ -25,6 +26,7 @@ import kotlin.contracts.contract
  * @return the result of the invoked lambda, either from the `onSuccess` or `onFailure` function
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline operator fun <T, R> Result<T>.invoke(
     onSuccess: Transformer<T, R>,
     onFailure: Transformer<Throwable, R>
@@ -47,6 +49,7 @@ inline operator fun <T, R> Result<T>.invoke(
  * @throws Throwable If the result represents a failure, the encapsulated exception will be thrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 operator fun <T> Result<T>.invoke() = getOrThrow()
 
 /**
@@ -58,6 +61,7 @@ operator fun <T> Result<T>.invoke() = getOrThrow()
  * if the `Result` is a failure.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 operator fun <T> Result<T>.invoke(exception: ThrowableSupplier) = getOrThrow(lazyException = exception)
 
 /**
@@ -89,6 +93,7 @@ operator fun Result<*>.not() = isFailure
  * @throws Throwable If the [Result] contains a failure, the provided [lazyException] or its modified version is thrown.
  * @since 1.0.0
  */
+@IgnorableReturnValue
 inline fun <T> Result<T>.getOrThrow(includeCause: Boolean = true, lazyException: ThrowableSupplier) = getOrElse {
     val exception = lazyException()
     throw if (exception.cause.isNotNull() || !includeCause) exception else (exception causedBy exceptionOrNull())

@@ -48,6 +48,7 @@ import java.nio.file.Path
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Json.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Json.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_collection_declaration", "kutils_getorthrow_as_invoke", "RedundantSuppression")
+@MustUseReturnValues
 open class Json private constructor(@param:Language("json") override val value: String) : CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.Json) {
 
     /**

@@ -13,6 +13,7 @@ package dev.tommasop1804.kutils.classes.identifiers
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class UuidV8Type(subvariant: Int) {
     /**
      * Represents a UUIDv8 type that encodes data using a single string format.

@@ -23,6 +23,7 @@ import dev.tommasop1804.kutils.*
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
+@MustUseReturnValues
 enum class HttpMethod(
     val value: String,
     val canHasRequestBody: Boolean = false,

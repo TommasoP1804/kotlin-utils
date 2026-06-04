@@ -5,6 +5,7 @@
 @file:JvmName("RegexUtilsKt")
 @file:Suppress("unused")
 @file:Since("1.0.0")
+@file:MustUseReturnValues
 
 package dev.tommasop1804.kutils
 

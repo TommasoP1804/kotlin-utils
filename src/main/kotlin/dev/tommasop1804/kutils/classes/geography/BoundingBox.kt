@@ -40,6 +40,7 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = BoundingBox.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = BoundingBox.Companion.OldDeserializer::class)
 @Suppress("unused")
+@MustUseReturnValues
 class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable, Comparable<BoundingBox> {
     /**
      * Constructs a `BoundingBox` instance using minimum and maximum `Point` values.

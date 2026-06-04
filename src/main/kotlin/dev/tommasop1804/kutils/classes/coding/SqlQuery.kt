@@ -52,6 +52,7 @@ import kotlin.text.endsWith
 @JsonDeserialize(using = SqlQuery.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = SqlQuery.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = SqlQuery.Companion.OldDeserializer::class)
+@MustUseReturnValues
 class SqlQuery(@param:Language("sql") override val value: String): CharSequence, Code(value, dev.tommasop1804.kutils.classes.coding.Language.Sql) {
     /**
      * Validates that the query does not contain obvious SQL injection patterns.
@@ -944,6 +945,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @return The number of rows affected by the update query.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     context(entityManager: EntityManager)
     fun executeUpdate(
         parameters: List<Any> = emptyList(),
@@ -971,6 +973,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @return The number of rows affected by the update query.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     context(entityManager: EntityManager)
     fun executeUpdate(
         parameters: DataMap,

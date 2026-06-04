@@ -42,6 +42,7 @@ import java.nio.file.Path
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Csv.Companion.OldDeserializer::class)
 @Suppress("unused", "UNCHECKED_CAST", "kutils_collection_declaration")
 @Beta(since = "3.13.0")
+@MustUseReturnValues
 class Csv(override var value: String, val separator: Char = Char.COMMA, val hasHeaders: Boolean = true) : CharSequence, Code(value, Language.Csv) {
 
     /**

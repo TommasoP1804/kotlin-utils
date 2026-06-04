@@ -58,6 +58,7 @@ import kotlin.reflect.KProperty
 @JsonDeserialize(using = Contact.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Contact.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Contact.Companion.OldDeserializer::class)
+@MustUseReturnValues
 data class Contact(
     var name: Name,
     var jobs: Set<Job> = emptySet(),
