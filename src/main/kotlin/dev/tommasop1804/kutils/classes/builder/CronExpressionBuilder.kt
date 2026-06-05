@@ -8,7 +8,6 @@ import dev.tommasop1804.kutils.*
 import java.time.DayOfWeek
 import java.time.Month
 
-@Suppress("unused", "kutils_take_as_int_invoke")
 /**
  * A builder class for constructing cron expressions with flexible configurations.
  * This class provides methods for specifying values, ranges, or step intervals
@@ -34,7 +33,7 @@ import java.time.Month
  * @constructor Creates an empty Builder to begin constructing the cron expression.
  * @since 1.0.0
  */
-@MustUseReturnValues
+@Suppress("unused", "kutils_take_as_int_invoke")
 class CronExpressionBuilder(private val type: Type) {
     /**
      * Represents the seconds configuration for a builder.

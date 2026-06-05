@@ -47,6 +47,7 @@ class RegexBuilder {
      * @return the current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun literal(text: String): RegexBuilder {
         pattern.append(Regex.escape(text))
         return this
@@ -58,6 +59,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun anyChar(): RegexBuilder {
         pattern.append(".")
         return this
@@ -70,6 +72,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun char(c: Char): RegexBuilder {
         pattern.append(if (isInCharClass) c.toString() else Regex.escape(c.toString()))
         return this
@@ -82,6 +85,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun chars(vararg chars: Char): RegexBuilder {
         chars.forEach { pattern.append(if (isInCharClass) it.toString() else Regex.escape(it.toString())) }
         return this
@@ -94,6 +98,7 @@ class RegexBuilder {
      * @return the updated instance of [RegexBuilder]
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun charClass(chars: String): RegexBuilder {
         pattern.append("[").append(chars).append("]")
         return this
@@ -107,6 +112,7 @@ class RegexBuilder {
      * @return the current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun notCharClass(chars: String): RegexBuilder {
         pattern.append("[^").append(chars).append("]")
         return this
@@ -121,6 +127,7 @@ class RegexBuilder {
      * @return the current instance of [RegexBuilder] for method chaining
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun charRange(range: CharRange, omitSquareBrackets: Boolean): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append(range.first).append("-").append(range.last).append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -134,6 +141,7 @@ class RegexBuilder {
      * @return the current instance of [RegexBuilder] for method chaining
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun charRange(range: CharRange): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append(range.first).append("-").append(range.last).append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -147,6 +155,7 @@ class RegexBuilder {
      * @return The instance of the RegexBuilder with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun lowerLetterRange(omitSquareBrackets: Boolean): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("a").append("-").append("z").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -158,6 +167,7 @@ class RegexBuilder {
      * @return The instance of the RegexBuilder with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun lowerLetterRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("a").append("-").append("z").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -171,6 +181,7 @@ class RegexBuilder {
      * @return The updated `RegexBuilder` instance with the appended range.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun upperLetterRange(omitSquareBrackets: Boolean): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("a").append("-").append("z").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -183,6 +194,7 @@ class RegexBuilder {
      * @return The updated `RegexBuilder` instance with the appended range.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun upperLetterRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("a").append("-").append("z").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -197,6 +209,7 @@ class RegexBuilder {
      * @return The same instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun letterRange(omitSquareBrackets: Boolean): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("a-zA-Z").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -209,6 +222,7 @@ class RegexBuilder {
      * @return The same instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun letterRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("a-zA-Z").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -223,6 +237,7 @@ class RegexBuilder {
      * @return the updated RegexBuilder with the appended digit range pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun digitRange(omitSquareBrackets: Boolean): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("0-9").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -235,6 +250,7 @@ class RegexBuilder {
      * @return the updated RegexBuilder with the appended digit range pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun digitRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("0-9").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -248,6 +264,7 @@ class RegexBuilder {
      * @return The updated RegexBuilder instance with the appended pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun lowerLetterOrDigitRange(omitSquareBrackets: Boolean): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("a-z0-9").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -259,6 +276,7 @@ class RegexBuilder {
      * @return The updated RegexBuilder instance with the appended pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun lowerLetterOrDigitRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("a-z0-9").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -275,6 +293,7 @@ class RegexBuilder {
      * @return the updated RegexBuilder instance.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun upperLetterOrDigitRange(omitSquareBrackets: Boolean = false): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("A-Z0-9").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -288,6 +307,7 @@ class RegexBuilder {
      * @return the updated RegexBuilder instance.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun upperLetterOrDigitRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("A-Z0-9").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -303,6 +323,7 @@ class RegexBuilder {
      * @return The updated instance of the RegexBuilder for chaining further modifications.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun letterOrDigitRange(omitSquareBrackets: Boolean = false): RegexBuilder {
         pattern.append(if (omitSquareBrackets) String.EMPTY else "[").append("a-zA-Z0-9").append(if (omitSquareBrackets) String.EMPTY else "]")
         return this
@@ -315,6 +336,7 @@ class RegexBuilder {
      * @return The updated instance of the RegexBuilder for chaining further modifications.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun letterOrDigitRange(): RegexBuilder {
         pattern.append(if (isInCharClass) String.EMPTY else "[").append("a-zA-Z0-9").append(if (isInCharClass) String.EMPTY else "]")
         return this
@@ -326,6 +348,7 @@ class RegexBuilder {
      * @return The RegexBuilder instance with the updated pattern including the digit match.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun digit(): RegexBuilder {
         pattern.append("\\d")
         return this
@@ -338,6 +361,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder].
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun notDigit(): RegexBuilder {
         pattern.append("\\D")
         return this
@@ -352,6 +376,7 @@ class RegexBuilder {
      * @return The current instance of the RegexBuilder for chaining further calls.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun wordChar(): RegexBuilder {
         pattern.append("\\w")
         return this
@@ -365,6 +390,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun notWordChar(): RegexBuilder {
         pattern.append("\\W")
         return this
@@ -379,6 +405,7 @@ class RegexBuilder {
      * @return The current instance of the `RegexBuilder` for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun whitespace(): RegexBuilder {
         pattern.append("\\s")
         return this
@@ -390,6 +417,7 @@ class RegexBuilder {
      * @return This RegexBuilder instance, allowing for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun notWhitespace(): RegexBuilder {
         pattern.append("\\S")
         return this
@@ -401,6 +429,7 @@ class RegexBuilder {
      * @return the current instance of [RegexBuilder] to allow method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfString(): RegexBuilder {
         pattern.append("^")
         return this
@@ -412,6 +441,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder].
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun endOfString(): RegexBuilder {
         pattern.append("$")
         return this
@@ -424,6 +454,7 @@ class RegexBuilder {
      * @return The updated instance of [RegexBuilder] for further chaining of regex building methods.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfCharClass(): RegexBuilder {
         pattern.append("[")
         isInCharClass = true
@@ -439,6 +470,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] to enable method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun endOfCharClass(): RegexBuilder {
         pattern.append("]")
         isInCharClass = false
@@ -452,6 +484,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] to allow method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun wordBoundary(): RegexBuilder {
         pattern.append("\\b")
         return this
@@ -465,6 +498,7 @@ class RegexBuilder {
      * @throws NumberSignException if the number of repetitions is not positive.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     operator fun times(n: Int): RegexBuilder {
         n.isPositive || throw NumberSignException("The number of repetitions must be positive.")
         pattern.append("{").append(n).append("}")
@@ -480,6 +514,7 @@ class RegexBuilder {
      * @throws NumberSignException if the range of repetitions is not positive.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     operator fun times(range: IntRange): RegexBuilder {
         (range.first.isPositive && range.last.isPositive) || throw NumberSignException("The number of repetitions must be positive.")
         pattern.append("{").append(range.first).append(",").append(range.last).append("}")
@@ -495,6 +530,7 @@ class RegexBuilder {
      * @throws NumberSignException if the minimum number of repetitions is not positive or zero.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun timesOrMore(min: Int): RegexBuilder {
         min.isNotNegative || throw NumberSignException("The minimum number of repetitions must be positive or zero.")
         pattern.append("{").append(min).append(",}")
@@ -509,6 +545,7 @@ class RegexBuilder {
      * @throws NumberSignException if the maximum number of repetitions is not positive.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun timesOrLess(max: Int): RegexBuilder {
         max.isPositive || throw NumberSignException("The maximum number of repetitions must be positive.")
         pattern.append("{0,").append(max).append("}")
@@ -522,6 +559,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun zeroOrMore(): RegexBuilder {
         pattern.append("*")
         return this
@@ -534,6 +572,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun oneOrMore(): RegexBuilder {
         pattern.append("+")
         return this
@@ -547,6 +586,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] to allow method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun optional(): RegexBuilder {
         pattern.append("?")
         return this
@@ -558,6 +598,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] to allow method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfGroup(): RegexBuilder {
         pattern.append("(")
         return this
@@ -573,6 +614,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun endOfGroup(): RegexBuilder {
         pattern.append(")")
         return this
@@ -584,6 +626,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] with the updated pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun or(): RegexBuilder {
         pattern.append("|")
         return this
@@ -596,6 +639,7 @@ class RegexBuilder {
      * @return The updated RegexBuilder instance with the appended pattern.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun raw(@Language("regex") regex: String): RegexBuilder {
         pattern.append(regex)
         return this
@@ -608,6 +652,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder], allowing for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfNonCapturingGroup(): RegexBuilder {
         pattern.append("(?:")
         return this
@@ -621,6 +666,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] to enable method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfPositiveLookahead(): RegexBuilder {
         pattern.append("(?=")
         return this
@@ -634,6 +680,7 @@ class RegexBuilder {
      * @return the current [RegexBuilder] instance for method chaining
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfNegativeLookahead(): RegexBuilder {
         pattern.append("(?!")
         return this
@@ -646,6 +693,7 @@ class RegexBuilder {
      * @return the current instance of [RegexBuilder] for method chaining
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun dotAllMode(): RegexBuilder {
         pattern.insert(0, "(?s)")
         return this
@@ -660,6 +708,7 @@ class RegexBuilder {
      * @return The instance of [RegexBuilder] with case-insensitive mode enabled.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun enableCaseInsensitiveMode(): RegexBuilder {
         pattern.insert(0, "(?i)")
         return this
@@ -672,6 +721,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun disableCaseInsensitiveMode(): RegexBuilder {
         pattern.insert(0, "(?-i)")
         return this
@@ -685,6 +735,7 @@ class RegexBuilder {
      * @return This `RegexBuilder` instance with multiline mode enabled.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun multilineMode(): RegexBuilder {
         pattern.insert(0, "(?m)")
         return this
@@ -698,6 +749,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder], allowing for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun unicodeMode(): RegexBuilder {
         pattern.insert(0, "(?u)")
         return this
@@ -710,6 +762,7 @@ class RegexBuilder {
      * @return The current instance of RegexBuilder for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun startOfNamedGroup(name: String): RegexBuilder {
         pattern.append("(?<").append(name).append(">")
         return this
@@ -723,6 +776,7 @@ class RegexBuilder {
      * @return the current instance of RegexBuilder for method chaining
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun charClassEscaped(chars: String): RegexBuilder {
         pattern.append("[")
         chars.forEach {
@@ -741,6 +795,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] to allow method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun backreference(index: Int): RegexBuilder {
         pattern.append("\\").append(index)
         return this
@@ -754,6 +809,7 @@ class RegexBuilder {
      * @return The current instance of [RegexBuilder] for method chaining.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun namedBackreference(name: String): RegexBuilder {
         pattern.append("\\k<").append(name).append(">")
         return this
@@ -767,6 +823,7 @@ class RegexBuilder {
      * @return The current instance of RegexBuilder with extended mode applied.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun extendedMode(): RegexBuilder {
         pattern.insert(0, "(?x)")
         return this
@@ -779,6 +836,7 @@ class RegexBuilder {
      * @return The string representation of the `pattern`.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun peek() = pattern.toString()
 
     /**
@@ -789,6 +847,7 @@ class RegexBuilder {
      * @throws MalformedInputException if the provided pattern is invalid.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun build(vararg options: RegexOption): Regex = tryOrThrow({ -> MalformedInputException("Invalid regular expression") }) {
         Regex(pattern.toString(), options.toSet())
     }
@@ -800,6 +859,7 @@ class RegexBuilder {
      * @return A `Code` object generated based on the provided options.
      * @since 1.0.0
      */
+    @IgnorableReturnValue
     fun buildAsCode(vararg options: RegexOption): Code = build(*options).toCode()
 }
 

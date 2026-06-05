@@ -98,7 +98,7 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      *
      * @since 3.6.0
      */
-    fun condition(@Language("sql") expr: String, autoApplyOperator: LogicOperator? = this.autoApplyOperator) {
+    fun condition(expr: String, autoApplyOperator: LogicOperator? = this.autoApplyOperator) {
         parts += if (parts.isEmpty()) expr else when (autoApplyOperator) {
             LogicOperator.And -> "AND $expr"
             LogicOperator.Or -> "OR $expr"
@@ -111,7 +111,7 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      *
      * @since 3.6.0
      */
-    fun and(@Language("sql") expr: String) {
+    fun and(expr: String) {
         parts += "AND $expr"
     }
 
@@ -120,7 +120,7 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      *
      * @since 3.6.0
      */
-    fun or(@Language("sql") expr: String) {
+    fun or(expr: String) {
         parts += "OR $expr"
     }
 
@@ -129,7 +129,7 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      *
      * @since 3.6.0
      */
-    fun not(@Language("sql") expr: String, logicOperator: LogicOperator? = null) {
+    fun not(expr: String, logicOperator: LogicOperator? = null) {
         val prefix = logicOperator?.let { "${it.name} " } ?: String.EMPTY
         parts += "${prefix}NOT ($expr)"
     }
@@ -243,6 +243,14 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
     fun exists(@Language("sql") subquery: String) {
         condition("EXISTS ($subquery)")
     }
+    /**
+     * Adds an `EXISTS` subquery condition.
+     *
+     * @since 4.1.1
+     */
+    fun exists(subquery: SqlQuery) {
+        condition("EXISTS (${subquery.value})")
+    }
 
     /**
      * Adds a `NOT EXISTS` subquery condition.
@@ -251,6 +259,14 @@ class WhereScope @PublishedApi internal constructor(val autoApplyOperator: Logic
      */
     fun notExists(@Language("sql") subquery: String) {
         condition("NOT EXISTS ($subquery)")
+    }
+    /**
+     * Adds a `NOT EXISTS` subquery condition.
+     *
+     * @since 4.1.1
+     */
+    fun notExists(subquery: SqlQuery) {
+        condition("NOT EXISTS (${subquery.value})")
     }
 
     @PublishedApi
@@ -274,7 +290,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String? = null) {
+    fun join(table: String, type: JoinType, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -288,7 +304,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun inner(@Language("sql") table: String, @Language("sql") on: String) =
+    fun inner(table: String, on: String) =
         join(table, JoinType.Inner, on.validate("inner", "on", predicate = String::isNotBlank))
 
     /**
@@ -296,7 +312,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun left(@Language("sql") table: String, @Language("sql") on: String) =
+    fun left(table: String, on: String) =
         join(table, JoinType.LeftOuter, on.validate("left", "on", predicate = String::isNotBlank))
 
     /**
@@ -304,7 +320,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun right(@Language("sql") table: String, @Language("sql") on: String) =
+    fun right(table: String, on: String) =
         join(table, JoinType.RightOuter, on.validate("right", "on", predicate = String::isNotBlank))
 
     /**
@@ -312,7 +328,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun full(@Language("sql") table: String, @Language("sql") on: String) =
+    fun full(table: String, on: String) =
         join(table, JoinType.FullOuter, on.validate("full", "on", predicate = String::isNotBlank))
 
     /**
@@ -320,7 +336,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun cross(@Language("sql") table: String) {
+    fun cross(table: String) {
         joins += " CROSS JOIN $table"
     }
 
@@ -329,7 +345,7 @@ class JoinScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun natural(@Language("sql") table: String) {
+    fun natural(table: String) {
         joins += " NATURAL JOIN $table"
     }
 
@@ -352,7 +368,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @throws IllegalOperationException If an invalid combination of `type` and `on` is provided.
      * @since 3.9.3
      */
-    fun lateral(@Language("sql") query: String, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
+    fun lateral(query: String, type: JoinType, alias: String? = null, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -373,7 +389,7 @@ class JoinScope @PublishedApi internal constructor() {
      * @throws IllegalOperationException Thrown if the provided ON condition does not satisfy the requirements of the specified join type.
      * @since 3.9.3
      */
-    fun lateral(query: SqlQuery, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
+    fun lateral(query: SqlQuery, type: JoinType, alias: String? = null, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -399,7 +415,7 @@ class OrderByScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun column(@Language("sql") name: String, direction: SortDirection = SortDirection.Ascending) {
+    fun column(name: String, direction: SortDirection = SortDirection.Ascending) {
         columns += name + if (direction == SortDirection.Descending) " DESC" else String.EMPTY
     }
 
@@ -408,21 +424,21 @@ class OrderByScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun asc(@Language("sql") name: String) = column(name, SortDirection.Ascending)
+    fun asc(name: String) = column(name, SortDirection.Ascending)
 
     /**
      * Shorthand: descending column.
      *
      * @since 3.6.0
      */
-    fun desc(@Language("sql") name: String) = column(name, SortDirection.Descending)
+    fun desc(name: String) = column(name, SortDirection.Descending)
 
     /**
      * Adds a column with NULLS FIRST directive.
      *
      * @since 3.6.0
      */
-    fun nullsFirst(@Language("sql") name: String, direction: SortDirection = SortDirection.Ascending) {
+    fun nullsFirst(name: String, direction: SortDirection = SortDirection.Ascending) {
         columns += name + (if (direction == SortDirection.Descending) " DESC" else String.EMPTY) + " NULLS FIRST"
     }
 
@@ -431,7 +447,7 @@ class OrderByScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun nullsLast(@Language("sql") name: String, direction: SortDirection = SortDirection.Ascending) {
+    fun nullsLast(name: String, direction: SortDirection = SortDirection.Ascending) {
         columns += name + (if (direction == SortDirection.Descending) " DESC" else String.EMPTY) + " NULLS LAST"
     }
 }
@@ -477,7 +493,7 @@ class TriggerScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun onTable(@Language("sql") tableName: String) {
+    fun onTable(tableName: String) {
         table = tableName
     }
 
@@ -495,7 +511,7 @@ class TriggerScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun whenCondition(@Language("sql") condition: String) {
+    fun whenCondition(condition: String) {
         whenCondition = condition
     }
 
@@ -504,7 +520,7 @@ class TriggerScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun body(@Language("sql") statement: String) {
+    fun body(statement: String) {
         bodyParts += statement
     }
 }
@@ -528,7 +544,7 @@ class FunctionScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun param(@Language("sql") definition: String) {
+    fun param(definition: String) {
         params += definition
     }
 
@@ -537,7 +553,7 @@ class FunctionScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun returns(@Language("sql") type: String) {
+    fun returns(type: String) {
         returnType = type
     }
 
@@ -566,7 +582,7 @@ class FunctionScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun body(@Language("sql") statement: String) {
+    fun body(statement: String) {
         bodyParts += statement
     }
 }
@@ -588,7 +604,7 @@ class ProcedureScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun param(@Language("sql") definition: String) {
+    fun param(definition: String) {
         params += definition
     }
 
@@ -606,7 +622,7 @@ class ProcedureScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun body(@Language("sql") statement: String) {
+    fun body(statement: String) {
         bodyParts += statement
     }
 }
@@ -635,7 +651,7 @@ class InsertValuesScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun row(@Language("sql") vararg values: String) {
+    fun row(vararg values: String) {
         rows += values.toList()
     }
 }
@@ -667,7 +683,7 @@ class TableColumnsScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun column(@Language("sql") definition: String) {
+    fun column(definition: String) {
         definitions += definition
     }
 
@@ -676,7 +692,7 @@ class TableColumnsScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun primaryKey(@Language("sql") vararg columns: String) {
+    fun primaryKey(vararg columns: String) {
         definitions += "PRIMARY KEY (${columns.joinToString(", ")})"
     }
 
@@ -685,7 +701,7 @@ class TableColumnsScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun unique(@Language("sql") vararg columns: String) {
+    fun unique(vararg columns: String) {
         definitions += "UNIQUE (${columns.joinToString(", ")})"
     }
 
@@ -695,8 +711,8 @@ class TableColumnsScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun foreignKey(
-        @Language("sql") columns: String,
-        @Language("sql") references: String,
+        columns: String,
+        references: String,
         onDelete: String? = null,
         onUpdate: String? = null
     ) {
@@ -713,7 +729,7 @@ class TableColumnsScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun check(@Language("sql") expression: String) {
+    fun check(expression: String) {
         definitions += "CHECK ($expression)"
     }
 
@@ -722,7 +738,7 @@ class TableColumnsScope @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun constraint(@Language("sql") definition: String) {
+    fun constraint(definition: String) {
         definitions += definition
     }
 }
@@ -823,7 +839,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun select(@Language("sql") vararg columns: String, distinct: Boolean = false) {
+    fun select(vararg columns: String, distinct: Boolean = false) {
         queryType = QueryType.Select
         this.distinct = this.distinct || distinct
         if (columns.isEmpty()) {
@@ -840,7 +856,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun selectCount(@Language("sql") expression: String = "*") {
+    fun selectCount(expression: String = "*") {
         queryType = QueryType.Select
         selectColumns += "COUNT($expression)"
     }
@@ -850,7 +866,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun from(@Language("sql") vararg tables: String) {
+    fun from(vararg tables: String) {
         validate(tables.isNotEmpty())
         fromTables += tables
     }
@@ -880,7 +896,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun join(@Language("sql") table: String, type: JoinType, @Language("sql") on: String? = null) {
+    fun join(table: String, type: JoinType, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -896,7 +912,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.9.3
      */
-    fun lateralJoin(@Language("sql") query: String, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
+    fun lateralJoin(query: String, type: JoinType, alias: String? = null, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -912,7 +928,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.9.3
      */
-    fun lateralJoin(query: SqlQuery, type: JoinType, alias: String? = null, @Language("sql") on: String? = null) {
+    fun lateralJoin(query: SqlQuery, type: JoinType, alias: String? = null, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
         if (!type.onCondition && on.isNotNullOrBlank())
@@ -925,7 +941,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun groupBy(@Language("sql") vararg columns: String) {
+    fun groupBy(vararg columns: String) {
         groupByColumns += columns
     }
 
@@ -934,7 +950,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun having(@Language("sql") condition: String) {
+    fun having(condition: String) {
         havingConditions += condition
     }
 
@@ -969,7 +985,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun where(@Language("sql") condition: String, autoApplyOperator: LogicOperator? = LogicOperator.And) {
+    fun where(condition: String, autoApplyOperator: LogicOperator? = LogicOperator.And) {
         whereParts += if (whereParts.isEmpty()) condition else when(autoApplyOperator) {
             LogicOperator.And -> "AND $condition"
             LogicOperator.Or -> "OR $condition"
@@ -1016,7 +1032,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun orderBy(@Language("sql") vararg columns: String, direction: SortDirection = SortDirection.Ascending) {
+    fun orderBy(vararg columns: String, direction: SortDirection = SortDirection.Ascending) {
         columns.forEach { col ->
             orderByParts += col + if (direction == SortDirection.Descending) " DESC" else String.EMPTY
         }
@@ -1089,7 +1105,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun columns(@Language("sql") vararg cols: String) {
+    fun columns(vararg cols: String) {
         insertColumns += cols
     }
 
@@ -1098,7 +1114,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun values(@Language("sql") vararg vals: String) {
+    fun values(vararg vals: String) {
         insertRows += vals.toList()
     }
 
@@ -1124,7 +1140,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun fromSelect(@Language("sql") selectSql: String) {
+    fun fromSelect(selectSql: String) {
         insertSelectQuery = selectSql
     }
 
@@ -1174,7 +1190,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun set(@Language("sql") vararg expressions: String) {
+    fun set(vararg expressions: String) {
         setExpressions += expressions
     }
 
@@ -1207,7 +1223,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun truncate(@Language("sql") table: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
+    fun truncate(table: String, ifExists: Boolean = false, dropType: DropType = DropType.Restrict) {
         queryType = QueryType.Truncate
         ddlParts.clear()
         ddlParts += "TRUNCATE TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $table $dropType"
@@ -1220,7 +1236,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createView(viewName: String, orReplace: Boolean = false, @Language("sql") selectSQL: String) {
+    fun createView(viewName: String, orReplace: Boolean = false, selectSQL: String) {
         queryType = QueryType.CreateView
         ddlParts.clear()
         ddlParts += "CREATE${if (orReplace) " OR REPLACE" else String.EMPTY} VIEW $viewName AS $selectSQL"
@@ -1250,7 +1266,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun alterView(viewName: String, ifExists: Boolean = false, @Language("sql") selectSQL: String) {
+    fun alterView(viewName: String, ifExists: Boolean = false, selectSQL: String) {
         queryType = QueryType.AlterView
         ddlParts.clear()
         ddlParts += "ALTER VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName AS $selectSQL"
@@ -1274,7 +1290,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createMaterializedView(viewName: String, orReplace: Boolean = false, withData: Boolean = true, @Language("sql") selectSQL: String) {
+    fun createMaterializedView(viewName: String, orReplace: Boolean = false, withData: Boolean = true, selectSQL: String) {
         queryType = QueryType.CreateMaterializedView
         ddlParts.clear()
         ddlParts += "CREATE${if (orReplace) " OR REPLACE" else String.EMPTY} MATERIALIZED VIEW $viewName AS $selectSQL WITH ${if (!withData) "NO " else String.EMPTY}DATA"
@@ -1305,7 +1321,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun alterMaterializedView(viewName: String, ifExists: Boolean = false, @Language("sql") action: String) {
+    fun alterMaterializedView(viewName: String, ifExists: Boolean = false, action: String) {
         queryType = QueryType.AlterMaterializedView
         ddlParts.clear()
         ddlParts += "ALTER MATERIALIZED VIEW${if (ifExists) " IF EXISTS" else String.EMPTY} $viewName $action"
@@ -1329,7 +1345,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createTable(tableName: String, @Language("sql") body: String) {
+    fun createTable(tableName: String, body: String) {
         queryType = QueryType.CreateTable
         ddlParts.clear()
         ddlParts += "CREATE TABLE $tableName ($body)"
@@ -1361,7 +1377,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun alterTable(tableName: String, ifExists: Boolean = false, @Language("sql") alteration: String) {
+    fun alterTable(tableName: String, ifExists: Boolean = false, alteration: String) {
         queryType = QueryType.AlterTable
         ddlParts.clear()
         ddlParts += "ALTER TABLE${if (ifExists) " IF EXISTS" else String.EMPTY} $tableName $alteration"
@@ -1385,7 +1401,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createIndex(indexName: String, table: String, @Language("sql") columns: String, unique: Boolean = false) {
+    fun createIndex(indexName: String, table: String, columns: String, unique: Boolean = false) {
         queryType = QueryType.CreateIndex
         ddlParts.clear()
         ddlParts += "CREATE${if (unique) " UNIQUE" else String.EMPTY} INDEX $indexName ON $table ($columns)"
@@ -1546,7 +1562,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createSequence(name: String, ifNotExists: Boolean = false, @Language("sql") definition: String) {
+    fun createSequence(name: String, ifNotExists: Boolean = false, definition: String) {
         queryType = QueryType.CreateSequence
         ddlParts.clear()
         ddlParts += "CREATE SEQUENCE${if (ifNotExists) " IF NOT EXISTS" else String.EMPTY} $name $definition"
@@ -1557,7 +1573,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun alterSequence(name: String, ifExists: Boolean = false, @Language("sql") alteration: String) {
+    fun alterSequence(name: String, ifExists: Boolean = false, alteration: String) {
         queryType = QueryType.AlterSequence
         ddlParts.clear()
         ddlParts += "ALTER SEQUENCE${if (ifExists) " IF EXISTS" else String.EMPTY} $name $alteration"
@@ -1644,7 +1660,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createCompositeType(name: String, @Language("sql") vararg columns: String) {
+    fun createCompositeType(name: String, vararg columns: String) {
         queryType = QueryType.CreateType
         ddlParts.clear()
         ddlParts += "CREATE TYPE $name AS (${columns.joinToString()})"
@@ -1723,7 +1739,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun createDomain(name: String, @Language("sql") `as`: String, @Language("sql") check: String) {
+    fun createDomain(name: String, `as`: String, check: String) {
         queryType = QueryType.CreateDomain
         ddlParts.clear()
         ddlParts += "CREATE DOMAIN $name AS $`as` CHECK ($check)"
@@ -1734,7 +1750,7 @@ class SqlBuilder @PublishedApi internal constructor() {
      *
      * @since 3.6.0
      */
-    fun alterDomain(name: String, ifExists: Boolean = false, @Language("sql") operation: String) {
+    fun alterDomain(name: String, ifExists: Boolean = false, operation: String) {
         queryType = QueryType.ALterDomain
         ddlParts.clear()
         ddlParts += "ALTER DOMAIN${if (ifExists) " IF EXISTS" else String.EMPTY} $name $operation"
