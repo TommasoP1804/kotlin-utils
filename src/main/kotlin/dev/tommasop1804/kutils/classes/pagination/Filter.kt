@@ -10,13 +10,15 @@
 package dev.tommasop1804.kutils.classes.pagination
 
 import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.exceptions.*
-import tools.jackson.databind.SerializationContext
-import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.*
+import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -34,7 +36,9 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 @JsonSerialize(using = FilterOption.Companion.Serializer::class)
+@JsonDeserialize(using = FilterOption.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = FilterOption.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = FilterOption.Companion.OldDeserializer::class)
 data class FilterOption(
     var field: String? = null,
     var operator: FilterOperator = FilterOperator.Equals,
@@ -187,6 +191,17 @@ data class FilterOption(
             }
         }
 
+        class Deserializer : ValueDeserializer<FilterOption>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): FilterOption {
+                val node = p.objectReadContext().readTree<JsonNode>(p)
+                return FilterOption(
+                    node.get("field").traverse(p.objectReadContext()).readValueAs(String::class.java),
+                    FilterOperator.ofSymbol(node.get("operator").traverse(p.objectReadContext()).readValueAs(String::class.java))!!,
+                    node.get("value").traverse(p.objectReadContext()).readValueAs(String::class.java)
+                )
+            }
+        }
+
         class OldSerializer : JsonSerializer<FilterOption>() {
             override fun serialize(value: FilterOption, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
@@ -195,6 +210,17 @@ data class FilterOption(
                 gen.writeStringField("operator", value.operator.symbol)
                 gen.writeStringField("value", value.value?.toString())
                 gen.writeEndObject()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<FilterOption>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): FilterOption {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
+                return FilterOption(
+                    node.get("field").asText(),
+                    FilterOperator.valueOf(node.get("operator").asText()),
+                    node.get("value").asText()
+                )
             }
         }
     }
@@ -561,7 +587,7 @@ enum class FilterOperator(
          */
         ArraySearch
     }
-    
+
     /*    /*
      * Represents a filter operator for checking the existence of a specific condition.
      *

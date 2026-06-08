@@ -1,7 +1,7 @@
 # kutils
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.20-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-blue.svg)](https://kotlinlang.org)
 [![JDK](https://img.shields.io/badge/JDK-21-orange.svg)](https://openjdk.org)
 
 A comprehensive Kotlin/JVM utility library providing extensions, helpers, and ready-to-use classes for common development tasks.
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.tommasop1804:kotlin-utils:4.1.1")
+    implementation("dev.tommasop1804:kotlin-utils:4.1.2")
 }
 ```
 

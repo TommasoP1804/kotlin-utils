@@ -10,14 +10,16 @@
 package dev.tommasop1804.kutils.classes.pagination
 
 import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.exceptions.*
-import tools.jackson.databind.SerializationContext
-import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.*
+import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -38,7 +40,9 @@ import kotlin.reflect.KProperty
  * @since 1.0.0
  */
 @JsonSerialize(using = SortOption.Companion.Serializer::class)
+@JsonDeserialize(using = SortOption.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = SortOption.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = SortOption.Companion.OldDeserializer::class)
 data class SortOption(
     var field: String,
     var direction: SortDirection = SortDirection.Ascending
@@ -86,7 +90,7 @@ data class SortOption(
      * @since 1.0.0
      */
     private constructor(sortOption: SortOption) : this(sortOption.field, sortOption.direction)
-    
+
     companion object {
         /**
          * Parses a variable number of string inputs and maps them to a list of SortOption instances.
@@ -139,12 +143,32 @@ data class SortOption(
             }
         }
 
+        class Deserializer : ValueDeserializer<SortOption>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): SortOption {
+                val node = p.objectReadContext().readTree<JsonNode>(p)
+                return SortOption(
+                    node.get("field").asString(),
+                    SortDirection.ofSymbol(node.get("direction").asString().first())!!
+                )
+            }
+        }
+
         class OldSerializer : JsonSerializer<SortOption>() {
             override fun serialize(value: SortOption, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
                 gen.writeStringField("field", value.field)
                 gen.writeStringField("direction", value.direction.symbol.toString())
                 gen.writeEndObject()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<SortOption>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): SortOption {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
+                return SortOption(
+                    node.get("field").asText(),
+                    SortDirection.ofSymbol(node.get("direction").asText().first())!!
+                )
             }
         }
     }
