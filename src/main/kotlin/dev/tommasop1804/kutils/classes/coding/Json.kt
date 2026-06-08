@@ -26,6 +26,7 @@ import tools.jackson.databind.json.JsonMapper
 import tools.jackson.databind.node.ArrayNode
 import tools.jackson.databind.node.ObjectNode
 import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.readValue
 import java.io.File
 import java.nio.file.Path
 
@@ -782,7 +783,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     inline fun <reified T> toList() = runCatching {
-        MAPPER.readValue(value, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java)) as List<T>
+        MAPPER.readValue<List<T>>(value)
     }
 
     /**
@@ -815,9 +816,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
      * @since 3.0.0
      */
-    inline fun <reified T> toSet() = runCatching {
-        MAPPER.readValue(value, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java)) as Set<T>
-    }
+    inline fun <reified T> toSet() = runCatching { toList<T>().getOrThrow().toSet() }
 
     /**
      * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
