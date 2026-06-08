@@ -27,7 +27,7 @@ Full documentation will be soon available at: [https://tommasop1804.notion.site/
 ## Requirements
 
 - JDK 21+
-- Kotlin 2.3.20+
+- Kotlin 2.4.0+
 
 ## License
 
