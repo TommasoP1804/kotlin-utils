@@ -212,8 +212,8 @@ data class CalendarEvent(
 
     init {
         validate(name.isNotBlank()) { "The name of the event cannot be blank." }
-        period.start.expectClass(OffsetDateTime::class) { "The end date of the event must be OffsetDateTime instance." }
-        period.end.expectClass(OffsetDateTime::class) { "The start date of the event must be OffsetDateTime instance." }
+        period.start.expectClass(OffsetDateTime::class, lazyMessage = { "The end date of the event must be OffsetDateTime instance." })
+        period.end.expectClass(OffsetDateTime::class, lazyMessage = { "The start date of the event must be OffsetDateTime instance." })
         validate((period.start as OffsetDateTime).isBefore(period.end as OffsetDateTime)) { "The start date of the event must be before the end date." }
         reminders.forEach { validate(it > Duration()) { "The reminder duration must be greater than zero." } }
     }

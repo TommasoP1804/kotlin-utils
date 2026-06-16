@@ -95,8 +95,8 @@ class Memoizer<T, R>(
     fun invalidate(input: T) {
         when (cache) {
             is ConcurrentHashMap<*, *> -> (cache as ConcurrentHashMap<T, R>).remove(input)
-            is LruCache<*, *> -> (cache as LruCache<T, R>).remove(input)
-            is TtlCache<*, *> -> (cache as TtlCache<T, R>).remove(input)
+            is LruCache<*, *> -> { val _ = (cache as LruCache<T, R>).remove(input) }
+            is TtlCache<*, *> -> { val _ = (cache as TtlCache<T, R>).remove(input) }
         }
     }
 

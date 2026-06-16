@@ -1404,8 +1404,8 @@ fun Any?.toSafeString(): String = when (this) {
  */
 @JvmName("receiverRequire")
 @IgnorableReturnValue
-fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause))
+fun <T> T.require(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
     return this
 }
 /**
@@ -1423,8 +1423,8 @@ fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, predicat
  */
 @JvmName("receiverRequire")
 @IgnorableReturnValue
-fun <T> T.require(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
+fun <T> T.require(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 
@@ -1448,6 +1448,62 @@ fun <T> T.requireOrThrow(lazyException: Transformer<T, Throwable>, predicate: Pr
 }
 
 /**
+ * Ensures that the current object does not satisfy the given predicate. If the predicate evaluates to true,
+ * this method throws an exception, optionally accepting a specific cause or a custom throwable.
+ *
+ * @param causeOf an optional custom throwable to be used if the predicate evaluates to true.
+ * @param cause an optional underlying cause for the thrown exception.
+ * @param predicate a conditional function that tests the current object.
+ * @return the current object if it does not satisfy the predicate.
+ * @throws Throwable the provided cause or a default IllegalArgumentException if the predicate evaluates to true.
+ * @since 4.2.0
+ */
+@JvmName("receiverRequireNot")
+@IgnorableReturnValue
+fun <T> T.requireNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
+    return this
+}
+/**
+ * Evaluates the given predicate on the receiver object, and if the predicate returns `true`,
+ * throws an exception with the specified message and optional causes.
+ *
+ * @param causeOf The primary throwable to be thrown if the predicate evaluates to `true`.
+ *                If null, a default `IllegalArgumentException` is created.
+ * @param cause The secondary throwable to be used as the cause of the exception.
+ *              Can be null.
+ * @param lazyMessage A supplier for the exception message which is lazily evaluated if the
+ *                    predicate evaluates to `true`.
+ * @param predicate A predicate that is evaluated on the receiver object.
+ *                  If the predicate returns `true`, an exception is thrown.
+ * @return The receiver object if the predicate evaluates to `false`.
+ * @since 4.2.0
+ */
+@JvmName("receiverRequireNot")
+@IgnorableReturnValue
+fun <T> T.requireNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
+    return this
+}
+
+/**
+ * Verifies that the receiver does not satisfy the given predicate. If the predicate is satisfied,
+ * an exception is thrown using the provided lazy exception transformer. Otherwise, returns the receiver.
+ *
+ * @param lazyException a function that transforms the receiver into an exception to be thrown
+ *                       if the predicate evaluates to true
+ * @param predicate a condition to evaluate against the receiver
+ * @return the receiver itself if the predicate evaluates to false
+ * @since 4.2.0
+ */
+@JvmName("receiverRequireNotOrThrow")
+@IgnorableReturnValue
+fun <T> T.requireNotOrThrow(lazyException: Transformer<T, Throwable>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw lazyException(this)
+    return this
+}
+
+/**
  * Ensures that the receiver is null. If the receiver is not null, an IllegalArgumentException is thrown.
  *
  * @param causeOf an optional throwable to be used as the main exception, or `null`
@@ -1458,11 +1514,11 @@ fun <T> T.requireOrThrow(lazyException: Transformer<T, Throwable>, predicate: Pr
  */
 @JvmName("receiverRequireNull")
 @IgnorableReturnValue
-fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.requireNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@requireNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this is null", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: $this is null", cause))
+    if (this != null) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this is null", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this is null", cause?.invoke()))
     return this
 }
 /**
@@ -1477,11 +1533,11 @@ fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null): T?
  */
 @JvmName("receiverRequireNull")
 @IgnorableReturnValue
-fun <T> T?.requireNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.requireNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@requireNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
+    if (this != null) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -1514,11 +1570,11 @@ fun <T> T?.requireNullOrThrow(lazyException: ThrowableSupplier): T? {
  */
 @JvmName("receiverRequireNotNull")
 @IgnorableReturnValue
-fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requireNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requireNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this is null", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: $this is null", cause))
+    if (this == null) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this is null", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this is null", cause?.invoke()))
     return this
 }
 /**
@@ -1534,11 +1590,11 @@ fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null):
  */
 @JvmName("receiverRequireNotNull")
 @IgnorableReturnValue
-fun <T> T?.requireNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.requireNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@requireNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
+    if (this == null) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -1572,8 +1628,8 @@ fun <T> T?.requireNotNullOrThrow(lazyException: ThrowableSupplier): T {
  */
 @JvmName("receiverCheck")
 @IgnorableReturnValue
-fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause) else causeOf.initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause))
+fun <T> T.check(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
     return this
 }
 /**
@@ -1591,10 +1647,50 @@ fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, predicate:
  */
 @JvmName("receiverCheck")
 @IgnorableReturnValue
-fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
+fun <T> T.check(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
+
+/**
+ * Checks if the current object does not satisfy the given predicate. If the predicate evaluates to `true`,
+ * an exception is thrown. Otherwise, the current object is returned.
+ *
+ * @param causeOf The primary throwable cause to be thrown if the predicate evaluates to `true`.
+ *                Defaults to `null`.
+ * @param cause The secondary throwable cause that is set as the cause of the exception if thrown.
+ *              Defaults to `null`.
+ * @param predicate The predicate to evaluate the current object.
+ * @return The current object if the predicate evaluates to `false`.
+ * @throws IllegalStateException If the predicate evaluates to `true` and no `causeOf` is provided.
+ *         If `causeOf` is provided, it is thrown instead, with its cause set to an `IllegalStateException`.
+ * @since 4.2.0
+ */
+@JvmName("receiverCheckNot")
+@IgnorableReturnValue
+fun <T> T.checkNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
+    return this
+}
+/**
+ * Evaluates the given predicate on the receiver object, and if the predicate returns true,
+ * throws an exception constructed using the provided optional cause or causeOf, and a lazily evaluated message.
+ *
+ * @param causeOf the primary throwable that caused this exception to be thrown (optional)
+ * @param cause the secondary throwable or cause (optional)
+ * @param lazyMessage a supplier that provides the error message used in the exception
+ * @param predicate the condition to evaluate on the receiver object
+ * @return the receiver object if the predicate evaluates to false
+ * @throws IllegalStateException if the predicate evaluates to true and no causeOf is provided
+ * @since 4.2.0
+ */
+@JvmName("receiverCheckNot")
+@IgnorableReturnValue
+fun <T> T.checkNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
+    return this
+}
+
 /**
  * Checks if the receiver of this function is null. Throws an IllegalStateException
  * if it is not null.
@@ -1610,11 +1706,11 @@ fun <T> T.check(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessag
  */
 @JvmName("receiverCheckNull")
 @IgnorableReturnValue
-fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.checkNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@checkNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalStateException("Invalid state: $this is not-null", cause) else causeOf.initCause(IllegalStateException("Invalid state: $this is not-null", cause))
+    if (this != null) throw if (causeOf == null) IllegalStateException("Invalid state: $this is not-null", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid state: $this is not-null", cause?.invoke()))
     return this
 }
 /**
@@ -1630,11 +1726,11 @@ fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
  */
 @JvmName("receiverCheckNull")
 @IgnorableReturnValue
-fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.checkNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@checkNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
+    if (this != null) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 
@@ -1651,11 +1747,11 @@ fun <T> T?.checkNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyM
  */
 @JvmName("receiverCheckNotNull")
 @IgnorableReturnValue
-fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.checkNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@checkNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) IllegalStateException("Invalid state: $this is null", cause) else causeOf.initCause(IllegalStateException("Invalid state: $this is null", cause))
+    if (this == null) throw if (causeOf == null) IllegalStateException("Invalid state: $this is null", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid state: $this is null", cause?.invoke()))
     return this
 }
 /**
@@ -1671,11 +1767,11 @@ fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T
  */
 @JvmName("receiverCheckNotNull")
 @IgnorableReturnValue
-fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.checkNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@checkNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
+    if (this == null) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 
@@ -1696,8 +1792,8 @@ fun <T> T?.checkNotNull(causeOf: Throwable? = null, cause: Throwable? = null, la
  */
 @JvmName("receiverValidate")
 @IgnorableReturnValue
-fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause) else causeOf.initCause(ValidationFailedException("Validation failed.", cause))
+fun <T> T.validate(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Validation failed.", cause?.invoke()))
     return this
 }
 /**
@@ -1717,8 +1813,8 @@ fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, predica
  */
 @JvmName("receiverValidate")
 @IgnorableReturnValue
-fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
+fun <T> T.validate(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -1736,8 +1832,8 @@ fun <T> T.validate(causeOf: Throwable? = null, cause: Throwable? = null, lazyMes
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause) else causeOf.initCause(ValidationFailedException(property, variableName, message, cause))
+fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message, cause?.invoke()))
     return this
 }
 /**
@@ -1755,8 +1851,8 @@ fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, messag
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause) else causeOf.initCause(ValidationFailedException(property, variable, message, cause))
+fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message, cause?.invoke()))
     return this
 }
 /**
@@ -1774,8 +1870,8 @@ fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: St
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message, cause))
+fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message, cause?.invoke()))
     return this
 }
 /**
@@ -1794,8 +1890,8 @@ fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, messa
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message, cause))
+fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message, cause?.invoke()))
     return this
 }
 /**
@@ -1812,8 +1908,8 @@ fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: Str
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message, cause))
+fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message, cause?.invoke()))
     return this
 }
 /**
@@ -1832,8 +1928,159 @@ fun <T> T.validate(callableName: String?, parameterName: String? = null, message
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message, cause))
+fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message, cause?.invoke()))
+    return this
+}
+
+/**
+ * Validates that the receiver does not satisfy the given predicate. If the predicate
+ * evaluates to true, a [ValidationFailedException] or the provided exception is thrown.
+ *
+ * @param causeOf An optional throwable that will be thrown if validation fails.
+ *                If null, a new [ValidationFailedException] is created.
+ * @param cause An optional cause that can be passed to the generated exception
+ *              for additional context. This is ignored if `causeOf` is provided.
+ * @param predicate A predicate to test the receiver. If the predicate evaluates to true,
+ *                  the validation is considered failed.
+ * @return The receiver if the validation passes.
+ * @throws ValidationFailedException If the receiver satisfies the predicate and
+ *                                   no exception is provided in `causeOf`.
+ * @since 4.2.0
+ */
+@JvmName("receiverValidateNot")
+@IgnorableReturnValue
+fun <T> T.validateNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Validation failed.", cause?.invoke()))
+    return this
+}
+/**
+ * Validates the receiver object against a given predicate and throws a validation exception
+ * if the predicate evaluates to true.
+ *
+ * @param causeOf An optional throwable to use as the cause of the validation failure.
+ * @param cause An optional throwable to set as the underlying cause of the validation failure.
+ * @param lazyMessage A supplier that provides a message for the validation failure when needed.
+ * @param predicate A predicate to test the receiver object against.
+ * @return The receiver object if the predicate evaluates to false.
+ * @since 4.2.0
+ */
+@JvmName("receiverValidateNot")
+@IgnorableReturnValue
+fun <T> T.validateNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    return this
+}
+/**
+ * Validates the current value of type `T` against a given predicate. If the predicate evaluates to `true`,
+ * a `ValidationFailedException` is thrown.
+ *
+ * @param property The property associated with this validation, or null if not applicable.
+ * @param variableName The name of the variable being validated, or null if not specified.
+ * @param message An optional message providing additional context in case of validation failure.
+ * @param causeOf An optional throwable that is the overarching cause of this validation, used to chain exceptions.
+ * @param cause An optional throwable to include as the cause of the `ValidationFailedException`.
+ * @param predicate A predicate that determines the validation logic. If the predicate returns `true`, the validation fails.
+ * @return The current instance of type `T` if validation succeeds.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.validateNot(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message, cause?.invoke()))
+    return this
+}
+/**
+ * Validates the current object against a specified predicate and throws a `ValidationFailedException`
+ * if the predicate returns true.
+ *
+ * The exception includes optional metadata such as the associated properties, an optional message,
+ * and an optional cause chain.
+ *
+ * @param property the primary property associated with the validation, providing contextual information; may be null
+ * @param variable an optional secondary property that may offer additional context; may be null
+ * @param message an optional descriptive message to include in the exception, providing further details; may be null
+ * @param causeOf an optional pre-existing throwable used as the root cause of the exception; may be null
+ * @param cause an additional optional throwable to include as the underlying cause in the exception; may be null
+ * @param predicate a predicate function to evaluate the condition; the validation fails if this function returns true
+ * @return the current object if the validation passes without throwing an exception
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.validateNot(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message, cause?.invoke()))
+    return this
+}
+/**
+ * Validates the receiver object against the specified predicate and throws a `ValidationFailedException`
+ * if the predicate evaluates to `true`.
+ *
+ * @param callable A reference to the Kotlin function (`KFunction`) that the validation is related to. Can be null.
+ * @param parameterName The name of the parameter in the `callable` to which this validation applies. Can be null.
+ * @param message An optional custom message that provides additional context about the validation failure. Default is null.
+ * @param causeOf An optional pre-existing throwable to be set as the primary cause of the exception. Can be null.
+ * @param cause An optional underlying cause of the validation failure, represented as a `Throwable`. Can be null.
+ * @param predicate The predicate function that determines if the validation fails for the receiver object.
+ * @return The receiver object if the predicate does not evaluate to `true`.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.validateNot(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message, cause?.invoke()))
+    return this
+}
+/**
+ * Validates the current value against a specified predicate. If the predicate evaluates to true,
+ * a `ValidationFailedException` is thrown with the provided details.
+ *
+ * @param callable the callable (function) related to the validation context, or null if not applicable
+ * @param parameter the parameter being validated, or null if not applicable
+ * @param message an optional message providing additional context about the validation failure
+ * @param causeOf an optional throwable to wrap the validation failure exception as its cause
+ * @param cause the underlying cause of the validation failure, or null if no cause is specified
+ * @param predicate the predicate used to determine if validation fails
+ * @return the current value if validation passes
+ * @throws ValidationFailedException if the predicate evaluates to true for the current value
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.validateNot(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message, cause?.invoke()))
+    return this
+}
+/**
+ * Validates the current value against the specified predicate. If the predicate evaluates to `true`,
+ * a validation exception is thrown with optional contextual details.
+ *
+ * @param callableName The name of the callable (e.g., function or method) where the validation occurs.
+ * @param parameterName The name of the parameter being validated, or `null` if not applicable.
+ * @param message An optional custom message providing additional details about the validation failure.
+ * @param causeOf An optional pre-existing exception to wrap the validation failure exception, or `null` if not applicable.
+ * @param cause An optional underlying cause of the validation failure, or `null` if not applicable.
+ * @param predicate A predicate that determines if the validation should fail. If this evaluates to `true`, validation fails.
+ * @return The original value if validation passes.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.validateNot(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message, cause?.invoke()))
+    return this
+}
+/**
+ * Validates the current instance against a specified predicate and throws a ValidationFailedException
+ * if the predicate evaluation returns true.
+ *
+ * @param callableName The name of the callable (e.g., function or property) where the validation occurs, or null if not specified.
+ * @param parameter The parameter associated with the validation, or null if not applicable.
+ * @param message An optional custom error message for the validation failure.
+ * @param causeOf An optional primary throwable that caused the validation failure and is used as the root cause.
+ * @param cause An optional supplementary throwable providing additional context to the validation failure.
+ * @param predicate A condition to evaluate the current instance. If the condition returns true, the validation fails.
+ * @return The current instance if the validation passes.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.validateNot(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message, cause?.invoke()))
     return this
 }
 
@@ -1852,11 +2099,11 @@ fun <T> T.validate(callableName: String?, parameter: KParameter?, message: Strin
  */
 @IgnorableReturnValue
 @JvmName("receiverValidateNull")
-fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException("Value is not null.", cause) else causeOf.initCause(ValidationFailedException("Value is not null.", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException("Value is not null.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is not null.", cause?.invoke()))
     return this
 }
 /**
@@ -1876,11 +2123,11 @@ fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null): T
  */
 @JvmName("receiverValidateNull")
 @IgnorableReturnValue
-fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.validateNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -1896,11 +2143,11 @@ fun <T> T?.validateNull(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null", cause) else causeOf.initCause(ValidationFailedException(property, variableName, message ?: "is not null", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not null", cause?.invoke()))
     return this
 }
 /**
@@ -1917,11 +2164,11 @@ fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, m
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null", cause) else causeOf.initCause(ValidationFailedException(property, variable, message ?: "is not null", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not null", cause?.invoke()))
     return this
 }
 /**
@@ -1941,11 +2188,11 @@ fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, messag
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null", cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message ?: "is not null", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not null", cause?.invoke()))
     return this
 }
 /**
@@ -1961,11 +2208,11 @@ fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null", cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message ?: "is not null", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not null", cause?.invoke()))
     return this
 }
 /**
@@ -1982,11 +2229,11 @@ fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null", cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null", cause?.invoke()))
     return this
 }
 /**
@@ -2003,11 +2250,11 @@ fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, me
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null", cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message ?: "is not null", cause))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not null", cause?.invoke()))
     return this
 }
 
@@ -2025,11 +2272,11 @@ fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: 
  */
 @IgnorableReturnValue
 @JvmName("receiverValidateNotNull")
-fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException("Value is null.", cause) else causeOf.initCause(ValidationFailedException("Value is null.", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException("Value is null.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is null.", cause?.invoke()))
     return this
 }
 /**
@@ -2049,11 +2296,11 @@ fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null)
  */
 @IgnorableReturnValue
 @JvmName("receiverValidateNotNull")
-fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.validateNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -2071,11 +2318,11 @@ fun <T> T?.validateNotNull(causeOf: Throwable? = null, cause: Throwable? = null,
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNotNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null", cause) else causeOf.initCause(ValidationFailedException(property, variableName, message ?: "is null", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is null", cause?.invoke()))
     return this
 }
 /**
@@ -2094,11 +2341,11 @@ fun <T> T?.validateNotNull(property: KProperty<*>?, variableName: String? = null
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null", cause) else causeOf.initCause(ValidationFailedException(property, variable, message ?: "is null", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is null", cause?.invoke()))
     return this
 }
 /**
@@ -2117,11 +2364,11 @@ fun <T> T?.validateNotNull(property: KProperty<*>?, variable: KProperty<*>?, mes
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNotNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null", cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message ?: "is null", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is null", cause?.invoke()))
     return this
 }
 /**
@@ -2139,11 +2386,11 @@ fun <T> T?.validateNotNull(callable: KFunction<*>?, parameterName: String? = nul
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null", cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message ?: "is null", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is null", cause?.invoke()))
     return this
 }
 /**
@@ -2158,11 +2405,11 @@ fun <T> T?.validateNotNull(callable: KFunction<*>?, parameter: KParameter?, mess
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNotNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null", cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message ?: "is null", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is null", cause?.invoke()))
     return this
 }
 /**
@@ -2181,11 +2428,11 @@ fun <T> T?.validateNotNull(callableName: String?, parameterName: String? = null,
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@validateNotNull != null)
     }
-    if (this == null) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null", cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message ?: "is null", cause))
+    if (this == null) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is null", cause?.invoke()))
     return this
 }
 
@@ -2200,8 +2447,8 @@ fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, messag
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf.initCause(MalformedInputException(message))
+fun <T> T.validateInputFormat(message: String? = null, causeOf: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf().initCause(MalformedInputException(message))
     return this
 }
 /**
@@ -2215,8 +2462,8 @@ fun <T> T.validateInputFormat(message: String? = null, causeOf: Throwable? = nul
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf.initCause(MalformedInputException(`class`))
+fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf().initCause(MalformedInputException(`class`))
     return this
 }
 /**
@@ -2231,8 +2478,8 @@ fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Throwable? = 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validateInputFormat(type: KType? = null, causeOf: Throwable? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf.initCause(MalformedInputException(type))
+fun <T> T.validateInputFormat(type: KType? = null, causeOf: ThrowableSupplier? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf().initCause(MalformedInputException(type))
     return this
 }
 /**
@@ -2246,8 +2493,8 @@ fun <T> T.validateInputFormat(type: KType? = null, causeOf: Throwable? = null, p
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = null, causeOf: Throwable? = null): T {
-    if (!regex(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf.initCause(MalformedInputException(message))
+fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = null, causeOf: ThrowableSupplier? = null): T {
+    if (!regex(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf().initCause(MalformedInputException(message))
     return this
 }
 /**
@@ -2263,8 +2510,8 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = nu
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? = null, causeOf: Throwable? = null): T {
-    if (!regex(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf.initCause(MalformedInputException(`class`))
+fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? = null, causeOf: ThrowableSupplier? = null): T {
+    if (!regex(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf().initCause(MalformedInputException(`class`))
     return this
 }
 /**
@@ -2280,8 +2527,8 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, causeOf: Throwable? = null): T {
-    if (!regex(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf.initCause(MalformedInputException(type))
+fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, causeOf: ThrowableSupplier? = null): T {
+    if (!regex(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf().initCause(MalformedInputException(type))
     return this
 }
 
@@ -2298,10 +2545,10 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T.expect(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     if (this != expectation) throw
-        if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause)
-        else causeOf.initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause))
+        if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke())
+        else causeOf().initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke()))
     return this
 }
 /**
@@ -2319,8 +2566,8 @@ fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ExpectationMismatchException(lazyMessage().toString(), cause))
+fun <T> T.expect(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -2338,8 +2585,8 @@ fun <T> T.expect(expectation: T, causeOf: Throwable? = null, cause: Throwable? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(property, variableName, expectation, this, cause))
+fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()))
     return this
 }
 /**
@@ -2356,8 +2603,8 @@ fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(property, variable, expectation, this, cause))
+fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()))
     return this
 }
 /**
@@ -2374,8 +2621,8 @@ fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause))
+fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()))
     return this
 }
 /**
@@ -2395,8 +2642,8 @@ fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause))
+fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()))
     return this
 }
 /**
@@ -2414,8 +2661,8 @@ fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause))
+fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()))
     return this
 }
 /**
@@ -2432,8 +2679,154 @@ fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause) else causeOf.initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause))
+fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()))
+    return this
+}
+
+/**
+ * Verifies that the current object is not equal to the expected value.
+ * If the object matches the expected value, an [ExpectationMismatchException] is thrown.
+ * Optionally allows specifying a cause of type [Throwable].
+ *
+ * @param expectation The value that the current object is compared against. If the two values are equal, an exception is thrown.
+ * @param causeOf An optional throwable that will have the generated [ExpectationMismatchException] set as its cause.
+ * @param cause An optional throwable to act as the direct cause of the generated [ExpectationMismatchException].
+ * @return The current object if it does not match the expected value.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw
+    if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke())
+    else causeOf().initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke()))
+    return this
+}
+/**
+ * Ensures that the current object is not equal to the specified expectation.
+ * Throws an `ExpectationMismatchException` if the expectation is met.
+ *
+ * @param expectation The value that this object is compared against.
+ * @param causeOf An optional throwable that serves as the primary cause of the failure. If null, a new exception will be created.
+ * @param cause An optional underlying throwable cause for the new exception.
+ * @param lazyMessage A supplier that provides a message for the exception if the expectation is met.
+ * @return The original object if it does not match the expectation.
+ * @throws ExpectationMismatchException If the current object equals the expectation.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
+    return this
+}
+/**
+ * Checks whether the current value is not equal to the provided `expectation`.
+ * If the values are equal, an `ExpectationMismatchException` is thrown.
+ *
+ * @param expectation The value that the current instance is not expected to be equal to.
+ * @param property An optional property representing the field or value involved in the check.
+ * @param variableName An optional name of the variable being evaluated for debugging or logging purposes.
+ * @param causeOf An optional `Throwable` to use as the primary cause for the exception, if thrown.
+ * @param cause An optional `Throwable` to attach as an additional cause for the exception, if thrown.
+ * @return The current value if it does not match the provided expectation.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()))
+    return this
+}
+/**
+ * Asserts that the current value does not match the specified expectation.
+ * If the expectation matches the current value, an `ExpectationMismatchException` is thrown.
+ *
+ * @param expectation The value that the current value should not match.
+ * @param property The primary property associated with the value being checked, or null if not applicable.
+ * @param variable An optional secondary property associated with the value being checked, or null if not applicable.
+ * @param causeOf An optional throwable to serve as the main exception cause, or null if not applicable.
+ * @param cause An additional throwable cause, or null if not applicable.
+ * @return The current value, if it does not match the expectation.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()))
+    return this
+}
+/**
+ * Ensures that the receiver value does not match the specified expectation. If the receiver value
+ * equals the expectation, an `ExpectationMismatchException` is thrown.
+ *
+ * @param expectation The value that the receiver should not match. Can be `null`.
+ * @param callable The Kotlin function that contains the parameter being validated. Can be `null` if the context
+ * of the callable is unavailable.
+ * @param parameterName The name of the parameter being validated in the callable. Can be `null` if the parameter name
+ * is unavailable.
+ * @param causeOf The primary cause to propagate if the mismatch exception is triggered. Can be `null`.
+ * @param cause The root cause of the failure, which can be chained to the thrown exception. Can be `null`.
+ * @return The receiver value if it does not match the expectation.
+ * @throws ExpectationMismatchException if the receiver value matches the expectation.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()))
+    return this
+}
+/**
+ * Compares the current value with a given expectation and throws an `ExpectationMismatchException`
+ * if they are equal. This method is typically used to ensure that certain expectations are not met.
+ *
+ * @param expectation the value that the current object is expected NOT to match
+ * @param callable the callable function associated with the expectation check, or null if not applicable
+ * @param parameter the parameter being checked within the callable function, or null if not applicable
+ * @param causeOf an optional pre-existing exception that caused this expectation to fail
+ * @param cause an optional cause to be used for the `ExpectationMismatchException`, if the expectation fails
+ * @return the current value if it does not match the expectation
+ * @throws ExpectationMismatchException if the current value equals the given expectation
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()))
+    return this
+}
+/**
+ * Ensures that the current value does not match the specified expectation. If the value matches
+ * the expectation, an [ExpectationMismatchException] is thrown.
+ *
+ * @param expectation the value that the current value is expected not to match
+ * @param callableName the name of the callable where this check occurs, or `null` if unavailable
+ * @param parameterName the name of the parameter being checked, or `null` if unavailable
+ * @param causeOf an optional existing throwable that this exception wraps or extends, or `null` if unavailable
+ * @param cause an optional throwable to be set as the cause of the exception if a mismatch occurs, or `null` if unavailable
+ * @return the original value if it does not match the expectation
+ * @throws ExpectationMismatchException if the current value matches the specified expectation
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()))
+    return this
+}
+/**
+ * Verifies that the current value is not equal to the provided expectation.
+ *
+ * If the current value matches the expectation, an `ExpectationMismatchException`
+ * is thrown. Optionally, a custom throwable can be provided as the cause.
+ *
+ * @param expectation The value that the current value should not match.
+ * @param callableName The name of the function or property being evaluated, or null if unknown.
+ * @param parameter The parameter being evaluated, or null if not applicable.
+ * @param causeOf An optional throwable representing the root cause to be used if the expectation is not met.
+ * @param cause An optional additional cause that provides context for the failure.
+ * @return The current value (receiver) if it does not match the expectation.
+ * @throws ExpectationMismatchException If the current value matches the expectation.
+ * @since 4.2.0
+ */
+@IgnorableReturnValue
+fun <T> T.expectNot(expectation: T, callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()))
     return this
 }
 
@@ -2449,11 +2842,11 @@ fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException("Variable was expected to be null, but was $this", cause) else causeOf.initCause(ExpectationMismatchException("Variable was expected to be null, but was $this", cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException("Variable was expected to be null, but was $this", cause?.invoke()) else causeOf().initCause(ExpectationMismatchException("Variable was expected to be null, but was $this", cause?.invoke()))
     return this
 }
 /**
@@ -2472,11 +2865,11 @@ fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null): T? 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.expectNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ExpectationMismatchException(lazyMessage().toString(), cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -2494,11 +2887,11 @@ fun <T> T?.expectNull(causeOf: Throwable? = null, cause: Throwable? = null, lazy
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variableName, null, this, cause) else causeOf.initCause(ExpectationMismatchException(property, variableName, null, this, cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variableName, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variableName, null, this, cause?.invoke()))
     return this
 }
 /**
@@ -2513,11 +2906,11 @@ fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, cau
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variable, null, this, cause) else causeOf.initCause(ExpectationMismatchException(property, variable, null, this, cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variable, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variable, null, this, cause?.invoke()))
     return this
 }
 /**
@@ -2536,11 +2929,11 @@ fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf:
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, null, this, cause) else causeOf.initCause(ExpectationMismatchException(callable, parameterName, null, this, cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameterName, null, this, cause?.invoke()))
     return this
 }
 /**
@@ -2555,11 +2948,11 @@ fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, ca
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, null, this, cause) else causeOf.initCause(ExpectationMismatchException(callable, parameter, null, this, cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameter, null, this, cause?.invoke()))
     return this
 }
 /**
@@ -2573,11 +2966,11 @@ fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, null, this, cause) else causeOf.initCause(ExpectationMismatchException(callableName, parameterName, null, this, cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName, null, this, cause?.invoke()))
     return this
 }
 /**
@@ -2596,11 +2989,11 @@ fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, caus
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T? {
+fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, null, this, cause) else causeOf.initCause(ExpectationMismatchException(callableName, parameter, null, this, cause))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameter, null, this, cause?.invoke()))
     return this
 }
 
@@ -2620,9 +3013,9 @@ fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Th
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(expectationClass, this::class, cause)
-    else causeOf.initCause(ClassMismatchException(expectationClass, this::class, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(expectationClass, this::class, cause?.invoke())
+    else causeOf().initCause(ClassMismatchException(expectationClass, this::class, cause?.invoke()))
     return this
 }
 /**
@@ -2638,8 +3031,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = n
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ClassMismatchException(lazyMessage().toString(), cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ClassMismatchException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -2655,8 +3048,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Throwable? = n
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variableName, expectationClass, cause) else causeOf.initCause(ClassMismatchException(property, variableName, expectationClass, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variableName, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(property, variableName, expectationClass, cause?.invoke()))
     return this
 }
 /**
@@ -2671,8 +3064,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variable, expectationClass, cause) else causeOf.initCause(ClassMismatchException(property, variable, expectationClass, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variable, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(property, variable, expectationClass, cause?.invoke()))
     return this
 }
 /**
@@ -2692,8 +3085,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameterName, expectationClass, cause) else causeOf.initCause(ClassMismatchException(callable, parameterName, expectationClass, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameterName, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callable, parameterName, expectationClass, cause?.invoke()))
     return this
 }
 /**
@@ -2712,8 +3105,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameter, expectationClass, cause) else causeOf.initCause(ClassMismatchException(callable, parameter, expectationClass, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameter, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callable, parameter, expectationClass, cause?.invoke()))
     return this
 }
 /**
@@ -2730,8 +3123,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause) else causeOf.initCause(ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause?.invoke()))
     return this
 }
 /**
@@ -2751,8 +3144,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameter, expectationClass, cause) else causeOf.initCause(ClassMismatchException(callableName, parameter, expectationClass, cause))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameter, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callableName, parameter, expectationClass, cause?.invoke()))
     return this
 }
 
@@ -2773,11 +3166,11 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, 
  * @since 3.2.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredProperty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredPropertyException("Property is required.", cause) else causeOf.initCause(RequiredPropertyException("Field is required.", cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException("Property is required.", cause?.invoke()) else causeOf().initCause(RequiredPropertyException("Field is required.", cause?.invoke()))
     return this
 }
 
@@ -2791,11 +3184,11 @@ fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null
  * @since 3.2.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.requiredProperty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredPropertyException(lazyMessage().toString(), cause) else causeOf.initCause(RequiredPropertyException(lazyMessage().toString(), cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(RequiredPropertyException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -2816,11 +3209,11 @@ fun <T> T?.requiredProperty(causeOf: Throwable? = null, cause: Throwable? = null
  * @since 3.2.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredProperty(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredProperty(property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredPropertyException(property, variableName, cause) else causeOf.initCause(RequiredPropertyException(property, variableName, cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException(property, variableName, cause?.invoke()) else causeOf().initCause(RequiredPropertyException(property, variableName, cause?.invoke()))
     return this
 }
 /**
@@ -2834,10 +3227,10 @@ fun <T> T?.requiredProperty(property: KProperty<*>?, variableName: String? = nul
  * @since 3.2.0
  */
 @IgnorableReturnValue
-fun <T> KProperty0<T>.requiredProperty(variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
+fun <T> KProperty0<T>.requiredProperty(variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null) = get().run {
     if (this == null) throw
-    if (causeOf == null) RequiredPropertyException(this@requiredProperty, variableName, cause)
-    else causeOf.initCause(RequiredPropertyException(this@requiredProperty, variableName, cause))
+    if (causeOf == null) RequiredPropertyException(this@requiredProperty, variableName, cause?.invoke())
+    else causeOf().initCause(RequiredPropertyException(this@requiredProperty, variableName, cause?.invoke()))
     this as T
 }
 /**
@@ -2856,11 +3249,11 @@ fun <T> KProperty0<T>.requiredProperty(variableName: String? = null, causeOf: Th
  * @since 3.2.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredProperty(property: KProperty<*>?, variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredProperty(property: KProperty<*>?, variable: KProperty<*>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredProperty != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredPropertyException(property, variable, cause) else causeOf.initCause(RequiredPropertyException(property, variable, cause))
+    if (this == null) throw if (causeOf == null) RequiredPropertyException(property, variable, cause?.invoke()) else causeOf().initCause(RequiredPropertyException(property, variable, cause?.invoke()))
     return this
 }
 /**
@@ -2874,10 +3267,10 @@ fun <T> T?.requiredProperty(property: KProperty<*>?, variable: KProperty<*>, cau
  * @since 3.2.0
  */
 @IgnorableReturnValue
-fun <T> KProperty0<T>.requiredProperty(variable: KProperty<*>, causeOf: Throwable? = null, cause: Throwable? = null) = get().run {
+fun <T> KProperty0<T>.requiredProperty(variable: KProperty<*>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null) = get().run {
     if (this == null) throw
-    if (causeOf == null) RequiredPropertyException(this@requiredProperty, variable, cause)
-    else causeOf.initCause(RequiredPropertyException(this@requiredProperty, variable, cause))
+    if (causeOf == null) RequiredPropertyException(this@requiredProperty, variable, cause?.invoke())
+    else causeOf().initCause(RequiredPropertyException(this@requiredProperty, variable, cause?.invoke()))
     this as T
 }
 /**
@@ -2892,11 +3285,11 @@ fun <T> KProperty0<T>.requiredProperty(variable: KProperty<*>, causeOf: Throwabl
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredParameter(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredParameterException("Parameter is required.", cause) else causeOf.initCause(RequiredParameterException("Parameter is required.", cause))
+    if (this == null) throw if (causeOf == null) RequiredParameterException("Parameter is required.", cause?.invoke()) else causeOf().initCause(RequiredParameterException("Parameter is required.", cause?.invoke()))
     return this
 }
 /**
@@ -2918,11 +3311,11 @@ fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = nul
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): T {
+fun <T> T?.requiredParameter(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
     contract {
         returns() implies (this@requiredParameter != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredParameterException(lazyMessage().toString(), cause) else causeOf.initCause(RequiredParameterException(lazyMessage().toString(), cause))
+    if (this == null) throw if (causeOf == null) RequiredParameterException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(RequiredParameterException(lazyMessage().toString(), cause?.invoke()))
     return this
 }
 /**
@@ -2938,11 +3331,11 @@ fun <T> T?.requiredParameter(causeOf: Throwable? = null, cause: Throwable? = nul
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredParameter(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredParameter(callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredParameterException(callable, parameterName, cause) else causeOf.initCause(RequiredParameterException(callable, parameterName, cause))
+    if (this == null) throw if (causeOf == null) RequiredParameterException(callable, parameterName, cause?.invoke()) else causeOf().initCause(RequiredParameterException(callable, parameterName, cause?.invoke()))
     return this
 }
 /**
@@ -2961,11 +3354,11 @@ fun <T> T?.requiredParameter(callable: KFunction<*>?, parameterName: String? = n
  * @throws RequiredParameterException if the parameter is null.
  */
 @IgnorableReturnValue
-fun <T> T?.requiredParameter(callable: KFunction<*>?, parameter: KParameter, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredParameter(callable: KFunction<*>?, parameter: KParameter, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredParameterException(callable, parameter, cause) else causeOf.initCause(RequiredParameterException(callable, parameter, cause))
+    if (this == null) throw if (causeOf == null) RequiredParameterException(callable, parameter, cause?.invoke()) else causeOf().initCause(RequiredParameterException(callable, parameter, cause?.invoke()))
     return this
 }
 /**
@@ -2981,11 +3374,11 @@ fun <T> T?.requiredParameter(callable: KFunction<*>?, parameter: KParameter, cau
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredParameter(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredParameter(callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredParameterException(callableName, parameterName, cause) else causeOf.initCause(RequiredParameterException(callableName, parameterName, cause))
+    if (this == null) throw if (causeOf == null) RequiredParameterException(callableName, parameterName, cause?.invoke()) else causeOf().initCause(RequiredParameterException(callableName, parameterName, cause?.invoke()))
     return this
 }
 /**
@@ -3004,12 +3397,43 @@ fun <T> T?.requiredParameter(callableName: String?, parameterName: String? = nul
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.requiredParameter(callableName: String?, parameter: KParameter, causeOf: Throwable? = null, cause: Throwable? = null): T {
+fun <T> T?.requiredParameter(callableName: String?, parameter: KParameter, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
     contract {
         returns() implies (this@requiredParameter != null)
     }
-    if (this == null) throw if (causeOf == null) RequiredParameterException(callableName, parameter, cause) else causeOf.initCause(RequiredParameterException(callableName, parameter, cause))
+    if (this == null) throw if (causeOf == null) RequiredParameterException(callableName, parameter, cause?.invoke()) else causeOf().initCause(RequiredParameterException(callableName, parameter, cause?.invoke()))
     return this
+}
+
+/**
+ * Throws an [IllegalArgumentException] if the [value] is `true`.
+ *
+ * @param value The condition to be checked. Throws an exception if this evaluates to `true`.
+ * @param lazyMessage A supplier for the error message to be used if the exception is thrown.
+ * @since 4.2.0
+ */
+inline fun requireNot(value: Boolean, lazyMessage: Supplier<Any>) {
+    contract {
+        returns() implies value
+    }
+    if (value) {
+        val message = lazyMessage()
+        throw IllegalArgumentException(message.toString())
+    }
+}
+/**
+ * Validates that the given condition is not true.
+ * If the condition is true, an IllegalArgumentException is thrown.
+ *
+ * @param value The condition to validate.
+ *              If true, an exception will be thrown.
+ * @since 4.2.0
+ */
+fun requireNot(value: Boolean) {
+    contract {
+        returns() implies value
+    }
+    if (value) throw IllegalArgumentException("Validation failed.")
 }
 
 /**
@@ -3102,6 +3526,37 @@ inline fun <T> requireNotNullOrThrow(value: T?, lazyException: ThrowableSupplier
 }
 
 /**
+ * Throws an [IllegalStateException] if the provided condition [value] is false.
+ *
+ * The exception message is generated using the [lazyMessage] supplier.
+ *
+ * @param value The condition to evaluate. If false, an exception is thrown.
+ * @param lazyMessage A supplier for generating the exception message when the condition is false.
+ * @since 4.2.0
+ */
+inline fun checkNot(value: Boolean, lazyMessage: Supplier<Any>) {
+    contract {
+        returns() implies value
+    }
+    if (value) {
+        val message = lazyMessage()
+        throw IllegalStateException(message.toString())
+    }
+}
+/**
+ * Ensures that the provided boolean value is true. If the value is false, an exception is thrown.
+ *
+ * @param value the boolean value to be checked; must be true to avoid triggering an exception
+ * @since 4.2.0
+ */
+fun checkNot(value: Boolean) {
+    contract {
+        returns() implies value
+    }
+    if (value) throw IllegalStateException("Validation failed.")
+}
+
+/**
  * Checks if the given value is null and throws an exception if it's not.
  *
  * This function uses a contract to inform the compiler about the nullability of the given value.
@@ -3164,6 +3619,37 @@ fun validate(value: Boolean) {
     }
     if (!value) throw ValidationFailedException("Validation failed.")
 }
+
+/**
+ * Validates that the provided boolean expression is false. If the expression evaluates to true,
+ * it throws a ValidationFailedException with a lazily-evaluated error message.
+ *
+ * @param value The boolean value to validate. If true, a ValidationFailedException will be thrown.
+ * @param lazyMessage A supplier to provide the error message only when the validation fails.
+ * @since 4.2.0
+ */
+inline fun validateNot(value: Boolean, lazyMessage: Supplier<Any>) {
+    contract {
+        returns() implies value
+    }
+    if (value) {
+        val message = lazyMessage()
+        throw ValidationFailedException(message.toString())
+    }
+}
+/**
+ * Validates that the given condition is false. If the condition is true, a ValidationFailedException is thrown.
+ *
+ * @param value The condition to validate. Throws an exception if this value is true.
+ * @since 4.2.0
+ */
+fun validateNot(value: Boolean) {
+    contract {
+        returns() implies value
+    }
+    if (value) throw ValidationFailedException("Validation failed.")
+}
+
 /**
  * Validates whether the provided value is null.
  * If the value is not null, a [ValidationFailedException] is thrown.
@@ -3364,7 +3850,6 @@ fun validateInputFormat(value: CharSequence, regex: Regex, type: KType) {
 fun <T> expect(value: T, expectation: T, lazyMessage: Supplier<Any>) {
     if (value != expectation) throw ExpectationMismatchException(lazyMessage().toString())
 }
-
 /**
  * Validates that the provided value matches the expected value. If the values do not match,
  * an `ExpectationMismatchException` is thrown.
@@ -3379,7 +3864,6 @@ fun <T> expect(value: T, expectation: T, lazyMessage: Supplier<Any>) {
 fun <T> expect(value: T, expectation: T) {
     if (value != expectation) throw ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but is $value.")
 }
-
 /**
  * Validates that the provided value matches the expected value. If the values do not match,
  * an `ExpectationMismatchException` is thrown with a detailed error message.
@@ -3396,7 +3880,6 @@ fun <T> expect(value: T, expectation: T) {
 fun <T> expect(value: T, expectation: T, property: KProperty<*>, variableName: String) {
     if (value != expectation) throw ExpectationMismatchException(property, variableName, expectation, value)
 }
-
 /**
  * Validates that a given value matches the expected value. If the values do not match,
  * an `ExpectationMismatchException` is thrown with a descriptive message.
@@ -3414,6 +3897,63 @@ fun <T> expect(value: T, expectation: T, property: KProperty<*>, variableName: S
  */
 fun <T> expect(value: T, expectation: T, callable: KFunction<*>, parameterName: String) {
     if (value != expectation) throw ExpectationMismatchException(callable, parameterName, expectation, value)
+}
+
+/**
+ * Throws an exception if the given `value` is equal to the `expectation`.
+ *
+ * @param T The type of the arguments `value` and `expectation`.
+ * @param value The actual value to be tested.
+ * @param expectation The value that `value` should not be equal to.
+ * @param lazyMessage A supplier function to provide a custom error message if the expectation is not met.
+ *                    This message will be used in the thrown exception.
+ * @throws ExpectationMismatchException if `value` is equal to `expectation`.
+ * @since 4.2.0
+ */
+fun <T> expectNot(value: T, expectation: T, lazyMessage: Supplier<Any>) {
+    if (value == expectation) throw ExpectationMismatchException(lazyMessage().toString())
+}
+/**
+ * Verifies that the given value does not match the expected value.
+ * Throws an `ExpectationMismatchException` if the value matches the expectation.
+ *
+ * @param T The type of the values being compared.
+ * @param value The actual value to be evaluated.
+ * @param expectation The value that the actual value is expected not to match.
+ * @throws ExpectationMismatchException If the provided value matches the expectation.
+ * @since 4.2.0
+ */
+fun <T> expectNot(value: T, expectation: T) {
+    if (value == expectation) throw ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but is $value.")
+}
+/**
+ * Validates that the given `value` is not equal to the specified `expectation`.
+ * If the validation fails, an `ExpectationMismatchException` is thrown with details about the mismatch.
+ *
+ * @param T the type of the values being compared
+ * @param value the actual value to validate
+ * @param expectation the value that the actual value should not match
+ * @param property the `KProperty` associated with the value, used for detailed exception reporting
+ * @param variableName the name of the variable being evaluated, used for detailed exception reporting
+ * @since 4.2.0
+ */
+fun <T> expectNot(value: T, expectation: T, property: KProperty<*>, variableName: String) {
+    if (value == expectation) throw ExpectationMismatchException(property, variableName, expectation, value)
+}
+/**
+ * Validates that the given value does not match the expected value for a specific parameter
+ * of a callable function. If the values match, an `ExpectationMismatchException` is thrown.
+ *
+ * @param T The type of the value being compared.
+ * @param value The actual value that is being checked.
+ * @param expectation The value that the actual value must not be equal to.
+ * @param callable The callable function associated with the parameter being validated.
+ * @param parameterName The name of the parameter being checked.
+ * @throws ExpectationMismatchException if the actual value matches the expected value.
+ * @since 4.2.0
+ */
+fun <T> expectNot(value: T, expectation: T, callable: KFunction<*>, parameterName: String) {
+    if (value == expectation) throw ExpectationMismatchException(callable, parameterName, expectation, value)
 }
 
 /**

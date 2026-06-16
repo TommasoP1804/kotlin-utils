@@ -100,7 +100,7 @@ data class Chunked<T>(
             dateFields: Set<String> = emptySet(),
             dateTimeFields: Set<String> = emptySet(),
             dateTimeWithZoneFields: Set<String> = emptySet(),
-            exceptionForInvalid: Transformer<String, Throwable>,
+            crossinline exceptionForInvalid: Transformer<String, Throwable>,
             separatorSymbol: Regex = Regex(":"),
             generalFilterSymbol: String = String.STAR
         ): Chunked<T> {
@@ -108,7 +108,7 @@ data class Chunked<T>(
                 "generateFromQuery",
                 "offset",
                 message = "Offset must be greater than or equal to 0",
-                causeOf = exceptionForInvalid("Offset must be greater than or equal to 0")
+                causeOf = { exceptionForInvalid("Offset must be greater than or equal to 0") }
             ) { it >= 0 }
 
             val limit = limit ?: -1
@@ -116,7 +116,7 @@ data class Chunked<T>(
                 "generateFromQuery",
                 "limit",
                 message = "Limit must be greater than 0 or equal to -1",
-                causeOf = exceptionForInvalid("Limit must be greater than 0 or equal to -1")
+                causeOf = { exceptionForInvalid("Limit must be greater than 0 or equal to -1") }
             ) { it > 0 || it == -1 }
 
             val generalFilterString = filter.find { (it / separatorSymbol).first() == generalFilterSymbol }
@@ -127,7 +127,7 @@ data class Chunked<T>(
                 val generalFilter = FilterOption.parse(generalFilterString).onlyElement()
                 generalFilter.operator.validate(
                     lazyMessage = { "General filter operator in ${((FilterOperator byCategory Category.String) + (FilterOperator byCategory Equality)).map(FilterOperator::operator)}" },
-                    causeOf = exceptionForInvalid("General filter operator is invalid")
+                    causeOf = { exceptionForInvalid("General filter operator is invalid") }
                 ) { it.category in arrayOf(String, Equality) }
 
                 val getCondition = { it: String -> generalFilter.operator.sql(
@@ -152,7 +152,7 @@ data class Chunked<T>(
                         callableName = callableName,
                         parameterName = "sorting",
                         message = "in $availFilteringFields",
-                        causeOf = exceptionForInvalid("The sorting field $sorting is not supported.")
+                        causeOf = { exceptionForInvalid("The sorting field $sorting is not supported.") }
                     )
                     if (it.value.isNotNull()) {
                         orFilters += it.operator.sql(
@@ -255,7 +255,7 @@ data class Chunked<T>(
             availGeneralFilteringFields: Set<String> = emptySet(),
             availFilteringFields: Set<String> = emptySet(),
             availSortingFields: Set<String> = emptySet(),
-            noinline exceptionForInvalid: Transformer<String, Throwable>,
+            crossinline exceptionForInvalid: Transformer<String, Throwable>,
             separatorSymbol: Regex = Regex(":"),
             generalFilterSymbol: String = String.STAR
         ): Chunked<T> {
@@ -263,7 +263,7 @@ data class Chunked<T>(
                 "generateFromCollection",
                 "offset",
                 message = "Offset must be greater than or equal to 0",
-                causeOf = exceptionForInvalid("Offset must be greater than or equal to 0")
+                causeOf = { exceptionForInvalid("Offset must be greater than or equal to 0") }
             ) { it >= 0 }
 
             val limit = limit ?: -1
@@ -271,7 +271,7 @@ data class Chunked<T>(
                 "generateFromCollection",
                 "limit",
                 message = "Limit must be greater than 0 or equal to -1",
-                causeOf = exceptionForInvalid("Limit must be greater than 0 or equal to -1")
+                causeOf = { exceptionForInvalid("Limit must be greater than 0 or equal to -1") }
             ) { it > 0 || it == -1 }
 
             var decomponedFilters = filter.map {
@@ -290,7 +290,6 @@ data class Chunked<T>(
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
                 for (sortOption in (-1)(sorting)) {
-                    println(sortOption)
                     val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.field }] ?: throw NoSuchPropertyException()
                     comparator = if (sortOption.direction == SortDirection.Descending)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
@@ -318,7 +317,6 @@ data class Chunked<T>(
                         decomponedFilters { it.field == property.name }.forEach {
                             it.field in availFilteringFields || throw exceptionForInvalid("Filtering field not supported")
                             if (!filter(property.call(element).toString(), it, exceptionForInvalid)) {
-                                println("check for ${it.field} failed")
                                 continue@element
                             }
                         }
@@ -342,7 +340,7 @@ data class Chunked<T>(
         }
 
         @InternalScope
-        fun filter(value: String, fliterOption: FilterOption, exceptionForInvalid: Transformer<String, Throwable>) = when (fliterOption.operator) {
+        inline fun filter(value: String, fliterOption: FilterOption, exceptionForInvalid: Transformer<String, Throwable>) = when (fliterOption.operator) {
             Equals -> value equalsIgnoreCase fliterOption.value.toString()
             NotEquals -> value notEqualsIgnoreCase fliterOption.value.toString()
             In -> tryOr({ false }) { value inIgnoreCase (fliterOption.value as Iterable<*>).joinToString() }

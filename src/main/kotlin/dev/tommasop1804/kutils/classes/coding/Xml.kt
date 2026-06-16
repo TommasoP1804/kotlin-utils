@@ -303,7 +303,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          * @since 3.9.0
          */
         fun String.isValidXml(): Boolean = try {
-            parseDocument(this)
+            val _ = parseDocument(this)
             true
         } catch (_: Exception) {
             false

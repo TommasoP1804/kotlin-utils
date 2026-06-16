@@ -357,11 +357,11 @@ operator fun <T> Boolean.invoke(onTrue: T? = null, onFalse: T? = null) = if (thi
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.requireTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@requireTrue
     }
-    if (!this) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: should be true", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: should be true", cause))
+    if (!this) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: should be true", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: should be true", cause?.invoke()))
     return true
 }
 /**
@@ -377,11 +377,11 @@ fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null): B
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.requireTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.requireTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@requireTrue
     }
-    if (!this) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
+    if (!this) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
     return true
 }
 /**
@@ -411,11 +411,11 @@ fun Boolean.requireTrueOrThrow(lazyException: ThrowableSupplier): Boolean {
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.requireFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@requireFalse
     }
-    if (this) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: should be false", cause) else causeOf.initCause(IllegalArgumentException("Invalid argument: should be false", cause))
+    if (this) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: should be false", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: should be false", cause?.invoke()))
     return false
 }
 /**
@@ -429,11 +429,11 @@ fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null): 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.requireFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.requireFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@requireFalse
     }
-    if (this) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalArgumentException(lazyMessage().toString(), cause))
+    if (this) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
     return false
 }
 /**
@@ -469,11 +469,11 @@ fun Boolean.requireFalseOrThrow(lazyException: ThrowableSupplier): Boolean {
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.checkTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@checkTrue
     }
-    if (!this) throw if (causeOf.isNull()) IllegalStateException("Invalid state: should be true", cause) else causeOf.initCause(IllegalStateException("Invalid state: should be true", cause))
+    if (!this) throw if (causeOf.isNull()) IllegalStateException("Invalid state: should be true", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid state: should be true", cause?.invoke()))
     return true
 }
 /**
@@ -487,11 +487,11 @@ fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boo
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.checkTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@checkTrue
     }
-    if (!this) throw if (causeOf.isNull()) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
+    if (!this) throw if (causeOf.isNull()) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
     return true
 }
 
@@ -507,11 +507,11 @@ fun Boolean.checkTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazy
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.checkFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@checkFalse
     }
-    if (this) throw if (causeOf.isNull()) IllegalStateException("Invalid state: should be false", cause) else causeOf.initCause(IllegalStateException("Invalid state: should be false", cause))
+    if (this) throw if (causeOf.isNull()) IllegalStateException("Invalid state: should be false", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid state: should be false", cause?.invoke()))
     return false
 }
 /**
@@ -525,11 +525,11 @@ fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null): Bo
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.checkFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@checkFalse
     }
-    if (this) throw if (causeOf.isNull()) IllegalStateException(lazyMessage().toString(), cause) else causeOf.initCause(IllegalStateException(lazyMessage().toString(), cause))
+    if (this) throw if (causeOf.isNull()) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
     return false
 }
 
@@ -545,11 +545,11 @@ fun Boolean.checkFalse(causeOf: Throwable? = null, cause: Throwable? = null, laz
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException("Value is not true.", cause) else causeOf.initCause(ValidationFailedException("Value is not true.", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException("Value is not true.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is not true.", cause?.invoke()))
     return true
 }
 /**
@@ -568,11 +568,11 @@ fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null): 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.validateTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
     return true
 }
 /**
@@ -589,11 +589,11 @@ fun Boolean.validateTrue(causeOf: Throwable? = null, cause: Throwable? = null, l
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not true", cause) else causeOf.initCause(ValidationFailedException(property, variableName, message ?: "is not true", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not true", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not true", cause?.invoke()))
     return true
 }
 /**
@@ -608,11 +608,11 @@ fun Boolean.validateTrue(property: KProperty<*>?, variableName: String? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not true", cause) else causeOf.initCause(ValidationFailedException(property, variable, message ?: "is not true", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not true", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not true", cause?.invoke()))
     return true
 }
 /**
@@ -628,11 +628,11 @@ fun Boolean.validateTrue(property: KProperty<*>?, variable: KProperty<*>?, messa
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not true", cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message ?: "is not true", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not true", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not true", cause?.invoke()))
     return true
 }
 /**
@@ -648,11 +648,11 @@ fun Boolean.validateTrue(callable: KFunction<*>?, parameterName: String? = null,
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not true", cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message ?: "is not true", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not true", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not true", cause?.invoke()))
     return true
 }
 /**
@@ -670,11 +670,11 @@ fun Boolean.validateTrue(callable: KFunction<*>?, parameter: KParameter? = null,
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not true", cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message ?: "is not true", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not true", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not true", cause?.invoke()))
     return true
 }
 /**
@@ -690,11 +690,11 @@ fun Boolean.validateTrue(callableName: String?, parameterName: String? = null, m
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateTrue(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateTrue(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@validateTrue
     }
-    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not true", cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message ?: "is not true", cause))
+    if (!this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not true", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not true", cause?.invoke()))
     return true
 }
 
@@ -710,11 +710,11 @@ fun Boolean.validateTrue(callableName: String?, parameter: KParameter? = null, m
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException("Value is not false.", cause) else causeOf.initCause(ValidationFailedException("Value is not false.", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException("Value is not false.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is not false.", cause?.invoke()))
     return false
 }
 /**
@@ -733,11 +733,11 @@ fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null):
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.validateFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause) else causeOf.initCause(ValidationFailedException(lazyMessage().toString(), cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
     return false
 }
 /**
@@ -758,11 +758,11 @@ fun Boolean.validateFalse(causeOf: Throwable? = null, cause: Throwable? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not false", cause) else causeOf.initCause(ValidationFailedException(property, variableName, message ?: "is not false", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not false", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not false", cause?.invoke()))
     return false
 }
 /**
@@ -778,11 +778,11 @@ fun Boolean.validateFalse(property: KProperty<*>?, variableName: String? = null,
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not false", cause) else causeOf.initCause(ValidationFailedException(property, variable, message ?: "is not false", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not false", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not false", cause?.invoke()))
     return false
 }
 /**
@@ -799,11 +799,11 @@ fun Boolean.validateFalse(property: KProperty<*>?, variable: KProperty<*>?, mess
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not false", cause) else causeOf.initCause(ValidationFailedException(callable, parameterName, message ?: "is not false", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not false", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not false", cause?.invoke()))
     return false
 }
 /**
@@ -818,11 +818,11 @@ fun Boolean.validateFalse(callable: KFunction<*>?, parameterName: String? = null
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not false", cause) else causeOf.initCause(ValidationFailedException(callable, parameter, message ?: "is not false", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not false", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not false", cause?.invoke()))
     return false
 }
 /**
@@ -838,11 +838,11 @@ fun Boolean.validateFalse(callable: KFunction<*>?, parameter: KParameter? = null
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not false", cause) else causeOf.initCause(ValidationFailedException(callableName, parameterName, message ?: "is not false", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not false", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not false", cause?.invoke()))
     return false
 }
 /**
@@ -859,11 +859,11 @@ fun Boolean.validateFalse(callableName: String?, parameterName: String? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.validateFalse(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.validateFalse(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@validateFalse
     }
-    if (this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not false", cause) else causeOf.initCause(ValidationFailedException(callableName, parameter, message ?: "is not false", cause))
+    if (this) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not false", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not false", cause?.invoke()))
     return false
 }
 
@@ -879,11 +879,11 @@ fun Boolean.validateFalse(callableName: String?, parameter: KParameter? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
-    if (!this) throw if (causeOf.isNull()) ExpectationMismatchException("Value was expected to be true, but was ${false}.", cause) else causeOf.initCause(ExpectationMismatchException("Value was expected to be true, but was ${false}.", cause))
+    if (!this) throw if (causeOf.isNull()) ExpectationMismatchException("Value was expected to be true, but was ${false}.", cause?.invoke()) else causeOf().initCause(ExpectationMismatchException("Value was expected to be true, but was ${false}.", cause?.invoke()))
     return true
 }
 /**
@@ -899,11 +899,11 @@ fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null): Bo
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.expectTrue(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies this@expectTrue
     }
-    if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ExpectationMismatchException(lazyMessage().toString(), cause))
+    if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
     return true
 }
 /**
@@ -925,18 +925,18 @@ fun Boolean.expectTrue(causeOf: Throwable? = null, cause: Throwable? = null, laz
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
     if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(property, variableName,
         expectation = true,
         value = false,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(property, variableName,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(property, variableName,
         expectation = true,
         value = false,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return true
 }
@@ -952,18 +952,18 @@ fun Boolean.expectTrue(property: KProperty<*>?, variableName: String? = null, ca
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
     if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(property, variable,
         expectation = true,
         value = false,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(property, variable,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(property, variable,
         expectation = true,
         value = false,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return true
 }
@@ -982,18 +982,18 @@ fun Boolean.expectTrue(property: KProperty<*>?, variable: KProperty<*>?, causeOf
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
     if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(callable, parameterName,
         expectation = true,
         value = false,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callable, parameterName,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callable, parameterName,
         expectation = true,
         value = false,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return true
 }
@@ -1012,18 +1012,18 @@ fun Boolean.expectTrue(callable: KFunction<*>?, parameterName: String? = null, c
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
     if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(callable, parameter,
         expectation = true,
         value = false,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callable, parameter,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callable, parameter,
         expectation = true,
         value = false,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return true
 }
@@ -1039,18 +1039,18 @@ fun Boolean.expectTrue(callable: KFunction<*>?, parameter: KParameter?, causeOf:
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
     if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(callableName, parameterName,
         expectation = true,
         value = false,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callableName, parameterName,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName,
         expectation = true,
         value = false,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return true
 }
@@ -1067,18 +1067,18 @@ fun Boolean.expectTrue(callableName: String?, parameterName: String? = null, cau
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectTrue(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectTrue(callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies this@expectTrue
     }
     if (!this) throw if (causeOf.isNull()) ExpectationMismatchException(callableName, parameter,
         expectation = true,
         value = false,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callableName, parameter,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callableName, parameter,
         expectation = true,
         value = false,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return true
 }
@@ -1095,11 +1095,11 @@ fun Boolean.expectTrue(callableName: String?, parameter: KParameter?, causeOf: T
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
-    if (this) throw if (causeOf.isNull()) ExpectationMismatchException("Value was expected to be false, but was ${true}.", cause) else causeOf.initCause(ExpectationMismatchException("Value was expected to be false, but was ${true}.", cause))
+    if (this) throw if (causeOf.isNull()) ExpectationMismatchException("Value was expected to be false, but was ${true}.", cause?.invoke()) else causeOf().initCause(ExpectationMismatchException("Value was expected to be false, but was ${true}.", cause?.invoke()))
     return false
 }
 /**
@@ -1116,11 +1116,11 @@ fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null): B
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null, lazyMessage: Supplier<Any>): Boolean {
+fun Boolean.expectFalse(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
-    if (this) throw if (causeOf.isNull()) ExpectationMismatchException(lazyMessage().toString(), cause) else causeOf.initCause(ExpectationMismatchException(lazyMessage().toString(), cause))
+    if (this) throw if (causeOf.isNull()) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
     return false
 }
 /**
@@ -1141,18 +1141,18 @@ fun Boolean.expectFalse(causeOf: Throwable? = null, cause: Throwable? = null, la
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(property: KProperty<*>?, variableName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
     if (this) throw if (causeOf.isNull()) ExpectationMismatchException(property, variableName,
         expectation = false,
         value = true,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(property, variableName,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(property, variableName,
         expectation = false,
         value = true,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return false
 }
@@ -1170,18 +1170,18 @@ fun Boolean.expectFalse(property: KProperty<*>?, variableName: String? = null, c
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
     if (this) throw if (causeOf.isNull()) ExpectationMismatchException(property, variable,
         expectation = false,
         value = true,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(property, variable,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(property, variable,
         expectation = false,
         value = true,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return false
 }
@@ -1197,18 +1197,18 @@ fun Boolean.expectFalse(property: KProperty<*>?, variable: KProperty<*>?, causeO
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(callable: KFunction<*>?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
     if (this) throw if (causeOf.isNull()) ExpectationMismatchException(callable, parameterName,
         expectation = false,
         value = true,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callable, parameterName,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callable, parameterName,
         expectation = false,
         value = true,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return false
 }
@@ -1228,18 +1228,18 @@ fun Boolean.expectFalse(callable: KFunction<*>?, parameterName: String? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(callable: KFunction<*>?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
     if (this) throw if (causeOf.isNull()) ExpectationMismatchException(callable, parameter,
         expectation = false,
         value = true,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callable, parameter,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callable, parameter,
         expectation = false,
         value = true,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return false
 }
@@ -1255,18 +1255,18 @@ fun Boolean.expectFalse(callable: KFunction<*>?, parameter: KParameter?, causeOf
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(callableName: String?, parameterName: String? = null, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
     if (this) throw if (causeOf.isNull()) ExpectationMismatchException(callableName, parameterName,
         expectation = false,
         value = true,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callableName, parameterName,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName,
         expectation = false,
         value = true,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return false
 }
@@ -1286,18 +1286,18 @@ fun Boolean.expectFalse(callableName: String?, parameterName: String? = null, ca
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun Boolean.expectFalse(callableName: String?, parameter: KParameter?, causeOf: Throwable? = null, cause: Throwable? = null): Boolean {
+fun Boolean.expectFalse(callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): Boolean {
     contract {
         returns() implies !this@expectFalse
     }
     if (this) throw if (causeOf.isNull()) ExpectationMismatchException(callableName, parameter,
         expectation = false,
         value = true,
-        cause = cause
-    ) else causeOf.initCause(ExpectationMismatchException(callableName, parameter,
+        cause = cause?.invoke()
+    ) else causeOf().initCause(ExpectationMismatchException(callableName, parameter,
         expectation = false,
         value = true,
-        cause = cause
+        cause = cause?.invoke()
     ))
     return false
 }

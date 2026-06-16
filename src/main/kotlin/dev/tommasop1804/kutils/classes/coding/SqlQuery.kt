@@ -47,7 +47,9 @@ import kotlin.text.endsWith
  * @author Tommaso Pastorelli
  * @since 1.0.0
  */
-@Suppress("unused", "SqlNoDataSourceInspection", "SqlSourceToSinkFlow", "UNCHECKED_CAST", "functionName")
+@Suppress("unused", "SqlNoDataSourceInspection", "SqlSourceToSinkFlow", "UNCHECKED_CAST", "functionName",
+    "RETURN_VALUE_NOT_USED_COERCION"
+)
 @JsonSerialize(using = SqlQuery.Companion.Serializer::class)
 @JsonDeserialize(using = SqlQuery.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = SqlQuery.Companion.OldSerializer::class)

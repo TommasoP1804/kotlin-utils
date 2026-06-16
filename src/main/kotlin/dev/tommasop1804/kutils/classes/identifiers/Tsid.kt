@@ -190,7 +190,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
      * @since 3.0.0
      */
     constructor(bytes: ByteArray) : this(with(bytes) {
-        expect(size == TSID_BYTES) { "TSID must be 8 bytes long" }
+        expect(size, TSID_BYTES) { "TSID must be 8 bytes long" }
         var _number = 0L
         _number = _number or ((bytes[0x0].toLong() and 0xffL) shl 56)
         _number = _number or ((bytes[0x1].toLong() and 0xffL) shl 48)
@@ -513,7 +513,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
                 y: Tsid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Tsid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Tsid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
@@ -710,7 +710,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
             var x = BigInt.ZERO
             val radix = BigInt.valueOf(base.toLong())
             val length = ceil(64 / (ln(base.toDouble()) / ln(2.0))).toInt()
-            expect(str.length == length) { String.format("Invalid base-%d length: %s", base, str.length) }
+            expect(str.length, length) { String.format("Invalid base-%d length: %s", base, str.length) }
             for (i in str.indices) {
                 val plus = str[i](ALPHABET).toLong()
                 validate(plus in 0..<base) { String.format("Invalid base-%d character: %s", base, str[i]) }
@@ -1204,6 +1204,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
              * @return [Builder]
              * @since 3.0.0
              */
+            @IgnorableReturnValue
             fun withRandom(random: Random?): Builder {
                 random?.let {
                     this.random = if (it is SecureRandom) {
@@ -1257,6 +1258,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
              * @return [Builder]
              * @since 3.0.0
              */
+            @IgnorableReturnValue
             fun withClock(clock: Clock): Builder {
                 this.clock = clock
                 return this

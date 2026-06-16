@@ -382,7 +382,7 @@ class BloomFilter<T> private constructor(
      * @since 3.5.0
      */
     operator fun plusAssign(element: T) {
-        put(element)
+        val _ = put(element)
     }
 
     /**

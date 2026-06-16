@@ -159,7 +159,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @param weekNumber the week number within the year
      * @since 1.0.0
      */
-    constructor(year: Year, weekNumber: Int) : this(of(year, weekNumber))
+    constructor(year: Year, weekNumber: Int) : this(_of(year, weekNumber))
 
     /**
      * Constructor initializes an instance using a specified year and week number.
@@ -168,7 +168,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @param weekNumber the week number of the year
      * @since 1.0.0
      */
-    constructor(year: Int, weekNumber: Int) : this(of(year, weekNumber))
+    constructor(year: Int, weekNumber: Int) : this(_of(year, weekNumber))
 
     /**
      * Constructs an instance using the specified year and month, and the given week number.
@@ -178,7 +178,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @param weekNumber the week number associated with the specified year and month
      * @since 1.0.0
      */
-    constructor(yearMonth: YearMonth, weekNumber: Int) : this(of(yearMonth, weekNumber))
+    constructor(yearMonth: YearMonth, weekNumber: Int) : this(_of(yearMonth, weekNumber))
 
     /**
      * Constructs an instance using the provided instant and time-zone.
@@ -260,9 +260,10 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
     private constructor(week: Week) : this(week.firstDay)
 
     init {
-        expect(firstDay.dayOfWeek == DayOfWeek.MONDAY) { "The first day of week must be a Monday" }
+        expect(firstDay.dayOfWeek, DayOfWeek.MONDAY) { "The first day of week must be a Monday" }
     }
 
+    @Suppress("FunctionName")
     companion object {
         /**
          * Creates a `Week` instance from the provided `Temporal` object.
@@ -289,7 +290,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          * @return the `Week` object representing the specified year and week number
          * @since 1.0.0
          */
-        private fun of(year: Year, weekNumber: Int): Week {
+        private fun _of(year: Year, weekNumber: Int): Week {
             val weekFields = WeekFields.ISO
             return Week(LocalDate.of(year.value, 1, 4)
                 .with(weekFields.weekOfWeekBasedYear(), weekNumber.toLong())
@@ -304,7 +305,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          * @return a new instance created using the provided year and week number.
          * @since 1.0.0
          */
-        private fun of(year: Int, weekNumber: Int) = of(year.toYear()(), weekNumber)
+        private fun _of(year: Int, weekNumber: Int) = _of(year.toYear()(), weekNumber)
         /**
          * Creates a `Week` object based on the provided `YearMonth` and week number.
          *
@@ -313,7 +314,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          * @return A `Week` object representing the specified week of the given year and month.
          * @since 1.0.0
          */
-        private fun of(yearMonth: YearMonth, weekNumber: Int): Week {
+        private fun _of(yearMonth: YearMonth, weekNumber: Int): Week {
             val weekFields = WeekFields.ISO
             return Week(LocalDate.of(yearMonth.year, yearMonth.month, 1)
                 .with(weekFields.weekOfMonth(), weekNumber.toLong())
@@ -398,7 +399,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          * @since 1.0.0
          */
         val Year.firstWeek: Week
-            get() = of(this, 1)
+            get() = _of(this, 1)
         /**
          * Returns the 52nd week of the current year represented by this `Year` instance.
          * This property provides convenient access to the last ISO-8601 week of the given year.
@@ -413,7 +414,7 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          * @since 1.0.0
          */
         val Year.lastWeek: Week
-            get() = of(this, 52)
+            get() = _of(this, 52)
 
         /**
          * Converts the current `LocalDateTime` instance to a `Week` object.

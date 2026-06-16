@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
+import dev.tommasop1804.kutils.classes.geography.Country.Companion.ofAlpha2
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
@@ -228,7 +229,7 @@ value class Iban private constructor(val value: String) : CharSequence {
                     .mod(97.toBigInt()).toInt()
                 ).toString()
         if (checkDigits.length == 1) checkDigits = "0$checkDigits"
-        checkDigits.expect(value[2..3]) { "Invalid check digits for IBAN" }
+        checkDigits.expect(value[2..3], lazyMessage = { "Invalid check digits for IBAN" })
 
         if (country == Italy) {
             Regex("^[A-Z]{2}[0-9]{2}[A-Z][0-9]{10}[0-9A-Z]{12}$")(value) || throw MalformedInputException("Invalid IBAN format for Italy")
@@ -315,7 +316,7 @@ value class Iban private constructor(val value: String) : CharSequence {
                 }
             }
             val result = ('A'..'Z').toList()[(odd.sum() + even.sum()).mod(26)]
-            result.expect(value[4]) { "Invalid Italian IBAN check digit" }
+            result.expect(value[4], lazyMessage = { "Invalid Italian IBAN check digit" })
         }
     }
 

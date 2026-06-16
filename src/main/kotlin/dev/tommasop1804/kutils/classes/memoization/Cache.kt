@@ -453,7 +453,7 @@ class TtlCache<K, V>(private val defaultTtl: Duration = Duration(minutes = 5)) :
      * @since 4.0.0
      */
     override operator fun set(key: K, value: V) {
-        put(key, value)
+        val _ = put(key, value)
     }
 
     /**
@@ -463,7 +463,7 @@ class TtlCache<K, V>(private val defaultTtl: Duration = Duration(minutes = 5)) :
      * @since 4.0.0
      */
     override operator fun plusAssign(keyAndValue: Pair<K, V>) {
-        put(keyAndValue.first, keyAndValue.second)
+        val _ = put(keyAndValue.first, keyAndValue.second)
     }
 
     /**
@@ -475,7 +475,7 @@ class TtlCache<K, V>(private val defaultTtl: Duration = Duration(minutes = 5)) :
      * @since 4.0.0
      */
     override operator fun minusAssign(key: K) {
-        remove(key)
+        val _ = remove(key)
     }
 
     /**

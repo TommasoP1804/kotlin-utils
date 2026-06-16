@@ -271,7 +271,7 @@ open class Rectangle(var topLeft: Point = Point(), width: Double = 0.0, height: 
      * @since 1.0.0
      */
     override operator fun contains(point: Point): Boolean {
-        point.z.expect(0.0, causeOf = GeometryException("Point z-coordinate must be zero."))
+        point.z.expect(0.0, causeOf = { GeometryException("Point z-coordinate must be zero.") })
 
         val x: Double = point.x
         val y: Double = point.y
