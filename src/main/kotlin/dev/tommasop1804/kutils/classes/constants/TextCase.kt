@@ -130,7 +130,7 @@ enum class TextCase(
                             sb.append(to.separator)
                             sb.append(c.lowercaseChar())
                         } else {
-                            sb.append(c)
+                            sb.append(if (from == PascalCase) c.lowercase() else c)
                         }
                     }
                     return sb.toString().convertCase(LowerCase, to)
