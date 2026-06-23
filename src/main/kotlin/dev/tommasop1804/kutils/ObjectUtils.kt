@@ -296,7 +296,7 @@ infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
  * @since 2.0.0
  */
 @IgnorableReturnValue
-inline fun <T> T.letWhen(predicate: Predicate<T>, block: Transformer<T, T>): T {
+inline fun <T> T.letWhen(predicate: Predicate<T>, block: MonoTransformer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -353,7 +353,7 @@ inline fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, blo
  * @since 2.0.0
  */
 @IgnorableReturnValue
-inline fun <T> T.letWhen(condition: Boolean, block: Transformer<T, T>): T {
+inline fun <T> T.letWhen(condition: Boolean, block: MonoTransformer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block
@@ -415,7 +415,7 @@ inline fun <T, R> T.letWhenOr(condition: Boolean, default: Supplier<R>, block: T
  * @since 2.0.0
  */
 @IgnorableReturnValue
-inline fun <T> T.letUnless(predicate: Predicate<T>, block: Transformer<T, T>): T {
+inline fun <T> T.letUnless(predicate: Predicate<T>, block: MonoTransformer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -474,7 +474,7 @@ inline fun <T, R> T.letUnlessOr(predicate: Predicate<T>, default: Supplier<R>, b
  * @since 2.0.0
  */
 @IgnorableReturnValue
-inline  fun <T, R> T.letUnless(condition: Boolean, block: Transformer<T, T>): T {
+inline  fun <T, R> T.letUnless(condition: Boolean, block: MonoTransformer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         !condition holdsIn block
@@ -4054,7 +4054,7 @@ fun <T> expectNull(value: T?, callable: KFunction<*>, parameterName: String) {
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.repeat(times: Int, transformer: Transformer<T, T>): T {
+fun <T> T.repeat(times: Int, transformer: MonoTransformer<T>): T {
     if (times <= 0) return this
 
     var result = this

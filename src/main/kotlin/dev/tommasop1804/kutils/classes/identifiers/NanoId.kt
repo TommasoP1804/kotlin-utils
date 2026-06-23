@@ -189,7 +189,7 @@ value class NanoId(private val value: String) : CharSequence, Serializable {
                 y: NanoId?
             ): Boolean = x == y
 
-            override fun hashCode(x: NanoId?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: NanoId?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,

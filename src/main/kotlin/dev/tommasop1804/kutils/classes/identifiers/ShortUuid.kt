@@ -230,7 +230,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
                 y: ShortUuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ShortUuid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: ShortUuid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
@@ -284,7 +284,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
                 y: ShortUuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: ShortUuid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: ShortUuid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
@@ -374,6 +374,5 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
      * @receiver The shortened UUID string to decode.
      * @since 3.0.0
      */
-    @OptIn(ExperimentalUuidApi::class)
     fun toKotlinUuid() = Uuid(decode(value.toCharArray())).toKotlinUuid()
 }

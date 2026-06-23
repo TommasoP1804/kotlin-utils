@@ -5,7 +5,6 @@
 package dev.tommasop1804.kutils.classes.translators
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.io.File

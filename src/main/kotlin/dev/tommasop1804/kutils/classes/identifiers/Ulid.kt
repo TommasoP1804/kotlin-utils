@@ -13,7 +13,6 @@ import dev.tommasop1804.kutils.Supplier
 import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.classes.identifiers.Ulid.Companion.generateHashUlid
-import dev.tommasop1804.kutils.classes.identifiers.Ulid.Factory.ByteRandom.Companion.newRandomFunction
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNull
@@ -211,7 +210,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * monotonicity for closely related timestamps. Default is `false`.
      * @since 3.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, monotonic: Boolean = false) : this(if (monotonic) generateMonotonic(instant.toEpochMilliseconds()) else generate(instant.toEpochMilliseconds()))
     /**
      * Constructs a ULID instance based on the provided timestamp and monotonicity flag.
@@ -237,7 +235,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param uuid The UUID from which the ULID will be constructed.
      * @since 3.0.0
      */
-    constructor(uuid: dev.tommasop1804.kutils.Uuid) : this(from(uuid))
+    constructor(uuid: Uuid) : this(from(uuid))
     /**
      * Constructs a ULID instance from the given byte array.
      *
@@ -285,7 +283,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param string A string input used to influence the hash generation of the ULID.
      * @since 3.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(time: kotlin.time.Instant, string: String) : this(generateHashUlid(time.toEpochMilliseconds(), string))
     /**
      * Constructs a new ULID instance using a specific timestamp and a hashed representation of a byte array.
@@ -312,7 +309,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @see generateHashUlid
      * @since 3.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(time: kotlin.time.Instant, bytes: ByteArray) : this(generateHashUlid(time.toEpochMilliseconds(), bytes))
     /**
      * Constructs a new ULID instance by deriving its components from the given ULID and time values.
@@ -353,7 +349,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param time The `Instant` used to set the timestamp.
      * @since 3.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(ulid: Ulid, time: kotlin.time.Instant) : this(time.toEpochMilliseconds(), ulid.randomComponent)
     /**
      * Constructs a new ULID using a ULID instance and optionally enforces monotonicity for sequential ULID generation.
@@ -913,7 +908,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 y: Ulid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Ulid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ulid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
@@ -968,7 +963,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 y: Ulid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Ulid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ulid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
@@ -1022,7 +1017,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 y: Ulid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Ulid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ulid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,

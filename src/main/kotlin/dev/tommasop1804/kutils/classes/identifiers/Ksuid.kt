@@ -9,12 +9,10 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.Supplier
-import dev.tommasop1804.kutils.classes.base.Base62
-import dev.tommasop1804.kutils.classes.numbers.Hex
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.base.*
+import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
-import dev.tommasop1804.kutils.validate
 import jakarta.persistence.AttributeConverter
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
@@ -167,7 +165,6 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @param instant the timestamp to use for generating the KSUID
      * @since 3.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant) : this(Generator.INSTANCE.newKsuid(instant.toJavaInstant()))
     /**
      * Constructs a new instance of the KSUID class using a newly generated KSUID string.
@@ -319,7 +316,7 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
                 y: Ksuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Ksuid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ksuid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
@@ -373,7 +370,7 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
                 y: Ksuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Ksuid?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: Ksuid?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,

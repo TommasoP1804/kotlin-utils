@@ -36,7 +36,6 @@ import java.util.regex.Pattern
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.reflect.KProperty
-import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 
 /**
@@ -2807,9 +2806,9 @@ val OffsetTime.isNoon get() = toLocalTime() == LocalTime.NOON
  * otherwise it evaluates to `false`.
  *
  * @return `true` if the offset is `ZoneOffset.UTC`, otherwise `false`.
- * @since 1.0.0
+ * @since 4.3.0
  */
-val OffsetDateTime.isUTC get() = offset == ZoneOffset.UTC
+val OffsetDateTime.isUtc get() = offset == ZoneOffset.UTC
 /**
  * Indicates whether the `ZonedDateTime` is in the UTC time zone.
  *
@@ -2817,9 +2816,9 @@ val OffsetDateTime.isUTC get() = offset == ZoneOffset.UTC
  * `ZonedDateTime` is equal to `ZoneOffset.UTC`. Otherwise, it returns `false`.
  *
  * @return `true` if the `ZonedDateTime` represents the UTC time zone; `false` otherwise.
- * @since 1.0.0
+ * @since 4.3.0
  */
-val ZonedDateTime.isUTC get() = offset == ZoneOffset.UTC
+val ZonedDateTime.isUtc get() = offset == ZoneOffset.UTC
 /**
  * Indicates whether the current `OffsetTime` instance is in the UTC time zone.
  *
@@ -2828,9 +2827,9 @@ val ZonedDateTime.isUTC get() = offset == ZoneOffset.UTC
  *
  * @receiver The `OffsetTime` instance to check for UTC offset.
  * @return `true` if the offset is `ZoneOffset.UTC`, `false` otherwise.
- * @since 1.0.0
+ * @since 4.3.0
  */
-val OffsetTime.isUTC get() = offset == ZoneOffset.UTC
+val OffsetTime.isUtc get() = offset == ZoneOffset.UTC
 /**
  * Indicates whether the `OffsetMonthDayTime` instance represents a time in the UTC time zone.
  *
@@ -2838,9 +2837,9 @@ val OffsetTime.isUTC get() = offset == ZoneOffset.UTC
  *
  * @receiver OffsetMonthDayTime instance whose offset is being checked.
  * @return `true` if the offset is `ZoneOffset.UTC`, otherwise `false`.
- * @since 1.0.0
+ * @since 4.3.0
  */
-val OffsetMonthDayTime.isUTC get() = offset == ZoneOffset.UTC
+val OffsetMonthDayTime.isUtc get() = offset == ZoneOffset.UTC
 /**
  * Indicates whether the current `ZonedMonthDayTime` instance is in the UTC timezone.
  *
@@ -2848,9 +2847,9 @@ val OffsetMonthDayTime.isUTC get() = offset == ZoneOffset.UTC
  * otherwise it returns `false`. It is used to determine if the time representation aligns with
  * Universal Coordinated Time (UTC).
  *
- * @since 1.0.0
+ * @since 4.3.0
  */
-val ZonedMonthDayTime.isUTC get() = offset == ZoneOffset.UTC
+val ZonedMonthDayTime.isUtc get() = offset == ZoneOffset.UTC
 /**
  * Retrieves the number of milliseconds since the epoch of 1970-01-01T00:00:00Z.
  * This property is a shorthand for converting the current `Instant`

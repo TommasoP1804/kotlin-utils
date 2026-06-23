@@ -325,7 +325,7 @@ typealias MultiMap<K, V> = Map<K, List<V>>
  * @see MutableMap
  * @see MutableList
  */
-typealias MultiMMap<K, V> = MutableMap<K, MutableList<V>>
+typealias MultiMMap<K, V> = MutableMap<K, MList<V>>
 
 /**
  * A typealias representing a map where each key maps to a set of values.
@@ -348,7 +348,7 @@ typealias SetMap<K, V> = Map<K, Set<V>>
  * @param V The type of elements in the mutable sets associated with the keys.
  * @since 3.0.0
  */
-typealias SetMMap<K, V> = MutableMap<K, MutableSet<V>>
+typealias SetMMap<K, V> = MutableMap<K, MSet<V>>
 
 /**
  * A type alias for a map where the keys are of type String, and the values are lists of Strings.
@@ -365,7 +365,7 @@ typealias MultiStringMap = Map<String, List<String>>
  *
  * @since 2.1.0
  */
-typealias MultiStringMMap = MutableMap<String, MutableList<String>>
+typealias MultiStringMMap = MutableMap<String, MList<String>>
 
 /**
  * A type alias for the generic `Map<K, V>` interface, allowing for more concise and readable code.
@@ -503,6 +503,14 @@ typealias TriConsumer<T1, T2, T3> = (T1, T2, T3) -> Unit
  */
 typealias ReceiverTriConsumer<T1, T2, T3> = T1.(T2, T3) -> Unit
 
+/**
+ * A type alias representing a function that takes a single input of type T
+ * and returns a transformed value of the same type T.
+ *
+ * @param T The type of the input and output of the transformer function.
+ * @since 4.3.0
+ */
+typealias MonoTransformer<T> = (T) -> T
 /**
  * Type alias representing a function that takes an input of type T and returns a result of type R.
  *

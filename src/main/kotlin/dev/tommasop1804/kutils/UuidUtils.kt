@@ -550,7 +550,7 @@ private object UuidGenerator {
      * @since 3.0.0
      */
     fun v8(type: UuidV8Type, timestamp: Long?, strings: Any2): Uuid = when (type) {
-        UuidV8Type.STRING -> {
+        UuidV8Type.String -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             sha1.update(strings.first.toString().toByteArray(Charsets.UTF_8))
             val hash = sha1.digest()
@@ -560,7 +560,7 @@ private object UuidGenerator {
 
             hash.toUuid()
         }
-        UuidV8Type.TS_STRING -> {
+        UuidV8Type.TimestampString -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             val hash = sha1.digest(strings.first.toString().toByteArray(Charsets.UTF_8))
 
@@ -576,7 +576,7 @@ private object UuidGenerator {
             val bb2 = ByteBuffer.wrap(uuidBytes)
             Uuid(bb2.long, bb2.long)
         }
-        UuidV8Type.STRING_RANDOM -> {
+        UuidV8Type.StringRandom -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             val hash = sha1.digest(strings.first.toString().toByteArray(Charsets.UTF_8))
 
@@ -595,7 +595,7 @@ private object UuidGenerator {
             val bb = ByteBuffer.wrap(bytes)
             Uuid(bb.long, bb.long)
         }
-        UuidV8Type.STRING_STRING -> {
+        UuidV8Type.StringString -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             sha1.update(strings.first.toString().toByteArray(Charsets.UTF_8))
             sha1.update(0.toByte()) // delimitatore per evitare ambiguità
@@ -610,7 +610,7 @@ private object UuidGenerator {
             val bb = ByteBuffer.wrap(bytes)
             Uuid(bb.long, bb.long)
         }
-        UuidV8Type.TS_STRING_STRING -> {
+        UuidV8Type.TimestampStringString -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             sha1.update(strings.first.toString().toByteArray(Charsets.UTF_8))
             sha1.update(0.toByte()) // delimitatore
@@ -632,7 +632,7 @@ private object UuidGenerator {
             val bb2 = ByteBuffer.wrap(bytes)
             Uuid(bb2.long, bb2.long)
         }
-        UuidV8Type.STRING_STRING_RANDOM -> {
+        UuidV8Type.StringStringRandom -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             sha1.update(strings.first.toString().toByteArray(Charsets.UTF_8))
             sha1.update(0.toByte())
@@ -681,10 +681,10 @@ private object UuidGenerator {
      * @return A UUID object created from the ByteArray.
      * @since 3.0.0
      */
-    private fun ByteArray.toUuid(): UUID {
+    private fun ByteArray.toUuid(): Uuid {
         val buffer = ByteBuffer.wrap(this)
         val mostSigBits = buffer.long
         val leastSigBits = buffer.long
-        return UUID(mostSigBits, leastSigBits)
+        return Uuid(mostSigBits, leastSigBits)
     }
 }

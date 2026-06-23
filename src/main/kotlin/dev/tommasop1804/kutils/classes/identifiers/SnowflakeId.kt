@@ -254,7 +254,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
                 y: SnowflakeId?
             ): Boolean = x == y
 
-            override fun hashCode(x: SnowflakeId?): Int = x?.hashCode() ?: 0
+            override fun hashCode(x: SnowflakeId?): Int = x.hashCode()
 
             override fun nullSafeGet(
                 rs: ResultSet?,
