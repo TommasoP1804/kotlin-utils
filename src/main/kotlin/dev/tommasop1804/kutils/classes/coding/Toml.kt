@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.dataformat.toml.TomlMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.Instant
 import dev.tommasop1804.kutils.annotations.*
@@ -332,7 +333,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      */
     inline fun <reified T> toObject() = runCatching {
         tryOr({ toJson().toObject<T>()() }) {
-            TOML_MAPPER.readValue(value, T::class.java)!!
+            TOML_MAPPER.readValue<T>(value)!!
         }
     }
 

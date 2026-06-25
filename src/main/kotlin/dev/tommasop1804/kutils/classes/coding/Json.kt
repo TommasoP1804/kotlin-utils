@@ -754,7 +754,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * successful, or an exception if an error occurs.
      * @since 3.0.0
      */
-    inline fun <reified T> toObject() = runCatching { MAPPER.readValue(value, T::class.java) as T }
+    inline fun <reified T> toObject() = runCatching { MAPPER.readValue<T>(value) as T }
 
     /**
      * Converts the content represented by the current instance into a typed array of the specified type [T].

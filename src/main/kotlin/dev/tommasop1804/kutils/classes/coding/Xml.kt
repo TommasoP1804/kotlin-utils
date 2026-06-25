@@ -30,6 +30,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import tools.jackson.dataformat.xml.XmlMapper
 import tools.jackson.dataformat.xml.XmlModule
 import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.readValue
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
@@ -649,7 +650,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @return a [Result] containing the deserialized object or an exception.
      * @since 3.9.0
      */
-    inline fun <reified T> toObject() = runCatching { MAPPER.readValue(value, T::class.java) as T }
+    inline fun <reified T> toObject() = runCatching { MAPPER.readValue<T>(value) as T }
 
     /**
      * Converts the XML content into a typed array of the specified type [T].
