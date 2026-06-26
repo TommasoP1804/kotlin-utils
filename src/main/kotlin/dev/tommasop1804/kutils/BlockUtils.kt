@@ -51,6 +51,59 @@ fun <T> compute(supplier: Supplier<T>): T {
 }
 
 /**
+ * Executes the specified action for each element within the given range.
+ * Allows breaking or continuing the loop using specific flow control methods.
+ *
+ * @param range the range of integers to iterate over
+ * @param action a lambda function that takes the current loop context and the current element as parameters
+ * @since 4.3.2
+ */
+inline fun <T> forIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, Int>) {
+    contract {
+        callsInPlace(action, InvocationKind.UNKNOWN)
+    }
+
+    with(LoopContext()) {
+        for (i in range) {
+            try {
+                action(i)
+            } catch (b: Break) {
+                return
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+}
+/**
+ * Executes the given action for each integer within the specified range while providing
+ * the ability to control the loop using a custom loop context.
+ *
+ * @param T The type of the receiver used in the action.
+ * @param range The range of integers to iterate through.
+ * @param action The lambda function to execute for each integer in the range. The function
+ *               receives a [LoopContext] instance and the current integer value as parameters.
+ * @since 4.3.2
+ */
+inline fun <T> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, Int>) {
+    contract {
+        callsInPlace(action, InvocationKind.UNKNOWN)
+    }
+
+    with(LoopContext()) {
+        for (i in range) {
+            try {
+                action(i)
+            } catch (b: Break) {
+                return
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+}
+
+/**
  * Repeatedly executes the given action until a `breakLoop()` is thrown.
  * The loop handles `breakLoop()` to exit execution and `continueLoop()` to skip
  * the current iteration without terminating the loop.
