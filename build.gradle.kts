@@ -7,10 +7,10 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "dev.tommasop1804"
-version = "4.3.2"
+version = "4.4.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260626T120950Z
+// Last update: Tommaso Pastorelli | 20260626T130620Z
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.4.0"
@@ -55,7 +55,7 @@ dependencies {
     implementation("io.hypersistence:hypersistence-tsid:2.1.4")
     implementation("org.locationtech.jts:jts-core:1.19.0")
     implementation("org.locationtech.jts.io:jts-io-common:1.19.0")
-    implementation("org.hibernate:hibernate-spatial:6.6.0.Final")
+    implementation("org.hibernate.orm:hibernate-spatial:7.4.2.Final")
     implementation("org.geolatte:geolatte-geom:1.9.1")
     implementation("org.locationtech.proj4j:proj4j:1.3.0")
     api("org.jetbrains.kotlin:kotlin-reflect")

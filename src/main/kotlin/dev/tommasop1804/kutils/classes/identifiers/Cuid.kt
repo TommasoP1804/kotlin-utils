@@ -13,12 +13,11 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.BigInt
 import dev.tommasop1804.kutils.Instant
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
+import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.get
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.toBigInt
 import jakarta.persistence.AttributeConverter
-import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
@@ -35,8 +34,6 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.time.Instant
 import kotlin.math.pow
 import kotlin.text.startsWith
@@ -501,26 +498,7 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
                 y: Cuid?
             ): Boolean = x == y
 
-            override fun hashCode(x: Cuid?): Int = x?.hashCode() ?: 0
-
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): Cuid? {
-                val value = rs?.getString(position) ?: return null
-                return Cuid(value, identifyVersion(value))
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: Cuid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                st?.setString(index, value?.value) ?: throw IllegalArgumentException("Statement cannot be null")
-            }
+            override fun hashCode(x: Cuid?): Int = x.hashCode()
 
             override fun deepCopy(value: Cuid?): Cuid? = value?.let { Cuid(it.value, it.version) }
 

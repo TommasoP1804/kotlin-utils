@@ -12,10 +12,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.BigInt
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.toUuid
 import jakarta.persistence.AttributeConverter
-import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
@@ -25,13 +23,10 @@ import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.ln
 import kotlin.repeat
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toKotlinUuid
 
 /**
@@ -232,25 +227,6 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
             override fun hashCode(x: ShortUuid?): Int = x.hashCode()
 
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): ShortUuid? {
-                val value = rs?.getString(position) ?: return null
-                return ShortUuid(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: ShortUuid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                st?.setString(index, value?.value)
-            }
-
             override fun deepCopy(value: ShortUuid?): ShortUuid? = value?.let { ShortUuid(it.value) }
 
             override fun isMutable(): Boolean = false
@@ -285,29 +261,6 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
             ): Boolean = x == y
 
             override fun hashCode(x: ShortUuid?): Int = x.hashCode()
-
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): ShortUuid? {
-                val value = rs?.getObject(position, UUID::class.java) ?: return null
-                return ShortUuid(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: ShortUuid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                if (value.isNull()) {
-                    st?.setNull(index, SqlTypes.UUID)
-                } else {
-                    st?.setObject(index, value.toUuid())
-                }
-            }
 
             override fun deepCopy(value: ShortUuid?): ShortUuid? = value?.let { ShortUuid(it.toUuid()) }
 

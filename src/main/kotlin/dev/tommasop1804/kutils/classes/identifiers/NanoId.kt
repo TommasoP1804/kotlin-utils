@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
-import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
@@ -23,8 +22,6 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
 import java.security.SecureRandom
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -190,25 +187,6 @@ value class NanoId(private val value: String) : CharSequence, Serializable {
             ): Boolean = x == y
 
             override fun hashCode(x: NanoId?): Int = x.hashCode()
-
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): NanoId? {
-                val value = rs?.getString(position) ?: return null
-                return NanoId(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: NanoId?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                st?.setString(index, value?.value) ?: throw IllegalArgumentException("Statement cannot be null")
-            }
 
             override fun deepCopy(value: NanoId?): NanoId? = value?.let { NanoId(it.value) }
 

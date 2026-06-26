@@ -321,7 +321,7 @@ inline fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T,
     return if (predicate(this)) block(this) else null
 }
 /**
- * Evaluates a predicate on the receiver object and, if it returns true, applies the transformation block with 
+ * Evaluates a predicate on the receiver object and, if it returns true, applies the transformation block with
  * the receiver object. Otherwise, returns the result of the provided default supplier.
  *
  * @param T the type of the receiver object
@@ -379,8 +379,8 @@ inline fun <T, R> T.letWhenOrNull(condition: Boolean, block: Transformer<T, R>):
     return if (condition) block(this) else null
 }
 /**
- * Executes a transformation block on the receiver when the provided condition is true, otherwise returns 
- * the result from the default supplier. Ensures the transformation block or the default supplier is invoked at most once 
+ * Executes a transformation block on the receiver when the provided condition is true, otherwise returns
+ * the result from the default supplier. Ensures the transformation block or the default supplier is invoked at most once
  * with the contracts provided.
  *
  * @param condition A boolean determining which operation to execute. If true, the block is invoked.
@@ -449,7 +449,7 @@ inline fun <T, R> T.letUnlessOrNull(predicate: Predicate<T>, block: Transformer<
  *                  If the predicate evaluates to true, the [default] is executed; otherwise, the [block] is executed.
  * @param default a supplier function that produces a fallback result when the [predicate] evaluates to true.
  * @param block a transformation function applied to the receiver object when the [predicate] evaluates to false.
- * @return the result of applying the [block] to the receiver object if the [predicate] evaluates to false, 
+ * @return the result of applying the [block] to the receiver object if the [predicate] evaluates to false,
  *         or the result of the [default] supplier if the [predicate] evaluates to true. Returns `null` if neither function is executed.
  * @since 2.0.0
  */
@@ -482,7 +482,7 @@ inline  fun <T, R> T.letUnless(condition: Boolean, block: MonoTransformer<T>): T
     return if (!condition) block(this) else this
 }
 /**
- * Executes the given [block] on the receiver if the [condition] is `false`. 
+ * Executes the given [block] on the receiver if the [condition] is `false`.
  * If the [condition] is `true`, the method returns `null`.
  *
  * @param T The type of the receiver on which the block is executed.
@@ -504,8 +504,8 @@ inline fun <T, R> T.letUnlessOrNull(condition: Boolean, block: Transformer<T, R>
     return if (!condition) block(this) else null
 }
 /**
- * Executes the given [block] if the [condition] is false. If the [condition] is true, it executes the [default] 
- * supplier instead. This function ensures that the [block] or [default] is invoked based on the specified condition. 
+ * Executes the given [block] if the [condition] is false. If the [condition] is true, it executes the [default]
+ * supplier instead. This function ensures that the [block] or [default] is invoked based on the specified condition.
  * Contracts are defined to ensure proper control flow and invocation constraints.
  *
  * @param T the type of the receiver parameter.
@@ -886,21 +886,21 @@ inline fun <T> tryOr(
 /**
  * Attempts to execute a given block of code and determines the resulting boolean outcome
  * based on the provided specific exception handling rules.
- * 
+ *
  * This method evaluates a block of code and handles exceptions with customizable behavior.
  * It provides mechanisms for defining specific cases, overwriting behavior, or excluding
  * specific exceptions from being handled.
- * 
+ *
  * @param specificCases A map defining specific exceptions and their associated transformations
- * to return boolean values. If an exception type from this map is encountered, the corresponding 
+ * to return boolean values. If an exception type from this map is encountered, the corresponding
  * transformer is applied. Default is an empty map.
- * @param overwriteOnly A set of exception types for which the handling behavior is restricted to overwriting. 
+ * @param overwriteOnly A set of exception types for which the handling behavior is restricted to overwriting.
  * Any exceptions not in this set will not be caught. Default is an empty set.
  * @param notOverwrite A set of exception types that are explicitly excluded from being handled.
  * If an exception in this set is encountered, it will be thrown. Default is an empty set.
  * @param block An action block of code to execute which potentially throws an exception.
- * @return True if the block executes successfully without exceptions or if an exception is handled 
- * as true based on the provided rules. False if an exception occurs and is handled as such. 
+ * @return True if the block executes successfully without exceptions or if an exception is handled
+ * as true based on the provided rules. False if an exception occurs and is handled as such.
  * Throws the exception if it does not meet any handling conditions.
  * @since 1.0.0
  */
@@ -935,18 +935,18 @@ inline fun tryTrueOrFalse(
 }
 /**
  * Executes a provided block of code and returns a Boolean value based on the success or failure of the execution.
- * The behavior on exceptions can be customized through parameters such as specific exception handling, 
+ * The behavior on exceptions can be customized through parameters such as specific exception handling,
  * overwriting, and exclusion rules.
  *
  * @param specificCases A map defining specific exception classes and their corresponding transformer functions
  * converting the exception to a Boolean value. These have the highest priority over other parameters.
- * @param overwriteOnly A specific exception class that, if thrown during execution of the block, indicates 
+ * @param overwriteOnly A specific exception class that, if thrown during execution of the block, indicates
  * whether the exception should be consumed or propagate.
- * @param notOverwrite A set of exception classes that should not be overwritten. Exceptions from this set are 
+ * @param notOverwrite A set of exception classes that should not be overwritten. Exceptions from this set are
  * rethrown even if other parameters are specified.
  * @param block An action representing the block of code to execute.
  * @return Boolean True if the block executes successfully or matches the rules to return true, false otherwise.
- * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` share conflicting exception 
+ * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` share conflicting exception
  * classes, or if `specificCases` and `notOverwrite` overlap.
  * @since 1.0.0
  */
@@ -985,21 +985,21 @@ inline fun <T> tryTrueOrFalse(
     block: Action
 ) = tryTrueOrFalse(specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 /**
- * Executes the provided block and captures any thrown exceptions. Returns a Boolean value based on 
+ * Executes the provided block and captures any thrown exceptions. Returns a Boolean value based on
  * specific handling rules configured via the parameters.
  *
  * @param specificCases a map associating specific exception types with transformers to handle them.
- *                      The transformer converts the exception into a Boolean. This map has the highest priority 
+ *                      The transformer converts the exception into a Boolean. This map has the highest priority
  *                      over `overwriteOnly` and `notOverwrite`.
- * @param overwriteOnly a set of exception types that should be explicitly caught and processed 
+ * @param overwriteOnly a set of exception types that should be explicitly caught and processed
  *                      as false unless `notOverwrite` indicates otherwise.
- * @param notOverwrite a single exception type that should not be processed, even if it is in 
+ * @param notOverwrite a single exception type that should not be processed, even if it is in
  *                     `specificCases` or `overwriteOnly`.
  * @param block an action representing the code block to be executed, which may throw an exception.
  *              If no exception occurs, the method returns true.
  * @return true if the block executed successfully, or a Boolean result based on the specific rules
  *         defined by the parameters if exceptions occur.
- * @throws ParametersInConflictException if there are contradictions in the configuration, such as overlapping 
+ * @throws ParametersInConflictException if there are contradictions in the configuration, such as overlapping
  *                                       rules between `overwriteOnly`, `notOverwrite`, and `specificCases`.
  * @since 1.0.0
  */

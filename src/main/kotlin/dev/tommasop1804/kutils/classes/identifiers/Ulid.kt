@@ -18,7 +18,6 @@ import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
-import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
@@ -32,8 +31,6 @@ import java.lang.Byte
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -49,14 +46,14 @@ import kotlin.IllegalStateException
 import kotlin.IndexOutOfBoundsException
 import kotlin.Int
 import kotlin.Long
-import kotlin.OptIn
+import kotlin.MustUseReturnValues
 import kotlin.Result
 import kotlin.String
 import kotlin.Suppress
 import kotlin.code
+import kotlin.hashCode
 import kotlin.let
 import kotlin.runCatching
-import kotlin.time.ExperimentalTime
 
 /**
  * Represents a Universally Unique Lexicographically Sortable Identifier (ULID).
@@ -910,25 +907,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
 
             override fun hashCode(x: Ulid?): Int = x.hashCode()
 
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): Ulid? {
-                val value = rs?.getString(position) ?: return null
-                return Ulid(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: Ulid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                st?.setString(index, value?.toString()) ?: throw IllegalArgumentException("Statement cannot be null")
-            }
-
             override fun deepCopy(value: Ulid?): Ulid? = value?.let { Ulid(it) }
 
             override fun isMutable(): Boolean = false
@@ -965,29 +943,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
 
             override fun hashCode(x: Ulid?): Int = x.hashCode()
 
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): Ulid? {
-                val bytes = rs?.getBytes(position) ?: return null
-                return Ulid(bytes = bytes)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: Ulid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                if (value.isNull()) {
-                    st?.setNull(index, SqlTypes.VARBINARY)
-                } else {
-                    st?.setBytes(index, value.toByteArray())
-                }
-            }
-
             override fun deepCopy(value: Ulid?): Ulid? = value
 
             override fun isMutable(): Boolean = false
@@ -1018,29 +973,6 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
             ): Boolean = x == y
 
             override fun hashCode(x: Ulid?): Int = x.hashCode()
-
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): Ulid? {
-                val value = rs?.getObject(position, UUID::class.java) ?: return null
-                return Ulid(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: Ulid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                if (value.isNull()) {
-                    st?.setNull(index, SqlTypes.UUID)
-                } else {
-                    st?.setObject(index, value.toUuid())
-                }
-            }
 
             override fun deepCopy(value: Ulid?): Ulid? = value?.let { Ulid(it.toUuid()) }
 

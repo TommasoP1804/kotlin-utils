@@ -256,25 +256,6 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
 
             override fun hashCode(x: SnowflakeId?): Int = x.hashCode()
 
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): SnowflakeId? {
-                val value = rs?.getLong(position)?.run { if (this == -1L) null else this } ?: return null
-                return SnowflakeId(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: SnowflakeId?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                st?.setLong(index, value?.value ?: -1) ?: throw IllegalArgumentException("Statement cannot be null")
-            }
-
             override fun deepCopy(value: SnowflakeId?): SnowflakeId? = value?.let { SnowflakeId(it.value) }
 
             override fun isMutable(): Boolean = false

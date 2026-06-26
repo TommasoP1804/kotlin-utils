@@ -515,25 +515,6 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
 
             override fun hashCode(x: Tsid?): Int = x.hashCode()
 
-            override fun nullSafeGet(
-                rs: ResultSet?,
-                position: Int,
-                session: SharedSessionContractImplementor?,
-                owner: Any?
-            ): Tsid? {
-                val value = rs?.getLong(position)?.run { if (this == -1L) null else this } ?: return null
-                return Tsid(value)
-            }
-
-            override fun nullSafeSet(
-                st: PreparedStatement?,
-                value: Tsid?,
-                index: Int,
-                session: SharedSessionContractImplementor?
-            ) {
-                st?.setLong(index, value?.number ?: -1) ?: throw IllegalArgumentException("Statement cannot be null")
-            }
-
             override fun deepCopy(value: Tsid?): Tsid? = value?.let { Tsid(it.number) }
 
             override fun isMutable(): Boolean = false

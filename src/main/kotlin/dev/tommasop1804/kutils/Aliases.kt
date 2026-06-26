@@ -20,6 +20,10 @@ import java.net.URI
 import java.net.URL
 import java.net.URLConnection
 import java.util.*
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KMutableProperty2
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -96,6 +100,22 @@ typealias MCollection<E> = MutableCollection<E>
  * @since 3.0.0
  */
 typealias MIterable<T> = MutableIterable<T>
+/**
+ * A typealias for `MutableIterator<T>`, which represents an iterator
+ * that allows both iterating over and removing elements from a collection.
+ *
+ * @param T the type of elements returned by the iterator.
+ * @since 4.4.0
+ */
+typealias MIterator<T> = MutableIterator<T>
+/**
+ * A typealias for MutableListIterator, providing a shorter, more concise way
+ * to reference a mutable list iterator for a specified type.
+ *
+ * @param T the type of elements the iterator will traverse.
+ * @since 4.4.0
+ */
+typealias MListIterator<T> = MutableListIterator<T>
 
 /**
  * A type alias for `Table<String, String, V>` where the row and column keys are both of type `String`.
@@ -397,6 +417,40 @@ typealias MapEntry<K, V> = Map.Entry<K, V>
 typealias MMapEntry<K, V> = MutableMap.MutableEntry<K, V>
 
 /**
+ * A typealias for `KMutableProperty<V>`, which represents a mutable property in Kotlin.
+ *
+ * @param V The type of the property value.
+ * @since 4.4.0
+ */
+typealias KMProperty<V> = KMutableProperty<V>
+/**
+ * A type alias for `KMutableProperty0`, representing a reference to a mutable property
+ * of type `V` in Kotlin. This alias simplifies the usage of `KMutableProperty0`.
+ *
+ * @param V The type of the mutable property's value.
+ * @since 4.4.0
+ */
+typealias KMProperty3<V> = KMutableProperty0<V>
+/**
+ * Type alias representing a mutable property reference of type [KMutableProperty1].
+ *
+ * @param T The type of the object that the property belongs to.
+ * @param V The type of the property value.
+ * @since 4.4.0
+ */
+typealias KMProperty1<T, V> = KMutableProperty1<T, V>
+/**
+ * A type alias for `KMutableProperty2`, representing a mutable property
+ * that is a member of a class or an extension and takes two receiver types.
+ *
+ * @param D The type of the first receiver (the class declaring the property or the first receiver in case of an extension property).
+ * @param E The type of the second receiver (the class or type for the extended property receiver).
+ * @param V The type of the property value.
+ * @since 4.4.0
+ */
+typealias KMProperty2<D, E, V> = KMutableProperty2<D, E, V>
+
+/**
  * A typealias representing a predicate function that takes a single parameter of type `T`
  * and returns a `Boolean` indicating whether the parameter satisfies a certain condition.
  *
@@ -407,6 +461,14 @@ typealias MMapEntry<K, V> = MutableMap.MutableEntry<K, V>
  */
 typealias Predicate<T> = (T) -> Boolean
 /**
+ * A type alias representing a predicate function that operates within a specific contextual scope.
+ *
+ * @param C The context type in which the function operates.
+ * @param T The type of the value that the predicate evaluates.
+ * @since 4.4.0
+ */
+typealias ContextPredicate<C, T> = context(C) (T) -> Boolean
+/**
  * A type alias representing an extension function type that acts as a predicate on the receiver object.
  * It takes a receiver of type [T] and returns a Boolean, indicating whether the receiver meets the specific condition.
  *
@@ -414,6 +476,14 @@ typealias Predicate<T> = (T) -> Boolean
  * @since 1.0.0
  */
 typealias ReceiverPredicate<T> = T.() -> Boolean
+/**
+ * A type alias representing a predicate function that operates within a specific context.
+ *
+ * @param C The type of the context required to invoke the predicate.
+ * @param T The type of the receiver on which the predicate is evaluated.
+ * @since 4.4.0
+ */
+typealias ContextReceiverPredicate<C, T> = context(C) T.() -> Boolean
 /**
  * A type alias for a function type that takes two parameters of types T1 and T2
  * and returns a Boolean result. Represents a predicate (boolean-valued function)
@@ -426,6 +496,18 @@ typealias ReceiverPredicate<T> = T.() -> Boolean
  */
 typealias BiPredicate<T1, T2> = (T1, T2) -> Boolean
 /**
+ * A typealias representing a function type that takes a contextual receiver of type [C],
+ * two parameters of types [T1] and [T2], and returns a Boolean result.
+ *
+ * This can be used to define binary predicates that operate within a given context [C].
+ *
+ * @param C The contextual receiver type providing additional functionality or scope in which the predicate operates.
+ * @param T1 The type of the first parameter of the predicate.
+ * @param T2 The type of the second parameter of the predicate.
+ * @since 4.4.0
+ */
+typealias ContextBiPredicate<C, T1, T2> = context(C) (T1, T2) -> Boolean
+/**
  * A typealias representing a predicate function that operates on a receiver of type `T1`
  * and takes an additional parameter of type `T2`. It returns a Boolean value based on the logic defined.
  *
@@ -436,6 +518,19 @@ typealias BiPredicate<T1, T2> = (T1, T2) -> Boolean
  * @since 1.0.0
  */
 typealias ReceiverBiPredicate<T1, T2> = T1.(T2) -> Boolean
+/**
+ * A type alias representing a context-sensitive bi-predicate function.
+ *
+ * @param C The contextual receiver, providing additional context or state for the function.
+ * @param T1 The type of the first receiver (the function is an extension of this type).
+ * @param T2 The type of the second parameter to the function.
+ *
+ * This type alias allows defining functions where the logic depends on both the contextual
+ * receiver `C` and an extension receiver of type `T1`. The function evaluates a condition
+ * with the provided parameter of type `T2` and returns a Boolean result.
+ * @since 4.4.0
+ */
+typealias ContextReceiverBiPredicate<C, T1, T2> = context(C) T1.(T2) -> Boolean
 
 /**
  * A type alias for a single-argument function that consumes a value of type [T]
@@ -447,6 +542,13 @@ typealias ReceiverBiPredicate<T1, T2> = T1.(T2) -> Boolean
  */
 typealias Consumer<T> = (T) -> Unit
 /**
+ * A type alias that defines a function type, which operates within a specific context.
+ *
+ * @param T The type of the context that this function operates in.
+ * @since 4.4.0
+ */
+typealias ContextConsumer<C, T> = context(C) (T) -> Unit
+/**
  * Type alias representing a function literal with receiver. This is a functional type where
  * the receiver object of type `T` is used as the function's receiver. Allows for invoking
  * the function with the context of the receiver object.
@@ -455,6 +557,16 @@ typealias Consumer<T> = (T) -> Unit
  * @since 1.0.0
  */
 typealias ReceiverConsumer<T> = T.() -> Unit
+/**
+ * A typealias representing a function type that takes a context receiver of type `C`
+ * and extends a receiver of type `T`. This allows defining functions that operate
+ * on the receiver `T` within the scope of a given context `C`.
+ *
+ * @param C The type of the context receiver.
+ * @param T The type of the receiver on which the function operates.
+ * @since 4.4.0
+ */
+typealias ContextReceiverConsumer<C, T> = context(C)  T.() -> Unit
 /**
  * A type alias for a lambda function that accepts two parameters of types T1 and T2, and returns no result.
  * This is a functional interface commonly used to represent a consumer operation that consumes
@@ -465,6 +577,15 @@ typealias ReceiverConsumer<T> = T.() -> Unit
  * @since 1.0.0
  */
 typealias BiConsumer<T1, T2> = (T1, T2) -> Unit
+/**
+ * A type alias for a bi-consumer function that operates within a specific context.
+ *
+ * @param C The context in which the function is executed.
+ * @param T1 The type of the first parameter consumed by the function.
+ * @param T2 The type of the second parameter consumed by the function.
+ * @since 4.4.0
+ */
+typealias ContextBiConsumer<C, T1, T2> = context(C) (T1, T2) -> Unit
 /**
  * A typealias representing a function type with a receiver. It allows invoking a function on a receiver object of type `T1`,
  * while also passing an additional parameter of type `T2`.
@@ -478,6 +599,18 @@ typealias BiConsumer<T1, T2> = (T1, T2) -> Unit
  */
 typealias ReceiverBiConsumer<T1, T2> = T1.(T2) -> Unit
 /**
+ * A typealias that represents a bi-consumer function with a context receiver.
+ *
+ * The `ContextReceiverBiConsumer` is a lambda function type that takes a context parameter of type `C`.
+ * The lambda is invoked on a receiver of type `T1` and accepts a single argument of type `T2`.
+ *
+ * @param C The type of the context required by the lambda.
+ * @param T1 The type of the receiver on which the lambda is invoked.
+ * @param T2 The type of the parameter accepted by the lambda function.
+ * @since 4.4.0
+ */
+typealias ContextReceiverBiConsumer<C, T1, T2> = context(C) T1.(T2) -> Unit
+/**
  * A typealias representing a function that takes three parameters of types T1, T2, and T3, and returns no value.
  *
  * Useful for passing a lambda or function reference that performs an operation using three input arguments
@@ -489,6 +622,16 @@ typealias ReceiverBiConsumer<T1, T2> = T1.(T2) -> Unit
  * @since 1.0.0
  */
 typealias TriConsumer<T1, T2, T3> = (T1, T2, T3) -> Unit
+/**
+ * A typealias representing a context-aware function that takes three parameters and returns no result.
+ *
+ * @param C The context in which this function operates.
+ * @param T1 The type of the first parameter.
+ * @param T2 The type of the second parameter.
+ * @param T3 The type of the third parameter.
+ * @since 4.4.0
+ */
+typealias ContextTriConsumer<C, T1, T2, T3> = context(C) (T1, T2, T3) -> Unit
 /**
  * A typealias defining a function type where the first parameter `T1` acts as the receiver,
  * and it takes two additional parameters of types `T2` and `T3`. The function does not return a value.
@@ -502,6 +645,18 @@ typealias TriConsumer<T1, T2, T3> = (T1, T2, T3) -> Unit
  * @since 1.0.0
  */
 typealias ReceiverTriConsumer<T1, T2, T3> = T1.(T2, T3) -> Unit
+/**
+ * A type alias representing a context receiver lambda function that operates within a specific context [C].
+ * This lambda is an extension function on a receiver of type [T1], taking two additional parameters [T2] and [T3],
+ * and returns no result (Unit).
+ *
+ * @param C The specific contextual type within which the function operates.
+ * @param T1 The type of the receiver on which the extension function is invoked.
+ * @param T2 The type of the first parameter passed to the function.
+ * @param T3 The type of the second parameter passed to the function.
+ * @since 4.4.0
+ */
+typealias ContextReceiverTriConsumer<C, T1, T2, T3> = context(C) T1.(T2, T3) -> Unit
 
 /**
  * A type alias representing a function that takes a single input of type T
@@ -511,6 +666,14 @@ typealias ReceiverTriConsumer<T1, T2, T3> = T1.(T2, T3) -> Unit
  * @since 4.3.0
  */
 typealias MonoTransformer<T> = (T) -> T
+/**
+ * A type alias representing a transformer function that operates within a specific context.
+ *
+ * @param C The contextual receiver's type, defining the context in which the function operates.
+ * @param T The type of the value being transformed.
+ * @since 4.4.0
+ */
+typealias ContextMonoTransformer<C, T> = context(C) (T) -> T
 /**
  * Type alias representing a function that takes an input of type T and returns a result of type R.
  *
@@ -523,6 +686,18 @@ typealias MonoTransformer<T> = (T) -> T
  */
 typealias Transformer<T, R> = (T) -> R
 /**
+ * Represents a type alias for a context-aware transformer function.
+ *
+ * This type alias defines a higher-order function that operates within a given context [C],
+ * transforming an input of type [T] into a result of type [R].
+ *
+ * @param C The type of the context in which the function operates.
+ * @param T The type of the input parameter that the function accepts.
+ * @param R The type of the result produced by the function.
+ * @since 4.4.0
+ */
+typealias ContextTransformer<C, T, R> = context(C) (T) -> R
+/**
  * A typealias that represents a function type where the receiver is of type [T]
  * and the function returns a value of type [R].
  *
@@ -533,6 +708,15 @@ typealias Transformer<T, R> = (T) -> R
  * @since 1.0.0
  */
 typealias ReceiverTransformer<T, R> = T.() -> R
+/**
+ * A type alias representing a function type with a context receiver.
+ *
+ * @param C The type of the context receiver.
+ * @param T The type of the receiver object on which the function is invoked.
+ * @param R The return type of the function.
+ * @since 4.4.0
+ */
+typealias ContextReceiverTransformer<C, T, R> = context(C) T.() -> R
 /**
  * Represents a function that accepts two arguments and produces a result.
  * This type alias is a shorthand for a function type with two input parameters of types T1 and T2,
@@ -546,6 +730,19 @@ typealias ReceiverTransformer<T, R> = T.() -> R
  */
 typealias BiTransformer<T1, T2, R> = (T1, T2) -> R
 /**
+ * A type alias representing a context-aware bi-transformer function.
+ *
+ * This function operates in the scope of a contextual receiver of type [C]
+ * and takes two input parameters of type [T1] and [T2], returning a result of type [R].
+ *
+ * @param C The contextual receiver that provides additional scope or functionality for the function.
+ * @param T1 The type of the first input parameter.
+ * @param T2 The type of the second input parameter.
+ * @param R The return type of the function.
+ * @since 4.4.0
+ */
+typealias ContextBiTransformer<C, T1, T2, R> = context(C) (T1, T2) -> R
+/**
  * A typealias representing a function type where the first parameter (receiver) is of type `T1`,
  * the second parameter is of type `T2`, and the return type is `R`.
  *
@@ -558,6 +755,20 @@ typealias BiTransformer<T1, T2, R> = (T1, T2) -> R
  */
 typealias ReceiverBiTransformer<T1, T2, R> = T1.(T2) -> R
 /**
+ * Represents a type alias for a function that operates within a given context receiver.
+ *
+ * This type alias defines a function that can be invoked on a receiver of type `T1`,
+ * takes an argument of type `T2`, and produces a result of type `R`, while also
+ * utilizing a context of type `C` provided by the `context` keyword.
+ *
+ * @param C The type of the contextual environment required by this function.
+ * @param T1 The type of the receiver on which the function is invoked.
+ * @param T2 The type of the parameter passed to the function.
+ * @param R The type of the result produced by the function.
+ * @since 4.4.0
+ */
+typealias ContextReceiverBiTransformer<C, T1, T2, R> = context(C) T1.(T2) -> R
+/**
  * A typealias representing a function that takes three parameters of types T1, T2, and T3
  * and returns a result of type R.
  *
@@ -568,6 +779,17 @@ typealias ReceiverBiTransformer<T1, T2, R> = T1.(T2) -> R
  * @since 1.0.0
  */
 typealias TriTransformer<T1, T2, T3, R> = (T1, T2, T3) -> R
+/**
+ * A typealias representing a higher-order function that operates within a specific context.
+ *
+ * @param C The type of the context required by the function.
+ * @param T1 The type of the first parameter of the function.
+ * @param T2 The type of the second parameter of the function.
+ * @param T3 The type of the third parameter of the function.
+ * @param R The return type of the function.
+ * @since 4.4.0
+ */
+typealias ContextTriTransformer<C, T1, T2, T3, R> = context(C) (T1, T2, T3) -> R
 /**
  * A typealias representing a function type with a receiver of type [T1] that accepts
  * two additional parameters of types [T2] and [T3], and returns a value of type [R].
@@ -582,6 +804,17 @@ typealias TriTransformer<T1, T2, T3, R> = (T1, T2, T3) -> R
  * @since 1.0.0
  */
 typealias ReceiverTriTransformer<T1, T2, T3, R> = T1.(T2, T3) -> R
+/**
+ * A type alias representing a contextual function type with three receivers.
+ *
+ * @param C The context in which the function operates.
+ * @param T1 The primary receiver type on which the function is invoked.
+ * @param T2 The type of the second parameter passed to the function.
+ * @param T3 The type of the third parameter passed to the function.
+ * @param R The return type of the function.
+ * @since 4.4.0
+ */
+typealias ContextReceiverTriTransformer<C, T1, T2, T3, R> = context(C) T1.(T2, T3) -> R
 
 /**
  * A type alias representing a supplier function that takes no arguments
@@ -594,6 +827,14 @@ typealias ReceiverTriTransformer<T1, T2, T3, R> = T1.(T2, T3) -> R
  */
 typealias Supplier<R> = () -> R
 /**
+ * A type alias that represents a supplier function using a contextual receiver.
+ *
+ * @param C The type of the context required by the supplier function.
+ * @param R The type of the result produced by the supplier function.
+ * @since 4.4.0
+ */
+typealias ContextSupplier<C, R> = context(C) () -> R
+/**
  * A typealias representing a supplier that provides a pair of values of types R1 and R2.
  * The supplier is implemented as a no-argument function that returns a Pair.
  *
@@ -602,6 +843,16 @@ typealias Supplier<R> = () -> R
  * @since 1.0.0
  */
 typealias BiSupplier<R1, R2> = () -> Pair<R1, R2>
+/**
+ * A type alias representing a function that operates within a context of type [C]
+ * and returns a pair of results of types [R1] and [R2].
+ *
+ * @param C The type of the context within which the function operates.
+ * @param R1 The type of the first result in the returned pair.
+ * @param R2 The type of the second result in the returned pair.
+ * @since 4.4.0
+ */
+typealias ContextBiSupplier<C, R1, R2> = context(C) () -> Pair<R1, R2>
 /**
  * Represents a functional type alias for a supplier that provides a triple of values
  * of types [R1], [R2], and [R3].
@@ -614,6 +865,17 @@ typealias BiSupplier<R1, R2> = () -> Pair<R1, R2>
  * @since 1.0.0
  */
 typealias TriSupplier<R1, R2, R3> = () -> Triple<R1, R2, R3>
+/**
+ * A typealias that defines a context-aware functional type taking no parameters
+ * and returning a [Triple] containing three result values of types [R1], [R2], and [R3].
+ * The function is executed within a specified context of type [C].
+ *
+ * @param C The context in which the function will be executed.
+ * @param R1 The type of the first value in the resulting [Triple].
+ * @param R2 The type of the second value in the resulting [Triple].
+ * @param R3 The type of the third value in the resulting [Triple].
+ */
+typealias ContextTriSupplier<C, R1, R2, R3> = context(C) () -> Triple<R1, R2, R3>
 
 /**
  * A type alias representing a supplier function that provides a Throwable instance.
@@ -649,6 +911,13 @@ typealias NullableThrowableSupplier = () -> Throwable?
  * @since 1.0.0
  */
 typealias Action = () -> Unit
+/**
+ * A type alias representing a function with a context receiver.
+ *
+ * @param C The type of the context required by the function.
+ * @since 4.4.0
+ */
+typealias ContextAction<C> = context(C) () -> Unit
 
 /**
  * Represents a type alias for a [Pair] consisting of two generic [Any] types.

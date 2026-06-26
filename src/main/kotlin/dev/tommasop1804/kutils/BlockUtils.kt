@@ -56,14 +56,14 @@ fun <T> compute(supplier: Supplier<T>): T {
  *
  * @param range the range of integers to iterate over
  * @param action a lambda function that takes the current loop context and the current element as parameters
- * @since 4.3.2
+ * @since 4.4.0
  */
-inline fun <T> forIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, Int>) {
+inline fun forIn(range: IntRange, action: ContextConsumer<LoopContext, Int>) {
     contract {
         callsInPlace(action, InvocationKind.UNKNOWN)
     }
 
-    with(LoopContext()) {
+    context(LoopContext()) {
         for (i in range) {
             try {
                 action(i)
@@ -76,25 +76,94 @@ inline fun <T> forIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, In
     }
 }
 /**
+ * Executes the specified action for each element within the range defined by the start and end values.
+ * Provides a loop context that can control the flow of the iteration.
+ *
+ * @param start the starting value (inclusive) of the range to iterate over
+ * @param end the ending value (inclusive) of the range to iterate over
+ * @param action a lambda function that receives the loop context and the current element as parameters
+ * @since 4.4.0
+ */
+inline fun forIn(start: Int, end: Int, action: ContextConsumer<LoopContext, Int>) =
+    forIn(start..end, action)
+/**
+ * Executes the specified action for each index from 0 (inclusive) to the given number of iterations (exclusive).
+ * The loop allows for control flow manipulation using the loop context.
+ *
+ * @param iterations the number of iterations to run the loop
+ * @param action a lambda function that takes the current loop context and the current index as parameters
+ * @since 4.4.0
+ */
+inline fun forIn(iterations: Int, action: ContextConsumer<LoopContext, Int>) =
+    forIn(0..<iterations, action)
+/**
+ * Executes the specified action for each element within the given range.
+ * Allows breaking or continuing the loop using specific flow control methods.
+ *
+ * @param range the range of integers to iterate over
+ * @param action a lambda function that takes the current loop context and the current element as parameters
+ * @since 4.4.0
+ */
+inline fun forInLong(range: LongRange, action: ContextConsumer<LoopContext, Long>) {
+    contract {
+        callsInPlace(action, InvocationKind.UNKNOWN)
+    }
+
+    context(LoopContext()) {
+        for (i in range) {
+            try {
+                action(i)
+            } catch (b: Break) {
+                return
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+}
+/**
+ * Iterates over the range of numbers defined by the `start` and `end` parameters.
+ * For each value within the range, the specified action is executed, providing the
+ * current loop context and the current value of the loop.
+ *
+ * @param start the starting value of the range (inclusive)
+ * @param end the ending value of the range (inclusive)
+ * @param action a lambda function that takes a `LoopContext` instance and the current value
+ *        of the iteration as parameters
+ * @since 4.4.0
+ */
+inline fun forInLong(start: Long, end: Long, action: ContextConsumer<LoopContext, Long>) =
+    forInLong(start..end, action)
+/**
+ * Executes the specified action for each iteration within the given range from 0 to the specified number of iterations.
+ * Provides a loop context to manage flow control such as breaking or continuing within the loop.
+ *
+ * @param iterations the number of iterations to execute the action
+ * @param action a lambda function that takes the current loop context and the current iteration index as parameters
+ * @since 4.4.0
+ */
+inline fun forInLong(iterations: Long, action: ContextConsumer<LoopContext, Long>) =
+    forInLong(0..<iterations, action)
+/**
  * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
  *
  * Executes the provided action for each value in the specified range within a receiver context.
  * Allows for custom control flow through exceptions such as `Break` and `Continue`.
  *
- * @param T The type of the receiver for the action.
  * @param R The type of result returned by the action in case of a `Break`.
  * @param range The integer range over which to iterate.
  * @param action A lambda function to be invoked on each iteration, providing the current loop index
  *               and the receiver context.
  * @return The result of the loop if a `Break` exception is thrown, or null if the loop completes normally.
+ * @since 4.4.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <T, R> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, Int>): R? {
+inline fun <R> rForIn(range: IntRange, action: ContextConsumer<LoopContext, Int>): R? {
     contract {
         callsInPlace(action, InvocationKind.UNKNOWN)
     }
 
-    with(LoopContext()) {
+    context(LoopContext()) {
         for (i in range) {
             try {
                 action(i)
@@ -107,6 +176,88 @@ inline fun <T, R> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext
     }
     return null
 }
+/**
+ * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Executes the specified action for each element within the range defined by the start and end values.
+ * Provides a loop context that can control the flow of the iteration.
+ *
+ * @param start the starting value (inclusive) of the range to iterate over
+ * @param end the ending value (inclusive) of the range to iterate over
+ * @param action a lambda function that receives the loop context and the current element as parameters
+ * @since 4.4.0
+ */
+inline fun <R> rForIn(start: Int, end: Int, action: ContextConsumer<LoopContext, Int>) =
+    rForIn<R>(start..end, action)
+/**
+ * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Executes the specified action for each index from 0 (inclusive) to the given number of iterations (exclusive).
+ * The loop allows for control flow manipulation using the loop context.
+ *
+ * @param iterations the number of iterations to run the loop
+ * @param action a lambda function that takes the current loop context and the current index as parameters
+ * @since 4.4.0
+ */
+inline fun <R> rForIn(iterations: Int, action: ContextConsumer<LoopContext, Int>) =
+    rForIn<R>(0..<iterations, action)
+/**
+ * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Executes the provided action for each value in the specified range within a receiver context.
+ * Allows for custom control flow through exceptions such as `Break` and `Continue`.
+ *
+ * @param R The type of result returned by the action in case of a `Break`.
+ * @param range The integer range over which to iterate.
+ * @param action A lambda function to be invoked on each iteration, providing the current loop index
+ *               and the receiver context.
+ * @return The result of the loop if a `Break` exception is thrown, or null if the loop completes normally.
+ * @since 4.4.0
+ */
+@Suppress("UNCHECKED_CAST")
+inline fun <R> rForInLong(range: LongRange, action: ContextConsumer<LoopContext, Long>): R? {
+    contract {
+        callsInPlace(action, InvocationKind.UNKNOWN)
+    }
+
+    context(LoopContext()) {
+        for (i in range) {
+            try {
+                action(i)
+            } catch (b: Break) {
+                return (b.result as? R)
+            } catch (c: Continue) {
+                continue
+            }
+        }
+    }
+    return null
+}
+/**
+ * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Executes the specified action for each element within the range defined by the start and end values.
+ * Provides a loop context that can control the flow of the iteration.
+ *
+ * @param start the starting value (inclusive) of the range to iterate over
+ * @param end the ending value (inclusive) of the range to iterate over
+ * @param action a lambda function that receives the loop context and the current element as parameters
+ * @since 4.4.0
+ */
+inline fun <R> rForInLong(start: Long, end: Long, action: ContextConsumer<LoopContext, Long>) =
+    rForInLong<R>(start..end, action)
+/**
+ * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
+ *
+ * Executes the specified action for each index from 0 (inclusive) to the given number of iterations (exclusive).
+ * The loop allows for control flow manipulation using the loop context.
+ *
+ * @param iterations the number of iterations to run the loop
+ * @param action a lambda function that takes the current loop context and the current index as parameters
+ * @since 4.4.0
+ */
+inline fun <R> rForInLong(iterations: Long, action: ContextConsumer<LoopContext, Long>) =
+    rForInLong<R>(0..<iterations, action)
 
 /**
  * Repeatedly executes the given action until a `breakLoop()` is thrown.
@@ -117,12 +268,12 @@ inline fun <T, R> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun loop(action: ReceiverConsumer<LoopContext>) {
+inline fun loop(action: ContextAction<LoopContext>) {
     contract {
         callsInPlace(action, InvocationKind.UNKNOWN)
     }
 
-    with(LoopContext()) {
+    context(LoopContext()) {
         while (true) {
             try {
                 action()
@@ -148,11 +299,11 @@ inline fun loop(action: ReceiverConsumer<LoopContext>) {
  * @since 1.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <R> rLoop(action: ReceiverConsumer<LoopContext>): R? {
+inline fun <R> rLoop(action: ContextAction<LoopContext>): R? {
     contract {
         callsInPlace(action, InvocationKind.UNKNOWN)
     }
-    with(LoopContext()) {
+    context(LoopContext()) {
         while (true) {
             try {
                 action()
