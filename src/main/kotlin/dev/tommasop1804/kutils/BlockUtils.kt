@@ -76,16 +76,20 @@ inline fun <T> forIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, In
     }
 }
 /**
- * Executes the given action for each integer within the specified range while providing
- * the ability to control the loop using a custom loop context.
+ * Stands for `forInWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
  *
- * @param T The type of the receiver used in the action.
- * @param range The range of integers to iterate through.
- * @param action The lambda function to execute for each integer in the range. The function
- *               receives a [LoopContext] instance and the current integer value as parameters.
- * @since 4.3.2
+ * Executes the provided action for each value in the specified range within a receiver context.
+ * Allows for custom control flow through exceptions such as `Break` and `Continue`.
+ *
+ * @param T The type of the receiver for the action.
+ * @param R The type of result returned by the action in case of a `Break`.
+ * @param range The integer range over which to iterate.
+ * @param action A lambda function to be invoked on each iteration, providing the current loop index
+ *               and the receiver context.
+ * @return The result of the loop if a `Break` exception is thrown, or null if the loop completes normally.
  */
-inline fun <T> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, Int>) {
+@Suppress("UNCHECKED_CAST")
+inline fun <T, R> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, Int>): R? {
     contract {
         callsInPlace(action, InvocationKind.UNKNOWN)
     }
@@ -95,12 +99,13 @@ inline fun <T> rForIn(range: IntRange, action: ReceiverBiConsumer<LoopContext, I
             try {
                 action(i)
             } catch (b: Break) {
-                return
+                return (b.result as? R)
             } catch (c: Continue) {
                 continue
             }
         }
     }
+    return null
 }
 
 /**
