@@ -272,6 +272,8 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
         const val ACCEPT_LANGUAGE = "Accept-Language"
         const val ACCEPT_PATCH = "Accept-Patch"
         const val ACCEPT_RANGES = "Accept-Ranges"
+        /** [RFC 10008 - The Accept-Query Header Field](https://datatracker.ietf.org/doc/html/rfc10008#name-the-accept-query-header-fie) */
+        const val ACCEPT_QUERY = "Accept-Query"
         const val HOST = "Host"
         const val REFERER = "Referer"
         const val ORIGIN = "Origin"

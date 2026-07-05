@@ -13,8 +13,8 @@ import dev.tommasop1804.kutils.*
  * request and response bodies, security, idempotence, caching, and usage within 
  * HTML modules. 
  * 
- * @property canHasRequestBody Indicates whether the HTTP method can include a request body.
- * @property canHasResponseBody Indicates whether the HTTP method can expect a response body.
+ * @property mayHaveRequestBody Indicates whether the HTTP method can include a request body.
+ * @property mayHaveResponseBody Indicates whether the HTTP method can expect a response body.
  * @property secure Indicates whether the HTTP method is considered secure for idempotent or safe operations.
  * @property idempotent Indicates whether the HTTP method guarantees the same result if called multiple times.
  * @property cacheable Specifies whether responses to the HTTP method are cacheable for subsequent requests.
@@ -26,8 +26,8 @@ import dev.tommasop1804.kutils.*
 @MustUseReturnValues
 enum class HttpMethod(
     val value: String,
-    val canHasRequestBody: Boolean = false,
-    val canHasResponseBody: Boolean = false,
+    val mayHaveRequestBody: Boolean = false,
+    val mayHaveResponseBody: Boolean = false,
     val secure: Boolean = false,
     val idempotent: Boolean = false,
     val cacheable: Boolean = false,
@@ -52,7 +52,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Delete("DELETE", canHasRequestBody = true, canHasResponseBody = true, idempotent = true),
+    Delete("DELETE", mayHaveRequestBody = true, mayHaveResponseBody = true, idempotent = true),
     /**
      * Represents the HTTP GET method.
      *
@@ -65,7 +65,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Get("GET", canHasResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHtmlModules = true),
+    Get("GET", mayHaveResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHtmlModules = true),
     /**
      * Represents the HTTP HEAD method.
      *
@@ -90,7 +90,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Options("OPTIONS", canHasRequestBody = true, canHasResponseBody = true, secure = true, idempotent = true),
+    Options("OPTIONS", mayHaveRequestBody = true, mayHaveResponseBody = true, secure = true, idempotent = true),
     /**
      * Represents the HTTP PATCH method used to apply partial modifications to a resource.
      *
@@ -104,7 +104,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Patch("PATCH", canHasRequestBody = true, canHasResponseBody = true, cacheable = true),
+    Patch("PATCH", mayHaveRequestBody = true, mayHaveResponseBody = true, cacheable = true),
     /**
      * Represents the HTTP POST method, which is primarily used to submit data to a server
      * for processing. Unlike the GET method, POST requests typically include a request body.
@@ -118,7 +118,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Post("POST", canHasRequestBody = true, canHasResponseBody = true, cacheable = true),
+    Post("POST", mayHaveRequestBody = true, mayHaveResponseBody = true, cacheable = true),
     /**
      * The HTTP PUT method.
      *
@@ -128,7 +128,17 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Put("PUT", canHasRequestBody = true, canHasResponseBody = true, idempotent = true),
+    Put("PUT", mayHaveRequestBody = true, mayHaveResponseBody = true, idempotent = true),
+    /**
+     * Represents the QUERY HTTP method and its associated properties.
+     *
+     * This method is commonly used to retrieve data without causing any side effects, such as modifying
+     * server state. The QUERY method is secure, idempotent, cacheable, and can include a request body
+     * if necessary. Additionally, it supports response bodies and can be used within HTML modules.
+     *
+     * @since 4.5.0
+     */
+    Query("QUERY", mayHaveRequestBody = true, mayHaveResponseBody = true, secure = true, idempotent = true, cacheable = true, canBeInHtmlModules = true),
     /**
      * Represents the TRACE HTTP method.
      *
@@ -143,7 +153,7 @@ enum class HttpMethod(
      *
      * @since 1.0.0
      */
-    Trace("TRACE", canHasResponseBody = true, secure = true, idempotent = true);
+    Trace("TRACE", mayHaveResponseBody = true, secure = true, idempotent = true);
 
     companion object {
         /**
@@ -167,7 +177,7 @@ enum class HttpMethod(
      *
      * @since 3.1.0
      */
-    operator fun component1() = canHasRequestBody
+    operator fun component1() = mayHaveRequestBody
     /**
      * Destructures the instance, providing the value of the `canHasResponseBody` property.
      *
@@ -177,7 +187,7 @@ enum class HttpMethod(
      * @return The value of the `canHasResponseBody` property.
      * @since 3.1.0
      */
-    operator fun component2() = canHasResponseBody
+    operator fun component2() = mayHaveResponseBody
     /**
      * Provides access to the `secure` property of the `HttpMethod` class
      * as a component within a destructuring declaration.

@@ -25,15 +25,15 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
- * Represents an option for sorting a collection or dataset by a specific field and order.
+ * Represents an option for sorting a collection or dataset by a specific property and order.
  *
- * The `SortOption` class encapsulates a field to sort by and an enumerated direction specifying
+ * The `SortOption` class encapsulates a property to sort by and an enumerated direction specifying
  * the sorting direction (ascending or descending). It is commonly used in data retrieval or
  * manipulation scenarios where sorting is required.
  *
  * This class is serializable but not deserializable.
  *
- * @param field The name of the field to sort by.
+ * @param property The name of the property to sort by.
  * @param direction The direction of sorting to apply. Defaults to [SortDirection.Ascending].
  *
  * @author Tommaso Pastorelli
@@ -44,24 +44,24 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = SortOption.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = SortOption.Companion.OldDeserializer::class)
 data class SortOption(
-    var field: String,
+    var property: String,
     var direction: SortDirection = SortDirection.Ascending
 ) {
     /**
-     * Constructs a SortOption instance based on the provided field and sorting direction.
+     * Constructs a SortOption instance based on the provided property and sorting direction.
      *
-     * The constructor processes the field property to compute a unique identifier by appending the
-     * simple name of the first parameter type (if available and non-null) to the field name. If
-     * the simple name is null, the field name is used directly without modification.
+     * The constructor processes the property to compute a unique identifier by appending the
+     * simple name of the first parameter type (if available and non-null) to the property name. If
+     * the simple name is null, the property name is used directly without modification.
      *
-     * @param field The property that defines what to sort. Must be of type [KProperty].
+     * @param property The property that defines what to sort. Must be of type [KProperty].
      * @param direction The direction in which the sorting is to be performed. Defaults to [SortDirection.Ascending].
      * @since 1.0.0
      */
-    constructor(field: KProperty<*>, direction: SortDirection = SortDirection.Ascending) : this(
-        field.run {
+    constructor(property: KProperty<*>, direction: SortDirection = SortDirection.Ascending) : this(
+        property.run {
             val type1 = (parameters.firstOrNull()?.type?.classifier as? KClass<*>)?.simpleName
-            if (type1.isNotNull()) "$type1$${field.name}" else name
+            if (type1.isNotNull()) "$type1$${property.name}" else name
         },
         direction
     )
@@ -70,11 +70,11 @@ data class SortOption(
      * Constructs a [SortOption] instance by parsing the provided string.
      *
      * This constructor utilizes the `parse` method to process the input string,
-     * extract the field name and sorting direction, and initialize the corresponding
+     * extract the property name and sorting direction, and initialize the corresponding
      * properties of the `SortOption` instance.
      *
-     * @param stringToParse The string to be parsed. It should follow the format "field:operator",
-     * where `field` represents the field name and `operator` specifies the sorting direction.
+     * @param stringToParse The string to be parsed. It should follow the format "property:operator",
+     * where `property` represents the property name and `operator` specifies the sorting direction.
      * @since 1.0.0
      */
     constructor(stringToParse: String) : this(parse(stringToParse).onlyElement())
@@ -83,27 +83,27 @@ data class SortOption(
      * Private constructor for creating a SortOption instance using another SortOption.
      *
      * This constructor allows the creation of a new SortOption instance by
-     * copying the field and direction properties of an existing SortOption.
+     * copying the property and direction properties of an existing SortOption.
      *
-     * @param sortOption The instance of SortOption from which the field and
+     * @param sortOption The instance of SortOption from which the property and
      * direction are copied.
      * @since 1.0.0
      */
-    private constructor(sortOption: SortOption) : this(sortOption.field, sortOption.direction)
+    private constructor(sortOption: SortOption) : this(sortOption.property, sortOption.direction)
 
     companion object {
         /**
          * Parses a variable number of string inputs and maps them to a list of SortOption instances.
          *
          * Each string input is split into two parts using a delimiter and trimmed.
-         * The first part is used as the field name, and the second part is used to determine the sorting direction.
+         * The first part is used as the property name, and the second part is used to determine the sorting direction.
          * If the operator in the second part is invalid, an IllegalArgumentException is thrown.
          *
-         * @param strings A variable number of string inputs, each representing a field and sorting operator separated by a separator.
+         * @param strings A variable number of string inputs, each representing a property and sorting operator separated by a separator.
          * @param separatorSymbol The regular expression pattern used to split the input strings. Defaults to a colon (:).
          * @return A list of SortOption instances created based on the input strings.
          * @throws IllegalArgumentException if an invalid operator is encountered in the input strings.
-         * @throws MalformedInputException If the input string contains an invalid field name.
+         * @throws MalformedInputException If the input string contains an invalid property name.
          * @since 1.0.0
          */
         fun parse(vararg strings: String, separatorSymbol: Regex = Regex(":")) = strings.map {
@@ -118,14 +118,14 @@ data class SortOption(
          * Parses a variable number of string inputs and maps them to a list of SortOption instances.
          *
          * Each string input is split into two parts using a separator delimiter and trimmed.
-         * The first part is used as the field name, and the second part is used to determine the sorting direction.
+         * The first part is used as the property name, and the second part is used to determine the sorting direction.
          * If the operator in the second part is invalid, an IllegalArgumentException is thrown.
          *
-         * @param strings A variable number of string inputs, each representing a field and sorting operator separated by a separator.
+         * @param strings A variable number of string inputs, each representing a property and sorting operator separated by a separator.
          * @param separatorSymbol The regular expression pattern used to split the input strings. Defaults to a colon (:).
          * @return A list of SortOption instances created based on the input strings.
          * @throws IllegalArgumentException if an invalid operator is encountered in the input strings.
-         * @throws MalformedInputException If the input string contains an invalid field name.
+         * @throws MalformedInputException If the input string contains an invalid property name.
          * @since 1.0.0
          */
         fun parse(strings: Iterable<String>, separatorSymbol: Regex = Regex(":")) = parse(*strings.toList().toTypedArray(), separatorSymbol = separatorSymbol)
@@ -137,8 +137,8 @@ data class SortOption(
                 ctxt: SerializationContext
             ) {
                 gen.writeStartObject()
-                gen.writeStringProperty("field", value.field)
-                gen.writeStringProperty("direction", value.direction.symbol.toString())
+                gen.writeStringProperty("property", value.property)
+                gen.writeStringProperty("direction", value.direction.preferred)
                 gen.writeEndObject()
             }
         }
@@ -147,8 +147,8 @@ data class SortOption(
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): SortOption {
                 val node = p.objectReadContext().readTree<JsonNode>(p)
                 return SortOption(
-                    node.get("field").asString(),
-                    SortDirection.ofSymbol(node.get("direction").asString().first())!!
+                    node.get("property").asString(),
+                    SortDirection.ofOperator(node.get("direction").asString())!!
                 )
             }
         }
@@ -156,8 +156,8 @@ data class SortOption(
         class OldSerializer : JsonSerializer<SortOption>() {
             override fun serialize(value: SortOption, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
-                gen.writeStringField("field", value.field)
-                gen.writeStringField("direction", value.direction.symbol.toString())
+                gen.writeStringField("property", value.property)
+                gen.writeStringField("direction", value.direction.preferred)
                 gen.writeEndObject()
             }
         }
@@ -166,8 +166,8 @@ data class SortOption(
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): SortOption {
                 val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
                 return SortOption(
-                    node.get("field").asText(),
-                    SortDirection.ofSymbol(node.get("direction").asText().first())!!
+                    node.get("property").asText(),
+                    SortDirection.ofOperator(node.get("direction").asText())!!
                 )
             }
         }
@@ -176,7 +176,7 @@ data class SortOption(
     /**
      * Provides the ability to retrieve the value of a property using the reflection-based mapping of property names to their values.
      *
-     * - `field` - TYPE: [KProperty]
+     * - `property` - TYPE: [KProperty]
      * - `type` - TYPE: [SortDirection]
      *
      * @param R The expected return type of the property value.
@@ -191,10 +191,10 @@ data class SortOption(
     /**
      * Returns a string representation of the SortOption instance.
      *
-     * The returned string includes the field name and the sorting type.
+     * The returned string includes the property name and the sorting type.
      *
-     * @return A string representation of the SortOption in the format "SortOption(field=<field_name>, type=<sorting_type>)".
+     * @return A string representation of the SortOption in the format "SortOption(property=<property_name>, type=<sorting_type>)".
      * @since 1.0.0
      */
-    override fun toString(): String = "SortOption(field=$field, direction=$direction)"
+    override fun toString(): String = "SortOption(property=$property, direction=$direction)"
 }

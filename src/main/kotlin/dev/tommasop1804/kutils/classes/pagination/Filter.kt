@@ -24,7 +24,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
- * Represents a filter option used for querying or filtering data based on a specific field,
+ * Represents a filter option used for querying or filtering data based on a specific property,
  * operator, and value. The class supports custom operators and allows dynamic evaluation
  * of property values using Kotlin reflection.
  *
@@ -40,20 +40,20 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = FilterOption.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = FilterOption.Companion.OldDeserializer::class)
 data class FilterOption(
-    var field: String? = null,
+    var property: String? = null,
     var operator: FilterOperator = FilterOperator.Equals,
     var value: Any?
 ) {
     /**
-     * Secondary constructor for initializing a filter object with a specific field, operator, and value.
+     * Secondary constructor for initializing a filter object with a specific property, operator, and value.
      *
-     * @param field The property on which the filter is based. It determines the field to be filtered.
+     * @param property The property on which the filter is based. It determines the property to be filtered.
      * @param operator The filter operator used for comparison. Defaults to `FilterOperator.EQUALS`.
      * @param value The value specified for the filtering condition.
      * @since 1.0.0
      */
-    constructor(field: KProperty<*>, operator: FilterOperator = FilterOperator.Equals, value: Any?) : this(
-        field.run {
+    constructor(property: KProperty<*>, operator: FilterOperator = FilterOperator.Equals, value: Any?) : this(
+        property.run {
             val type1 = ownerClass?.simpleName
             if (type1.isNotNull()) $$"$$type1$$${name}" else name
         },
@@ -66,42 +66,42 @@ data class FilterOption(
      * `FilterOperator` enum value. If the specified operator is invalid or cannot be resolved, an
      * `IllegalArgumentException` is thrown.
      *
-     * - `field`: Represents the field name on which filtering is applied. Default is `null`.
+     * - `property`: Represents the property name on which filtering is applied. Default is `null`.
      * - `operator`: Defines the filtering operation as a string. Defaults to `"eq"`.
      * - `value`: The value to filter against.
      *
      * Delegates to another primary constructor of `FilterOption` after resolving the operator.
      *
-     * @param field The name of the field on which the filter is applied. Can be `null`.
+     * @param property The name of the property on which the filter is applied. Can be `null`.
      * @param operator The operator for filtering, represented as a string. Defaults to `"eq"`.
-     * @param value The value against which the field is filtered.
+     * @param value The value against which the property is filtered.
      * @throws IllegalArgumentException If the provided operator string cannot be resolved to a `FilterOperator`.
      * @since 1.0.0
      */
-    constructor(field: String? = null, operator: String = "eq", value: Any?) : this(
-        field,
+    constructor(property: String? = null, operator: String = FilterOperator.Equals.operator, value: Any?) : this(
+        property,
         FilterOperator.ofOperator(operator) ?: throw IllegalArgumentException("Invalid operator"),
         value
     )
 
     /**
-     * Constructs a `FilterOption` instance from a field, operator string, and value.
+     * Constructs a `FilterOption` instance from a property, operator string, and value.
      *
-     * This constructor allows creating a `FilterOption` object by specifying a field, a string
+     * This constructor allows creating a `FilterOption` object by specifying a property, a string
      * representation of an operator, and a value. The operator string is converted into its corresponding
      * `FilterOperator` enum value. If the provided operator string does not match any predefined operator,
      * an `IllegalArgumentException` is thrown.
      *
-     * @param field The property reference (field) to which the filter should apply.
+     * @param property The property reference to which the filter should apply.
      * @param operator The string representation of the operator, defaulting to "eq" (equals).
      * @param value The value against which the filter is applied. Can be of any type.
      * @throws IllegalArgumentException If the provided operator string is invalid or does not correspond to a valid `FilterOperator`.
      * @since 1.0.0
      */
-    constructor(field: KProperty<*>, operator: String = "eq", value: Any?) : this(
-        field.run {
+    constructor(property: KProperty<*>, operator: String = FilterOperator.Equals.operator, value: Any?) : this(
+        property.run {
             val type1 = (parameters.firstOrNull()?.type?.classifier as? KClass<*>)?.simpleName
-            if (type1.isNotNull()) $$"$$type1$$${field.name}" else name
+            if (type1.isNotNull()) $$"$$type1$$${property.name}" else name
         },
         FilterOperator.ofOperator(operator) ?: throw IllegalArgumentException("Invalid operator"),
         value
@@ -111,10 +111,10 @@ data class FilterOption(
      * Constructs a `FilterOption` instance by parsing the input string.
      *
      * This constructor utilizes the `parse` function to interpret the input string
-     * and derive the field, operator, and value required to initialize the `FilterOption`.
+     * and derive the property, operator, and value required to initialize the `FilterOption`.
      *
      * @param stringToParse The input string to parse for initializing the `FilterOption`.
-     *                      The string should be in the format "field:operator:value".
+     *                      The string should be in the format "property:operator:value".
      * @throws IllegalArgumentException If the input string does not contain a valid operator.
      * @since 1.0.0
      */
@@ -129,23 +129,23 @@ data class FilterOption(
      * @param filter An instance of [FilterOption] used to initialize the object.
      * @since 1.0.0
      */
-    private constructor(filter: FilterOption) : this(filter.field, filter.operator, filter.value)
+    private constructor(filter: FilterOption) : this(filter.property, filter.operator, filter.value)
 
     companion object {
         /**
-         * Parses a string into a `FilterOption` object by extracting the field, operator, and value
+         * Parses a string into a `FilterOption` object by extracting the property, operator, and value
          * components from the input string based on specific delimiters.
          *
          * The input string is split into parts using a separator as the delimiter up to a maximum of three parts:
-         * - The first part represents the field name.
+         * - The first part represents the property name.
          * - The second part is converted into a `FilterOperator`.
          * - The third part represents the value.
          *
-         * @param strings The input string to be parsed into a `FilterOption` object. Should be in the format "field:operator:value".
+         * @param strings The input string to be parsed into a `FilterOption` object. Should be in the format "property:operator:value".
          * @param separatorSymbol The regular expression pattern used to split the input strings. Defaults to a colon (:).
-         * @return A `FilterOption` object containing the parsed field, operator, and value.
+         * @return A `FilterOption` object containing the parsed property, operator, and value.
          * @throws IllegalArgumentException If the input string does not contain a valid operator.
-         * @throws MalformedInputException If the input string contains an invalid field name.
+         * @throws MalformedInputException If the input string contains an invalid property name.
          * @since 1.0.0
          */
         fun parse(vararg strings: String, separatorSymbol: Regex = Regex(":")) = strings.map {
@@ -159,19 +159,19 @@ data class FilterOption(
         }
 
         /**
-         * Parses a string into a `FilterOption` object by extracting the field, operator, and value
+         * Parses a string into a `FilterOption` object by extracting the property, operator, and value
          * components from the input string based on specific delimiters.
          *
          * The input string is split into parts using a colon as the delimiter up to a maximum of three parts:
-         * - The first part represents the field name.
+         * - The first part represents the property name.
          * - The second part is converted into a `FilterOperator`.
          * - The third part represents the value.
          *
-         * @param strings The input string to be parsed into a `FilterOption` object. Should be in the format "field:operator:value".
+         * @param strings The input string to be parsed into a `FilterOption` object. Should be in the format "property:operator:value".
          * @param separatorSymbol The regular expression pattern used to split the input strings. Defaults to a colon (:).
-         * @return A `FilterOption` object containing the parsed field, operator, and value.
+         * @return A `FilterOption` object containing the parsed property, operator, and value.
          * @throws IllegalArgumentException If the input string does not contain a valid operator.
-         * @throws MalformedInputException If the input string contains an invalid field name.
+         * @throws MalformedInputException If the input string contains an invalid property name.
          * @since 1.0.0
          */
         fun parse(strings: Iterable<String>, separatorSymbol: Regex = Regex(":")) = parse(*strings.toList().toTypedArray(), separatorSymbol = separatorSymbol)
@@ -183,9 +183,9 @@ data class FilterOption(
                 ctxt: SerializationContext
             ) {
                 gen.writeStartObject()
-                if (value.field.isNotNull())
-                    gen.writeStringProperty("field", "${value.field}")
-                gen.writeStringProperty("operator", value.operator.symbol)
+                if (value.property.isNotNull())
+                    gen.writeStringProperty("property", "${value.property}")
+                gen.writeStringProperty("operator", value.operator.operator)
                 gen.writeStringProperty("value", value.value?.toString())
                 gen.writeEndObject()
             }
@@ -195,8 +195,8 @@ data class FilterOption(
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): FilterOption {
                 val node = p.objectReadContext().readTree<JsonNode>(p)
                 return FilterOption(
-                    node.get("field").traverse(p.objectReadContext()).readValueAs(String::class.java),
-                    FilterOperator.ofSymbol(node.get("operator").traverse(p.objectReadContext()).readValueAs(String::class.java))!!,
+                    node.get("property").traverse(p.objectReadContext()).readValueAs(String::class.java),
+                    FilterOperator.ofOperator(node.get("operator").traverse(p.objectReadContext()).readValueAs(String::class.java))!!,
                     node.get("value").traverse(p.objectReadContext()).readValueAs(String::class.java)
                 )
             }
@@ -205,9 +205,9 @@ data class FilterOption(
         class OldSerializer : JsonSerializer<FilterOption>() {
             override fun serialize(value: FilterOption, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
-                if (value.field.isNotNull())
-                    gen.writeStringField("field", "${value.field}")
-                gen.writeStringField("operator", value.operator.symbol)
+                if (value.property.isNotNull())
+                    gen.writeStringField("property", "${value.property}")
+                gen.writeStringField("operator", value.operator.operator)
                 gen.writeStringField("value", value.value?.toString())
                 gen.writeEndObject()
             }
@@ -217,8 +217,8 @@ data class FilterOption(
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): FilterOption {
                 val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
                 return FilterOption(
-                    node.get("field").asText(),
-                    FilterOperator.valueOf(node.get("operator").asText()),
+                    node.get("property").asText(),
+                    FilterOperator.ofOperator(node.get("operator").asText())!!,
                     node.get("value").asText()
                 )
             }
@@ -231,7 +231,7 @@ data class FilterOption(
      * This function operates as a delegated property getter and leverages a reflective approach
      * to convert an object's properties to a map and resolve the value of the requested property.
      *
-     * - `field` - TYPE: `KProperty?`
+     * - `property` - TYPE: `KProperty?`
      * - `operator` - TYPE: [FilterOperator]
      * - `value` - TYPE: `Any?`
      *
@@ -246,12 +246,12 @@ data class FilterOption(
     /**
      * Returns a string representation of the FilterOption instance.
      *
-     * The returned string includes details about the field, operator, and value.
+     * The returned string includes details about the property, operator, and value.
      *
-     * @return A string representation of the FilterOption in the format "FilterOption(field=<field_name>, operator=<operator>, value=<value>)".
+     * @return A string representation of the FilterOption in the format "FilterOption(property=<property_name>, operator=<operator>, value=<value>)".
      * @since 1.0.0
      */
-    override fun toString(): String = "FilterOption(field=$field, operator=$operator, value=$value)"
+    override fun toString(): String = "FilterOption(property=$property, operator=$operator, value=$value)"
 }
 
 /**
@@ -265,7 +265,7 @@ data class FilterOption(
  * @property operator A symbolic representation of the filter operation, typically short and
  *                    concise, used as an identifier.
  * @property sql      A SQL-like string template that represents the filter operation
- *                    in query syntax. It may contain placeholders like `{field}`, `{value}`,
+ *                    in query syntax. It may contain placeholders like `{property}`, `{value}`,
  *                    or `{condition}` that can be replaced to build concrete expressions.
  * @property category Since 4.6.8, a category that groups filter operations based on their functionalities.
  *                    This property is used to categorize filter operations for better organization
@@ -284,24 +284,24 @@ enum class FilterOperator(
     /**
      * Represents the equality filter operation within the `FilterOperator` class.
      *
-     * This operation is used to filter datasets or collections by comparing a field with a specific value
-     * and returning only those elements where the field's value matches the provided value.
+     * This operation is used to filter datasets or collections by comparing a property with a specific value
+     * and returning only those elements where the property's value matches the provided value.
      *
-     * The SQL representation of this operator is defined as "{field} = {value}".
+     * The SQL representation of this operator is defined as "{property} = {value}".
      *
      * @since 4.0.0
      */
-    Equals("eq", "{field} = {value}", Category.Equality, "="),
+    Equals("eq", "{property} = {value}", Category.Equality, "="),
     /**
      * Represents the "not equals" filter operator in a query.
      *
-     * The `NotEquals` operator is used to filter data where the value of a specified field
+     * The `NotEquals` operator is used to filter data where the value of a specified property
      * is not equal to a given value. This operator is commonly utilized in query-building
      * scenarios for data filtering purposes.
      *
      * @since 4.0.0
      */
-    NotEquals("ne", "{field} <> {value}", Category.Equality, "≠"),
+    NotEquals("ne", "{property} <> {value}", Category.Equality, "≠"),
     /**
      * Represents the "in" operator used for filtering.
      *
@@ -309,7 +309,7 @@ enum class FilterOperator(
      *
      * @since 4.0.0
      */
-    In("in", "{value} IN {field}", Category.ArraySearch, "∈"),
+    In("in", "{value} IN {property}", Category.ArraySearch, "∈"),
     /**
      * Represents the `NOT IN` filter operator used to determine if a given value does not exist
      * within a specified set of values or collection.
@@ -318,141 +318,141 @@ enum class FilterOperator(
      * conditions such as "value NOT IN (set)" need to be represented in a structured format.
      *
      * The `operator` ("nin") defines the symbolic representation of this filter operator, while
-     * the `sql` pattern ("{value} NOT IN {field}") specifies how the operator should be formatted during translation to SQL or similar query languages.
+     * the `sql` pattern ("{value} NOT IN {property}") specifies how the operator should be formatted during translation to SQL or similar query languages.
      *
      * @since 4.0.0
      */
-    NotIn("nin", "{value} NOT IN {field}", Category.ArraySearch, "∉"),
+    NotIn("nin", "{value} NOT IN {property}", Category.ArraySearch, "∉"),
     /**
      * Represents a "less than" filter operation in a query or filtering system.
      *
-     * The `LessThan` operation is used to evaluate whether a specific field's value
+     * The `LessThan` operation is used to evaluate whether a specific property's value
      * is less than the given comparison value. It is typically utilized in filtering scenarios
      * to include only records that satisfy the specified "less than" condition.
      *
      * @since 4.0.0
      */
-    LessThan("lt", "{field} < {value}", Category.Comparison, "<"),
+    LessThan("lt", "{property} < {value}", Category.Comparison, "<"),
     /**
      * Represents a "greater than" filter operator for use in filtering operations.
      *
      * The `GreaterThan` filtering operator is used to identify and select records
-     * where the value of a specified field is greater than a given comparison value.
+     * where the value of a specified property is greater than a given comparison value.
      * This is particularly useful in query-building scenarios where conditional
-     * filtering by field value is needed.
+     * filtering by property value is needed.
      *
      * The operator has a symbolic representation `>` for SQL and similar query languages.
      * @since 4.0.0
      */
-    GreaterThan("gt", "{field} > {value}", Category.Comparison, ">"),
+    GreaterThan("gt", "{property} > {value}", Category.Comparison, ">"),
     /**
      * Represents a filtering operator for "greater than or equal to" comparisons.
      *
-     * The `GreaterThan` filter operator is used to compare a field's value
-     * to a specified value, evaluating to true if the field's value is greater than or equal
+     * The `GreaterThan` filter operator is used to compare a property's value
+     * to a specified value, evaluating to true if the property's value is greater than or equal
      * to the given value. It is commonly utilized in database queries or filtering mechanisms.
      *
      * @since 4.0.0
      */
-    LessThanOrEquals("le", "{field} <= {value}", Category.Comparison, "≤"),
+    LessThanOrEquals("le", "{property} <= {value}", Category.Comparison, "≤"),
     /**
      * A filter operator representing the "greater than or equals" comparison.
      *
-     * The `GreaterThanOrEquals` operator is used to filter data where a field value is greater than or equal to a specified value.
+     * The `GreaterThanOrEquals` operator is used to filter data where a property value is greater than or equal to a specified value.
      * It is commonly employed in filtering criteria in data retrieval or query-building scenarios.
      *
      * @since 4.0.0
      */
-    GreaterThanOrEquals("ge", "{field} >= {value}", Category.Comparison, "≥"),
+    GreaterThanOrEquals("ge", "{property} >= {value}", Category.Comparison, "≥"),
     /**
      * Represents a `StartsWith` filter operation for querying datasets.
      *
-     * The `StartsWith` filter checks if a field's value begins with the specified value.
+     * The `StartsWith` filter checks if a property's value begins with the specified value.
      * This operator generates an SQL `LIKE` expression using the format:
-     * `{field} LIKE CONCAT({value}, '%')`.
+     * `{property} LIKE CONCAT({value}, '%')`.
      *
      * @since 4.0.0
      */
-    StartsWith("startswith", "{field} LIKE CONCAT({value}, '%')", Category.String, "starts with"),
+    StartsWith("startswith", "{property} LIKE CONCAT({value}, '%')", Category.String, "starts with"),
     /**
-     * Represents a filter operator that matches values where the specified field does not start with the given value.
+     * Represents a filter operator that matches values where the specified property does not start with the given value.
      *
      * This operator constructs an SQL condition using the "NOT LIKE" clause with a wildcard (%) appended
-     * to the provided value, ensuring that the field does not start with the specified pattern.
+     * to the provided value, ensuring that the property does not start with the specified pattern.
      *
      * @since 4.0.0
      */
-    NotStartsWith("nstartswith", "{field} NOT LIKE CONCAT({value}, '%')", Category.String, "not starts with"),
+    NotStartsWith("nstartswith", "{property} NOT LIKE CONCAT({value}, '%')", Category.String, "not starts with"),
     /**
-     * Represents a filter operator that checks if the field value ends with the specified value.
+     * Represents a filter operator that checks if the property value ends with the specified value.
      *
      * The `EndsWith` operator is translated into a SQL `LIKE` clause that matches records
-     * where the field's value ends with the given string. This allows for filtering data based
+     * where the property's value ends with the given string. This allows for filtering data based
      * on string suffix matching.
      *
      * Operator: `endswith`
-     * SQL Translation: `{field} LIKE CONCAT('%', {value})`
+     * SQL Translation: `{property} LIKE CONCAT('%', {value})`
      *
      * @since 4.0.0
      */
-    EndsWith("endswith", "{field} LIKE CONCAT('%', {value})", Category.String, "ends with"),
+    EndsWith("endswith", "{property} LIKE CONCAT('%', {value})", Category.String, "ends with"),
     /**
-     * Represents a filter operator that checks if a field's value does not end with the specified value.
+     * Represents a filter operator that checks if a property's value does not end with the specified value.
      *
      * The `NotEndsWith` operator is used to construct an SQL condition using the "NOT LIKE" clause
-     * with a wildcard (%) appended to the provided value, ensuring that the field's value does not end with the specified pattern.
+     * with a wildcard (%) appended to the provided value, ensuring that the property's value does not end with the specified pattern.
      *
      * Operator: `notendwith`
-     * SQL Translation: `{field} NOT LIKE CONCAT('%', {value})`
+     * SQL Translation: `{property} NOT LIKE CONCAT('%', {value})`
      *
      * @since 4.0.0
      */
-    NotEndsWith("nendswith", "{field} NOT LIKE CONCAT('%', {value})", Category.String, "not ends with"),
+    NotEndsWith("nendswith", "{property} NOT LIKE CONCAT('%', {value})", Category.String, "not ends with"),
     /**
-     * An operator used for filtering data by checking if a field contains a specified value.
+     * An operator used for filtering data by checking if a property contains a specified value.
      *
      * `Contains` is used to construct SQL-like filter operations where the value
-     * is checked to be a substring of the field's content. The operation format
-     * is represented as `{field} LIKE CONCAT('%', {value}, '%')`.
+     * is checked to be a substring of the property's content. The operation format
+     * is represented as `{property} LIKE CONCAT('%', {value}, '%')`.
      *
      * @since 4.0.0
      */
-    Contains("contains", "{field} LIKE CONCAT('%', {value}, '%')", Category.String, "⊇"),
+    Contains("contains", "{property} LIKE CONCAT('%', {value}, '%')", Category.String, "⊇"),
     /**
-     * Represents a filter operator that checks if a field does not contain a specified value.
+     * Represents a filter operator that checks if a property does not contain a specified value.
      *
      * The `NotContains` operator is used in filtering expressions to exclude records where
-     * a specified field contains a particular substring. It constructs a SQL condition
+     * a specified property contains a particular substring. It constructs a SQL condition
      * using the `NOT LIKE` operator with wildcard patterns.
      *
-     * For instance, given a field and a value, the SQL condition generated will look like:
-     * `{field} NOT LIKE CONCAT('%', {value}, '%')`.
+     * For instance, given a property and a value, the SQL condition generated will look like:
+     * `{property} NOT LIKE CONCAT('%', {value}, '%')`.
      *
      * This is useful for scenarios where you need to filter out records based on
-     * partial matches within string fields.
+     * partial matches within string property.
      *
      * @since 4.0.0
      */
-    NotContains("ncontains", "{field} NOT LIKE CONCAT('%', {value}, '%')", Category.String, "⊉"),
+    NotContains("ncontains", "{property} NOT LIKE CONCAT('%', {value}, '%')", Category.String, "⊉"),
     /**
-     * Represents a SQL `LIKE` operator used for filtering data where a field matches a specified pattern.
+     * Represents a SQL `LIKE` operator used for filtering data where a property matches a specified pattern.
      *
      * This operator is generally used in query conditions to perform pattern matching
      * against string data types. The comparison is case-sensitive in most SQL implementations.
      *
      * @since 4.0.0
      */
-    Like("like", "{field} LIKE {value}", Category.String, "~"),
+    Like("like", "{property} LIKE {value}", Category.String, "~"),
     /**
      * Represents an operator used for filtering entities based on a NOT LIKE condition.
      *
      * This class is part of the `FilterOperator` family, which defines various operations for data filtering.
-     * The `NotLike` operator determines whether a specified field's value does not match a given pattern
+     * The `NotLike` operator determines whether a specified property's value does not match a given pattern
      * using a SQL `NOT LIKE` expression.
      *
      * @since 4.0.0
      */
-    NotLike("nlike", "{field} NOT LIKE {value}", Category.String, "≁");
+    NotLike("nlike", "{property} NOT LIKE {value}", Category.String, "≁");
 
     companion object {
         /**
@@ -587,88 +587,4 @@ enum class FilterOperator(
          */
         ArraySearch
     }
-
-    /*    /*
-     * Represents a filter operator for checking the existence of a specific condition.
-     *
-     * The `HAS` operator is used to verify the presence of records that match a certain condition within a sub-query.
-     * It is typically applied in filtering scenarios where an "EXISTS" condition is required in a SQL-like query language.
-     *
-     * @property operator The name of the operator as a string.
-     * @property sql The corresponding SQL representation of the filter operator, which allows dynamic substitution of placeholders.
-     *
-     * @since 1.0.0
-     */
-    HAS("has", "EXISTS (SELECT 1 FROM {field} WHERE {value})"),*/
-    /*
-     * Represents the logical negation operation in a filter context.
-     *
-     * The logical negation, identified by the keyword "not", is used to negate a specified condition.
-     * It is often utilized in expressions to invert the result of a logical evaluation.
-     *
-     * @property operator The keyword representing the logical negation operation, e.g., "not".
-     * @property sql The SQL representation of the logical negation operation, e.g., "NOT ({condition})".
-     * @since 1.0.0
-     *//*
-
-    LOGICAL_NEGATION("not", "NOT ({condition})"),
-
-        /*
-     * Represents a filter operator used in querying data.
-     *
-     * The `ANY` operator checks if a condition is met for at least one element in a collection.
-     * It is typically utilized in queries where an `EXISTS` clause is required.
-     *
-     * - The operator keyword is "any".
-     * - The SQL representation of the condition is "EXISTS (SELECT 1 FROM {field} f WHERE f IN ({value}))".
-     *
-     * @param operator The keyword representing the filter operator.
-     * @param sql The SQL representation of the filter condition.
-     *
-     * @since 1.0.0
-     */
-    ANY("any", "EXISTS (SELECT 1 FROM {field} f WHERE f IN ({value}))"),
-    /*
-     * Represents the "ALL" filter operator used in SQL operations.
-     *
-     * The `ALL` operator is used to filter a dataset by checking that all sub-values
-     * of a certain field satisfy a specific condition when compared to a given set of values.
-     *
-     * The SQL equivalent of the `ALL` operator is implemented as:
-     * `NOT EXISTS (SELECT 1 FROM {field} f WHERE f NOT IN ({value}))`.
-     *
-     * @property operator The string representation of the operator ("all").
-     * @property sql The SQL equivalent of the operator's logic.
-     *
-     * @since 1.0.0
-     */
-    ALL("all", "NOT EXISTS (SELECT 1 FROM {field} f WHERE f NOT IN ({value}))"),
-
-    /*
-     * Represents the logical AND filter operator in query construction or filtering conditions.
-     *
-     * This operator is used to combine multiple conditions logically, ensuring that all the conditions
-     * must be true for a record to match the filter.
-     *
-     * @property operator The string representation of the operator.
-     * @property sql The equivalent SQL representation of the operator.
-     * @since 1.0.0
-     */
-    AND("and", "AND"),
-    /*
-     * Represents the logical OR operator in filtering operations.
-     *
-     * The `OR` operator is used to combine multiple filter conditions, where the overall
-     * condition is true if at least one of the individual conditions is true.
-     *
-     * This operator is typically used in scenarios where multiple filtering criteria need
-     * to be evaluated in a disjunctive manner.
-     *
-     * @property operator The string representation of the operator.
-     * @property sql The SQL representation of the operator.
-     *
-     * @since 1.0.0
-     */
-    OR("or", "OR"),
-*/
 }

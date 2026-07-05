@@ -142,10 +142,10 @@ data class Chunked<T>(
 
             // OTHERS
             val parsedFilters = FilterOption.parse(otherFilters, separatorSymbol = separatorSymbol)
-            parsedFilters.groupBy(FilterOption::field).forEach { parsedFilter ->
+            parsedFilters.groupBy(FilterOption::property).forEach { parsedFilter ->
                 val orFilters = emptyMList<String>()
                 parsedFilter.value.forEach {
-                    it.field.validate(
+                    it.property.validate(
                         predicate = availFilteringFields::contains,
                         callableName = callableName,
                         parameterName = "sorting",
@@ -155,21 +155,21 @@ data class Chunked<T>(
                     if (it.value.isNotNull()) {
                         orFilters += it.operator.sql(
                             if (it.operator.category in arrayOf(String, Equality))
-                                "LOWER(CAST(${(dbDictionary[it.field] ?: it.field)} AS TEXT))"
-                            else (dbDictionary[it.field] ?: it.field),
+                                "LOWER(CAST(${(dbDictionary[it.property] ?: it.property)} AS TEXT))"
+                            else (dbDictionary[it.property] ?: it.property),
                             when (it.operator.category)  {
                                 Category.String, Equality -> "'${it.value?.toString()?.lowercase()}'"
-                                Comparison if it.field in dateFields -> {
+                                Comparison if it.property in dateFields -> {
                                     if (YearMonth(it.value!!.toString()).isSuccess)
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()}' AS DATE)"
                                 }
-                                Comparison if it.field in dateTimeFields -> {
+                                Comparison if it.property in dateTimeFields -> {
                                     if (YearMonth(it.value!!.toString()).isSuccess)
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()} ${if (it.operator in setOf(GreaterThan, GreaterThanOrEquals)) "00:00:00" else "23:59:59"}' AS TIMESTAMP)"
                                 }
-                                Comparison if it.field in dateTimeWithZoneFields -> {
+                                Comparison if it.property in dateTimeWithZoneFields -> {
                                     "CAST('${it.value.toString()} ${if (it.operator in setOf(GreaterThan, GreaterThanOrEquals)) "00:00:00" else "23:59:59"}' AS TIMESTAMP WITH TIME ZONE)"
                                 }
                                 else -> it.value.toString()
@@ -276,19 +276,19 @@ data class Chunked<T>(
                 val decomponed = it / separatorSymbol
                 FilterOption(decomponed[0], decomponed[1], decomponed[2])
             }
-            val generalFilter = decomponedFilters[{ it.field == generalFilterSymbol }]
+            val generalFilter = decomponedFilters[{ it.property == generalFilterSymbol }]
             if (generalFilter.isNotNull()) decomponedFilters = decomponedFilters - generalFilter
 
             var baseCollection = baseCollection.toList()
             val sorting = SortOption.parse(sorting, separatorSymbol = separatorSymbol)
-            sorting.all { it.field in availSortingFields } || throw exceptionForInvalid("Sorting field not supported")
+            sorting.all { it.property in availSortingFields } || throw exceptionForInvalid("Sorting field not supported")
             if (sorting.isNotEmpty() && baseCollection.isNotEmpty()) {
-                val property = baseCollection.first()::class.memberProperties[{ it.name == sorting.first().field }] ?: throw NoSuchPropertyException()
+                val property = baseCollection.first()::class.memberProperties[{ it.name == sorting.first().property }] ?: throw NoSuchPropertyException()
                 var comparator = if (sorting.first().direction == SortDirection.Descending)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
                 for (sortOption in (-1)(sorting)) {
-                    val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.field }] ?: throw NoSuchPropertyException()
+                    val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.property }] ?: throw NoSuchPropertyException()
                     comparator = if (sortOption.direction == SortDirection.Descending)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
                     else comparator.thenBy { property.call(it) as Comparable<*>? }
@@ -312,8 +312,8 @@ data class Chunked<T>(
                 if (flag == false) continue@element
                 for (property in properties) {
                     if (decomponedFilters.isNotEmpty() && property.name in availFilteringFields)
-                        decomponedFilters { it.field == property.name }.forEach {
-                            it.field in availFilteringFields || throw exceptionForInvalid("Filtering field not supported")
+                        decomponedFilters { it.property == property.name }.forEach {
+                            it.property in availFilteringFields || throw exceptionForInvalid("Filtering field not supported")
                             if (!filter(property.call(element).toString(), it, exceptionForInvalid)) {
                                 continue@element
                             }
@@ -331,7 +331,7 @@ data class Chunked<T>(
                 totalPages = if (limit == -1) 1 else ceil(totalElements.toDouble() / limit).toInt(),
                 pageIndex = offset,
                 limit = limit whenFalse (limit == -1),
-                appliedFilters = decomponedFilters.map { it.copy(field = "${T::class.simpleName}$${it.field}") } + generalFilter?.copy(field = null)?.asSingleList().orEmpty(),
+                appliedFilters = decomponedFilters.map { it.copy(property = "${T::class.simpleName}$${it.property}") } + generalFilter?.copy(property = null)?.asSingleList().orEmpty(),
                 sort = sorting,
                 data = goodCollection
             )

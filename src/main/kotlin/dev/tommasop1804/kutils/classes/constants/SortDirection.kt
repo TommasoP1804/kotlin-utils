@@ -14,7 +14,7 @@ import dev.tommasop1804.kutils.*
  */
 @Suppress("unused")
 @MustUseReturnValues
-enum class SortDirection(val operators: Set<String>, val symbol: Char) {
+enum class SortDirection(val operators: Set<String>, val symbol: Char, internal val preferred: String) {
     /**
      * Represents an ascending sorting order within the SortDirection enumeration.
      *
@@ -23,7 +23,7 @@ enum class SortDirection(val operators: Set<String>, val symbol: Char) {
      *
      * @since 4.0.0
      */
-    Ascending(setOf("as", "asc", "ascending"), symbol = '↑'),
+    Ascending(setOf("as", "asc", "ascending"), symbol = '↑', preferred = "asc"),
     /**
      * Represents the descending sorting order.
      *
@@ -32,7 +32,7 @@ enum class SortDirection(val operators: Set<String>, val symbol: Char) {
      *
      * @since 4.0.0
      */
-    Descending(setOf("de", "des", "desc", "descending"), symbol = '↓');
+    Descending(setOf("de", "des", "desc", "descending"), symbol = '↓', preferred = "desc");
 
     companion object {
         /**
