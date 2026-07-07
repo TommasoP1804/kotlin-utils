@@ -1517,8 +1517,8 @@ fun <E, A, R> Iterable<E>.legacyCollect(collector: Collector<E, A, R>): R = toLi
  */
 fun <E, R> Iterable<E>.legacyCollect(
     supplier: Supplier<R>,
-    accumulator: BiConsumer<R, E>,
-    combiner: BiConsumer<R, R>
+    accumulator: (resultContainer: R, element: E) -> Unit,
+    combiner: (resultContainer: R, partialContainer: R) -> Unit
 ): R = toList().stream().collect(supplier, accumulator, combiner)
 
 /**

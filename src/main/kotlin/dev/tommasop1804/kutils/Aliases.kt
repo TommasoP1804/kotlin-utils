@@ -675,6 +675,26 @@ typealias MonoTransformer<T> = (T) -> T
  */
 typealias ContextMonoTransformer<C, T> = context(C) (T) -> T
 /**
+ * A type alias representing a transformation function that operates on a receiver object of type [T]
+ * and returns a result of the same type. This allows defining extension functions that transform
+ * the receiver object in a concise and expressive manner.
+ *
+ * @param T The type of the receiver object and the result.
+ * @since 4.6.0
+ */
+typealias ReceiverMonoTransformer<T> = T.() -> T
+/**
+ * Represents a type alias for a function type that operates in a context receiver scope.
+ * This alias defines a transformation function that takes an implicit context receiver of type [C],
+ * is invoked on a receiver of type [T], and returns a value of the same type [T].
+ *
+ * @param C The type of the context receiver required to invoke the function.
+ * @param T The type of the receiver on which the function is invoked and the type of the returned result.
+ * @since 4.6.0
+ */
+typealias ContextReceiverMonoTransformer<C, T> = context(C) T.() -> T
+
+/**
  * Type alias representing a function that takes an input of type T and returns a result of type R.
  *
  * This provides a concise way to refer to a function type throughout the codebase,
