@@ -885,6 +885,18 @@ inline operator fun <reified E> Array<E>.get(range: IntProgression) = toList().s
  */
 operator fun <E> Array<E>.get(index: Int, lazyException: ThrowableSupplier = { NoSuchElementException("Index $index not present") }): E =
     getOrNull(index) ?: throw lazyException()
+/**
+ * Returns the element at the position corresponding to the given percentage
+ * within the array. The percentage is calculated relative to the size of the array.
+ *
+ * @param percentage The percentage of the array where the element should be retrieved.
+ *          Must be between 0 and 100 inclusive.
+ * @return The element at the specified percentage-based position in the array.
+ * @throws IndexOutOfBoundsException If the array is empty.
+ * @throws IllegalArgumentException If the percentage is not in the valid range [0, 100].
+ * @since 4.6.1
+ */
+operator fun <E> Array<E>.get(percentage: Percentage) = percent(percentage)
 
 /**
  * Sorts the array based on the specified sorting direction.
@@ -1006,6 +1018,7 @@ inline infix fun <reified E> Array<E>.afterLastIncluding(element: E) = if (conta
  * @throws IllegalArgumentException If the percentage is not in the valid range [0, 100].
  * @since 2.1.0
  */
+@Deprecated("Use get operator instead", replaceWith = ReplaceWith("this[p]"))
 infix fun <E> Array<E>.percent(p: Percentage): E {
     isNotEmpty() || throw IndexOutOfBoundsException("List is empty.")
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
@@ -1183,6 +1196,7 @@ inline fun <E, R> Array<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopConte
  *         the integer's value.
  * @since 2.1.0
  */
+@Deprecated("Use take or drop instead")
 inline operator fun <reified E> Int.invoke(array: Array<E>): Array<E> {
     if (this == 0) return emptyArray()
     if (isPositive) return array.take(this).toTypedArray<E>()

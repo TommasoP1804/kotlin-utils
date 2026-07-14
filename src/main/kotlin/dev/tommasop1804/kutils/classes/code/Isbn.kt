@@ -71,7 +71,7 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val eanPrefix
-        get() = if (count { it == Char.HYPEN } == 4) 3(value) else null
+        get() = if (count { it == Char.HYPEN } == 4) value.take(3) else null
 
     /**
      * Represents the linguistic group extracted from an ISBN-13 code.

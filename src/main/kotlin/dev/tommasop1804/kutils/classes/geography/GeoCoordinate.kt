@@ -250,7 +250,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
             var parts = s.split((if (";" in s) ";" else ",").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (parts.size == 1) {
                 val index = if ("N" in s) s.indexOf("N") + 1 else s.indexOf("S") + 1
-                parts = arrayOf(s.take(index), (-index)(s))
+                parts = arrayOf(s.take(index), s.drop(index))
             }
             parts.size == 2 || throw MalformedInputException("Invalid format")
             val lat = parts[0].trim()
@@ -301,7 +301,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
                 val index = if ("N" in s) s.indexOf("N") + 1 else s.indexOf("S") + 1
                 parts = arrayOf(
                     s.take(index),
-                    (-index)(s)
+                    s.drop(index)
                 )
             }
             parts.size == 2 || throw MalformedInputException("Invalid format")
@@ -534,7 +534,7 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
          */
         fun parsePostGis(postgis: String) = runCatching {
             if (postgis.startsWith("SRID") && ";POINT(" in postgis) {
-                val srid = postgis[5..<';'.code.toChar()(postgis)].toInt()
+                val srid = postgis[5..<postgis.indexOf(';'.code.toChar())].toInt()
                 srid == 4326 || throw ExpectationMismatchException("SRID must be 4326")
                 val coordinates = postgis[16..<postgis.length - 1]
 

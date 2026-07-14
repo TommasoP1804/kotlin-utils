@@ -2744,7 +2744,6 @@ fun initGitlabCi(block: ReceiverConsumer<PipelineBuilder>): PipelineBuilder =
  * @return A `Yaml` object containing the serialized YAML representation of the pipeline.
  * @since 3.3.0
  */
-@OptIn(Beta::class)
 fun Pipeline.toYaml() = Yaml(buildString {
     // Stages
     if (stages.isNotEmpty()) {
@@ -2911,7 +2910,7 @@ private fun StringBuilder.renderJob(name: String, job: Job) {
             if (rule.changes.isNotEmpty() || rule.exists.isNotEmpty() || rule.variables.isNotEmpty()) {
                 if (parts.isNotEmpty()) appendLine(parts.first())
                 else appendLine()
-                (-1)(parts).forEach { appendLine("      $it") }
+                parts.drop(1).forEach { appendLine("      $it") }
                 if (rule.changes.isNotEmpty()) {
                     appendLine("      changes:")
                     rule.changes.forEach { appendLine("        - $it") }
@@ -3099,7 +3098,6 @@ private fun Duration.toCiString(): String {
  *             The path must be writable, and existing content will be overwritten.
  * @since 3.3.0
  */
-@OptIn(Beta::class)
 fun Pipeline.writeYaml(path: Path) {
     path.writeText(toYaml().value)
 }
@@ -3110,7 +3108,6 @@ fun Pipeline.writeYaml(path: Path) {
  * @param writer The writer to which the YAML representation of the pipeline will be written.
  * @since 3.3.0
  */
-@OptIn(Beta::class)
 fun Pipeline.writeTo(writer: Writer) {
     writer.write(toYaml().value)
     writer.flush()

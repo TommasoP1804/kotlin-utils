@@ -17,6 +17,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.base.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.EMAIL_REGEX
 import dev.tommasop1804.kutils.exceptions.*
 import org.apache.commons.codec.binary.Base32
@@ -2295,6 +2296,23 @@ operator fun String.get(substring: ClosedRange<Char>, includeDelimiters: Boolean
     }
 
 /**
+ * Retrieves the character at a specific position in the CharSequence based on the given percentage.
+ *
+ * @param percentage The percentage which determines the character's position.
+ *                   Must be between 0 and 100 inclusive.
+ * @return The character at the calculated position in the CharSequence.
+ * @throws IndexOutOfBoundsException if the CharSequence is empty.
+ * @throws ValidationFailedException if the percentage is not within the valid range.
+ * @since 4.6.1
+ */
+operator fun CharSequence.get(percentage: Percentage): Char {
+    isNotEmpty() || throw IndexOutOfBoundsException("Char sequence is empty.")
+    validate(percentage.isNotOverflowing) { "Percentage must be between 0 and 100." }
+    val index = if (percentage.isFull) lastIndex else (percentage.toDouble() / 100 * length).toInt()
+    return this[index]
+}
+
+/**
  * Replaces placeholders in the string with corresponding values provided in the arguments.
  * The placeholders must follow the pattern `"{key}"` where `key` is the first element of a pair in the arguments.
  *
@@ -3186,6 +3204,7 @@ fun String.insertAfter(element: Regex, value: String) = beforeIncluding(element)
  * @return the manipulated string based on the logic described
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", replaceWith = ReplaceWith("if (this == 0) String.EMPTY else if (this > 0) string.take(this) else string.drop(-this)"))
 operator fun Int.invoke(string: String): String {
     if (this == 0) return String.EMPTY
     if (isPositive) return string.take(this)
@@ -4804,7 +4823,7 @@ infix fun ByteArray.hashingToHex(algorithm: MessageDigest): dev.tommasop1804.kut
  * @since 1.0.0
  */
 infix fun String.hashingToHex(algorithm: MessageDigest): dev.tommasop1804.kutils.classes.numbers.Hex =
-    dev.tommasop1804.kutils.classes.numbers.Hex(Hex.toHexString(hashing(algorithm)))
+    Hex(Hex.toHexString(hashing(algorithm)))
 
 /**
  * Compares the hash of the current string, produced using the specified hashing algorithm,

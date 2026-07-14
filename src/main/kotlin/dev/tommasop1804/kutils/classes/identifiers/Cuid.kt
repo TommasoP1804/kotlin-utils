@@ -15,7 +15,6 @@ import dev.tommasop1804.kutils.BigInt
 import dev.tommasop1804.kutils.Instant
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.get
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.toBigInt
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.SqlTypes
@@ -37,7 +36,6 @@ import java.security.SecureRandom
 import java.time.Instant
 import kotlin.math.pow
 import kotlin.text.startsWith
-import kotlin.time.ExperimentalTime
 
 
 /**
@@ -167,7 +165,6 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
      *
      * @since 3.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(version: CuidVersion = CuidVersion.V1, timestamp: kotlin.time.Instant, lengthForV2: Int = LENGTH_V2) : this(when (version) {
         CuidVersion.V1 -> generateV1(timestamp.toEpochMilliseconds())
         CuidVersion.V2 -> generateV2(timestamp.toEpochMilliseconds(), lengthForV2)
@@ -391,7 +388,7 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
          * @since 3.0.0
          */
         private fun generateV2(ts: Long?, length: Int = LENGTH_V2): String {
-            val firstChar: Char = (-10)(ALPHABET)[RANDOM.nextInt((-10)(ALPHABET).length)]
+            val firstChar: Char = ALPHABET.drop(10)[RANDOM.nextInt(ALPHABET.drop(10).length)]
             val timestamp = ts ?: System.currentTimeMillis()
             val count: Long = ++counter2
             val randomStr = toBase36(BigInt(128, RANDOM)) + toBase36(BigInt(128, RANDOM))

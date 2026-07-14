@@ -245,7 +245,7 @@ fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
     if ("." in dateTimeString) {
         val decimal = dateTimeString.substring(
             dateTimeString.indexOf('.'),
-            if ("Z" in dateTimeString) dateTimeString.length - 1 else if ("+" in dateTimeString) dateTimeString.indexOf("+") else if ("-" in (-10)(dateTimeString))
+            if ("Z" in dateTimeString) dateTimeString.length - 1 else if ("+" in dateTimeString) dateTimeString.indexOf("+") else if ("-" in dateTimeString.drop(10))
                 dateTimeString.indexOf("-") else dateTimeString.length
         )
         dateTimeString = when (decimal.length) {
@@ -257,7 +257,7 @@ fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
     }
 
     val subDateTimeString = dateTimeString.take(
-        if ("Z" in dateTimeString) dateTimeString.length - 1 else if ("+" in dateTimeString) dateTimeString.indexOf("+") else if ("-" in (-10)(dateTimeString))
+        if ("Z" in dateTimeString) dateTimeString.length - 1 else if ("+" in dateTimeString) dateTimeString.indexOf("+") else if ("-" in dateTimeString.drop(10))
             dateTimeString.indexOf("-")
         else dateTimeString.length
     )
@@ -364,7 +364,7 @@ fun CharSequence.parseToLocalTime(): Result<LocalTime> {
             timeString.indexOf('.'),
             if ("Z" in timeString) timeString.length - 1 else if ("+" in timeString)
                 timeString.indexOf("+")
-            else if ("-" in (-10)(timeString)) timeString.indexOf("-")
+            else if ("-" in timeString.drop(10)) timeString.indexOf("-")
             else timeString.length
         )
         timeString = when (decimal.length) {
@@ -1009,7 +1009,7 @@ fun LocalDateTime.atOffset(fromOffset: ZoneId = ZoneId.systemDefault(), toOffset
  * @throws DateTimeException if the offset cannot be obtained from the zone identifier.
  * @since 1.0.0
  */
-fun LocalDateTime.atOffset(offset: ZoneIdent) = atOffset(offset.offset)!!
+infix fun LocalDateTime.atOffset(offset: ZoneIdent) = atOffset(offset.offset)!!
 
 /**
  * Adjusts the LocalDateTime from one time-zone offset to another and returns the resulting [OffsetDateTime].
@@ -1037,7 +1037,7 @@ fun LocalDateTime.atOffset(fromOffset: ZoneIdent, toOffset: ZoneIdent) =
  * @param zone the ZoneIdent object representing the time zone to be applied to this LocalDateTime.
  * @since 1.0.0
  */
-fun LocalDateTime.atZone(zone: ZoneIdent) = atZone(zone.zoneId)!!
+infix fun LocalDateTime.atZone(zone: ZoneIdent) = atZone(zone.zoneId)!!
 
 /**
  * Converts the `LocalDateTime` to an `OffsetDateTime` by applying the specified time zones.
@@ -1088,7 +1088,7 @@ fun Instant.atOffset(fromOffset: ZoneId = ZoneId.systemDefault(), toOffset: Zone
  * @return An `OffsetDateTime` object representing the `Instant` adjusted to the specified offset.
  * @since 1.0.0
  */
-fun Instant.atOffset(offset: ZoneIdent) = atOffset(offset.offset)!!
+infix fun Instant.atOffset(offset: ZoneIdent) = atOffset(offset.offset)!!
 
 /**
  * Adjusts the given `Instant` by converting to the specified zone offsets.
@@ -1123,7 +1123,7 @@ fun Instant.atOffset(fromOffset: ZoneIdent, toOffset: ZoneIdent) =
  * @param zone the time zone to use for the conversion
  * @since 1.0.0
  */
-fun Instant.atZone(zone: ZoneIdent) = atZone(zone.zoneId)!!
+infix fun Instant.atZone(zone: ZoneIdent) = atZone(zone.zoneId)!!
 
 /**
  * Converts the current `Instant` instance to an `OffsetDateTime`, applying the specified time zones.
@@ -1157,7 +1157,7 @@ fun Instant.atZone(fromZone: ZoneIdent, toZone: ZoneIdent) =
  * @param zoneId the target time zone to apply when adjusting this `OffsetDateTime`
  * @since 1.0.0
  */
-fun OffsetDateTime.atZoneSameInstant(zoneId: ZoneIdent) = atZoneSameInstant(zoneId.zoneId)!!
+infix fun OffsetDateTime.atZoneSameInstant(zoneId: ZoneIdent) = atZoneSameInstant(zoneId.zoneId)!!
 
 /**
  * Combines this `OffsetDateTime` with a specified time-zone to create a `ZonedDateTime`,
@@ -1169,7 +1169,7 @@ fun OffsetDateTime.atZoneSameInstant(zoneId: ZoneIdent) = atZoneSameInstant(zone
  * @param zoneId the target time-zone to be applied, not null
  * @since 1.0.0
  */
-fun OffsetDateTime.atZoneSimilarLocal(zoneId: ZoneIdent) = atZoneSimilarLocal(zoneId.zoneId)!!
+infix fun OffsetDateTime.atZoneSimilarLocal(zoneId: ZoneIdent) = atZoneSimilarLocal(zoneId.zoneId)!!
 
 /**
  * Adjusts the LocalDate to the start of the day based on the specified time zone.

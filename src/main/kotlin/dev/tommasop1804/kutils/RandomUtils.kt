@@ -52,7 +52,7 @@ fun Char.Companion.random(acceptUpperLetters: Boolean = true, acceptLowerLetters
     if (acceptUpperLetters) sb.append(CHARS, 0, 26)
     if (acceptLowerLetters) sb.append(CHARS, 26, 52)
     if (acceptNumber) sb.append(CHARS, 52, 62)
-    if (acceptSpecialChars) sb.append((-62)(CHARS))
+    if (acceptSpecialChars) sb.append(CHARS.drop(62))
     return sb.toString()[sb.indices.random()]
 }
 
@@ -259,7 +259,7 @@ fun <T: Enum<*>> Class<T>.random(range: IntRange = enumConstants.indices): T = e
  * @return A randomly selected enum constant from the specified `enumClass` within the given `range`.
  * @since 1.0.0
  */
-fun <T: Enum<T>> KClass<T>.random(range: IntRange = 0 until java.enumConstants.size): T = java.enumConstants[range.random()]
+fun <T: Enum<T>> KClass<T>.random(range: IntRange = java.enumConstants.indices): T = java.enumConstants[range.random()]
 
 /**
  * Returns a random entry from the map.

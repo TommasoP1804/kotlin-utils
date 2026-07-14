@@ -877,7 +877,7 @@ data class Contact(
             get() {
                 val digitsAndPlus = value.filter { it.isDigit() || it == '+' }
                 if (digitsAndPlus.startsWith("+")) {
-                    return "+" + (-1)(digitsAndPlus).filter { it.isDigit() }
+                    return "+" + digitsAndPlus.drop(1).filter { it.isDigit() }
                 }
                 return digitsAndPlus.filter { it.isDigit() }
             }
@@ -912,7 +912,7 @@ data class Contact(
         val countryCode: String?
             get() {
                 if (!hasCountryCode) return null
-                val newVal = if (value.startsWith("+")) (-1)(value) else (-2)(value)
+                val newVal = if (value.startsWith("+")) value.drop(1) else value.drop(2)
                 return newVal.run {
                     if (startsWith("1")) {
                         if (startsWith("1 (") || startsWith("1("))

@@ -68,7 +68,7 @@ value class Iban private constructor(val value: String) : CharSequence {
      * @since 3.0.0
      */
     val country
-        get() = Country ofAlpha2 2(value)
+        get() = Country ofAlpha2 value.take(2)
 
     /**
      * Retrieves the check digits of the IBAN.
@@ -97,7 +97,7 @@ value class Iban private constructor(val value: String) : CharSequence {
      * @since 3.0.0
      */
     val bban
-        get() = (-4)(value)
+        get() = value.drop(4)
 
     /**
      * Constructs an IBAN instance by processing the provided [value].
@@ -221,7 +221,7 @@ value class Iban private constructor(val value: String) : CharSequence {
                 || throw MalformedInputException("Invalid IBAN format")
 
         var checkDigits = (
-                98 - (bban + 2(value) + "00")
+                98 - (bban + value.take(2) + "00")
                     .map { EUROPEAN_CHECK_DIGITS_CONVERSION[it]!! }
                     .joinToString(String.EMPTY)
                     .toBigInt()()
@@ -232,7 +232,7 @@ value class Iban private constructor(val value: String) : CharSequence {
 
         if (country == Italy) {
             Regex("^[A-Z]{2}[0-9]{2}[A-Z][0-9]{10}[0-9A-Z]{12}$")(value) || throw MalformedInputException("Invalid IBAN format for Italy")
-            val odd = (-5)(value).filterIndexed { index, _ -> index.isEven }.map {
+            val odd = value.drop(5).filterIndexed { index, _ -> index.isEven }.map {
                 when (it) {
                     '0' -> 1
                     '1' -> 0
@@ -273,7 +273,7 @@ value class Iban private constructor(val value: String) : CharSequence {
                     else -> throw Error()
                 }
             }
-            val even = (-5)(value).filterIndexed { index, _ -> index.isOdd }.map {
+            val even = value.drop(5).filterIndexed { index, _ -> index.isOdd }.map {
                 when (it) {
                     '0' -> 0
                     '1' -> 1

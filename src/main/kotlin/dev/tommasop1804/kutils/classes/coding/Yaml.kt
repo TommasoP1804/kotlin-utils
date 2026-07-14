@@ -643,7 +643,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @since 3.2.0
      */
     infix fun mergePatch(patch: Yaml) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty())) }, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
             toJson().mergePatch(patch.toJson())().toYaml()
         }
     }
@@ -658,7 +658,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @since 3.2.0
      */
     infix fun mergePatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty())) }, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
             toJson().mergePatch(patch)().toYaml()
         }
     }
@@ -671,7 +671,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @since 3.2.0
      */
     infix fun yamlPatch(patch: Yaml) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty()), e.cause) }, includeCause = false, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2), e.cause) }, includeCause = false, overwriteOnly = NoSuchJsonPathException::class) {
             toJson().jsonPatch(patch.toJson())().toYaml()
         }
     }
@@ -684,7 +684,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @since 3.2.0
      */
     infix fun yamlPatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException((-Char.COLON(e.message.orEmpty()) - 2)(e.message.orEmpty())) }, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
             toJson().jsonPatch(patch)().toYaml()
         }
     }

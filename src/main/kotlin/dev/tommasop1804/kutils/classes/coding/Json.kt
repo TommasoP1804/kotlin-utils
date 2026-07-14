@@ -316,7 +316,6 @@ open class Json private constructor(@param:Language("json") override val value: 
          * @since 3.0.0
          */
         @JvmName("yamlToJson")
-        @OptIn(Beta::class)
         fun Yaml.toJson(): Json {
             if (isBlank()) return EMPTY_JSON
             if (isObject) return toDataMap()().toJson()
@@ -414,7 +413,6 @@ open class Json private constructor(@param:Language("json") override val value: 
          * @since 3.0.0
          */
         @JvmName("yamlToPrettyJson")
-        @OptIn(Beta::class)
         fun Yaml.toPrettyJson(): Json {
             if (isBlank()) return EMPTY_JSON
             val obj = toObject<Any>()
@@ -1189,9 +1187,7 @@ open class Json private constructor(@param:Language("json") override val value: 
         val node = MAPPER.readTree(value)
         for (field in expectedFields)
             if (!node.has(field)) return false
-        return if (restrictive)
-            expectedFields.size == MAPPER.readTree(value).propertyNames().toSet().size
-        else true
+        return !restrictive || expectedFields.size == MAPPER.readTree(value).propertyNames().toSet().size
     }
 
     /**
@@ -1428,7 +1424,6 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @param patch The YAML object representing the patch to be applied.
      * @since 3.2.0
      */
-    @OptIn(Beta::class)
     infix fun mergePatch(patch: Yaml) = mergePatch(patch.toJson())
 
     private fun applyMergePatch(target: JsonNode?, patch: JsonNode): JsonNode {
@@ -1534,7 +1529,6 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @return The modified JSON object wrapped in a `Result` object, which will contain the result of the `runCatching` block.
      * @since 3.2.0
      */
-    @OptIn(Beta::class)
     infix fun jsonPatch(patch: Yaml) = jsonPatch(patch.toJson())
 
     private fun applyAdd(root: JsonNode, pathStr: String, value: JsonNode) {
@@ -1571,7 +1565,7 @@ open class Json private constructor(@param:Language("json") override val value: 
             throw MalformedParameterException("Invalid path: $pathStr")
         }
 
-        val tokens = (-1)(pathStr.split(Char.SLASH)).map {
+        val tokens = pathStr.split(Char.SLASH).drop(1).map {
             it.replace("~1", Char.SLASH).replace("~0", Char.TILDE)
         }
 

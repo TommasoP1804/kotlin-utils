@@ -9,9 +9,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.exceptions.TemporalException
-import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.splitAndTrim
 import dev.tommasop1804.kutils.validateInputFormat
@@ -26,6 +24,7 @@ import java.io.Serial
 import java.io.Serializable
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalUnit
+import kotlin.text.startsWith
 
 /**
  * Represents a temporal interval that can repeat over time, defining a start, end, and optional repetition factor.
@@ -218,7 +217,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
          * This can be useful for defining ranges or periods in terms of a start `Duration` and an `end` `Temporal`.
          *
          * @param end the temporal object marking the endpoint of the interval
-         * @return a [`RepeatedTemporalInterval`] instance representing the interval between the current `Duration` and the specified `Temporal` object.
+         * @return a [RepeatedTemporalInterval] instance representing the interval between the current `Duration` and the specified `Temporal` object.
          * @since 1.0.0
          */
         infix fun Duration.intervalTo(end: Temporal) = of(this, end)
@@ -301,7 +300,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
             if (repeated && parts.size == 2) {
                 of(
                     Duration.parse(parts[1]).getOrThrow(),
-                    if (parts[0].length == 1) -1 else (-1)(parts[0]).toInt()
+                    if (parts[0].length == 1) -1 else parts[0].drop(1).toInt()
                 )
             } else if (!repeated && parts.size == 1) {
                 of(Duration.parse(parts[0]).getOrThrow())
@@ -309,13 +308,13 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
                 of(
                     Duration.parse(((if (repeated) parts[1] else parts[0]))).getOrThrow(),
                     TemporalInterval.parse(if (repeated) (parts[2] + "/" + parts[2]) else (parts[1] + "/" + parts[1])).getOrThrow().start,
-                    if (!repeated) 0 else (if (parts[0].length == 1) -1 else (-1)(parts[0]).toInt())
+                    if (!repeated) 0 else (if (parts[0].length == 1) -1 else parts[0].drop(1).toInt())
                 )
             } else if ((if (repeated) parts[2] else parts[1]).startsWith("P")) {
                 of(
                     TemporalInterval.parse(if (repeated) (parts[1] + "/" + parts[1]) else (parts[0] + "/" + parts[0])).getOrThrow().end,
                     Duration.parse(((if (repeated) parts[2] else parts[1]))).getOrThrow(),
-                    if (!repeated) 0 else if (parts[0].length == 1) -1 else (-1)(parts[0]).toInt()
+                    if (!repeated) 0 else if (parts[0].length == 1) -1 else parts[0].drop(1).toInt()
                 )
             } else throw MalformedInputException("Invalid time interval: $s")
         }

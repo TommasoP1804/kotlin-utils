@@ -693,7 +693,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
             val length = ceil(64 / (ln(base.toDouble()) / ln(2.0))).toInt()
             expect(str.length, length) { String.format("Invalid base-%d length: %s", base, str.length) }
             for (i in str.indices) {
-                val plus = str[i](ALPHABET).toLong()
+                val plus = ALPHABET.indexOf(str[i]).toLong()
                 validate(plus in 0..<base) { String.format("Invalid base-%d character: %s", base, str[i]) }
                 x = x.multiply(radix).add(BigInt.valueOf(plus))
             }

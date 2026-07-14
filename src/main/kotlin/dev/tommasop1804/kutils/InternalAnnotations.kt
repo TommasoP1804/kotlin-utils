@@ -8,7 +8,7 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Retention(AnnotationRetention.RUNTIME)
@@ -21,12 +21,6 @@ annotation class RiskyApproximationOfTemporal
 @Target(AnnotationTarget.FUNCTION)
 @Suppress("unused")
 annotation class CannotCheckExcludedElements
-
-@RequiresOptIn(level = RequiresOptIn.Level.WARNING)
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.FUNCTION)
-@Suppress("unused")
-annotation class ConditionNotPreventingExceptions
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Retention(AnnotationRetention.RUNTIME)

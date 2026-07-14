@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.classes.colors
 
-import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.math.abs
@@ -252,13 +251,13 @@ internal object ColorParser {
                 Color(r, g, b, Percentage(a, true))
             }
             6 -> {
-                val r = 2(hex).toInt(16)
+                val r = hex.take(2).toInt(16)
                 val g = hex.substring(2, 4).toInt(16)
                 val b = hex.substring(4, 6).toInt(16)
                 Color(r, g, b)
             }
             8 -> {
-                val r = 2(hex).toInt(16)
+                val r = hex.take(2).toInt(16)
                 val g = hex.substring(2, 4).toInt(16)
                 val b = hex.substring(4, 6).toInt(16)
                 val a = hex.substring(6, 8).toInt(16) / 255.0

@@ -291,6 +291,7 @@ inline fun <R> Boolean?.ifNullOrFalse(action: ReceiverTransformer<Boolean?, R>):
  * @since 3.12.1
  */
 @IgnorableReturnValue
+@Deprecated("Use if instead", replaceWith = ReplaceWith("if (this) onTrue else onFalse"))
 inline operator fun <T : Any> Boolean.invoke(onTrue: Supplier<T>, onFalse: Supplier<T>): T {
     contract {
         callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
@@ -311,6 +312,7 @@ inline operator fun <T : Any> Boolean.invoke(onTrue: Supplier<T>, onFalse: Suppl
  */
 @JvmName("invokeWithDefault")
 @IgnorableReturnValue
+@Deprecated("Use if instead", replaceWith = ReplaceWith("if (this) onTrue else onFalse"))
 inline operator fun <T> Boolean.invoke(onTrue: Supplier<T?> = { null }, onFalse: Supplier<T?> = { null }): T? {
     contract {
         callsInPlace(onTrue, InvocationKind.AT_MOST_ONCE)
@@ -329,6 +331,7 @@ inline operator fun <T> Boolean.invoke(onTrue: Supplier<T?> = { null }, onFalse:
  * @return the value of `onTrue` if the Boolean is true, otherwise the value of `onFalse`.
  * @since 3.12.1
  */
+@Deprecated("Use if instead", replaceWith = ReplaceWith("if (this) onTrue else onFalse"))
 operator fun <T : Any> Boolean.invoke(onTrue: T, onFalse: T): T =
     if (this) onTrue else onFalse
 
@@ -343,6 +346,7 @@ operator fun <T : Any> Boolean.invoke(onTrue: T, onFalse: T): T =
  * @since 1.0.0
  */
 @JvmName("invokeWithDefault")
+@Deprecated("Use if instead", replaceWith = ReplaceWith("if (this) onTrue else onFalse"))
 operator fun <T> Boolean.invoke(onTrue: T? = null, onFalse: T? = null) = if (this) onTrue else onFalse
 
 /**

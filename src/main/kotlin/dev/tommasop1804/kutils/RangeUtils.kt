@@ -21,9 +21,9 @@ import dev.tommasop1804.kutils.exceptions.*
  * @param percentage A fraction between 0.0 and 1.0 (inclusive) representing the position within the range.
  * @return A value within the range corresponding to the specified fraction.
  * @throws IllegalArgumentException If the fraction is not between 0.0 and 1.0.
- * @since 1.0.0
+ * @since 4.6.1
  */
-operator fun ClosedRange<Double>.invoke(percentage: Percentage): Double {
+operator fun ClosedRange<Double>.get(percentage: Percentage): Double {
     if (percentage.isOverflowing) throw ValidationFailedException("Fraction should be between 0.0 and 100.0")
     val span = endInclusive - start
     return start + (span * percentage.toDouble(true))

@@ -201,7 +201,7 @@ interface TemporalInterval : Serializable {
         @Suppress("UNCHECKED_CAST")
         internal fun <T: Temporal> parseTemporal(input: String): T {
             if ("T" in input) {
-                return if ("Z" in input || "+" in input || "-" in (-10)(input)) {
+                return if ("Z" in input || "+" in input || "-" in input.drop(10)) {
                     (input.parseToOffsetDateTime()).getOrThrow() as T
                 } else {
                     (input.parseToLocalDateTime()).getOrThrow() as T

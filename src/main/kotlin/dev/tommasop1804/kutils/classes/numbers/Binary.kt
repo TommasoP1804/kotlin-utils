@@ -9,11 +9,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.div
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.startsWith
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -70,7 +67,7 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
     init {
         value.all { it in "bB01 .2#" } || throw MalformedInputException("The string is not a binary number")
         this.value =
-            (if (value.startsWith("0b") || value.startsWith("0B") || value.startsWith("2#")) (-2)(value) else value)
+            (if (value.startsWith("0b") || value.startsWith("0B") || value.startsWith("2#")) value.drop(2) else value)
                 .replace("b", "")
                 .replace("B", "")
                 .replace("2", "")
@@ -439,7 +436,7 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
         val fractionalPart = if (parts.size > 1) parts[1] else String.EMPTY
 
         var result = 0.0
-        if (!intPart.isEmpty()) {
+        if (intPart.isNotEmpty()) {
             result = intPart.toInt(2).toDouble()
         }
 

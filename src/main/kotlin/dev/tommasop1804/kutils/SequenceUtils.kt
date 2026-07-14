@@ -85,6 +85,7 @@ fun <E, K, V, M : MutableMap<in K, in V>> Sequence<E>.associateTo(
  * @return a new sequence with elements taken or dropped based on the integer value.
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) sequence.take(this) else sequence.drop(-this)"))
 operator fun <T> Int.invoke(sequence: Sequence<T>): Sequence<T> {
     return if (this > 0) sequence.take(this)
     else sequence.drop(-this)

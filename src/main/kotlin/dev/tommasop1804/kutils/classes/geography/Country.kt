@@ -476,7 +476,7 @@ enum class Country(
 		 * @since 1.0.0
 		 */
 		infix fun byPhoneCode(phoneCode: String): List<Country> {
-			val phoneCode = if (phoneCode.startsWith("+")) (-1)(phoneCode).trim() else phoneCode
+			val phoneCode = if (phoneCode.startsWith("+")) phoneCode.drop(1).trim() else phoneCode
 			return entries.filter { phoneCode in it.phoneCodes }
 		}
 		/**

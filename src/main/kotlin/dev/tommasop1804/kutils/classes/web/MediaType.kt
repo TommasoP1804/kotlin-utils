@@ -429,7 +429,7 @@ data class MediaType(
         fun parse(value: String) = runCatching {
             val parts = value.split(';').map { it.trim() }
             val mimeType = MimeType(parts.first())
-            val params = (-1)(parts).associate { param ->
+            val params = parts.drop(1).associate { param ->
                 val [k, v] = param.split('=', limit = 2)
                 k.trim() to v.trim()
             }
@@ -632,7 +632,7 @@ data class MediaType(
         result = 31 * result + length
         result = 31 * result + type.hashCode()
         result = 31 * result + subtype.hashCode()
-        result = 31 * result + (charset?.hashCode() ?: 0)
+        result = 31 * result + charset.hashCode()
         return result
     }
 }

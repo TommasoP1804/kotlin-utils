@@ -223,7 +223,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     val tables: List<String> = run {
         val regex = Regex("\\bFROM\\s+([a-zA-Z0-9_.]+)|\\bJOIN\\s+([a-zA-Z0-9_.]+)", RegexOption.IGNORE_CASE)
         regex.findAll(value)
-            .flatMap { match -> (-1)(match.groupValues).filter { it.isNotEmpty() } }
+            .flatMap { match -> match.groupValues.drop(1).filter { it.isNotEmpty() } }
             .distinct()
             .toList()
     }
@@ -568,7 +568,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 value,
                 Int::class.java
             )
-            parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
+            parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             nativeQuery.singleResult as Int
         }
     }
@@ -657,7 +657,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 value,
                 T::class.java
             )
-            parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
+            parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             try {
                 nativeQuery.singleResult as? T
             } catch (e: NoResultException) {
@@ -754,7 +754,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 value,
                 T::class.java
             )
-            parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
+            parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             nativeQuery.resultList as List<T>
         }
     }
@@ -835,7 +835,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 value,
                 T::class.java
             )
-            parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
+            parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             (nativeQuery.resultList as List<T>).toSet()
         }
     }
@@ -925,7 +925,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
                 value,
                 T::class.java
             )
-            parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
+            parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             val result = nativeQuery.resultList as MList<T>
             collection += result
             when (collection) {
@@ -987,7 +987,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     ): Int {
         return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
             val nativeQuery = entityManager.createNativeQuery(value)
-            parameters.mapKeys { if (it.key startsWith Char.COLON) (-1)(it.key) else it.key }.forEach(nativeQuery::setParameter)
+            parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             nativeQuery.executeUpdate()
         }
     }

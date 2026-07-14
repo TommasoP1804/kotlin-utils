@@ -62,7 +62,7 @@ open class PageLimitPaginationSpec(
         limit.validate(::limit, message = "must be null, -1 or positive") {
             it.isNull() || it == -1 || it.isPositive
         }
-        this.limit = limit.letWhen(limit == -1) { null }
+        this.limit = limit.letIf(limit == -1) { null }
     }
 
     companion object {
@@ -86,13 +86,12 @@ open class PageLimitPaginationSpec(
         }
 
         class Deserializer : ValueDeserializer<PageLimitPaginationSpec>() {
-            @OptIn(ConditionNotPreventingExceptions::class)
             override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): PageLimitPaginationSpec {
                 val node = p.objectReadContext().readTree<JsonNode>(p)
                 val tf = ctxt.typeFactory
                 return PageLimitPaginationSpec(
                     node.get("page").asInt(),
-                    node.get("limit")?.whenFalse { it.isNull }?.asInt(),
+                    node.get("limit")?.takeUnless { it.isNull }?.asInt(),
                     ctxt.readTreeAsValue(node.get("filter"), tf.constructCollectionType(List::class.java, FilterOption::class.java)),
                     ctxt.readTreeAsValue(node.get("sort"), tf.constructCollectionType(List::class.java, SortOption::class.java)),
                 )
@@ -115,13 +114,12 @@ open class PageLimitPaginationSpec(
         }
 
         class OldDeserializer : JsonDeserializer<PageLimitPaginationSpec>() {
-            @OptIn(ConditionNotPreventingExceptions::class)
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): PageLimitPaginationSpec {
                 val node = ctxt.readTree(p)
                 val tf = ctxt.typeFactory
                 return PageLimitPaginationSpec(
                     node.get("page").asInt(),
-                    node.get("limit")?.whenTrue { !it.isNull }?.asInt(),
+                    node.get("limit")?.takeIf { !it.isNull }?.asInt(),
                     ctxt.readTreeAsValue(node.get("filter"), tf.constructCollectionType(List::class.java, FilterOption::class.java)),
                     ctxt.readTreeAsValue(node.get("sort"), tf.constructCollectionType(List::class.java, SortOption::class.java)),
                 )
@@ -234,7 +232,7 @@ open class CursorPaginationSpec(
         limit.validate(::limit, message = "must be null, -1 or positive") {
             it.isNull() || it == -1 || it.isPositive
         }
-        this.limit = limit.letWhen(limit == -1) { null }
+        this.limit = limit.letIf(limit == -1) { null }
     }
 
     companion object {
@@ -264,7 +262,6 @@ open class CursorPaginationSpec(
         }
 
         class Deserializer : ValueDeserializer<CursorPaginationSpec>() {
-            @OptIn(ConditionNotPreventingExceptions::class)
             override fun deserialize(
                 p: tools.jackson.core.JsonParser,
                 ctxt: DeserializationContext
@@ -272,8 +269,8 @@ open class CursorPaginationSpec(
                 val node = p.objectReadContext().readTree<JsonNode>(p)
                 val tf = ctxt.typeFactory
                 return CursorPaginationSpec(
-                    node.get("cursor")?.whenFalse { it.isNull }?.asString(),
-                    node.get("limit")?.whenFalse { it.isNull }?.asInt(),
+                    node.get("cursor")?.takeUnless { it.isNull }?.asString(),
+                    node.get("limit")?.takeUnless { it.isNull }?.asInt(),
                     ctxt.readTreeAsValue(
                         node.get("filter"),
                         tf.constructCollectionType(List::class.java, FilterOption::class.java)
@@ -305,7 +302,6 @@ open class CursorPaginationSpec(
         }
 
         class OldDeserializer : JsonDeserializer<CursorPaginationSpec>() {
-            @OptIn(ConditionNotPreventingExceptions::class)
             override fun deserialize(
                 p: JsonParser,
                 ctxt: com.fasterxml.jackson.databind.DeserializationContext
@@ -313,8 +309,8 @@ open class CursorPaginationSpec(
                 val node = ctxt.readTree(p)
                 val tf = ctxt.typeFactory
                 return CursorPaginationSpec(
-                    node.get("cursor")?.whenFalse { it.isNull }?.asText(),
-                    node.get("limit")?.whenFalse { it.isNull }?.asInt(),
+                    node.get("cursor")?.takeUnless { it.isNull }?.asText(),
+                    node.get("limit")?.takeUnless { it.isNull }?.asInt(),
                     ctxt.readTreeAsValue(
                         node.get("filter"),
                         tf.constructCollectionType(List::class.java, FilterOption::class.java)

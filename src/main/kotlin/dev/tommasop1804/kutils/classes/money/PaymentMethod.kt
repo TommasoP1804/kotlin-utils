@@ -379,7 +379,7 @@ sealed interface PaymentMethod {
             result = 31 * result + expiry.hashCode()
             result = 31 * result + cvvHash.hashCode()
             result = 31 * result + holderName.hashCode()
-            result = 31 * result + (issuer?.hashCode() ?: 0)
+            result = 31 * result + issuer.hashCode()
             result = 31 * result + panHash.hashCode()
             return result
         }
@@ -530,7 +530,7 @@ sealed interface PaymentMethod {
          * @return The masked representation of the IBAN or the unaltered IBAN value if the length is 8 or less.
          * @since 3.1.0
          */
-        val maskedIban get() = if (iban.length > 8) "${4(iban.value)}${"•".repeat(iban.length - 8)}${iban.takeLast(4)}" else iban.value
+        val maskedIban get() = if (iban.length > 8) "${iban.value.take(4)}${"•".repeat(iban.length - 8)}${iban.takeLast(4)}" else iban.value
 
         /**
          * Represents the country associated with the IBAN (International Bank Account Number).
@@ -638,9 +638,9 @@ sealed interface PaymentMethod {
          */
         override fun hashCode(): Int {
             var result = iban.hashCode()
-            result = 31 * result + (bic?.hashCode() ?: 0)
-            result = 31 * result + (bankName?.hashCode() ?: 0)
-            result = 31 * result + (holderName?.hashCode() ?: 0)
+            result = 31 * result + bic.hashCode()
+            result = 31 * result + bankName.hashCode()
+            result = 31 * result + holderName.hashCode()
             return result
         }
     }
@@ -756,7 +756,7 @@ sealed interface PaymentMethod {
          */
         override fun hashCode(): Int {
             var result = provider.hashCode()
-            result = 31 * result + (email?.hashCode() ?: 0)
+            result = 31 * result + email.hashCode()
             return result
         }
 
@@ -986,7 +986,7 @@ sealed interface PaymentMethod {
          * @since 3.1.0
          */
         override fun hashCode(): Int {
-            var result = maxAmount?.hashCode() ?: 0
+            var result = maxAmount.hashCode()
             result = 31 * result + currency.hashCode()
             return result
         }

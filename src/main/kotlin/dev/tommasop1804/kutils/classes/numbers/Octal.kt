@@ -9,10 +9,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.exceptions.MalformedInputException
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.startsWith
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -20,6 +18,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.text.startsWith
 
 
 /**
@@ -75,10 +74,8 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
     init {
         value.all { it in "01234567oO#8" } || throw MalformedInputException("The string is not an octal number")
         this.value =
-            (if (value.startsWith("0o") || value.startsWith("0O") || value.startsWith("8#")) (-2)(value) else if (value.startsWith(
-                    "0"
-                )
-            ) (-1)(value) else value)
+            (if (value.startsWith("0o") || value.startsWith("0O") || value.startsWith("8#")) value.drop(2) else if (value.startsWith("0"))
+                value.drop(1) else value)
                 .replace("o", "")
                 .replace("O", "")
                 .replace("8", "")

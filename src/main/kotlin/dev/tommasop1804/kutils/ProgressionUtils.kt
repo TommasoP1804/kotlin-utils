@@ -19,6 +19,7 @@ import dev.tommasop1804.kutils.annotations.*
  * @return an `IntList` containing the modified sequence based on the invoking integer
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) progression.take(this) else progression.drop(-this)"))
 operator fun Int.invoke(progression: IntProgression): List<Int> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
@@ -32,6 +33,7 @@ operator fun Int.invoke(progression: IntProgression): List<Int> {
  * @return a CharList containing the result of the operation
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) progression.take(this) else progression.drop(-this)"))
 operator fun Int.invoke(progression: CharProgression): List<Char> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
@@ -45,6 +47,7 @@ operator fun Int.invoke(progression: CharProgression): List<Char> {
  * @return a [List<Long>] containing the resulting elements after taking or dropping.
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) progression.take(this) else progression.drop(-this)"))
 operator fun Int.invoke(progression: LongProgression): List<Long> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
@@ -60,6 +63,7 @@ operator fun Int.invoke(progression: LongProgression): List<Long> {
  * @return a list of unsigned integers resulting from taking or dropping elements in the progression
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) progression.take(this) else progression.drop(-this)"))
 operator fun Int.invoke(progression: UIntProgression): List<UInt> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)
@@ -74,6 +78,7 @@ operator fun Int.invoke(progression: UIntProgression): List<UInt> {
  * @return a list of unsigned long values either taken or skipped based on the integer value
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) progression.take(this) else progression.drop(-this)"))
 operator fun Int.invoke(progression: ULongProgression): List<ULong> {
     return if (this > 0) progression.take(this)
     else progression.drop(-this)

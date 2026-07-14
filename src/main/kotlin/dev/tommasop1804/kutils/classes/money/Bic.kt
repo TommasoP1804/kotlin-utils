@@ -67,7 +67,7 @@ value class Bic private constructor(val value: String) : CharSequence {
      * @since 3.0.0
      */
     val bankCode: String
-        get() = 4(value)
+        get() = value.take(4)
 
     /**
      * Represents a nullable [Country] determined by extracting a specific range

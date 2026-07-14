@@ -1050,6 +1050,21 @@ operator fun <E> List<E>.get(range: IntProgression) = subList(range)
 @JvmName("mutableListGetIntProgression")
 @Suppress("deprecation")
 operator fun <E> MutableList<E>.get(range: IntProgression) = subList(range)
+/**
+ * Returns the element at the position corresponding to the given percentage of the list's size.
+ *
+ * This method calculates the index in the list based on the specified percentage and returns
+ * the element at that index. The list should not be empty, and the percentage must be within
+ * the range of 0 to 100 inclusive.
+ *
+ * @param percentage The percentage of the list's size (0 to 100 inclusive).
+ * @return The element at the calculated index based on the percentage.
+ * @throws IndexOutOfBoundsException If the list is empty.
+ * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the percentage is not within the 0 to 100 range.
+ * @since 4.6.1
+ */
+@Suppress("deprecation")
+operator fun <E> List<E>.get(percentage: Percentage) = percent(percentage)
 
 /**
  * Retrieves the element at the specified index of the list or throws an exception if the index is out of bounds
@@ -1256,6 +1271,7 @@ infix fun <E> List<E>.afterLastIncluding(element: E) = if (contains(element)) ge
  * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the percentage is not within the 0 to 100 range.
  * @since 1.0.0
  */
+@Deprecated("Use get operator instead", replaceWith = ReplaceWith("this[p]"))
 infix fun <E> List<E>.percent(p: Percentage): E {
     isNotEmpty() || throw IndexOutOfBoundsException("List is empty.")
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
@@ -1465,6 +1481,7 @@ inline fun <E, R> Iterable<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopCo
  * and all elements except the first `-this` elements if the integer is negative.
  * @since 1.0.0
  */
+@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) sequence.take(this) else sequence.drop(-this)"))
 operator fun <E> Int.invoke(collection: Collection<E>): List<E> {
     if (this == 0) return emptyList()
     if (isPositive) return collection.take(this)

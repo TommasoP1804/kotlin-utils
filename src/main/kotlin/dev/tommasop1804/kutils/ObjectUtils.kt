@@ -226,8 +226,8 @@ infix fun <T> Supplier<T>.whenTrue(condition: Boolean): T? {
  * @since 1.0.0
  */
 @JvmName("whenTrueGeneric")
-@ConditionNotPreventingExceptions
 @IgnorableReturnValue
+@Deprecated("Use takeIf instead", replaceWith = ReplaceWith("takeIf(predicate)"))
 inline infix fun <T> T.whenTrue(predicate: Predicate<T>) = if (predicate(this)) this else null
 /**
  * Returns the receiver object if the specified condition is true, otherwise returns null.
@@ -238,8 +238,8 @@ inline infix fun <T> T.whenTrue(predicate: Predicate<T>) = if (predicate(this)) 
  * @since 1.0.0
  */
 @JvmName("whenTrueGeneric")
-@ConditionNotPreventingExceptions
 @IgnorableReturnValue
+@Deprecated("Use takeIf instead", replaceWith = ReplaceWith("takeIf { condition }"))
 infix fun <T> T.whenTrue(condition: Boolean) = if (condition) this else null
 
 /**
@@ -266,8 +266,8 @@ infix fun <T> Supplier<T>.whenFalse(condition: Boolean): T? {
  * @since 1.0.0
  */
 @JvmName("whenFalseGeneric")
-@ConditionNotPreventingExceptions
 @IgnorableReturnValue
+@Deprecated("Use takeUnless instead", replaceWith = ReplaceWith("takeUnless(predicate)"))
 inline infix fun <T> T.whenFalse(predicate: Predicate<T>) = if (!predicate(this)) this else null
 /**
  * Returns the receiver object if the given condition is false; otherwise, returns null.
@@ -279,8 +279,8 @@ inline infix fun <T> T.whenFalse(predicate: Predicate<T>) = if (!predicate(this)
  * @since 1.0.0
  */
 @JvmName("whenFalseGeneric")
-@ConditionNotPreventingExceptions
 @IgnorableReturnValue
+@Deprecated("Use takeUnless instead", replaceWith = ReplaceWith("takeUnless { condition }"))
 infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
 
 /**
@@ -293,10 +293,10 @@ infix fun <T> T.whenFalse(condition: Boolean) = if (!condition) this else null
  * @param predicate a function that takes this value as receiver and returns a Boolean indicating whether to apply the transformation
  * @param block a transformation function that takes this value as receiver and returns a transformed value of the same type
  * @return the transformed value if the predicate is true, otherwise this value unchanged
- * @since 2.0.0
+ * @since 4.6.1
  */
 @IgnorableReturnValue
-inline fun <T> T.letWhen(predicate: Predicate<T>, block: MonoTransformer<T>): T {
+inline fun <T> T.letIf(predicate: Predicate<T>, block: MonoTransformer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -311,10 +311,10 @@ inline fun <T> T.letWhen(predicate: Predicate<T>, block: MonoTransformer<T>): T 
  * @param predicate A predicate function to test the receiver.
  * @param block A transformation function applied to the receiver when the predicate evaluates to true.
  * @return The transformed value of type [R] if the predicate returns true, otherwise null.
- * @since 2.0.0
+ * @since 4.6.1
  */
 @IgnorableReturnValue
-inline fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
+inline fun <T, R> T.letIfOrNull(predicate: Predicate<T>, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -330,10 +330,10 @@ inline fun <T, R> T.letWhenOrNull(predicate: Predicate<T>, block: Transformer<T,
  * @param default a supplier function that provides the default result to be returned if the predicate evaluates to false
  * @param block a transformation function that takes the receiver object and returns the result of type R when the predicate evaluates to true
  * @return the result of applying the transformation block when the predicate evaluates to true, or the result of the default supplier when the predicate evaluates to false
- * @since 2.0.0
+ * @since 4.6.1
  */
 @IgnorableReturnValue
-inline fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
+inline fun <T, R> T.letIfOr(predicate: Predicate<T>, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -353,7 +353,7 @@ inline fun <T, R> T.letWhenOr(predicate: Predicate<T>, default: Supplier<R>, blo
  * @since 2.0.0
  */
 @IgnorableReturnValue
-inline fun <T> T.letWhen(condition: Boolean, block: MonoTransformer<T>): T {
+inline fun <T> T.letIf(condition: Boolean, block: MonoTransformer<T>): T {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block
@@ -370,7 +370,7 @@ inline fun <T> T.letWhen(condition: Boolean, block: MonoTransformer<T>): T {
  * @since 2.0.0
  */
 @IgnorableReturnValue
-inline fun <T, R> T.letWhenOrNull(condition: Boolean, block: Transformer<T, R>): R? {
+inline fun <T, R> T.letIfOrNull(condition: Boolean, block: Transformer<T, R>): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block
@@ -392,7 +392,7 @@ inline fun <T, R> T.letWhenOrNull(condition: Boolean, block: Transformer<T, R>):
  */
 
 @IgnorableReturnValue
-inline fun <T, R> T.letWhenOr(condition: Boolean, default: Supplier<R>, block: Transformer<T, R>): R {
+inline fun <T, R> T.letIfOr(condition: Boolean, default: Supplier<R>, block: Transformer<T, R>): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         condition holdsIn block

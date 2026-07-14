@@ -1177,5 +1177,8 @@ operator fun Char.unaryMinus() = lowercase()
  * @param ignoreCase if `true`, the search ignores character case; otherwise, case matters
  * @since 1.0.0
  */
+@Deprecated("Use the Char.indexOf() or Char.lastIndexOf() functions instead.",
+    ReplaceWith("if (!last) cs.indexOf(this, startIndex, ignoreCase) else cs.lastIndexOf(this, startIndex, ignoreCase)")
+)
 operator fun Char.invoke(cs: CharSequence, last: Boolean = false, startIndex: Int = 0, ignoreCase: Boolean = false) =
     if (!last) cs.indexOf(this, startIndex, ignoreCase) else cs.lastIndexOf(this, startIndex, ignoreCase)

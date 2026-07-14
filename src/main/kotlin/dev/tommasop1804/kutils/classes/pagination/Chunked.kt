@@ -79,7 +79,6 @@ data class Chunked<T>(
          * @return A `Chunked<T>` object containing the paginated dataset, total pages, total elements, applied filters, sorting, and metadata.
          * @since 1.0.0
          */
-        @OptIn(ConditionNotPreventingExceptions::class)
         @Suppress("SqlNoDataSourceInspection")
         context(context: SqlBuilder)
         inline fun <reified M : Any, T> generateFromQuery(
@@ -191,23 +190,21 @@ data class Chunked<T>(
                 range(limit * offset ..< limit * offset + limit)
             }.build()
 
-            val totalElements = (limit == -1)(onTrue = {
-                with(entityManager) {
-                    buildSql {
-                        selectCount()
-                        from("(${query.value.replaceAfter("LIMIT", String.EMPTY) - "LIMIT".length})")
-                    }.executeCount()
-                }
-            })
+            val totalElements = with(entityManager) {
+                buildSql {
+                    selectCount()
+                    from("(${query.value.replaceAfter("LIMIT", String.EMPTY) - "LIMIT".length})")
+                }.executeCount()
+            }
 
             logger.debug("<> Query from ${Ansi.ITALIC}${this::class.simpleName}${Ansi.RESET}: {}", query.value)
 
             val filtered = with(entityManager) { query.executeSelectMultipleResult<M>().map(dtoMapper) }
             return Chunked(
-                totalElements = totalElements ?: filtered.size,
-                totalPages = if (limit == -1) 1 else ceil((totalElements ?: filtered.size).toDouble() / limit).toInt(),
+                totalElements = totalElements,
+                totalPages = if (limit == -1) 1 else ceil(totalElements.toDouble() / limit).toInt(),
                 pageIndex = offset,
-                limit = limit whenFalse (limit == -1),
+                limit = limit.takeUnless { (limit == -1) },
                 appliedFilters = parsedFilters + if (generalFilterString.isNotNull()) FilterOption(
                     operator = (generalFilterString / separatorSymbol)[1],
                     value = (generalFilterString / separatorSymbol)[2]
@@ -242,7 +239,6 @@ data class Chunked<T>(
          * @throws Throwable if an invalid filter or sorting expression is encountered, as determined by `exceptionForInvalid`.
          * @since 1.0.0
          */
-        @OptIn(ConditionNotPreventingExceptions::class)
         @ComparisonOperatorUnsupported
         inline fun <reified T : Any> generateFromBaseCollection(
             baseCollection: Collection<T>,
@@ -287,7 +283,7 @@ data class Chunked<T>(
                 var comparator = if (sorting.first().direction == SortDirection.Descending)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
-                for (sortOption in (-1)(sorting)) {
+                for (sortOption in sorting.drop(1)) {
                     val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.property }] ?: throw NoSuchPropertyException()
                     comparator = if (sortOption.direction == SortDirection.Descending)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
@@ -330,7 +326,7 @@ data class Chunked<T>(
                 totalElements = totalElements,
                 totalPages = if (limit == -1) 1 else ceil(totalElements.toDouble() / limit).toInt(),
                 pageIndex = offset,
-                limit = limit whenFalse (limit == -1),
+                limit = limit.takeUnless { (limit == -1) },
                 appliedFilters = decomponedFilters.map { it.copy(property = "${T::class.simpleName}$${it.property}") } + generalFilter?.copy(property = null)?.asSingleList().orEmpty(),
                 sort = sorting,
                 data = goodCollection

@@ -1886,7 +1886,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         val otherHeaders = other.headers.toList()
         tailrec fun addRec(current: HttpHeaders, remaining: List<HttpHeader>): HttpHeaders {
             if (remaining.isEmpty()) return current
-            return addRec(current + remaining.first(), (-1)(remaining))
+            return addRec(current + remaining.first(), remaining.drop(1))
         }
 
         return addRec(this, otherHeaders)
@@ -2210,9 +2210,9 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         val tokens = value / Char.COMMA
         val result = emptyMList<Charset>()
         for (token in tokens) {
-            val paramIdx = ';'(token)
+            val paramIdx = token.indexOf(';')
             val charsetName = if (paramIdx == -1) token
-            else paramIdx(token)
+            else token.take(paramIdx)
             if (charsetName != String.STAR) result.add(Charset.forName(charsetName))
         }
         return result.toList()
@@ -2420,9 +2420,9 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun getHost(): InetSocketAddress = getFirstOrThrow(HOST).let {
         var host: String? = null
         var port = 0
-        val separator = if (it startsWith '[') it.indexOf(Char.COLON, ']'(it)) else it.lastIndexOf(Char.COLON)
+        val separator = if (it startsWith '[') it.indexOf(Char.COLON, it.indexOf(']')) else it.lastIndexOf(Char.COLON)
         if (separator != -1) {
-            host = separator(it)
+            host = it.take(separator)
             val portString = it.substring(separator + 1)
             tryOrNull { port = portString.toInt() }
         }
