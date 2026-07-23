@@ -13,8 +13,6 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
-import org.hibernate.engine.spi.SharedSessionContractImplementor
-import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -24,8 +22,6 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
 import java.security.SecureRandom
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -504,7 +500,7 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
         }
 
         class Type : EnhancedUserType<Tsid> {
-            override fun getSqlType(): Int = SqlTypes.BIGINT
+            override fun getSqlType(): Int = java.sql.Types.BIGINT
 
             override fun returnedClass(): Class<Tsid> = Tsid::class.java
 

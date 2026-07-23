@@ -14,7 +14,6 @@ import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.toUuid
 import jakarta.persistence.AttributeConverter
-import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -216,7 +215,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
         }
 
         class TypeVarchar : EnhancedUserType<ShortUuid> {
-            override fun getSqlType(): Int = SqlTypes.VARCHAR
+            override fun getSqlType(): Int = java.sql.Types.VARCHAR
 
             override fun returnedClass(): Class<ShortUuid> = ShortUuid::class.java
 
@@ -251,7 +250,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
         }
 
         class TypeUuid : EnhancedUserType<ShortUuid> {
-            override fun getSqlType(): Int = SqlTypes.UUID
+            override fun getSqlType(): Int = java.sql.Types.OTHER
 
             override fun returnedClass(): Class<ShortUuid> = ShortUuid::class.java
 

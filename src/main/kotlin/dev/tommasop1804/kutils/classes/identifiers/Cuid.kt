@@ -17,7 +17,6 @@ import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.get
 import dev.tommasop1804.kutils.toBigInt
 import jakarta.persistence.AttributeConverter
-import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -486,7 +485,7 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
         }
 
         class Type : EnhancedUserType<Cuid> {
-            override fun getSqlType(): Int = SqlTypes.VARCHAR
+            override fun getSqlType(): Int = java.sql.Types.VARCHAR
 
             override fun returnedClass(): Class<Cuid> = Cuid::class.java
 

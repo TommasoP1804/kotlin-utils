@@ -14,16 +14,12 @@ import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMillisOfDuration
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
-import org.hibernate.engine.spi.SharedSessionContractImplementor
-import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import java.io.Serializable
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
@@ -245,7 +241,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
         }
 
         class Type : EnhancedUserType<SnowflakeId> {
-            override fun getSqlType(): Int = SqlTypes.BIGINT
+            override fun getSqlType(): Int = java.sql.Types.BIGINT
 
             override fun returnedClass(): Class<SnowflakeId> = SnowflakeId::class.java
 

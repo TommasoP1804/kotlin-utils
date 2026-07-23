@@ -14,7 +14,6 @@ import dev.tommasop1804.kutils.classes.base.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import jakarta.persistence.AttributeConverter
-import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -303,7 +302,7 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
         }
 
         class TypeChar : EnhancedUserType<Ksuid> {
-            override fun getSqlType(): Int = SqlTypes.CHAR
+            override fun getSqlType(): Int = java.sql.Types.CHAR
 
             override fun returnedClass(): Class<Ksuid> = Ksuid::class.java
 
@@ -338,7 +337,7 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
         }
 
         class TypeBytea : EnhancedUserType<Ksuid> {
-            override fun getSqlType(): Int = SqlTypes.VARBINARY
+            override fun getSqlType(): Int = java.sql.Types.VARBINARY
 
             override fun returnedClass(): Class<Ksuid> = Ksuid::class.java
 

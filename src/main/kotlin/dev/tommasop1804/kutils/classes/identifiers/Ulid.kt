@@ -18,7 +18,6 @@ import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
-import org.hibernate.type.SqlTypes
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -896,7 +895,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
         }
 
         class TypeChar : EnhancedUserType<Ulid> {
-            override fun getSqlType(): Int = SqlTypes.CHAR
+            override fun getSqlType(): Int = java.sql.Types.CHAR
 
             override fun returnedClass(): Class<Ulid> = Ulid::class.java
 
@@ -932,7 +931,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
         }
 
         class TypeBytea : EnhancedUserType<Ulid> {
-            override fun getSqlType(): Int = SqlTypes.VARBINARY
+            override fun getSqlType(): Int = java.sql.Types.VARBINARY
 
             override fun returnedClass(): Class<Ulid> = Ulid::class.java
 
@@ -963,7 +962,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
         }
 
         class TypeUuid : EnhancedUserType<Ulid> {
-            override fun getSqlType(): Int = SqlTypes.UUID
+            override fun getSqlType(): Int = java.sql.Types.OTHER
 
             override fun returnedClass(): Class<Ulid> = Ulid::class.java
 
