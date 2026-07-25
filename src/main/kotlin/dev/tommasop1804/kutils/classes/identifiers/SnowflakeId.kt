@@ -37,10 +37,9 @@ import java.util.concurrent.ThreadLocalRandom
  * @since 3.0.0
  * @author Tommaso Pastorelli
  */
-@JvmInline
 @Suppress("unused")
 @MustUseReturnValues
-value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable {
+class SnowflakeId(val value: Long) : Number(), Comparable<SnowflakeId>, Serializable {
     /**
      * Represents the elapsed time portion of the Snowflake ID.
      * This value is derived by shifting the internal value by the defined
@@ -322,7 +321,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
      * @return The Double value corresponding to the internal value of this SnowflakeID.
      * @since 3.0.0
      */
-    fun toDouble() = value.toDouble()
+    override fun toDouble() = value.toDouble()
     /**
      * Converts the internal value of this SnowflakeID to its Float representation.
      *
@@ -333,7 +332,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
      * @return A Float representation of the internal value.
      * @since 3.0.0
      */
-    fun toFloat() = value.toFloat()
+    override fun toFloat() = value.toFloat()
     /**
      * Converts the SnowflakeID to its equivalent long representation.
      *
@@ -343,7 +342,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
      * @return The 64-bit long value representing this SnowflakeID.
      * @since 3.0.0
      */
-    fun toLong() = value
+    override fun toLong() = value
     /**
      * Converts the internal value of this SnowflakeID to an unsigned long representation.
      *
@@ -361,7 +360,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
      * @return The integer representation of the internal value.
      * @since 3.0.0
      */
-    fun toInt() = value.toInt()
+    override fun toInt() = value.toInt()
     /**
      * Converts the internal value of the SnowflakeID to an unsigned 32-bit integer representation.
      *
@@ -382,7 +381,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
      * @return The `Short` representation of the internal value.
      * @since 3.0.0
      */
-    fun toShort() = value.toShort()
+    override fun toShort() = value.toShort()
     /**
      * Converts the internal value of this SnowflakeID into an [UShort].
      *
@@ -405,7 +404,7 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
      * @return The byte representation of the internal value.
      * @since 3.0.0
      */
-    fun toByte() = value.toByte()
+    override fun toByte() = value.toByte()
     /**
      * Converts the internal value of the SnowflakeID to an unsigned byte representation.
      *

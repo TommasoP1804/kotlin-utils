@@ -46,9 +46,8 @@ import kotlin.math.ln
 @JsonDeserialize(using = Tsid.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Tsid.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Tsid.Companion.OldDeserializer::class)
-@JvmInline
 @MustUseReturnValues
-value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequence {
+class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSequence {
     /**
      * Provides the length of the string representation of the TSID.
      *
@@ -683,6 +682,98 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
      * @since 3.0.0
      */
     override fun subSequence(startIndex: Int, endIndex: Int) = toString().subSequence(startIndex, endIndex)
+
+    /**
+     * Converts the value of the current instance to a Double.
+     *
+     * This method overrides the `toDouble` function and returns the double
+     * representation of the `number` property.
+     *
+     * @return the `Double` equivalent of the `number` property.
+     * @since 4.6.4
+     */
+    override fun toDouble() = number.toDouble()
+    /**
+     * Converts the underlying numeric value of the current object to a `Float`.
+     *
+     * This method provides a floating-point representation of the object's numeric field.
+     *
+     * @return A `Float` representation of the numeric value.
+     * @since 4.6.4
+     */
+    override fun toFloat() = number.toFloat()
+    /**
+     * Converts the underlying numeric value represented by this instance to a `Long`.
+     *
+     * @return The numeric value as a `Long`.
+     * @since 4.6.4
+     */
+    override fun toLong() = number
+    /**
+     * Converts the underlying numeric value of the `Tsid` instance to an unsigned long (`ULong`).
+     *
+     * This function provides a type conversion of the `number` property to its `ULong` representation,
+     * ensuring the numeric value is treated as an unsigned 64-bit integer.
+     *
+     * @return The unsigned long representation of the `number` property.
+     * @since 4.6.4
+     */
+    fun toULong() = number.toULong()
+    /**
+     * Converts the value of the current instance to its integer representation.
+     *
+     * @return The integer value obtained from the current instance.
+     * @since 4.6.4
+     */
+    override fun toInt() = number.toInt()
+    /**
+     * Converts the underlying numeric value of the `Tsid` instance to an unsigned integer (`UInt`).
+     *
+     * This function provides a type conversion of the `number` property to its `UInt` representation.
+     * The conversion ensures the numeric value is treated as an unsigned 32-bit integer.
+     *
+     * @return The unsigned integer representation of the `number` field.
+     * @since 4.6.4
+     */
+    fun toUInt() = number.toUInt()
+    /**
+     * Converts the `number` field of the `Tsid` object to a `Short` value.
+     *
+     * This function provides a type conversion of the underlying numeric value
+     * to its `Short` representation.
+     *
+     * @return The `Short` value representation of the `number` field.
+     * @since 4.6.4
+     */
+    override fun toShort() = number.toShort()
+    /**
+     * Converts the value of the property `number` to an unsigned short (UShort).
+     *
+     * @return The unsigned short representation of the `number` value.
+     */
+    fun toUShort() = number.toUShort()
+    /**
+     * Converts the encapsulated numeric value to its `Byte` representation.
+     *
+     * This method overrides the `toByte` function and transforms the stored `number`
+     * property into a `Byte`. The conversion may result in data loss if the numeric
+     * value exceeds the range of a `Byte` (-128 to 127).
+     *
+     * @return The `Byte` representation of the numeric value.
+     * @since 4.6.4
+     */
+    override fun toByte() = number.toByte()
+    /**
+     * Converts the numeric value of the `Tsid` instance to an `UByte` representation.
+     *
+     * This function transforms the numeric value stored in the `number` field to its
+     * unsigned byte equivalent. The conversion may result in a truncated representation
+     * if the numeric value exceeds the range of an `UByte` (0 to 255).
+     *
+     * @return The `UByte` representation of the numeric value.
+     * @since 4.6.4
+     */
+    fun toUByte() = number.toUByte()
 
     private object BaseN {
         val MAX: BigInt = BigInt.valueOf(2).pow(64)
