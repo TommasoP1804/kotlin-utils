@@ -18,6 +18,8 @@ import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.SqlTypes
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -30,6 +32,8 @@ import java.lang.Byte
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.SecureRandom
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -928,6 +932,25 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
 
             override fun fromStringValue(sequence: CharSequence?): Ulid =
                 sequence?.let { Ulid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Ulid? {
+                val value = rs.getString(position)
+                return if (rs.wasNull()) null else Ulid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Ulid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, SqlTypes.CHAR)
+                else st.setString(index, value.toString())
+            }
         }
 
         class TypeBytea : EnhancedUserType<Ulid> {
@@ -959,6 +982,25 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
 
             override fun fromStringValue(sequence: CharSequence?): Ulid =
                 sequence?.let { Ulid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Ulid? {
+                val value = rs.getBytes(position)
+                return if (rs.wasNull()) null else Ulid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Ulid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, SqlTypes.VARBINARY)
+                else st.setBytes(index, value.toByteArray())
+            }
         }
 
         class TypeUuid : EnhancedUserType<Ulid> {
@@ -994,6 +1036,25 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
 
             override fun fromStringValue(sequence: CharSequence?): Ulid =
                 sequence?.let { Ulid(Uuid(it.toString())) } ?: throw IllegalArgumentException("Cannot convert null to ULID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Ulid? {
+                val value = rs.getObject(position, UUID::class.java)
+                return if (rs.wasNull()) null else Ulid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Ulid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, SqlTypes.UUID)
+                else st.setObject(index, value.toUuid(), SqlTypes.UUID)
+            }
         }
     }
 

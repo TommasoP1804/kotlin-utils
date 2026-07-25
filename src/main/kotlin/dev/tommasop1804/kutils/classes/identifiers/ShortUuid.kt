@@ -14,6 +14,8 @@ import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.toUuid
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.SqlTypes
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -22,6 +24,8 @@ import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.ln
@@ -247,6 +251,25 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
             override fun fromStringValue(sequence: CharSequence?): ShortUuid =
                 sequence?.let { ShortUuid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): ShortUuid? {
+                val value = rs.getString(position)
+                return if (rs.wasNull()) null else ShortUuid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: ShortUuid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, SqlTypes.VARCHAR)
+                else st.setString(index, value.value)
+            }
         }
 
         class TypeUuid : EnhancedUserType<ShortUuid> {
@@ -278,6 +301,25 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
             override fun fromStringValue(sequence: CharSequence?): ShortUuid =
                 sequence?.let { ShortUuid(it.toUuid()().toString()) } ?: throw IllegalArgumentException("Cannot convert null to ShortUUID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): ShortUuid? {
+                val value = rs.getObject(position, UUID::class.java)
+                return if (rs.wasNull()) null else ShortUuid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: ShortUuid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, SqlTypes.UUID)
+                else st.setObject(index, value.toUuid(), SqlTypes.UUID)
+            }
         }
     }
 

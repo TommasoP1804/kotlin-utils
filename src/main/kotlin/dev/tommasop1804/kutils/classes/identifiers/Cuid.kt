@@ -17,6 +17,7 @@ import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.get
 import dev.tommasop1804.kutils.toBigInt
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -32,6 +33,8 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Instant
 import kotlin.math.pow
 import kotlin.text.startsWith
@@ -517,6 +520,25 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
 
             override fun fromStringValue(sequence: CharSequence?): Cuid =
                 sequence?.let { Cuid(it.toString(), identifyVersion(it.toString())) } ?: throw IllegalArgumentException("Cannot convert null to CUID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Cuid? {
+                val value = rs.getString(position)
+                return if (rs.wasNull()) null else Cuid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Cuid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, java.sql.Types.VARCHAR)
+                else st.setString(index, value.value)
+            }
         }
     }
 

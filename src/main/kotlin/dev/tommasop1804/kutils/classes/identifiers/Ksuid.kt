@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.classes.base.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -24,6 +25,8 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
 import java.nio.ByteBuffer
 import java.security.SecureRandom
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Instant
 import java.util.*
 import kotlin.time.toJavaInstant
@@ -334,6 +337,25 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
 
             override fun fromStringValue(sequence: CharSequence?): Ksuid =
                 sequence?.let { Ksuid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to KSUID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Ksuid? {
+                val value = rs.getString(position)
+                return if (rs.wasNull()) null else Ksuid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Ksuid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, java.sql.Types.CHAR)
+                else st.setString(index, value.toString())
+            }
         }
 
         class TypeBytea : EnhancedUserType<Ksuid> {
@@ -365,6 +387,25 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
 
             override fun fromStringValue(sequence: CharSequence?): Ksuid =
                 sequence?.let { Ksuid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to KSUID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Ksuid? {
+                val value = rs.getBytes(position)
+                return if (rs.wasNull()) null else Ksuid(ksuidBytes = value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Ksuid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, java.sql.Types.VARBINARY)
+                else st.setBytes(index, value.toByteArray())
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -21,6 +22,8 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
 import java.security.SecureRandom
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -208,6 +211,25 @@ value class NanoId(private val value: String) : CharSequence, Serializable {
 
             override fun fromStringValue(sequence: CharSequence?): NanoId =
                 sequence?.let { NanoId(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to NanoID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): NanoId? {
+                val value = rs.getString(position)
+                return if (rs.wasNull()) null else NanoId(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: NanoId?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, java.sql.Types.VARCHAR)
+                else st.setString(index, value.value)
+            }
         }
     }
 

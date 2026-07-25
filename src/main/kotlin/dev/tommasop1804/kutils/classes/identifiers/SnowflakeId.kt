@@ -14,12 +14,16 @@ import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMillisOfDuration
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.SqlTypes
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import java.io.Serializable
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
 
@@ -270,6 +274,25 @@ value class SnowflakeId(val value: Long) : Comparable<SnowflakeId>, Serializable
 
             override fun fromStringValue(sequence: CharSequence?): SnowflakeId =
                 sequence?.let { SnowflakeId(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to TSID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): SnowflakeId? {
+                val value = rs.getLong(position)
+                return if (rs.wasNull()) null else SnowflakeId(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: SnowflakeId?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, SqlTypes.BIGINT)
+                else st.setLong(index, value.value)
+            }
         }
     }
 

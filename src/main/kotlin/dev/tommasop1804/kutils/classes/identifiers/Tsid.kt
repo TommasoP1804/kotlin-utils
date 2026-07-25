@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -22,6 +23,8 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serializable
 import java.security.SecureRandom
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -529,6 +532,25 @@ value class Tsid(val number: Long) : Comparable<Tsid>, Serializable, CharSequenc
 
             override fun fromStringValue(sequence: CharSequence?): Tsid =
                 sequence?.let { Tsid(it.toString()) } ?: throw IllegalArgumentException("Cannot convert null to TSID")
+
+            override fun nullSafeGet(
+                rs: ResultSet,
+                position: Int,
+                options: WrapperOptions
+            ): Tsid? {
+                val value = rs.getLong(position)
+                return if (rs.wasNull()) null else Tsid(value)
+            }
+
+            override fun nullSafeSet(
+                st: PreparedStatement,
+                value: Tsid?,
+                index: Int,
+                options: WrapperOptions
+            ) {
+                if (value == null) st.setNull(index, java.sql.Types.BIGINT)
+                else st.setLong(index, value.number)
+            }
         }
     }
 
