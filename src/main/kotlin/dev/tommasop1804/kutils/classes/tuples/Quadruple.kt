@@ -4,6 +4,7 @@
 
 package dev.tommasop1804.kutils.classes.tuples
 
+import dev.tommasop1804.kutils.exceptions.*
 import java.io.Serializable
 
 /**
@@ -26,6 +27,30 @@ import java.io.Serializable
  */
 @MustUseReturnValues
 data class Quadruple<out A, out B, out C, out D> (val first: A, val second: B, val third: C, val fourth: D) : Serializable {
+    companion object {
+        /**
+         * Constructs a Quadruple instance using the provided elements.
+         *
+         * @param A The type of the first element in the quadruple.
+         * @param B The type of the second element in the quadruple.
+         * @param C The type of the third element in the quadruple.
+         * @param D The type of the fourth element in the quadruple.
+         * @param elements A vararg parameter expected to contain exactly four elements.
+         * @return A newly created Quadruple containing the four specified elements.
+         * @throws TooFewElementsException If the number of elements is less than 4.
+         */
+        @Suppress("UNCHECKED_CAST")
+        operator fun <A, B, C, D> of(vararg elements: Any): Quadruple<A, B, C, D> {
+            if (elements.size < 4) throw TooFewElementsException("Quadruple.of() requires exactly 4 elements")
+            return Quadruple(
+                elements[0] as A,
+                elements[1] as B,
+                elements[2] as C,
+                elements[3] as D
+            )
+        }
+    }
+
     /**
      * Returns a string representation of the quadruple in the format (first, second, third, fourth).
      *
