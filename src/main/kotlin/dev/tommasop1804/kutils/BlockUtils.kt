@@ -1132,56 +1132,221 @@ fun <T> retry(
     return supplier.retry(duration, lazyException, catchOnly, dontCatch.asSingleSet()) }
 
 /**
- * Executes the given [action] and expects it to throw an exception. If the [action] completes
- * successfully, an [UnexpectedSuccessException] is thrown. If the [action] throws an exception,
- * that exception is returned.
+ * Executes the provided [action] and verifies that it results in a failure, handling exceptions
+ * based on the specified sets of expected and ignored exception types.
  *
- * @param action The action to be executed, which is expected to fail by throwing an exception.
- * @return The exception thrown by the [action].
- * @since 3.11.0
+ * @param expect A set of exception types that are expected during the execution of the [action].
+ *               If not empty, the method will throw an exception if the thrown exception does not
+ *               match any type in this set.
+ * @param ignore A set of exception types to ignore during the execution. If an exception matches
+ *               any type in this set, it will be treated as if no failure occurred.
+ * @param lazyExceptionIfSuccess A lambda that produces an exception to be thrown if no failure occurs.
+ * @param lazyExceptionIfUnexpected A lambda that transforms an unexpected exception into a new exception
+ *                                   to be thrown when the thrown exception does not match any type in [expect].
+ * @param action The block of code to execute, which is expected to fail with one of the specified exception types.
+ * @return The exception that was thrown and not ignored, or handled as expected.
+ * @throws UnexpectedSuccessException If the [action] completes successfully or throws an unexpected exception type.
+ * @since 4.7.1
  */
-inline fun expectFailure(action: Action): Throwable = runCatching(action)(
-    { throw UnexpectedSuccessException("Expected failure but action succeeded") },
-    { return it }
-)
+inline fun expectFailure(
+    expect: Set<KClass<out Throwable>> = emptySet(),
+    ignore: Set<KClass<out Throwable>> = emptySet(),
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected one of ${expect.map { it.simpleName }} failures, but got ${e::class.simpleName} instead") },
+    action: Action
+): Throwable {
+    val thrown = try {
+        action()
+        null
+    } catch (t: Throwable) { t }
+
+    val effectiveThrown = thrown?.takeUnless { t -> ignore.any { it.isInstance(t) } }
+    if (effectiveThrown.isNull()) throw lazyExceptionIfSuccess()
+
+    if (expect.isNotEmpty() && expect.none { it.isInstance(effectiveThrown) })
+        throw lazyExceptionIfUnexpected(effectiveThrown)
+
+    return effectiveThrown
+}
 /**
- * Executes the given action and expects it to throw an exception. If the action completes
- * successfully, an [UnexpectedSuccessException] is thrown. If the action throws an exception,
- * that exception is returned.
+ * Executes an action, expecting it to throw a failure. The method verifies if the thrown exception
+ * meets the expected or ignored conditions. If the action succeeds unexpectedly or throws an
+ * unexpected exception, a custom exception is thrown.
  *
- * @receiver The action to be executed, which is expected to fail by throwing an exception.
- * @return The exception thrown by the action.
- * @since 3.11.0
+ * @param expect A set of expected exception types. If non-empty, the method verifies that the
+ *               thrown exception is one of these types.
+ * @param ignore A set of exception types to be ignored. If the action throws any of these
+ *               exceptions, they are ignored and treated as a success.
+ * @param lazyExceptionIfSuccess A lambda function that provides the exception to be thrown when
+ *                                the action unexpectedly succeeds without any exceptions.
+ * @param lazyExceptionIfUnexpected A lambda function that transforms a thrown, unexpected
+ *                                   exception into a custom exception.
+ * @return The exception that was ultimately determined to meet the failure criteria, if any.
+ * @throws Throwable If the operation succeeds unexpectedly or throws an exception that doesn't
+ *                   match the expected or ignored criteria.
+ * @since 4.7.1
  */
-@JvmName("expectFailureReceiver")
-fun Supplier<*>.expectFailure(): Throwable = runCatching(this)(
-    { throw UnexpectedSuccessException("Expected failure but action succeeded") },
-    { return it }
-)
+inline fun Action.expectFailure(
+    expect: Set<KClass<out Throwable>> = emptySet(),
+    ignore: Set<KClass<out Throwable>> = emptySet(),
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected one of ${expect.map { it.simpleName }} failures, but got ${e::class.simpleName} instead") },
+): Throwable {
+    val thrown = try {
+        this()
+        null
+    } catch (t: Throwable) { t }
+
+    val effectiveThrown = thrown?.takeUnless { t -> ignore.any { it.isInstance(t) } }
+    if (effectiveThrown.isNull()) throw lazyExceptionIfSuccess()
+
+    if (expect.isNotEmpty() && expect.none { it.isInstance(effectiveThrown) })
+        throw lazyExceptionIfUnexpected(effectiveThrown)
+
+    return effectiveThrown
+}
+// --- Overload per la versione top-level: expectFailure(action = ...) ---
 
 /**
- * Executes the provided `action` and returns its result if successful, or throws a lazily
- * provided exception if the action fails.
+ * Convenience overload of [expectFailure] that accepts a single expected exception type
+ * instead of a [Set].
  *
- * @param lazyException a supplier function that provides the exception to throw in case of failure
- * @param action a lambda representing the operation to execute
- * @return the exception thrown if the action fails, or the result of the action if it succeeds
- * @since 3.11.0
+ * @param expect The single exception type expected during the execution of the [action].
+ * @param ignore A set of exception types to ignore during the execution. If an exception matches
+ *               any type in this set, it will be treated as if no failure occurred.
+ * @param lazyExceptionIfSuccess A lambda that produces an exception to be thrown if no failure occurs.
+ * @param lazyExceptionIfUnexpected A lambda that transforms an unexpected exception into a new exception
+ *                                   to be thrown when the thrown exception does not match [expect].
+ * @param action The block of code to execute, which is expected to fail with the specified exception type.
+ * @return The exception that was thrown and not ignored, or handled as expected.
+ * @throws UnexpectedSuccessException If the [action] completes successfully or throws an unexpected exception type.
+ * @since 4.7.1
  */
-inline fun expectFailureOrThrow(lazyException: ThrowableSupplier, action: Action): Throwable = runCatching(action)(
-    { throw lazyException() },
-    { return it }
-)
+inline fun expectFailure(
+    expect: KClass<out Throwable>,
+    ignore: Set<KClass<out Throwable>> = emptySet(),
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected ${expect.simpleName} failure, but got ${e::class.simpleName} instead") },
+    action: Action
+): Throwable = expectFailure(setOf(expect), ignore, lazyExceptionIfSuccess, lazyExceptionIfUnexpected, action)
+
 /**
- * Expects the execution of the supplier to fail and returns the exception if it occurs.
- * If the supplier executes successfully, the provided `lazyException` is thrown.
+ * Convenience overload of [expectFailure] that accepts a single ignored exception type
+ * instead of a [Set].
  *
- * @param lazyException a supplier that lazily provides the exception to be thrown if the execution succeeds
- * @return the exception that caused the supplier to fail, or throws the provided `lazyException` if successful
- * @since 3.11.0
+ * @param expect A set of exception types that are expected during the execution of the [action].
+ *               If not empty, the method will throw an exception if the thrown exception does not
+ *               match any type in this set.
+ * @param ignore The single exception type to ignore during the execution. If the thrown exception
+ *               matches this type, it will be treated as if no failure occurred.
+ * @param lazyExceptionIfSuccess A lambda that produces an exception to be thrown if no failure occurs.
+ * @param lazyExceptionIfUnexpected A lambda that transforms an unexpected exception into a new exception
+ *                                   to be thrown when the thrown exception does not match any type in [expect].
+ * @param action The block of code to execute, which is expected to fail with one of the specified exception types.
+ * @return The exception that was thrown and not ignored, or handled as expected.
+ * @throws UnexpectedSuccessException If the [action] completes successfully or throws an unexpected exception type.
+ * @since 4.7.1
  */
-@JvmName("expectFailureOrThrowReceiver")
-fun Supplier<*>.expectFailure(lazyException: ThrowableSupplier): Throwable = runCatching(this)(
-    { throw lazyException() },
-    { return it }
-)
+inline fun expectFailure(
+    expect: Set<KClass<out Throwable>> = emptySet(),
+    ignore: KClass<out Throwable>,
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected one of ${expect.map { it.simpleName }} failures, but got ${e::class.simpleName} instead") },
+    action: Action
+): Throwable = expectFailure(expect, setOf(ignore), lazyExceptionIfSuccess, lazyExceptionIfUnexpected, action)
+
+/**
+ * Convenience overload of [expectFailure] that accepts a single expected exception type
+ * and a single ignored exception type instead of [Set]s.
+ *
+ * @param expect The single exception type expected during the execution of the [action].
+ * @param ignore The single exception type to ignore during the execution. If the thrown exception
+ *               matches this type, it will be treated as if no failure occurred.
+ * @param lazyExceptionIfSuccess A lambda that produces an exception to be thrown if no failure occurs.
+ * @param lazyExceptionIfUnexpected A lambda that transforms an unexpected exception into a new exception
+ *                                   to be thrown when the thrown exception does not match [expect].
+ * @param action The block of code to execute, which is expected to fail with the specified exception type.
+ * @return The exception that was thrown and not ignored, or handled as expected.
+ * @throws UnexpectedSuccessException If the [action] completes successfully or throws an unexpected exception type.
+ * @since 4.7.1
+ */
+inline fun expectFailure(
+    expect: KClass<out Throwable>,
+    ignore: KClass<out Throwable>,
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected ${expect.simpleName} failure, but got ${e::class.simpleName} instead") },
+    action: Action
+): Throwable = expectFailure(setOf(expect), setOf(ignore), lazyExceptionIfSuccess, lazyExceptionIfUnexpected, action)
+
+
+// --- Overload per la versione extension: Action.expectFailure(...) ---
+
+/**
+ * Convenience overload of [Action.expectFailure] that accepts a single expected exception type
+ * instead of a [Set].
+ *
+ * @param expect The single exception type expected during the execution of the action.
+ * @param ignore A set of exception types to be ignored. If the action throws any of these
+ *               exceptions, they are ignored and treated as a success.
+ * @param lazyExceptionIfSuccess A lambda function that provides the exception to be thrown when
+ *                                the action unexpectedly succeeds without any exceptions.
+ * @param lazyExceptionIfUnexpected A lambda function that transforms a thrown, unexpected
+ *                                   exception into a custom exception.
+ * @return The exception that was ultimately determined to meet the failure criteria, if any.
+ * @throws Throwable If the operation succeeds unexpectedly or throws an exception that doesn't
+ *                   match the expected or ignored criteria.
+ * @since 4.7.1
+ */
+inline fun Action.expectFailure(
+    expect: KClass<out Throwable>,
+    ignore: Set<KClass<out Throwable>> = emptySet(),
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected ${expect.simpleName} failure, but got ${e::class.simpleName} instead") },
+): Throwable = expectFailure(setOf(expect), ignore, lazyExceptionIfSuccess, lazyExceptionIfUnexpected)
+
+/**
+ * Convenience overload of [Action.expectFailure] that accepts a single ignored exception type
+ * instead of a [Set].
+ *
+ * @param expect A set of expected exception types. If non-empty, the method verifies that the
+ *               thrown exception is one of these types.
+ * @param ignore The single exception type to be ignored. If the action throws this exception,
+ *               it is ignored and treated as a success.
+ * @param lazyExceptionIfSuccess A lambda function that provides the exception to be thrown when
+ *                                the action unexpectedly succeeds without any exceptions.
+ * @param lazyExceptionIfUnexpected A lambda function that transforms a thrown, unexpected
+ *                                   exception into a custom exception.
+ * @return The exception that was ultimately determined to meet the failure criteria, if any.
+ * @throws Throwable If the operation succeeds unexpectedly or throws an exception that doesn't
+ *                   match the expected or ignored criteria.
+ * @since 4.7.1
+ */
+inline fun Action.expectFailure(
+    expect: Set<KClass<out Throwable>> = emptySet(),
+    ignore: KClass<out Throwable>,
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected one of ${expect.map { it.simpleName }} failures, but got ${e::class.simpleName} instead") },
+): Throwable = expectFailure(expect, setOf(ignore), lazyExceptionIfSuccess, lazyExceptionIfUnexpected)
+
+/**
+ * Convenience overload of [Action.expectFailure] that accepts a single expected exception type
+ * and a single ignored exception type instead of [Set]s.
+ *
+ * @param expect The single exception type expected during the execution of the action.
+ * @param ignore The single exception type to be ignored. If the action throws this exception,
+ *               it is ignored and treated as a success.
+ * @param lazyExceptionIfSuccess A lambda function that provides the exception to be thrown when
+ *                                the action unexpectedly succeeds without any exceptions.
+ * @param lazyExceptionIfUnexpected A lambda function that transforms a thrown, unexpected
+ *                                   exception into a custom exception.
+ * @return The exception that was ultimately determined to meet the failure criteria, if any.
+ * @throws Throwable If the operation succeeds unexpectedly or throws an exception that doesn't
+ *                   match the expected or ignored criteria.
+ * @since 4.7.1
+ */
+inline fun Action.expectFailure(
+    expect: KClass<out Throwable>,
+    ignore: KClass<out Throwable>,
+    lazyExceptionIfSuccess: ThrowableSupplier = { UnexpectedSuccessException("Expected failure but action succeeded") },
+    lazyExceptionIfUnexpected: ThrowableTransformer = { e -> UnexpectedSuccessException("Expected ${expect.simpleName} failure, but got ${e::class.simpleName} instead") },
+): Throwable = expectFailure(setOf(expect), setOf(ignore), lazyExceptionIfSuccess, lazyExceptionIfUnexpected)
