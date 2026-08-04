@@ -627,10 +627,10 @@ inline fun <T> tryOrNull(
  * @since 1.0.0
  */
 @IgnorableReturnValue
+context(logger: Logger)
 inline fun <T> tryOrLog(
-    logger: Logger,
-    message: Transformer<Throwable, Pair<String?, LogLevel?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
+    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
+    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeException: Boolean = true,
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
@@ -651,12 +651,12 @@ inline fun <T> tryOrLog(
     } catch (e: Throwable) {
         val message = message(e)
         if (e::class in specificCases)
-            logWithOrWithoutException(logger, specificCases[e::class]!!.second ?: message.second ?: LogLevel.Error, specificCases[e::class]!!.first ?: e.message, includeException, e)
+            logWithOrWithoutException(logger, specificCases[e::class]!!.first ?: message.first ?: LogLevel.Error, specificCases[e::class]!!.second ?: e.message, includeException, e)
         else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty())
-            logWithOrWithoutException(logger, message.second ?: LogLevel.Error, message.first ?: e.message, includeException, e)
+            logWithOrWithoutException(logger, message.first ?: LogLevel.Error, message.second ?: e.message, includeException, e)
         else {
             if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            logWithOrWithoutException(logger, message.second ?: LogLevel.Error, message.first ?: e.message, includeException, e)
+            logWithOrWithoutException(logger, message.first ?: LogLevel.Error, message.second ?: e.message, includeException, e)
         }
         null
     }
@@ -684,15 +684,15 @@ inline fun <T> tryOrLog(
  * @since 1.0.0
  */
 @IgnorableReturnValue
+context(logger: Logger)
 inline fun <T> tryOrLog(
-    logger: Logger,
-    message: Transformer<Throwable, Pair<String?, LogLevel?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
+    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
+    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeException: Boolean = true,
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: Set<KClass<out Throwable>> = emptySet(),
     block: Supplier<T>
-): T? = tryOrLog(logger, message, specificCases, includeException, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
+): T? = tryOrLog(message, specificCases, includeException, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
 /**
  * Executes the provided block of code within a try-catch block and handles exceptions by logging them
  * based on the specified configuration. This method provides flexible control over logging behavior for
@@ -715,15 +715,15 @@ inline fun <T> tryOrLog(
  * @since 1.0.0
  */
 @IgnorableReturnValue
+context(logger: Logger)
 inline fun <T> tryOrLog(
-    logger: Logger,
-    message: Transformer<Throwable, Pair<String?, LogLevel?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
+    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
+    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeException: Boolean = true,
     overwriteOnly: KClass<out Throwable>?,
     notOverwrite: KClass<out Throwable>?,
     block: Supplier<T>
-): T? = tryOrLog(logger, message, specificCases, includeException, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
+): T? = tryOrLog(message, specificCases, includeException, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 /**
  * Executes the provided block of code within a try-catch block and handles exceptions by logging them
  * according to the specified configuration. This method allows flexible control over logging behavior
@@ -749,16 +749,15 @@ inline fun <T> tryOrLog(
  * @since 1.0.0
  */
 @IgnorableReturnValue
+context(logger: Logger)
 inline fun <T> tryOrLog(
-    logger: Logger,
-    message: Transformer<Throwable, Pair<String?, LogLevel?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<String?, LogLevel?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
+    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
+    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
     includeException: Boolean = true,
     overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
     notOverwrite: KClass<out Throwable>?,
     block: Supplier<T>
-): T? = tryOrLog(logger, message, specificCases, includeException, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-
+): T? = tryOrLog(message, specificCases, includeException, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 
 /**
  * Executes the given block of code, returning the result or applying fallback strategies in case of exceptions.
