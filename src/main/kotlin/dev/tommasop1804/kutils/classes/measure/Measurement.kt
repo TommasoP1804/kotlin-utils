@@ -14,6 +14,10 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BIT_BINARY
+import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BIT_DECIMAL
+import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTE_BINARY
+import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTE_DECIMAL
 import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -45,7 +49,7 @@ import kotlin.reflect.KProperty
 @JsonDeserialize(using = Measurement.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Measurement.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Measurement.Companion.OldDeserializer::class)
-open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Serializable, Comparable<Measurement> {
+open class Measurement(open val value: Double, open val unit: ScalarUnit) : Number(), Serializable, Comparable<Measurement> {
     /**
      * Retrieves the measurement unit as a string representation.
      *
@@ -629,7 +633,7 @@ open class Measurement(val value: Double, val unit: ScalarUnit) : Number(), Seri
 @JsonDeserialize(using = RMeasurement.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = RMeasurement.Companion.OldSerializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = RMeasurement.Companion.OldDeserializer::class)
-class RMeasurement<T : ScalarUnit>(value: Double, unit: T) : Measurement(value, unit), Serializable {
+class RMeasurement<T : ScalarUnit>(override val value: Double, override val unit: T) : Measurement(value, unit), Serializable {
     companion object {
         /**
          * Converts a numerical value to a measurement with the specified scalar unit.
@@ -939,3 +943,33 @@ typealias PlaneAngle = RMeasurement<MeasureUnit.PlaneAngleUnit>
  * @since 3.0.0
  */
 typealias Mass = RMeasurement<MeasureUnit.MassUnit>
+
+/**
+ * Normalizes the data size value to a more human-readable unit based on the specified parameters.
+ *
+ * @param useBytes Indicates whether the normalization should use byte-based units (true) or bit-based units (false).
+ *                 Defaults to true.
+ * @param useBinaryBase Indicates whether the normalization should use binary-based scaling (1024) or decimal-based scaling (1000).
+ *                      Defaults to false.
+ * @return A new instance of `DataSize` with a normalized value and unit based on the provided parameters.
+ * @since 4.7.0
+ */
+fun DataSize.normalize(
+    useBytes: Boolean = true,
+    useBinaryBase: Boolean = false
+): DataSize {
+    val bits = unit.toBits(value)
+
+    val scale = when {
+        useBytes && useBinaryBase -> BYTE_BINARY
+        useBytes && !useBinaryBase -> BYTE_DECIMAL
+        !useBytes && useBinaryBase -> BIT_BINARY
+        else -> BIT_DECIMAL
+    }
+
+    val targetUnit = scale
+        .lastOrNull { it.fromBits(bits).absoluteValue >= 1.0 }
+        ?: scale.first()
+
+    return RMeasurement(targetUnit.fromBits(bits), targetUnit)
+}

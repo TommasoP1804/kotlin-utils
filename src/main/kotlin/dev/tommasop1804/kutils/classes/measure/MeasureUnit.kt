@@ -1151,6 +1151,53 @@ open class MeasureUnit internal constructor(override val measure: String, overri
             val ZEBIBYTES = DataSizeUnit("zebibytes", "ZiB", { it.toDouble() * 8 * 2.0.pow(70) }, { it.toDouble() / 8 / 2.0.pow(70) }, knownSymbol = true)
             val YOBIBYTES = DataSizeUnit("yobibytes", "YiB", { it.toDouble() * 8 * 2.0.pow(80) }, { it.toDouble() / 8 / 2.0.pow(80) }, knownSymbol = true)
 
+            val BIT_DECIMAL = listOf(
+                BITS,
+                KILOBITS,
+                MEGABITS,
+                GIGABITS,
+                TERABITS,
+                PETABITS,
+                EXABITS,
+                ZETTABITS,
+                YOTTABITS
+            )
+            val BIT_BINARY = listOf(
+                BITS,
+                KIBIBITS,
+                MEBIBITS,
+                GIBIBITS,
+                TEBIBITS,
+                PEBIBITS,
+                EXBIBITS,
+                ZEBIBITS,
+                YOBIBITS
+            )
+            val BYTE_DECIMAL = listOf(
+                BYTES,
+                KILOBYTES,
+                MEGABYTES,
+                GIGABYTES,
+                TERABYTES,
+                PETABYTES,
+                EXABYTES,
+                ZETTABYTES,
+                YOTTABYTES,
+                RONNABYTES,
+                QUETTABYTES
+            )
+            val BYTE_BINARY = listOf(
+                BYTES,
+                KIBIBYTES,
+                MEBIBYTES,
+                GIBIBYTES,
+                TEBIBYTES,
+                PEBIBYTES,
+                EXBIBYTES,
+                ZEBIBYTES,
+                YOBIBYTES
+            )
+
             internal val KNOWN_SYMBOLS = setOf(
                 BITS,
                 BYTES,
@@ -1192,9 +1239,9 @@ open class MeasureUnit internal constructor(override val measure: String, overri
             )
         }
 
-        private fun toBits(value: Double) = unitInBits(value).toDouble()
+        internal fun toBits(value: Double) = unitInBits(value).toDouble()
 
-        private fun fromBits(value: Double) = unitFromBits(value).toDouble()
+        internal fun fromBits(value: Double) = unitFromBits(value).toDouble()
 
         fun convertTo(value: Double, targetUnit: DataSizeUnit) = targetUnit.fromBits(toBits(value))
     }

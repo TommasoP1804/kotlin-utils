@@ -1165,20 +1165,3 @@ operator fun Char.unaryPlus() = uppercase()
  * @since 1.0.0
  */
 operator fun Char.unaryMinus() = lowercase()
-
-/**
- * Invokes the functionality to find the index of the character in the given character sequence.
- * Depending on the value of the `last` parameter, it finds either the first or the last occurrence
- * of this character in the provided `cs` starting from the specified index.
- *
- * @param cs the character sequence to search within
- * @param last if `true`, searches for the last occurrence; otherwise, searches for the first occurrence
- * @param startIndex the index to start the search from
- * @param ignoreCase if `true`, the search ignores character case; otherwise, case matters
- * @since 1.0.0
- */
-@Deprecated("Use the Char.indexOf() or Char.lastIndexOf() functions instead.",
-    ReplaceWith("if (!last) cs.indexOf(this, startIndex, ignoreCase) else cs.lastIndexOf(this, startIndex, ignoreCase)")
-)
-operator fun Char.invoke(cs: CharSequence, last: Boolean = false, startIndex: Int = 0, ignoreCase: Boolean = false) =
-    if (!last) cs.indexOf(this, startIndex, ignoreCase) else cs.lastIndexOf(this, startIndex, ignoreCase)

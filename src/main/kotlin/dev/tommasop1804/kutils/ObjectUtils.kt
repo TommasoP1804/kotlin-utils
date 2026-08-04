@@ -1404,8 +1404,8 @@ fun Any?.toSafeString(): String = when (this) {
  */
 @JvmName("receiverRequire")
 @IgnorableReturnValue
-fun <T> T.require(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
+fun <T> T.require(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)) else causeOf(this).initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)))
     return this
 }
 /**
@@ -1423,8 +1423,8 @@ fun <T> T.require(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? 
  */
 @JvmName("receiverRequire")
 @IgnorableReturnValue
-fun <T> T.require(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.require(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage().toString(), cause?.invoke(this)) else causeOf(this).initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke(this)))
     return this
 }
 
@@ -1460,8 +1460,8 @@ fun <T> T.requireOrThrow(lazyException: Transformer<T, Throwable>, predicate: Pr
  */
 @JvmName("receiverRequireNot")
 @IgnorableReturnValue
-fun <T> T.requireNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
+fun <T> T.requireNot(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)) else causeOf(this).initCause(IllegalArgumentException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)))
     return this
 }
 /**
@@ -1481,8 +1481,8 @@ fun <T> T.requireNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplie
  */
 @JvmName("receiverRequireNot")
 @IgnorableReturnValue
-fun <T> T.requireNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.requireNot(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(IllegalArgumentException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 
@@ -1514,11 +1514,11 @@ fun <T> T.requireNotOrThrow(lazyException: Transformer<T, Throwable>, predicate:
  */
 @JvmName("receiverRequireNull")
 @IgnorableReturnValue
-fun <T> T?.requireNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.requireNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@requireNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalArgumentException("Invalid argument: $this is null", cause?.invoke()) else causeOf().initCause(IllegalArgumentException("Invalid argument: $this is null", cause?.invoke()))
+    if (this != null) throw if (causeOf.isNull()) IllegalArgumentException("Invalid argument: $this is null", cause?.invoke(this)) else causeOf(this).initCause(IllegalArgumentException("Invalid argument: $this is null", cause?.invoke(this)))
     return this
 }
 /**
@@ -1533,11 +1533,11 @@ fun <T> T?.requireNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSuppl
  */
 @JvmName("receiverRequireNull")
 @IgnorableReturnValue
-fun <T> T?.requireNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.requireNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T? {
     contract {
         returns() implies (this@requireNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalArgumentException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalArgumentException(lazyMessage().toString(), cause?.invoke()))
+    if (this != null) throw if (causeOf.isNull()) IllegalArgumentException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(IllegalArgumentException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1550,11 +1550,11 @@ fun <T> T?.requireNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSuppl
  */
 @JvmName("receiverRequireNullOrThrow")
 @IgnorableReturnValue
-fun <T> T?.requireNullOrThrow(lazyException: ThrowableSupplier): T? {
+fun <T> T?.requireNullOrThrow(lazyException: Transformer<T, Throwable>): T? {
     contract {
         returns() implies (this@requireNullOrThrow == null)
     }
-    if (this != null) throw lazyException()
+    if (this != null) throw lazyException(this)
     return this
 }
 
@@ -1628,8 +1628,8 @@ fun <T> T?.requireNotNullOrThrow(lazyException: ThrowableSupplier): T {
  */
 @JvmName("receiverCheck")
 @IgnorableReturnValue
-fun <T> T.check(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
+fun <T> T.check(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)) else causeOf(this).initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)))
     return this
 }
 /**
@@ -1647,8 +1647,8 @@ fun <T> T.check(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = 
  */
 @JvmName("receiverCheck")
 @IgnorableReturnValue
-fun <T> T.check(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.check(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke(this)) else causeOf(this).initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke(this)))
     return this
 }
 
@@ -1668,8 +1668,8 @@ fun <T> T.check(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = 
  */
 @JvmName("receiverCheckNot")
 @IgnorableReturnValue
-fun <T> T.checkNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke()))
+fun <T> T.checkNot(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)) else causeOf(this).initCause(IllegalStateException("Invalid argument: $this not ensure the predicate", cause?.invoke(this)))
     return this
 }
 /**
@@ -1686,8 +1686,8 @@ fun <T> T.checkNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier?
  */
 @JvmName("receiverCheckNot")
 @IgnorableReturnValue
-fun <T> T.checkNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.checkNot(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) IllegalStateException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(IllegalStateException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 
@@ -1706,11 +1706,11 @@ fun <T> T.checkNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier?
  */
 @JvmName("receiverCheckNull")
 @IgnorableReturnValue
-fun <T> T?.checkNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.checkNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@checkNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalStateException("Invalid state: $this is not-null", cause?.invoke()) else causeOf().initCause(IllegalStateException("Invalid state: $this is not-null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) IllegalStateException("Invalid state: $this is not-null", cause?.invoke(this)) else causeOf(this).initCause(IllegalStateException("Invalid state: $this is not-null", cause?.invoke(this)))
     return this
 }
 /**
@@ -1726,11 +1726,11 @@ fun <T> T?.checkNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplie
  */
 @JvmName("receiverCheckNull")
 @IgnorableReturnValue
-fun <T> T?.checkNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.checkNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T? {
     contract {
         returns() implies (this@checkNull == null)
     }
-    if (this != null) throw if (causeOf == null) IllegalStateException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(IllegalStateException(lazyMessage().toString(), cause?.invoke()))
+    if (this != null) throw if (causeOf == null) IllegalStateException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(IllegalStateException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 
@@ -1792,8 +1792,8 @@ fun <T> T?.checkNotNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupp
  */
 @JvmName("receiverValidate")
 @IgnorableReturnValue
-fun <T> T.validate(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Validation failed.", cause?.invoke()))
+fun <T> T.validate(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Validation failed.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1813,8 +1813,8 @@ fun <T> T.validate(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier?
  */
 @JvmName("receiverValidate")
 @IgnorableReturnValue
-fun <T> T.validate(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.validate(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1832,8 +1832,8 @@ fun <T> T.validate(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message, cause?.invoke()))
+fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -1851,8 +1851,8 @@ fun <T> T.validate(property: KProperty<*>?, variableName: String? = null, messag
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message, cause?.invoke()))
+fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -1870,8 +1870,8 @@ fun <T> T.validate(property: KProperty<*>?, variable: KProperty<*>?, message: St
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message, cause?.invoke()))
+fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -1890,8 +1890,8 @@ fun <T> T.validate(callable: KFunction<*>?, parameterName: String? = null, messa
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message, cause?.invoke()))
+fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -1908,8 +1908,8 @@ fun <T> T.validate(callable: KFunction<*>?, parameter: KParameter?, message: Str
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message, cause?.invoke()))
+fun <T> T.validate(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -1928,8 +1928,8 @@ fun <T> T.validate(callableName: String?, parameterName: String? = null, message
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message, cause?.invoke()))
+fun <T> T.validate(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message, cause?.invoke(this)))
     return this
 }
 
@@ -1950,8 +1950,8 @@ fun <T> T.validate(callableName: String?, parameter: KParameter?, message: Strin
  */
 @JvmName("receiverValidateNot")
 @IgnorableReturnValue
-fun <T> T.validateNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Validation failed.", cause?.invoke()))
+fun <T> T.validateNot(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException("Validation failed.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Validation failed.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1967,8 +1967,8 @@ fun <T> T.validateNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSuppli
  */
 @JvmName("receiverValidateNot")
 @IgnorableReturnValue
-fun <T> T.validateNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.validateNot(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1985,8 +1985,8 @@ fun <T> T.validateNot(causeOf: ThrowableSupplier? = null, cause: ThrowableSuppli
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.validateNot(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message, cause?.invoke()))
+fun <T> T.validateNot(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variableName, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -2006,8 +2006,8 @@ fun <T> T.validateNot(property: KProperty<*>?, variableName: String? = null, mes
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.validateNot(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message, cause?.invoke()))
+fun <T> T.validateNot(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(property, variable, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -2024,8 +2024,8 @@ fun <T> T.validateNot(property: KProperty<*>?, variable: KProperty<*>?, message:
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.validateNot(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message, cause?.invoke()))
+fun <T> T.validateNot(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -2043,8 +2043,8 @@ fun <T> T.validateNot(callable: KFunction<*>?, parameterName: String? = null, me
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.validateNot(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message, cause?.invoke()))
+fun <T> T.validateNot(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -2061,8 +2061,8 @@ fun <T> T.validateNot(callable: KFunction<*>?, parameter: KParameter?, message: 
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.validateNot(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message, cause?.invoke()))
+fun <T> T.validateNot(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message, cause?.invoke(this)))
     return this
 }
 /**
@@ -2079,8 +2079,8 @@ fun <T> T.validateNot(callableName: String?, parameterName: String? = null, mess
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.validateNot(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message, cause?.invoke()))
+fun <T> T.validateNot(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (predicate(this)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message, cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message, cause?.invoke(this)))
     return this
 }
 
@@ -2099,11 +2099,11 @@ fun <T> T.validateNot(callableName: String?, parameter: KParameter?, message: St
  */
 @IgnorableReturnValue
 @JvmName("receiverValidateNull")
-fun <T> T?.validateNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException("Value is not null.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is not null.", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException("Value is not null.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is not null.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2123,11 +2123,11 @@ fun <T> T?.validateNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupp
  */
 @JvmName("receiverValidateNull")
 @IgnorableReturnValue
-fun <T> T?.validateNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.validateNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2143,11 +2143,11 @@ fun <T> T?.validateNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupp
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null", cause?.invoke(this)))
     return this
 }
 /**
@@ -2164,11 +2164,11 @@ fun <T> T?.validateNull(property: KProperty<*>?, variableName: String? = null, m
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null", cause?.invoke(this)))
     return this
 }
 /**
@@ -2188,11 +2188,11 @@ fun <T> T?.validateNull(property: KProperty<*>?, variable: KProperty<*>?, messag
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null", cause?.invoke(this)))
     return this
 }
 /**
@@ -2208,11 +2208,11 @@ fun <T> T?.validateNull(callable: KFunction<*>?, parameterName: String? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null", cause?.invoke(this)))
     return this
 }
 /**
@@ -2229,11 +2229,11 @@ fun <T> T?.validateNull(callable: KFunction<*>?, parameter: KParameter?, message
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null", cause?.invoke(this)))
     return this
 }
 /**
@@ -2250,11 +2250,11 @@ fun <T> T?.validateNull(callableName: String?, parameterName: String? = null, me
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.validateNull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@validateNull == null)
     }
-    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not null", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null", cause?.invoke(this)))
     return this
 }
 
@@ -2447,8 +2447,8 @@ fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, messag
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validateInputFormat(message: String? = null, causeOf: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf().initCause(MalformedInputException(message))
+fun <T> T.validateInputFormat(message: String? = null, causeOf: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf(this).initCause(MalformedInputException(message))
     return this
 }
 /**
@@ -2462,8 +2462,8 @@ fun <T> T.validateInputFormat(message: String? = null, causeOf: ThrowableSupplie
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf().initCause(MalformedInputException(`class`))
+fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf(this).initCause(MalformedInputException(`class`))
     return this
 }
 /**
@@ -2478,8 +2478,8 @@ fun <T> T.validateInputFormat(`class`: KClass<*>? = null, causeOf: ThrowableSupp
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.validateInputFormat(type: KType? = null, causeOf: ThrowableSupplier? = null, predicate: Predicate<T>): T {
-    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf().initCause(MalformedInputException(type))
+fun <T> T.validateInputFormat(type: KType? = null, causeOf: Transformer<T, Throwable>? = null, predicate: Predicate<T>): T {
+    if (!predicate(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf(this).initCause(MalformedInputException(type))
     return this
 }
 /**
@@ -2493,8 +2493,8 @@ fun <T> T.validateInputFormat(type: KType? = null, causeOf: ThrowableSupplier? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = null, causeOf: ThrowableSupplier? = null): T {
-    if (!regex(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf().initCause(MalformedInputException(message))
+fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = null, causeOf: Transformer<T, Throwable>? = null): T {
+    if (!regex(this)) throw if (causeOf == null) MalformedInputException(message) else causeOf(this).initCause(MalformedInputException(message))
     return this
 }
 /**
@@ -2510,8 +2510,8 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, message: String? = nu
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? = null, causeOf: ThrowableSupplier? = null): T {
-    if (!regex(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf().initCause(MalformedInputException(`class`))
+fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? = null, causeOf: Transformer<T, Throwable>? = null): T {
+    if (!regex(this)) throw if (causeOf == null) MalformedInputException(`class`) else causeOf(this).initCause(MalformedInputException(`class`))
     return this
 }
 /**
@@ -2527,8 +2527,8 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, `class`: KClass<*>? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, causeOf: ThrowableSupplier? = null): T {
-    if (!regex(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf().initCause(MalformedInputException(type))
+fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, causeOf: Transformer<T, Throwable>? = null): T {
+    if (!regex(this)) throw if (causeOf == null) MalformedInputException(type) else causeOf(this).initCause(MalformedInputException(type))
     return this
 }
 
@@ -2545,10 +2545,10 @@ fun <T : CharSequence> T.validateInputFormat(regex: Regex, type: KType? = null, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T> T.expect(expectation: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     if (this != expectation) throw
-        if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke())
-        else causeOf().initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke()))
+        if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke(this))
+        else causeOf(this).initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke(this)))
     return this
 }
 /**
@@ -2566,8 +2566,8 @@ fun <T> T.expect(expectation: T, causeOf: ThrowableSupplier? = null, cause: Thro
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.expect(expectation: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2585,8 +2585,8 @@ fun <T> T.expect(expectation: T, causeOf: ThrowableSupplier? = null, cause: Thro
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()))
+fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2603,8 +2603,8 @@ fun <T> T.expect(expectation: T, property: KProperty<*>?, variableName: String? 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()))
+fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2621,8 +2621,8 @@ fun <T> T.expect(expectation: T, property: KProperty<*>?, variable: KProperty<*>
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()))
+fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2642,8 +2642,8 @@ fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameterName: String?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()))
+fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2661,8 +2661,8 @@ fun <T> T.expect(expectation: T, callable: KFunction<*>?, parameter: KParameter?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()))
+fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2679,8 +2679,8 @@ fun <T> T.expect(expectation: T, callableName: String?, parameterName: String? =
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()))
+fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke(this)))
     return this
 }
 
@@ -2696,10 +2696,10 @@ fun <T> T.expect(expectation: T, callableName: String?, parameter: KParameter?, 
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T> T.expectNot(expectation: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     if (this == expectation) throw
-    if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke())
-    else causeOf().initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke()))
+    if (causeOf == null) ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke(this))
+    else causeOf(this).initCause(ExpectationMismatchException("Value was expected as ${if (expectation.toString().isBlank()) "\"\"" else expectation}, but was $this", cause?.invoke(this)))
     return this
 }
 /**
@@ -2715,8 +2715,8 @@ fun <T> T.expectNot(expectation: T, causeOf: ThrowableSupplier? = null, cause: T
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
+fun <T> T.expectNot(expectation: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2732,8 +2732,8 @@ fun <T> T.expectNot(expectation: T, causeOf: ThrowableSupplier? = null, cause: T
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke()))
+fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variableName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2749,8 +2749,8 @@ fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variableName: Strin
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variable, expectation, this, cause?.invoke()))
+fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(property, variable, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2769,8 +2769,8 @@ fun <T> T.expectNot(expectation: T, property: KProperty<*>?, variable: KProperty
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke()))
+fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2787,8 +2787,8 @@ fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameterName: Stri
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke()))
+fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2805,8 +2805,8 @@ fun <T> T.expectNot(expectation: T, callable: KFunction<*>?, parameter: KParamet
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke()))
+fun <T> T.expectNot(expectation: T, callableName: String?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, expectation, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2825,8 +2825,8 @@ fun <T> T.expectNot(expectation: T, callableName: String?, parameterName: String
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T> T.expectNot(expectation: T, callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke()))
+fun <T> T.expectNot(expectation: T, callableName: String?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == expectation) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, expectation, this, cause?.invoke(this)))
     return this
 }
 
@@ -2842,11 +2842,11 @@ fun <T> T.expectNot(expectation: T, callableName: String?, parameter: KParameter
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException("Variable was expected to be null, but was $this", cause?.invoke()) else causeOf().initCause(ExpectationMismatchException("Variable was expected to be null, but was $this", cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException("Variable was expected to be null, but was $this", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Variable was expected to be null, but was $this", cause?.invoke(this)))
     return this
 }
 /**
@@ -2865,11 +2865,11 @@ fun <T> T?.expectNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSuppli
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T? {
+fun <T> T?.expectNull(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(lazyMessage().toString(), cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2887,11 +2887,11 @@ fun <T> T?.expectNull(causeOf: ThrowableSupplier? = null, cause: ThrowableSuppli
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variableName, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variableName, null, this, cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variableName, null, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, null, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2906,11 +2906,11 @@ fun <T> T?.expectNull(property: KProperty<*>?, variableName: String? = null, cau
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variable, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(property, variable, null, this, cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(property, variable, null, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, null, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2929,11 +2929,11 @@ fun <T> T?.expectNull(property: KProperty<*>?, variable: KProperty<*>?, causeOf:
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameterName, null, this, cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, null, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, null, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2948,11 +2948,11 @@ fun <T> T?.expectNull(callable: KFunction<*>?, parameterName: String? = null, ca
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callable, parameter, null, this, cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, null, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, null, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2966,11 +2966,11 @@ fun <T> T?.expectNull(callable: KFunction<*>?, parameter: KParameter?, causeOf: 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameterName, null, this, cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, null, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, null, this, cause?.invoke(this)))
     return this
 }
 /**
@@ -2989,11 +2989,11 @@ fun <T> T?.expectNull(callableName: String?, parameterName: String? = null, caus
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T? {
+fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T? {
     contract {
         returns() implies (this@expectNull == null)
     }
-    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, null, this, cause?.invoke()) else causeOf().initCause(ExpectationMismatchException(callableName, parameter, null, this, cause?.invoke()))
+    if (this != null) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, null, this, cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, null, this, cause?.invoke(this)))
     return this
 }
 
@@ -3013,9 +3013,9 @@ fun <T> T?.expectNull(callableName: String?, parameter: KParameter?, causeOf: Th
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(expectationClass, this::class, cause?.invoke())
-    else causeOf().initCause(ClassMismatchException(expectationClass, this::class, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(expectationClass, this::class, cause?.invoke(this))
+    else causeOf(this).initCause(ClassMismatchException(expectationClass, this::class, cause?.invoke(this)))
     return this
 }
 /**
@@ -3031,8 +3031,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: ThrowableSuppl
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ClassMismatchException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3048,8 +3048,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, causeOf: ThrowableSuppl
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variableName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variableName, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(property, variableName, expectationClass, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variableName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variableName, expectationClass, cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(property, variableName, expectationClass, cause?.invoke(this)))
     return this
 }
 /**
@@ -3064,8 +3064,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variable: KProperty<*>?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variable, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(property, variable, expectationClass, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?, variable: KProperty<*>?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(property, variable, expectationClass, cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(property, variable, expectationClass, cause?.invoke(this)))
     return this
 }
 /**
@@ -3085,8 +3085,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, property: KProperty<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameterName, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callable, parameterName, expectationClass, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameterName, expectationClass, cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(callable, parameterName, expectationClass, cause?.invoke(this)))
     return this
 }
 /**
@@ -3105,8 +3105,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameter, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callable, parameter, expectationClass, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callable, parameter, expectationClass, cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(callable, parameter, expectationClass, cause?.invoke(this)))
     return this
 }
 /**
@@ -3123,8 +3123,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callable: KFunction<*>?
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameterName: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameterName: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(callableName, parameterName, expectationClass, this::class, cause?.invoke(this)))
     return this
 }
 /**
@@ -3144,8 +3144,8 @@ fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, 
  * @since 1.0.0
  */
 @IgnorableReturnValue
-fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameter: KParameter?, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameter, expectationClass, cause?.invoke()) else causeOf().initCause(ClassMismatchException(callableName, parameter, expectationClass, cause?.invoke()))
+fun <T : Any> T.expectClass(expectationClass: KClass<*>, callableName: String?, parameter: KParameter?, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (!expectationClass.isInstance(this)) throw if (causeOf == null) ClassMismatchException(callableName, parameter, expectationClass, cause?.invoke(this)) else causeOf(this).initCause(ClassMismatchException(callableName, parameter, expectationClass, cause?.invoke(this)))
     return this
 }
 

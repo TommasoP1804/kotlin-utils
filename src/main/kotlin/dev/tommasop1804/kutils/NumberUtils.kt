@@ -1034,8 +1034,8 @@ fun Number.toBigDecimal(): BigDecimal = BigDecimal.valueOf(toDouble())
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException("Value is not positive.", cause?.invoke()) else causeOf().initCause(NumberSignException("Value is not positive.", cause?.invoke()))
+fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException("Value is not positive.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is not positive.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1049,8 +1049,8 @@ fun <T : Number> T.validatePositive(causeOf: ThrowableSupplier? = null, cause: T
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(NumberSignException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1070,8 +1070,8 @@ fun <T : Number> T.validatePositive(causeOf: ThrowableSupplier? = null, cause: T
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke()))
+fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1087,8 +1087,8 @@ fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: Strin
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not positive", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variable, message ?: "is not positive", cause?.invoke()))
+fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1104,8 +1104,8 @@ fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke()))
+fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1122,8 +1122,8 @@ fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: Stri
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke()))
+fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1139,8 +1139,8 @@ fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParamet
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke()))
+fun <T : Number> T.validatePositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1156,8 +1156,8 @@ fun <T : Number> T.validatePositive(callableName: String?, parameterName: String
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not positive", cause?.invoke()))
+fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 
@@ -1174,8 +1174,8 @@ fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException("Value is positive.", cause?.invoke()) else causeOf().initCause(NumberSignException("Value is positive.", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException("Value is positive.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is positive.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1191,8 +1191,8 @@ fun <T : Number> T.validateNotPositive(causeOf: ThrowableSupplier? = null, cause
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(NumberSignException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1215,8 +1215,8 @@ fun <T : Number> T.validateNotPositive(causeOf: ThrowableSupplier? = null, cause
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is positive", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variableName, message ?: "is positive", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1236,8 +1236,8 @@ fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: St
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is positive", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variable, message ?: "is positive", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1254,8 +1254,8 @@ fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KPrope
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1271,8 +1271,8 @@ fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: S
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1288,8 +1288,8 @@ fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KPara
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -1305,8 +1305,8 @@ fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: Str
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke()))
+fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 
@@ -1320,8 +1320,8 @@ fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParame
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException("Value is not negative.", cause?.invoke()) else causeOf().initCause(NumberSignException("Value is not negative.", cause?.invoke()))
+fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException("Value is not negative.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is not negative.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1340,8 +1340,8 @@ fun <T : Number> T.validateNegative(causeOf: ThrowableSupplier? = null, cause: T
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(NumberSignException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1363,8 +1363,8 @@ fun <T : Number> T.validateNegative(causeOf: ThrowableSupplier? = null, cause: T
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke()))
+fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1381,8 +1381,8 @@ fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: Strin
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not negative", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variable, message ?: "is not negative", cause?.invoke()))
+fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1398,8 +1398,8 @@ fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke()))
+fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1415,8 +1415,8 @@ fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: Stri
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke()))
+fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1432,8 +1432,8 @@ fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParamet
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke()))
+fun <T : Number> T.validateNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1449,8 +1449,8 @@ fun <T : Number> T.validateNegative(callableName: String?, parameterName: String
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke()))
+fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 
@@ -1466,8 +1466,8 @@ fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException("Value is negative.", cause?.invoke()) else causeOf().initCause(NumberSignException("Value is negative.", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException("Value is negative.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is negative.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1482,8 +1482,8 @@ fun <T : Number> T.validateNotNegative(causeOf: ThrowableSupplier? = null, cause
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(NumberSignException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1505,8 +1505,8 @@ fun <T : Number> T.validateNotNegative(causeOf: ThrowableSupplier? = null, cause
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is negative", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variableName, message ?: "is negative", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1527,8 +1527,8 @@ fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: St
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is negative", cause?.invoke()) else causeOf().initCause(NumberSignException(property, variable, message ?: "is negative", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1544,8 +1544,8 @@ fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KPrope
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1562,8 +1562,8 @@ fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: S
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1581,8 +1581,8 @@ fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KPara
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -1598,8 +1598,8 @@ fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: Str
  * @since 3.5.0
  */
 @IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke()) else causeOf().initCause(NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke()))
+fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 

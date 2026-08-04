@@ -1471,24 +1471,6 @@ inline fun <E, R> Iterable<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopCo
 }
 
 /**
- * Invokes the integer operator on a given collection to either take or drop a specific number of elements
- * based on the integer value.
- *
- * @param collection the collection of elements from which elements are taken or dropped.
- * @return a list containing the resulting elements.
- * Returns an empty list if the integer is zero,
- * the first `this` elements if the integer is positive,
- * and all elements except the first `-this` elements if the integer is negative.
- * @since 1.0.0
- */
-@Deprecated("Use take or drop instead", ReplaceWith("if (this > 0) sequence.take(this) else sequence.drop(-this)"))
-operator fun <E> Int.invoke(collection: Collection<E>): List<E> {
-    if (this == 0) return emptyList()
-    if (isPositive) return collection.take(this)
-    return collection.drop(-this)
-}
-
-/**
  * Converts the elements in the iterable into a string, separated by the specified separator,
  * starting with the given prefix and ending with the given postfix.
  *
@@ -1681,8 +1663,8 @@ fun <E> emptyMSet(): MSet<E> = mutableSetOf()
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The collection is empty.", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1700,8 +1682,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: ThrowableSupplier? = null
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1717,8 +1699,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: ThrowableSupplier? = null
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1734,8 +1716,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableN
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1751,8 +1733,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable:
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1768,8 +1750,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1786,8 +1768,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1805,8 +1787,8 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameterNa
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1821,12 +1803,12 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameter: 
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is null or empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The collection is null or empty.", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1841,12 +1823,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier?
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1866,12 +1848,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier?
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1888,12 +1870,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, va
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1908,12 +1890,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, va
  * @since 4.2.0
  **/
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1929,12 +1911,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, pa
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1950,12 +1932,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, pa
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1973,12 +1955,12 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, para
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -1992,8 +1974,8 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, para
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The collection is not empty.", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2008,8 +1990,8 @@ fun <T : Collection<E>, E> T.validateEmpty(causeOf: ThrowableSupplier? = null, c
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2025,8 +2007,8 @@ fun <T : Collection<E>, E> T.validateEmpty(causeOf: ThrowableSupplier? = null, c
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2042,8 +2024,8 @@ fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variableName
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2059,8 +2041,8 @@ fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KP
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2076,8 +2058,8 @@ fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterNam
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2092,8 +2074,8 @@ fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: K
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2110,8 +2092,8 @@ fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameterName:
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke()))
+fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2128,12 +2110,12 @@ fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameter: KPa
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not null or empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2151,12 +2133,12 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = 
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2171,12 +2153,12 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = 
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2196,12 +2178,12 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, varia
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2217,12 +2199,12 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, varia
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2239,12 +2221,12 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, param
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2264,12 +2246,12 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, param
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -2289,11 +2271,11 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, paramet
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }

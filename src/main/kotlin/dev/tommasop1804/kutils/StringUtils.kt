@@ -3194,24 +3194,6 @@ fun String.insertAfter(element: Char, value: String) = beforeIncluding(element) 
 fun String.insertAfter(element: Regex, value: String) = beforeIncluding(element) + value + after(element)
 
 /**
- * Invokes the custom behavior of the Int receiver where it manipulates the input string
- * based on the value of the integer. For positive integers, it takes a substring of
- * length equal to the integer value. For negative integers, it drops a prefix of
- * length equal to the absolute value of the integer. If the integer value is zero,
- * it returns an empty string.
- *
- * @param string the input string to be manipulated based on the integer value
- * @return the manipulated string based on the logic described
- * @since 1.0.0
- */
-@Deprecated("Use take or drop instead", replaceWith = ReplaceWith("if (this == 0) String.EMPTY else if (this > 0) string.take(this) else string.drop(-this)"))
-operator fun Int.invoke(string: String): String {
-    if (this == 0) return String.EMPTY
-    if (isPositive) return string.take(this)
-    return string.drop(-this)
-}
-
-/**
  * Removes multiple consecutive spaces in a string and replaces them with a single space.
  * This function operates on the receiver string, ensuring that any sequences of whitespace
  * characters are compacted into a single space, making the string more concise and standardized.
@@ -3265,8 +3247,8 @@ infix fun String.surroundWith(char: Char) = "$char$this$char"
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is empty.", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3286,8 +3268,8 @@ fun <T : CharSequence> T.validateNotEmpty(causeOf: ThrowableSupplier? = null, ca
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3303,8 +3285,8 @@ fun <T : CharSequence> T.validateNotEmpty(causeOf: ThrowableSupplier? = null, ca
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3320,8 +3302,8 @@ fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variableName:
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3337,8 +3319,8 @@ fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variable: KPr
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3354,8 +3336,8 @@ fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameterName
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3371,8 +3353,8 @@ fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameter: KP
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3389,8 +3371,8 @@ fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameterName: 
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke()))
+fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3405,12 +3387,12 @@ fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameter: KPar
  * @throws ValidationFailedException if the `CharSequence` is null or empty.
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is null or empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is null or empty.", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3425,12 +3407,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier? = n
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3447,12 +3429,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: ThrowableSupplier? = n
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3473,12 +3455,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variab
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3496,12 +3478,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variab
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3517,12 +3499,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parame
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3539,12 +3521,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parame
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3561,12 +3543,12 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, paramete
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke()))
+    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3579,8 +3561,8 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, paramete
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is not empty.", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3599,8 +3581,8 @@ fun <T : CharSequence> T.validateEmpty(causeOf: ThrowableSupplier? = null, cause
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3616,8 +3598,8 @@ fun <T : CharSequence> T.validateEmpty(causeOf: ThrowableSupplier? = null, cause
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3633,8 +3615,8 @@ fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variableName: St
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3651,8 +3633,8 @@ fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variable: KPrope
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3668,8 +3650,8 @@ fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameterName: S
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3686,8 +3668,8 @@ fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameter: KPara
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3706,8 +3688,8 @@ fun <T : CharSequence> T.validateEmpty(callableName: String?, parameterName: Str
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke()))
+fun <T : CharSequence> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3723,12 +3705,12 @@ fun <T : CharSequence> T.validateEmpty(callableName: String?, parameter: KParame
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not null or empty.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is not null or empty.", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3745,12 +3727,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = null
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3768,12 +3750,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: ThrowableSupplier? = null
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3793,12 +3775,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variableN
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3814,12 +3796,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variable:
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3835,12 +3817,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3855,12 +3837,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -3879,12 +3861,12 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameterNa
  * @since 4.2.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke()))
+    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 
@@ -3901,8 +3883,8 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameter: 
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is blank.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is blank.", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3917,8 +3899,8 @@ fun <T : CharSequence> T.validateNotBlank(causeOf: ThrowableSupplier? = null, ca
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3937,8 +3919,8 @@ fun <T : CharSequence> T.validateNotBlank(causeOf: ThrowableSupplier? = null, ca
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -3954,8 +3936,8 @@ fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variableName:
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -3971,8 +3953,8 @@ fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variable: KPr
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -3989,8 +3971,8 @@ fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameterName
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4007,8 +3989,8 @@ fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameter: KP
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4025,8 +4007,8 @@ fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameterName: 
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke()))
+fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4041,12 +4023,12 @@ fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameter: KPar
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is null or blank.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is null or blank.", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4061,12 +4043,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: ThrowableSupplier? = n
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4087,12 +4069,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: ThrowableSupplier? = n
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4108,12 +4090,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variab
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4129,12 +4111,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variab
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4151,12 +4133,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parame
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4172,12 +4154,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parame
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4198,12 +4180,12 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, paramete
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke()))
+    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4219,8 +4201,8 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, paramete
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not blank.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is not blank.", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4236,8 +4218,8 @@ fun <T : CharSequence> T.validateBlank(causeOf: ThrowableSupplier? = null, cause
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4254,8 +4236,8 @@ fun <T : CharSequence> T.validateBlank(causeOf: ThrowableSupplier? = null, cause
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4276,8 +4258,8 @@ fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variableName: St
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4294,8 +4276,8 @@ fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variable: KPrope
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4312,8 +4294,8 @@ fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameterName: S
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4330,8 +4312,8 @@ fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameter: KPara
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4347,8 +4329,8 @@ fun <T : CharSequence> T.validateBlank(callableName: String?, parameterName: Str
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke()))
+fun <T : CharSequence> T.validateBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4370,12 +4352,12 @@ fun <T : CharSequence> T.validateBlank(callableName: String?, parameter: KParame
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not null or blank.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("The char sequence is not null or blank.", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4394,12 +4376,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(causeOf: ThrowableSupplier? = null
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
+fun <T : CharSequence?> T.validateNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4417,12 +4399,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(causeOf: ThrowableSupplier? = null
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4441,12 +4423,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variableN
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4466,12 +4448,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variable:
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4490,12 +4472,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4512,12 +4494,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -4536,12 +4518,12 @@ fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameterNa
  * @since 4.6.0
  */
 @IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
+fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     contract {
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke()))
+    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 
