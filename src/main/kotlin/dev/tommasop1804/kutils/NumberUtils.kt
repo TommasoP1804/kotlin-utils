@@ -507,6 +507,14 @@ val Number.signum
     get() = sign(toDouble())
 
 /**
+ * Provides a string representation of the current [Number] in words, including
+ * both the integer and fractional parts (if any). For fractional parts, each digit
+ * after the decimal point is translated into its corresponding word and joined with "point."
+ * Example: 3.14 -> "three point one four".
+ * @since 4.8.0
+ */
+val Number.words get() = NumberWords.toWords(toBigDecimal())
+/**
  * Converts the current Long value into its corresponding word representation.
  *
  * This property provides a human-readable string representation of the Long value
@@ -1604,7 +1612,6 @@ fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParame
 }
 
 private object NumberWords {
-
     private val UNITS = listOf(
         "zero", "one", "two", "three", "four", "five", "six", "seven",
         "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
@@ -1623,6 +1630,40 @@ private object NumberWords {
     )
 
     // ---------- NUMBER -> WORDS ----------
+
+    /**
+     * Converte un numero decimale in parole, leggendo le cifre dopo il punto
+     * una per una (es. 3.14 -> "three point one four").
+     */
+    fun toWords(value: BigDecimal): String {
+        val negative = value.signum() < 0
+        val abs = value.abs()
+
+        // separa parte intera e parte decimale come stringa di cifre "grezze"
+        val plain = abs.stripTrailingZeros().toPlainString()
+        val dotIdx = plain.indexOf('.')
+
+        val integerPart: Long
+        val fractionalDigits: String
+        if (dotIdx == -1) {
+            integerPart = plain.toLong()
+            fractionalDigits = ""
+        } else {
+            integerPart = plain.substring(0, dotIdx).toLong()
+            fractionalDigits = plain.substring(dotIdx + 1)
+        }
+
+        val integerWords = toWords(integerPart)
+
+        val result = if (fractionalDigits.isEmpty()) {
+            integerWords
+        } else {
+            val digitWords = fractionalDigits.map { UNITS[it - '0'] }.joinToString(" ")
+            "$integerWords point $digitWords"
+        }
+
+        return if (negative) "negative $result" else result
+    }
 
     fun toWords(value: Long): String {
         if (value == 0L) return UNITS[0]
@@ -1683,7 +1724,7 @@ private object NumberWords {
         return r
     }
 
-    fun parse(text: String): Long {
+    fun parse(text: String): BigDecimal {
         val tokens = text.lowercase()
             .replace("-", " ")
             .replace(",", " ")
@@ -1698,11 +1739,36 @@ private object NumberWords {
             negative = true; idx = 1
         }
 
+        val pointIdx = tokens.indexOf("point").let { if (it >= idx) it else -1 }
+
+        val integerTokens = if (pointIdx == -1) tokens.subList(idx, tokens.size) else tokens.subList(idx, pointIdx)
+        val fractionalTokens = if (pointIdx == -1) emptyList() else tokens.subList(pointIdx + 1, tokens.size)
+
+        val integerValue = parseIntegerTokens(integerTokens)
+
+        val fractionalDigits = buildString {
+            for (token in fractionalTokens) {
+                val digit = WORD_VALUES[token]
+                require(digit != null && digit in 0..9) { "Unknown digit after 'point': '$token'" }
+                append(digit)
+            }
+        }
+
+        var result = BigDecimal(integerValue)
+        if (fractionalDigits.isNotEmpty()) {
+            result = result.add(BigDecimal("0.$fractionalDigits"))
+        }
+
+        return if (negative) result.negate() else result
+    }
+
+    private fun parseIntegerTokens(tokens: List<String>): Long {
+        if (tokens.isEmpty()) return 0L
+
         var total = 0L      // accumulated full result
         var current = 0L    // current group being built (< 1000 before scale applied)
 
-        for (i in idx until tokens.size) {
-            val token = tokens[i]
+        for (token in tokens) {
             when {
                 WORD_VALUES.containsKey(token) -> current += WORD_VALUES[token]!!
                 token == "hundred" -> current *= 100
@@ -1714,7 +1780,6 @@ private object NumberWords {
                 else -> throw IllegalArgumentException("Unknown token: '$token'")
             }
         }
-        val result = total + current
-        return if (negative) -result else result
+        return total + current
     }
 }

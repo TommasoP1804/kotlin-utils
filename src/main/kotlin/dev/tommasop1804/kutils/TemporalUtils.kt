@@ -56,7 +56,7 @@ val ISO_DATE_TIME_PATTERN: Pattern = Pattern.compile(ISO_DATE_TIME_REGEX.pattern
  * Predicate for ISO 8601 date-time format.
  * @since 1.0.0
  */
-val ISO_DATE_TIME_VALIDATOR = { s: String -> ISO_DATE_TIME_REGEX.matches(s) }
+val ISO_DATE_TIME_VALIDATOR: Predicate<String> = { s: String -> ISO_DATE_TIME_REGEX.matches(s) }
 /**
  * Regular expression for ISO 8601 date-time format (only with separator '-' and ':').
  * @since 1.0.0
@@ -71,7 +71,7 @@ val ISO_DATE_TIME_PATTERN_ONLY_SEPARATOR: Pattern = Pattern.compile(ISO_DATE_TIM
  * Predicate for ISO 8601 date-time format (only with separator '-' and ':').
  * @since 1.0.0
  */
-val ISO_DATE_TIME_VALIDATOR_ONLY_SEPARATOR = { s: String -> ISO_DATE_TIME_REGEX_ONLY_SEPARATOR.matches(s) }
+val ISO_DATE_TIME_VALIDATOR_ONLY_SEPARATOR: Predicate<String> = { s: String -> ISO_DATE_TIME_REGEX_ONLY_SEPARATOR.matches(s) }
 /**
  * Regular expression for ISO 8601 date-time format with exclusion for weeks format and day-of-year format.
  * @since 1.0.0
@@ -86,7 +86,7 @@ val ISO_DATE_TIME_STANDARD_PATTERN: Pattern = Pattern.compile(ISO_DATE_TIME_STAN
  * Predicate for ISO 8601 date-time format with exclusion for weeks format and day-of-year format.
  * @since 1.0.0
  */
-val ISO_DATE_TIME_STANDARD_VALIDATOR = { s: String -> ISO_DATE_TIME_STANDARD_REGEX.matches(s) }
+val ISO_DATE_TIME_STANDARD_VALIDATOR: Predicate<String> = { s: String -> ISO_DATE_TIME_STANDARD_REGEX.matches(s) }
 /**
  * Regular expression for ISO 8601 date-time format with exclusion for weeks format and day-of-year format (only with separator '-' and ':').
  * @since 1.0.0
@@ -101,7 +101,7 @@ val ISO_DATE_TIME_STANDARD_PATTERN_ONLY_SEPARATOR: Pattern = Pattern.compile(ISO
  * Predicate for ISO 8601 date-time format with exclusion for weeks format and day-of-year format (only with separator '-' and ':').
  * @since 1.0.0
  */
-val ISO_DATE_TIME_STANDARD_VALIDATOR_ONLY_SEPARATOR = { s: String -> ISO_DATE_TIME_STANDARD_REGEX_ONLY_SEPARATOR.matches(s) }
+val ISO_DATE_TIME_STANDARD_VALIDATOR_ONLY_SEPARATOR: Predicate<String> = { s: String -> ISO_DATE_TIME_STANDARD_REGEX_ONLY_SEPARATOR.matches(s) }
 /**
  * Regular expression for ISO 8601 date format.
  * @since 1.0.0
@@ -116,7 +116,7 @@ val ISO_DATE_PATTERN: Pattern = Pattern.compile(ISO_DATE_REGEX.pattern)
  * Predicate for ISO 8601 date format.
  * @since 1.0.0
  */
-val ISO_DATE_VALIDATOR = { s: String -> ISO_DATE_REGEX.matches(s) }
+val ISO_DATE_VALIDATOR: Predicate<String> = { s: String -> ISO_DATE_REGEX.matches(s) }
 /**
  * Regular expression for ISO 8601 date format (only with separator '-').
  * @since 1.0.0
@@ -131,7 +131,7 @@ val ISO_DATE_PATTERN_ONLY_SEPARATOR: Pattern = Pattern.compile(ISO_DATE_REGEX_ON
  * Predicate for ISO 8601 date format (only with separator '-').
  * @since 1.0.0
  */
-val ISO_DATE_VALIDATOR_ONLY_SEPARATOR = { s: String -> ISO_DATE_REGEX_ONLY_SEPARATOR.matches(s) }
+val ISO_DATE_VALIDATOR_ONLY_SEPARATOR: Predicate<String> = { s: String -> ISO_DATE_REGEX_ONLY_SEPARATOR.matches(s) }
 /**
  * Regular expression for ISO 8601 date format with exclusion for weeks format and day-of-year format.
  * @since 1.0.0
@@ -146,7 +146,7 @@ val ISO_DATE_STANDARD_PATTERN: Pattern = Pattern.compile(ISO_DATE_STANDARD_REGEX
  * Predicate for ISO 8601 date format with exclusion for weeks format and day-of-year format.
  * @since 1.0.0
  */
-val ISO_DATE_STANDARD_VALIDATOR = { s: String -> ISO_DATE_STANDARD_REGEX.matches(s) }
+val ISO_DATE_STANDARD_VALIDATOR: Predicate<String> = { s: String -> ISO_DATE_STANDARD_REGEX.matches(s) }
 /**
  * Regular expression for ISO 8601 date format with exclusion for weeks format and day-of-year format (only with separator '-').
  * @since 1.0.0
@@ -161,7 +161,7 @@ val ISO_DATE_STANDARD_PATTERN_ONLY_SEPARATOR: Pattern = Pattern.compile(ISO_DATE
  * Predicate for ISO 8601 date format with exclusion for weeks format and day-of-year format (only with separator '-').
  * @since 1.0.0
  */
-val ISO_DATE_STANDARD_VALIDATOR_ONLY_SEPARATOR = { s: String -> ISO_DATE_STANDARD_REGEX_ONLY_SEPARATOR.matches(s) }
+val ISO_DATE_STANDARD_VALIDATOR_ONLY_SEPARATOR: Predicate<String> = { s: String -> ISO_DATE_STANDARD_REGEX_ONLY_SEPARATOR.matches(s) }
 /**
  * Regular expression for ISO 8601 time format.
  * @since 1.0.0
@@ -176,7 +176,7 @@ val ISO_TIME_PATTERN: Pattern = Pattern.compile(ISO_TIME_REGEX.pattern)
  * Predicate for ISO 8601 time format.
  * @since 1.0.0
  */
-val ISO_TIME_VALIDATOR = { s: String -> ISO_TIME_REGEX.matches(s) }
+val ISO_TIME_VALIDATOR: Predicate<String> = { s: String -> ISO_TIME_REGEX.matches(s) }
 /**
  * Regular expression for ISO 8601 time format (only with separator ':').
  * @since 1.0.0
@@ -191,7 +191,7 @@ val ISO_TIME_PATTERN_ONLY_SEPARATOR: Pattern = Pattern.compile(ISO_TIME_REGEX_ON
  * Predicate for ISO 8601 time format (only with separator ':').
  * @since 1.0.0
  */
-val ISO_TIME_VALIDATOR_ONLY_SEPARATOR = { s: String -> ISO_TIME_REGEX_ONLY_SEPARATOR.matches(s) }
+val ISO_TIME_VALIDATOR_ONLY_SEPARATOR: Predicate<String> = { s: String -> ISO_TIME_REGEX_ONLY_SEPARATOR.matches(s) }
 /**
  * Regular expression for ISO 8601 period format.
  * @since 1.0.0
@@ -206,7 +206,7 @@ val ISO_PERIOD_PATTERN: Pattern = Pattern.compile(ISO_PERIOD_REGEX.pattern)
  * Predicate for ISO 8601 period format.
  * @since 1.0.0
  */
-val ISO_PERIOD_VALIDATOR = { s: String -> ISO_PERIOD_REGEX.matches(s) }
+val ISO_PERIOD_VALIDATOR: Predicate<String> = { s: String -> ISO_PERIOD_REGEX.matches(s) }
 
 /**
  * A pre-configured `DateTimeFormatter` for formatting and parsing date-time values

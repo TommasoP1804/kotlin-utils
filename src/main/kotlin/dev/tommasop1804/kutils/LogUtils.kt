@@ -15,6 +15,38 @@ import org.slf4j.event.Level
 import kotlin.reflect.KClass
 
 /**
+ * An interface providing a logger instance for the implementing class.
+ * Classes implementing this interface can use the predefined `logger` property
+ * to log information, warnings, or errors. The logger is automatically associated
+ * with the class or its enclosing class in the case of nested structures.
+ * @author Tommaso Pastorelli
+ * @since 4.8.0
+ */
+interface Loggable {
+    /**
+     * Provides a logger instance for the implementing class.
+     * The logger is initialized using the enclosing class if available,
+     * or the actual class if no enclosing class is present. This ensures
+     * that the log output corresponds to the specific class using the logger.
+     * @since 4.8.0
+     */
+    val logger: Logger get() {
+        val javaClass = this::class.java
+        val clazz = javaClass.enclosingClass ?: javaClass
+        return LoggerFactory.getLogger(clazz)
+    }
+
+    /**
+     * A logger instance specific to the runtime class of the current object.
+     * This logger is initialized with the exact runtime class of the object,
+     * regardless of whether it is nested or not. It ensures that log messages
+     * are tagged with the most precise class context.
+     * @since 4.8.0
+     */
+    val loggerOfThis: Logger get() = LoggerFactory.getLogger(this::class.java)
+}
+
+/**
  * Represents different levels of logging severity.
  * Each log level is associated with an integer value and a string name.
  *
@@ -198,9 +230,9 @@ fun log(logger: Logger, level: LogLevel, message: Any) = when (level) {
  * @param message The content or object to log at the specified logging level.
  * @since 1.0.0
  */
-@JvmName("logWithContext")
+@JvmName("logContext")
 context(logger: Logger)
-infix fun LogLevel.log(message: Any) = log(this, message)
+infix fun LogLevel.log(message: Any) = log(logger, this, message)
 /**
  * Logs the string representation of the current object using the specified logger and log level.
  *
@@ -210,6 +242,18 @@ infix fun LogLevel.log(message: Any) = log(this, message)
  */
 @JvmName("logAnyReceiver")
 fun <T> T.log(logger: Logger, level: LogLevel) = apply { log(logger, level, toString()) }
+/**
+ * Logs the current instance at the specified log level using the provided logger from the context.
+ *
+ * This method leverages the `Logger` instance available in the context to log the string representation
+ * of the current instance (`toString()`) at the specified `LogLevel`.
+ *
+ * @param level The severity level of the log (TRACE, DEBUG, INFO, WARN, or ERROR).
+ * @since 4.8.0
+ */
+@JvmName("logAnyReceiverContext")
+context(logger: Logger)
+infix fun <T> T.log(level: LogLevel) = apply { log(logger, level, toString()) }
 
 /**
  * Logs a message at the specified logging level if the given condition is true.
@@ -286,10 +330,10 @@ fun logIf(condition: Boolean, logger: Logger, level: LogLevel, message: Any) {
  * @param message The message to log if the condition evaluates to true.
  * @since 4.1.0
  */
-@JvmName("logIfWithContext")
+@JvmName("logIfContext")
 context(logger: Logger)
 fun LogLevel.logIf(condition: Boolean, message: Any) {
-    if (condition) log(this, message)
+    if (condition) log(logger, this, message)
 }
 /**
  * Logs the current object using the provided logger and log level if the specified condition is met.
@@ -302,3 +346,17 @@ fun LogLevel.logIf(condition: Boolean, message: Any) {
  */
 @JvmName("logIfAnyReceiver")
 fun <T> T.logIf(condition: Boolean, logger: Logger, level: LogLevel) = apply { if (condition) log(logger, level, toString()) }
+/**
+ * Logs the current object if the specified condition is met, and returns the object itself.
+ *
+ * This function enables logging based on a condition, for the severity level specified.
+ * It uses the provided logger within the context to log the current object.
+ *
+ * @param condition Determines whether the logging should occur. If true, the object is logged.
+ * @param level The severity level at which the object should be logged.
+ * @return The calling object itself, allowing for method chaining.
+ * @since 4.8.0
+ */
+@JvmName("logIfAnyReceiverContext")
+context(logger: Logger)
+fun <T> T.logIf(condition: Boolean, level: LogLevel) = apply { if (condition) log(logger, level, toString()) }

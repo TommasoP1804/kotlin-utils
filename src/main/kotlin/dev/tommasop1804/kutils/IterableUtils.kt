@@ -52,6 +52,44 @@ val <E> Iterable<E>?.cardinalityMap: CountMap<E>
     }
 
 /**
+ * Extension property for iterable collections that evaluates whether all elements
+ * in the collection are equal to each other.
+ *
+ * @receiver The iterable collection whose elements are to be compared.
+ * @return `true` if all elements in the collection are equal or if the collection
+ * is empty. Returns `false` if at least one pair of elements in the collection
+ * are not equal.
+ * @since 4.8.0
+ */
+val <E> Iterable<E>.allEqual: Boolean get() {
+    val iterator = iterator()
+    iterator.hasNext().ifFalse { return true }
+    iterator.next().let {
+        while (iterator.hasNext())
+            if (it != iterator.next()) return false
+    }
+    return true
+}
+
+/**
+ * Extension property that checks whether all elements in an [Iterable] are distinct.
+ *
+ * This property returns `true` if all elements in the [Iterable] are unique.
+ * If the [Iterable] is empty or has only one element, the result is always `true`.
+ * @since 4.8.0
+ */
+val <E> Iterable<E>.allDistinct: Boolean get() {
+    val iterator = iterator()
+    iterator.hasNext().ifFalse { return true }
+    val first = iterator.next()
+    iterator.hasNext().ifFalse { return true }
+    val seen = HashSet<E>()
+    seen.add(first)
+    do seen.add(iterator.next()).ifFalse { return false } while (iterator.hasNext())
+    return true
+}
+
+/**
  * Checks if the iterable contains duplicate elements.
  *
  * This function returns `true` if any element in the iterable appears more than once,
@@ -79,6 +117,55 @@ val Collection<*>.isSingleElement get() = size == 1
  * @since 1.0.0
  */
 val Collection<*>.isNotSingleElement get() = size != 1
+
+/**
+ * Checks if all elements in the iterable produce the same key when transformed by the given selector function.
+ *
+ * @param E The type of elements in the iterable.
+ * @param K The type of key produced by the selector function.
+ * @param selector A function that transforms an element of type E into a key of type K.
+ * @return `true` if all elements produce the same key, or if the iterable is empty; `false` otherwise.
+ * @since 4.8.0
+ */
+fun <E, K> Iterable<E>.allEqualBy(selector: Transformer<E, K>): Boolean {
+    val iterator = iterator()
+    iterator.hasNext().ifFalse { return true }
+    var element = iterator.next()
+    iterator.hasNext().ifFalse { return true }
+    var firstKey: K? = null
+    var isFirst = true
+    loop {
+        val key = selector(element)
+        if (isFirst) {
+            firstKey = key
+            isFirst = false
+        } else if (firstKey != key) return false
+        iterator.hasNext().ifFalse { breakLoop() }
+        element = iterator.next()
+    }
+    return true
+}
+
+/**
+ * Checks if all elements in the iterable are distinct based on the key selected by the given selector.
+ *
+ * @param selector A function that selects a key of type [K] from an element of type [E].
+ * @return `true` if all elements are distinct by the selected key or the iterable is empty; otherwise, `false`.
+ * @since 4.8.0
+ */
+fun <E, K> Iterable<E>.allDistinctBy(selector: Transformer<E, K>): Boolean {
+    val iterator = iterator()
+    iterator.hasNext().ifFalse { return true }
+    var element = iterator.next()
+    iterator.hasNext().ifFalse { return true }
+    val seen = HashSet<K>()
+    loop {
+        seen.add(selector(element)).ifFalse { return false }
+        iterator.hasNext().ifFalse { breakLoop() }
+        element = iterator.next()
+    }
+    return true
+}
 
 /**
  * Merges the current collection with one or more additional collections.

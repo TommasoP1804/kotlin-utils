@@ -20,49 +20,12 @@ import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.exceptions.*
 import org.slf4j.Logger
-import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.*
 
-
-/**
- * Invokes the `Optional` instance, returning the contained value if present,
- * or `null` if the instance is empty.
- *
- * This operator provides a shorthand for accessing the wrapped value
- * within an `Optional` without explicitly calling the `orElse` method.
- *
- * @return the value contained within this `Optional` if present, or `null` if the `Optional` is empty.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-operator fun <T> Optional<T>.invoke(): T? = orElse(null)
-/**
- * Provides an operator function for the `Optional` type, allowing an alternative value
- * to be returned if the optional instance is empty.
- *
- * @param other the value to return if the optional instance is empty
- * @return the value contained within the optional if present, or `other` if empty
- * @since 1.0.0
- */
-@IgnorableReturnValue
-operator fun <T> Optional<T>.invoke(other: T): T = orElse(other)!!
-/**
- * Invokes the `Optional` instance, returning the contained value if present,
- * or `null` if the instance is empty.
- *
- * This operator provides a shorthand for accessing the wrapped value
- * within an `Optional` without explicitly calling the `orElse` method.
- *
- * @return the value contained within this `Optional` if present, or `null` if the `Optional` is empty.
- * @since 1.0.0
- */
-@JvmName("optionalInvokeThrowableSupplier")
-@IgnorableReturnValue
-operator fun <T> Optional<T>.invoke(lazyException: ThrowableSupplier): T = orElseThrow(lazyException)!!
 
 /**
  * Checks if the current object is not null.
@@ -4587,15 +4550,16 @@ fun Long.printErr() = apply { System.err.print(this) }
 @IgnorableReturnValue
 fun Float.printErr() = apply { System.err.print(this) }
 /**
- * Prints the value of the Short to the standard error output stream.
+ * Prints the string to the standard error output stream (System.err) without adding a newline.
  *
- * This function sends the Short value directly to the `System.err` stream without any additional formatting.
+ * This function allows chaining operations on the resulting string.
  *
- * @receiver The Short value to be printed to the error stream.
- * @since 1.0.0
+ * @receiver The string to be printed to the standard error output stream.
+ * @return The original string, allowing further chaining operations.
+ * @since 4.8.0
  */
 @IgnorableReturnValue
-fun Short.printErr() = apply { System.err.print(this) }
+fun String.printErr() = apply { System.err.print(this) }
 /**
  * Prints the double value to the standard error stream (`System.err`).
  *
@@ -4699,17 +4663,17 @@ fun Long.printlnErr() = apply { System.err.println(this) }
 @IgnorableReturnValue
 fun Float.printlnErr() = apply { System.err.println(this) }
 /**
- * Prints the value of the Short instance to the standard error stream.
+ * Prints the string to the standard error output stream.
  *
- * This function sends the string representation of the Short value to
- * the `System.err` output, providing a mechanism to log or display
- * error-related numeric information.
+ * This function sends the string content to `System.err.println`,
+ * allowing messages or errors to be logged to the error stream.
  *
- * @receiver The Short value to be printed to the error output stream.
- * @since 1.0.0
+ * @receiver The string to be printed to the error stream.
+ * @return The original string (`this`) to allow method chaining.
+ * @since 4.8.0
  */
 @IgnorableReturnValue
-fun Short.printlnErr() = apply { System.err.println(this) }
+fun String.printlnErr() = apply { System.err.println(this) }
 /**
  * Prints the double value of the current instance to the standard error stream.
  *

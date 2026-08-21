@@ -38,6 +38,8 @@ import kotlin.reflect.KProperty
  *
  * @property latitude the latitude of the coordinate as a `Double`.
  * @property longitude the longitude of the coordinate as a `Double`.
+ * @throws LocationException if the latitude is not in -90..90
+ * @throws LocationException if the value is not within the range of -180.0 to 180.0.
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
@@ -47,51 +49,13 @@ import kotlin.reflect.KProperty
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = GeoCoordinate.Companion.OldDeserializer::class)
 @Suppress("unused", "kutils_take_as_int_invoke", "kutils_ignorecase_function")
 @MustUseReturnValues
-class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializable, Comparable<GeoCoordinate> {
-    /**
-     * Represents the geographical latitude of a location in degrees.
-     * Latitude values range from -90.0 to 90.0, where positive values indicate north
-     * and negative values indicate south. Setting a value outside this range
-     * will throw a LocationException.
-     *
-     * @throws LocationException if the latitude is not in -90..90
-     * @since 1.0.0
-     */
-    var latitude: Double = 0.0
-        set(value) {
-            isValidLatitude(value) || throw LocationException("Latitude must be between -90.0 and 90.0")
-            field = value
-        }
-    /**
-     * Represents the geographical longitude in degrees.
-     *
-     * This variable stores the longitude value which must be within the valid range
-     * of -180.0 to 180.0 to conform to geographical standards.
-     * Longitude values are generally used to specify locations on the Earth's surface.
-     *
-     * @throws LocationException if the value is not within the range of -180.0 to 180.0.
-     * @since 1.0.0
-     */
-    var longitude: Double = 0.0
-        set(value) {
-            isValidLongitude(value) || throw LocationException("Longitude must be between -180.0 and 180.0")
-            field = value
-        }
-
-    init {
-        latitude in -90.0..90.0 || throw LocationException("Latitude must be between -90.0 and 90.0")
-        longitude in -180.0..180.0 || throw LocationException("Longitude must be between -180.0 and 180.0")
-
-        this.latitude = latitude
-        this.longitude = longitude
-    }
-
+class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Serializable, Comparable<GeoCoordinate> {
     /**
      * Secondary constructor that initializes an instance using a given pair of doubles.
      * This constructor delegates to the primary constructor with the values extracted
      * from the provided pair.
      *
-     * 
+     *
      * @param pair A pair containing two double values used for initialization.
      * @since 1.0.0
      */
@@ -115,16 +79,20 @@ class GeoCoordinate(latitude: Double = 0.0, longitude: Double = 0.0): Serializab
      * @throws ExpectationMismatchException if the SRID of the geometry is not 4326
      * @since 1.0.0
      */
-    constructor(geometry: Geometry<*>) : this() {
+    constructor(geometry: Geometry<*>) : this(compute {
         when (geometry) {
             is org.geolatte.geom.Point -> {
                 geometry.srid == 4326 || throw ExpectationMismatchException("SRID must be 4326")
                 val position = geometry.position
-                longitude = position.getCoordinate(0)
-                latitude = position.getCoordinate(1)
+                position.getCoordinate(0) to position.getCoordinate(1)
             }
             else -> throw ClassMismatchException("Only Point geometries are supported")
         }
+    })
+
+    init {
+        latitude in -90.0..90.0 || throw LocationException("Latitude must be between -90.0 and 90.0")
+        longitude in -180.0..180.0 || throw LocationException("Longitude must be between -180.0 and 180.0")
     }
 
     companion object {

@@ -22,6 +22,7 @@ import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.tryOrThrow
 import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.words
 import jakarta.persistence.AttributeConverter
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -1797,7 +1798,9 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
     } else {
         fun Number.fmt(full: String, short: String, format: Format): String =
             when (format) {
+                Format.ShortTextual -> (if (isDecimal) this else toLong()).run { "$words $short" }
                 Format.Short -> (if (isDecimal) this else toLong()).run { "$this$short" }
+                Format.FullTextual -> (if (isDecimal) this else toLong()).run { if (toLong() == 1L) "$words $full" else "$words ${full}s" }
                 Format.Full -> (if (isDecimal) this else toLong()).run { if (toLong() == 1L) "$this $full" else "$this ${full}s" }
                 else -> String.EMPTY
             }
@@ -1986,8 +1989,26 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
          */
         Iso,
         /**
+         * Represents the full textual format within the Format enumeration.
+         *
+         * This format is used to provide a detailed textual representation,
+         * offering a human-readable and descriptive way of formatting values.
+         * Often utilized in scenarios where clarity and explicitness are prioritized
+         * over brevity.
+         *
+         * - `Full`: 6 hours 3 minutes
+         * - `FullTextual`: six hours three minutes
+         *
+         * @since 4.8.0
+         */
+        FullTextual,
+        /**
          * Represents the FULL format type as part of the Format enumeration.
          * Typically used to denote a detailed or comprehensive representation of data.
+         *
+         * - `Full`: 6 hours 3 minutes
+         * - `FullTextual`: six hours three minutes
+         *
          * @since 4.0.0
          */
         Full,
@@ -1996,6 +2017,22 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
          *
          * This enum constant is used to define short format style, often for representing
          * data in a compact manner.
+         *
+         * - `Short`: 6h 3m
+         * - `ShortTextual`: six h three m
+         *
+         * @since 4.8.0
+         */
+        ShortTextual,
+        /**
+         * Represents a formatting style with concise representation.
+         *
+         * This enum constant is used to define short format style, often for representing
+         * data in a compact manner.
+         *
+         * - `Short`: 6h 3m
+         * - `ShortTextual`: six h three m
+         *
          * @since 4.0.0
          */
         Short
