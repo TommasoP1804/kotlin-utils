@@ -39,6 +39,10 @@ class Validated<T : Any>(private var value: T? = null, private val predicates: I
      */
     constructor(value: T?, predicate: Predicate<T>) : this(value, listOf(predicate))
 
+    init {
+        value?.let { v -> predicates.forEach { v.validate(predicate = it) } }
+    }
+
     /**
      * Retrieves the value of the property delegate.
      *
@@ -75,6 +79,10 @@ class Validated<T : Any>(private var value: T? = null, private val predicates: I
  * @author Tommaso Pastorelli
  */
 class NullableValidated<T>(private var value: T? = null, private val predicates: Iterable<Predicate<T>>) {
+    init {
+        value?.let { v -> predicates.forEach { v.validate(predicate = it) } }
+    }
+
     /**
      * Secondary constructor for NullableValidated that accepts a value and a variable number of predicates.
      *
@@ -190,6 +198,8 @@ class WithDefault<T : Any>(private var value: T?, private val default: Iterable<
  * @since 3.7.0
  */
 class InRange<T : Comparable<T>>(private var value: T? = null, private var range: ClosedRange<T>) {
+    init { value?.validateIn(range) }
+
     /**
      * Retrieves the value of a delegated property. If the value has not been initialized,
      * an IllegalStateException is thrown indicating that the property has not been initialized.
@@ -211,11 +221,7 @@ class InRange<T : Comparable<T>>(private var value: T? = null, private var range
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
-        newValue.validate(
-            property,
-            message = "($newValue) is not within the range $range",
-            predicate = { it in range },
-        )
+        newValue.validateIn(range, property)
         value = newValue
     }
 }
@@ -230,6 +236,8 @@ class InRange<T : Comparable<T>>(private var value: T? = null, private var range
  * @since 3.7.0
  */
 class NullableInRange<T : Comparable<T>?>(private var value: T? = null, private var range: ClosedRange<T & Any>) {
+    init { value?.validateIn(range) }
+
     /**
      * Provides the value associated with the delegated property.
      *
@@ -249,11 +257,7 @@ class NullableInRange<T : Comparable<T>?>(private var value: T? = null, private 
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
-        newValue?.validate(
-            property,
-            message = "($newValue) is not within the range $range",
-            predicate = { it in range },
-        )
+        newValue?.validateIn(range, property)
         value = newValue
     }
 }

@@ -19,6 +19,8 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 class PositiveNumber<T : Number>(private var value: T? = null) {
+    init { value?.validatePositive() }
+
     /**
      * Retrieves the value of a delegated property or throws an exception if the value is not initialized.
      *
@@ -52,6 +54,8 @@ class PositiveNumber<T : Number>(private var value: T? = null) {
  * @author Tommaso Pastorelli
  */
 class NullablePositiveNumber<T : Number?>(private var value: T? = null) {
+    init { value?.validatePositive() }
+
     /**
      * Retrieves the value of a delegated property or throws an exception if the value is not initialized.
      *
@@ -86,6 +90,8 @@ class NullablePositiveNumber<T : Number?>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NegativeNumber<T : Number>(private var value: T? = null) {
+    init { value?.validateNegative() }
+
     /**
      * Retrieves the value of the delegated property or throws an exception if the value has not been initialized.
      *
@@ -121,6 +127,9 @@ class NegativeNumber<T : Number>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NullableNegativeNumber<T : Number?>(private var value: T? = null) {
+    init { value?.validateNegative() }
+
+
     /**
      * Retrieves the value of the delegated property or throws an exception if the value has not been initialized.
      *
@@ -155,6 +164,8 @@ class NullableNegativeNumber<T : Number?>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NotPositiveNumber<T : Number>(private var value: T? = null) {
+    init { value?.validateNotPositive() }
+
     /**
      * Retrieves the value of a delegated property.
      *
@@ -192,6 +203,9 @@ class NotPositiveNumber<T : Number>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NullableNotPositiveNumber<T : Number?>(private var value: T? = null) {
+    init { value?.validateNotPositive() }
+
+
     /**
      * Retrieves the value of a delegated property.
      *
@@ -229,6 +243,8 @@ class NullableNotPositiveNumber<T : Number?>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NotNegativeNumber<T : Number>(private var value: T? = null) {
+    init { value?.validateNotNegative() }
+
     /**
      * Retrieves the value of the delegated property.
      *
@@ -265,6 +281,8 @@ class NotNegativeNumber<T : Number>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NullableNotNegativeNumber<T : Number?>(private var value: T? = null) {
+    init { value?.validateNotNegative() }
+
     /**
      * Retrieves the value of the delegated property.
      *
@@ -302,6 +320,8 @@ class NullableNotNegativeNumber<T : Number?>(private var value: T? = null) {
  * @since 3.7.0
  */
 class EvenNumber<T : Number>(private var value: T? = null) {
+    init { value?.validateEven() }
+
     /**
      * Retrieves the value of a delegated property.
      *
@@ -329,7 +349,7 @@ class EvenNumber<T : Number>(private var value: T? = null) {
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
-        newValue.validate(property, message = "must be even", predicate = Number::isEven)
+        newValue.validateEven(property)
         value = newValue
     }
 }
@@ -344,6 +364,8 @@ class EvenNumber<T : Number>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NullableEvenNumber<T : Number?>(private var value: T? = null) {
+    init { value?.validateEven() }
+
     /**
      * Retrieves the value of a delegated property.
      *
@@ -369,7 +391,7 @@ class NullableEvenNumber<T : Number?>(private var value: T? = null) {
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
-        newValue?.validate(property, message = "must be even", predicate = Number::isEven)
+        newValue?.validateEven(property)
         value = newValue
     }
 }
@@ -384,6 +406,8 @@ class NullableEvenNumber<T : Number?>(private var value: T? = null) {
  * @since 3.7.0
  */
 class OddNumber<T : Number>(private var value: T? = null) {
+    init { value?.validateOdd() }
+
     /**
      * Retrieves the value of the delegated property.
      *
@@ -407,7 +431,7 @@ class OddNumber<T : Number>(private var value: T? = null) {
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
-        newValue.validate(property, message = "must be odd", predicate = Number::isOdd)
+        newValue.validateOdd(property)
         value = newValue
     }
 }
@@ -421,6 +445,8 @@ class OddNumber<T : Number>(private var value: T? = null) {
  * @since 3.7.0
  */
 class NullableOddNumber<T : Number?>(private var value: T? = null) {
+    init { value?.validateOdd() }
+
     /**
      * Retrieves the value of the delegated property.
      *

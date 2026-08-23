@@ -13,9 +13,12 @@ import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isOdd
+import dev.tommasop1804.kutils.toMList
 import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.unaryPlus
 import dev.tommasop1804.kutils.validate
+import dev.tommasop1804.kutils.validateNotEmpty
+import dev.tommasop1804.kutils.validatePositive
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
 import tools.jackson.databind.DeserializationContext
@@ -457,6 +460,93 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
     fun toString(textCase: TextCase) = toString(HexSymbol.ZeroX, textCase)
 
     /**
+     * Converts the value to a string representation by applying text case transformation, grouping characters,
+     * and inserting a specific symbol at defined intervals.
+     *
+     * @param groupDivide The number of characters in each group before the symbol is inserted.
+     * @param symbol The symbol to insert between groups of characters.
+     * @param textCase The desired text case transformation to apply to the value. Defaults to TextCase.UpperCase.
+     * @return A formatted string representation of the value.
+     * @throws NumberSignException if the [groupDivide] is not positive.
+     * @since 5.0.1
+     */
+    fun toString(groupDivide: Int, symbol: String, textCase: TextCase = TextCase.UpperCase) = buildString {
+        groupDivide.validatePositive("toString", "groupDivide")
+        value.convertCase(TextCase.UpperCase, textCase).forEachIndexed { index, ch ->
+            if (index > 0 && index % groupDivide == 0) append(symbol)
+            append(ch)
+        }
+    }
+    /**
+     * Converts the object to its string representation with additional formatting options.
+     *
+     * @param groupDivide Specifies the grouping size for formatted output.
+     * @param symbol Character to be used as a grouping separator.
+     * @param textCase Enum value indicating the desired text case format. Defaults to `TextCase.UpperCase`.
+     * @throws NumberSignException if the [groupDivide] is not positive.
+     * @since 5.0.1
+     */
+    fun toString(groupDivide: Int, symbol: Char, textCase: TextCase = TextCase.UpperCase) =
+        toString(groupDivide, symbol.toString(), textCase)
+    /**
+     * Converts a value to a string, grouping characters based on specified segment lengths and applying a defined text case.
+     *
+     * @param groupDivide A list of integers that specify the lengths of character segments for grouping. The list is processed in reverse order.
+     * @param symbol A string to be inserted between groups of characters as the separator.
+     * @param textCase The case transformation to apply to the characters. Defaults to `TextCase.UpperCase`.
+     * @return A formatted string with grouped characters and the specified text case transformation.
+     * @throws NumberSignException if any of [groupDivide] is not positive.
+     * @since 5.0.1
+     */
+    fun toString(groupDivide: List<Int>, symbol: String, textCase: TextCase = TextCase.UpperCase) = buildString {
+        val divide = groupDivide.toMList().onEach { it.validatePositive("toString", "groupDivide") }
+        var nextBreak = divide.removeFirstOrNull()
+        value.convertCase(TextCase.UpperCase, textCase).forEachIndexed { index, ch ->
+            if (index > 0 && nextBreak != null && index == nextBreak) {
+                append(symbol)
+                nextBreak = divide.removeFirstOrNull()?.let { it + index }
+            }
+            append(ch)
+        }
+    }
+    /**
+     * Converts the object to its string representation based on the specified parameters.
+     *
+     * @param groupDivide A list of integers that defines the grouping structure used in the string representation.
+     * @param symbol A character that is used as the delimiter or separator in the string representation.
+     * @param textCase Specifies the desired case transformation for the string. Defaults to TextCase.UpperCase.
+     * @throws NumberSignException if any of [groupDivide] is not positive.
+     * @since 5.0.1
+     */
+    fun toString(groupDivide: List<Int>, symbol: Char, textCase: TextCase = TextCase.UpperCase) =
+        toString(groupDivide, symbol.toString(), textCase)
+
+    /**
+     * Converts the value to a string representation based on the provided format.
+     *
+     * @param format The formatting rules to apply, including grouping symbols,
+     *               group divide parameters, text case transformation, and other settings
+     *               encapsulated in the [Format] object.
+     * @return The formatted string representation of the value.
+     * @since 5.0.1
+     */
+    fun toString(format: Format) = buildString {
+        append(format.symbol.symbol)
+        val divide = format.groupDivideList.orEmpty().toMList()
+
+        var nextBreak = divide.removeFirstOrNull() ?: format.groupDivide
+
+        value.convertCase(TextCase.UpperCase, format.textCase).forEachIndexed { index, ch ->
+            if (index > 0 && nextBreak != null && index == nextBreak) {
+                append(format.groupSymbol)
+                val step = divide.removeFirstOrNull() ?: format.groupDivide
+                nextBreak = step?.let { it + index }
+            }
+            append(ch)
+        }
+    }
+
+    /**
      * Converts the hexadecimal string value to uppercase.
      *
      * @return A new HexString instance with all characters in uppercase.
@@ -790,4 +880,27 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
          */
         Hash("#")
     }
+
+    /**
+     * Represents a format configuration for handling hexadecimal representations.
+     *
+     * @property symbol Specifies the prefix to use for hexadecimal numbers, e.g., 0x.
+     * @property textCase Specifies the text casing (upper or lower) for hexadecimal characters.
+     * @property groupDivide Specifies the grouping interval for dividing digits. If null, grouping is not applied.
+     * @property groupSymbol Specifies the character used as a separator for grouped digits. Ignored if grouping is not applied.
+     *
+     * @constructor Initializes the Format instance and validates the grouping divisor if provided.
+     * @since 5.0.1
+     */
+    class Format(
+        val symbol: HexSymbol = HexSymbol.ZeroX,
+        val textCase: TextCase = TextCase.UpperCase,
+        val groupDivide: Int? = null,
+        val groupDivideList: List<Int>? = null,
+        val groupSymbol: Char? = null
+    ) { init {
+        groupDivide?.validatePositive(::textCase)
+        groupDivideList?.validateNotEmpty(::groupDivideList)
+        groupDivideList?.forEach { it.validatePositive(::groupDivideList) }
+    } }
 }

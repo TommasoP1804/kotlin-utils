@@ -607,22 +607,6 @@ operator fun <K, V> Map<K, V>.rem(limit: Int): List<Map<K, V>> = chunked(limit)
 operator fun <K, V> MMap<K, V>.rem(limit: Int): MList<MMap<K, V>> = chunked(limit).kMap { it.toMMap() }.toMList()
 
 /**
- * Iterates over each entry in the map and applies the specified block to it.
- *
- * The map itself remains unmodified, and the original map is returned to allow method chaining.
- *
- * @param K the type of keys in the map.
- * @param V the type of values in the map.
- * @param block a lambda function that is invoked for each entry in the map.
- *              Receives a `Map.Entry<K, V>` as its parameter.
- * @return the original map after applying the block to its entries.
- * @since 2.0.0
- */
-inline fun <K, V> Map<K, V>.peek(block: ReceiverConsumer<Map.Entry<K, V>>) = apply {
-    for (element in this@peek) block(element)
-}
-
-/**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
  * Executes the given block for each entry in the map, passing both the loop context and the map entry

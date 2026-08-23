@@ -1755,14 +1755,6 @@ fun CharSequence.thirdOr(default: Supplier<Char>, predicate: Predicate<Char>): C
 }
 
 /**
- * Applies the given action to each character of the string and
- * retrieves the original string.
- *
- * @param action the action to apply to each character of the string
- * @since 2.0.0
- */
-fun String.peek(action: Consumer<Char>) = toList().peek(action).joinToString(String.EMPTY)
-/**
  * Stands for `controlledEach`. You can use [breakLoop] and [continueLoop].
  *
  * Applies the given action to each character of the string and

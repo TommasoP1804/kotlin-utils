@@ -1596,16 +1596,6 @@ operator fun <E> MCollection<E>.minusAssign(removeIf: Predicate<E>) {
 operator fun <E> Iterable<E>.minus(filterNot: Predicate<E>) = filterNot(filterNot)
 
 /**
- * Iterates through each element in the iterable collection and applies the given block of code to it.
- * Returns the original iterable collection after the operation.
- *
- * @param E the type of elements in the iterable collection.
- * @param block the action to be performed on each element.
- * @return the original iterable collection after applying the block to each element.
- * @since 2.0.0
- */
-inline fun <E> Iterable<E>.peek(block: Consumer<E>) = apply { for (element in this) block(element) }
-/**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
  * Iterates through each element in the iterable collection and applies the given block of code to it.
@@ -1616,7 +1606,7 @@ inline fun <E> Iterable<E>.peek(block: Consumer<E>) = apply { for (element in th
  * @return the original iterable collection after applying the block to each element.
  * @since 2.0.0
  */
-inline fun <E> Iterable<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
+inline fun <T : Iterable<E>, E> T.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
     with(LoopContext()) {
         for (element in this@cForEach) {
             try {
@@ -1642,7 +1632,7 @@ inline fun <E> Iterable<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) =
  *              The `block` is executed for each element in the iterable.
  * @since 2.0.0
  */
-inline fun <E> Iterable<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
+inline fun <T : Iterable<E>, E> T.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
     with(LoopContext()) {
         for ([index, element] in withIndex()) {
             try {
@@ -1670,7 +1660,7 @@ inline fun <E> Iterable<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContex
  * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <E, R> Iterable<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
+inline fun <T : Iterable<E>, E, R> T.rForEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
     with(LoopContext()) {
         for (element in this@rForEach) {
             try {
@@ -1697,7 +1687,7 @@ inline fun <E, R> Iterable<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E
  * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <E, R> Iterable<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
+inline fun <T : Iterable<E>, E, R> T.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
     with(LoopContext()) {
         for ([index, element] in withIndex()) {
             try {

@@ -30,6 +30,8 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 class NotBlankString(private var value: String? = null) {
+    init { value?.validateNotBlank() }
+
     /**
      * Retrieves the value of a delegated property.
      *
@@ -58,7 +60,7 @@ class NotBlankString(private var value: String? = null) {
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: String) {
-        newValue.validate(property, message = "must not be blank", predicate = String::isNotNullOrBlank)
+        newValue.validateNotBlank(property)
         value = newValue
     }
 }
@@ -83,6 +85,8 @@ class NotBlankString(private var value: String? = null) {
  * @author Tommaso Pastorelli
  */
 class NullableNotBlankString(private var value: String? = null) {
+    init { value?.validateNotBlank() }
+
     /**
      * Retrieves the value of a delegated property.
      *
@@ -111,7 +115,7 @@ class NullableNotBlankString(private var value: String? = null) {
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: String?) {
-        newValue?.validate(property, message = "must not be blank", predicate = String::isNotNullOrBlank)
+        newValue?.validateNotBlank(property)
         value = newValue
     }
 }

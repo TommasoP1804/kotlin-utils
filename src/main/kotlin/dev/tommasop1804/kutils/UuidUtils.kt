@@ -11,6 +11,7 @@ package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.identifiers.*
+import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.net.NetworkInterface
 import java.nio.ByteBuffer
@@ -306,6 +307,15 @@ fun CharSequence.toKotlinUuid() = runCatching { kotlin.uuid.Uuid.parse(toString(
  * @since 3.0.0
  */
 fun isValidUuid(string: String) = runCatching { UUID.fromString(string) }.isSuccess
+
+/**
+ * Converts the UUID to its hexadecimal string representation without hyphens.
+ *
+ * @receiver The UUID instance to be converted.
+ * @return A hexadecimal string representation of the UUID without hyphens.
+ * @since 5.0.1
+ */
+fun Uuid.toHex() = Hex(withoutHyphens)
 
 /**
  * Returns the most significant bits of this UUID.

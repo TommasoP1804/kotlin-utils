@@ -22,6 +22,8 @@ import kotlin.reflect.KProperty
  * @author Tommaso Pastorelli
  */
 class UuidRestrictedVersion(private var value: Uuid? = null, private val version: UuidVersion) {
+    init { value?.validateVersion(version) }
+
     /**
      * Retrieves the value of the property or throws an exception if the value has not been initialized.
      *
@@ -42,7 +44,7 @@ class UuidRestrictedVersion(private var value: Uuid? = null, private val version
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: Uuid) {
-        newValue.version.validate(property, message = "version must be $version", predicate = { it == version })
+        newValue.validateVersion(version, property)
         value = newValue
     }
 }
@@ -58,6 +60,8 @@ class UuidRestrictedVersion(private var value: Uuid? = null, private val version
  * @author Tommaso Pastorelli
  */
 class NullableUuidRestrictedVersion(private var value: Uuid? = null, private val version: UuidVersion) {
+    init { value?.validateVersion(version) }
+
     /**
      * Retrieves the current value of the property.
      *
@@ -77,7 +81,7 @@ class NullableUuidRestrictedVersion(private var value: Uuid? = null, private val
      * @since 3.7.0
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: Uuid?) {
-        newValue?.version?.validate(property, message = "version must be $version", predicate = { it == version })
+        newValue?.validateVersion(version, property)
         value = newValue
     }
 }

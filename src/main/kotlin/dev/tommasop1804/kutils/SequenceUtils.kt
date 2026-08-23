@@ -277,20 +277,6 @@ fun <E> Sequence<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
 }
 
 /**
- * Iterates over each element in the sequence and applies the given [block] to it.
- *
- * The sequence itself is returned after the operation, allowing for chaining.
- *
- * @param E the type of elements in the sequence.
- * @param block a lambda function that takes an element of the sequence as a parameter
- * and performs an operation on it.
- * @since 2.0.0
- */
-inline fun <E> Sequence<E>.peek(block: Consumer<E>) = apply {
-    for (element in this@peek) block(element)
-}
-
-/**
  * Returns a sequence containing all elements of the original sequence except those that match the given predicate.
  *
  * @param filterNot The predicate used to test elements for exclusion from the resulting sequence.

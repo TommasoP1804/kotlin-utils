@@ -1943,16 +1943,6 @@ inline infix fun <E, R> Array<E>.filterNull(element: Transformer<E, R>) =
     filter { element(it) == null }
 
 /**
- * Applies the given block of code to each element in the array without modifying the array itself.
- * This function is typically used for inspecting or performing side effects on the elements.
- *
- * @param E The type of elements contained in the array.
- * @param block A lambda function or consumer to be applied to each element of the array.
- * @since 2.1.0
- */
-inline fun <E> Array<E>.peek(block: Consumer<E>) = apply { for (element in this) block(element) }
-
-/**
  * Iterates over the elements of the array and executes the provided block for each element.
  * The block has access to the receiver [LoopContext] and the current element, enabling
  * controlled breaking and continuation operations using the [Break] and [Continue] exceptions.
