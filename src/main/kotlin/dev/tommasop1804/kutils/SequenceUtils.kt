@@ -21,9 +21,50 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
+
+/**
+ * Checks if the sequence is empty.
+ *
+ * @receiver The sequence to be checked.
+ * @return `true` if the sequence contains no elements, `false` otherwise.
+ */
+val <E> Sequence<E>.isEmpty get() = none()
+/**
+ * Extension property for `Sequence` to check if it is not empty.
+ *
+ * This property evaluates to `true` if the sequence contains at least one element,
+ * otherwise it evaluates to `false`.
+ *
+ * It is a shorthand for calling the `any()` function on the sequence.
+ */
+val <E> Sequence<E>.isNotEmpty get() = any()
+/**
+ * Extension property to check if a nullable [Sequence] is either null or empty.
+ *
+ * This property returns `true` if the sequence is null or contains no elements.
+ * It returns `false` if the sequence is non-null and contains at least one element.
+ *
+ * Contracts are used to ensure that when this property returns `false`,
+ * the sequence is guaranteed to be non-null.
+ */
+val <E> Sequence<E>?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || none()
+}
+/**
+ * Checks if the sequence is not null and contains at least one element.
+ *
+ * @receiver The sequence to check, which can be nullable.
+ * @return `true` if the sequence is not null and has at least one element, otherwise `false`.
+ */
+val <E> Sequence<E>?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && any()
+}
 
 /**
  * Determines whether the sequence contains exactly one element.
@@ -31,7 +72,7 @@ import kotlin.reflect.KProperty
  * @return `true` if the sequence has exactly one element, otherwise `false`.
  * @since 1.0.0
  */
-val  <E> Sequence<E>.isSingleElement: Boolean get() = singleOrNull().isNotNull()
+val  <E> Sequence<E>.isSingleElement: Boolean get() = singleOrNull() != null
 /**
  * Checks if the sequence does not contain exactly one element.
  *
@@ -136,9 +177,9 @@ inline fun <E> Sequence<E>.findOrThrow(lazyException: ThrowableSupplier, predica
 @Suppress("UNCHECKED_CAST")
 fun <T: Sequence<E>, E> T?.merge(vararg sequences: Sequence<E>): T {
     return when {
-        sequences.isEmpty() && (isNull() || none()) -> emptySequence<E>() as T
+        sequences.isEmpty() && (this == null || none()) -> emptySequence<E>() as T
         sequences.isEmpty() -> this as T
-        isNull() || none() -> sequences.first().merge(*sequences.drop(1).toTypedArray()) as T
+        this == null || none() -> sequences.first().merge(*sequences.drop(1).toTypedArray()) as T
         else -> sequences.fold(this) { acc, sequence -> acc.plus(sequence) as T }
     }
 }
@@ -405,7 +446,7 @@ infix fun <E> Sequence<E>.repeatEach(n: Int) = flatMap { e -> e.asSingleList() *
  */
 fun <E> Sequence<E>.onlyElement() = run {
     if (none()) throw NoSuchElementException()
-    else if (singleOrNull().isNotNull()) single() else throw TooManyElementsException()
+    else if (singleOrNull() != null) single() else throw TooManyElementsException()
 }
 /**
  * Returns the single element of the sequence if it contains exactly one element, or `null` if the sequence is empty
@@ -463,7 +504,7 @@ infix fun <E> Sequence<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): 
  */
 infix fun <E> Sequence<E>.onlyElement(predicate: Predicate<E>) = run {
     if (none()) throw NoSuchElementException()
-    else if (singleOrNull(predicate).isNotNull()) single() else throw TooManyElementsException()
+    else if (singleOrNull(predicate) != null) single() else throw TooManyElementsException()
 }
 /**
  * Returns the single element of the sequence that matches the given [predicate], or `null` if no such element was found.
@@ -764,63 +805,6 @@ fun <E> Sequence<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>): E {
 }
 
 /**
- * Checks if the sequence is empty.
- *
- * This function evaluates whether the sequence contains no elements.
- * It returns `true` if the sequence is empty, and `false` otherwise.
- *
- * Note that this function evaluates the sequence. Be cautious when using
- * it with potentially infinite sequences, as it might result in infinite execution.
- *
- * @receiver Sequence<E> the sequence to be checked.
- * @return `true` if the sequence contains no elements, `false` otherwise.
- * @since 1.0.0
- */
-fun <E> Sequence<E>.isEmpty() = none()
-/**
- * Checks if the sequence is not empty.
- *
- * This function evaluates the sequence to determine if it contains at least one element.
- * It is a terminal operation that consumes elements of the sequence if it is not empty.
- *
- * @receiver The sequence to check.
- * @return `true` if the sequence contains at least one element, `false` otherwise.
- * @since 1.0.0
- */
-fun <E> Sequence<E>.isNotEmpty() = any()
-
-/**
- * Checks if the given sequence is either `null` or empty.
- *
- * This function uses a contract to indicate that when it returns `false`, the sequence is guaranteed to be non-null.
- *
- * @return `true` if the sequence is `null` or contains no elements; otherwise `false`.
- * @since 1.0.0
- */
-@OptIn(ExperimentalContracts::class)
-@Suppress("kutils_null_check")
-fun <E> Sequence<E>?.isNullOrEmpty(): Boolean {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return isNull() || none()
-}
-/**
- * Checks if the given sequence is not null and not empty.
- *
- * @return `true` if the sequence is not null and contains at least one element, otherwise `false`.
- * @since 1.0.0
- */
-@OptIn(ExperimentalContracts::class)
-@Suppress("kutils_null_check")
-fun <E> Sequence<E>?.isNotNullOrEmpty(): Boolean {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return isNotNull() && any()
-}
-
-/**
  * Returns the original sequence if it is neither null nor empty; otherwise, it invokes the
  * specified [defaultValue] supplier and returns its result.
  *
@@ -831,52 +815,95 @@ fun <E> Sequence<E>?.isNotNullOrEmpty(): Boolean {
  * @return the original sequence if it's not null or empty; otherwise, the result of the [defaultValue] supplier
  * @since 1.0.0
  */
-@OptIn(ExperimentalContracts::class)
 inline infix fun <S : Sequence<E>, E> S?.ifNullOrEmpty(defaultValue: Supplier<S>): S {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }
-    return if (isNullOrEmpty()) defaultValue() else this
+    return if (isNullOrEmpty) defaultValue() else this
 }
-
 /**
- * Invokes the given action if the sequence is not empty.
+ * Executes the given [action] on the sequence if it is not empty.
  *
- * This function checks whether the sequence contains at least one element.
- * If the sequence is not empty, the provided action is executed with the sequence as its receiver.
- * Otherwise, the sequence is returned unchanged.
+ * This function allows performing an operation on a sequence only when it contains
+ * at least one element, without affecting the sequence itself.
  *
- * @param action A lambda function or receiver transformer to execute if the sequence is not empty.
- * @return The result of the action if the sequence is not empty, otherwise the original sequence.
- * @since 4.1.0
+ * @param action A consumer function to be invoked with the sequence if it is not empty.
+ * @return The original sequence, regardless of whether the action was invoked.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <E, R> Sequence<E>.ifNotEmpty(action: ReceiverTransformer<Sequence<E>, R>): R {
+inline fun <E> Sequence<E>.ifNotEmpty(action: Consumer<Sequence<E>>): Sequence<E> {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return (if (isNotEmpty()) action(this) else this) as R
+    if (isNotEmpty) action(this)
+    return this
 }
-
 /**
- * Executes the given action if the sequence is not null and not empty.
+ * Invokes the given action with the current sequence if it is not null and contains at least one element.
  *
- * @param action A functional operation to apply to the sequence if it is not null or empty.
- *               The sequence itself is provided as the receiver of the `action`.
- * @return The result of the `action` if the sequence is not null or empty, otherwise `null`.
- * @since 4.1.0
+ * @param action A function to be executed with the sequence if it is not null or empty.
+ * @return The original sequence, or `null` if the sequence is null.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <E, R> Sequence<E>?.ifNotNullOrEmpty(action: ReceiverTransformer<Sequence<E>, R>): R? {
+inline fun <E, R> Sequence<E>?.ifNotNullOrEmpty(action: Consumer<Sequence<E>>): Sequence<E>? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) holdsIn action
         (this@ifNotNullOrEmpty != null) implies returnsNotNull()
     }
-    return (if (isNotNullOrEmpty()) action(this) else this) as R
+    if (isNotNullOrEmpty) action(this)
+    return this
+}
+
+/**
+ * Executes the specified action if the sequence contains the given element.
+ *
+ * @param element the element to be checked for in the sequence.
+ * @param action the action to be executed if the element is found in the sequence.
+ * @return the original sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <E> Sequence<E>.ifContains(element: E, action: Consumer<Sequence<E>>): Sequence<E> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (contains(element)) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the sequence does not contain the given element.
+ *
+ * @param element The element to check for in the sequence.
+ * @param action The action to perform if the element is not found in the sequence.
+ * @return The original sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <E> Sequence<E>.ifNotContains(element: E, action: Consumer<Sequence<E>>): Sequence<E> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!contains(element)) action(this)
+    return this
+}
+
+/**
+ * Invokes the given [action] if the sequence contains exactly one element.
+ *
+ * @param action the action to perform on the single element of the sequence
+ * @return the sequence itself
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <E> Sequence<E>.ifSingleElement(action: Consumer<Sequence<E>>): Sequence<E> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isSingleElement) action(this)
+    return this
 }
 
 /**
@@ -888,12 +915,24 @@ inline fun <E, R> Sequence<E>?.ifNotNullOrEmpty(action: ReceiverTransformer<Sequ
  */
 @Suppress("kutils_null_check")
 @OptIn(ExperimentalContracts::class)
+@JvmName("nullableNot")
 operator fun <E> Sequence<E>?.not(): Boolean {
     contract {
         returns(false) implies (this@not != null)
     }
-    return isNullOrEmpty()
+    return isNullOrEmpty
 }
+/**
+ * Extension operator function that returns whether a sequence is empty.
+ *
+ * The `not` operator is used as an alternative way to check if the sequence contains no elements.
+ * This function evaluates to `true` if the sequence is empty, and `false` otherwise.
+ *
+ * @receiver Sequence to be checked for emptiness.
+ * @return `true` if the sequence is empty, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun <E> Sequence<E>.not() = isEmpty
 
 /**
  * Divides the elements of a sequence into two groups based on a given predicate.
@@ -1105,7 +1144,7 @@ infix fun <E> Sequence<E>.afterLastIncluding(element: E) = if (contains(element)
  * @since 1.0.0
  */
 infix fun <E, R> Sequence<E>.filterNotNull(element: Transformer<E, R>) =
-    filter { element(it).isNotNull() }
+    filter { element(it) != null }
 
 /**
  * Filters elements from the sequence by applying the provided transformer function and
@@ -1116,640 +1155,4 @@ infix fun <E, R> Sequence<E>.filterNotNull(element: Transformer<E, R>) =
  * @since 1.0.0
  */
 infix fun <E, R> Sequence<E>.filterNull(element: Transformer<E, R>) =
-    filter { element(it).isNull() }
-
-/**
- * Validates that the sequence is not empty.
- *
- * This function checks if the sequence contains no elements. If the sequence is empty,
- * it throws a `ValidationFailedException` with an optional cause specified by the provided
- * throwable suppliers. If the sequence is not empty, the original sequence is returned.
- *
- * @param causeOf a supplier for providing a specific throwable to be thrown; may be null.
- * @param cause a supplier for providing the underlying cause of the exception; may be null.
- * @return the original sequence if it is not empty.
- * @throws ValidationFailedException if the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The sequence is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty. If the sequence is empty, it throws a `ValidationFailedException`
- * with an optional cause and message supplied by the provided suppliers.
- *
- * @param causeOf an optional supplier for a specific cause to be used as the root `Throwable`. If `null`, a default
- *                cause is created using `ValidationFailedException`.
- * @param cause an optional supplier for an additional nested cause to be attached to the exception.
- * @param lazyMessage a supplier for the lazy-evaluated message to be used in the exception if validation fails.
- * @return the original sequence if the validation is successful (i.e., the sequence is not empty).
- * @throws ValidationFailedException if the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty.
- *
- * If the sequence is empty, it throws a `ValidationFailedException`. The exception message can
- * include details about the property, variable name, a custom message, and the cause of the failure.
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName The name of the variable being validated. Included in the exception message if provided.
- * @param message An optional custom message to include in the exception if validation fails. Defaults to "is empty".
- * @param causeOf A supplier for the primary cause of the exception, if applicable. Can be null.
- * @param cause A supplier for an additional cause to associate with the exception. Can be null.
- * @return The same sequence that was validated, if it is not empty.
- * @throws ValidationFailedException If the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty. If the sequence is empty, a `ValidationFailedException` is thrown.
- *
- * @param property the primary property associated with the validation, used for generating contextual information in the exception
- * @param variable an optional secondary property providing additional context, used for detailed exception messages
- * @param message an optional custom error message describing the validation failure
- * @param causeOf a supplier providing a throwable to be used as the main cause of the exception; if null, a default exception is constructed
- * @param cause a supplier providing an additional cause to be attached to the generated `ValidationFailedException`
- * @return the sequence itself if validation passes, allowing for method chaining
- * @throws ValidationFailedException if the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty. If the sequence is empty, this method throws a
- * ValidationFailedException with the provided details.
- *
- * @param callable The Kotlin function (`KFunction`) to which this validation is related. Can be null.
- * @param parameterName The name of the parameter in the specified callable being validated. Can be null.
- * @param message An optional custom message to include in the exception if validation fails. Defaults to "is empty".
- * @param causeOf A supplier for an exception to be thrown as the root cause if validation fails. Can be null.
- * @param cause A supplier for an additional cause to include in the ValidationFailedException. Can be null.
- * @return The original sequence if the validation passes.
- * @throws ValidationFailedException If the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty. If the sequence is empty, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] related to the validation, or null if not applicable.
- * @param parameter the [KParameter] representing the parameter involved in the validation, or null if not applicable.
- * @param message an optional message providing additional context for the validation failure. Defaults to null.
- * @param causeOf an optional supplier for the exception to be thrown if the validation fails. Defaults to null.
- * @param cause an optional supplier for the underlying cause of the validation failure. Defaults to null.
- * @return the validated sequence if it is not empty.
- * @throws ValidationFailedException if the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty. If the sequence is empty, a `ValidationFailedException` is thrown.
- *
- * @param callableName the name of the callable (e.g., function or method) related to the validation failure. Can be `null`.
- * @param parameterName the name of the parameter that caused the validation failure. Can be `null`.
- * @param message an optional custom message providing additional details about the validation failure. Defaults to "is empty" if `null`.
- * @param causeOf a supplier for the primary exception that serves as the root cause. Can be `null`.
- * @param cause a supplier for a secondary exception that becomes an underlying cause. Can be `null`.
- * @return the same sequence if it is not empty.
- * @throws ValidationFailedException if the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not empty. If the sequence is empty, throws a `ValidationFailedException`.
- *
- * @param callableName The name of the callable where the validation is performed, or null if not specified.
- * @param parameter The `KParameter` instance representing the parameter being validated, or null if not applicable.
- * @param message An optional custom error message to use if validation fails. Defaults to "is empty".
- * @param causeOf A supplier for the specific `Throwable` to throw instead of the default exception, or null if not used.
- * @param cause A supplier for the underlying cause of the validation failure, or null if there is no underlying cause.
- * @return The original sequence if it is not empty.
- * @throws ValidationFailedException if the sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not null or empty. If the validation fails, a
- * `ValidationFailedException` is thrown with an optional cause.
- *
- * @param causeOf an optional supplier that provides a throwable to be used as the
- *                primary cause of the validation failure. If null, a default exception
- *                is created.
- * @param cause an optional supplier that provides a throwable which can be linked
- *              as an additional cause to provide more context for the exception.
- * @return the validated sequence if it is not null or empty.
- * @throws ValidationFailedException if the sequence is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The sequence is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given sequence is neither `null` nor empty.
- * If the sequence is `null` or empty, a `ValidationFailedException` is thrown.
- *
- * @param causeOf an optional supplier for a `Throwable` that will serve as the main cause if validation fails.
- * @param cause an optional supplier for a `Throwable` that will be attached as the underlying cause for the validation failure.
- * @param lazyMessage a supplier for the error message to be used in the `ValidationFailedException`, constructed lazily.
- * @return the validated sequence, if it is neither `null` nor empty.
- * @throws ValidationFailedException if the sequence is `null` or empty, with the provided error message and cause(s).
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is neither null nor empty. If the validation fails, a `ValidationFailedException`
- * is thrown with the provided details.
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName An optional name of the variable involved in the validation. Used in the error message if provided.
- * @param message An optional custom message to include in the exception. Defaults to "is null or empty".
- * @param causeOf A supplier for the throwable that should be used as the base exception. If null, a default exception is generated.
- * @param cause A supplier for the throwable that should be used as the direct cause of the validation exception. Can be null.
- * @return The sequence itself if validation passes successfully.
- * @throws ValidationFailedException if the sequence is null or empty, with the provided or default details.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not null or empty. If the sequence is null or empty, throws a
- * `ValidationFailedException` with an optionally provided message and cause.
- *
- * @param property the primary property associated with the validation failure, or null if not specified
- * @param variable an optional secondary property providing additional context, or null if not specified
- * @param message an optional message explaining the validation failure; defaults to "is null or empty" if not specified
- * @param causeOf an optional supplier for a custom exception to be thrown if the validation fails; defaults to null
- * @param cause an optional supplier for the underlying cause of the exception; defaults to null
- * @return the original sequence if the validation succeeds
- * @throws ValidationFailedException if the sequence is null or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not `null` or empty. If the validation fails, throws a `ValidationFailedException`.
- *
- * @param callable An optional Kotlin function (`KFunction`) reference associated with the validation context.
- * @param parameterName The name of the parameter being validated. Can be `null` if not applicable.
- * @param message An optional custom message to include in the exception if validation fails.
- * @param causeOf An optional supplier for the exception's primary cause if validation fails.
- * @param cause An optional supplier for the additional cause to be set in the exception if validation fails.
- * @return The validated sequence, if it is not `null` or empty.
- * @throws ValidationFailedException If the sequence is `null` or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a sequence is neither `null` nor empty.
- *
- * Throws a [ValidationFailedException] if the sequence is `null` or empty.
- *
- * @param callable the [KFunction] related to the validation, providing context about the function in which the validation occurs; may be `null`.
- * @param parameter the [KParameter] representing the parameter being validated; may be `null`.
- * @param message an optional message describing the validation failure; default value is `null`.
- * @param causeOf an optional supplier for custom exception to throw as the primary cause; default value is `null`.
- * @param cause an optional supplier for the secondary cause to be attached to the exception; default value is `null`.
- * @return the original sequence if it is not `null` or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is not null or empty. If the sequence is null or empty,
- * throws a `ValidationFailedException` with the specified details.
- *
- * @param callableName The name of the callable (e.g., method, function) related to this validation check.
- * @param parameterName The name of the parameter being validated, which can be null if not applicable.
- * @param message An optional custom message providing more context about the validation failure.
- * @param causeOf A supplier that provides the primary cause of validation failure, or null if not applicable.
- * @param cause A supplier for the underlying throwable cause for the exception, or null if not applicable.
- * @return The sequence itself if the validation passes.
- * @throws ValidationFailedException If the sequence is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given sequence is neither null nor empty.
- * If the sequence is null or empty, a `ValidationFailedException` is thrown.
- *
- * @param callableName The name of the callable (e.g., function or property) associated with the validation,
- *                     or `null` if not specified.
- * @param parameter The `KParameter` instance representing the parameter being validated, or `null` if not applicable.
- * @param message An optional error message providing additional details about the validation failure,
- *                or `null` to use the default message.
- * @param causeOf A supplier for the root cause of the validation failure, which may wrap the generated `ValidationFailedException`,
- *                or `null` if not specified.
- * @param cause A supplier for the cause of the validation failure, or `null` if not specified.
- * @return The original sequence if it is neither null nor empty.
- * @throws ValidationFailedException If the sequence is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is empty. If the sequence is not empty, a validation exception is thrown.
- *
- * @param causeOf Optional supplier for the throwable that provides additional context for the exception.
- *                If provided, the throwable is used as the primary cause of failure.
- * @param cause Optional supplier for the throwable that serves as the underlying cause of the validation exception.
- * @return The original sequence, if it passes the validation (i.e., it is empty).
- * @throws ValidationFailedException if the sequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The sequence is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is not empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is empty and throws a validation exception if it is not.
- *
- * @param causeOf An optional supplier for a throwable to be used as the cause of the exception,
- *                or `null` to ignore this parameter.
- * @param cause An optional supplier for a throwable to be set as the cause of the validation exception,
- *              or `null` if no cause is needed.
- * @param lazyMessage A supplier that generates the error message to be used in the validation exception
- *                    if the sequence is not empty.
- * @return The original sequence if it is empty.
- * @throws ValidationFailedException if the sequence is not empty, constructed with the supplied message
- *                                   and optional cause(s).
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the sequence is empty. If the sequence is not empty, throws a `ValidationFailedException`.
- *
- * @param property The property associated with the validation. Can be null if no specific property is involved.
- * @param variableName An optional name of the variable being validated. Included in the error details if provided.
- * @param message An optional custom error message. Defaults to "is not empty" if not specified.
- * @param causeOf A supplier providing a specific `Throwable` instance to be thrown. If null, a default exception is thrown.
- * @param cause A supplier providing the cause of the exception. Can be null if no cause is specified.
- * @return The original sequence, if validation passes.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is empty, throwing a ValidationFailedException if it's not.
- *
- * This method is useful for ensuring that a sequence contains no elements during validation checks.
- * If the sequence is not empty, the specified error details will be used to construct the exception.
- *
- * @receiver The sequence to validate.
- * @param property The main KProperty associated with the validation failure, or null if not specified.
- * @param variable An optional secondary KProperty that provides additional context, or null if not specified.
- * @param message An optional message providing additional details about the validation failure.
- * @param causeOf A supplier for the primary exception cause, or null if not specified.
- * @param cause A supplier for any additional exception cause, or null if not specified.
- * @return The original sequence if it is empty.
- * @throws ValidationFailedException if the sequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the sequence is empty. If the sequence is not empty, it throws a [ValidationFailedException].
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation error is related. Can be null.
- * @param parameterName The name of the parameter in the given callable that caused the validation issue. Defaults to null.
- * @param message An optional custom message providing additional details about the validation failure. Defaults to null.
- * @param causeOf A supplier that provides the root cause of the validation failure as a [Throwable]. Defaults to null.
- * @param cause A supplier that provides additional context for the validation failure as a [Throwable]. Defaults to null.
- * @return The original sequence if it is empty.
- * @throws ValidationFailedException if the sequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is empty. If the sequence is not empty, throws a [ValidationFailedException].
- *
- * @param callable The [KFunction] related to the validation, or null if not applicable.
- * @param parameter The [KParameter] representing the parameter involved in the validation, or null if not applicable.
- * @param message An optional message providing additional context about the validation failure. Defaults to "is not empty" if not specified.
- * @param causeOf A supplier for the throwable to be thrown as the root cause, or null if not specified.
- * @param cause A supplier for the underlying exception cause, or null if not specified.
- * @return The original sequence if it is empty.
- * @throws ValidationFailedException If the sequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is empty and throws a `ValidationFailedException` if it is not.
- *
- * @param callableName The name of the callable (e.g., function or method) related to the validation.
- * @param parameterName The name of the parameter being validated, or null if unspecified.
- * @param message An optional custom message to provide additional context for the validation failure.
- * @param causeOf An optional supplier for the throwable cause of the validation failure, or null if unspecified.
- * @param cause An optional supplier for the underlying cause of the exception, or null if unspecified.
- * @return The same sequence if validation passes.
- * @throws ValidationFailedException If the sequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a sequence is empty. If the sequence is not empty, a `ValidationFailedException` is thrown.
- *
- * This method is useful for enforcing expectations about the emptiness of sequences in validation logic.
- *
- * @param callableName The name of the callable (e.g., function or property) related to the validation. Can be null.
- * @param parameter The parameter associated with the validation, represented as a `KParameter`. Can be null.
- * @param message An optional error message to provide additional context about the validation failure. Defaults to "is not empty" if not specified.
- * @param causeOf A supplier for an optional base cause `Throwable` to be used in creating the exception, or null.
- * @param cause A supplier for an optional `Throwable` detailing additional context for the exception, or null.
- * @return The original sequence if it is empty.
- * @throws ValidationFailedException If the sequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>, E> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is either null or empty. If the sequence does not meet the condition,
- * it throws a [ValidationFailedException].
- *
- * @param causeOf An optional supplier for a [Throwable] that serves as the primary cause of the exception,
- *                or `null`. If provided, this will be used as the root cause.
- * @param cause An optional supplier for a secondary [Throwable] that will be wrapped as the cause of the
- *              [ValidationFailedException], or `null`.
- * @return The original sequence if it passes the validation (i.e., it is null or empty).
- * @throws ValidationFailedException if the sequence is not null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is not null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a sequence is either null or empty.
- * If the sequence is neither null nor empty, a `ValidationFailedException` is thrown.
- *
- * @param causeOf A supplier for a throwable that will be raised if the validation fails.
- *                This throwable will be set as the cause of the thrown exception if provided.
- * @param cause An additional supplier of a throwable that can be used as a cause for context.
- *              If provided, this will be linked as a cause to the supplied `causeOf` throwable
- *              or directly to the `ValidationFailedException`.
- * @param lazyMessage A supplier for the error message used in the exception if validation fails.
- *                    This allows for lazy evaluation of the error message.
- * @return The same sequence on which the validation was performed.
- *         If the sequence passes the validation (is null or empty), it is returned as-is.
- * @throws ValidationFailedException If the sequence is neither null nor empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the sequence is either null or empty. If the sequence is not null and not empty,
- * a `ValidationFailedException` is thrown.
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName The name of the variable being validated. Can be null if not provided.
- * @param message An optional custom message for the validation error. Defaults to "is not null or empty".
- * @param causeOf An optional supplier for the cause of the exception to be thrown. If not null, it will be invoked
- *                to provide a `Throwable`.
- * @param cause An optional supplier for an additional throwable cause to be associated with the exception. If not null,
- *              it will be invoked to provide the cause.
- * @return The same sequence instance if the validation does not fail.
- * @throws ValidationFailedException If the sequence is not null and not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the sequence is null or empty and throws a [ValidationFailedException] if it is not.
- *
- * @param property the main [KProperty] associated with the validation, providing context for the error, or null if not applicable
- * @param variable an additional [KProperty] offering further context, or null if not applicable
- * @param message an optional error message to include in the exception if validation fails, or null for a default message
- * @param causeOf a [ThrowableSupplier] that supplies the root cause of the validation failure, or null if not specified
- * @param cause a [ThrowableSupplier] providing a supplementary cause for the [ValidationFailedException], or null if not specified
- * @return the original sequence if it passes validation
- * @throws ValidationFailedException if the sequence is not null or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is either null or empty. If the sequence is neither null nor empty,
- * a `ValidationFailedException` is thrown with the provided details.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation is related. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional custom message for the exception. Default is "is not null or empty".
- * @param causeOf A supplier for the `Throwable` that represents the root cause of the validation failure. Can be null.
- * @param cause A supplier for the `Throwable` that provides additional context to the exception. Can be null.
- * @return The same sequence after validation.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given sequence is either `null` or empty. If the sequence is not `null` or empty,
- * a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] associated with the validation failure, or `null` if not applicable.
- * @param parameter the [KParameter] representing the parameter being validated, or `null` if not applicable.
- * @param message an optional message providing additional details about the validation failure, defaulting to a standard message.
- * @param causeOf a supplier for the root cause of the validation failure, or `null` if not applicable.
- * @param cause an optional supplier for additional context on the cause of the failure, or `null` if not specified.
- * @return the original sequence if it passes validation without exceptions.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the sequence is either null or empty. If the sequence is not null and not empty,
- * a `ValidationFailedException` is thrown.
- *
- * @param callableName the name of the callable (e.g., function or method) where the validation is performed
- * @param parameterName the name of the parameter being validated; optional
- * @param message an optional custom message providing additional details about the validation failure
- * @param causeOf a supplier that provides a custom throwable to be thrown as the cause of the failure; optional
- * @param cause a supplier that provides an additional cause for the `ValidationFailedException`; optional
- * @return the original sequence if validation passes
- * @throws ValidationFailedException if the sequence is not null and not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a sequence is null or empty. Throws a [ValidationFailedException]
- * if the sequence is neither null nor empty.
- *
- * @param callableName The name of the callable where the validation is performed. This may be null if not applicable.
- * @param parameter The [KParameter] associated with the validation. This may be null if not applicable.
- * @param message An optional custom error message to be included in the exception if validation fails. Defaults to "is not null or empty".
- * @param causeOf A supplier for an optional root cause of the validation failure. If provided, it initializes the throwable chain with the supplied cause.
- * @param cause A supplier for an optional additional cause of the failure. If provided, this is set as the cause of the [ValidationFailedException].
- * @return The original sequence if it passes the validation (i.e., if it is null or empty).
- * @throws ValidationFailedException If the sequence is neither null nor empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
+    filter { element(it) == null }

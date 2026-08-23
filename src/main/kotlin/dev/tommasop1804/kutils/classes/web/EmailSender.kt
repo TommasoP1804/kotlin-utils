@@ -83,14 +83,14 @@ class SMTPEmailSender(
     private val session: Session
 
     init {
-        if (tokenProvider.isNull() && password.isNull()) throw RequiredParameterException("You must provide a tokenProvider or a password")
+        if (tokenProvider == null && password == null) throw RequiredParameterException("You must provide a tokenProvider or a password")
 
         val props = Properties().apply {
             put("mail.smtp.auth", "true")
             put("mail.smtp.starttls.enable", useTLS.toString())
             put("mail.smtp.host", host)
             put("mail.smtp.port", port.toString())
-            if (tokenProvider.isNotNull()) put("mail.smtp.auth.mechanism", "XOAUTH2")
+            if (tokenProvider != null) put("mail.smtp.auth.mechanism", "XOAUTH2")
         }
         session = Session.getInstance(props, object : Authenticator() {
             /**
@@ -106,7 +106,7 @@ class SMTPEmailSender(
              */
             override fun getPasswordAuthentication(): PasswordAuthentication = PasswordAuthentication(
                 username,
-                if (tokenProvider.isNotNull()) tokenProvider() else password
+                if (tokenProvider != null) tokenProvider() else password
             )
         })
     }
@@ -147,8 +147,8 @@ class SMTPEmailSender(
 
             val bodyPart = MimeBodyPart()
             when {
-                htmlBody.isNotNull() -> bodyPart.setContent(htmlBody, "text/html; charset=utf-8")
-                textBody.isNotNull() -> bodyPart.setText(textBody)
+                htmlBody != null -> bodyPart.setContent(htmlBody, "text/html; charset=utf-8")
+                textBody != null -> bodyPart.setText(textBody)
                 else -> bodyPart.setText(String.EMPTY) // Fallback vuoto
             }
             multipart.addBodyPart(bodyPart)

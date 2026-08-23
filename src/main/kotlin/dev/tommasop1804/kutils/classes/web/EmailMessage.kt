@@ -63,7 +63,7 @@ data class EmailMessage(
      *
      * @since 1.0.0
      */
-    val hasSubject: Boolean get() = subject.isNotNull()
+    val hasSubject: Boolean get() = subject != null
     /**
      * Indicates whether the email message contains a text body.
      *
@@ -73,7 +73,7 @@ data class EmailMessage(
      *
      * @since 1.0.0
      */
-    val hasTextBody: Boolean get() = textBody.isNotNull()
+    val hasTextBody: Boolean get() = textBody != null
     /**
      * Indicates whether the email message contains an HTML body.
      *
@@ -81,7 +81,7 @@ data class EmailMessage(
      *
      * @since 1.0.0
      */
-    val hasHtmlBody: Boolean get() = htmlBody.isNotNull()
+    val hasHtmlBody: Boolean get() = htmlBody != null
     /**
      * Indicates whether the message contains a body, either in plain text or HTML format.
      * Returns true if the message has a text body or an HTML body; false otherwise.

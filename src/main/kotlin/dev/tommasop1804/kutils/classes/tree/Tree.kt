@@ -133,8 +133,8 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     fun checkValidParentIds(): Boolean {
         val parentIds: List<Uuid?> = flatNodesDFS().map { it.parentId }.toMutableList()
         if (parentIds.isEmpty()) return true
-        if (parentIds.first().isNotNull()) return false
-        return parentIds.drop(1).none { it.isNull() }
+        if (parentIds.first() != null) return false
+        return parentIds.drop(1).none { it == null }
     }
 
     /**
@@ -179,7 +179,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @since 1.0.0
      */
     private fun computeDepth(current: TreeNode<T?>?, target: TreeNode<T?>, depth: Int): Int {
-        if (current.isNull()) return -1
+        if (current == null) return -1
         if (current == target) return depth
         for (child in current.children) {
             val result = computeDepth(child, target, depth + 1)
@@ -389,7 +389,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @param value the value to search for in the tree.
      * @since 1.0.0
      */
-    operator fun contains(value: T) = findByValueBFS(data = value).isNotNull()
+    operator fun contains(value: T) = findByValueBFS(data = value) != null
 
     /**
      * Checks whether the specified TreeNode is contained within the tree.
@@ -425,7 +425,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @since 1.0.0
      */
     fun findByIdBFS(node: TreeNode<T?> = root, id: Uuid?): TreeNode<T?>? {
-        if (id.isNull()) return null
+        if (id == null) return null
         if (node.id == id) return node
 
         val queue = ArrayDeque<TreeNode<T?>>()
@@ -454,7 +454,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
 
         for (child in node.children) {
             val result = findByIdDFS(child, id)
-            if (result.isNotNull()) return result
+            if (result != null) return result
         }
         return null
     }
@@ -492,7 +492,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
         if (node.value == data) return node
         for (child in node.children) {
             val result = findByValueDFS(child, data)
-            if (result.isNotNull()) return result
+            if (result != null) return result
         }
         return null
     }
@@ -553,7 +553,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
         var effNode: TreeNode<T?>? = node
         val path = mutableListOf<Uuid?>()
         var id: Uuid? = node.id
-        while (effNode.isNotNull()) {
+        while (effNode != null) {
             path.add(id)
             id = effNode.parentId
             effNode = findByIdBFS(id = id)
@@ -581,7 +581,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * @since 1.0.0
      */
     fun siblingsOf(node: TreeNode<T?>): List<TreeNode<T?>> {
-        if (node.parentId.isNull()) return emptyList()
+        if (node.parentId == null) return emptyList()
         return (findByIdBFS(id = node.parentId) ?: throw IllegalStateException("Parent node not found")).children.filter { it.id != node.id }
     }
 

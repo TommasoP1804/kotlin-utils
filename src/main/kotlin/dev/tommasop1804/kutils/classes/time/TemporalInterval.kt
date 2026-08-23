@@ -247,7 +247,7 @@ interface TemporalInterval : Serializable {
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<TemporalInterval?, String?> {
             override fun convertToDatabaseColumn(attribute: TemporalInterval?) = attribute?.toString()
-            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse(dbData).getOrThrow()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
     }
 

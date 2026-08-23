@@ -551,7 +551,7 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
         class Converter : AttributeConverter<LocalMonthDayTime?, String?> {
             override fun convertToDatabaseColumn(attribute: LocalMonthDayTime?) = if (Objects.isNull(attribute)) null else attribute.toString()
 
-            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse(dbData).getOrThrow()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
     }
 

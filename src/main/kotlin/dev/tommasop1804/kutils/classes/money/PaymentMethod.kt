@@ -89,7 +89,7 @@ sealed interface PaymentMethod {
     @Suppress("UNCHECKED_CAST")
     companion object {
         internal fun <T : PaymentMethod> tryDeserialize(jsonNode: JsonNode) = when {
-            jsonNode.get("panHash").isNotNull() -> Card(
+            jsonNode.get("panHash") != null -> Card(
                 panHash = jsonNode.get("panHash").asString(),
                 last4Digits = jsonNode.get("last4Digits").asString(),
                 expiry = YearMonth(jsonNode.get("expiry").asString())(),
@@ -97,17 +97,17 @@ sealed interface PaymentMethod {
                 holderName = jsonNode.get("holderName").asString(),
                 issuer = jsonNode.get("issuer")?.let { Card.Issuer.ofName(it.asString()) }
             ) as T
-            jsonNode.get("iban").isNotNull() -> BankTransfer(
+            jsonNode.get("iban") != null -> BankTransfer(
                 iban = jsonNode.get("iban").asString().let(::Iban),
                 bic = jsonNode.get("bic")?.asString()?.let(::Bic),
                 bankName = jsonNode.get("bankName")?.asString(),
                 holderName = jsonNode.get("holderName")?.asString(),
             ) as T
-            jsonNode.get("provider").isNotNull() -> DigitalWallet(
+            jsonNode.get("provider") != null -> DigitalWallet(
                 provider = jsonNode.get("provider").asString().let { DigitalWallet.Provider.ofName(it) },
                 email = jsonNode.get("email").asString()?.let(::Email),
             ) as T
-            jsonNode.get("currency").isNotNull() -> Cash(
+            jsonNode.get("currency") != null -> Cash(
                 maxAmount = jsonNode.get("maxAmount")?.asDouble()?.toBigDecimal(),
                 currency = jsonNode.get("currency").asString().let { Currency.getInstance(it) },
             ) as T
@@ -115,7 +115,7 @@ sealed interface PaymentMethod {
         }
 
         internal fun <T : PaymentMethod> tryDeserialize(jsonNode: com.fasterxml.jackson.databind.JsonNode) = when {
-            jsonNode.get("panHash").isNotNull() -> Card(
+            jsonNode.get("panHash") != null -> Card(
                 panHash = jsonNode.get("panHash").asText(),
                 last4Digits = jsonNode.get("last4Digits").asText(),
                 expiry = YearMonth(jsonNode.get("expiry").asText())(),
@@ -123,17 +123,17 @@ sealed interface PaymentMethod {
                 holderName = jsonNode.get("holderName").asText(),
                 issuer = jsonNode.get("issuer")?.let { Card.Issuer.ofName(it.asText()) }
             ) as T
-            jsonNode.get("iban").isNotNull() -> BankTransfer(
+            jsonNode.get("iban") != null -> BankTransfer(
                 iban = jsonNode.get("iban").asText().let(::Iban),
                 bic = jsonNode.get("bic")?.asText()?.let(::Bic),
                 bankName = jsonNode.get("bankName")?.asText(),
                 holderName = jsonNode.get("holderName")?.asText(),
             ) as T
-            jsonNode.get("provider").isNotNull() -> DigitalWallet(
+            jsonNode.get("provider") != null -> DigitalWallet(
                 provider = jsonNode.get("provider").asText().let { DigitalWallet.Provider.ofName(it) },
                 email = jsonNode.get("email").asText()?.let(::Email),
             ) as T
-            jsonNode.get("currency").isNotNull() -> Cash(
+            jsonNode.get("currency") != null -> Cash(
                 maxAmount = jsonNode.get("maxAmount")?.asDouble()?.toBigDecimal(),
                 currency = jsonNode.get("currency").asText().let { Currency.getInstance(it) },
             ) as T
@@ -184,7 +184,7 @@ sealed interface PaymentMethod {
          *
          * @since 3.1.0
          */
-        override val displayName: String get() = (if (issuer.isNotNull()) "${issuer.displayName} " else String.EMPTY) + "•••• $last4Digits"
+        override val displayName: String get() = (if (issuer != null) "${issuer.displayName} " else String.EMPTY) + "•••• $last4Digits"
 
         /**
          * Indicates whether the card is expired.
@@ -235,7 +235,7 @@ sealed interface PaymentMethod {
                     gen.writeStringProperty("expiry", value.expiry.toString())
                     gen.writeStringProperty("cvvHash", value.cvvHash)
                     gen.writeStringProperty("holderName", value.holderName)
-                    if (value.issuer.isNotNull()) gen.writeStringProperty("issuer", value.issuer.displayName)
+                    if (value.issuer != null) gen.writeStringProperty("issuer", value.issuer.displayName)
                     gen.writeEndObject()
                 }
             }
@@ -513,7 +513,7 @@ sealed interface PaymentMethod {
          *
          * @since 3.1.0
          */
-        override val displayName: String get() = "Bank Transfer " + (if (bankName.isNotNull()) "$bankName " else String.EMPTY) + maskedIban
+        override val displayName: String get() = "Bank Transfer " + (if (bankName != null) "$bankName " else String.EMPTY) + maskedIban
 
         /**
          * A computed property that generates a masked representation of the International Bank 
@@ -546,9 +546,9 @@ sealed interface PaymentMethod {
                 override fun serialize(value: BankTransfer, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                     gen.writeStartObject()
                     gen.writeStringProperty("iban", value.iban.value)
-                    if (value.bic.isNotNull()) gen.writeStringProperty("bic", value.bic.value)
-                    if (value.bankName.isNotNull()) gen.writeStringProperty("bankName", value.bankName)
-                    if (value.holderName.isNotNull()) gen.writeStringProperty("holderName", value.holderName)
+                    if (value.bic != null) gen.writeStringProperty("bic", value.bic.value)
+                    if (value.bankName != null) gen.writeStringProperty("bankName", value.bankName)
+                    if (value.holderName != null) gen.writeStringProperty("holderName", value.holderName)
                     gen.writeEndObject()
                 }
             }
@@ -572,9 +572,9 @@ sealed interface PaymentMethod {
                 override fun serialize(value: BankTransfer, gen: JsonGenerator, serializers: SerializerProvider) {
                     gen.writeStartObject()
                     gen.writeStringField("iban", value.iban.value)
-                    if (value.bic.isNotNull()) gen.writeStringField("bic", value.bic.value)
-                    if (value.bankName.isNotNull()) gen.writeStringField("bankName", value.bankName)
-                    if (value.holderName.isNotNull()) gen.writeStringField("holderName", value.holderName)
+                    if (value.bic != null) gen.writeStringField("bic", value.bic.value)
+                    if (value.bankName != null) gen.writeStringField("bankName", value.bankName)
+                    if (value.holderName != null) gen.writeStringField("holderName", value.holderName)
                     gen.writeEndObject()
                 }
             }
@@ -673,14 +673,14 @@ sealed interface PaymentMethod {
          *
          * @since 3.1.0
          */
-        override val displayName: String get() = provider.displayName + if (email.isNotNull()) " ($email)" else String.EMPTY
+        override val displayName: String get() = provider.displayName + if (email != null) " ($email)" else String.EMPTY
 
         companion object {
             class Serializer : ValueSerializer<DigitalWallet>() {
                 override fun serialize(value: DigitalWallet, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                     gen.writeStartObject()
                     gen.writeStringProperty("provider", value.provider.displayName)
-                    if (value.email.isNotNull()) gen.writeStringProperty("email", value.email.value)
+                    if (value.email != null) gen.writeStringProperty("email", value.email.value)
                     gen.writeEndObject()
                 }
             }
@@ -700,7 +700,7 @@ sealed interface PaymentMethod {
                 override fun serialize(value: DigitalWallet, gen: JsonGenerator, serializers: SerializerProvider) {
                     gen.writeStartObject()
                     gen.writeStringField("provider", value.provider.displayName)
-                    if (value.email.isNotNull()) gen.writeStringField("email", value.email.value)
+                    if (value.email != null) gen.writeStringField("email", value.email.value)
                     gen.writeEndObject()
                 }
             }
@@ -867,7 +867,7 @@ sealed interface PaymentMethod {
          *
          * @since 3.1.0
          */
-        override val displayName: String get() = "Cash of $currency" + (if (maxAmount.isNotNull()) " (max $maxAmount)" else String.EMPTY)
+        override val displayName: String get() = "Cash of $currency" + (if (maxAmount != null) " (max $maxAmount)" else String.EMPTY)
 
         /**
          * Secondary constructor for the `Cash` class.
@@ -905,7 +905,7 @@ sealed interface PaymentMethod {
             class Serializer : ValueSerializer<Cash>() {
                 override fun serialize(value: Cash, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                     gen.writeStartObject()
-                    if (value.maxAmount.isNotNull()) gen.writeNumberProperty("maxAmount", value.maxAmount)
+                    if (value.maxAmount != null) gen.writeNumberProperty("maxAmount", value.maxAmount)
                     gen.writeStringProperty("currency", value.currency.currencyCode)
                     gen.writeEndObject()
                 }
@@ -925,7 +925,7 @@ sealed interface PaymentMethod {
             class OldSerializer : JsonSerializer<Cash>() {
                 override fun serialize(value: Cash, gen: JsonGenerator, serializers: SerializerProvider) {
                     gen.writeStartObject()
-                    if (value.maxAmount.isNotNull()) gen.writeNumberField("maxAmount", value.maxAmount)
+                    if (value.maxAmount != null) gen.writeNumberField("maxAmount", value.maxAmount)
                     gen.writeStringField("currency", value.currency.currencyCode)
                     gen.writeEndObject()
                 }
@@ -970,7 +970,7 @@ sealed interface PaymentMethod {
 
             other as Cash
 
-            if (maxAmount?.let { other.maxAmount?.compareTo(it) != 0 } ?: other.maxAmount.isNull()) return false
+            if (maxAmount?.let { other.maxAmount?.compareTo(it) != 0 } ?: other.maxAmount == null) return false
             if (currency != other.currency) return false
 
             return true

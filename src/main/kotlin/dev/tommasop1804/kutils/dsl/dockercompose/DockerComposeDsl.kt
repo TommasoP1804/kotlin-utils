@@ -548,7 +548,7 @@ class ResourceSpecBuilder {
      * @return A `ResourceSpec` object if `cpus` or `memory` is not null, otherwise `null`.
      * @since 3.3.0
      */
-    fun build() = if (cpus.isNotNull() || memory.isNotNull()) ResourceSpec(cpus, memory) else null
+    fun build() = if (cpus != null || memory != null) ResourceSpec(cpus, memory) else null
 }
 
 /**
@@ -1957,7 +1957,7 @@ fun ComposeFile.toYaml() = Yaml(buildString {
         appendLine()
         appendLine("volumes:")
         volumes.forEach { [name, cfg] ->
-            if (cfg.isNull() || (cfg.driver.isNull() && !cfg.external && cfg.driverOpts.isEmpty())) {
+            if (cfg == null || (cfg.driver == null && !cfg.external && cfg.driverOpts.isEmpty())) {
                 appendLine("  $name:")
             } else {
                 appendLine("  $name:")
@@ -1976,7 +1976,7 @@ fun ComposeFile.toYaml() = Yaml(buildString {
         appendLine()
         appendLine("networks:")
         networks.forEach { [name, cfg] ->
-            if (cfg.isNull()) {
+            if (cfg == null) {
                 appendLine("  $name:")
             } else {
                 appendLine("  $name:")
@@ -2022,7 +2022,7 @@ private fun StringBuilder.renderService(name: String, svc: Service) {
     svc.image?.let { appendLine("    image: $it") }
 
     svc.build?.let { b ->
-        if (b.dockerfile.isNull() && b.args.isEmpty() && b.target.isNull() && b.cacheFrom.isEmpty()) {
+        if (b.dockerfile == null && b.args.isEmpty() && b.target == null && b.cacheFrom.isEmpty()) {
             appendLine("    build: ${b.context}")
         } else {
             appendLine("    build:")
@@ -2041,7 +2041,7 @@ private fun StringBuilder.renderService(name: String, svc: Service) {
     }
 
     svc.containerName?.let { appendLine("    container_name: $it") }
-    svc.command.ifNotEmpty { appendLine("    command: ${let { list -> if (list.isSingleElement) "\"${list.first()}\"" else list.map { "\"$it\"" } }}") }
+    svc.command.ifNotEmpty { c -> appendLine("    command: ${c.let { list -> if (list.isSingleElement) "\"${list.first()}\"" else list.map { "\"$it\"" } }}") }
     svc.entrypoint?.let { appendLine("    entrypoint: $it") }
     svc.restart?.let { appendLine("    restart: ${it.yaml}") }
     svc.workingDir?.let { appendLine("    working_dir: $it") }

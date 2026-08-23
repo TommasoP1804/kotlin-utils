@@ -291,12 +291,12 @@ class JoinScope @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun join(table: String, type: JoinType, on: String? = null) {
-        if (type.onCondition && on.isNullOrBlank())
+        if (type.onCondition && on.isNullOrBlank)
             throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
-        if (!type.onCondition && on.isNotNullOrBlank())
+        if (!type.onCondition && on.isNotNullOrBlank)
             throw IllegalOperationException("Cannot join table $table with type $type with onCondition. Please provide onCondition to join table $table with type $type")
 
-        joins += " ${+type.sqlKeyword} JOIN $table${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joins += " ${+type.sqlKeyword} JOIN $table${if (on.isNotNullOrBlank) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -371,9 +371,9 @@ class JoinScope @PublishedApi internal constructor() {
     fun lateral(query: String, type: JoinType, alias: String? = null, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
-        if (!type.onCondition && on.isNotNullOrBlank())
+        if (!type.onCondition && on.isNotNullOrBlank)
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joins += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "($query) $alias" else query}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joins += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank) "($query) $alias" else query}${if (on.isNotNullOrBlank) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -392,9 +392,9 @@ class JoinScope @PublishedApi internal constructor() {
     fun lateral(query: SqlQuery, type: JoinType, alias: String? = null, on: String? = null) {
         if (type.onCondition && on.isNullOrBlank())
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
-        if (!type.onCondition && on.isNotNullOrBlank())
+        if (!type.onCondition && on.isNotNullOrBlank)
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joins += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "(${query.value}) $alias" else query.value}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joins += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank) "(${query.value}) $alias" else query.value}${if (on.isNotNullOrBlank) " ON $on" else String.EMPTY}"
     }
 }
 
@@ -897,11 +897,11 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.6.0
      */
     fun join(table: String, type: JoinType, on: String? = null) {
-        if (type.onCondition && on.isNullOrBlank())
+        if (type.onCondition && on.isNullOrBlank)
             throw IllegalOperationException("Cannot join table $table with type $type without onCondition. Please provide onCondition to join table $table with type $type")
-        if (!type.onCondition && on.isNotNullOrBlank())
+        if (!type.onCondition && on.isNotNullOrBlank)
             throw IllegalOperationException("Cannot join table $table with type $type with onCondition. Please provide onCondition to join table $table with type $type")
-        joinParts += " ${+type.sqlKeyword} JOIN $table${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joinParts += " ${+type.sqlKeyword} JOIN $table${if (on.isNotNullOrBlank) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -913,11 +913,11 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.9.3
      */
     fun lateralJoin(query: String, type: JoinType, alias: String? = null, on: String? = null) {
-        if (type.onCondition && on.isNullOrBlank())
+        if (type.onCondition && on.isNullOrBlank)
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
-        if (!type.onCondition && on.isNotNullOrBlank())
+        if (!type.onCondition && on.isNotNullOrBlank)
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "($query) $alias" else query}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank) "($query) $alias" else query}${if (on.isNotNullOrBlank) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -929,11 +929,11 @@ class SqlBuilder @PublishedApi internal constructor() {
      * @since 3.9.3
      */
     fun lateralJoin(query: SqlQuery, type: JoinType, alias: String? = null, on: String? = null) {
-        if (type.onCondition && on.isNullOrBlank())
+        if (type.onCondition && on.isNullOrBlank)
             throw IllegalOperationException("Cannot join with type $type without onCondition. Please provide onCondition to join with type $type")
-        if (!type.onCondition && on.isNotNullOrBlank())
+        if (!type.onCondition && on.isNotNullOrBlank)
             throw IllegalOperationException("Cannot join with type $type with onCondition. Please provide onCondition to join with type $type")
-        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank()) "(${query.value}) $alias" else query.value}${if (on.isNotNullOrBlank()) " ON $on" else String.EMPTY}"
+        joinParts += " ${+type.sqlKeyword} JOIN LATERAL ${if (alias.isNotNullOrBlank) "(${query.value}) $alias" else query.value}${if (on.isNotNullOrBlank) " ON $on" else String.EMPTY}"
     }
 
     /**
@@ -1805,7 +1805,7 @@ class SqlBuilder @PublishedApi internal constructor() {
         QueryType.Insert -> buildString {
             append("INSERT INTO $insertTable")
             if (insertColumns.isNotEmpty()) append(" (${insertColumns.joinToString(", ")})")
-            if (insertSelectQuery.isNotNull()) {
+            if (insertSelectQuery != null) {
                 append(" $insertSelectQuery")
             } else {
                 append(" VALUES ")

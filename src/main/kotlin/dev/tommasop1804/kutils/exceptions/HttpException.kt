@@ -4,12 +4,8 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.Uri
-import dev.tommasop1804.kutils.before
-import dev.tommasop1804.kutils.classes.web.HttpMethod
-import dev.tommasop1804.kutils.classes.web.HttpStatus
-import dev.tommasop1804.kutils.isNotNull
+import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.web.*
 
 /**
  * Represents an exception that occurs during HTTP-related operations.
@@ -51,7 +47,7 @@ open class HttpException : RuntimeException {
      * @param errorMessage An optional error message providing additional context, or null if not specified.
      * @since 1.0.0
      */
-    constructor(statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}")
+    constructor(statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode != null) "$statusCode " else " "}calling ${if (method != null) "$method " else ""}${if (uri != null) "$uri" else "an URI"}${if (errorMessage != null) ": $errorMessage" else ""}")
     /**
      * Constructs an `HttpException` with a dynamically generated message based on the provided parameters.
      *
@@ -71,7 +67,7 @@ open class HttpException : RuntimeException {
      * @param errorMessage An optional error message providing additional context, or null if not specified.
      * @since 2.0.0
      */
-    constructor(statusCode: HttpStatus, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else "an URI"}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}")
+    constructor(statusCode: HttpStatus?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null) : super("Error ${if (statusCode != null) "$statusCode " else " "}calling ${if (method != null) "$method " else ""}${if (uri != null) "$uri" else "an URI"}${if (errorMessage != null) ": $errorMessage" else ""}")
     /**
      * Constructs an `HttpException` with the specified detail message.
      *
@@ -321,7 +317,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName.isNotNull()) "Error calling service $serviceName" else String.EMPTY))
+    constructor(serviceName: String?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName != null) "Error calling service $serviceName" else String.EMPTY))
     /**
      * Creates an ExternalServiceHttpException with detailed HTTP request information.
      *
@@ -338,7 +334,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
+    constructor(serviceName: String?, statusCode: Int?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode != null) "$statusCode " else " "}calling ${if (serviceName != null) "$serviceName " else ""}${if (method != null) "$method " else ""}${if (uri != null) "$uri" else String.EMPTY}${if (errorMessage != null) ": $errorMessage" else ""}"))
     /**
      * Creates an ExternalServiceHttpException with detailed HTTP request information.
      *
@@ -355,7 +351,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 2.0.0
      */
-    constructor(serviceName: String?, statusCode: HttpStatus?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode.isNotNull()) "$statusCode " else " "}calling ${if (serviceName.isNotNull()) "$serviceName " else ""}${if (method.isNotNull()) "$method " else ""}${if (uri.isNotNull()) "$uri" else String.EMPTY}${if (errorMessage.isNotNull()) ": $errorMessage" else ""}"))
+    constructor(serviceName: String?, statusCode: HttpStatus?, uri: Uri? = null, method: HttpMethod?, errorMessage: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ("Error ${if (statusCode != null) "$statusCode " else " "}calling ${if (serviceName != null) "$serviceName " else ""}${if (method != null) "$method " else ""}${if (uri != null) "$uri" else String.EMPTY}${if (errorMessage != null) ": $errorMessage" else ""}"))
     /**
      * Constructs a new ExternalServiceHttpException with the specified service name and error message.
      *
@@ -368,7 +364,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, message: String?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName.isNotNull()) "Error calling service $serviceName" else String.EMPTY) + (if (message.isNotNull()) ": $message" else String.EMPTY))
+    constructor(serviceName: String?, message: String?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName != null) "Error calling service $serviceName" else String.EMPTY) + (if (message != null) ": $message" else String.EMPTY))
     /**
      * Constructs a new ExternalServiceHttpException with the specified service name, detail message, and cause.
      *
@@ -383,7 +379,7 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName.isNotNull()) "Error calling service $serviceName" else String.EMPTY) + (if (message.isNotNull()) ": $message" else String.EMPTY), cause)
+    constructor(serviceName: String?, message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + (if (serviceName != null) "Error calling service $serviceName" else String.EMPTY) + (if (message != null) ": $message" else String.EMPTY), cause)
     /**
      * Constructs a new ExternalServiceHttpException with the specified service name and cause.
      *
@@ -396,5 +392,5 @@ open class ExternalServiceHttpException : HttpException {
      * @param internalErrorCode the internal error code associated with the exception.
      * @since 1.0.0
      */
-    constructor(serviceName: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ((if (serviceName.isNotNull()) "Error calling service $serviceName" else String.EMPTY)), cause)
+    constructor(serviceName: String?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + ((if (serviceName != null) "Error calling service $serviceName" else String.EMPTY)), cause)
 }

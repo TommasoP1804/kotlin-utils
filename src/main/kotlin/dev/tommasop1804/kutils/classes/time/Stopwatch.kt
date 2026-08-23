@@ -92,9 +92,9 @@ class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Seria
      */
     val elapsed: Duration
         get() {
-            if (startTime.isNull()) return Duration()
+            if (startTime == null) return Duration()
             if (isRunning) return Duration(nanos = (System.currentTimeMillis() - startTime!!) * NANOS_PER_MILLI)
-            if (endTime.isNull()) return Duration()
+            if (endTime == null) return Duration()
             return Duration(nanos = (endTime!! - startTime!!) * NANOS_PER_MILLI) - pause
         }
 
@@ -108,9 +108,9 @@ class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Seria
      */
     val elapsedMillis: Long
         get() {
-            if (startTime.isNull()) return 0
+            if (startTime == null) return 0
             if (isRunning) return (System.currentTimeMillis() - startTime!!) - pause.toMillis(start!!)
-            if (endTime.isNull()) return 0
+            if (endTime == null) return 0
             return (endTime!! - startTime!!)
         }
 
@@ -312,7 +312,7 @@ class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Seria
         if (!isRunning && !force) throw UnsupportedOperationException("The stopwatch is not running")
         endTime = System.currentTimeMillis()
         isRunning = false
-        if (pauseStart.isNotNull()) pause += Duration(nanos = (System.currentTimeMillis() - pauseStart!!) * NANOS_PER_MILLI)
+        if (pauseStart != null) pause += Duration(nanos = (System.currentTimeMillis() - pauseStart!!) * NANOS_PER_MILLI)
         
         return elapsed
     }

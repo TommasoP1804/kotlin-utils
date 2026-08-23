@@ -23,7 +23,7 @@ import kotlin.reflect.KProperty
  * @since 1.0.0
  */
 val Pair<*, *>.containsNullValues
-    get() = first.isNull() || second.isNull()
+    get() = first == null || second == null
 /**
  * Checks if any of the components of the Triple are null.
  *
@@ -35,7 +35,7 @@ val Pair<*, *>.containsNullValues
  * @since 1.0.0
  */
 val Triple<*, *, *>.containsNullValues
-    get() = first.isNull() || second.isNull() || third.isNull()
+    get() = first == null || second == null || third == null
 
 /**
  * Converts a [Pair] into a [Map.Entry].
@@ -478,7 +478,7 @@ fun <E> List<E>.toTriple(): MonoTriple<E?> = Triple(getOrNull(0), getOrNull(1), 
  * @since 1.0.0
  */
 val Quadruple<*, *, *, *>.containsNullValues
-    get() = first.isNull() || second.isNull() || third.isNull() || fourth.isNull()
+    get() = first == null || second == null || third == null || fourth == null
 
 /**
  * Transforms the elements of this Quadruple into another Quadruple by applying the given mapping functions
@@ -732,7 +732,7 @@ operator fun <A, B, C, D> Quadruple<A, B, C, D>.not() = Quadruple(fourth, third,
  * @since 1.0.0
  */
 val Quintuple<*, *, *, *, *>.containsNullValues
-    get() = first.isNull() || second.isNull() || third.isNull() || fourth.isNull() || fifth.isNull()
+    get() = first == null || second == null || third == null || fourth == null || fifth == null
 
 @Suppress("UNCHECKED_CAST")
 fun <A1, B1, C1, D1, E1, A2, B2, C2, D2, E2> Quintuple<A1, B1, C1, D1, E1>.map(

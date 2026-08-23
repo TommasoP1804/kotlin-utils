@@ -61,7 +61,7 @@ data class SortOption(
     constructor(property: KProperty<*>, direction: SortDirection = SortDirection.Ascending) : this(
         property.run {
             val type1 = (parameters.firstOrNull()?.type?.classifier as? KClass<*>)?.simpleName
-            if (type1.isNotNull()) "$type1$${property.name}" else name
+            if (type1 != null) "$type1$${property.name}" else name
         },
         direction
     )

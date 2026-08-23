@@ -24,12 +24,55 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
 import kotlin.collections.forEach as kForEach
 import kotlin.collections.groupBy as kGroupBy
 import kotlin.collections.map as kMap
+
+/**
+ * Extension property that indicates whether the map is empty.
+ *
+ * Returns `true` if the map contains no key-value pairs, otherwise `false`.
+ * @since 5.0.0
+ */
+val <K, V> Map<K, V>.isEmpty get() = isEmpty()
+/**
+ * Extension property for `Map` that checks whether the map is not empty.
+ *
+ * This property returns `true` if the map contains at least one key-value pair,
+ * indicating that it is not empty. If the map is empty, the property returns `false`.
+ *
+ * Note: This property is a shorthand for calling the `isNotEmpty()` function on the map.
+ * @since 5.0.0
+ */
+val <K, V> Map<K, V>.isNotEmpty get() = isNotEmpty()
+/**
+ * A read-only extension property for nullable maps that checks if the map is either null or empty.
+ *
+ * This property allows for concise checks of nullable maps to determine if they are either null
+ * or contain no entries. It returns `true` if the map is null or has no elements, and `false` otherwise.
+ * @since 5.0.0
+ */
+val <K, V> Map<K, V>?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return isNullOrEmpty()
+}
+/**
+ * Extension property for nullable maps that checks whether the map is not null and not empty.
+ *
+ * This property evaluates to `true` if the map is neither null nor empty. If the map is null
+ * or contains no entries, it evaluates to `false`.
+ *
+ * The contract for this property ensures that if it evaluates to `true`, the map is guaranteed to be non-null.
+ * @since 5.0.0
+ */
+val <K, V> Map<K, V>?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return !isNullOrEmpty()
+}
 
 /**
  * A property extension for a map that filters out entries with null keys.
@@ -42,7 +85,7 @@ import kotlin.collections.map as kMap
  * @since 1.0.0
  */
 val <T, R> Map<T?, R>.noNullKeys
-    get() = filterKeys { it.isNotNull() } as Map<T, R>
+    get() = filterKeys { it != null } as Map<T, R>
 
 /**
  * Returns a new map containing only the entries from the original map
@@ -57,7 +100,7 @@ val <T, R> Map<T?, R>.noNullKeys
  * @since 1.0.0
  */
 val <T, R> Map<T, R?>.noNullValues
-    get() = filterValues { it.isNotNull() } as Map<T, R>
+    get() = filterValues { it != null } as Map<T, R>
 
 /**
  * Extension property for `Map` that filters out all entries with `null` keys or values.
@@ -70,7 +113,7 @@ val <T, R> Map<T, R?>.noNullValues
  * @since 1.0.0
  */
 val <T, R> Map<T?, R?>.noNullEntries
-    get() = filter { it.key.isNotNull() && it.value.isNotNull() } as Map<T, R>
+    get() = filter { it.key != null && it.value != null } as Map<T, R>
 
 /**
  * Determines if the map contains exactly one entry.
@@ -82,7 +125,7 @@ val <T, R> Map<T?, R?>.noNullEntries
  * @return `true` if the map contains exactly one key-value pair, `false` otherwise
  * @since 1.1.0
  */
-val Map<*, *>.isSingleElement: Boolean get() = onlyEntryOrNull().isNotNull()
+val Map<*, *>.isSingleElement: Boolean get() = onlyEntryOrNull() != null
 /**
  * Extension property for a Map that checks if the map does not contain exactly one key-value pair.
  *
@@ -923,24 +966,6 @@ fun <K, V> Map<K, V>.groupByValue(): MultiMap<V, K> = entries.kGroupBy({ it.valu
 inline fun <K, V> Map<K, V>.find(predicate: Predicate<Map.Entry<K, V>>) = entries.find { predicate(it) }
 
 /**
- * Checks if a nullable map is neither null nor empty.
- *
- * This method returns true if the map is not null and contains at least one key-value pair.
- * Otherwise, it returns false.
- *
- * @receiver Nullable map that will be checked.
- * @return `true` if the map is not null and not empty, `false` otherwise.
- * @since 1.0.0
- */
-@Suppress("kutils_null_check")
-fun <K, V> Map<K, V>?.isNotNullOrEmpty(): Boolean {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return isNotNull() && isNotEmpty()
-}
-
-/**
  * Checks whether the Map is null or empty.
  *
  * This operator function is used to simplify the null or empty check
@@ -950,12 +975,24 @@ fun <K, V> Map<K, V>?.isNotNullOrEmpty(): Boolean {
  * @return `true` if the Map is null or empty, `false` otherwise.
  * @since 1.0.0
  */
+@JvmName("nullableNot")
 operator fun <K, V> Map<K, V>?.not(): Boolean {
     contract {
         returns(false) implies (this@not != null)
     }
     return isNullOrEmpty()
 }
+/**
+ * Provides functionality to invert the state of the map by checking
+ * whether it is empty.
+ *
+ * This operator function allows using the `!` operator to determine
+ * if the map contains no entries.
+ *
+ * @return `true` if the map is empty, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun <K, V> Map<K, V>.not() = isEmpty()
 
 /**
  * Returns the result of the provided `block` if the map is null or empty, otherwise returns the map itself.
@@ -967,41 +1004,87 @@ operator fun <K, V> Map<K, V>?.not(): Boolean {
 infix fun <M : Map<K, V>, K, V> M?.ifNullOrEmpty(block: Supplier<M>): M = if (isNullOrEmpty()) block() else this
 
 /**
- * Executes the given [action] if the map is not empty. If the map is empty, it returns the map itself.
+ * Executes the given action if the map is not empty and returns the map.
  *
- * @param action A lambda function to be executed if the map is not empty. It takes the map as a receiver.
- * @return The result of the [action] if the map is not empty, or the map itself if it is empty.
- * @since 3.1.3
+ * @param action The action to perform on the map if it is not empty.
+ * @return The original map after performing the action if applicable.
+ * @since 5.0.0
  */
-@Suppress("UNCHECKED_CAST")
-inline fun <M : Map<K, V>, K, V, R> M.ifNotEmpty(action: ReceiverTransformer<M, R>): R {
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifNotEmpty(action: Consumer<M>): M {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return (if (isNotEmpty()) action(this) else this) as R
+    if (isNotEmpty()) action(this)
+    return this
 }
-
 /**
- * Executes the given action if the nullable map is not null and not empty.
+ * Executes the specified action if the map is not null and not empty.
  *
- * This method checks if the receiver map is neither null nor empty and, if true,
- * invokes the specified action with the map as the input. If the map is null or empty,
- * it simply returns the map without invoking the action.
+ * This function checks if the nullable map is neither null nor empty using the `isNotNullOrEmpty` method.
+ * If the condition is true, it invokes the provided action with the map as the parameter.
+ * The original map is returned regardless of whether the action is executed.
  *
- * @param action The action to be executed if the map is not null and not empty.
- *               It is a function that takes the map as input and returns a result.
- * @return The result of the action if the map is not null and not empty,
- *         or the map itself if it is null or empty.
- * @since 3.1.3
+ * @param action The action to be performed if the map is not null and not empty.
+ * @return The original map, or null if the map was null or empty.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalExtendedContracts::class)
-@Suppress("UNCHECKED_CAST")
-inline fun <M : Map<K, V>?, K, V, R> M?.ifNotNullOrEmpty(action: ReceiverTransformer<M, R>): R? {
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M?.ifNotNullOrEmpty(action: Consumer<M>): M? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (this@ifNotNullOrEmpty != null) implies returnsNotNull()
     }
-    return (if (isNotNullOrEmpty()) action(this) else this) as R
+    if (isNotNullOrEmpty) action(this)
+    return this
+}
+
+/**
+ * Executes the given action if the size of the map matches the specified value.
+ *
+ * @param size The size to compare with the current map's size.
+ * @param action The action to execute if the map's size equals the specified size.
+ * @return The original map.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifSize(size: Int, action: Consumer<M>): M {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this.size == size) action(this)
+    return this
+}
+/**
+ * Executes the given action if the size of the map is not equal to the specified size.
+ *
+ * @param size The size to compare against the size of the map.
+ * @param action The action to execute if the size of the map does not match the specified size.
+ * @return The original map on which the method was called.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifNotSize(size: Int, action: Consumer<M>): M {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this.size != size) action(this)
+    return this
+}
+/**
+ * Executes the given action if the map contains exactly one entry.
+ *
+ * @param action A consumer function that will be invoked with the map as its argument if it has exactly one entry.
+ * @return The original map.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifSingleEntry(action: Consumer<M>): M {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (size == 1) action(this)
+    return this
 }
 
 /**
@@ -1087,645 +1170,3 @@ fun <K, V> mMapOf(vararg pairs: Pair<K, V>): MMap<K, V> = mutableMapOf(*pairs)
  * @since 1.0.0
  */
 fun <K, V> Map<K, V>.toMMap(): MMap<K, V> = toMutableMap()
-
-/**
- * Validates that the map is not empty. If the map is empty, a validation exception is thrown.
- *
- * @param causeOf An optional supplier for a custom throwable to be thrown when the validation fails. If provided, this throwable will be the primary exception, and its cause will
- *  be set to the validation exception.
- * @param cause An optional supplier for a throwable that will act as the cause for the validation exception if no custom throwable is provided.
- * @return The map itself if it is not empty.
- * @throws ValidationFailedException if the map is empty and no custom throwable is supplied via `causeOf`.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The map is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not empty. If the map is empty, an exception is thrown
- * with the specified lazy message, optional cause, and optional cause of the exception.
- *
- * @param causeOf an optional supplier for a throwable cause that will be
- *                set as the cause of the {@code ValidationFailedException}.
- *                If this is not null, its initialized cause will be set to the
- *                {@code ValidationFailedException}.
- * @param cause an optional supplier for a throwable that will be used to
- *              provide additional context to the exception.
- * @param lazyMessage a supplier for the lazy evaluation of the exception message
- *                    in case the validation fails.
- * @return the current map instance if it passes validation.
- * @throws ValidationFailedException if the map is empty. The exception message
- *                                   and cause are populated using the provided
- *                                   suppliers.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not empty. If the map is empty, throws a ValidationFailedException.
- *
- * @param property The property being validated. Can be null if not applicable.
- * @param variableName An optional name of the variable being validated. Included in the exception message if provided.
- * @param message An optional custom message to include in the exception. Defaults to "is empty".
- * @param causeOf A supplier for an alternative exception cause. If provided, it will be used as the root cause of
- *                the ValidationFailedException.
- * @param cause A supplier for an additional cause included in the exception chain. Optional and can be null.
- * @return The same map passed as the receiver if validation succeeds.
- * @throws ValidationFailedException If the map is empty, encapsulating the provided details.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current map is not empty. If the map is empty, a `ValidationFailedException` is thrown.
- *
- * @param property the main `KProperty` associated with this validation, providing class, name, and type context; can be null
- * @param variable an optional secondary `KProperty` providing additional variable-specific context; can be null
- * @param message an optional validation failure message to include in the exception; can be null, with a default of "is empty"
- * @param causeOf an optional supplier for a custom cause of the thrown exception; can be null
- * @param cause an optional supplier for an additional cause to be included in the exception; can be null
- * @return the same non-empty map instance that was validated
- * @throws ValidationFailedException if the map is empty, providing detailed validation context and an optional cause
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given map is not empty. Throws a `ValidationFailedException`
- * if the map is empty. The exception can include optional details such as
- * the callable, parameter name, custom message, and cause.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation is related. Can be null.
- * @param parameterName The name of the parameter in the callable to validate. Can be null.
- * @param message An optional custom message to include in the exception if validation fails. Default is "is empty".
- * @param causeOf A supplier for the root cause throwable associated with this validation failure. Can be null.
- * @param cause A supplier for a throwable indicating why the validation failed. Can be null.
- * @return The validated map, if it is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not empty. If the map is empty, throws a [ValidationFailedException].
- *
- * @param callable the [KFunction] associated with the validation, or null if not applicable
- * @param parameter the [KParameter] representing the parameter under validation, or null if not applicable
- * @param message an optional custom error message to include in the exception, defaults to "is empty" if null
- * @param causeOf an optional supplier for the primary cause of the exception, or null if not applicable
- * @param cause an optional supplier for an additional cause of the exception, or null if not applicable
- * @return the validated map if it is not empty
- * @throws ValidationFailedException if the map is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given map is not empty. Throws a ValidationFailedException if the map is empty.
- *
- * @param callableName the name of the callable (e.g., a function or method) where the validation is performed
- * @param parameterName the name of the parameter being validated; can be null
- * @param message an optional custom message to include in the exception if validation fails
- * @param causeOf a supplier for the primary cause of the validation failure; if null, a ValidationFailedException will be created instead
- * @param cause a supplier for the underlying cause of the exception; can be null
- * @return the validated map if it is not empty
- * @throws ValidationFailedException if the map is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not empty. If the map is empty, throws a `ValidationFailedException`.
- *
- * @param callableName The name of the callable (e.g., function or property) where validation failed, or null if not specified.
- * @param parameter The `KParameter` instance representing the parameter that failed validation, or null if not applicable.
- * @param message An optional error message providing additional context about the validation failure. Defaults to "is empty" if not specified.
- * @param causeOf An optional supplier for a cause `Throwable` that directly triggered this validation failure. Defaults to null.
- * @param cause An optional supplier for a secondary cause `Throwable`. Defaults to null.
- * @return The map itself if it is not empty.
- * @throws ValidationFailedException If the map is empty, with optional details about the failed callable, parameter, message, and cause(s).
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not null or empty.
- * If the map is null or empty, a specified throwable or a default `ValidationFailedException` is thrown.
- *
- * @param causeOf An optional supplier for the throwable to be used as the cause of the exception.
- *                If provided, this supplier will determine the throwable to be thrown.
- * @param cause   An optional supplier for the inner cause of the exception, used to provide additional
- *                context about the validation failure.
- * @return The original map if it is not null and not empty.
- * @throws ValidationFailedException if the map is null or empty and no custom throwable is supplied.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The map is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a given map is neither null nor empty. Throws a `ValidationFailedException` if the validation fails.
- *
- * @param causeOf optional supplier for the primary throwable cause, which can be used to associate a specific cause with the failure.
- * @param cause optional supplier for an additional throwable cause, providing more context about the failure.
- * @param lazyMessage a supplier for creating the message of the exception, used to describe the reason for validation failure.
- * @return the original map if the validation passes, ensuring fluent usage within processing chains.
- * @throws ValidationFailedException if the map is null or empty. The exception includes a detailed message and optionally a cause.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not null or empty. If the map is null or empty, a
- * [ValidationFailedException] is thrown with the provided details.
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName The name of the variable being validated. Used in the exception message if provided.
- * @param message An optional custom error message. Defaults to "is null or empty" if not specified.
- * @param causeOf A supplier for the cause of the validation failure. If provided, its result is used as the cause
- *                of the exception. Defaults to null.
- * @param cause An optional supplier for a throwable cause. It is used as the inner cause of the exception if `causeOf`
- *              is not provided. Defaults to null.
- * @return The validated map if it is not null or empty.
- * @throws ValidationFailedException If the map is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a Map is not null or empty. If the Map is null or empty, a `ValidationFailedException` is thrown.
- *
- * @param property the main property being validated, providing class and type context, or null if not specified
- * @param variable an optional secondary property providing additional context, or null if not specified
- * @param message an optional detailed message to include in the exception if validation fails, or null if not provided
- * @param causeOf a supplier function to provide a specific throwable as the cause of the exception, or null if not specified
- * @param cause a supplier function to provide an additional throwable to initialize the exception's cause, or null if not specified
- * @return the original Map if validation passes
- * @throws ValidationFailedException if the Map is null or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not null or empty. If the map is null or empty, this function throws a
- * `ValidationFailedException` with an optional custom message and cause.
- *
- * @param callable The Kotlin function (`KFunction`) associated with this validation. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional custom message to describe the validation failure. Defaults to "is null or empty" if not provided.
- * @param causeOf A supplier for a throwable that serves as the primary cause of failure. Can be null.
- * @param cause A supplier for a secondary throwable that may have contributed to the failure. Can be null.
- * @return The original map (`this`) if it is not null or empty.
- * @throws ValidationFailedException If the map is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given map is not null or empty. If the validation fails, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] related to the validation, or null if not applicable.
- * @param parameter the [KParameter] representing the parameter being validated, or null if not applicable.
- * @param message an optional error message to be included in the exception if validation fails; defaults to "is null or empty".
- * @param causeOf an optional supplier for the throwable causing the validation failure, or null if not applicable.
- * @param cause an optional supplier for the underlying cause of the exception, or null if not applicable.
- * @return the map being validated if the validation passes.
- * @throws ValidationFailedException if the map is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not null or empty. Throws a `ValidationFailedException` if the map is null or empty.
- *
- * @param callableName The name of the callable (e.g., function or method) related to the validation failure.
- * @param parameterName The name of the parameter that caused the validation failure, or null if not specified.
- * @param message An optional custom message providing additional details about the validation failure, or null if not specified.
- * @param causeOf A supplier for the root cause of the validation failure, or null if not specified.
- * @param cause A supplier for an additional cause to chain with the exception, or null if not specified.
- * @return The original map if validation passes.
- * @throws ValidationFailedException If the map is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is not null or empty and throws a validation exception if the condition fails.
- *
- * @param callableName The name of the function or property where validation is performed,
- *                     or null if not specified.
- * @param parameter The KParameter instance representing the parameter being validated,
- *                  or null if not applicable.
- * @param message An optional error message to include in the exception if validation fails,
- *                or null if not specified. Defaults to "is null or empty".
- * @param causeOf A supplier for the root cause of the validation failure exception, or null if not specified.
- * @param cause A supplier for the secondary cause of the validation failure exception, or null if not specified.
- * @return The original map if validation passes.
- * @throws ValidationFailedException If the map is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is empty. If the map is not empty, throws a [ValidationFailedException].
- * The exception message indicates that the map is not empty. Optionally, allows for custom
- * throwable suppliers to provide specific causes for the exception.
- *
- * @param causeOf an optional supplier for a throwable to throw when validation fails.
- *                If provided, this throwable will be used instead of the default exception.
- *                The supplier can return `null`, in which case the default exception is used.
- * @param cause an optional supplier for a throwable to be used as the cause of the exception.
- *              This throwable will be passed as the cause of the validation exception.
- *              The supplier can return `null`, which results in no cause being assigned.
- * @return the map on which this method is invoked, if it is empty.
- * @throws ValidationFailedException if the map is not empty and no custom throwable supplier
- *                                   is provided via `causeOf`.
- * @throws Throwable if a throwable supplier is provided via `causeOf` and returns a throwable.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The map is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is not empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a map is empty. If the map is not empty, a `ValidationFailedException` is thrown.
- *
- * @param causeOf a supplier for a custom exception to be thrown if validation fails. If `null`, a default
- *        `ValidationFailedException` is used.
- * @param cause a supplier for the underlying cause of the exception to be thrown. Can be `null`.
- * @param lazyMessage a supplier for the error message to be included in the exception if validation fails.
- * @return the original map if it is empty.
- * @throws ValidationFailedException if the map is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is empty. Throws a [ValidationFailedException] if the map is not empty.
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName An optional name of the variable being validated. Included in the exception message if provided.
- * @param message A custom message to include in the exception if the validation fails. Defaults to "is not empty".
- * @param causeOf A supplier for the primary exception cause, if applicable.
- * @param cause A supplier for the additional exception cause to set as the `cause` of the thrown exception. Can be null.
- * @return The original map if the validation passes.
- * @throws ValidationFailedException If the map is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is empty. If the map is not empty, throws a [ValidationFailedException].
- *
- * @param property the primary [KProperty] associated with the validation, used for error details, or null if not applicable
- * @param variable an optional secondary [KProperty] for additional context, or null if not applicable
- * @param message an optional custom message to include in the exception, or null for a default message
- * @param causeOf an optional supplier for a cause exception, invoked if the validation fails, or null if not applicable
- * @param cause an optional supplier for an exception to be used as the root cause, or null if not applicable
- * @return the original map if the validation passes
- * @throws ValidationFailedException if the map is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is empty. If the map is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) related to this validation. Can be null.
- * @param parameterName Optional name of the parameter related to the validation. Can be null.
- * @param message An optional custom validation message. If not provided, a default message "is not empty" is used.
- * @param causeOf A supplier providing a throwable that will be the primary cause of the exception. Can be null.
- * @param cause A supplier providing an additional cause for the exception. Can be null.
- * @return Returns the map itself if it is empty, allowing for method chaining.
- * @throws ValidationFailedException if the map is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current map is empty. If the map is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] related to the validation context, or null if not applicable
- * @param parameter the [KParameter] representing the parameter being validated, or null if not applicable
- * @param message an optional message to include in the validation exception, or null for a default message
- * @param causeOf a supplier providing a specific exception to throw, or null to use the default behavior
- * @param cause a supplier providing the underlying cause of the exception, or null if there is no specific cause
- * @return the same map instance upon successful validation
- * @throws ValidationFailedException if the map is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is empty. If the map is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callableName The name of the callable (e.g., function or method) related to the validation.
- * @param parameterName The name of the parameter being validated, or `null` if not applicable.
- * @param message An optional custom message to provide additional details about the validation failure. Defaults to "is not empty" if not specified.
- * @param causeOf A supplier that provides the root cause of the exception, or `null` if no specific cause is provided.
- * @param cause A supplier for the underlying cause associated with the validation failure, or `null` if not specified.
- * @return The same map if it passes validation (i.e., is empty).
- * @throws ValidationFailedException If the map is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a given map is empty. If the map is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callableName The name of the callable (e.g., function or property) related to the validation, or null if not specified.
- * @param parameter The `KParameter` instance representing the parameter being validated, or null if not applicable.
- * @param message An optional error message providing additional context about the validation failure. Defaults to "is not empty" if not provided.
- * @param causeOf A supplier for the primary `Throwable` cause of the validation failure, or null if no primary cause is provided.
- * @param cause A supplier for the secondary `Throwable` cause of the validation failure, or null if no secondary cause is provided.
- * @return The original map instance if it is empty.
- * @throws ValidationFailedException If the map is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the map is either `null` or empty. If the map is not `null`
- * or not empty, an exception is thrown.
- *
- * @param causeOf A supplier for the cause of the exception if validation fails.
- *                If provided, this will generate a throwable to further explain the failure.
- *                Default is `null`.
- * @param cause   A supplier for an additional cause to be attached to the exception,
- *                if validation fails. Default is `null`.
- * @return The same map instance if the validation passes (i.e., the map is `null` or empty).
- * @throws ValidationFailedException If the map is not `null` or not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The map is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is not null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the map is null or empty, and throws a validation exception if the condition is not met.
- *
- * @param causeOf an optional supplier that provides a throwable to be used as the cause of the exception.
- * @param cause an optional supplier that provides an additional chained throwable to be used as the cause.
- * @param lazyMessage a supplier that generates the message for the validation exception.
- * @return the map instance if the validation passes.
- * @throws ValidationFailedException if the map is not null and not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a map is either null or empty. If the map is not null and not empty, it throws a
- * ValidationFailedException with the provided details.
- *
- * @param property The property associated with the validation failure. Can be null if not applicable.
- * @param variableName Optional name of the variable being validated. Included in the exception message
- *                     if not null.
- * @param message Additional message to describe the validation failure. Defaults to "is not null or empty"
- *                if not specified.
- * @param causeOf Supplier for the cause of the exception. If provided, it is used to define the cause
- *                of the exception.
- * @param cause Supplier to initialize the cause of the ValidationFailedException. Can be null if not
- *              applicable.
- * @return The original map if it satisfies the validation (i.e., it is null or empty).
- * @throws ValidationFailedException if the map is not null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the given map is null or empty. Throws a [ValidationFailedException] if the map is not null or empty.
- *
- * @param property The property associated with the map being validated. Can be null.
- * @param variable The variable associated with the map being validated. Can be null.
- * @param message An optional custom message for the validation failure.
- * @param causeOf A supplier for the root cause exception, if any. Can be null.
- * @param cause An additional supplier for the cause of the validation failure, if any. Can be null.
- * @return The map itself if the validation passes.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the given map is null or empty. If the map is not null and not empty, a
- * `ValidationFailedException` is thrown. The exception can include optional details
- * such as the callable method, parameter name, error message, or a cause.
- *
- * @param callable An optional Kotlin function (`KFunction`) that the validation is associated with.
- *                 This is used in the construction of the exception. Can be null.
- * @param parameterName An optional name of the parameter that caused the validation failure.
- *                      This is used in the exception message. Can be null.
- * @param message An optional message providing details about the validation failure.
- *                Defaults to "is not null or empty" if not provided. Can be null.
- * @param causeOf An optional supplier for a pre-constructed throwable to be used as the primary
- *                cause of the exception. If provided, this is used as the exception thrown. Can be null.
- * @param cause An optional supplier for a throwable to include as the cause of the validation
- *              failure. This is appended as the cause to the `ValidationFailedException`
- *              if `causeOf` is not supplied. Can be null.
- * @return The original map (`T`) if no exception is thrown, allowing for chaining.
- * @throws ValidationFailedException If the map is not null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a map is null or empty. If the map is not null and not empty, this method throws a
- * [ValidationFailedException] with the provided details.
- *
- * @param callable The [KFunction] related to the validation failure, or null if not applicable.
- * @param parameter The [KParameter] representing the parameter involved in the validation failure, or null if not applicable.
- * @param message An optional message for the exception, describing the validation failure. Defaults to "is not null or empty" if null.
- * @param causeOf An optional supplier for the exception to be thrown. If supplied, this will wrap the generated exception.
- * @param cause An optional supplier for the cause of the exception, providing additional context about the failure.
- * @return The validated map if it is null or empty.
- * @throws ValidationFailedException If the map is not null and not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the map is null or empty and throws a `ValidationFailedException` if it is not.
- *
- * This method is used to enforce that a map must either be null or empty in specific contexts.
- * If the validation fails, an exception is thrown with detailed information about the callable, parameter,
- * optional custom message, and underlying cause, if provided.
- *
- * @param callableName The name of the callable (e.g., function or method) being validated.
- * @param parameterName An optional name of the parameter associated with this validation.
- * @param message An optional custom message providing additional details for the validation failure.
- * @param causeOf An optional supplier that provides the cause of the exception to be thrown. If null, a default exception is thrown.
- * @param cause An optional supplier that provides the underlying cause of the exception, adding more context.
- * @return The validated map `T` itself if it passes the validation.
- * @throws ValidationFailedException If the map is neither null nor empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a map is null or empty.
- *
- * If the map is neither null nor empty, this method throws a `ValidationFailedException`.
- *
- * @param callableName The name of the callable (e.g., function or property) the validation is associated with, or null if unspecified.
- * @param parameter The parameter being validated, represented as a `KParameter`, or null if not applicable.
- * @param message An optional error message to provide context about the validation failure.
- * @param causeOf A supplier that provides the throwable to be thrown as the cause of the validation failure, or null if no such cause exists.
- * @param cause A supplier that provides an additional throwable cause if applicable, or null if absent.
- * @return The same map (`this`) that was validated, if no exception is thrown.
- * @throws ValidationFailedException If the map is not null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Map<*, *>?> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}

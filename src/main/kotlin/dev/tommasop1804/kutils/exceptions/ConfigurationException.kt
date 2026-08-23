@@ -110,7 +110,7 @@ open class InvalidEnvPropertyException : ConfigurationException {
      * @since 1.0.2
      */
     constructor(propertyName: String?, propertyValue: String? = null, message: String? = null, internalErrorCode: String? = null) : super(
-        (internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + "Invalid environment property${if (propertyName.isNotNull()) " `$propertyName` " else String.EMPTY}${if (propertyValue.isNotNull()) " with value `$propertyValue`" else String.EMPTY}${if (message.isNotNull()) ": $message" else String.EMPTY}",
+        (internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + "Invalid environment property${if (propertyName != null) " `$propertyName` " else String.EMPTY}${if (propertyValue != null) " with value `$propertyValue`" else String.EMPTY}${if (message != null) ": $message" else String.EMPTY}",
         internalErrorCode
     )
     /**
@@ -177,7 +177,7 @@ open class NoSuchEnvPropertyException : ConfigurationException {
      * @since 3.3.2
      */
     constructor(propertyName: String?, message: String? = null, internalErrorCode: String? = null) : super(
-        (internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + "Property${if (propertyName.isNotNull()) " `$propertyName` " else String.EMPTY}not found${if (message.isNotNull()) ": $message" else String.EMPTY}",
+        (internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + "Property${if (propertyName != null) " `$propertyName` " else String.EMPTY}not found${if (message != null) ": $message" else String.EMPTY}",
         internalErrorCode
     )
     /**

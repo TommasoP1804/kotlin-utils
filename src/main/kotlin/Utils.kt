@@ -8,7 +8,7 @@
 
 import dev.tommasop1804.kutils.annotations.*
 
-@Deprecated("Use breakLoop() instead", ReplaceWith("breakLoop()", "dev.tommasop1804.kutils.breakLoop"))
-class Break(val result: Any? = null) : Throwable()
-@Deprecated("Use continueLoop() instead", ReplaceWith("continueLoop()", "dev.tommasop1804.kutils.breakLoop"))
-class Continue : Throwable()
+@PublishedApi
+internal class Break(val result: Any? = null) : Throwable()
+@PublishedApi
+internal class Continue : Throwable()

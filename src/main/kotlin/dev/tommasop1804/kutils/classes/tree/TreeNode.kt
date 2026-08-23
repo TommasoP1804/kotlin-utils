@@ -77,7 +77,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * @since 1.0.0
      */
     val hasParent: Boolean
-        get() = parentId.isNotNull()
+        get() = parentId != null
     /**
      * Indicates whether this node is the root node in the tree structure.
      * A node is considered the root if it does not have a parent, in which case its `parentId` is `null`.
@@ -86,7 +86,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * @since 1.0.0
      */
     val isRoot: Boolean
-        get() = parentId.isNull()
+        get() = parentId == null
     /**
      * Represents the total number of nodes within the tree, including the current node and all its descendants.
      *

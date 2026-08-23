@@ -141,7 +141,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
         try {
             SNAKE_YAML.load<Any>(value)
         } catch (e: MarkedYAMLException) {
-            throw MalformedInputException("${e.problem.sentenceCase()} at line ${e.problemMark.line + 1}, column ${e.problemMark.column + 1}${if (e.context.isNotNull()) " ${e.context}" else String.EMPTY}")
+            throw MalformedInputException("${e.problem.sentenceCase()} at line ${e.problemMark.line + 1}, column ${e.problemMark.column + 1}${if (e.context != null) " ${e.context}" else String.EMPTY}")
         } catch (e: YAMLException) {
             throw MalformedInputException("${e.message}")
         }
@@ -710,7 +710,7 @@ class YamlNode(val rawValue: Any?) {
      *
      * @since 3.0.0
      */
-    val isMissing: Boolean = rawValue.isNull()
+    val isMissing: Boolean = rawValue == null
     /**
      * Indicates whether the current YAML node represents an array-like structure.
      * This is determined by checking if the underlying raw value is an instance of `Iterable`.
@@ -857,7 +857,7 @@ class YamlNode(val rawValue: Any?) {
             if (current.isMissing) return current
 
             val index = key.toIntOrNull()
-            current = if (index.isNotNull() && current.isArray) current[index]
+            current = if (index != null && current.isArray) current[index]
             else current._get(key)
         }
         return current
@@ -898,7 +898,7 @@ class YamlNode(val rawValue: Any?) {
         for (key in parentPath) {
             val index = key.toIntOrNull()
 
-            if (index.isNotNull() && current.isArray)
+            if (index != null && current.isArray)
                 current = current[index]
             else {
                 if (current[key].isMissing) _set(key, mMapOf<String, Any?>())
@@ -907,7 +907,7 @@ class YamlNode(val rawValue: Any?) {
         }
 
         val lastIndex = lastKey.toIntOrNull()
-        if (lastIndex.isNotNull() && current.isArray) current[lastIndex] = value
+        if (lastIndex != null && current.isArray) current[lastIndex] = value
         else current._set(lastKey, value)
     }
     /**

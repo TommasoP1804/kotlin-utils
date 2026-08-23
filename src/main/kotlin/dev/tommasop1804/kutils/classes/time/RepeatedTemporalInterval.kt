@@ -347,7 +347,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
         class Converter : AttributeConverter<RepeatedTemporalInterval?, String?> {
             override fun convertToDatabaseColumn(attribute: RepeatedTemporalInterval?) = attribute?.toString()
 
-            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse(dbData).getOrThrow()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
     }
 

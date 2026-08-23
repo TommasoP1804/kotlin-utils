@@ -833,11 +833,11 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             val segment = segments[i]
             val index = segment.toIntOrNull()
 
-            current = if (index.isNotNull()) {
+            current = if (index != null) {
                 node.childrenAsList().getOrNull(index)
             } else {
                 val next = segments.getOrNull(i + 1)?.toIntOrNull()
-                if (next.isNotNull()) {
+                if (next != null) {
                     val matching = node.childrenAsList().filter { it.nodeName == segment }
                     val picked = matching.getOrNull(next)
                     i++
@@ -903,7 +903,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     operator fun invoke(dotPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR): Boolean =
-        getAsNode(dotPath, regexSeparator).isNotNull()
+        getAsNode(dotPath, regexSeparator) != null
 
     // --- STRUCTURAL OPERATIONS ---
 

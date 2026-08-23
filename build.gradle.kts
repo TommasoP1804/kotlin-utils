@@ -7,7 +7,7 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "dev.tommasop1804"
-version = "4.8.0"
+version = "5.0.0"
 // Kotlin-Utils
 // Tommaso Pastorelli
 // Last update: Tommaso Pastorelli | 20260821T153443Z
@@ -82,10 +82,13 @@ dependencies {
 kotlin {
     jvmToolchain(21)
     compilerOptions {
-        freeCompilerArgs.add("-Xcollection-literals")
-        freeCompilerArgs.add("-Xallow-returns-result-of")
-        freeCompilerArgs.add("-Xreturn-value-checker=check")
-        freeCompilerArgs.add("-Xname-based-destructuring=complete")
+        freeCompilerArgs.addAll(
+            "-Xcollection-literals",
+            "-Xallow-returns-result-of",
+            "-Xreturn-value-checker=check",
+            "-Xname-based-destructuring=complete",
+            "-Xexplicit-context-arguments"
+        )
     }
 }
 

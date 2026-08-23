@@ -1365,7 +1365,7 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
                 val bits = nodeBits ?: NODE_BITS_1024
                 val max = (1 shl bits) - 1
 
-                if (node.isNull()) {
+                if (node == null) {
                     node = Settings.getNode() ?: (random!!.nextInt() and max)
                 }
 
@@ -1385,7 +1385,7 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
              * @since 3.0.0
              */
             internal fun getNodeBits(): Int {
-                if (nodeBits.isNull()) {
+                if (nodeBits == null) {
                     nodeBits = Settings.getNodeCount()?.let {
                         ceil(ln(it.toDouble()) / ln(2.0)).toInt()
                     } ?: NODE_BITS_1024
@@ -1412,7 +1412,7 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
              * @since 3.0.0
 */
             internal fun getRandom(): IRandom {
-                if (random.isNull()) {
+                if (random == null) {
                     withRandom(SecureRandom())
                 }
                 return random!!
@@ -1425,7 +1425,7 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
              * @since 3.0.0
              */
             internal fun getClock(): Clock {
-                if (clock.isNull()) {
+                if (clock == null) {
                     withClock(Clock.systemUTC())
                 }
                 return clock!!

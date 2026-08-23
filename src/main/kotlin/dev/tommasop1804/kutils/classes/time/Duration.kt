@@ -17,7 +17,6 @@ import dev.tommasop1804.kutils.emptyMList
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isDecimal
-import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.tryOrThrow
 import dev.tommasop1804.kutils.validate
@@ -641,7 +640,7 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
         class Converter : AttributeConverter<Duration?, String?> {
             override fun convertToDatabaseColumn(attribute: Duration?) = attribute?.toString()
 
-            override fun convertToEntityAttribute(dbData: String?): Duration? = if (dbData.isNull()) null else parse(dbData).getOrThrow()
+            override fun convertToEntityAttribute(dbData: String?): Duration? = if (dbData == null) null else parse(dbData).getOrThrow()
         }
     }
 
@@ -1825,7 +1824,7 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
             }
         }
 
-        if (timePart.isNotNull()) {
+        if (timePart != null) {
             val duration = Duration(timePart)
             val hours = duration.hours
             val minutes = duration.minutes

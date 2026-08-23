@@ -247,7 +247,7 @@ data class Contact(
             ).joinToString(" ")
 
         init {
-            validate(firstName.isNotNull() || middleName.isNotNull() || lastName.isNotNull()) { "The name must have at least one not null field" }
+            validate(firstName != null || middleName != null || lastName != null) { "The name must have at least one not null field" }
         }
 
         companion object {
@@ -363,7 +363,7 @@ data class Contact(
         var since: Temporal? = null
     ) {
         init {
-            validate(jobTitle.isNotNull() || jobDepartment.isNotNull() || jobCompany.isNotNull()) {
+            validate(jobTitle != null || jobDepartment != null || jobCompany != null) {
                 "Job must have at least one field specified"
             }
         }
@@ -477,22 +477,22 @@ data class Contact(
          * @since 1.0.0
          */
         fun format(civicNumberBeforeStreet: Boolean = true) = buildString {
-            if (civicNumberBeforeStreet && civicNumber.isNotNull()) append(civicNumber).append(" ")
-            if (street.isNotNull()) append(street)
-            if (!civicNumberBeforeStreet && civicNumber.isNotNull()) append(" ").append(civicNumber)
-            if (apartment.isNotNull() || stair.isNotNull() || floor.isNotNull() || building.isNotNull()) append(" (")
-            if (apartment.isNotNull()) append("Aparment $apartment")
-            if (floor.isNotNull()) append(", Floor $floor")
-            if (stair.isNotNull()) append(", Stair $stair")
-            if (building.isNotNull()) append(", Building $building")
-            if (apartment.isNotNull() || stair.isNotNull() || floor.isNotNull() || building.isNotNull()) append(')')
+            if (civicNumberBeforeStreet && civicNumber != null) append(civicNumber).append(" ")
+            if (street != null) append(street)
+            if (!civicNumberBeforeStreet && civicNumber != null) append(" ").append(civicNumber)
+            if (apartment != null || stair != null || floor != null || building != null) append(" (")
+            if (apartment != null) append("Aparment $apartment")
+            if (floor != null) append(", Floor $floor")
+            if (stair != null) append(", Stair $stair")
+            if (building != null) append(", Building $building")
+            if (apartment != null || stair != null || floor != null || building != null) append(')')
             append(", ")
-            if (neighbourhood.isNotNull()) append(neighbourhood).append(", ")
-            if (postalCode.isNotNull()) append(postalCode).append(" ")
-            if (city.isNotNull()) append(city).append(" ")
-            if (district.isNotNull()) append("(").append(district).append("), ")
-            if (state.isNotNull()) append(state).append(", ")
-            if (country.isNotNull()) append(country?.countryName)
+            if (neighbourhood != null) append(neighbourhood).append(", ")
+            if (postalCode != null) append(postalCode).append(" ")
+            if (city != null) append(city).append(" ")
+            if (district != null) append("(").append(district).append("), ")
+            if (state != null) append(state).append(", ")
+            if (country != null) append(country?.countryName)
             if (last() == ' ') deleteCharAt(lastIndex)
             if (last() == ',') deleteCharAt(lastIndex)
         }

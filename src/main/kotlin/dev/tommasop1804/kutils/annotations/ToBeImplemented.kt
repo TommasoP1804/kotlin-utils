@@ -4,8 +4,7 @@
 
 package dev.tommasop1804.kutils.annotations
 
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.isNotNullOrEmpty
+import dev.tommasop1804.kutils.*
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
@@ -51,7 +50,7 @@ annotation class ToBeImplemented(
             val method = joinPoint.signature.toShortString()
             val annotation = try {
                 // Try to get annotation from the target method (for instance methods)
-                if (joinPoint.target.isNotNull()) {
+                if (joinPoint.target != null) {
                     val targetMethod = try {
                         joinPoint.target.javaClass.getDeclaredMethod(
                             joinPoint.signature.name,
@@ -78,8 +77,8 @@ annotation class ToBeImplemented(
 
             if (annotation?.throwError != false)
                 throw NotImplementedError("Function $method is not implemented." +
-                        (if (annotation?.since.isNotNullOrEmpty()) " | Since: ${annotation.since}" else "") +
-                        if (annotation?.expectedImplementationVersion.isNotNullOrEmpty()) " | Expected implementating version: ${annotation.expectedImplementationVersion}" else ""
+                        (if (annotation?.since.isNotNullOrEmpty) " | Since: ${annotation.since}" else "") +
+                        if (annotation?.expectedImplementationVersion.isNotNullOrEmpty) " | Expected implementating version: ${annotation.expectedImplementationVersion}" else ""
                 )
             logger.warn("Function $method is not implemented.")
             if (annotation.since.isNotEmpty())

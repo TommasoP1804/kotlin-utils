@@ -1795,7 +1795,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         infix fun ofPantoneCode(pantoneCode: String): Color? {
             val hex = PantoneConverter.byCode(pantoneCode)?.second
-            return if (hex.isNull()) null else ofHEX(hex)
+            return if (hex == null) null else ofHEX(hex)
         }
 
         /**
@@ -1812,7 +1812,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
          */
         fun ofPantoneName(pantoneName: String, textCase: TextCase = TextCase.Standard): Color? {
             val hex = PantoneConverter.byName(pantoneName.convertCase(textCase, TextCase.KebabCase))
-            return if (hex.isNull()) null else ofHEX(hex)
+            return if (hex == null) null else ofHEX(hex)
         }
 
         private fun testColorValueRange(red: Int, green: Int, blue: Int, alpha: Percentage) {
@@ -2528,7 +2528,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
      */
     override operator fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other.isNull()) return false
+        if (other == null) return false
         if (other is java.awt.Color) return red == other.red && green == other.green && blue == other.blue && (alpha.toDouble(true) * 255).roundToInt() == other.alpha
         if (javaClass != other.javaClass) return false
         val color = other as Color

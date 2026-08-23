@@ -158,9 +158,9 @@ class ControlElement(private val scope: String) : UiElement() {
     override fun build(): DataMap = buildMap {
         put("type", "Control")
         put("scope", scope)
-        if (label.isNotNull()) put("label", label)
+        if (label != null) put("label", label)
         if (options.isNotEmpty()) put("options", options.toMap())
-        if (rule.isNotNull()) put("rule", rule)
+        if (rule != null) put("rule", rule)
     }
 }
 
@@ -363,10 +363,10 @@ class LayoutElement(private val type: String) : UiElement() {
      */
     override fun build(): DataMap = buildMap {
         put("type", type)
-        if (label.isNotNull()) put("label", label)
+        if (label != null) put("label", label)
         put("elements", elements.map { it.build() })
         if (options.isNotEmpty()) put("options", options.toMap())
-        if (rule.isNotNull()) put("rule", rule)
+        if (rule != null) put("rule", rule)
     }
 }
 
@@ -735,7 +735,7 @@ class RuleBuilder {
      */
     fun build(): DataMap = buildMap {
         put("effect", effect)
-        if (condition.isNotNull()) put("condition", condition)
+        if (condition != null) put("condition", condition)
     }
 }
 

@@ -1046,7 +1046,7 @@ internal fun mapToJson(value: Any?, indent: Int, depth: Int): Json {
 
             is List<*> -> {
                 if (value.isEmpty()) EMPTY_JSON_ARRAY
-                else if (value.all { it is String || it is Number || it is Boolean || it.isNull() }) {
+                else if (value.all { it is String || it is Number || it is Boolean || it == null }) {
                     // Compact for simple arrays
                     value.joinToString(sep, "[", "]") { mapToJson(it, 0, 0) }
                 } else {

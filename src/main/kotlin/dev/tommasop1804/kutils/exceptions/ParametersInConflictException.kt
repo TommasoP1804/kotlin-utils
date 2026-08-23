@@ -6,8 +6,7 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.isNotNull
+import dev.tommasop1804.kutils.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 
@@ -96,10 +95,10 @@ open class ParametersInConflictException : IllegalArgumentException {
      */
     @Suppress("contains_as_in_operator")
     constructor(callable: KFunction<*>, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null) : super(
-        $$"<parameters of `$${callable.name}`>$${if (parametersName.isNotNull()) $$"$$${
+        $$"<parameters of `$${callable.name}`>$${if (parametersName != null) $$"$$${
             callable.parameters.filter { parametersName.distinct().contains(it.name) }
                 .joinToString { "`${it.name}` of type `${it.type}`" }
-        }" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
+        }" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
 
     /**
@@ -116,11 +115,11 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param valuesInConflict The optional set of values that are in conflict for the specified parameters, or null if not applicable.
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>, parameters: Set<KParameter>, valuesInConflict: Set<Any?>? = null) : super(
-        $$"<parameters of `$${callable.name}`>$${if (parameters.isNotNull()) $$"$$${
+    constructor(callable: KFunction<*>, parameters: Set<KParameter>?, valuesInConflict: Set<Any?>? = null) : super(
+        $$"<parameters of `$${callable.name}`>$${if (parameters != null) $$"$$${
             callable.parameters.filter { parameters.map(KParameter::name).contains(it.name) }
                 .joinToString { "`${it.name}` of type `${it.type}`" }
-        }" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
+        }" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
     
     /**
@@ -135,7 +134,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @since 1.0.0
      */
     constructor(callableName: String, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null) : super(
-        $$"<parameters of `$$callableName`>$${if (parametersName.isNotNull()) $$"$$${parametersName.distinct().joinToString { "`$it`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
+        $$"<parameters of `$$callableName`>$${if (parametersName != null) $$"$$${parametersName.distinct().joinToString { "`$it`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
     
     /**
@@ -150,8 +149,8 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param valuesInConflict The values that caused the conflict, or null if no specific conflicting values are provided.
      * @since 1.0.0
      */
-    constructor(callableName: String, parameters: Set<KParameter>, valuesInConflict: Set<Any?>? = null) : super(
-        $$"<parameters of `$$callableName`>$${if (parameters.isNotNull()) $$"$$${parameters.joinToString { "`${it.name}` of type `${it.type}`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
+    constructor(callableName: String, parameters: Set<KParameter>?, valuesInConflict: Set<Any?>? = null) : super(
+        $$"<parameters of `$$callableName`>$${if (parameters != null) $$"$$${parameters.joinToString { "`${it.name}` of type `${it.type}`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
 
     /**
@@ -168,10 +167,10 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @since 1.0.0
      */
     constructor(callable: KFunction<*>, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
-        $$"<parameters of `$${callable.name}`>$${if (parametersName.isNotNull()) $$"$$${
+        $$"<parameters of `$${callable.name}`>$${if (parametersName != null) $$"$$${
             callable.parameters.filter { parametersName.distinct().contains(it.name) }
                 .joinToString { "`${it.name}` of type `${it.type}`" }
-        }" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}",
+        }" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}",
         cause)
 
     /**
@@ -188,11 +187,11 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param cause Optional. The underlying cause of the parameter conflict, or null if not specified.
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>, parameters: Set<KParameter>, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
-        $$"<parameters of `$${callable.name}`>$${if (parameters.isNotNull()) $$"$$${
+    constructor(callable: KFunction<*>, parameters: Set<KParameter>?, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
+        $$"<parameters of `$${callable.name}`>$${if (parameters != null) $$"$$${
             callable.parameters.filter { parameters.map(KParameter::name).contains(it.name) }
                 .joinToString { "`${it.name}` of type `${it.type}`" }
-        }" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}",
+        }" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}",
         cause)
 
     /**
@@ -211,7 +210,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @since 1.0.0
      */
     constructor(callableName: String, parametersName: List<String>? = null, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
-        $$"<parameters of `$$callableName`>$${if (parametersName.isNotNull()) $$"$$${parametersName.distinct().joinToString { "`$it`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
+        $$"<parameters of `$$callableName`>$${if (parametersName != null) $$"$$${parametersName.distinct().joinToString { "`$it`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
 
     /**
@@ -228,7 +227,7 @@ open class ParametersInConflictException : IllegalArgumentException {
      * @param cause The cause of this exception, potentially null.
      * @since 1.0.0
      */
-    constructor(callableName: String, parameters: Set<KParameter>, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
-        $$"<parameters of `$$callableName`>$${if (parameters.isNotNull()) $$"$$${parameters.joinToString { "`${it.name}` of type `${it.type}`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict.isNotNull()) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
+    constructor(callableName: String, parameters: Set<KParameter>?, valuesInConflict: Set<Any?>? = null, cause: Throwable?) : super(
+        $$"<parameters of `$$callableName`>$${if (parameters != null) $$"$$${parameters.joinToString { "`${it.name}` of type `${it.type}`" }}" else String.EMPTY} are in conflict$${if (valuesInConflict != null) " with values ${valuesInConflict.joinToString { "`$it`" }}" else String.EMPTY}"
     )
 }

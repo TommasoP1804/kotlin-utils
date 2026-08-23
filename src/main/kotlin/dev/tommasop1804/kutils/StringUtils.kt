@@ -34,9 +34,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
 
 /**
  * Provides an empty string as a constant property of the String companion object.
@@ -292,49 +289,86 @@ val String.Companion.APOSTROPHE get() = '\''
 val String.Companion.QUOTATION_MARK get() = '"'
 
 /**
- * Checks if the given CharSequence is not null and not empty.
+ * Extension property to check if the [CharSequence] is empty.
  *
- * This function utilizes Kotlin contracts to provide better null-safety inference
- * when used in conditional checks.
- *
- * @return true if the CharSequence is not null and not empty, false otherwise.
- * @since 1.0.0
+ * @return `true` if the [CharSequence] has no characters, `false` otherwise.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-fun CharSequence?.isNotNullOrEmpty(): Boolean {
+val CharSequence.isEmpty get() = isEmpty()
+/**
+ * Extension property for `CharSequence` that checks whether the sequence is not empty.
+ *
+ * This property evaluates to `true` if the `CharSequence` contains one or more characters,
+ * otherwise it evaluates to `false`.
+ * @since 5.0.0
+ */
+val CharSequence.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property for [CharSequence] that checks if the character sequence is empty or contains only whitespace characters.
+ *
+ * @receiver The character sequence to be checked.
+ * @return `true` if the character sequence is empty or consists solely of whitespace characters, otherwise `false`.
+ * @since 5.0.0
+ */
+val CharSequence.isBlank get() = isBlank()
+/**
+ * Extension property for [CharSequence] that evaluates whether the character sequence is not blank.
+ * A character sequence is considered not blank if it contains at least one non-whitespace character.
+ * @since 5.0.0
+ */
+val CharSequence.isNotBlank get() = isNotBlank()
+/**
+ * Checks if the nullable [CharSequence] is either `null` or empty.
+ *
+ * @return `true` if the [CharSequence] is `null` or its length is 0, otherwise `false`.
+ * @since 5.0.0
+ */
+val CharSequence?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return isNullOrEmpty()
+}
+/**
+ * Extension property for `CharSequence?` to check whether it is not null and not empty.
+ *
+ * This property returns `true` if the `CharSequence?` is neither `null` nor empty.
+ * Otherwise, it returns `false`.
+ *
+ * Utilizes Kotlin contracts to ensure smart-casting of the value to `CharSequence`
+ * when the property returns `true`.
+ * @since 5.0.0
+ */
+val CharSequence?.isNotNullOrEmpty: Boolean get() {
     contract {
         returns(true) implies (this@isNotNullOrEmpty != null)
     }
     return !isNullOrEmpty()
 }
-
 /**
- * Checks if the given [CharSequence] is either `null` or consists solely of whitespace characters.
+ * Checks if the given [CharSequence] is either `null`, empty, or consists solely of whitespace characters.
  *
- * @receiver The [CharSequence] to be checked.
- * @return `true` if the [CharSequence] is `null` or blank (only contains whitespace characters),
- *         `false` otherwise.
- * @since 1.0.0
+ * @return `true` if the [CharSequence] is `null`, empty, or blank; `false` otherwise.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-fun CharSequence?.isNullOrBlank(): Boolean {
+val CharSequence?.isNullOrBlank: Boolean get() {
     contract {
         returns(false) implies (this@isNullOrBlank != null)
     }
-    return isNull() || isBlank()
+    return isNullOrBlank()
 }
 /**
- * Checks if the given CharSequence is not null and not blank.
+ * Extension property that evaluates whether a nullable [CharSequence] is not null
+ * and not blank (i.e., not empty and contains at least one non-whitespace character).
  *
- * A CharSequence is considered "not blank" if it contains at least one non-whitespace character.
- * This function provides a concise way to ensure that a nullable CharSequence contains meaningful content.
+ * This property returns `true` if the [CharSequence] is neither `null` nor blank.
+ * Otherwise, it returns `false`.
  *
- * @return `true` if the CharSequence is not null and contains at least one non-whitespace character,
- *         otherwise `false`.
- * @since 1.0.0
+ * Contracts are used to reinforce that a returned `true` result implies the
+ * [CharSequence] is not `null`.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-fun CharSequence?.isNotNullOrBlank(): Boolean {
+val CharSequence?.isNotNullOrBlank: Boolean get() {
     contract {
         returns(true) implies (this@isNotNullOrBlank != null)
     }
@@ -351,7 +385,7 @@ fun CharSequence?.isNotNullOrBlank(): Boolean {
  * @return `true` if the string is not empty and all characters are lowercase, `false` otherwise.
  * @since 1.0.0
  */
-val String.isLowerCase get() = isNotEmpty() && this == lowercase()
+val String.isLowerCase: Boolean get() = isNotEmpty() && none { it.isUpperCase() } && this == lowercase()
 /**
  * Checks if the entire string is in uppercase.
  *
@@ -364,7 +398,7 @@ val String.isLowerCase get() = isNotEmpty() && this == lowercase()
  *         `false` otherwise.
  * @since 1.0.0
  */
-val String.isUpperCase get() = isNotEmpty() && this == uppercase()
+val String.isUpperCase: Boolean get() = isNotEmpty() && none { it.isLowerCase() } && this == uppercase()
 /**
  * Checks if the string contains both uppercase and lowercase characters.
  * A string is considered mixed case if it is not empty, contains at least one uppercase character,
@@ -791,7 +825,7 @@ val String.matchedCases get() = TextCase.entries { it != TextCase.Standard && it
  * @receiver The string.
  * @since 1.0.0
  */
-fun String.containsAll(vararg substrings: CharSequence) = !isNull() && substrings.all { contains(it) }
+fun String.containsAll(vararg substrings: CharSequence) = substrings.all { contains(it) }
 
 /**
  * Checks whether the nullable string contains all the specified characters.
@@ -857,7 +891,6 @@ fun String.containsNone(vararg subchars: Char): Boolean = !containsAny(*subchars
  * @since 1.0.0
  */
 fun String.containsOnly(vararg valid: CharSequence): Boolean {
-    if (isNull()) return false
     for (char in this) {
         var contains = false
         for (c in valid) {
@@ -880,7 +913,6 @@ fun String.containsOnly(vararg valid: CharSequence): Boolean {
  * @since 1.0.0
  */
 fun String.containsOnly(vararg valid: Char): Boolean {
-    if (isNull()) return false
     for (char in this) {
         var contains = false
         for (c in valid) {
@@ -1771,11 +1803,11 @@ fun String.cForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, Char>) 
  * @return The current `CharSequence` if it's neither null nor empty; otherwise, the result of the `defaultValue` function.
  * @since 1.0.0
  */
-@OptIn(ExperimentalContracts::class)
-inline fun <C : CharSequence> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C {
+inline fun <C : CharSequence> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C? {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
         (this@ifNullOrEmpty == null) holdsIn defaultValue
+        (this@ifNullOrEmpty != null) implies returnsNotNull()
     }
     return if (isNullOrEmpty()) defaultValue() else this
 }
@@ -1793,94 +1825,522 @@ inline fun <C : CharSequence> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C {
  * of [defaultValue].
  * @since 1.0.0
  */
-@OptIn(ExperimentalContracts::class)
-inline fun <C : CharSequence> C?.ifNullOrBlank(defaultValue: Supplier<C>): C {
+inline fun <C : CharSequence> C?.ifNullOrBlank(defaultValue: Supplier<C>): C? {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
         (this@ifNullOrBlank == null) holdsIn defaultValue
+        (this@ifNullOrBlank != null) implies returnsNotNull()
     }
     return if (isNullOrBlank()) defaultValue() else this
 }
 /**
- * Executes the given [block] if the calling [CharSequence] is not empty.
- * If the [CharSequence] is empty, it returns itself cast to the expected return type.
+ * Executes the specified action if the CharSequence is not empty.
  *
- * @param block The transformation block to be executed if the [CharSequence] is not empty.
- * @return The result of the [block] if the [CharSequence] is not empty, otherwise the original [CharSequence] cast to the expected return type.
- * @since 3.6.5
+ * @param action The action to perform if the CharSequence is not empty.
+ * @return The original CharSequence on which the method was called.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <C : CharSequence, R> C.ifNotEmpty(block: ReceiverTransformer<C, R>): R {
+inline fun <C : CharSequence> C.ifNotEmpty(action: Consumer<C>): C {
     contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return if (isNotEmpty()) this.block() else this as R
+    if (isNotEmpty()) action(this)
+    return this
 }
 /**
- * Executes the given [block] if the character sequence is not blank.
+ * Executes the specified action if the character sequence is not blank.
  *
- * A character sequence is considered not blank if it is not empty
- * and contains at least one non-whitespace character.
- *
- * @param block A lambda that will be executed with the character sequence as the receiver
- *              if it is not blank.
- * @return The result of the [block] if the character sequence is not blank; otherwise,
- *         the original character sequence cast to the expected result type.
- * @since 3.6.5
+ * @param action the action to be performed if the character sequence is not blank
+ * @return the original character sequence
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <C : CharSequence, R> C.ifNotBlank(block: ReceiverTransformer<C, R>): R {
+inline fun <C : CharSequence> C.ifNotBlank(action: Consumer<C>): C {
     contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return if (isNotBlank()) this.block() else this as R
+    if (isNotBlank()) action(this)
+    return this
 }
 /**
- * Executes the given block of code if the CharSequence is not null and not empty.
+ * Executes the provided action if the CharSequence is not null and not empty.
+ * This function is inline and uses Kotlin contracts to help with null-safety inference.
  *
- * The function uses Kotlin contracts to provide enhanced null-safety inference.
- *
- * @param block The transformation or action to execute if the CharSequence is not null and not empty.
- *              The provided block receives the non-null and non-empty CharSequence as its receiver.
- * @return The value returned by the block if the CharSequence is not null and not empty;
- *         otherwise, it returns the CharSequence itself cast to the specified type.
- * @since 3.6.5
+ * @param action The action to perform on the CharSequence if it is not null and not empty.
+ * @return The original CharSequence, whether or not the action was executed.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <C : CharSequence, R> C?.ifNotNullOrEmpty(block: ReceiverTransformer<C, R>): R? {
+inline fun <C : CharSequence> C?.ifNotNullOrEmpty(action: Consumer<C>): C? {
     contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        (this@ifNotNullOrEmpty != null) holdsIn block
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrEmpty != null) holdsIn action
         (this@ifNotNullOrEmpty != null) implies returnsNotNull()
     }
-    return if (isNotNullOrEmpty()) this.block() else this as R
+    if (isNotNullOrEmpty) action(this)
+    return this
 }
 /**
- * Executes the given [block] if the CharSequence is not null and not blank.
+ * Executes the given action if the CharSequence is not null and not blank.
  *
- * This function checks if the receiver CharSequence is neither null nor blank. If the condition is met,
- * the provided [block] is invoked with the receiver as its parameter. If the condition is not met,
- * the receiver is returned as the result cast to the expected type [R].
+ * A CharSequence is considered "not blank" if it contains at least one non-whitespace character.
+ * This function provides a concise way to perform an action only when the CharSequence is meaningful.
  *
- * @param block A lambda function to execute if the CharSequence is not null and not blank. The receiver
- *              of the lambda is the non-null, non-blank CharSequence.
- * @since 3.6.5
+ * @param action The action to perform on the CharSequence if it is not null and not blank.
+ * @return The original CharSequence, whether or not the action was executed.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <C : CharSequence, R> C?.ifNotNullOrBlank(block: ReceiverTransformer<C, R>): R {
+inline fun <C : CharSequence> C?.ifNotNullOrBlank(action: Consumer<C>): C? {
     contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        (this@ifNotNullOrBlank != null) holdsIn block
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        (this@ifNotNullOrBlank != null) holdsIn action
+        (this@ifNotNullOrBlank != null) implies returnsNotNull()
     }
-    return if (isNotNullOrBlank()) this.block() else this as R
+    if (isNotNullOrBlank) action(this)
+    return this
+}
+/**
+ * Executes a given action if the current string equals the specified string, ignoring case differences.
+ *
+ * This function compares two nullable strings without considering case
+ * and, if they are equal, performs the specified action on a pair containing the two strings.
+ *
+ * @param other the string to compare with the current string, may be null
+ * @param action the action to execute if the strings are equal ignoring case; the action receives a MonoPair of the two strings
+ * @return the original string on which the function was called
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : String?> T.ifEqualsIgnoreCase(other: T, action: Consumer<MonoPair<T>>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this equalsIgnoreCase other) action(this to other)
+    return this
+}
+/**
+ * Executes the given action if the receiver string is not equal to the specified string, ignoring case considerations.
+ * The comparison is performed using the `notEqualsIgnoreCase` function.
+ *
+ * @param other The string to compare with the receiver string, ignoring case.
+ * @param action A consumer that takes a pair of the receiver string and the specified string if they are not equal.
+ * @return The receiver string.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : String?> T.ifNotEqualsIgnoreCase(other: T, action: Consumer<MonoPair<T>>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this notEqualsIgnoreCase other) action(this to other)
+    return this
+}
+
+/**
+ * Executes the specified action if the given character is found in the CharSequence.
+ *
+ * @param char the character to search for in the CharSequence.
+ * @param action a consumer action to be executed if the character is found.
+ * @return the original CharSequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifContains(char: Char, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (char in this) action(this)
+    return this
+}
+/**
+ * Executes the given action if the current CharSequence contains the specified substring.
+ *
+ * @param cs the substring to check for within the current CharSequence.
+ * @param action the action to perform if the substring is found.
+ * @return the original CharSequence on which the method was called.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifContains(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (cs in this) action(this)
+    return this
+}
+/**
+ * Performs the given [action] if the specified character sequence [cs] is found within the calling character sequence,
+ * ignoring case considerations.
+ *
+ * @param cs the character sequence to search for within the calling character sequence.
+ * @param action the action to perform if [cs] is found, with the calling character sequence passed as an argument.
+ * @return the calling character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifContainsIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (cs inIgnoreCase this) action(this)
+    return this
+}
+/**
+ * Executes the specified [action] if the invoking CharSequence matches the provided [regex].
+ *
+ * @param regex the regular expression to check within the CharSequence.
+ * @param action the lambda to invoke if the CharSequence contains a match for the provided regular expression.
+ * @return the original CharSequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifContains(regex: Regex, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (regex in this) action(this)
+    return this
+}
+/**
+ * Executes the given [action] if the character [char] is not found in the current CharSequence.
+ *
+ * @param char The character to check for in the CharSequence.
+ * @param action The action to execute if the character is not present.
+ * @return The original CharSequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotContains(char: Char, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (char !in this) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the given character sequence is not found in the current string.
+ *
+ * @param cs The character sequence to check for existence in the current string.
+ * @param action A function to be executed if the character sequence is not found in the current string.
+ * @return The original string on which this function was called.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotContains(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (cs !in this) action(this)
+    return this
+}
+/**
+ * Executes the given action if the current character sequence does not contain the specified substring, ignoring case considerations.
+ *
+ * @param cs the character sequence to check against this character sequence.
+ * @param action the action to be executed if the specified substring is not contained in this character sequence.
+ * @return the original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotContainsIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (cs notInIgnoreCase this) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the calling CharSequence does not match the given regular expression.
+ *
+ * @param regex The regular expression to check for in the CharSequence.
+ * @param action The action to execute if the regular expression is not found in the CharSequence.
+ * @return The original CharSequence unchanged.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotContains(regex: Regex, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (regex !in this) action(this)
+    return this
+}
+/**
+ * Executes the given action if the CharSequence matches the provided regular expression.
+ *
+ * @param regex The regular expression to match against the CharSequence.
+ * @param action The action to be executed if the CharSequence matches the regular expression.
+ * @return Returns the original CharSequence, regardless of whether the action was executed or not.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifMatches(regex: Regex, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (regex matches this) action(this)
+    return this
+}
+/**
+ * Executes the given action if the current char sequence does not match the provided regular expression.
+ *
+ * @param regex The regular expression to match against the current char sequence.
+ * @param action The action to invoke if the current char sequence does not match the regex.
+ * @return The original char sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotMatches(regex: Regex, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!(regex matches this)) action(this)
+    return this
+}
+
+/**
+ * Executes the given action if the character sequence starts with the specified character.
+ *
+ * @param char the character to check for at the start of the character sequence.
+ * @param action the action to perform if the character sequence starts with the specified character.
+ * @return the original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifStartsWith(char: Char, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (startsWith(char)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the character sequence starts with the specified prefix.
+ *
+ * @param cs The prefix to check against the character sequence.
+ * @param action The action to perform if the character sequence starts with the specified prefix.
+ * @return The original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifStartsWith(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (startsWith(cs)) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the current character sequence starts with the specified prefix, ignoring case.
+ *
+ * @param cs the character sequence to check as the potential prefix.
+ * @param action the action to perform if the current character sequence starts with the specified prefix.
+ * @return the original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifStartsWithIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (startsWithIgnoreCase(cs)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the character sequence does not start with the specified character.
+ *
+ * @param char the character to check against the start of the character sequence.
+ * @param action the action to be executed if the character sequence does not start with the specified character.
+ * @return the original character sequence after optionally executing the action.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotStartsWith(char: Char, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!startsWith(char)) action(this)
+    return this
+}
+/**
+ * Executes the specified action if this character sequence does not start with the given prefix.
+ *
+ * @param cs The character sequence to check as a prefix.
+ * @param action The action to execute if this character sequence does not start with the given prefix.
+ * @return The original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotStartsWith(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!startsWith(cs)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the character sequence does not start with the specified prefix, ignoring case considerations.
+ *
+ * @param cs the prefix to check for at the start of this character sequence.
+ * @param action the action to perform if the character sequence does not start with the specified prefix.
+ * @return the original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotStartsWithIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (notStartsWithIgnoreCase(cs)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the character sequence ends with the specified character.
+ *
+ * @param char the character to check as the suffix of this character sequence
+ * @param action the action to be executed if the character sequence ends with the specified character
+ * @return the original character sequence
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifEndsWith(char: Char, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (endsWith(char)) action(this)
+    return this
+}
+/**
+ * Executes the given [action] if this character sequence ends with the specified [cs].
+ *
+ * @param cs the character sequence to check as the suffix.
+ * @param action the action to invoke if this character sequence ends with [cs].
+ * @return this character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifEndsWith(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (endsWith(cs)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the character sequence ends with the specified suffix, ignoring case.
+ *
+ * @param cs the character sequence to check as a suffix
+ * @param action the action to perform on this character sequence if the condition is met
+ * @return the original character sequence
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifEndsWithIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (endsWithIgnoreCase(cs)) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the character sequence does not end with the given character.
+ *
+ * @param char the character to be checked as the suffix of this character sequence
+ * @param action the action to be executed if the character sequence does not end with the specified character
+ * @return the original character sequence
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotEndsWith(char: Char, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!endsWith(char)) action(this)
+    return this
+}
+/**
+ * Executes the given action on this character sequence if it does not end with the specified [cs].
+ *
+ * @param cs the character sequence to check as the suffix.
+ * @param action the action to execute if this character sequence does not end with [cs].
+ * @return the original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotEndsWith(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!endsWith(cs)) action(this)
+    return this
+}
+/**
+ * Executes the specified action if this character sequence does not end with the given suffix,
+ * ignoring character case.
+ *
+ * @param cs the character sequence to check against the end of this character sequence.
+ * @param action the action to invoke if the condition is met.
+ * @return this character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotEndsWithIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (notEndsWithIgnoreCase(cs)) action(this)
+    return this
+}
+
+/**
+ * Executes the given action if the length of the CharSequence matches the specified length.
+ *
+ * @param length The length to compare against the CharSequence's length.
+ * @param action The action to execute if the length matches. The current CharSequence is passed to this action.
+ * @return The original CharSequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : CharSequence> C.ifLength(length: Int, action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this.length == length) action(this)
+    return this
+}
+/**
+ * Executes the specified [action] if the length of the character sequence
+ * is not equal to the given [length]. Always returns the original character sequence.
+ *
+ * @param length the length to compare against
+ * @param action the action to execute if the length condition is not met
+ * @return the original character sequence
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : CharSequence> C.ifNotLength(length: Int, action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this.length != length) action(this)
+    return this
+}
+/**
+ * Invokes the given action if the character sequence has a length of one.
+ *
+ * @param action The consumer function to be executed if the character sequence contains a single character.
+ * @return The original character sequence.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : CharSequence> C.ifSingleChar(action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (length == 1) action(this)
+    return this
 }
 
 /**
@@ -2903,7 +3363,7 @@ infix fun String.before(delimiter: Char) = substringBefore(delimiter, String.EMP
  * @param delimiter The regular expression used to locate the position in the string before which the substring is extracted.
  * @since 1.0.0
  */
-infix fun String.before(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get(0..<(delimiter.find(this)!!.range.first))
+infix fun String.before(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get(0..<(delimiter.find(this)!!.range.first))
 /**
  * Returns a substring of the original string before the first occurrence of the specified delimiter,
  * including the delimiter itself. If the delimiter is not present in the string, an empty string
@@ -2962,7 +3422,7 @@ infix fun String.beforeLast(delimiter: Char) = substringBeforeLast(delimiter, St
  * @param delimiter The regular expression used to identify the last occurrence. Determines the split point.
  * @since 1.0.0
  */
-infix fun String.beforeLast(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get(0..<(delimiter.findAll(this).last().range.first))
+infix fun String.beforeLast(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get(0..<(delimiter.findAll(this).last().range.first))
 /**
  * Returns a substring of the original string that includes the part before the last occurrence
  * of the specified [delimiter], including the [delimiter] itself.
@@ -3000,7 +3460,7 @@ infix fun String.beforeLastIncluding(delimiter: Char): String {
  * @param delimiter A regular expression pattern used to find the last occurrence in the string.
  * @since 1.0.0
  */
-infix fun String.beforeLastIncluding(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get(0..(delimiter.findAll(this).last().range.last))
+infix fun String.beforeLastIncluding(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get(0..(delimiter.findAll(this).last().range.last))
 /**
  * Returns a substring of this string starting from the first occurrence of the specified delimiter.
  * If the delimiter is not found, this string is returned as empty.
@@ -3025,7 +3485,7 @@ infix fun String.after(delimiter: Char) = substringAfter(delimiter, String.EMPTY
  * @param delimiter A regular expression to identify the part of the string after which the substring should be taken.
  * @since 1.0.0
  */
-infix fun String.after(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get((delimiter.find(this)!!.range.last) + 1..<length)
+infix fun String.after(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get((delimiter.find(this)!!.range.last) + 1..<length)
 /**
  * Returns a string starting from and including the first occurrence of the specified [delimiter].
  * If the [delimiter] is not found in the string, an empty string is returned.
@@ -3058,7 +3518,7 @@ infix fun String.afterIncluding(delimiter: Char): String {
  * @param delimiter A regular expression used to find a match within the string. The substring starts immediately after the first match.
  * @since 1.0.0
  */
-infix fun String.afterIncluding(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get(delimiter.find(this)!!.range.first..<length)
+infix fun String.afterIncluding(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get(delimiter.find(this)!!.range.first..<length)
 /**
  * Returns a substring of this string obtained by taking the part after the last occurrence of the given [delimiter].
  * If the [delimiter] is not present in the string, an empty string is returned.
@@ -3082,7 +3542,7 @@ infix fun String.afterLast(delimiter: Char) = substringAfterLast(delimiter, this
  * @param delimiter A regular expression that determines the delimiter after which the substring is extracted.
  * @since 1.0.0
  */
-infix fun String.afterLast(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get((delimiter.findAll(this).lastOrNull()!!.range.last) + 1..<length)
+infix fun String.afterLast(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get((delimiter.findAll(this).lastOrNull()!!.range.last) + 1..<length)
 /**
  * Returns a substring of the original string starting from and including the last occurrence
  * of the specified delimiter. If the delimiter is not found in the string, an empty string
@@ -3120,7 +3580,7 @@ infix fun String.afterLastIncluding(delimiter: Char): String {
  * @param delimiter The regular expression used to find the last occurrence in the string.
  * @since 1.0.0
  */
-infix fun String.afterLastIncluding(delimiter: Regex) = if (delimiter.find(this).isNull()) String.EMPTY else get((delimiter.findAll(this).last().range.first)..<length)
+infix fun String.afterLastIncluding(delimiter: Regex) = if (delimiter.find(this) == null) String.EMPTY else get((delimiter.findAll(this).last().range.first)..<length)
 
 /**
  * Inserts the specified string at the given index in the current string instance.
@@ -3235,1297 +3695,6 @@ infix fun String.surroundWith(wrapper: CharSequence) = "$wrapper$this$wrapper"
  * @since 1.0.0
  */
 infix fun String.surroundWith(char: Char) = "$char$this$char"
-
-/**
- * Validates that the given character sequence is not empty.
- * If the sequence is empty, a `ValidationFailedException` is thrown with an optional cause.
- *
- * @param causeOf an optional supplier that provides the primary cause of the exception.
- * @param cause an optional supplier that provides an additional underlying cause of the exception.
- * @return the original character sequence if it is not empty.
- * @throws ValidationFailedException if the character sequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is not empty. If the validation fails,
- * a `ValidationFailedException` is thrown with a supplied message and optional cause.
- *
- * @param causeOf an optional supplier for a throwable that represents the primary cause
- *                of the validation failure. If provided, this will be thrown and initialized
- *                with a `ValidationFailedException` as its cause.
- * @param cause an optional supplier for a throwable representing additional context
- *              for the validation failure. This will be used as the cause for the
- *              `ValidationFailedException` if no primary cause is supplied.
- * @param lazyMessage a supplier for the error message to be included in the exception
- *                    if validation fails.
- * @return the current `CharSequence` instance if validation passes.
- * @throws ValidationFailedException if the validation fails and the `CharSequence` is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is not empty. If the sequence is empty, throws a ValidationFailedException.
- *
- * @param property The property associated with the validation failure. Can be null if not applicable.
- * @param variableName An optional name of the variable being validated. Included in the exception message if provided.
- * @param message An optional custom error message. Defaults to "is empty" if not specified.
- * @param causeOf A supplier for the primary cause of the exception. If not null, initializes the exception with this cause.
- * @param cause A supplier for an optional additional cause of the exception.
- * @return The original CharSequence if it is not empty.
- * @throws ValidationFailedException if the CharSequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a `CharSequence` is not empty. If the `CharSequence` is empty, a `ValidationFailedException` is thrown.
- *
- * @param property the primary property associated with the validation, or null if not specified
- * @param variable an optional secondary property providing additional context, or null if not specified
- * @param message an optional custom error message to include in the exception, or null for a default message
- * @param causeOf an optional supplier for the underlying cause of the exception, or null if not specified
- * @param cause an optional supplier for an additional nested cause, or null if not specified
- * @return the validated `CharSequence` if it is not empty
- * @throws ValidationFailedException if the `CharSequence` is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current [CharSequence] is not empty. If the validation fails, a [ValidationFailedException] is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) related to the validation. Can be null.
- * @param parameterName The name of the parameter related to the validation. Can be null.
- * @param message An optional custom message for the validation failure. Defaults to "is empty" if not provided.
- * @param causeOf A supplier for the throwable to be used as the primary cause if the validation fails. Can be null.
- * @param cause A supplier for an additional cause to be attached to the validation exception. Can be null.
- * @return The original [CharSequence] if the validation passes.
- * @throws ValidationFailedException if the [CharSequence] is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is not empty.
- *
- * @param callable The function in which the validation is being performed, or null if not applicable.
- * @param parameter The parameter related to the validation failure, or null if not applicable.
- * @param message An optional message to include if the validation fails, defaulting to null.
- * @param causeOf A supplier for the cause to be used if the validation fails and a specific root cause should be provided, defaulting to null.
- * @param cause A supplier for the exception cause to include in the thrown exception, defaulting to null.
- * @return The original CharSequence if it is not empty.
- * @throws ValidationFailedException If the CharSequence is empty, with detailed information about the failure.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is not empty. If the sequence is empty, a
- * ValidationFailedException is thrown with the specified details.
- *
- * @param callableName the name of the callable (e.g., function or method) associated with this validation.
- * @param parameterName the name of the parameter being validated, or null if unspecified.
- * @param message a custom error message to provide additional context for the validation failure, or null for a default message.
- * @param causeOf a supplier that provides a custom throwable as the root cause of the exception, or null if not defined.
- * @param cause a supplier for an additional throwable to be associated as the cause of the exception, or null if not provided.
- * @return the current CharSequence if validation passes.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is not empty.
- * Throws a ValidationFailedException if the validation fails.
- *
- * @param callableName The name of the callable (e.g., function or property) being validated, or null if not specified.
- * @param parameter The KParameter instance representing the parameter being validated, or null if not applicable.
- * @param message An optional error message to provide additional context when the exception is thrown.
- * @param causeOf A supplier for the throwable to be used as the cause of the validation failure, or null if not specified.
- * @param cause A supplier for an additional exception to be attached as the cause, or null if not specified.
- * @return The same CharSequence if it is not empty.
- * @throws ValidationFailedException If the CharSequence is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the receiver `CharSequence` is not null or empty.
- *
- * If the `CharSequence` is null or empty, a `ValidationFailedException` is thrown.
- * The exception can optionally include a custom cause or a cause of.
- *
- * @param causeOf a supplier for an optional `Throwable` to be used as the primary cause of the exception.
- * @param cause a supplier for an optional `Throwable` to be included as the underlying cause of the exception.
- * @return the validated `CharSequence`, ensuring it is not null or empty.
- * @throws ValidationFailedException if the `CharSequence` is null or empty.
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the `CharSequence` is not null or empty. If the validation fails,
- * a `ValidationFailedException` is thrown with the specified lazy message and optional causes.
- *
- * @param causeOf an optional supplier for a throwable that represents the primary cause of the exception.
- * @param cause an optional supplier for a throwable that represents a secondary cause of the exception.
- * @param lazyMessage a supplier for the exception message, executed lazily when the validation fails.
- * @return the validated `CharSequence` if it is not null or empty.
- * @throws ValidationFailedException if this `CharSequence` is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the calling [CharSequence] is not null or empty. If the validation fails, a
- * [ValidationFailedException] is thrown with an optional custom message and cause.
- *
- * @param property The associated property being validated. Can be null if there is no specific property.
- * @param variableName An optional name for the variable being validated. Used in the error message if provided.
- * @param message An optional custom message explaining the validation failure. Default message is "is null or empty".
- * @param causeOf A supplier for the root cause of the validation failure. If not null, it is used to create the exception.
- * @param cause A supplier for an additional cause, chained as the underlying throwable of the validation exception.
- * @return The original [CharSequence] if validation is successful.
- * @throws ValidationFailedException If the calling [CharSequence] is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a given CharSequence is not null or empty.
- *
- * Throws a [ValidationFailedException] if the CharSequence is null or empty.
- * The exception message can be customized using the `message` parameter.
- * Additional context can be provided through the `property` and `variable` parameters.
- * Optional throwable suppliers can be used to define the root cause or an additional cause for the exception.
- *
- * @param property the main property associated with the validation, or null if not provided
- * @param variable an optional secondary property providing additional context, or null if not provided
- * @param message a custom message to append to the exception, or null for a default message
- * @param causeOf a supplier for the root cause of the exception, or null if not provided
- * @param cause an additional cause supplier for the exception, or null if not provided
- * @return the original CharSequence instance if validation succeeds
- * @throws ValidationFailedException if the CharSequence is null or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is not null or empty. If the validation fails, a
- * `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation error relates. Can be null.
- * @param parameterName The name of the parameter in the given callable that failed validation. Can be null.
- * @param message An optional custom error message describing the validation failure. Defaults to "is null or empty".
- * @param causeOf A supplier providing the cause of the validation failure as a `Throwable`. If provided, it is used to
- *               initialize the `ValidationFailedException`.
- * @param cause A supplier providing additional context as a `Throwable` for the `ValidationFailedException`.
- * @return The validated `CharSequence` if it is neither null nor empty.
- * @throws ValidationFailedException If the current `CharSequence` is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current character sequence is not null or empty. If the validation fails, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] associated with the validation, or null if not applicable
- * @param parameter the [KParameter] representing the parameter being validated, or null if not applicable
- * @param message an optional message describing the validation failure for additional context, defaulting to null
- * @param causeOf a supplier for the primary `Throwable` cause of the validation failure, or null if not applicable
- * @param cause a supplier for an additional `Throwable` to be used as the cause, or null if not specified
- * @return the original character sequence if the validation passes
- * @throws ValidationFailedException if the character sequence is null or empty, with optional details provided by the callable, parameter, message, or causes
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is not null or empty.
- * If the validation fails, a `ValidationFailedException` is thrown with the provided details.
- *
- * @param callableName the name of the callable (e.g., function or method) performing the validation, or null if not specified.
- * @param parameterName the name of the parameter being validated, or null if not specified.
- * @param message an optional custom message to include in the exception if validation fails.
- * @param causeOf a supplier for the root cause of the validation failure, or null if not specified.
- * @param cause a supplier for an additional cause of the exception, or null if not specified.
- * @return the current `CharSequence` if validation succeeds.
- * @throws ValidationFailedException if the `CharSequence` is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is not null or empty.
- * If the validation fails, a `ValidationFailedException` is thrown.
- *
- * @param callableName The name of the callable (e.g., function or property) associated with this validation, or null if not specified.
- * @param parameter The parameter being validated, represented as a `KParameter`, or null if not applicable.
- * @param message An optional error message to include in the exception if validation fails, or null to use the default message.
- * @param causeOf An optional supplier for the underlying `Throwable` that triggered the validation failure, or null if absent.
- * @param cause An additional optional supplier for the `Throwable` to attach as the cause of the failure, or null if absent.
- * @return The validated `CharSequence` if it is not null or empty.
- * @throws ValidationFailedException If the `CharSequence` is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is empty. If the validation fails, a `ValidationFailedException` is thrown.
- *
- * @param causeOf an optional supplier for the exception to be thrown as the root cause if the validation fails.
- * @param cause an optional supplier for an additional cause to be associated with the thrown exception.
- * @return the current CharSequence if it passes the validation (i.e., it is empty).
- * @throws ValidationFailedException if the CharSequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a [CharSequence] is empty. If the string is not empty, a validation
- * exception is thrown using the provided message and optional cause suppliers.
- *
- * @param causeOf A supplier for the primary cause of the validation failure (nullable). If this
- * supplier is provided, its result is used as the root exception cause.
- * @param cause A supplier for an additional cause to be chained to the validation failure (nullable).
- * This is used only when `causeOf` is not provided.
- * @param lazyMessage A supplier for the message to be used in the validation exception. The message
- * is lazily computed.
- * @return The original [CharSequence] instance if it is empty.
- * @throws ValidationFailedException if the [CharSequence] is not empty, with an appropriate
- * message and cause provided by the supplier arguments.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given [CharSequence] is empty. If the sequence is not empty, throws a [ValidationFailedException].
- *
- * @param property The property associated with the validation. May be null if not applicable.
- * @param variableName An optional name for the variable being validated. Useful for including in error messages.
- * @param message An optional custom error message to describe the validation failure. Defaults to "is not empty".
- * @param causeOf A supplier for the throwable that should be thrown instead of the default [ValidationFailedException].
- * @param cause A supplier for the throwable that should be set as the cause of the validation error, if any.
- * @return The original [CharSequence] if the validation passes (i.e., it is empty).
- * @throws ValidationFailedException If the [CharSequence] is not empty and no custom throwable is provided.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the `CharSequence` is empty. If it is not empty, a `ValidationFailedException` is thrown.
- *
- * @param property the primary property associated with the validation, may be null
- * @param variable an optional secondary property for additional context, may be null
- * @param message an optional message to describe the validation failure, defaults to a default message if null
- * @param causeOf an optional supplier for the cause of the exception, may be null
- * @param cause an optional supplier for an additional cause, may be null
- * @return the same `CharSequence` if validation passes
- * @throws ValidationFailedException if the `CharSequence` is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given character sequence is empty. If the sequence is not empty, a
- * `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation error is related. Can be null.
- * @param parameterName The name of the parameter in the given callable that caused the validation issue. Can be null.
- * @param message An optional custom message providing additional details about the validation failure. If null, a default message "is not empty" is used.
- * @param causeOf A supplier for the specific cause of the validation failure, represented as a `Throwable`. If null, the cause will not be supplied by this parameter.
- * @param cause A supplier for a general cause of the validation failure, used to chain exceptions. Can be null.
- * @return The validated character sequence if it is empty.
- * @throws ValidationFailedException If the character sequence is not empty, with optional details provided by `callable`, `parameterName`, `message`, `causeOf`, or `cause`.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current [CharSequence] is empty.
- * Throws a [ValidationFailedException] if the [CharSequence] is not empty.
- *
- * @param callable the [KFunction] related to the validation context, or null if not applicable
- * @param parameter the [KParameter] representing the parameter associated with the validation context, or null if not applicable
- * @param message an optional message providing additional context about the validation failure, defaults to null
- * @param causeOf a supplier for the root cause of the exception if validation fails, defaults to null
- * @param cause a supplier for the underlying cause of the validation failure, defaults to null
- * @return the original [CharSequence] if it is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is empty. If the `CharSequence` is not empty,
- * throws a `ValidationFailedException` with the provided details.
- *
- * @param callableName The name of the callable (e.g., function or method) related to the validation.
- * @param parameterName The name of the parameter being validated, or null if not applicable.
- * @param message An optional custom message indicating the nature of the validation failure.
- * @param causeOf A supplier that provides the root cause of the validation failure, or null if not applicable.
- * @param cause A supplier that provides a secondary cause for the exception, or null if not applicable.
- * @return The original `CharSequence` if it is empty.
- * @throws ValidationFailedException if the `CharSequence` is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is empty.
- *
- * If the CharSequence is not empty, a [ValidationFailedException] is thrown. The exception includes
- * optional details like the callable name, parameter, a custom message, and causes for the exception.
- *
- * @param callableName The name of the callable where the validation is performed, or null if not specified.
- * @param parameter The KParameter instance representing the parameter being validated, or null if not applicable.
- * @param message An optional error message providing additional context for the validation failure.
- * @param causeOf An optional supplier for the primary cause of the exception.
- * @param cause An optional supplier for a secondary cause of the exception.
- * @return The original CharSequence if it is empty.
- * @throws ValidationFailedException If the CharSequence is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is either null or empty.
- * If the `CharSequence` is not null and not empty, a `ValidationFailedException` is thrown.
- *
- * @param causeOf an optional supplier of a custom exception that will serve as the cause of the validation exception.
- *                If this parameter is null, a default `ValidationFailedException` will be used.
- * @param cause an optional supplier of a secondary cause for the exception, which provides additional context.
- *              This is used to chain exceptions and can be null.
- * @return the original `CharSequence` if it is successfully validated as null or empty.
- * @throws ValidationFailedException if the `CharSequence` is not null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the calling CharSequence instance is null or empty.
- * If the instance is not null or empty, an exception is thrown with the specified cause
- * and message.
- *
- * @param causeOf an optional supplier for a specific throwable to be returned,
- *        or null if no specific throwable is required.
- * @param cause an optional supplier for the cause of the exception.
- * @param lazyMessage a supplier for the error message to be used in the exception.
- * @return the calling CharSequence instance if the validation passes.
- * @throws ValidationFailedException if the CharSequence is not null and not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is null or empty. If the validation fails,
- * a [ValidationFailedException] is thrown with the provided details.
- *
- * @param property The Kotlin property associated with the validation. This is optional and can be null.
- * @param variableName An optional name of the variable being validated. Defaults to null.
- * @param message An optional custom message to describe the validation failure. Defaults to null.
- * @param causeOf A supplier for the primary cause of the exception. If present, the exception returned by this supplier is used
- *                as the cause of the validation exception.
- * @param cause An optional supplier for an additional nested exception to be included as the cause of the validation exception. Defaults to null.
- * @return The current CharSequence instance if the validation passes.
- * @throws ValidationFailedException If the validation fails, with details about the failure.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given CharSequence is null or empty. If it is not null or empty,
- * a `ValidationFailedException` is thrown.
- *
- * The exception message is constructed using the provided KProperties and optional message.
- * A custom throwable cause can also be included when the exception is thrown.
- *
- * @param property the primary KProperty associated with the validation, or null if not specified
- * @param variable an optional secondary KProperty that provides additional context, or null if not specified
- * @param message an optional message providing further details about the validation failure
- * @param causeOf a supplier for the exception cause, which can generate a throwable when invoked, or null if not specified
- * @param cause an additional supplier for a throwable cause, or null if not specified
- * @return the original CharSequence if it passes the validation (i.e., it is null or empty)
- * @throws ValidationFailedException if the CharSequence is not null or empty, including the provided details and causes
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the current `CharSequence` instance is null or empty.
- * If the validation fails, throws a `ValidationFailedException` with the specified details.
- *
- * @param callable The Kotlin function (`KFunction`) associated with the validation check. Can be null.
- * @param parameterName An optional name of the parameter being validated. Can be null.
- * @param message An optional custom message describing the validation failure. Defaults to "is not null or empty".
- * @param causeOf An optional custom supplier for the primary cause of the exception. If supplied, its result is used as the exception's cause.
- * @param cause An optional secondary supplier for additional exception cause details. Can be null.
- * @return Returns the current `CharSequence` instance for further usage if validation passes.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is null or empty. If the validation fails, throws a ValidationFailedException.
- *
- * @param callable the [KFunction] associated with the context of the validation, or null if not applicable
- * @param parameter the [KParameter] representing the parameter involved, or null if not applicable
- * @param message an optional custom message to include in the exception, or null to use a default message
- * @param causeOf an optional supplier for a specific exception to throw if the validation fails, or null to throw a default exception
- * @param cause an optional supplier for the root cause of the exception, or null if no root cause is provided
- * @return the original CharSequence if it passes the validation
- * @throws ValidationFailedException if the CharSequence is not null or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is null or empty. Throws a `ValidationFailedException` if the validation fails.
- *
- * @param callableName The name of the callable (e.g., function or method) where the validation is being performed.
- * @param parameterName The name of the parameter being validated, or null if not specified.
- * @param message An optional custom message to be associated with the validation failure, or null for the default message.
- * @param causeOf A supplier for the exception that serves as the cause of the validation failure, if applicable.
- * @param cause A supplier for the exception that should be the root cause of the failure, or null if not specified.
- * @return The original CharSequence if validation passes.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the given CharSequence is null or empty. If the CharSequence is not null or empty,
- * a `ValidationFailedException` is thrown with the provided details. This method returns the original
- * CharSequence if the validation succeeds.
- *
- * @param callableName The name of the function or property associated with the validation. Can be null.
- * @param parameter The parameter that this validation is related to. Can be null.
- * @param message An optional custom message to include in the exception if validation fails. Can be null.
- * @param causeOf An optional supplier for the root cause of the exception if validation fails. Can be null.
- * @param cause An optional supplier for additional context related to the failure, to be included as a cause. Can be null.
- * @return The original CharSequence if it is null or empty.
- * @throws ValidationFailedException If the CharSequence is not null or empty. The exception will include
- * details from the provided parameters to aid in debugging.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-
-/**
- * Validates that the current `CharSequence` is not blank. If the sequence is blank, a
- * `ValidationFailedException` is thrown with the provided cause or message.
- *
- * @param causeOf A supplier that provides a throwable to be used as the primary exception cause,
- *                or `null` if no specific cause supplier is provided.
- * @param cause   A supplier that provides a throwable to be used as the underlying cause for the exception,
- *                or `null` if no specific cause supplier is provided.
- * @return The current `CharSequence` if it is not blank.
- * @throws ValidationFailedException if the current `CharSequence` is blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is blank.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is not blank. Throws a ValidationFailedException
- * if the CharSequence is blank.
- *
- * @param causeOf an optional supplier that provides the cause of the exception. If null, defaults to a standard ValidationFailedException.
- * @param cause an optional supplier that provides an additional cause to be associated with the ValidationFailedException.
- * @param lazyMessage a supplier for the error message to be used in the exception if validation fails.
- * @return the original CharSequence if it passes the validation.
- * @throws ValidationFailedException if the CharSequence is blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is not blank (contains non-whitespace characters). If the validation
- * fails (i.e., the CharSequence is blank), a ValidationFailedException is thrown with an optional property,
- * variable name, custom message, and/or cause details.
- *
- * @param property The property associated with the validation failure. Can be null if not applicable.
- * @param variableName The name of the variable being validated. If null, it will not be included in the exception message.
- * @param message An optional custom message to include with the exception if validation fails. Defaults to "is blank".
- * @param causeOf A supplier for the throwable that serves as the main cause of the validation failure.
- *                If provided, the original exception will wrap the newly generated validation exception as its cause.
- * @param cause A supplier for an optional additional throwable cause to include with the exception.
- * @return The same CharSequence if validation passes (i.e., it is not blank).
- * @throws ValidationFailedException If the CharSequence is blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given [CharSequence] is not blank. If the validation fails,
- * a [ValidationFailedException] is thrown.
- *
- * @param property the main property being validated, used for contextual error information, or null if not applicable
- * @param variable an optional secondary property providing additional context, or null if not applicable
- * @param message an optional custom message describing the validation failure, or null if a default message should be used
- * @param causeOf an optional supplier for the cause exception to be thrown instead of creating a new [ValidationFailedException]
- * @param cause an optional supplier for providing the underlying cause of the [ValidationFailedException]
- * @return the original [CharSequence] if the validation passes
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current [CharSequence] is not blank. If the validation fails, a [ValidationFailedException] is thrown.
- *
- * @param callable The function where the validation is being performed. This parameter is optional and can be null.
- * @param parameterName The name of the parameter being validated. This parameter is optional and can be null.
- * @param message A custom error message to include in the exception if validation fails. This parameter is optional and can be null.
- * @param causeOf A [ThrowableSupplier] that provides a cause for the exception, if any. This parameter is optional and can be null.
- * @param cause A [ThrowableSupplier] that provides an additional cause for the exception, if any. This parameter is optional and can be null.
- * @return The current [CharSequence] if it is not blank.
- * @throws ValidationFailedException if the current [CharSequence] is blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is not blank (i.e., not null, empty, or consisting only of whitespace characters).
- * If the validation fails, a ValidationFailedException is thrown.
- *
- * @param callable the [KFunction] associated with this validation, or null if not applicable
- * @param parameter the [KParameter] representing the parameter being validated, or null if not applicable
- * @param message an optional validation failure message, which defaults to "is blank" if not provided
- * @param causeOf an optional supplier of a [Throwable] to be used as the primary cause of the exception, or null
- * @param cause an optional supplier of a [Throwable] to be used as the secondary cause of the exception, or null
- * @return the validated CharSequence if it is not blank
- * @throws ValidationFailedException if the CharSequence is blank
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is not blank (contains non-whitespace characters).
- * Throws a [ValidationFailedException] if the validation fails.
- *
- * @param callableName the name of the callable (e.g., function or method) where the validation is performed.
- * @param parameterName the name of the parameter being validated, or null if not applicable.
- * @param message the custom message to include if the validation fails, or null to use a default message.
- * @param causeOf a supplier for the cause of the exception if validation fails, or null if not applicable.
- * @param cause an optional supplier for a secondary cause to associate with the validation failure, or null.
- * @return the validated CharSequence if it is not blank.
- * @throws ValidationFailedException if the CharSequence is blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current [CharSequence] is not blank (not empty and not consisting solely of whitespace).
- * If the validation fails, throws a [ValidationFailedException].
- *
- * @param callableName The name of the callable (e.g., function or property) where the validation is performed, or null if not specified.
- * @param parameter The parameter being validated, represented as a [KParameter] instance, or null if not applicable.
- * @param message An optional error message to include in the exception if the validation fails. Defaults to "is blank".
- * @param causeOf An optional supplier for a custom exception to throw instead of a default [ValidationFailedException].
- * @param cause An optional supplier for the underlying cause of the exception, if any.
- * @return The original [CharSequence] if the validation passes.
- * @throws ValidationFailedException If the [CharSequence] is blank and no custom exception is supplied via [causeOf].
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current [CharSequence] is neither `null` nor blank (consists solely of whitespace characters).
- * If it is, a [ValidationFailedException] is thrown. Optionally, custom suppliers for an exception or cause can be provided.
- *
- * @param causeOf A supplier for a custom exception to throw when validation fails. If not provided or `null`,
- *                a default [ValidationFailedException] is used.
- * @param cause A supplier for the underlying cause of the exception, if any. If `null`, no cause will be included.
- * @return The original [CharSequence], ensuring it is not `null` and not blank.
- * @throws ValidationFailedException If the [CharSequence] is `null` or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the CharSequence is neither null nor blank (consisting of only whitespace characters).
- * Throws an exception if the validation fails.
- *
- * @param causeOf a supplier for a throwable that provides additional context or cause when the validation fails.
- * @param cause an optional supplier for a throwable to be used as the direct cause of the failure exception.
- * @param lazyMessage a supplier providing a message or object to describe the failure when the validation fails.
- * @return the validated CharSequence if it is not null and not blank.
- * @throws ValidationFailedException if the CharSequence is null or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the invoked [CharSequence] is not null or blank. If the value is null or blank, a
- * [ValidationFailedException] is thrown. This can be used to ensure that mandatory string properties or variables
- * are properly initialized and contain meaningful data.
- *
- * @param property The property associated with the validation, used for constructing the error message.
- *                 Can be null if not applicable.
- * @param variableName An optional name of the variable involved in the validation, used in the error message.
- *                     Defaults to null.
- * @param message An optional custom message describing the validation failure. Defaults to null. If not provided,
- *                a default "is null or blank" message is used.
- * @param causeOf A supplier for an alternative throwable cause for the exception. Defaults to null.
- * @param cause A supplier for the underlying cause of the exception. Defaults to null.
- * @return The original [CharSequence] itself if it is not null or blank.
- * @throws ValidationFailedException If the [CharSequence] is null or consists solely of whitespace characters.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given [CharSequence] is not null or blank. If the validation fails, a [ValidationFailedException] is thrown.
- *
- * @param property The primary [KProperty] associated with the validation; can provide context about the invalid value, or `null`.
- * @param variable An optional secondary [KProperty] providing additional context about the validation, or `null`.
- * @param message An optional message describing the reason for the validation failure; default is "is null or blank".
- * @param causeOf A supplier providing a [Throwable] to be used as the root cause of the validation failure, or `null`.
- * @param cause A supplier providing a secondary [Throwable] to be used as the cause of the validation failure, or `null`.
- * @return The original [CharSequence], if it passes the validation.
- * @throws ValidationFailedException if the [CharSequence] is null or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is neither null nor blank. If the validation fails, an exception is thrown.
- *
- * @param callable The callable function that triggered the validation, used for contextual error reporting. Can be null.
- * @param parameterName The name of the parameter being validated, used for error message construction. Can be null.
- * @param message The custom error message to be included if validation fails. Defaults to "is null or blank" if not provided.
- * @param causeOf A supplier function that provides the root cause of the validation failure, if applicable. Can be null.
- * @param cause A supplier function that provides additional information about the cause of the failure, if applicable. Can be null.
- * @return The same non-null and non-blank CharSequence instance if validation succeeds.
- * @throws ValidationFailedException If the CharSequence is null or blank, with the appropriate context, message, and cause included.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is neither null nor blank. If the validation fails,
- * an exception is thrown. This method is designed for parameter validation in function calls.
- *
- * @param callable The function in which this validation is occurring. Can be null.
- * @param parameter The parameter being validated. Can be null.
- * @param message An optional custom error message to include in the exception. Defaults to "is null or blank" if null.
- * @param causeOf An optional supplier for the root cause of the exception.
- * @param cause An optional supplier for the cause of the exception.
- * @return The validated CharSequence if it passes the validation.
- * @throws ValidationFailedException If the CharSequence is null or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is not null or blank. If the validation fails, an exception is thrown.
- *
- * @param callableName the name of the callable (e.g., method or function) where this validation occurs. Can be null.
- * @param parameterName the name of the parameter being validated. Can be null.
- * @param message the custom error message to include in the exception. Defaults to "is null or blank" if not provided.
- * @param causeOf a supplier for the root cause of the exception. This can be used to chain exceptions for better error tracking. Can be null.
- * @param cause a supplier for an additional exception cause. This is appended to provide further context about the error. Can be null.
- * @return the validated CharSequence, guaranteed to be non-null and non-blank, if no exception is thrown.
- * @throws ValidationFailedException if the CharSequence is null or blank, including any relevant messages and causes.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a given CharSequence value is neither null nor blank. If the value is null or blank, a
- * [ValidationFailedException] is thrown with the specified details.
- *
- * @param callableName An optional name of the callable or context in which the validation is being performed.
- *                     This is used in the exception message to aid debugging.
- * @param parameter    An optional [KParameter] that represents the parameter being validated.
- *                     This can provide additional context in the exception message.
- * @param message      An optional custom error message to include in the exception if validation fails.
- *                     If null, a default message "is null or blank" is used.
- * @param causeOf      An optional supplier for the primary cause of the exception. If provided, it will
- *                     initialize the cause of the [ValidationFailedException].
- * @param cause        An optional supplier for an additional cause to include in the exception.
- * @return The original [CharSequence] value, if it passes validation (is not null or blank).
- * @throws ValidationFailedException If the value is null or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrBlank != null)
-    }
-    if (isNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the character sequence is blank.
- * If the character sequence is not blank, a [ValidationFailedException] is thrown.
- *
- * @param causeOf an optional supplier for a custom [Throwable] to be thrown; if provided, this will be used
- *                to construct the exception. If null, [ValidationFailedException] is used by default.
- * @param cause an optional supplier for a cause [Throwable] to be attached to the thrown exception.
- *              Used as the reason for the validation failure.
- * @return the original character sequence if it is blank.
- * @throws ValidationFailedException if the character sequence is not blank and no custom [Throwable] is supplied.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the calling [CharSequence] is blank. If the string is not blank, it throws a
- * [ValidationFailedException] with a custom error message and optional cause.
- *
- * @param causeOf a supplier for a throwable that may be initialized as the cause of the validation failure.
- *                If not provided, a default [ValidationFailedException] is used as the cause.
- * @param cause an additional supplier for a throwable to be used as the inner cause of the exception.
- * @param lazyMessage a supplier for the error message to be included in the exception if validation fails.
- * @return the original [CharSequence] if it is blank.
- * @throws ValidationFailedException if the [CharSequence] is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given character sequence is blank. If the sequence is not blank, it throws
- * an exception with the provided details.
- *
- * @param property The property associated with the character sequence being validated (nullable).
- * @param variableName The name of the variable being validated (nullable).
- * @param message An optional custom message for the validation failure (nullable).
- * @param causeOf A supplier for a specific exception to be used as the root cause (nullable).
- * @param cause A supplier for an additional throwable to be used as the cause of the exception (nullable).
- * @return The original character sequence if it is blank.
- * @throws ValidationFailedException if the character sequence is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the invoking CharSequence is blank. If the CharSequence is not blank,
- * it throws a `ValidationFailedException` with the specified parameters.
- *
- * @param property the primary property associated with the validation. This is used to provide context
- *                 in the error message when an exception is thrown, or null if not applicable.
- * @param variable an optional secondary property providing additional context for the validation,
- *                 or null if not applicable.
- * @param message an optional message describing the validation failure. Defaults to "is not blank" if not specified.
- * @param causeOf a supplier for an optional cause of the exception. If provided, it initializes the cause
- *                of the thrown exception.
- * @param cause a supplier for the direct underlying cause of the exception. If provided, it is set as the cause
- *              of the `ValidationFailedException` unless a non-null `causeOf` is specified.
- * @return the original CharSequence if it passes the validation (i.e., it is blank).
- * @throws ValidationFailedException if the CharSequence is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is blank. If the CharSequence is not blank,
- * a ValidationFailedException is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) associated with the validation. This can be null.
- * @param parameterName The name of the parameter being validated. This is used in the exception message if provided. Can be null.
- * @param message An optional custom message to detail the validation failure. Defaults to "is not blank" if not provided.
- * @param causeOf A supplier for the primary cause of the exception if any. Can be null.
- * @param cause A supplier for an optional underlying cause for the exception. Can be null.
- * @return The same CharSequence if it passes the validation (i.e., is blank).
- * @throws ValidationFailedException If the CharSequence is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given CharSequence is blank. If the CharSequence is not blank, this method throws a
- * [ValidationFailedException] with the provided details or invokes a supplied throwable as the cause.
- *
- * @param callable The callable (e.g., method or function) where the validation is being performed.
- * @param parameter The parameter related to the validation, used for error context.
- * @param message An optional custom validation failure message. Defaults to "is not blank" if not provided.
- * @param causeOf A supplier that provides the throwable to be used as the root cause of the exception if validation fails.
- * @param cause A supplier that provides an additional throwable cause to be associated with the exception if validation fails.
- * @return The same CharSequence instance, if the validation passes.
- * @throws ValidationFailedException If the CharSequence is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is blank. If the CharSequence is not blank, a
- * [ValidationFailedException] is thrown.
- *
- * @param callableName the name of the callable (function, method) where the validation occurs, used for error context.
- * @param parameterName the name of the parameter being validated, used for error context. Optional.
- * @param message the custom error message to include in the exception if validation fails. Optional.
- * @param causeOf a supplier for a custom Throwable cause to use for the exception if validation fails. Optional.
- * @param cause a supplier for an additional nested cause of the exception, used if [causeOf] is null. Optional.
- * @return the validated CharSequence itself if it is blank.
- * @throws ValidationFailedException if the CharSequence is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the invoking [CharSequence] is blank. If it is not blank, a [ValidationFailedException] is thrown.
- *
- * @param callableName The name of the callable (e.g., function or property) where validation failed, or null if not specified.
- * @param parameter The [KParameter] instance representing the parameter that failed validation, or null if not applicable.
- * @param message An optional error message providing additional details about the validation failure. Defaults to "is not blank" if not provided.
- * @param causeOf A supplier for the cause of the failure (another [Throwable]), or null if not applicable.
- * @param cause A supplier for an additional underlying cause (another [Throwable]), or null if not applicable.
- * @return The invoking [CharSequence] if it is blank.
- * @throws ValidationFailedException if the [CharSequence] is not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence> T.validateBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is either null or blank.
- *
- * This method ensures that a CharSequence meets a condition where it is either null
- * or contains only whitespace characters. If the condition is violated, an exception
- * is thrown, where additional details about the exception can be supplied through the
- * causeOf or cause parameters.
- *
- * @param causeOf an optional supplier for the overriding cause of the validation failure,
- *                which is used as the primary exception cause if provided.
- * @param cause an optional supplier for the underlying cause to be associated with
- *              the validation failure, used as a nested cause if provided.
- * @return the original CharSequence that passed the validation check (null or blank).
- *         If the CharSequence does not satisfy the validation condition, an exception is thrown.
- *         The return may be null or non-null based on the caller context.
- * @throws ValidationFailedException if the current CharSequence is not null and not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current `CharSequence` is either `null` or blank.
- *
- * If the `CharSequence` is not `null` and not blank, an exception is thrown. The exception
- * message and cause can be customized using the provided suppliers.
- *
- * @param causeOf A supplier for the throwable that will be used as the primary exception. If `null`,
- *                a default `ValidationFailedException` is used.
- * @param cause A supplier for the cause of the exception, which will be set as the underlying cause
- *              of the primary exception. Can be `null`.
- * @param lazyMessage A supplier for the error message that will be included in the `ValidationFailedException`.
- * @return The current `CharSequence` if it is `null` or blank; otherwise, an exception is thrown.
- * @throws ValidationFailedException If the `CharSequence` is not `null` and not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the provided CharSequence is null or blank and throws a ValidationFailedException if it is not.
- *
- * If the CharSequence is not null and not blank, this method will raise a validation error. The validation error
- * message and optional cause details can be customized through the provided parameters.
- *
- * @param property The KProperty associated with the validation. Can be null if not applicable.
- * @param variableName An optional name of the variable being validated. Used in the error message if not null.
- * @param message An optional custom validation error message. Defaults to a standard message if null.
- * @param causeOf A supplier for the root cause exception to be wrapped in the ValidationFailedException. Can be null.
- * @param cause A supplier for an additional throwable cause, if applicable. Can be null.
- * @return The original CharSequence input if it is null or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given [CharSequence] instance is null or blank. If the validation fails,
- * a [ValidationFailedException] is thrown. This method also allows specifying custom error messages
- * and exception suppliers for additional context or chaining of exceptions.
- *
- * @param property The primary property associated with the validation; can be null if not applicable.
- * @param variable The variable associated with the validation; can be null if not applicable.
- * @param message Optional custom error message to be used when the validation fails.
- * @param causeOf Optional supplier for an alternative exception to be thrown instead of default.
- * @param cause Optional supplier for the underlying cause of the exception.
- * @return Returns the original [CharSequence] instance if the validation passes.
- * @throws ValidationFailedException Thrown when the [CharSequence] is not null or blank, with
- * additional context based on the provided parameters.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the current CharSequence is null or blank and throws a ValidationFailedException if it is not.
- *
- * This function is useful for cases where null or blank values are acceptable,
- * but non-null or non-blank values must trigger a validation failure.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation is related. Can be null.
- * @param parameterName The name of the parameter in the given callable being validated. Can be null.
- * @param message An optional custom message to include in the ValidationFailedException when the validation fails. Can be null.
- * @param causeOf A supplier for the root cause of the ValidationFailedException. If provided, it generates the root cause exception. Can be null.
- * @param cause A supplier for an additional cause of the ValidationFailedException. If provided, it generates an additional layer of exception detail. Can be null.
- * @return The original CharSequence if it is null or blank; otherwise, this function throws a ValidationFailedException.
- *
- * @throws ValidationFailedException If the CharSequence is not null or blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current nullable or blank CharSequence either meets the criteria of being null or blank,
- * and throws a [ValidationFailedException] if it is not null or blank.
- *
- * @param callable The [KFunction] related to the context of this validation, or `null` if not applicable.
- * @param parameter The [KParameter] that represents the parameter being validated, or `null` if not applicable.
- * @param message An optional message that provides additional details about the validation failure,
- *                defaulting to `null`.
- * @param causeOf The supplier function providing a root cause for the exception, or `null` if not applicable.
- * @param cause An optional supplier function supplying the throwable as the cause of the exception,
- *              or `null` if not applicable.
- * @return The original CharSequence if it meets the validation criteria (null or blank).
- * @throws ValidationFailedException If the CharSequence is not null and not blank.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the current CharSequence is either null or blank and throws a `ValidationFailedException`
- * if the validation fails. This can be used to ensure that optional strings or text-based parameters
- * meet the expected criteria, assisting in the validation and debugging process.
- *
- * @param callableName the name of the callable (e.g., function or method) for context in the exception.
- * @param parameterName the name of the parameter being validated, or null if not applicable.
- * @param message an optional custom message providing additional details for the exception.
- * @param causeOf a supplier for the primary cause of the exception, or null if not applicable.
- * @param cause a supplier for a secondary or underlying cause of the exception, or null if not applicable.
- * @return the validated CharSequence if it is null or blank, otherwise it throws an exception.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current CharSequence is null or blank.
- *
- * If the CharSequence is not null and not blank, a ValidationFailedException is thrown with the provided
- * details, including callable name, parameter, optional message, and optional causes.
- *
- * @param callableName The name of the callable where the validation is performed. May be null if not specified.
- * @param parameter The parameter of the callable being validated. May be null if not applicable.
- * @param message An optional error message that provides additional context for the validation failure. Defaults to null.
- * @param causeOf An optional supplier for the cause of the exception if the validation fails. Defaults to null.
- * @param cause An optional supplier that provides additional context for the underlying cause of the exception. Defaults to null.
- * @return The validated CharSequence if it passes validation (i.e., if it is null or blank).
- *         Throws a ValidationFailedException if validation fails.
- * @since 4.6.0
- */
-@IgnorableReturnValue
-fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrBlank != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrBlank != null)
-    }
-    if (isNotNullOrBlank()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)))
-    return this
-}
 
 /**
  * Encodes the current string into a Base32 encoded string using UTF-8 character encoding.

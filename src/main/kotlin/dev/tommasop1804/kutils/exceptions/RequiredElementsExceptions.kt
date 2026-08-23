@@ -65,7 +65,7 @@ open class RequiredPropertyException : ValidationFailedException {
      * @throws IllegalArgumentException if the provided parameters cannot construct a valid message
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variableName: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
+    constructor(property: KProperty<*>?, variableName: String? = null, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
      * Constructs a new instance of `RequiredPropertyException` with a formatted message based on
      * the provided property and variable name.
@@ -81,7 +81,7 @@ open class RequiredPropertyException : ValidationFailedException {
      *
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variable: KProperty<*>, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
+    constructor(property: KProperty<*>?, variable: KProperty<*>?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variable != null) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
      * Constructs a new RequiredPropertyException with the specified cause.
      * This constructor is typically used when another exception raised during validation serves as the root cause
@@ -110,7 +110,7 @@ open class RequiredPropertyException : ValidationFailedException {
      * @param cause the optional cause of the exception, if any. Nullable.
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variableName: String? = null, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
+    constructor(property: KProperty<*>?, variableName: String? = null, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
     /**
      * Constructor for the RequiredPropertyException class.
      *
@@ -125,7 +125,7 @@ open class RequiredPropertyException : ValidationFailedException {
      * @param cause The underlying cause of the exception, or `null` if not applicable.
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variable: KProperty<*>, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
+    constructor(property: KProperty<*>?, variable: KProperty<*>?, cause: Throwable?, internalErrorCode: String? = null) : super((internalErrorCode?.plus(" @@@ ") ?: String.EMPTY) + $$"$${if (variable != null) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
 }
 
 /**
@@ -306,7 +306,7 @@ open class RequiredHeaderException : ValidationFailedException {
      *        context about the error, may be null.
      * @since 1.1.5
      */
-    constructor(message: String?, internalErrorCode: String? = null) : super((if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY) + message)
+    constructor(message: String?, internalErrorCode: String? = null) : super((if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY) + message)
     /**
      * Creates an instance of the RequiredHeaderException with a specified cause.
      *
@@ -323,7 +323,7 @@ open class RequiredHeaderException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code that provides additional context for this exception.
      * @since 1.1.5
      */
-    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY) + message, cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super((if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY) + message, cause)
     /**
      * Constructs a `RequiredHeaderException` with a specific header name, header type, and an optional internal error code.
      *
@@ -332,7 +332,7 @@ open class RequiredHeaderException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(headerName: String?, headerClass: KClass<*>, internalErrorCode: String? = null) : super(message = "${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Header `$${headerName}` of type `$${headerClass.simpleName}` is required")
+    constructor(headerName: String?, headerClass: KClass<*>, internalErrorCode: String? = null) : super(message = "${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Header `$${headerName}` of type `$${headerClass.simpleName}` is required")
     /**
      * Constructs a `RequiredHeaderException` with a specific header name, header type, and an optional internal error code.
      *
@@ -342,7 +342,7 @@ open class RequiredHeaderException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(headerName: String?, headerClass: KClass<*>, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Header `$${headerName}` of type `$${headerClass.simpleName}` is required", cause)
+    constructor(headerName: String?, headerClass: KClass<*>, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Header `$${headerName}` of type `$${headerClass.simpleName}` is required", cause)
     /**
      * Creates an instance of RequiredHeaderException with an optional internal error code.
      *
@@ -350,5 +350,5 @@ open class RequiredHeaderException : ValidationFailedException {
      * additional context for debugging or error tracking.
      * @since 1.1.5
      */
-    constructor(internalErrorCode: String? = null) : super(message = "${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Header is required.")
+    constructor(internalErrorCode: String? = null) : super(message = "${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Header is required.")
 }

@@ -196,7 +196,7 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * @return The HTTP status entry with the corresponding reason phrase, or null if no match is found.
          * @since 2.0.0
          */
-        infix fun ofReasonPhrase(phrase: String) = entries.find { it.reasonPhrase == phrase }
+        infix fun ofReasonPhrase(phrase: String) = entries.find { it.reasonPhrase equalsIgnoreCase phrase }
         /**
          * Filters the current collection of HTTP status entries to include only those
          * that belong to the specified family of HTTP status codes.

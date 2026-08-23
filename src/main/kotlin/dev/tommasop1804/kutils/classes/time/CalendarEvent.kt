@@ -152,7 +152,7 @@ data class CalendarEvent(
         reminders: Set<Duration> = emptySet()
     ) : this(
         name = name,
-        period = if (end.isNull()) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalTo start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalTo end,
+        period = if (end == null) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalTo start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalTo end,
         repeat = repeat,
         partecipants = partecipants,
         conferencing = conferencing,
@@ -199,7 +199,7 @@ data class CalendarEvent(
         reminders: Set<Duration> = emptySet()
     ) : this(
         name = name,
-        period = if (end.isNull()) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalTo start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalTo end,
+        period = if (end == null) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalTo start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalTo end,
         repeat = repeat,
         partecipants = partecipants,
         conferencing = conferencing,

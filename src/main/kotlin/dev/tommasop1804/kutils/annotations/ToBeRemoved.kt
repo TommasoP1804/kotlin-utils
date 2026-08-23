@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.annotations
 
-import dev.tommasop1804.kutils.isNotNull
 import dev.tommasop1804.kutils.isNull
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.Aspect
@@ -54,7 +53,7 @@ annotation class ToBeRemoved(
 
             val annotation = try {
                 // Try to get annotation from the target method (for instance methods)
-                if (joinPoint.target.isNotNull()) {
+                if (joinPoint.target != null) {
                     val targetMethod = try {
                         joinPoint.target.javaClass.getDeclaredMethod(
                             joinPoint.signature.name,
@@ -79,7 +78,7 @@ annotation class ToBeRemoved(
                 null
             }
 
-            if (annotation.isNull()) { return }
+            if (annotation == null) { return }
             logger.warn("Function {} is annotated with @ToBeRemoved. It will be removed in future version.", method)
 
             if (annotation.reason.isNotEmpty())

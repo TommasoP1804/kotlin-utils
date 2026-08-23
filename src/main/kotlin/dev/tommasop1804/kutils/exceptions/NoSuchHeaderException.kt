@@ -4,8 +4,7 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.isNotNullOrBlank
+import dev.tommasop1804.kutils.*
 
 /**
  * Exception thrown to indicate that a specified HTTP header was not found.
@@ -37,7 +36,7 @@ class NoSuchHeaderException : NoSuchElementException {
      *                If this parameter is not null or blank, it will be appended to the exception's message.
      * @since 2.2.0
      */
-    constructor(headerName: String, message: String? = null) : super("Header $headerName not found." + if (message.isNotNullOrBlank()) " $message" else String.EMPTY)
+    constructor(headerName: String, message: String? = null) : super("Header $headerName not found." + if (message.isNotNullOrBlank) " $message" else String.EMPTY)
     /**
      * Constructs a new instance of `NoSuchHeaderException` with a detailed error message
      * and an optional cause. The error message includes the specified header name and an
@@ -48,7 +47,7 @@ class NoSuchHeaderException : NoSuchElementException {
      * @param cause The underlying cause of the exception, or `null` if none exists.
      * @since 2.2.0
      */
-    constructor(headerName: String, message: String? = null, cause: Throwable) : super("Header $headerName not found." + if (message.isNotNullOrBlank()) " $message" else String.EMPTY, cause)
+    constructor(headerName: String, message: String? = null, cause: Throwable) : super("Header $headerName not found." + if (message.isNotNullOrBlank) " $message" else String.EMPTY, cause)
     /**
      * Constructs a new NoSuchHeaderException with the specified cause.
      *

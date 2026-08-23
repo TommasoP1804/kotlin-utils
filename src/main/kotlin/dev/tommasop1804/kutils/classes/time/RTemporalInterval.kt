@@ -179,7 +179,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             ): ValueDeserializer<*> {
                 val javaType = property?.type ?: ctxt.contextualType
                 val copy = Deserializer()
-                if (javaType.isNotNull() && javaType.containedTypeCount() >= 2) {
+                if (javaType != null && javaType.containedTypeCount() >= 2) {
                     copy.startType = javaType.containedType(0).rawClass
                     copy.endType = javaType.containedType(1).rawClass
                 }
@@ -214,7 +214,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             override fun createContextual(ctxt: com.fasterxml.jackson.databind.DeserializationContext, property: com.fasterxml.jackson.databind.BeanProperty?): JsonDeserializer<*> {
                 val javaType = property?.type ?: ctxt.contextualType
                 val copy = OldDeserializer()
-                if (javaType.isNotNull() && javaType.containedTypeCount() >= 2) {
+                if (javaType != null && javaType.containedTypeCount() >= 2) {
                     copy.startType = javaType.containedType(0).rawClass
                     copy.endType = javaType.containedType(1).rawClass
                 }
@@ -240,7 +240,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<RTemporalInterval<*, *>?, String?> {
             override fun convertToDatabaseColumn(attribute: RTemporalInterval<*, *>?) = attribute?.toString()
-            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse<Temporal, Temporal>(dbData)()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse<Temporal, Temporal>(dbData)()
         }
     }
 

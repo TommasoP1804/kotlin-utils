@@ -113,7 +113,7 @@ value class Iban private constructor(val value: String) : CharSequence {
     constructor(value: CharSequence) : this(+(value.toString() - Char.SPACE))
 
     init {
-        (country.isNull() || value.length == when (country) {
+        (country == null || value.length == when (country) {
             Albania -> 28
             Andorra -> 24
             Austria -> 20

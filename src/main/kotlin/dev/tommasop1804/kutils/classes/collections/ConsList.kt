@@ -80,7 +80,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      * ensuring that nullability checks are enforced at runtime.
      * @since 1.0.0
      */
-    val first get() = apply { pair.isNotNull() || throw IndexOutOfBoundsException("List is empty") }
+    val first get() = apply { pair != null || throw IndexOutOfBoundsException("List is empty") }
     /**
      * Provides the first element of the `ConsList` if it exists, or throws an
      * `IndexOutOfBoundsException` if the list is empty.
@@ -103,10 +103,10 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      * @since 1.0.0
      */
     val last: ConsList<T> get() = compute {
-        if (pair.isNull())
+        if (pair == null)
             throw IndexOutOfBoundsException("List is empty")
         var list = this
-        while (list.tail.isNotNull())
+        while (list.tail != null)
             list = list.tail!!
         list
     }
@@ -198,37 +198,37 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
         infix fun <T> T.cons(value: T): ConsList<T> = ConsList(this to ConsList(value to null))
 
         private tailrec fun <T> containsRecursive(list: ConsList<T>?, element: T): Boolean {
-            if (list.isNull() || list.isEmpty()) return false
+            if (list == null || list.isEmpty()) return false
             if (list.head == element) return true
             return containsRecursive(list.tail, element)
         }
 
         private tailrec fun <T> forEachRecursive(list: ConsList<T>?, action: Consumer<T>) {
-            if (list.isNotNull() && !list.isEmpty()) {
+            if (list != null && !list.isEmpty()) {
                 action(list.head)
                 forEachRecursive(list.tail, action)
             }
         }
 
         private tailrec fun <T> reverseRecursive(current: ConsList<T>?, acc: ConsList<T>): ConsList<T> {
-            return if (current.isNull() || current.isEmpty()) acc
+            return if (current == null || current.isEmpty()) acc
             else reverseRecursive(current.tail, current.head cons acc)
         }
 
         private tailrec fun <T, R> mapRecursive(current: ConsList<T>?, acc: ConsList<R>, transform: Transformer<T, R>): ConsList<R> {
-            return if (current.isNull() || current.isEmpty()) acc
+            return if (current == null || current.isEmpty()) acc
             else mapRecursive(current.tail, transform(current.head) cons acc, transform)
         }
 
         private tailrec fun <T> filterRecursive(current: ConsList<T>?, acc: ConsList<T>, predicate: Predicate<T>): ConsList<T> {
-            if (current.isNull() || current.isEmpty()) return acc
+            if (current == null || current.isEmpty()) return acc
 
             val newAcc = if (predicate(current.head)) (current.head cons acc) else acc
             return filterRecursive(current.tail, newAcc, predicate)
         }
 
         private tailrec fun <T, R> foldRecursive(list: ConsList<T>?, acc: R, operation: BiTransformer<R, T, R>): R {
-            if (list.isNull() || list.isEmpty()) return acc
+            if (list == null || list.isEmpty()) return acc
             val nextAcc = operation(acc, list.head)
             return foldRecursive(list.tail, nextAcc, operation)
         }
@@ -267,14 +267,14 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
 
     private fun toString(first: Boolean, builder: StringBuilder = StringBuilder(String.EMPTY)): StringBuilder {
         with(builder) {
-            if (pair.isNull())
+            if (pair == null)
                 return if (first) append("[]") else {
                     builder.setLength(builder.length - 2)
                     append("]")
                 }
             if (first) append("[") else append(String.EMPTY)
             append(pair.first.toString())
-            if (pair.second.isNotNull()) {
+            if (pair.second != null) {
                 append(", ")
                 pair.second!!.toString(false, builder)
             } else append("]")
@@ -299,7 +299,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      * @return `true` if the list is empty, `false` otherwise.
      * @since 1.0.0
      */
-    override fun isEmpty() = pair.isNull()
+    override fun isEmpty() = pair == null
     /**
      * Checks whether a collection, string, or other entity is not empty.
      * This method returns the negated result of the `isEmpty()` check.
@@ -319,11 +319,11 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      * @since 1.0.0
      */
     operator fun get(index: Int, startIndex: Int = 0): T =
-        if (pair.isNull()) throw IndexOutOfBoundsException("List is empty")
+        if (pair == null) throw IndexOutOfBoundsException("List is empty")
         else if (index < startIndex || index < 0) throw IndexOutOfBoundsException("Index $index out ouf bounds due to startIndex limitation")
         else {
             if (index == startIndex) pair.first
-            else if (pair.second.isNull()) throw IndexOutOfBoundsException("Index $index out ouf bounds")
+            else if (pair.second == null) throw IndexOutOfBoundsException("Index $index out ouf bounds")
             else pair.second!![index, startIndex + 1]
         }
 
@@ -451,7 +451,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
          * @return `true` if there are more elements to iterate over, `false` otherwise.
          * @since 1.0.0
          */
-        override fun hasNext(): Boolean = current.isNotNull() && !current!!.isEmpty()
+        override fun hasNext(): Boolean = current != null && !current!!.isEmpty()
 
         /**
          * Returns the next element in the iteration.
@@ -493,7 +493,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
     private fun computeSize(): Int {
         var count = 0
         var current: ConsList<T>? = this
-        while (current.isNotNull() && !current.isEmpty()) {
+        while (current != null && !current.isEmpty()) {
             count++
             current = current.tail
         }

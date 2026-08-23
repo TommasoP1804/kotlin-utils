@@ -18,7 +18,7 @@ import kotlin.contracts.contract
 val Throwable.rootCause: Throwable
     get() {
         var current = this
-        while (current.cause.isNotNull()) current = current.cause!!
+        while (current.cause != null) current = current.cause!!
         return current
     }
 
@@ -38,7 +38,7 @@ val Throwable.causes: List<Throwable>
     get() {
         val list = emptyMList<Throwable>()
         var current: Throwable? = this
-        while (current.isNotNull()) {
+        while (current != null) {
             list += current
             current = current.cause
         }
@@ -65,7 +65,7 @@ inline fun <reified T : Throwable> T.withoutCause(): T {
  * @param cause The throwable to be set as the cause of the current throwable.
  * @since 1.0.0
  */
-inline infix fun <reified T : Throwable> T.causedBy(cause: Throwable? = null) = if (cause.isNull()) withoutCause() else initCause(cause)!! as T
+inline infix fun <reified T : Throwable> T.causedBy(cause: Throwable? = null) = if (cause == null) withoutCause() else initCause(cause)!! as T
 /**
  * Sets the cause of this throwable using a supplied Throwable. This method is designed
  * for use with the `infix` notation to enhance readability when specifying a cause.
@@ -88,7 +88,7 @@ inline infix fun <reified T : Throwable> T.causedBy(cause: ThrowableSupplier): T
  * @return A `ThrowableSupplier` that produces an exception with the specified cause.
  * @since 1.0.0
  */
-infix fun ThrowableSupplier.causedBy(cause: Throwable?): ThrowableSupplier = { if (cause.isNull()) invoke().withoutCause() else invoke().initCause(cause)!! }
+infix fun ThrowableSupplier.causedBy(cause: Throwable?): ThrowableSupplier = { if (cause == null) invoke().withoutCause() else invoke().initCause(cause)!! }
 /**
  * Combines the current `ThrowableSupplier` with another `ThrowableSupplier` as its cause.
  * The resulting `Throwable` will have its cause set to the `Throwable` provided by the input supplier.

@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.isNotNull
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 
@@ -188,7 +187,7 @@ open class TooFewResultsException : RuntimeException {
      * @param minNumber the minimum acceptable number of results for a condition
      * @since 1.0.0
      */
-    constructor(size: Int? = null, minNumber: Int = 1) : super("${if (size.isNotNull()) "The results of the search are $size, but the accepted minimum number of results is $minNumber" else "The accepted minimum number of results of this predicate is $minNumber"}.")
+    constructor(size: Int? = null, minNumber: Int = 1) : super("${if (size != null) "The results of the search are $size, but the accepted minimum number of results is $minNumber" else "The accepted minimum number of results of this predicate is $minNumber"}.")
     /**
      * Constructs a [TooFewResultsException] with a message indicating that the number of results
      * from the evaluation of a condition does not meet the required constraints defined by the given range.
@@ -198,7 +197,7 @@ open class TooFewResultsException : RuntimeException {
      *
      * @since 1.0.0
      */
-    constructor(size: Int? = null, range: IntRange) :  super("${if (size.isNotNull()) "The results of the search are $size, but the accepted number of results must be inside $range" else "The accepted number of results of this predicate must be inside $range"}.")
+    constructor(size: Int? = null, range: IntRange) :  super("${if (size != null) "The results of the search are $size, but the accepted number of results must be inside $range" else "The accepted number of results of this predicate must be inside $range"}.")
 }
 
 /**
@@ -263,7 +262,7 @@ open class TooManyResultsException : RuntimeException {
      * @param maxNumber The maximum allowable number of results from a predicate. Default value is 1.
      * @since 1.0.0
      */
-    constructor(size: Int? = null, maxNumber: Int = 1) : super("${if (size.isNotNull()) "The results of the search are $size, but the accepted max number of results is $maxNumber" else "The accepted maximum number of results of this predicate is $maxNumber"}.")
+    constructor(size: Int? = null, maxNumber: Int = 1) : super("${if (size != null) "The results of the search are $size, but the accepted max number of results is $maxNumber" else "The accepted maximum number of results of this predicate is $maxNumber"}.")
     /**
      * Constructs an exception that indicates the number of results for a predicate
      * has exceeded the defined acceptable range.
@@ -272,7 +271,7 @@ open class TooManyResultsException : RuntimeException {
      * @param range the acceptable range for the number of results.
      * @since 1.0.0
      */
-    constructor(size: Int? = null, range: IntRange) :  super("${if (size.isNotNull()) "The results of the search are $size, but the accepted number of results must be inside $range" else "The accepted number of results of this predicate must be inside $range"}.")
+    constructor(size: Int? = null, range: IntRange) :  super("${if (size != null) "The results of the search are $size, but the accepted number of results must be inside $range" else "The accepted number of results of this predicate must be inside $range"}.")
 }
 
 /**
@@ -337,7 +336,7 @@ open class TooFewElementsException : RuntimeException {
      * @param variableName an optional variable name associated with the iterable, or null if not specified
      * @since 1.0.0
      */
-    constructor(size: Int? = null, minNumber: Int = 1, variableName: String? = null) : super("The iterable ${if (variableName.isNotNull()) "$variableName " else ""}${if (size.isNotNull()) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minumum of $minNumber elements"}")
+    constructor(size: Int? = null, minNumber: Int = 1, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minumum of $minNumber elements"}")
     /**
      * Initializes a new instance of the TooFewElementsException class.
      *
@@ -350,7 +349,7 @@ open class TooFewElementsException : RuntimeException {
      * @param variableName the name of the iterable variable, or null if unspecified
      * @since 1.0.0
      */
-    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterable ${if (variableName.isNotNull()) "$variableName " else ""}${if (size.isNotNull()) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
+    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
     /**
      * Constructs a `TooFewElementsException` with a message derived from the specified property, size,
      * minimum number of elements required, and an optional underlying cause.
@@ -361,7 +360,7 @@ open class TooFewElementsException : RuntimeException {
      * @param cause the underlying cause of the exception, or null if no cause is specified
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>, size: Int? = null, minNumber: Int = 1, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size.isNotNull()) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minimum of $minNumber elements"}")
+    constructor(property: KProperty<*>, size: Int? = null, minNumber: Int = 1, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size != null) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minimum of $minNumber elements"}")
     /**
      * Constructs a new `TooFewElementsException` for a property with an optional size,
      * a required range, and an optional cause.
@@ -376,7 +375,7 @@ open class TooFewElementsException : RuntimeException {
      * @param cause the optional underlying cause of this exception.
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size.isNotNull()) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
+    constructor(property: KProperty<*>, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
     /**
      * Constructs a `TooFewElementsException` with a message derived from the specified property, size,
      * minimum number of elements required, and an optional underlying cause.
@@ -387,7 +386,7 @@ open class TooFewElementsException : RuntimeException {
      * @param cause the underlying cause of the exception, or null if no cause is specified
      * @since 1.0.0
      */
-    constructor(parameter: KParameter, size: Int? = null, minNumber: Int = 1, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size.isNotNull()) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minimum of $minNumber elements"}")
+    constructor(parameter: KParameter, size: Int? = null, minNumber: Int = 1, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size != null) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minimum of $minNumber elements"}")
     /**
      * Constructs a new `TooFewElementsException` for a property with an optional size,
      * a required range, and an optional cause.
@@ -402,7 +401,7 @@ open class TooFewElementsException : RuntimeException {
      * @param cause the optional underlying cause of this exception.
      * @since 1.0.0
      */
-    constructor(parameter: KParameter, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size.isNotNull()) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
+    constructor(parameter: KParameter, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
 }
 
 /**
@@ -456,7 +455,7 @@ open class TooManyElementsException : RuntimeException {
      * @param variableName the name of the variable associated with the iterable, or null if not applicable
      * @since 1.0.0
      */
-    constructor(size: Int? = null, maxNumber: Int = 1, variableName: String? = null) : super("The iterable ${if (variableName.isNotNull()) "$variableName " else ""}${if (size.isNotNull()) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
+    constructor(size: Int? = null, maxNumber: Int = 1, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
     /**
      * Constructs a `TooManyElementsException` with a detailed error message based on the specified parameters.
      *
@@ -469,7 +468,7 @@ open class TooManyElementsException : RuntimeException {
      * @param variableName The name of the variable related to the exception, or null if unspecified.
      * @since 1.0.0
      */
-    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterable ${if (variableName.isNotNull()) "$variableName " else ""}${if (size.isNotNull()) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
+    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
     /**
      * Constructs a `TooManyElementsException` with a message derived from the provided property details, collection size,
      * maximum allowed number, and an optional cause.
@@ -485,7 +484,7 @@ open class TooManyElementsException : RuntimeException {
      * @param cause an optional throwable representing the cause of this exception
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>, size: Int? = null, maxNumber: Int = 1, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size.isNotNull()) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
+    constructor(property: KProperty<*>, size: Int? = null, maxNumber: Int = 1, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size != null) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
     /**
      * Constructs a `TooManyElementsException` with details about a property, the size of its elements,
      * a specified valid range, and an optional underlying cause.
@@ -501,7 +500,7 @@ open class TooManyElementsException : RuntimeException {
      * @param cause the underlying cause of the exception, which can be null
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size.isNotNull()) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
+    constructor(property: KProperty<*>, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${property.returnType}` `${property.name} ${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
     /**
      * Constructs a `TooManyElementsException` with a message derived from the provided property details, collection size,
      * maximum allowed number, and an optional cause.
@@ -517,7 +516,7 @@ open class TooManyElementsException : RuntimeException {
      * @param cause an optional throwable representing the cause of this exception
      * @since 1.0.0
      */
-    constructor(parameter: KParameter, size: Int? = null, maxNumber: Int = 1, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size.isNotNull()) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
+    constructor(parameter: KParameter, size: Int? = null, maxNumber: Int = 1, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size != null) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
     /**
      * Constructs a `TooManyElementsException` with details about a property, the size of its elements,
      * a specified valid range, and an optional underlying cause.
@@ -533,5 +532,5 @@ open class TooManyElementsException : RuntimeException {
      * @param cause the underlying cause of the exception, which can be null
      * @since 1.0.0
      */
-    constructor(parameter: KParameter, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size.isNotNull()) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
+    constructor(parameter: KParameter, size: Int? = null, range: IntRange, cause: Throwable? = null) : super("The `${parameter.type}` `${parameter.name} ${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of element inside $range"}")
 }

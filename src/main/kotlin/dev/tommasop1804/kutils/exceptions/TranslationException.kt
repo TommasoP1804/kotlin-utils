@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.isNotNull
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -44,7 +43,7 @@ open class TranslationException : RuntimeException {
      * @since 1.0.0
      */
     constructor(from: Any?, to: Any?, type: KClass<*>? = null) : super(
-        "Unable to translate ${if (type.isNotNull()) "${type.simpleName} " else ""}from $from to $to."
+        "Unable to translate ${if (type != null) "${type.simpleName} " else ""}from $from to $to."
     )
     /**
      * Constructs a TranslationException with a message indicating the failure
@@ -59,7 +58,7 @@ open class TranslationException : RuntimeException {
      * @since 1.0.0
      */
     constructor(from: Any?, to: Any?, type: KType? = null) : super(
-        "Unable to translate ${if (type.isNotNull()) "$type " else ""}from $from to $to."
+        "Unable to translate ${if (type != null) "$type " else ""}from $from to $to."
     )
     /**
      * Constructs a `TranslationException` with specified source, target, optional type, and cause.
@@ -77,7 +76,7 @@ open class TranslationException : RuntimeException {
      * @since 1.0.0
      */
     constructor(from: Any?, to: Any?, type: KClass<*>? = null, cause: Throwable?) : super(
-        "Unable to translate ${if (type.isNotNull()) "${type.simpleName} " else ""}from $from to $to.",
+        "Unable to translate ${if (type != null) "${type.simpleName} " else ""}from $from to $to.",
         cause
     )
     /**
@@ -93,7 +92,7 @@ open class TranslationException : RuntimeException {
      * @since 1.0.0
      */
     constructor(from: Any?, to: Any?, type: KType? = null, cause: Throwable?) : super(
-        "Unable to translate ${if (type.isNotNull()) "$type " else ""}from $from to $to.",
+        "Unable to translate ${if (type != null) "$type " else ""}from $from to $to.",
         cause
     )
     /**

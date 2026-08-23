@@ -980,7 +980,7 @@ open class Json private constructor(@param:Language("json") override val value: 
                 it.get(key).isNumber && value is Number -> if (it.get(key).asDouble() == value.toDouble()) result.add(it)
                 it.get(key).isString && value is String -> if (it.get(key).asString() == value) result.add(it)
                 it.get(key).isBoolean && value is Boolean -> if (it.get(key).asBoolean() == value) result.add(it)
-                it.get(key).isNull && value.isNull() -> result.add(it)
+                it.get(key).isNull && value == null -> result.add(it)
                 it.get(key).isArray && (value is List<*> || value is Array<*>) -> if (it.get(key).toList() == value) result.add(it)
             }
         }
@@ -1014,7 +1014,7 @@ open class Json private constructor(@param:Language("json") override val value: 
                 it.get(last).isNumber && value is Number -> if (it.get(last).asDouble() == value.toDouble()) result.add(it)
                 it.get(last).isString && value is String -> if (it.get(last).asString() == value) result.add(it)
                 it.get(last).isBoolean && value is Boolean -> if (it.get(last).asBoolean() == value) result.add(it)
-                it.get(last).isNull && value.isNull() -> result.add(it)
+                it.get(last).isNull && value == null -> result.add(it)
                 it.get(last).isArray && (value is List<*> || value is Array<*>) -> if (it.get(last).toList() == value) result.add(it)
             }
         }
@@ -1428,7 +1428,7 @@ open class Json private constructor(@param:Language("json") override val value: 
 
     private fun applyMergePatch(target: JsonNode?, patch: JsonNode): JsonNode {
         if (patch.isObject) {
-            val targetObj = if (target.isNotNull() && target.isObject)
+            val targetObj = if (target != null && target.isObject)
                 target.deepCopy() as ObjectNode
             else MAPPER.createObjectNode()
 
@@ -1510,7 +1510,7 @@ open class Json private constructor(@param:Language("json") override val value: 
                     val expectedValue = operation.get("value") ?: throw RequiredPropertyException("`value` is required for 'test'")
                     val actualValue = getPointerValue(targetNode, pathStr)
 
-                    if (actualValue.isNull() || actualValue != expectedValue) {
+                    if (actualValue == null || actualValue != expectedValue) {
                         throw ExpectationMismatchException("$pathStr was expected as $expectedValue, but is $actualValue")
                     }
                 }

@@ -23,24 +23,363 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
 
 /**
- * Negates the state of the array by returning `true` if the array is either `null` or empty.
+ * Extension property that checks if the array is empty.
  *
- * This operator checks if the array reference is `null` or if it contains no elements.
- *
- * @return `true` if the array is `null` or empty, otherwise `false`.
- * @since 1.0.0
+ * @receiver The array instance on which this property is invoked.
+ * @return `true` if the array contains no elements, `false` otherwise.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalContracts::class)
-operator fun Array<*>?.not(): Boolean {
+val <E> Array<E>.isEmpty get() = isEmpty()
+/**
+ * Extension property to check if the byte array is empty.
+ *
+ * @receiver The byte array being checked.
+ * @return `true` if the byte array has no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val ByteArray.isEmpty get() = isEmpty()
+/**
+ * Extension property that checks if the ShortArray is empty.
+ *
+ * @return `true` if the array has no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val ShortArray.isEmpty get() = isEmpty()
+/**
+ * Extension property for IntArray that indicates whether the array is empty.
+ * Returns `true` if the array contains no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val IntArray.isEmpty get() = isEmpty()
+/**
+ * Checks if the `LongArray` is empty.
+ *
+ * @return `true` if the array contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val LongArray.isEmpty get() = isEmpty()
+/**
+ * Extension property to determine if a FloatArray is empty.
+ *
+ * @return `true` if the array has no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val FloatArray.isEmpty get() = isEmpty()
+/**
+ * Extension property that checks if a [DoubleArray] is empty.
+ *
+ * @return `true` if the array contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val DoubleArray.isEmpty get() = isEmpty()
+/**
+ * Indicates whether the BooleanArray is empty.
+ *
+ * @return `true` if the array contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val BooleanArray.isEmpty get() = isEmpty()
+/**
+ * Extension property for [CharArray] that checks if the array is empty.
+ *
+ * @return `true` if the array contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val CharArray.isEmpty get() = isEmpty()
+/**
+ * Checks if the array is not empty.
+ *
+ * This property returns `true` if the array contains one or more elements,
+ * otherwise returns `false`.
+ * @since 5.0.0
+ */
+val <E> Array<E>.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property for `ByteArray` that checks if the array is not empty.
+ *
+ * Returns `true` if the `ByteArray` contains one or more elements.
+ * Returns `false` if the `ByteArray` is empty.
+ * @since 5.0.0
+ */
+val ByteArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property that returns `true` if the `ShortArray` is not empty, otherwise `false`.
+ * @since 5.0.0
+ */
+val ShortArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property to check if an IntArray is not empty.
+ *
+ * @receiver IntArray on which the property is accessed.
+ * @return `true` if the array contains one or more elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val IntArray.isNotEmpty get() = isNotEmpty()
+/**
+ * A property that checks if the LongArray is not empty.
+ *
+ * Returns `true` if the array contains one or more elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val LongArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property to check if a FloatArray is not empty.
+ *
+ * Returns `true` if the array contains one or more elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val FloatArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property for `DoubleArray` that checks if the array is not empty.
+ *
+ * @return `true` if the array contains at least one element, otherwise `false`.
+ * @since 5.0.0
+ */
+val DoubleArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property that checks if the BooleanArray is not empty.
+ *
+ * @return `true` if the BooleanArray contains one or more elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val BooleanArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property for the CharArray class that checks if the array is not empty.
+ *
+ * @return True if the character array contains one or more elements, false otherwise.
+ * @since 5.0.0
+ */
+val CharArray.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property for nullable arrays that checks whether the array is either null or empty.
+ *
+ * @return `true` if the array is null or contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val <E> Array<E>?.isNullOrEmpty: Boolean get() {
     contract {
-        returns(false) implies (this@not != null)
+        returns(false) implies (this@isNullOrEmpty != null)
     }
-    return isNull() || isEmpty()
+    return isNullOrEmpty()
+}
+/**
+ * Extension property to check if a nullable [ByteArray] is either null or empty.
+ *
+ * @return `true` if the [ByteArray] is null or has no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val ByteArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Checks if the nullable ShortArray is either null or empty.
+ *
+ * @return `true` if the ShortArray is null or contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val ShortArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Checks if the array is null or empty.
+ *
+ * This property provides a convenient way to validate whether an array is either null or contains no elements.
+ *
+ * @return `true` if the array is null or has no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val IntArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Extension property for nullable `LongArray` to check if the array is either null or empty.
+ *
+ * @return `true` if the array is null or has no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val LongArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Extension property to check whether a nullable FloatArray is either null or empty.
+ *
+ * This property evaluates to `true` if the FloatArray is null or contains no elements.
+ * Otherwise, it evaluates to `false`. The contract ensures that if the result is `false`,
+ * the receiver is not null.
+ * @since 5.0.0
+ */
+val FloatArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Extension property that determines if the nullable DoubleArray is either null or empty.
+ *
+ * @return `true` if the array is null or contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val DoubleArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Checks if the BooleanArray is either null or empty.
+ *
+ * @return `true` if the BooleanArray is null or contains no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val BooleanArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Extension property for nullable `CharArray` to check if it is `null` or empty.
+ *
+ * Returns `true` if the `CharArray` is `null` or contains no elements.
+ * Returns `false` if the `CharArray` is not `null` and contains one or more elements.
+ * @since 5.0.0
+ */
+val CharArray?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty()
+}
+/**
+ * Extension property for nullable arrays that checks whether the array is neither null nor empty.
+ *
+ * @return `true` if the array is not null and contains at least one element, `false` otherwise.
+ * @since 5.0.0
+ */
+val <E> Array<E>?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return !isNullOrEmpty()
+}
+/**
+ * Extension property for nullable ByteArray that checks if the array is not null and not empty.
+ *
+ * @receiver Nullable ByteArray to be checked.
+ * @return `true` if the array is not null and contains elements, `false` otherwise.
+ * @since 5.0.0
+ */
+val ByteArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Checks if the nullable [ShortArray] is not null and not empty.
+ *
+ * @return `true` if the array is non-null and contains at least one element, otherwise `false`.
+ * @since 5.0.0
+ */
+val ShortArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Checks if the nullable `IntArray` is not null and not empty.
+ *
+ * @receiver The nullable `IntArray` to be evaluated.
+ * @return `true` if the array is not null and contains at least one element, otherwise `false`.
+ * @since 5.0.0
+ */
+val IntArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Extension property for a nullable `LongArray` to check if it is neither null nor empty.
+ *
+ * This property returns `true` if the array is not null and contains at least one element.
+ * Otherwise, it returns `false`.
+ *
+ * A contract is specified to indicate that if this property returns `true`,
+ * the receiver is guaranteed to be non-null.
+ * @since 5.0.0
+ */
+val LongArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Checks if the nullable [FloatArray] is not null and not empty.
+ *
+ * @return `true` if the [FloatArray] is neither null nor empty, `false` otherwise.
+ * @since 5.0.0
+ */
+val FloatArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Extension property for nullable `DoubleArray` that checks if the array is not null
+ * and contains at least one element.
+ *
+ * @return `true` if the array is not null and not empty, `false` otherwise.
+ * @since 5.0.0
+ */
+val DoubleArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Extension property to determine whether a nullable [BooleanArray] is not null and not empty.
+ *
+ * Evaluates to `true` if the array is both non-null and contains at least one element.
+ * Utilizes the Kotlin contract to provide additional information about nullability.
+ * @since 5.0.0
+ */
+val BooleanArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
+}
+/**
+ * Extension property for nullable `CharArray` that checks whether the array is not null and not empty.
+ *
+ * @return `true` if the `CharArray` is not null and contains at least one character, otherwise `false`.
+ * @since 5.0.0
+ */
+val CharArray?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && isNotEmpty()
 }
 
 /**
@@ -71,11 +410,552 @@ val Array<*>.isSingleElement get() = size == 1
  * Extension property for arrays that checks whether the array does not contain
  * exactly one element.
  *
- * @return `true` if the array contains zero elements or more than one element, 
+ * @return `true` if the array contains zero elements or more than one element,
  *         `false` if the array contains exactly one element.
  * @since 2.1.0
  */
 val Array<*>.isNotSingleElement get() = size != 1
+
+/**
+ * Extension property for an array of comparable elements that determines
+ * whether the array is sorted in ascending order.
+ *
+ * This property evaluates to `true` if the array's elements are sorted
+ * such that each element is less than or equal to the next element.
+ * For an empty array or a single-element array, this property
+ * will always return `true`.
+ *
+ * @receiver Array of comparable elements.
+ * @return `true` if the array is sorted in non-decreasing order, `false` otherwise.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Array<E>.isSorted get() = isSorted()
+/**
+ * Extension property that evaluates whether the ByteArray is sorted in ascending order.
+ * It checks each element sequentially to determine if the current element is less than
+ * or equal to the next one.
+ *
+ * This property is read-only and computes the result dynamically whenever accessed.
+ * @since 5.0.0
+ */
+val ByteArray.isSorted get() = isSorted()
+/**
+ * Extension property for a ShortArray that checks if the array is sorted in ascending order.
+ *
+ * This property utilizes the `isSorted` function to determine whether the current array elements
+ * are sorted. It evaluates the array without modifying its contents.
+ *
+ * @receiver ShortArray The array to check for sorted order.
+ * @return Boolean `true` if the array is sorted in ascending order, otherwise `false`.
+ * @since 5.0.0
+ */
+val ShortArray.isSorted get() = isSorted()
+/**
+ * Extension property to determine if an integer array is sorted in ascending order.
+ *
+ * This property evaluates whether all elements in the array are in non-decreasing order.
+ * An empty array or an array with a single element is considered sorted.
+ *
+ * @receiver IntArray The integer array to check.
+ * @return Boolean `true` if the array is sorted in ascending order, `false` otherwise.
+ * @since 5.0.0
+ */
+val IntArray.isSorted get() = isSorted()
+/**
+ * Indicates whether the elements in the LongArray are sorted in ascending order.
+ *
+ * This property evaluates to `true` if all elements in the array are in non-decreasing order,
+ * meaning each element is less than or equal to the next element. If the array is empty or
+ * contains only one element, it is considered sorted.
+ * @since 5.0.0
+ */
+val LongArray.isSorted get() = isSorted()
+/**
+ * An extension property for `FloatArray` that checks if the array is sorted in ascending order.
+ *
+ * This property evaluates whether the elements of the array are in non-decreasing order.
+ * It returns `true` if the array is empty, contains a single element,
+ * or if each element is less than or equal to the next element.
+ *
+ * @return `true` if the array is sorted in ascending order, otherwise `false`.
+ * @since 5.0.0
+ */
+val FloatArray.isSorted get() = isSorted()
+/**
+ * Extension property that checks whether the elements of a [DoubleArray] are sorted
+ * in ascending order.
+ *
+ * @return `true` if the array elements are in ascending order, otherwise `false`.
+ * @since 5.0.0
+ */
+val DoubleArray.isSorted get() = isSorted()
+/**
+ * Extension property for `BooleanArray` that evaluates whether the array is sorted in non-decreasing order.
+ *
+ * The property returns `true` if all elements in the `BooleanArray` are arranged such that each element
+ * is less than or equal to the one following it. In the context of a `BooleanArray`, the values are
+ * treated as `false < true`.
+ *
+ * The computation is performed lazily when accessed.
+ * @since 5.0.0
+ */
+val BooleanArray.isSorted get() = isSorted()
+/**
+ * Extension property for CharArray that checks if the array is sorted in ascending order.
+ *
+ * @return `true` if the characters in the array are sorted in ascending order, `false` otherwise.
+ * @since 5.0.0
+ */
+val CharArray.isSorted get() = isSorted()
+/**
+ * Extension property for an array of comparable elements that checks
+ * if the array is not sorted in ascending order.
+ *
+ * @return `true` if the array is not sorted, otherwise `false`.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Array<E>.isNotSorted get() = !isSorted()
+/**
+ * Extension property for ByteArray that indicates whether the array is not sorted in ascending order.
+ *
+ * This property returns `true` if the byte array is not sorted in ascending order, and `false` otherwise.
+ * It internally utilizes the `isSorted()` function to determine the sorting state of the array.
+ * @since 5.0.0
+ */
+val ByteArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property for `ShortArray` that determines if the array is not sorted in ascending order.
+ *
+ * This property evaluates to `true` if the array is not sorted, and `false` if the array is sorted
+ * in ascending order. Sorting is determined based on the natural order of the elements.
+ *
+ * Note: This property calls the `isSorted` function to perform the sorting check.
+ * @since 5.0.0
+ */
+val ShortArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property for `IntArray` that indicates whether the array is not sorted.
+ *
+ * Returns `true` if the array is not sorted in ascending order, otherwise `false`.
+ * Utilizes the `isSorted()` function to determine the sorting status.
+ * @since 5.0.0
+ */
+val IntArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property for `LongArray` that indicates whether the array is not sorted.
+ * Returns `true` if the array is not sorted in ascending order, otherwise `false`.
+ * @since 5.0.0
+ */
+val LongArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property for `FloatArray` that indicates whether the array
+ * is not sorted in ascending order.
+ *
+ * @return `true` if the array is not sorted, otherwise `false`.
+ * @since 5.0.0
+ */
+val FloatArray.isNotSorted get() = !isSorted()
+/**
+ * A read-only property that returns `true` if the elements in the `DoubleArray` are not sorted in ascending order,
+ * and `false` otherwise.
+ *
+ * This property internally uses the `isSorted()` function to determine if the array is sorted and negates its result.
+ * @since 5.0.0
+ */
+val DoubleArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property that returns `true` if the `BooleanArray` is not sorted in ascending order,
+ * and `false` otherwise. Sorting is determined based on the natural order of boolean values,
+ * where `false` precedes `true`.
+ * @since 5.0.0
+ */
+val BooleanArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property for a CharArray that determines whether the array is not sorted in ascending order.
+ * The property evaluates to `true` if the array is not sorted and `false` if it is sorted.
+ * It relies on the `isSorted()` function to perform the check.
+ * @since 5.0.0
+ */
+val CharArray.isNotSorted get() = !isSorted()
+/**
+ * Extension property for determining if an array is sorted in descending order.
+ *
+ * This property operates on arrays where elements implement the `Comparable` interface.
+ * It evaluates whether each element in the array is greater than or equal to the next element,
+ * ensuring the entire array is sorted from the largest to the smallest value.
+ *
+ * @receiver The array of comparable elements to check.
+ * @return `true` if the array is sorted in descending order, or `false` otherwise.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Array<E>.isSortedDescending get() = isSortedDescending()
+/**
+ * An extension property for the `ByteArray` class that checks if the array's elements are sorted
+ * in descending order. The comparison is based on the natural order of the elements.
+ *
+ * @return `true` if the array is sorted in descending order, or `false` otherwise.
+ * @since 5.0.0
+ */
+val ByteArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property indicating whether the elements in the [ShortArray] are sorted in descending order.
+ * Returns `true` if the array is sorted in strictly decreasing order, or `false` otherwise.
+ * @since 5.0.0
+ */
+val ShortArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property that checks if the elements in the array are sorted in descending order.
+ * Returns `true` if the array is sorted in non-increasing order, otherwise `false`.
+ * @since 5.0.0
+ */
+val IntArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property for LongArray to determine if the array is sorted
+ * in descending order.
+ *
+ * @return `true` if the elements in the array are in non-increasing order,
+ *         otherwise `false`. An empty array or an array with a single element
+ *         is considered sorted in descending order.
+ * @since 5.0.0
+ */
+val LongArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Checks if the elements in the FloatArray are sorted in descending order.
+ *
+ * @return `true` if the FloatArray is sorted in descending order or is empty,
+ *         `false` otherwise.
+ * @since 5.0.0
+ */
+val FloatArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property that checks if a DoubleArray is sorted in descending order.
+ *
+ * Returns `true` if the elements in the array are arranged from largest to smallest,
+ * and `false` otherwise.
+ * @since 5.0.0
+ */
+val DoubleArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property for `BooleanArray` that determines whether the elements
+ * in the array are sorted in descending order.
+ *
+ * The property evaluates to `true` if each element in the array is greater than
+ * or equal to the element that follows it, and `false` otherwise. Returns `true`
+ * for an empty or single-element array, as they are considered trivially sorted.
+ * @since 5.0.0
+ */
+val BooleanArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property for `CharArray` that checks if the array is sorted in descending order.
+ *
+ * This property evaluates whether the characters in the array are arranged in
+ * non-increasing order, meaning each character is greater than or equal to
+ * the character following it.
+ *
+ * @return `true` if the array is sorted in descending order, otherwise `false`.
+ * @since 5.0.0
+ */
+val CharArray.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property that evaluates whether the elements in the array are not sorted
+ * in descending order. This is determined by checking if the array is not sorted
+ * in the reverse of natural order for the elements.
+ *
+ * @receiver Array of elements that are comparable.
+ * @return `true` if the array is not sorted in descending order, `false` otherwise.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Array<E>.isNotSortedDescending get() = !isSortedDescending()
+/**
+ * Extension property for `ByteArray` that determines whether
+ * the array is not sorted in descending order.
+ *
+ * @return `true` if the byte array is not sorted in strictly descending order, `false` otherwise.
+ * @since 5.0.0
+ */
+val ByteArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * Checks if the elements in the [ShortArray] are not sorted in a strictly descending order.
+ *
+ * This property evaluates to `true` if the array is not in descending order,
+ * including cases where the array is sorted in ascending order, unsorted,
+ * or has repeated elements. If the array is strictly sorted in descending
+ * order, the property evaluates to `false`.
+ * @since 5.0.0
+ */
+val ShortArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * Extension property for IntArray that checks whether the array
+ * is not sorted in descending order.
+ *
+ * Returns `true` if the array is not sorted in descending order,
+ * otherwise returns `false`.
+ *
+ * This property internally utilizes the `isSortedDescending` function
+ * to perform the descending order check and negates its result.
+ * @since 5.0.0
+ */
+val IntArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * Extension property to check if a [LongArray] is not sorted in descending order.
+ *
+ * This property evaluates to `true` if the array is not sorted in descending order,
+ * and `false` otherwise. It internally utilizes the `isSortedDescending` method
+ * to determine the sorting order of the array.
+ * @since 5.0.0
+ */
+val LongArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * Extension property for `FloatArray` that checks if the array is not sorted in descending order.
+ *
+ * This property returns `true` if the array is not sorted in strictly descending order.
+ * Otherwise, it returns `false`.
+ * @since 5.0.0
+ */
+val FloatArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * A read-only property extension for `DoubleArray` that determines if the array is not
+ * sorted in strictly descending order.
+ *
+ * This property evaluates to `true` if the array elements are not in descending order
+ * and `false` otherwise. The check is determined by negating the result of the
+ * `isSortedDescending()` function applied to the array.
+ * @since 5.0.0
+ */
+val DoubleArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * A read-only extension property for `BooleanArray` that checks whether the array is not sorted
+ * in descending order.
+ *
+ * This property evaluates to `true` if the array is not sorted in strictly descending order,
+ * and `false` otherwise.
+ *
+ * It uses the `isSortedDescending()` function to determine the descending order of the array,
+ * and negates the result.
+ * @since 5.0.0
+ */
+val BooleanArray.isNotDescendingSorted get() = !isSortedDescending()
+/**
+ * Extension property for `CharArray` which checks whether the array is
+ * not sorted in descending order.
+ *
+ * This property returns `true` if the character array is not sorted
+ * in strictly descending order, and `false` otherwise.
+ *
+ * The check is performed by negating the result of the `isSortedDescending`
+ * function. If the array is empty or contains a single element, it is
+ * considered as not descending sorted.
+ * @since 5.0.0
+ */
+val CharArray.isNotDescendingSorted get() = !isSortedDescending()
+
+/**
+ * Negates the state of the array by returning `true` if the array is either `null` or empty.
+ *
+ * This operator checks if the array reference is `null` or if it contains no elements.
+ *
+ * @return `true` if the array is `null` or empty, otherwise `false`.
+ * @since 1.0.0
+ */
+@JvmName("nullableNot")
+operator fun Array<*>?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty()
+}
+/**
+ * Performs a logical NOT operation on the nullable [ByteArray].
+ * This operator checks whether the [ByteArray] is null or empty.
+ *
+ * @return `true` if the [ByteArray] is null or empty, otherwise `false`.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun ByteArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Checks if the nullable ShortArray is either null or empty.
+ *
+ * @return `false` if the array is not null and contains elements, `true` otherwise.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun ShortArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Checks whether the nullable [IntArray] is null or empty.
+ *
+ * @return `false` if the [IntArray] is not null and contains elements, otherwise `true`.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun IntArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Checks whether the long array is either `null` or empty.
+ *
+ * @return `true` if the array is `null` or contains no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun LongArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Checks whether the nullable FloatArray is null or empty.
+ *
+ * This operator function allows using the logical NOT operator (`!`) on a nullable FloatArray to determine
+ * if it is either null or contains no elements.
+ *
+ * @return `false` if the FloatArray is not null and contains one or more elements, otherwise `true`.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun FloatArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Checks if the DoubleArray is null or empty.
+ *
+ * This operator function returns `false` if the DoubleArray is not null and contains elements.
+ * Otherwise, it returns `true` if the DoubleArray is either null or has no elements.
+ *
+ * @return `true` if the DoubleArray is null or empty, `false` otherwise.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun DoubleArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Performs a logical NOT operation on the provided BooleanArray.
+ *
+ * @receiver The nullable BooleanArray on which the operation is performed.
+ * @return `false` if the BooleanArray is not null and not empty; `true` otherwise.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun BooleanArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+/**
+ * Checks if the `CharArray` is null or empty.
+ *
+ * @return `true` if the `CharArray` is null or empty, `false` otherwise.
+ * @since 5.0.0
+ */
+@JvmName("nullableNot")
+operator fun CharArray?.not(): Boolean {
+    contract {
+        returns(false) implies (this@not != null)
+    }
+    return isNullOrEmpty
+}
+
+/**
+ * Returns `true` if the array is empty, otherwise `false`.
+ *
+ * This operator function provides a not (~) operation for arrays,
+ * allowing the empty state of the array to be evaluated conveniently.
+ *
+ * @return `true` if the array contains no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+operator fun Array<*>.not(): Boolean = isEmpty()
+/**
+ * Operator function that checks whether the ByteArray is empty.
+ *
+ * @return true if the ByteArray is empty, false otherwise.
+ * @since 5.0.0
+ */
+operator fun ByteArray.not(): Boolean = isEmpty
+/**
+ * Checks if the ShortArray is empty.
+ *
+ * This operator function is used to determine whether the array contains no elements.
+ *
+ * @return `true` if the array is empty, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun ShortArray.not(): Boolean = isEmpty
+/**
+ * Checks if the IntArray is empty.
+ *
+ * This operator function negates the array by returning true if the array is empty
+ * and false otherwise.
+ *
+ * @return true if the array is empty, false otherwise.
+ * @since 5.0.0
+ */
+operator fun IntArray.not(): Boolean = isEmpty
+/**
+ * Checks if the LongArray is empty, providing a negation-like operation.
+ *
+ * @return true if the array is empty, false otherwise.
+ */
+operator fun LongArray.not(): Boolean = isEmpty
+/**
+ * Checks whether the FloatArray is empty.
+ *
+ * This operator function allows the use of the `not` operator to determine
+ * if the FloatArray contains no elements.
+ *
+ * @return `true` if the FloatArray is empty, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun FloatArray.not(): Boolean = isEmpty
+/**
+ * Returns `true` if the DoubleArray is empty, otherwise returns `false`.
+ *
+ * @return `true` if the array has no elements, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun DoubleArray.not(): Boolean = isEmpty
+/**
+ * Returns `true` if the Boolean array is empty, otherwise returns `false`.
+ *
+ * This operator function is a Kotlin extension that negates the Boolean state
+ * of the array based on its emptiness.
+ *
+ * @return `true` if the array is empty, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun BooleanArray.not(): Boolean = isEmpty
+/**
+ * Checks if the character array is empty.
+ *
+ * This operator function returns true if the character array has no elements,
+ * and false otherwise.
+ *
+ * @return true if the character array is empty, false otherwise.
+ * @since 5.0.0
+ */
+operator fun CharArray.not(): Boolean = isEmpty
 
 /**
  * Merges the current array with one or more additional collections into a new array of the same type.
@@ -571,40 +1451,6 @@ fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate:
 }
 
 /**
- * Checks if the array is either null or empty.
- *
- * This function determines whether the array contains no elements or is null.
- *
- * @return `true` if the array is null or has no elements, `false` otherwise.
- * @since 2.1.0
- */
-@OptIn(ExperimentalContracts::class)
-@Suppress("kutils_null_check")
-fun <E> Array<E>?.isNullOrEmpty(): Boolean {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return isNotNull() && isNotEmpty()
-}
-
-/**
- * Checks if the array is not null and not empty.
- *
- * This function ensures the array is both non-null and contains at least one element.
- *
- * @return true if the array is not null and contains at least one element, false otherwise.
- * @since 2.1.0
- */
-@OptIn(ExperimentalContracts::class)
-@Suppress("kutils_null_check")
-fun <E> Array<E>?.isNotNullOrEmpty(): Boolean {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return isNotNull() && isNotEmpty()
-}
-
-/**
  * Returns the original array if it is not null or empty. Otherwise, invokes the provided
  * `defaultValue` supplier and returns its result.
  *
@@ -612,7 +1458,6 @@ fun <E> Array<E>?.isNotNullOrEmpty(): Boolean {
  * @return The original array if it is not null or empty, otherwise the result of invoking `defaultValue`.
  * @since 2.1.0
  */
-@OptIn(ExperimentalContracts::class)
 inline fun <E> Array<E>?.ifNullOrEmpty(defaultValue: Supplier<Array<E>>): Array<E> {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
@@ -621,43 +1466,69 @@ inline fun <E> Array<E>?.ifNullOrEmpty(defaultValue: Supplier<Array<E>>): Array<
 }
 
 /**
- * Executes the given action if the array is not empty. Returns the result of the action
- * if the array is non-empty; otherwise, returns the array itself.
+ * Executes the given action if the array is not empty and returns the array.
  *
- * @param action A function to be invoked with the array as the receiver if it is not empty.
- * @return The result of the action if the array is not empty, or the array itself if it is empty.
- * @since 3.1.3
+ * @param action A consumer that performs an operation on the array if it is not empty.
+ * @return The original array.
  */
-@OptIn(ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <E, R> Array<E>.ifNotEmpty(action: ReceiverTransformer<Array<E>, R>): R {
+inline fun <E> Array<E>.ifNotEmpty(action: Consumer<Array<E>>): Array<E> {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return (if (isNotEmpty()) action(this) else this) as R
+    if (isNotEmpty()) action(this)
+    return this
 }
-
 /**
  * Executes the specified [action] if the array is not null and not empty.
  *
- * This function checks whether the array fulfills the condition of being non-null and having at least one element.
- * If the condition is met, the given [action] is invoked with the array as its receiver.
- * Otherwise, the function returns the array as is.
+ * This function checks if the array is both non-null and contains at least one element.
+ * If the condition is met, the provided [action] is invoked with the array as its parameter.
  *
- * @param action The lambda or function to execute when the array is not null and not empty.
- * @return The result of the [action] if executed, or the original array cast to the expected type if not.
- * @since 3.1.3
+ * @param action A function to be executed if the array is not null and not empty.
+ * @return The original array, or null if the array is null or empty.
  */
-@OptIn(ExperimentalExtendedContracts::class, ExperimentalContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <E, R> Array<E>?.ifNotNullOrEmpty(action: ReceiverTransformer<Array<E>, R>): R? {
+inline fun <E> Array<E>?.ifNotNullOrEmpty(action: Consumer<Array<E>>): Array<E>? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (this@ifNotNullOrEmpty != null) implies returnsNotNull()
     }
-    return (if (isNotNullOrEmpty()) action(this) else this) as R
+    if (isNotNullOrEmpty) action(this)
+    return this
+}
+
+/**
+ * Executes the specified action if the array contains the given element and returns the array.
+ *
+ * @param element The element to check for in the array.
+ * @param action The action to execute if the element is found.
+ * @return The original array, regardless of whether the action was executed.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <E> Array<E>.ifContains(element: E, action: Consumer<Array<E>>): Array<E> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (contains(element)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the array does not contain the specified element.
+ *
+ * @param element The element to check for in the array.
+ * @param action The action to be performed if the array does not contain the specified element.
+ * @return The original array after performing the action, if applicable.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <E> Array<E>.ifNotContains(element: E, action: Consumer<Array<E>>): Array<E> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!contains(element)) action(this)
+    return this
 }
 
 /**
@@ -1060,7 +1931,7 @@ inline fun <E, K, V, M : MutableMap<in K, in V>> Array<E>.associateTo(
  * @since 2.1.0
  */
 inline infix fun <E, R> Array<E>.filterNotNull(element: Transformer<E, R>) =
-    filter { element(it).isNotNull() }
+    filter { element(it) != null }
 
 /**
  * Filters the elements of the array based on a transformation function that checks for null values.
@@ -1069,7 +1940,7 @@ inline infix fun <E, R> Array<E>.filterNotNull(element: Transformer<E, R>) =
  * @since 2.1.0
  */
 inline infix fun <E, R> Array<E>.filterNull(element: Transformer<E, R>) =
-    filter { element(it).isNull() }
+    filter { element(it) == null }
 
 /**
  * Applies the given block of code to each element in the array without modifying the array itself.
@@ -1201,649 +2072,4 @@ inline operator fun <reified E> Int.invoke(array: Array<E>): Array<E> {
     if (this == 0) return emptyArray()
     if (isPositive) return array.take(this).toTypedArray<E>()
     return array.drop(-this).toTypedArray<E>()
-}
-
-/**
- * Ensures that the array is not empty. If the array is empty, it throws a `ValidationFailedException`.
- *
- * @param causeOf An optional supplier for a custom throwable to be thrown. If provided, it takes precedence over a default exception.
- * @param cause An optional supplier for the underlying cause of the throwable.
- * @return The original array if it is not empty.
- * @throws ValidationFailedException if the array is empty and no custom throwable is provided.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The array is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The array is empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that an array is not empty. If the array is empty, a `ValidationFailedException` is thrown
- * with an optional lazy message and optional throwable causes.
- *
- * @param causeOf an optional supplier for a throwable that will be initialized as the cause of a `ValidationFailedException`.
- * @param cause an optional supplier for a throwable that serves as the root cause of the validation failure.
- * @param lazyMessage a supplier for a lazy-evaluated message to include in the exception if validation fails.
- * @return the same array if it is not empty.
- * @throws ValidationFailedException if the array is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null, lazyMessage: Transformer<Array<E>, Any>): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is not empty. If the array is empty, a `ValidationFailedException` is thrown.
- *
- * @param property The property associated with this validation. Can be null if not applicable.
- * @param variableName An optional name of the variable being validated. Used to provide more context in the error message.
- * @param message An optional custom message to be included in the exception if validation fails. Defaults to a generic message.
- * @param causeOf A supplier for the throwable cause of the exception. If provided, it will be invoked when constructing the exception.
- * @param cause An optional supplier for an underlying throwable that caused the validation failure. Defaults to null.
- * @return Returns this array instance if the validation succeeds.
- * @throws ValidationFailedException If the array is empty, with additional context provided by the parameters.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Ensures that the array is not empty, throwing a validation exception if the array is empty.
- *
- * @param property the primary property associated with the validation context; can be null
- * @param variable an additional property providing further validation context; can be null
- * @param message an optional custom message for the validation error; defaults to "is empty" if not provided
- * @param causeOf a supplier for the cause of the exception, if applicable; can be null
- * @param cause an alternative supplier for the exception's cause, if applicable; can be null
- * @return the same array if validation passes (i.e., the array is not empty)
- * @throws ValidationFailedException if the array is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is not empty. If the array is empty, it throws a `ValidationFailedException`.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation is related. Can be null.
- * @param parameterName The name of the parameter in the callable being validated. Can be null.
- * @param message An optional custom message to describe the validation failure. Defaults to "is empty" if not provided.
- * @param causeOf A supplier for the primary `Throwable` cause of the validation failure, if applicable. Can be null.
- * @param cause A supplier for the secondary `Throwable` cause of the validation failure, if applicable. Can be null.
- * @return The same array after validation, if it is not empty.
- * @throws ValidationFailedException if the array is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Ensures that the array is not empty. If the array is empty, a [ValidationFailedException] is thrown.
- *
- * @param callable the [KFunction] related to the validation context, or null if not applicable
- * @param parameter the [KParameter] representing the parameter being validated, or null if not applicable
- * @param message an optional message providing additional context about the validation failure, defaulting to null
- * @param causeOf a supplier for the primary cause of the validation failure, defaulting to null
- * @param cause a supplier for the underlying cause of the validation failure, defaulting to null
- * @return the validated array if it is not empty
- * @throws ValidationFailedException if the array is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is not empty. If the array is empty, a `ValidationFailedException` is thrown.
- *
- * @param callableName the name of the callable (e.g., function or method) to identify the context of the validation failure
- * @param parameterName the name of the parameter being validated, or null if not applicable
- * @param message an optional custom error message to provide additional details about the validation failure
- * @param causeOf a supplier of the root cause exception for the validation failure, or null if not applicable
- * @param cause a supplier of the exception to be set as the cause, or null if not applicable
- * @return the same array if it is not empty
- * @throws ValidationFailedException if the array is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is not empty. If the array is empty, throws a `ValidationFailedException`.
- *
- * @param callableName The name of the callable (e.g., function or property) where this validation is performed, or null if unspecified.
- * @param parameter The `KParameter` representing the parameter being validated, or null if not applicable.
- * @param message An optional custom error message to include in the exception if validation fails. Defaults to "is empty".
- * @param causeOf A supplier for a root cause to use as the primary exception or null if not provided.
- * @param cause A supplier for the underlying cause of the validation failure or null if not provided.
- * @return The validated array if it is not empty.
- * @throws ValidationFailedException if the array is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given array is neither null nor empty.
- *
- * This method checks if the array is null or contains no elements. If either condition is true,
- * a `ValidationFailedException` is thrown. The exception can optionally include a specific
- * cause or additional context via the provided `ThrowableSupplier` parameters.
- *
- * @param causeOf an optional supplier for a throwable, providing additional context for the exception.
- *                If null, a default context is used in the exception message.
- * @param cause an optional supplier for the exception's underlying cause. If null, no additional
- *              chained cause is included in the thrown exception.
- * @return the same array if it is neither null nor empty.
- * @throws ValidationFailedException if the array is null or empty, with an optional cause and context.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is not null or empty.
- *
- * If the array is null or empty, this method throws a `ValidationFailedException` with a
- * message and optional causes provided by the supplied parameters.
- *
- * @param causeOf an optional supplier for the primary cause of the exception. If null,
- *                the default exception is used.
- * @param cause an optional supplier for the secondary or additional cause for context.
- * @param lazyMessage a supplier function that provides the error message to be included
- *                    in the exception. This is evaluated lazily.
- * @return the validated array if it is not null or empty.
- * @throws ValidationFailedException if the array is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null, lazyMessage: Transformer<Array<E>?, Any>): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given array is not null or empty. If the array is null or empty, throws a
- * `ValidationFailedException` with an optional property reference, variable name, custom message, and causes
- * for additional context.
- *
- * @param property The property associated with the validation for diagnostic purposes. Can be null.
- * @param variableName An optional name of the variable being validated. Used in the exception message if provided.
- * @param message An optional custom message describing the validation failure. Defaults to "is null or empty" if not specified.
- * @param causeOf A supplier for the base exception to wrap the `ValidationFailedException`. If null, the validation exception will be created directly.
- * @param cause A supplier for an underlying throwable to be used as the cause of the `ValidationFailedException`. Can be null.
- * @return The original array if it is neither null nor empty.
- * @throws ValidationFailedException if the array is null or empty, with detailed information provided by the parameters.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is neither null nor empty.
- *
- * If the array is null or empty, a `ValidationFailedException` is thrown with an optional custom message
- * and cause. The exception can also include additional context via the specified `property` and `variable`.
- *
- * @param property the primary property associated with the validation, or null if not specified
- * @param variable an optional secondary property providing additional context, or null if not specified
- * @param message an optional message to include in the exception if validation fails, or null for a default message
- * @param causeOf an optional supplier to provide the throwable cause of the exception, or null if not used
- * @param cause an optional supplier to generate an additional cause for the exception, or null if not applicable
- * @return the validated array if it is neither null nor empty
- * @throws ValidationFailedException if the array is null or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given array is not null or empty.
- *
- * This method ensures that the provided array is neither null nor empty.
- * If the array is null or empty, a `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) where this validation is being performed. Can be null.
- * @param parameterName The name of the parameter in the callable being validated. Can be null.
- * @param message An optional custom message to be included in the exception if validation fails. Defaults to "is null or empty".
- * @param causeOf A supplier for a `Throwable` to be thrown as the root cause of the validation failure. Can be null.
- * @param cause A supplier for an additional `Throwable` to be included as the cause of the `ValidationFailedException`. Can be null.
- * @return The validated array if it is not null or empty.
- * @throws ValidationFailedException if the array is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given array is neither null nor empty.
- *
- * This method checks if the array is null or contains no elements. If the validation fails,
- * it throws a `ValidationFailedException` with detailed information including the callable,
- * parameter, message, and cause.
- *
- * @param callable the [KFunction] related to the validation context, or `null` if not applicable
- * @param parameter the [KParameter] representing the parameter being validated, or `null` if not applicable
- * @param message an optional custom message to describe the validation failure; defaults to "is null or empty"
- * @param causeOf an optional supplier of a `Throwable` to use as the primary cause of failure, or `null`
- * @param cause an optional supplier of a secondary `Throwable` to associate with the validation failure, or `null`
- * @return the validated array if it is not `null` or empty
- * @throws ValidationFailedException if the array is `null` or empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given array is not `null` or empty.
- *
- * This method checks if the array is either `null` or contains no elements. If the condition is met,
- * it throws a `ValidationFailedException` with the specified details. Otherwise, the array is returned as-is.
- *
- * @param callableName the name of the callable (e.g., function or method) related to this validation.
- * This will be included in the exception details.
- * @param parameterName the name of the parameter being validated. This will be included in the exception details.
- * Defaults to `null` if not specified.
- * @param message an optional custom message providing additional details about the validation failure.
- * Defaults to `null` if not specified.
- * @param causeOf a supplier function for the root cause of the validation failure.
- * Defaults to `null` if not specified.
- * @param cause a supplier function for the underlying exception cause. Defaults to `null` if not specified.
- *
- * @return the original array if it is not `null` or empty.
- *
- * @throws ValidationFailedException if the array is either `null` or contains no elements.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given array is not null or empty.
- *
- * If the array is null or empty, a `ValidationFailedException` is thrown.
- *
- * @param callableName The name of the callable (e.g., function or property) where validation failed, or null if not specified.
- * @param parameter The KParameter instance representing the parameter being validated, or null if not applicable.
- * @param message An optional error message providing additional details about the validation failure. Default is `null`.
- * @param causeOf A supplier for an optional custom Throwable to be thrown instead of the default exception. Default is `null`.
- * @param cause A supplier for the root cause of the exception, if any. Default is `null`.
- * @return The validated array if it is not null or empty.
- * @throws ValidationFailedException If the array is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>?, Throwable>? = null, cause: Transformer<Array<E>?, Throwable>? = null): Array<E> {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the array is empty. Throws a `ValidationFailedException` if the array is not empty.
- *
- * @param causeOf An optional supplier for a custom throwable to be thrown instead of the default exception.
- *                If provided, this exception will wrap the default exception.
- * @param cause An optional supplier for an underlying cause to be associated with the exception.
- * @return The same array if it is empty.
- * @throws ValidationFailedException if the array is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is empty. If the array is not empty, a validation exception is thrown.
- *
- * @param causeOf Supplier for the exception to be thrown. If null, a `ValidationFailedException` with additional context is created.
- * @param cause Supplier for the underlying cause of the exception. This parameter is optional and may be null.
- * @param lazyMessage Supplier for the lazy-evaluated detail message included in the exception.
- * @return The original array if it is empty.
- * @throws ValidationFailedException if the array is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null, lazyMessage: Transformer<Array<E>, Any>): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the array is empty. If the array is not empty, a `ValidationFailedException` is thrown
- * with a detailed error message. The optional parameters allow customization of the validation failure message
- * and the associated cause.
- *
- * @param property The property associated with the validation failure. Can be null if not applicable.
- * @param variableName The optional name of the variable involved in the validation.
- * @param message An optional custom message describing the validation failure. Defaults to "is not empty".
- * @param causeOf A supplier for the throwable cause, used to wrap the `ValidationFailedException` if needed.
- *                Can be null if wrapping is not required.
- * @param cause A supplier for the throwable cause to be associated with the `ValidationFailedException`.
- *              Can be null if no cause is needed.
- * @return The original array if it is empty.
- * @throws ValidationFailedException If the array is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is empty. If the array is not empty, a `ValidationFailedException` is thrown.
- *
- * @param property the main KProperty associated with the validation, or null if not specified
- * @param variable an optional secondary KProperty providing additional context, or null if not specified
- * @param message an optional message providing additional details about the validation failure, or null to use a default message
- * @param causeOf a supplier for the cause of the exception, or null if no cause supplier is specified
- * @param cause a supplier for a specific throwable as the cause of the exception, or null if not specified
- * @return the original array if validation passes
- * @throws ValidationFailedException if the array is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is empty. If the array is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation is related. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional custom message for the validation failure. Default message: "is not empty".
- * @param causeOf An optional supplier providing a throwable to use as the cause of the validation failure. Can be null.
- * @param cause An optional supplier providing a secondary throwable cause if `causeOf` is not supplied. Can be null.
- * @return The original array if validation passes (i.e., the array is empty).
- * @throws ValidationFailedException If the array is not empty. Includes the callable, parameterName, custom message, and cause if provided.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is empty. If the array is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] related to the validation context, or null if not applicable
- * @param parameter the [KParameter] representing the parameter involved in the validation, or null if not applicable
- * @param message an optional message describing the reason for the validation failure, defaults to "is not empty"
- * @param causeOf a supplier for the throwable to be thrown as the primary cause of the validation failure, or null if not specified
- * @param cause an additional supplier for a throwable to be included as a secondary cause, or null if not specified
- * @return the same array instance if the validation passes
- * @throws ValidationFailedException if the array is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current array is empty. If the array is not empty, a `ValidationFailedException`
- * is thrown, optionally including additional context such as the callable name, parameter name, custom
- * error message, or a root cause.
- *
- * @param callableName The name of the callable (e.g., function or method) to include in the exception message, if applicable.
- * @param parameterName The name of the parameter being validated, if applicable.
- * @param message An optional custom error message to include in the exception, providing additional details about the validation failure.
- * @param causeOf A supplier for the root cause of the validation failure, if applicable.
- * @param cause A supplier for an additional cause to include in the exception, if applicable.
- * @return The current array if it passes validation (i.e., is empty).
- * @throws ValidationFailedException If the array is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the array is empty. If not, throws a [ValidationFailedException].
- *
- * @param callableName The name of the callable being validated, or null if not specified.
- * @param parameter The [KParameter] instance representing the parameter being validated, or null if not applicable.
- * @param message An optional custom error message for the validation failure. Defaults to "is not empty" if not specified.
- * @param causeOf An optional supplier providing the root cause [Throwable] for the validation failure. If this is not null, the
- * resulting exception will use it as the cause instead of creating a new one.
- * @param cause An optional supplier providing an additional [Throwable] to wrap as the cause in the exception.
- * @return The original array if the validation passes (i.e., it is empty).
- * @throws ValidationFailedException If the array is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given array is null or empty. If the array is not null or empty,
- * a `ValidationFailedException` is thrown.
- *
- * @param causeOf An optional supplier for the cause of the validation failure. Used to provide
- *                a custom exception to be thrown. If `null`, a default exception is constructed.
- * @param cause An optional supplier for the root cause of the validation failure, which will
- *              be included as the cause of the thrown exception.
- * @return The same array if it is null or empty, allowing chained calls.
- * @throws ValidationFailedException if the array is not null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the given array is null or empty. If the array is not null or empty, a specified exception
- * is thrown. The exception and its message can be customized using the provided suppliers.
- *
- * @param E the type of elements in the array.
- * @param causeOf a supplier for a custom `Throwable` to throw if validation fails. If null, a default exception is used.
- * @param cause a supplier providing the underlying cause of the exception, if applicable. Can be null.
- * @param lazyMessage a supplier that generates the exception message lazily if validation fails.
- * @return the same array if it is `null` or empty.
- * @throws ValidationFailedException if the array is not null and not empty, and no custom throwable is provided.
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null, lazyMessage: Transformer<Array<E>, Any>): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given array is either null or empty. If the array is not null or not empty,
- * a `ValidationFailedException` is thrown with the provided details.
- *
- * @param property The property associated with the validation, used for error reporting. Can be null if not applicable.
- * @param variableName The name of the variable involved in the validation. Included in the exception message if provided.
- * @param message An optional message describing the reason for the validation failure. Defaults to a generic message.
- * @param causeOf An optional supplier for a custom throwable to be used as the primary cause of the validation failure.
- * @param cause An optional supplier for a throwable causing the validation failure. Used as an underlying cause.
- * @return The array itself if it is null or empty; otherwise, an exception is thrown.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given array is null or empty, throwing a `ValidationFailedException` if it is not.
- *
- * The exception message and cause can be customized using the provided parameters.
- *
- * @param property the primary KProperty associated with the validation, providing contextual information, or null if not specified
- * @param variable an optional secondary KProperty for additional context, or null if not specified
- * @param message an optional custom message to be appended to the exception if validation fails
- * @param causeOf a supplier for the exception to be thrown if validation fails, or null to use a default exception
- * @param cause a supplier for the underlying cause of the exception, or null if not needed
- * @return the original array if it is null or empty
- * @throws ValidationFailedException if the array is neither null nor empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates if the array is null or empty. If it is not null or empty, throws a `ValidationFailedException`.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation error is related. Can be null.
- * @param parameterName The name of the parameter in the given callable that caused the validation issue. Can be null.
- * @param message An optional custom message providing additional details about the validation failure. Default is null.
- * @param causeOf A supplier for the underlying cause of the validation error. Can be null.
- * @param cause A supplier for an additional cause to attach to the exception. Can be null.
- * @return Returns the original array if it is null or empty. If the array is neither null nor empty, an exception is thrown.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given array is null or empty and throws a `ValidationFailedException` if the validation fails.
- *
- * If the array is not null or not empty, the function throws a `ValidationFailedException` with the provided details.
- *
- * @param callable the [KFunction] related to the validation, or null if not applicable.
- * @param parameter the [KParameter] representing the parameter being validated, or null if not applicable.
- * @param message an optional custom message for the validation failure, defaulting to "is not null or empty".
- * @param causeOf an optional supplier for a throwable that directly represents the failure cause. If provided,
- *                it initializes the thrown exception. Defaults to null.
- * @param cause an optional supplier for a throwable that represents the underlying cause of the validation failure.
- *              It is chained as the cause of the exception thrown. Defaults to null.
- * @return the validated array if it passed the null or empty validation, or null if the input was null.
- * @throws ValidationFailedException if the array is not null or not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates whether the given array is null or empty. If the validation fails, a `ValidationFailedException` is thrown.
- *
- * @param callableName the name of the callable (e.g., function or method) related to the validation process
- * @param parameterName the name of the parameter being validated, or null if not specified
- * @param message an optional custom message providing additional details about the validation failure
- * @param causeOf a supplier for the specific exception to throw as the root cause of validation failure, or null if not specified
- * @param cause a supplier for the underlying cause of the exception, or null if not specified
- * @return the original array if it passes the validation
- * @throws ValidationFailedException if the array is not null or not empty and validation fails
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that an array is either null or empty.
- *
- * This function checks if the array is null or empty and throws a `ValidationFailedException`
- * if it is not. The exception can include additional context such as the callable name,
- * parameter details, an optional message, and optionally configured causes. If the validation
- * passes (i.e., the array is null or empty), the original array is returned unchanged.
- *
- * @param callableName The name of the callable being validated, or null if not specified.
- * @param parameter The `KParameter` associated with the validation, or null if not applicable.
- * @param message An optional custom validation failure message to include in the exception.
- * @param causeOf A supplier for the specific cause of the validation failure, or null if not applicable.
- * @param cause An additional supplier for the root cause of the validation failure, or null if not applicable.
- * @return The original array if it is null or empty; otherwise, an exception is thrown.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>?.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E>? {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
 }

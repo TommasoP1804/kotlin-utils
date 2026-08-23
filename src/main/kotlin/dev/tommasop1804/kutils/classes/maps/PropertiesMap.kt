@@ -62,7 +62,7 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
      * @return `true` if the map contains the specified key, otherwise `false`.
      * @since 3.10.0
      */
-    operator fun contains(key: String) = map.keys.find { it.name == key }.isNotNull()
+    operator fun contains(key: String) = map.keys.find { it.name == key } != null
     /**
      * Checks if the underlying map contains no key-value mappings.
      *
@@ -78,7 +78,7 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
      * @return `true` if the map contains a key with the specified name; otherwise, `false`.
      * @since 3.10.0
      */
-    fun containsKey(key: String) = map.keys.find { it.name == key }.isNotNull()
+    fun containsKey(key: String) = map.keys.find { it.name == key } != null
 
     /**
      * Checks if the specified value is present in the underlying map.

@@ -55,7 +55,7 @@ data class FilterOption(
     constructor(property: KProperty<*>, operator: FilterOperator = FilterOperator.Equals, value: Any?) : this(
         property.run {
             val type1 = ownerClass?.simpleName
-            if (type1.isNotNull()) $$"$$type1$$${name}" else name
+            if (type1 != null) $$"$$type1$$${name}" else name
         },
         operator,
         value
@@ -101,7 +101,7 @@ data class FilterOption(
     constructor(property: KProperty<*>, operator: String = FilterOperator.Equals.operator, value: Any?) : this(
         property.run {
             val type1 = (parameters.firstOrNull()?.type?.classifier as? KClass<*>)?.simpleName
-            if (type1.isNotNull()) $$"$$type1$$${property.name}" else name
+            if (type1 != null) $$"$$type1$$${property.name}" else name
         },
         FilterOperator.ofOperator(operator) ?: throw IllegalArgumentException("Invalid operator"),
         value
@@ -183,7 +183,7 @@ data class FilterOption(
                 ctxt: SerializationContext
             ) {
                 gen.writeStartObject()
-                if (value.property.isNotNull())
+                if (value.property != null)
                     gen.writeStringProperty("property", "${value.property}")
                 gen.writeStringProperty("operator", value.operator.operator)
                 gen.writeStringProperty("value", value.value?.toString())
@@ -205,7 +205,7 @@ data class FilterOption(
         class OldSerializer : JsonSerializer<FilterOption>() {
             override fun serialize(value: FilterOption, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
-                if (value.property.isNotNull())
+                if (value.property != null)
                     gen.writeStringField("property", "${value.property}")
                 gen.writeStringField("operator", value.operator.operator)
                 gen.writeStringField("value", value.value?.toString())

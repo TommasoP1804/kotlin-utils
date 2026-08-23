@@ -603,7 +603,7 @@ class TomlNode(val rawValue: Any?) {
      *
      * @since 3.11.0
      */
-    val isMissing: Boolean = rawValue.isNull()
+    val isMissing: Boolean = rawValue == null
     /**
      * Indicates whether the current TOML node represents an array-like structure.
      *
@@ -710,7 +710,7 @@ class TomlNode(val rawValue: Any?) {
             if (current.isMissing) return current
 
             val index = key.toIntOrNull()
-            current = if (index.isNotNull() && current.isArray) current[index]
+            current = if (index != null && current.isArray) current[index]
             else current._get(key)
         }
         return current
@@ -744,7 +744,7 @@ class TomlNode(val rawValue: Any?) {
         for (key in parentPath) {
             val index = key.toIntOrNull()
 
-            if (index.isNotNull() && current.isArray)
+            if (index != null && current.isArray)
                 current = current[index]
             else {
                 if (current[key].isMissing) _set(key, mMapOf<String, Any?>())
@@ -753,7 +753,7 @@ class TomlNode(val rawValue: Any?) {
         }
 
         val lastIndex = lastKey.toIntOrNull()
-        if (lastIndex.isNotNull() && current.isArray) current[lastIndex] = value
+        if (lastIndex != null && current.isArray) current[lastIndex] = value
         else current._set(lastKey, value)
     }
     /**

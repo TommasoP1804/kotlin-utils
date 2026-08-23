@@ -380,7 +380,7 @@ data class MdImage(val alt: String, val url: String, val title: String? = null) 
      * @return A string representing the image in Markdown syntax.
      * @since 3.3.0
      */
-    override fun render() = if (title.isNotNull()) "![${alt}](${url} \"${title}\")" else "![$alt]($url)"
+    override fun render() = if (title != null) "![${alt}](${url} \"${title}\")" else "![$alt]($url)"
 }
 
 /**

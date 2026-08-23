@@ -96,5 +96,5 @@ operator fun Result<*>.not() = isFailure
 @IgnorableReturnValue
 inline fun <T> Result<T>.getOrThrow(includeCause: Boolean = true, lazyException: ThrowableSupplier) = getOrElse {
     val exception = lazyException()
-    throw if (exception.cause.isNotNull() || !includeCause) exception else (exception causedBy exceptionOrNull())
+    throw if (exception.cause != null || !includeCause) exception else (exception causedBy exceptionOrNull())
 }

@@ -1,0 +1,975 @@
+/*
+ * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
+ */
+
+@file:OptIn(ExperimentalContracts::class)
+@file:JvmName("BooleanValidatorsKt")
+@file:Since("5.0.0")
+@file:Suppress("unused")
+
+package dev.tommasop1804.kutils
+
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.exceptions.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
+import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
+import kotlin.reflect.KProperty
+
+/**
+ * Ensures that the current Boolean value is `true`.
+ * If the value is `false`, it throws an `IllegalArgumentException` or a provided throwable.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception.
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return the value `true` if the current Boolean value is `true`.
+ * @throws IllegalArgumentException if the current Boolean value is `false` and no custom throwable is provided.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.requireTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@requireTrue
+    }
+    if (!this) throw if (causeOf == null) IllegalArgumentException("Invalid argument: should be true", cause?.invoke(false)) else causeOf(false).initCause(IllegalArgumentException("Invalid argument: should be true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Ensures that the boolean value is `true`, throwing an exception if the condition is not met.
+ * If `false`, it throws an `IllegalArgumentException` or the provided throwable with a lazily evaluated
+ * error message.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage a supplier function that provides the error message to include in the thrown exception.
+ * @return the boolean value `true` if the condition is met.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.requireTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies this@requireTrue
+    }
+    if (!this) throw if (causeOf == null) IllegalArgumentException(lazyMessage(false).toString(), cause?.invoke(false)) else causeOf(false).initCause(IllegalArgumentException(lazyMessage(false).toString(), cause?.invoke(false)))
+    return true
+}
+/**
+ * Ensures the boolean value is true, otherwise throws an exception provided by the given exception supplier.
+ *
+ * @param lazyException a supplier that generates an exception to be thrown if the boolean value is false
+ * @return the boolean value `true`, if the check passes
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.requireTrueOrThrow(lazyException: Transformer<Boolean, Throwable>): Boolean {
+    contract {
+        returns() implies this@requireTrueOrThrow
+    }
+    if (!this) throw lazyException(false)
+    return true
+}
+
+/**
+ * Ensures that the calling Boolean is false.
+ * If the Boolean is true, an exception is thrown with the provided cause or a default cause.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return Returns false if the Boolean is false.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.requireFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@requireFalse
+    }
+    if (this) throw if (causeOf == null) IllegalArgumentException("Invalid argument: should be false", cause?.invoke(true)) else causeOf(true).initCause(IllegalArgumentException("Invalid argument: should be false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Ensures that the boolean value is `false`. If the value is `true`, it throws an exception.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage a supplier providing a message used for creating the exception
+ * @return the boolean value `false` if the condition is satisfied
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.requireFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies !this@requireFalse
+    }
+    if (this) throw if (causeOf == null) IllegalArgumentException(lazyMessage(true).toString(), cause?.invoke(true)) else causeOf(true).initCause(IllegalArgumentException(lazyMessage(true).toString(), cause?.invoke(true)))
+    return false
+}
+/**
+ * Ensures that the Boolean value is false, throwing the specified exception if it is true.
+ *
+ * If the Boolean value is true, the exception supplied by the given `lazyException` supplier
+ * will be thrown. If the Boolean value is false, it will simply return false.
+ *
+ * @param lazyException a supplier function that provides the exception to throw if the Boolean value is true
+ * @return false if the Boolean value is false
+ * @throws Exception the exception provided by the `lazyException` supplier when the Boolean value is true
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.requireFalseOrThrow(lazyException: Transformer<Boolean, Throwable>): Boolean {
+    contract {
+        returns() implies !this@requireFalseOrThrow
+    }
+    if (this) throw lazyException(true)
+    return false
+}
+
+/**
+ * Verifies whether the invoking boolean value is `true`.
+ * If the value is `false`, it throws an exception with an optional cause.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return `true` if the invoking boolean value is `true`.
+ * @throws IllegalStateException if the invoking boolean value is `false` and no cause is provided.
+ * @throws Throwable if the invoking boolean value is `false` and a cause is provided, with its cause being initialized to an IllegalStateException.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.checkTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@checkTrue
+    }
+    if (!this) throw if (causeOf == null) IllegalStateException("Invalid state: should be true", cause?.invoke(false)) else causeOf(false).initCause(IllegalStateException("Invalid state: should be true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Checks if the boolean value is `true`. If not, throws an exception with the provided lazy message and optional cause.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage a supplier function providing the message to be used in the exception if the boolean is `false`.
+ * @return `true` if the boolean value is `true`; otherwise, an exception is thrown.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.checkTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies this@checkTrue
+    }
+    if (!this) throw if (causeOf == null) IllegalStateException(lazyMessage(false).toString(), cause?.invoke(false)) else causeOf(false).initCause(IllegalStateException(lazyMessage(false).toString(), cause?.invoke(false)))
+    return true
+}
+
+/**
+ * Ensures the boolean value is false. If the value is true, it throws an exception.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return `false` if the boolean value is false.
+ * @throws IllegalStateException if the boolean value is true. If `causeOf` is provided, it will be used as the cause for the exception, with an additional "Invalid state: should
+ *  be false" message.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.checkFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@checkFalse
+    }
+    if (this) throw if (causeOf == null) IllegalStateException("Invalid state: should be false", cause?.invoke(true)) else causeOf(true).initCause(IllegalStateException("Invalid state: should be false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Checks if the value of the Boolean is `false`. If the value is `true`, an exception is thrown.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage A supplier providing the error message for the exception if thrown.
+ * @return Returns `false` if the check passes without throwing an exception.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.checkFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies !this@checkFalse
+    }
+    if (this) throw if (causeOf == null) IllegalStateException(lazyMessage(true).toString(), cause?.invoke(true)) else causeOf(true).initCause(IllegalStateException(lazyMessage(true).toString(), cause?.invoke(true)))
+    return false
+}
+
+/**
+ * Validates whether the current Boolean value is `true`. If the value is `false`, a
+ * [ValidationFailedException] is thrown, optionally with a provided cause.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return The Boolean value `true`, if validation passes.
+ * @throws ValidationFailedException If the Boolean value is `false`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException("Value is not true.", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException("Value is not true.", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates whether the boolean value is true and throws an exception if the validation fails.
+ * This method is typically used to ensure a condition has been met, such as input validation
+ * or enforcing preconditions.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage A supplier for a custom error message. The supplier is evaluated only
+ *                    if the validation fails, allowing for delayed and potentially expensive
+ *                    computation of error messages.
+ * @return Returns `true` if the boolean value is `true`.
+ * @throws Throwable If the boolean value is `false`, throws the provided `causeOf` or a new [ValidationFailedException].
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(lazyMessage(false).toString(), cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(lazyMessage(false).toString(), cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates that the boolean value is `true`. If it is not, a `ValidationFailedException` is thrown with
+ * optional property, variable name, message, and cause details.
+ *
+ * @param property An optional `KProperty` associated with the validation process. Defaults to `null`.
+ * @param variableName An optional name of the variable being validated. Defaults to `null`.
+ * @param message An optional custom message to include in case of failure. Defaults to `null`.
+ * @param causeOf The throwable that should cause this validation failure, if applicable. Defaults to `null`.
+ * @param cause An additional throwable cause that can be associated with the validation failure. Defaults to `null`.
+ * @return Returns `true` if the boolean value is true.
+ * @throws ValidationFailedException if the boolean value is not true.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not true", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(property, variableName, message ?: "is not true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates that a boolean value is `true`. If the value is `false`, a `ValidationFailedException` is thrown.
+ *
+ * @param property the primary property being validated, or null if not applicable
+ * @param variable an optional secondary property providing additional context for the validation, or null if not applicable
+ * @param message an optional custom error message to be included in the exception, or null to use a default message
+ * @param causeOf an optional pre-existing exception to be used as the cause of the validation failure, or null to create a new exception
+ * @param cause an optional underlying cause to be attached to the generated exception, or null if no underlying cause is specified
+ * @return `true` if the validation passes (i.e., the boolean value is `true`)
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not true", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(property, variable, message ?: "is not true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates if the Boolean value is `true`. If not, it throws a `ValidationFailedException`.
+ *
+ * @param callable The Kotlin function (`KFunction`) to which the validation relates. Can be null.
+ * @param parameterName The name of the parameter in the callable that failed validation. Can be null.
+ * @param message Optional custom message to describe the validation failure. Defaults to "is not true" if not provided.
+ * @param causeOf An optional existing `Throwable` to be used as the main exception, with the validation failure as its cause. Can be null.
+ * @param cause An optional underlying cause (`Throwable`) for the validation error. Can be null.
+ * @return Returns `true` if the validation succeeds (i.e., the Boolean value is `true`).
+ * @throws ValidationFailedException If the Boolean value is `false`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not true", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(callable, parameterName, message ?: "is not true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates if the Boolean value is true. If not, throws a [ValidationFailedException] with optional detailed information.
+ *
+ * @param callable the [KFunction] associated with the validation context. Nullable if no callable is provided.
+ * @param parameter the [KParameter] representing the parameter involved in the validation context. Nullable if no parameter is provided.
+ * @param message an optional custom message to include in the exception if validation fails. Defaults to a standard message if null.
+ * @param causeOf an optional explicitly specified exception to be used as the cause of validation failure. If not null, it will be initialized with the internally created exception
+ * .
+ * @param cause an optional throwable to attach to the exception for additional context about the failure.
+ * @return true if the Boolean value is valid (true), otherwise throws a [ValidationFailedException].
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not true", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(callable, parameter, message ?: "is not true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates that the Boolean value is true. If the value is false, a `ValidationFailedException`
+ * is thrown with optional contextual information including the callable name, parameter name,
+ * custom message, or root cause.
+ *
+ * @param callableName The name of the callable (e.g., function or method) related to the validation.
+ * @param parameterName The name of the parameter being validated, or null if not applicable.
+ * @param message An optional custom message describing the validation failure.
+ * @param causeOf An optional existing `Throwable` to be enhanced with `ValidationFailedException`.
+ * @param cause An optional underlying cause for the exception, if the validation fails.
+ * @return Returns true if the validation passes.
+ * @throws ValidationFailedException if the Boolean value is false and validation fails.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not true", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not true", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates whether the Boolean instance is `true`. If not, a [ValidationFailedException] is thrown.
+ *
+ * @param callableName The name of the callable (e.g., function or property) associated with the validation, or null if not applicable.
+ * @param parameter The parameter (represented as a [KParameter]) related to the validation, or null if not applicable.
+ * @param message An optional error message providing additional details. If not provided, a default message is used.
+ * @param causeOf An optional already-existing [Throwable] used as the main exception being thrown, which may also chain a new [ValidationFailedException] as its cause.
+ * @param cause An optional cause to provide additional context for chaining in the exception. This is passed to the [ValidationFailedException].
+ * @return `true` if the validation succeeds (i.e., the Boolean is `true`).
+ * @throws ValidationFailedException If the Boolean is `false`, with additional context provided by parameters.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateTrue(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@validateTrue
+    }
+    if (!this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not true", cause?.invoke(false)) else causeOf(false).initCause(ValidationFailedException(callableName, parameter, message ?: "is not true", cause?.invoke(false)))
+    return true
+}
+
+/**
+ * Validates that the boolean value is false. If the value is true, throws a [ValidationFailedException].
+ * Optionally, a specific cause can be provided, which will be linked to the thrown exception.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return Always returns false if no exception is thrown.
+ * @throws ValidationFailedException if the boolean value is true.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException("Value is not false.", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException("Value is not false.", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the receiver boolean is `false`. If the boolean is `true`, a validation exception is thrown.
+ *
+ * The exception thrown can be a custom one provided via the `causeOf` parameter or a default
+ * `ValidationFailedException` with a message generated from the `lazyMessage` supplier.
+ * This method is typically used for invariant checks where `false` indicates a valid state.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage A lambda supplying the error message for the validation exception.
+ *                    The message is only computed if an exception is about to be thrown.
+ * @return Always returns `false` if the receiver boolean is `false`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(lazyMessage(true).toString(), cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(lazyMessage(true).toString(), cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the Boolean value is `false`.
+ *
+ * If the value is `true`, this method throws a [ValidationFailedException].
+ *
+ * @param property The property associated with the validation, which can be used to provide additional context
+ *                 in the validation error message. Can be `null` if not applicable.
+ * @param variableName Optional name of the variable being validated. If specified, it will be included in the
+ *                     validation error message. Defaults to `null`.
+ * @param message Custom error message describing the validation failure. If not provided, a default message
+ *                "is not false" is used.
+ * @param causeOf An optional throwable to use as the root cause of the exception. If provided, it will be
+ *                initialized with a [ValidationFailedException] that encapsulates validation details.
+ * @param cause An optional throwable representing an additional cause of the exception, or `null` if not applicable.
+ * @return `true` if the value is validated as `false`. If the value is `true`, an exception is thrown instead.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not false", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(property, variableName, message ?: "is not false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates whether the boolean receiver is `false`.
+ * If the receiver is `true`, a `ValidationFailedException` is thrown.
+ *
+ * @param property The main KProperty associated with the validation failure, or null if not specified.
+ * @param variable An optional secondary KProperty that provides additional context, or null if not specified.
+ * @param message An optional message providing additional details about the validation failure. Defaults to "is not false" if null.
+ * @param causeOf A pre-existing throwable to chain as a cause. If specified, it will be initialized with a `ValidationFailedException`.
+ * @param cause An optional underlying cause of the exception.
+ * @return Returns `true` if the receiver is `false`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not false", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(property, variable, message ?: "is not false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the boolean value is `false`. If the boolean value is `true`, a `ValidationFailedException`
+ * is thrown with the given parameters.
+ *
+ * @param callable The Kotlin function (`KFunction`) to which the validation error is related. Can be null.
+ * @param parameterName The optional parameter name from the callable that caused the validation issue. Can be null.
+ * @param message An optional custom message providing details about the validation failure. Default message is "is not false".
+ * @param causeOf The optional existing exception that caused the validation failure. The exception will wrap the validation exception.
+ * @param cause The optional underlying cause for the validation failure represented as a `Throwable`.
+ * @return Returns `true` if the validation passes, i.e., the boolean value is `false`.
+ *
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not false", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(callable, parameterName, message ?: "is not false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the Boolean value is `false`. If the value is `true`, it throws a `ValidationFailedException`.
+ *
+ * @param callable an optional [KFunction] that provides context about the function where the validation occurs
+ * @param parameter an optional [KParameter] representing the parameter involved in the validation
+ * @param message an optional custom message describing the validation failure
+ * @param causeOf an optional [Throwable] that will serve as the cause of the exception if provided
+ * @param cause an optional [Throwable] that provides additional context for the validation failure
+ * @return `true` if the validation succeeds (i.e., the Boolean value is `false`)
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not false", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(callable, parameter, message ?: "is not false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the current Boolean value is `false`. If the value is `true`, a `ValidationFailedException`
+ * is thrown with the specified details.
+ *
+ * @param callableName the name of the callable (e.g., function or method) related to the validation failure
+ * @param parameterName the name of the parameter being validated, or null if not specified
+ * @param message an optional custom message to include in the exception if validation fails
+ * @param causeOf an optional `Throwable` to be used as the root cause of the exception if validation fails
+ * @param cause an optional additional `Throwable` providing extra context for the exception
+ * @return `true` if validation passes (i.e., the Boolean value is `false`)
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not false", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not false", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the Boolean value is `false`.
+ *
+ * Throws a [ValidationFailedException] if the Boolean value is `true`.
+ *
+ * @param callableName The name of the callable (e.g., function or property) where the validation occurs, or null if not specified.
+ * @param parameter The [KParameter] representing the parameter related to the validation, or null if not applicable.
+ * @param message An optional error message providing additional context for the validation failure.
+ * @param causeOf The initial cause of the validation failure, which may be another [Throwable], or null if not specified.
+ * @param cause An optional additional cause for the exception, or null if not applicable.
+ * @return `true` if the validation succeeds (i.e., the Boolean is `false`); otherwise, throws an exception.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.validateFalse(callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@validateFalse
+    }
+    if (this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not false", cause?.invoke(true)) else causeOf(true).initCause(ValidationFailedException(callableName, parameter, message ?: "is not false", cause?.invoke(true)))
+    return false
+}
+
+/**
+ * Verifies that the current `Boolean` value is `true`. If the value is `false`, an exception is thrown.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return The `Boolean` value, which will always be `true` if no exception is thrown.
+ * @throws ExpectationMismatchException if the value is `false` and no cause is provided.
+ * @throws Throwable if the value is `false` and a non-null `causeOf` is provided.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException("Value was expected to be true, but was ${false}.", cause?.invoke(false)) else causeOf(false).initCause(ExpectationMismatchException("Value was expected to be true, but was ${false}.", cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates that the Boolean value is `true`. If the value is `false`, throws an `ExpectationMismatchException`
+ * with an optional cause or a custom message provided by the `lazyMessage` supplier.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage A supplier providing the error message to be used in the exception if the validation fails.
+ * @return Returns `true` if the boolean value is `true`.
+ * @throws ExpectationMismatchException If the boolean value is `false` and no `causeOf` is provided.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(false).toString(), cause?.invoke(false)) else causeOf(false).initCause(ExpectationMismatchException(lazyMessage(false).toString(), cause?.invoke(false)))
+    return true
+}
+/**
+ * Validates that the `Boolean` value is `true`, throwing an exception if the value is `false`.
+ *
+ * This function checks whether the `Boolean` instance it is invoked on is `true`. If the value
+ * is `false`, it throws an `ExpectationMismatchException` with optional details about the
+ * property or variable associated with the validation, expected value, and actual value:
+ * - If `causeOf` is provided, it will be used as the exception thrown, initialized with the
+ *   `ExpectationMismatchException` as its cause.
+ * - Otherwise, an `ExpectationMismatchException` is directly thrown.
+ *
+ * @param property An optional reflection-based property reference used to provide contextual
+ *                 information about the property involved in the expectation mismatch.
+ * @param variableName An optional name of the variable being validated, used for more human-readable error messages.
+ * @param causeOf An optional `Throwable` provided as the primary exception cause if validation fails.
+ * @param cause An optional additional `Throwable` representing a secondary cause of the failure.
+ * @return Always returns `true` if the validation passes, as the input `Boolean` is expected to be `true`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(property: KProperty<*>?, variableName: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(property, variableName,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ) else causeOf(false).initCause(ExpectationMismatchException(property, variableName,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ))
+    return true
+}
+/**
+ * Asserts that the boolean receiver is `true`. If not, throws an `ExpectationMismatchException`
+ * or optionally another specified `Throwable`.
+ *
+ * @param property the primary `KProperty` involved in the expectation, or null if not applicable
+ * @param variable an optional secondary `KProperty` related to the expectation, or null if not applicable
+ * @param causeOf an optional `Throwable` to be thrown instead of `ExpectationMismatchException`, or null if not applicable
+ * @param cause an optional cause passed to the `ExpectationMismatchException`, or null if not applicable
+ * @return true if the receiver is `true`; otherwise, an exception is thrown
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(property, variable,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ) else causeOf(false).initCause(ExpectationMismatchException(property, variable,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ))
+    return true
+}
+/**
+ * Ensures that the Boolean receiver is true, throwing an `ExpectationMismatchException`
+ * if it is false. This function is useful for validating expectations in contexts where
+ * a specific condition must be met.
+ *
+ * @param callable The Kotlin function related to the expectation being validated.
+ *                 Can be `null` if the context of the callable is not available.
+ * @param parameterName The name of the parameter being checked, if applicable. Can be `null`.
+ * @param causeOf A specific throwable to be used as the cause of the exception
+ *                if the expectation fails. Can be `null`.
+ * @param cause The underlying cause of the exception. Can be `null`.
+ * @return `true` if the Boolean receiver is true. If the receiver is false, an exception is thrown.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(callable: KFunction<*>?, parameterName: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ) else causeOf(false).initCause(ExpectationMismatchException(callable, parameterName,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ))
+    return true
+}
+/**
+ * Ensures that the Boolean value is true; otherwise, throws an `ExpectationMismatchException`
+ * with the provided details about the callable, parameter, and optional causes.
+ *
+ * This function is intended to be used for assertions or validation and leverages Kotlin contracts
+ * to imply the Boolean value is true in its scope, allowing for smarter compiler optimizations.
+ *
+ * @param callable the callable function where this expectation is being checked; can be null
+ * @param parameter the parameter or property being asserted; can be null
+ * @param causeOf an optional throwable that is the direct cause of this exception, or null
+ * @param cause an optional throwable that provides additional context for the exception, or null
+ * @return true if the Boolean value is true; otherwise, the method throws an exception and does not return
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(callable: KFunction<*>?, parameter: KParameter?, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(callable, parameter,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ) else causeOf(false).initCause(ExpectationMismatchException(callable, parameter,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ))
+    return true
+}
+/**
+ * Verifies that the Boolean value is `true`. If the value is `false`, an `ExpectationMismatchException` is thrown
+ * with detailed information about the failed expectation.
+ *
+ * @param callableName the name of the callable in which the expectation check is performed, or `null` if unavailable
+ * @param parameterName the name of the parameter involved in the expectation check, or `null` if unavailable
+ * @param causeOf an optional `Throwable` to indicate the initial cause of the exception, which will be used as the root cause
+ * @param cause the underlying cause for the exception, or `null` if there is no additional cause
+ * @return `true` if the Boolean value is `true`
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(callableName: String?, parameterName: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ) else causeOf(false).initCause(ExpectationMismatchException(callableName, parameterName,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ))
+    return true
+}
+/**
+ * Asserts that the Boolean value is `true`. If the value is `false`, an exception is thrown.
+ * This method is used to enforce expectations programmatically.
+ *
+ * @param callableName The name of the callable function or property being evaluated, or null.
+ * @param parameter The property whose expected value is being compared, or null.
+ * @param causeOf The primary cause of the exception, if available, or null.
+ * @param cause An optional secondary cause to attach to the exception, or null.
+ * @return The value `true` if the assertion passes.
+ * @throws ExpectationMismatchException if the Boolean value is `false`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectTrue(callableName: String?, parameter: KParameter?, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies this@expectTrue
+    }
+    if (!this) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ) else causeOf(false).initCause(ExpectationMismatchException(callableName, parameter,
+        expectation = true,
+        value = false,
+        cause = cause?.invoke(false)
+    ))
+    return true
+}
+
+/**
+ * Verifies that the Boolean value is `false`.
+ * If the value is `true`, an exception is thrown.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @return Returns `false` if the value is already `false`.
+ * @throws ExpectationMismatchException if the Boolean value is `true`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException("Value was expected to be false, but was ${true}.", cause?.invoke(true)) else causeOf(true).initCause(ExpectationMismatchException("Value was expected to be false, but was ${true}.", cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the current Boolean value is `false`. If the value is `true`,
+ * an `ExpectationMismatchException` is thrown with a custom message provided
+ * by the supplied lazy message.
+ *
+ * @param causeOf an optional throwable to be used as the main exception, or `null`
+ *                to use the standard situation as exception
+ * @param cause An optional underlying exception to include in the thrown exception. Defaults to null.
+ * @param lazyMessage A `Supplier` that provides a message describing the expectation mismatch,
+ * which is invoked only when the exception is thrown.
+ * @return Returns `false`, indicating the current value meets the expectation.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null, lazyMessage: Transformer<Boolean, Any>): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(true).toString(), cause?.invoke(true)) else causeOf(true).initCause(ExpectationMismatchException(lazyMessage(true).toString(), cause?.invoke(true)))
+    return false
+}
+/**
+ * Validates that the boolean calling this method is `false`. If the value is `true`, an
+ * `ExpectationMismatchException` is thrown. This method utilizes Kotlin contracts to specify
+ * that if the method returns successfully, the boolean value is guaranteed to be `false`.
+ *
+ * @param property An optional `KProperty` representing the property being validated,
+ * providing additional metadata about the evaluation.
+ * @param variableName An optional `String` representing the name of the variable being validated.
+ *                     This is useful for detailed error reporting in case of mismatches.
+ * @param causeOf An optional `Throwable` which can override or wrap the default exception.
+ *                This allows additional context to be attached to the error.
+ * @param cause An optional `Throwable` representing the root cause of the error, which is
+ *              passed to the `ExpectationMismatchException` for detailed error chains.
+ * @return Always returns `false` when the current boolean value is `false`.
+ * @throws ExpectationMismatchException If the current boolean value is `true`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(property: KProperty<*>?, variableName: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(property, variableName,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ) else causeOf(true).initCause(ExpectationMismatchException(property, variableName,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ))
+    return false
+}
+/**
+ * Verifies that the boolean value is `false`. If the value is `true`, an `ExpectationMismatchException`
+ * is thrown with optional details about the mismatch.
+ *
+ * @param property The primary `KProperty` associated with the expectation, or `null` if no property is involved.
+ * @param variable An optional secondary `KProperty` associated with the expectation, or `null` if not applicable.
+ * @param causeOf An optional `Throwable` representing the root cause of the exception, or `null` if not applicable.
+ * @param cause An optional `Throwable` providing additional context for the exception, or `null` if not applicable.
+ * @return Always returns `false` if the boolean value is validated successfully.
+ * @throws ExpectationMismatchException if the boolean value is `true`. The exception will include details from
+ * the provided `property`, `variable`, `expectation`, and `cause` parameters.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(property: KProperty<*>?, variable: KProperty<*>?, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(property, variable,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ) else causeOf(true).initCause(ExpectationMismatchException(property, variable,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ))
+    return false
+}
+/**
+ * Ensures that the receiver Boolean value is `false`. If it evaluates to `true`,
+ * an `ExpectationMismatchException` is thrown with the provided context details.
+ *
+ * @param callable The Kotlin function which contains the parameter being checked. Can be `null` if not applicable.
+ * @param parameterName The name of the parameter being validated. Can be `null` if the name is not available.
+ * @param causeOf An optional pre-existing throwable to be used as the root cause, instead of creating a new exception.
+ * @param cause The underlying cause of the failure. Can be `null`.
+ * @return Always returns `false` if the receiver is `false`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(callable: KFunction<*>?, parameterName: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ) else causeOf(true).initCause(ExpectationMismatchException(callable, parameterName,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ))
+    return false
+}
+/**
+ * Asserts that the receiver Boolean value is `false`. If the value is `true`, it throws an
+ * `ExpectationMismatchException` with detailed information about the callable function, its parameter,
+ * the expected value, the actual value, and an optional cause.
+ *
+ * This method is useful for enforcing expectations and signaling mismatches in program logic.
+ *
+ * @param callable the function in which the expectation mismatch is being checked, or null if not applicable
+ * @param parameter the property or parameter related to the expectation, or null if not applicable
+ * @param causeOf an optional throwable that caused this mismatch, or null if not applicable
+ * @param cause an optional additional throwable cause, or null if not applicable
+ * @return always returns `false` if the receiver is `false`
+ * @throws ExpectationMismatchException if the receiver Boolean value is `true`
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(callable: KFunction<*>?, parameter: KParameter?, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(callable, parameter,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ) else causeOf(true).initCause(ExpectationMismatchException(callable, parameter,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ))
+    return false
+}
+/**
+ * Verifies that the boolean value is `false`. If the boolean value is `true`,
+ * an `ExpectationMismatchException` is thrown with the provided context details.
+ *
+ * @param callableName the name of the callable where the check is performed, or `null` if unavailable
+ * @param parameterName the name of the parameter being checked, or `null` if unavailable
+ * @param causeOf a specific cause of the failure, or `null` if no specific cause is provided
+ * @param cause an additional throwable cause to detail the failure, or `null` if no such cause exists
+ * @return `false` if the boolean value is already false
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(callableName: String?, parameterName: String? = null, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ) else causeOf(true).initCause(ExpectationMismatchException(callableName, parameterName,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ))
+    return false
+}
+/**
+ * Ensures that the boolean value is `false`, throwing an exception if the value is `true`.
+ *
+ * This function is used to validate that a given boolean condition is `false`. If the condition is not met,
+ * an `ExpectationMismatchException` is thrown, providing detailed information about the callable name,
+ * relevant parameter, and the mismatch.
+ *
+ * @param callableName The name of the callable function or property being evaluated, or null if not specified.
+ * @param parameter The property whose expected value is being compared, or null if not applicable.
+ * @param causeOf An optional throwable that serves as the primary cause or context for the failure, or null.
+ * @param cause The underlying cause of the exception, or null if no specific cause is specified.
+ * @return Always returns `false` if no exception is thrown.
+ * @throws ExpectationMismatchException If the boolean value is `true`.
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+fun Boolean.expectFalse(callableName: String?, parameter: KParameter?, causeOf: Transformer<Boolean, Throwable>? = null, cause: Transformer<Boolean, Throwable>? = null): Boolean {
+    contract {
+        returns() implies !this@expectFalse
+    }
+    if (this) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ) else causeOf(true).initCause(ExpectationMismatchException(callableName, parameter,
+        expectation = false,
+        value = true,
+        cause = cause?.invoke(true)
+    ))
+    return false
+}

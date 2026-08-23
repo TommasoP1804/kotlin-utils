@@ -80,7 +80,7 @@ val <T : Any> T.memberPropertiesNames: Set<String> get() = this::class.memberPro
  * @since 3.10.0
  */
 @get:JvmName("memberPropertiesNamesKClass")
-val KClass<*>.memberPropertiesNames: Set<String> get() = this.memberProperties
+val KClass<*>.memberPropertiesNames: Set<String> get() = memberProperties
     .filter { it.visibility == KVisibility.PUBLIC }
     .map { it.name }
     .toSet()

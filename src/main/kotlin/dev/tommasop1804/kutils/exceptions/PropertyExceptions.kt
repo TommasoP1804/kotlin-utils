@@ -6,10 +6,7 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.EMPTY
-import dev.tommasop1804.kutils.isNotNull
-import dev.tommasop1804.kutils.isNotNullOrEmpty
-import dev.tommasop1804.kutils.ownerClass
+import dev.tommasop1804.kutils.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -40,7 +37,7 @@ abstract class PropertyException : IllegalStateException {
      * @param message An optional message detailing the reason for the exception.
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>?, message: String? = null) : super((if (property.isNotNull() || message.isNotNull()) "Property" else String.EMPTY) + if (property.isNotNull()) $$" `$${property.ownerClass?.simpleName}`$`$${property.name}` of type `$${property.returnType}`" else String.EMPTY + {if (message.isNotNullOrEmpty()) " $message" else ""})
+    constructor(property: KProperty<*>?, message: String? = null) : super((if (property != null || message != null) "Property" else String.EMPTY) + if (property != null) $$" `$${property.ownerClass?.simpleName}`$`$${property.name}` of type `$${property.returnType}`" else String.EMPTY + {if (message.isNotNullOrEmpty) " $message" else ""})
     /**
      * Constructs a new instance of the exception with the specified detail message.
      *
@@ -283,7 +280,7 @@ class PropertyNotFoundException : PropertyException {
      * @param `class` The name of the class where the property was expected to be found.
      * @since 1.0.0
      */
-    constructor(propertyName: String, `class`: String? = null) : super($$"Property `$${propertyName}`" + (if (`class`.isNotNull()) " of class `$${`class`}`" else String.EMPTY) + " not found")
+    constructor(propertyName: String, `class`: String? = null) : super($$"Property `$${propertyName}`" + (if (`class` != null) " of class `$${`class`}`" else String.EMPTY) + " not found")
     /**
      * Constructs a new `PropertyNotFoundException` with a message indicating that
      * the specified property of the given class could not be found.

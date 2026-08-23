@@ -281,7 +281,7 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<Point?, String?> {
             override fun convertToDatabaseColumn(attribute: Point?) = attribute?.toSimpleString()
-            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse(dbData).getOrThrow()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
     }
 

@@ -15,49 +15,16 @@ import org.slf4j.event.Level
 import kotlin.reflect.KClass
 
 /**
- * An interface providing a logger instance for the implementing class.
- * Classes implementing this interface can use the predefined `logger` property
- * to log information, warnings, or errors. The logger is automatically associated
- * with the class or its enclosing class in the case of nested structures.
- * @author Tommaso Pastorelli
- * @since 4.8.0
- */
-interface Loggable {
-    /**
-     * Provides a logger instance for the implementing class.
-     * The logger is initialized using the enclosing class if available,
-     * or the actual class if no enclosing class is present. This ensures
-     * that the log output corresponds to the specific class using the logger.
-     * @since 4.8.0
-     */
-    val logger: Logger get() {
-        val javaClass = this::class.java
-        val clazz = javaClass.enclosingClass ?: javaClass
-        return LoggerFactory.getLogger(clazz)
-    }
-
-    /**
-     * A logger instance specific to the runtime class of the current object.
-     * This logger is initialized with the exact runtime class of the object,
-     * regardless of whether it is nested or not. It ensures that log messages
-     * are tagged with the most precise class context.
-     * @since 4.8.0
-     */
-    val loggerOfThis: Logger get() = LoggerFactory.getLogger(this::class.java)
-}
-
-/**
  * Represents different levels of logging severity.
  * Each log level is associated with an integer value and a string name.
  *
  * @param levelInt The integer representation of the log level.
- * @param levelName The string name of the log level.
  *
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
 @MustUseReturnValues
-enum class LogLevel(val levelInt: Int, val levelName: String) {
+enum class LogLevel(val levelInt: Int) {
     /**
      * Represents the error logging level.
      *
@@ -66,14 +33,14 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * @since 4.0.0
      */
-    Error(40, "ERROR"),
+    Error(40),
     /**
      * Represents the WARN log level, commonly used to indicate potentially harmful situations
      * that may require attention but are not immediately critical.
-     * 
+     *
      * @since 4.0.0
      */
-    Warn(30, "WARN"),
+    Warn(30),
     /**
      * Represents the INFO log level with a severity integer value of 20 and a name "INFO".
      *
@@ -81,14 +48,14 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * @since 4.0.0
      */
-    Info(20, "INFO"),
+    Info(20),
     /**
-     * Represents the DEBUG log level, typically used for detailed diagnostic messages 
+     * Represents the DEBUG log level, typically used for detailed diagnostic messages
      * that are useful during software development and debugging.
-     * 
+     *
      * @since 4.0.0
      */
-    Debug(10, "DEBUG"),
+    Debug(10),
     /**
      * Represents the TRACE logging level with the lowest severity.
      *
@@ -97,7 +64,18 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
      *
      * @since 4.0.0
      */
-    Trace(0, "TRACE");
+    Trace(0);
+
+    /**
+     * The name of the logging level represented as an uppercase string.
+     *
+     * This property holds the string designation of a logging level
+     * and is derived by applying the unary plus operator to a base name.
+     * It is typically used to identify or represent the current logging level
+     * in a readable and consistent format across various logging frameworks.
+     * @since 1.0.0
+     */
+    val levelName: String = +name
 
     /**
      * Returns the string representation of the `LogLevel` instance.
@@ -113,7 +91,7 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
     /**
      * Converts the current `LogLevel` instance to its corresponding SLF4J `Level`.
      *
-     * Uses the `levelName` property of the `LogLevel` enum to match and retrieve 
+     * Uses the `levelName` property of the `LogLevel` enum to match and retrieve
      * the associated SLF4J logging level.
      *
      * @return The corresponding `Level` from SLF4J for the current `LogLevel` instance.
@@ -134,6 +112,17 @@ enum class LogLevel(val levelInt: Int, val levelName: String) {
 }
 
 /**
+ * Extension property for obtaining a logger instance associated with the current class.
+ *
+ * This property uses the class metadata to create a logger via the LoggerFactory,
+ * enabling structured logging specific to the context of the invoking class.
+ *
+ * The logger can be used for various levels of logging, such as debug, info,
+ * warn, error, or trace, providing a unified and consistent logging mechanism.
+ */
+val KClass<*>.logger: Logger get() = LoggerFactory.getLogger(java)
+
+/**
  * Creates a new Logger instance with the specified name.
  *
  * @param name The name of the logger to be created.
@@ -148,6 +137,7 @@ fun Logger(name: String): Logger = LoggerFactory.getLogger(name)
  * @return A Logger instance associated with the specified class.
  * @since 1.0.0
  */
+@Deprecated("Use Logger<Class> instead", ReplaceWith("Logger<`class`>()"))
 fun Logger(`class`: KClass<*>): Logger = LoggerFactory.getLogger(`class`.java)
 /**
  * Provides a logger instance for the specified class type.
@@ -199,11 +189,11 @@ inline fun <reified T> T.log(level: LogLevel, message: Any? = null, throwable: T
  * @since 1.0.0
  */
 fun log(logger: Logger, level: LogLevel, message: Any?, throwable: Throwable) = when (level) {
-    LogLevel.Trace -> logger.trace(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.Debug -> logger.debug(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.Info -> logger.info(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.Warn -> logger.warn(message?.toString() ?: String.EMPTY, throwable)
-    LogLevel.Error -> logger.error(message?.toString() ?: String.EMPTY, throwable)
+    LogLevel.Trace -> logger.trace(message?.toString().orEmpty(), throwable)
+    LogLevel.Debug -> logger.debug(message?.toString().orEmpty(), throwable)
+    LogLevel.Info -> logger.info(message?.toString().orEmpty(), throwable)
+    LogLevel.Warn -> logger.warn(message?.toString().orEmpty(), throwable)
+    LogLevel.Error -> logger.error(message?.toString().orEmpty(), throwable)
 }
 /**
  * Logs a message at the specified log level using the provided logger.
@@ -223,8 +213,8 @@ fun log(logger: Logger, level: LogLevel, message: Any) = when (level) {
 /**
  * Logs a message with the specified logging level within the context of a `Logger` instance.
  *
- * This method serves as a contextual extension that allows seamless logging by infixing 
- * a `LogLevel` object with a message. The method requires a current `Logger` to be 
+ * This method serves as a contextual extension that allows seamless logging by infixing
+ * a `LogLevel` object with a message. The method requires a current `Logger` to be
  * available in the context through the `logger` receiver.
  *
  * @param message The content or object to log at the specified logging level.
@@ -295,11 +285,11 @@ inline fun <reified T> T.logIf(condition: Boolean, level: LogLevel, message: Any
 fun logIf(condition: Boolean, logger: Logger, level: LogLevel, message: Any?, throwable: Throwable) {
     if (condition) {
         when (level) {
-            LogLevel.Trace -> logger.trace(message?.toString() ?: String.EMPTY, throwable)
-            LogLevel.Debug -> logger.debug(message?.toString() ?: String.EMPTY, throwable)
-            LogLevel.Info -> logger.info(message?.toString() ?: String.EMPTY, throwable)
-            LogLevel.Warn -> logger.warn(message?.toString() ?: String.EMPTY, throwable)
-            LogLevel.Error -> logger.error(message?.toString() ?: String.EMPTY, throwable)
+            LogLevel.Trace -> logger.trace(message?.toString().orEmpty(), throwable)
+            LogLevel.Debug -> logger.debug(message?.toString().orEmpty(), throwable)
+            LogLevel.Info -> logger.info(message?.toString().orEmpty(), throwable)
+            LogLevel.Warn -> logger.warn(message?.toString().orEmpty(), throwable)
+            LogLevel.Error -> logger.error(message?.toString().orEmpty(), throwable)
         }
     }
 }
@@ -347,6 +337,16 @@ fun LogLevel.logIf(condition: Boolean, message: Any) {
 @JvmName("logIfAnyReceiver")
 fun <T> T.logIf(condition: Boolean, logger: Logger, level: LogLevel) = apply { if (condition) log(logger, level, toString()) }
 /**
+ * Applies a given predicate to the current instance and logs a message using the provided logger if the predicate evaluates to true.
+ *
+ * @param predicate A function that takes the current instance as a parameter and returns a boolean indicating whether the log should occur.
+ * @param logger An instance of the logger used to log messages.
+ * @param level The severity level of the log (e.g., TRACE, DEBUG, INFO, WARN, or ERROR).
+ * @since 5.0.0
+ */
+@JvmName("logIfAnyReceiver")
+fun <T> T.logIf(predicate: Predicate<T>, logger: Logger, level: LogLevel) = apply { if (predicate(this)) log(logger, level, toString()) }
+/**
  * Logs the current object if the specified condition is met, and returns the object itself.
  *
  * This function enables logging based on a condition, for the severity level specified.
@@ -360,3 +360,13 @@ fun <T> T.logIf(condition: Boolean, logger: Logger, level: LogLevel) = apply { i
 @JvmName("logIfAnyReceiverContext")
 context(logger: Logger)
 fun <T> T.logIf(condition: Boolean, level: LogLevel) = apply { if (condition) log(logger, level, toString()) }
+/**
+ * Logs the current object if it satisfies the given predicate, using the specified log level.
+ *
+ * @param predicate A condition function that determines whether the current object should be logged.
+ * @param level The logging severity level at which the object should be logged if the predicate evaluates to true.
+ * @since 5.0.0
+ */
+@JvmName("logIfAnyReceiverContext")
+context(logger: Logger)
+fun <T> T.logIf(predicate: Predicate<T>, level: LogLevel) = apply { if (predicate(this)) log(logger, level, toString()) }

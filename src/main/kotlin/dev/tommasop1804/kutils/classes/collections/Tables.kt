@@ -503,7 +503,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     val sizeNotNull: Int
-        get() = cells.filter { it.value.isNotNull() }.size
+        get() = cells.filter { it.value != null }.size
     /**
      * A collection of distinct row keys present in the table, representing all unique rows defined by the cells.
      * The row keys are derived from the `rowKey` property of each cell in the table.
@@ -596,7 +596,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             val rows = mutableListOf<R>()
             rowKeys.forEach { rowKey ->
                 val all = cells.filter { it.rowKey == rowKey }
-                if (all.size == all.filter { it.value.isNotNull() }.size) rows.add(rowKey)
+                if (all.size == all.filter { it.value != null }.size) rows.add(rowKey)
             }
             return rows
         }
@@ -615,7 +615,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             val columns = mutableListOf<C>()
             columnKeys.forEach { columnKey ->
                 val all = cells.filter { it.columnKey == columnKey }
-                if (all.size == all.filter { it.value.isNotNull() }.size) columns.add(columnKey)
+                if (all.size == all.filter { it.value != null }.size) columns.add(columnKey)
             }
             return columns
         }
@@ -632,7 +632,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     val emptyCells: List<Cell<R, C, V?>>
-        get() = cells.filter { it.value.isNull() }
+        get() = cells.filter { it.value == null }
     /**
      * A computed property that provides a list of row keys where all corresponding cell values are null.
      *
@@ -647,7 +647,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             val rows = mutableListOf<R>()
             rowKeys.forEach { rowKey ->
                 val all = cells.filter { it.rowKey == rowKey }
-                if (all.size == all.filter { it.value.isNull() }.size) rows.add(rowKey)
+                if (all.size == all.filter { it.value == null }.size) rows.add(rowKey)
             }
             return rows
         }
@@ -667,7 +667,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
             val columns = mutableListOf<C>()
             columnKeys.forEach { columnKey ->
                 val all = cells.filter { it.columnKey == columnKey }
-                if (all.size == all.filter { it.value.isNull() }.size) columns.add(columnKey)
+                if (all.size == all.filter { it.value == null }.size) columns.add(columnKey)
             }
             return columns
         }
@@ -965,7 +965,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
         val alreadyTaken = mutableListOf<Cell<R, C, V?>>()
         _entries2.forEach { cell ->
             val old: Cell<R, C, V?>? = alreadyTaken.rForEach { if (it.sameKeys(cell)) breakLoop(it) }
-            if (old.isNotNull()) _entries.remove(old)
+            if (old != null) _entries.remove(old)
             alreadyTaken.add(cell)
         }
         val sortedEntries = _entries.sortedWith(
@@ -1209,7 +1209,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     @Suppress("UNCHECKED_CAST")
-    fun getFromRowNotNull(rowKey: R): Map<C, V> = getFromRow(rowKey).filterValues { it.isNotNull() } as Map<C, V>
+    fun getFromRowNotNull(rowKey: R): Map<C, V> = getFromRow(rowKey).filterValues { it != null } as Map<C, V>
 
     /**
      * Retrieves a map of row keys to their associated values for a specified column key.
@@ -1229,7 +1229,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @since 1.0.0
      */
     @Suppress("UNCHECKED_CAST")
-    fun getFromColumnNotNull(columnKey: C): Map<R, V> = getFromColumn(columnKey).filterValues { it.isNotNull() } as Map<R, V>
+    fun getFromColumnNotNull(columnKey: C): Map<R, V> = getFromColumn(columnKey).filterValues { it != null } as Map<R, V>
 
     /**
      * Generates a string representation of the table, formatted in a structured and visually readable way.
@@ -1368,7 +1368,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val sizeNotNull: Int
-        get() = cells.filter { it.value.isNotNull() }.size
+        get() = cells.filter { it.value != null }.size
     /**
      * Provides a distinct list of all row keys present within the table.
      * The row keys are extracted from the underlying cells of the table and
@@ -1461,7 +1461,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
             val rows = mutableListOf<R>()
             rowKeys.forEach { rowKey ->
                 val all = cells.filter { it.rowKey == rowKey }
-                if (all.size == all.filter { it.value.isNotNull() }.size) rows.add(rowKey)
+                if (all.size == all.filter { it.value != null }.size) rows.add(rowKey)
             }
             return rows
         }
@@ -1480,7 +1480,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
             val columns = mutableListOf<C>()
             columnKeys.forEach { columnKey ->
                 val all = cells.filter { it.columnKey == columnKey }
-                if (all.size == all.filter { it.value.isNotNull() }.size) columns.add(columnKey)
+                if (all.size == all.filter { it.value != null }.size) columns.add(columnKey)
             }
             return columns
         }
@@ -1494,7 +1494,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     val emptyCells: List<MCell<R, C, V?>>
-        get() = cells.filter { it.value.isNull() }
+        get() = cells.filter { it.value == null }
     /**
      * Provides a list of row keys where all their corresponding cell values are null.
      *
@@ -1511,7 +1511,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
             val rows = mutableListOf<R>()
             rowKeys.forEach { rowKey ->
                 val all = cells.filter { it.rowKey == rowKey }
-                if (all.size == all.filter { it.value.isNull() }.size) rows.add(rowKey)
+                if (all.size == all.filter { it.value == null }.size) rows.add(rowKey)
             }
             return rows
         }
@@ -1530,7 +1530,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
             val columns = mutableListOf<C>()
             columnKeys.forEach { columnKey ->
                 val all = cells.filter { it.columnKey == columnKey }
-                if (all.size == all.filter { it.value.isNull() }.size) columns.add(columnKey)
+                if (all.size == all.filter { it.value == null }.size) columns.add(columnKey)
             }
             return columns
         }
@@ -1816,7 +1816,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
         val alreadyTaken = mutableListOf<MCell<R, C, V?>>()
         _entries2.forEach { cell ->
             val old: MCell<R, C, V?>? = alreadyTaken.rForEach { if (it.sameKeys(cell)) breakLoop(it) }
-            if (old.isNotNull()) _entries.remove(old)
+            if (old != null) _entries.remove(old)
             alreadyTaken.add(cell)
         }
         val sortedEntries = _entries.sortedWith(
@@ -2059,7 +2059,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     @Suppress("UNCHECKED_CAST")
-    fun getFromRowNotNull(rowKey: R): Map<C, V> = getFromRow(rowKey).filterValues { it.isNotNull() } as Map<C, V>
+    fun getFromRowNotNull(rowKey: R): Map<C, V> = getFromRow(rowKey).filterValues { it != null } as Map<C, V>
 
     /**
      * Retrieves a map of row keys to their corresponding values for a given column key.
@@ -2081,7 +2081,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @since 1.0.0
      */
     @Suppress("UNCHECKED_CAST")
-    fun getFromColumnNotNull(columnKey: C): Map<R, V> = getFromColumn(columnKey).filterValues { it.isNotNull() } as Map<R, V>
+    fun getFromColumnNotNull(columnKey: C): Map<R, V> = getFromColumn(columnKey).filterValues { it != null } as Map<R, V>
 
     /**
      * Associates the specified value with the specified pair of keys in this structure.
@@ -2534,7 +2534,7 @@ val Table<*, *, *>?.isNotNullOrEmpty: Boolean
         contract {
             returns(true) implies (this@isNotNullOrEmpty != null)
         }
-        return isNotNull() && this.isNotEmpty
+        return this != null && this.isNotEmpty
     }
 /**
  * Checks if a nullable `Table<R, C, V>` is either null or empty.
@@ -2553,7 +2553,7 @@ val Table<*, *, *>?.isNullOrEmpty: Boolean
     contract {
         returns(false) implies (this@isNullOrEmpty != null)
     }
-    return isNull() || this.isEmpty
+    return this == null || this.isEmpty
 }
 
 /**
@@ -2572,7 +2572,7 @@ operator fun <R, C, V> Table<R, C, V>?.not(): Boolean {
     contract {
         returns(false) implies (this@not != null)
     }
-    return isNull() || this.isEmpty
+    return this == null || this.isEmpty
 }
 
 /**
@@ -2608,7 +2608,7 @@ val MTable<*, *, *>?.isNotNullOrEmpty: Boolean
         contract {
             returns(true) implies (this@isNotNullOrEmpty != null)
         }
-        return isNotNull() && this.isNotEmpty
+        return this != null && this.isNotEmpty
     }
 /**
  * Checks if a nullable `Table<R, C, V>` is either null or empty.
@@ -2627,7 +2627,7 @@ val MTable<*, *, *>?.isNullOrEmpty: Boolean
         contract {
             returns(false) implies (this@isNullOrEmpty != null)
         }
-        return isNull() || this.isEmpty
+        return this == null || this.isEmpty
     }
 
 /**
@@ -2646,7 +2646,7 @@ operator fun <R, C, V> MTable<R, C, V>?.not(): Boolean {
     contract {
         returns(false) implies (this@not != null)
     }
-    return isNull() || this.isEmpty
+    return this == null || this.isEmpty
 }
 
 /**

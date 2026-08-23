@@ -1253,7 +1253,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @since 3.0.0
      */
     override fun equals(other: Any?): Boolean {
-        if (other.isNull()) return false
+        if (other == null) return false
         if (other.javaClass != Ulid::class.java) return false
 
         val that = other as Ulid
@@ -1662,7 +1662,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                  * @since 3.0.0
                  */
                 fun newInstance(random: Random?): IRandom {
-                    return if (random.isNull()) ByteRandom() else {
+                    return if (random == null) ByteRandom() else {
                         if (random is SecureRandom) ByteRandom(random)
                         else LongRandom(random)
                     }

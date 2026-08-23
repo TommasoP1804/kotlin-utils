@@ -80,11 +80,9 @@ data class Chunked<T>(
          * @since 1.0.0
          */
         @Suppress("SqlNoDataSourceInspection")
-        context(context: SqlBuilder)
+        context(context: SqlBuilder, entityManager: EntityManager, logger: Logger)
         inline fun <reified M : Any, T> generateFromQuery(
             callableName: String? = null,
-            logger: Logger = Logger(),
-            entityManager: EntityManager,
             offset: Int = 0,
             limit: Int? = null,
             filter: List<String> = emptyList(),
@@ -98,7 +96,7 @@ data class Chunked<T>(
             dateTimeFields: Set<String> = emptySet(),
             dateTimeWithZoneFields: Set<String> = emptySet(),
             crossinline exceptionForInvalid: Transformer<String, Throwable>,
-            separatorSymbol: Regex = Regex(":"),
+            separatorSymbol: Regex = Regex(String.COLON),
             generalFilterSymbol: String = String.STAR
         ): Chunked<T> {
             offset.validate(
@@ -120,7 +118,7 @@ data class Chunked<T>(
             val otherFilters = generalFilterString?.run { filter - this } ?: filter
 
             // GENERAL FILTER
-            if (generalFilterString.isNotNull()) {
+            if (generalFilterString != null) {
                 val generalFilter = FilterOption.parse(generalFilterString).onlyElement()
                 generalFilter.operator.validate(
                     lazyMessage = { "General filter operator in ${((FilterOperator byCategory Category.String) + (FilterOperator byCategory Equality)).map(FilterOperator::operator)}" },
@@ -151,7 +149,7 @@ data class Chunked<T>(
                         message = "in $availFilteringFields",
                         causeOf = { exceptionForInvalid("The sorting field $sorting is not supported.") }
                     )
-                    if (it.value.isNotNull()) {
+                    if (it.value != null) {
                         orFilters += it.operator.sql(
                             if (it.operator.category in arrayOf(String, Equality))
                                 "LOWER(CAST(${(dbDictionary[it.property] ?: it.property)} AS TEXT))"
@@ -197,7 +195,7 @@ data class Chunked<T>(
                 }.executeCount()
             }
 
-            logger.debug("<> Query from ${Ansi.ITALIC}${this::class.simpleName}${Ansi.RESET}: {}", query.value)
+            log(logger, LogLevel.Debug, "<> Query from ${Ansi.ITALIC}${this::class.simpleName}${Ansi.RESET}: ${query.value}")
 
             val filtered = with(entityManager) { query.executeSelectMultipleResult<M>().map(dtoMapper) }
             return Chunked(
@@ -205,7 +203,7 @@ data class Chunked<T>(
                 totalPages = if (limit == -1) 1 else ceil(totalElements.toDouble() / limit).toInt(),
                 pageIndex = offset,
                 limit = limit.takeUnless { (limit == -1) },
-                appliedFilters = parsedFilters + if (generalFilterString.isNotNull()) FilterOption(
+                appliedFilters = parsedFilters + if (generalFilterString != null) FilterOption(
                     operator = (generalFilterString / separatorSymbol)[1],
                     value = (generalFilterString / separatorSymbol)[2]
                 ).asSingleList() else emptyList(),
@@ -273,7 +271,7 @@ data class Chunked<T>(
                 FilterOption(decomponed[0], decomponed[1], decomponed[2])
             }
             val generalFilter = decomponedFilters[{ it.property == generalFilterSymbol }]
-            if (generalFilter.isNotNull()) decomponedFilters = decomponedFilters - generalFilter
+            if (generalFilter != null) decomponedFilters = decomponedFilters - generalFilter
 
             var baseCollection = baseCollection.toList()
             val sorting = SortOption.parse(sorting, separatorSymbol = separatorSymbol)
@@ -297,7 +295,7 @@ data class Chunked<T>(
                 val properties = element::class.memberProperties
                 var flag: Boolean? = null
                 general@ for (property in properties) {
-                    if (generalFilter.isNotNull() && property.name in availGeneralFilteringFields) {
+                    if (generalFilter != null && property.name in availGeneralFilteringFields) {
                         flag = false
                         if (filter(property.call(element).toString(), generalFilter, exceptionForInvalid)) {
                             flag = true
@@ -351,10 +349,10 @@ data class Chunked<T>(
         class Serializer : ValueSerializer<Chunked<*>>() {
             override fun serialize(value: Chunked<*>, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeStartObject()
-                value.totalElements.ifNotNull { gen.writeNumberProperty("totalElements", this) }
-                value.totalPages.ifNotNull { gen.writeNumberProperty("totalPages", this) }
-                value.pageIndex.ifNotNull { gen.writeNumberProperty("pageIndex", this) }
-                value.limit.ifNotNull { gen.writeNumberProperty("limit", this) }
+                value.totalElements.ifNotNull { gen.writeNumberProperty("totalElements", it) }
+                value.totalPages.ifNotNull { gen.writeNumberProperty("totalPages", it) }
+                value.pageIndex.ifNotNull { gen.writeNumberProperty("pageIndex", it) }
+                value.limit.ifNotNull { gen.writeNumberProperty("limit", it) }
                 gen.writeArrayPropertyStart("appliedFilters")
                 value.appliedFilters.forEach { gen.writePOJO(it) }
                 gen.writeEndArray()
@@ -371,10 +369,10 @@ data class Chunked<T>(
         class OldSerializer : JsonSerializer<Chunked<*>>() {
             override fun serialize(value: Chunked<*>, gen: JsonGenerator, serializers: SerializerProvider?) {
                 gen.writeStartObject()
-                value.totalElements.ifNotNull { gen.writeNumberField("totalElements", this) }
-                value.totalPages.ifNotNull { gen.writeNumberField("totalPages", this) }
-                value.pageIndex.ifNotNull { gen.writeNumberField("pageIndex", this) }
-                value.limit.ifNotNull { gen.writeNumberField("limit", this) }
+                value.totalElements.ifNotNull { gen.writeNumberField("totalElements", it) }
+                value.totalPages.ifNotNull { gen.writeNumberField("totalPages", it) }
+                value.pageIndex.ifNotNull { gen.writeNumberField("pageIndex", it) }
+                value.limit.ifNotNull { gen.writeNumberField("limit", it) }
                 gen.writeArrayFieldStart("appliedFilters")
                 value.appliedFilters.forEach { gen.writePOJO(it) }
                 gen.writeEndArray()

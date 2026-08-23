@@ -2756,7 +2756,7 @@ fun Pipeline.toYaml() = Yaml(buildString {
     if (variables.isNotEmpty()) {
         appendLine("variables:")
         variables.forEach { [key, entry] ->
-            if (entry.description.isNotNull() || entry.options.isNotNull()) {
+            if (entry.description != null || entry.options != null) {
                 appendLine("  $key:")
                 appendLine("    value: \"${entry.value}\"")
                 entry.description?.let { appendLine("    description: \"$it\"") }
@@ -2821,11 +2821,11 @@ fun Pipeline.toYaml() = Yaml(buildString {
         appendLine("include:")
         includes.forEach { inc ->
             when {
-                inc.local.isNotNull() -> appendLine("  - local: '${inc.local}'")
-                inc.remote.isNotNull() -> appendLine("  - remote: '${inc.remote}'")
-                inc.template.isNotNull() -> appendLine("  - template: ${inc.template}")
-                inc.component.isNotNull() -> appendLine("  - component: '${inc.component}'")
-                inc.project.isNotNull() -> {
+                inc.local != null -> appendLine("  - local: '${inc.local}'")
+                inc.remote != null -> appendLine("  - remote: '${inc.remote}'")
+                inc.template != null -> appendLine("  - template: ${inc.template}")
+                inc.component != null -> appendLine("  - component: '${inc.component}'")
+                inc.project != null -> {
                     appendLine("  - project: '${inc.project}'")
                     inc.ref?.let { appendLine("    ref: '$it'") }
                     inc.file?.let { appendLine("    file: '${it}'") }
@@ -2865,7 +2865,7 @@ private fun StringBuilder.renderJob(name: String, job: Job) {
     if (job.services.isNotEmpty()) {
         appendLine("  services:")
         job.services.forEach { svc ->
-            if (svc.alias.isNull() && svc.command.isEmpty() && svc.variables.isEmpty()) {
+            if (svc.alias == null && svc.command.isEmpty() && svc.variables.isEmpty()) {
                 appendLine("    - $svc.name")
             } else {
                 appendLine("    - name: ${svc.name}")
@@ -2931,7 +2931,7 @@ private fun StringBuilder.renderJob(name: String, job: Job) {
 
     // Needs
     if (job.needs.isNotEmpty()) {
-        val allSimple = job.needs.all { it.artifacts && !it.optional && it.pipeline.isNull() && it.project.isNull() }
+        val allSimple = job.needs.all { it.artifacts && !it.optional && it.pipeline == null && it.project == null }
         if (allSimple) {
             appendLine("  needs:")
             job.needs.forEach { appendLine("    - ${it.job}") }

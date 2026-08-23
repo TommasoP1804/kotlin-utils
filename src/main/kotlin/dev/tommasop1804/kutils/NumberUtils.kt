@@ -6,22 +6,33 @@
 @file:Suppress("unused", "kutils_take_as_int_invoke", "kutils_drop_as_int_invoke", "java_integer_as_kotlin_int")
 @file:Since("1.0.0")
 @file:MustUseReturnValues
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.numbers.*
+import dev.tommasop1804.kutils.classes.range.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.div
+import kotlin.invoke
 import kotlin.math.*
 import kotlin.math.pow
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
+import kotlin.text.toDouble
+import kotlin.toString
 
 /**
  * Indicates whether the current number is not a decimal (i.e., it represents a whole number),
@@ -34,7 +45,6 @@ import kotlin.reflect.KProperty
  */
 val Number.isNotDecimalClassBased
     get() = isNotDecimal(true)
-
 /**
  * Indicates whether the current number is not a decimal (represents a whole number).
  *
@@ -46,7 +56,6 @@ val Number.isNotDecimalClassBased
  */
 val Number.isNotDecimal
     get() = isNotDecimal()
-
 /**
  * Indicates whether the current number is a decimal type, utilizing a class-based determination method.
  *
@@ -58,7 +67,6 @@ val Number.isNotDecimal
  */
 val Number.isDecimalClassBased
     get() = isDecimal(true)
-
 /**
  * Indicates whether the current number is a decimal value.
  *
@@ -83,7 +91,6 @@ val Number.isDecimal
  */
 val Number.isEven
     get() = toLong() % 2 == 0.toLong()
-
 /**
  * Determines if the number is odd.
  *
@@ -106,7 +113,6 @@ val Number.isOdd
  */
 val Number.isPositive
     get() = toDouble() > 0.toDouble()
-
 /**
  * Checks if the number is negative.
  *
@@ -119,7 +125,6 @@ val Number.isPositive
  */
 val Number.isNegative
     get() = toDouble() < 0.toDouble()
-
 /**
  * Checks whether a [Number] is not positive.
  *
@@ -132,7 +137,6 @@ val Number.isNegative
  */
 val Number.isNotPositive
     get() = !isPositive
-
 /**
  * Checks if the number is not negative.
  *
@@ -147,6 +151,21 @@ val Number.isNotPositive
  */
 val Number.isNotNegative
     get() = !isNegative
+/**
+ * A read-only extension property for the [Number] class that checks if the number is zero.
+ *
+ * @return `true` if the number is equal to zero, `false` otherwise.
+ * @since 5.0.0
+ */
+val Number.isZero
+    get() = this == 0
+/**
+ * Extension property for the [Number] class that checks if the numeric value is not zero.
+ * Returns `true` if the value is not equal to zero, otherwise returns `false`.
+ * @since 5.0.0
+ */
+val Number.isNotZero
+    get() = this != 0
 
 /**
  * Extension property that provides the positive integer representation of the Byte value.
@@ -1033,581 +1052,420 @@ fun String.toBigDecimal(): Result<BigDecimal> = runCatching { BigDecimal.valueOf
 fun Number.toBigDecimal(): BigDecimal = BigDecimal.valueOf(toDouble())
 
 /**
- * Validates that the number is positive. If the number is not positive, throws a `NumberSignException`.
+ * Executes the given action if the number is positive.
  *
- * @param causeOf The optional throwable to use as the primary exception; if provided, its cause is set to a new `NumberSignException`.
- * @param cause The optional throwable to be used as the cause of the `NumberSignException`.
- * @return The number itself if it is positive.
- * @throws NumberSignException If the number is not positive.
- * @since 3.5.0
+ * @param action The action to be executed if the number is positive.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException("Value is not positive.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is not positive.", cause?.invoke(this)))
+inline fun <T : Number> T.ifPositive(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isPositive) action(this)
     return this
 }
 /**
- * Validates that the number is positive. If the number is not positive, a [NumberSignException] is thrown.
+ * Executes the given action if the number is negative.
  *
- * @param causeOf An optional [Throwable] indicating the cause of the exception. If provided, it will be used as the base for exception chaining.
- * @param cause An optional [Throwable] representing the cause of the exception. Can be null.
- * @param lazyMessage A supplier function for the exception message, which will be lazily evaluated.
- * @return The validated number if it is positive.
- * @throws NumberSignException If the number is not positive.
- * @since 3.5.0
+ * @param action The action to be performed if the number is negative.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+inline fun <T : Number> T.ifNegative(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNegative) action(this)
     return this
 }
 /**
- * Validates that the current number is positive. If the number is not positive, a `NumberSignException` is thrown.
+ * Executes the given action if the number is not positive.
  *
- * @param property The Kotlin property associated with the validation, providing contextual information
- *                 such as its owner class, name, and return type. May be `null`.
- * @param variableName An optional name of the variable being validated. If provided, it will be included
- *                     in the exception for better error context. Defaults to `null`.
- * @param message An optional custom error message describing the validation failure. If not provided, a default
- *                message "is not positive" will be used. Defaults to `null`.
- * @param causeOf An optional `Throwable` to be used as the cause of the exception. If provided, it will wrap
- *                the `NumberSignException`. Defaults to `null`.
- * @param cause An optional `Throwable` to be included in the `NumberSignException` used for validation. Defaults to `null`.
- * @return The current number (this) if the validation is successful.
- * @throws NumberSignException if the number is not positive.
- * @since 3.5.0
+ * @param action The action to perform if the number is not positive.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifNotPositive(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNotPositive) action(this)
     return this
 }
 /**
- * Validates if the current number is positive. If the number is not positive, a `NumberSignException` is thrown.
+ * Executes the given action if the number is not negative.
  *
- * @param property The primary property being validated. This is used for exception context and can be null.
- * @param variable An optional secondary property related to the validation. This is used for additional exception context if provided.
- * @param message  An optional custom error message to include in the exception if the validation fails.
- * @param causeOf  An optional root cause throwable to set as the cause of the exception. If null, a new `NumberSignException` is created.
- * @param cause    An optional secondary cause throwable to include when creating the exception.
- * @return The current instance if the validation passes.
- * @throws NumberSignException If the number is not positive.
- * @since 3.5.0
+ * @param action The action to be executed if the number is not negative.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifNotNegative(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNotNegative) action(this)
     return this
 }
 /**
- * Validates that the number is positive and throws a `NumberSignException` if it is not.
+ * Executes the given action if the number is zero.
  *
- * @param callable The Kotlin function that the parameter belongs to. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional custom message to include in the exception. Defaults to "is not positive" if null.
- * @param causeOf An existing exception to propagate by initializing its cause with a new `NumberSignException`. Can be null.
- * @param cause An optional underlying cause for the exception. Can be null.
- * @return The current number instance if it is confirmed to be positive.
- * @throws NumberSignException if the number is not positive.
- * @since 3.5.0
+ * @param action the action to be executed if the number is zero
+ * @return the original number
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifZero(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isZero) action(this)
     return this
 }
 /**
- * Validates that the current number is positive.
- * If the number is not positive, a `NumberSignException` is thrown.
+ * Executes the given action if the number is not zero.
  *
- * @param callable The function to which the parameter belongs, or null if not applicable.
- * @param parameter The specific parameter within the function being validated, or null if not applicable.
- * @param message An optional descriptive message to include in the exception, or null to use the default message.
- * @param causeOf An exception that will serve as the cause of the `NumberSignException`, or null if not applicable.
- * @param cause The underlying cause to associate with this exception, or null if not applicable.
- * @return The current number if it is positive.
- * @throws NumberSignException If the number is not positive.
- * @since 3.5.0
+ * @param action The action to perform if the number is not zero.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifNotZero(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isZero) action(this)
     return this
 }
 /**
- * Validates that the number is positive. If the number is not positive, a `NumberSignException` is thrown.
+ * Executes the provided action if the number is even.
  *
- * @param callableName The name of the callable where this validation occurs, or null.
- * @param parameterName The name of the parameter being validated, or null.
- * @param message A custom error message to include in the exception, or null to use the default message.
- * @param causeOf An optional throwable that will serve as the originating cause of the new exception, or null.
- * @param cause An optional throwable used to link exceptions for diagnostic purposes, or null.
- * @return The number if it is positive.
- * @throws NumberSignException If the number is not positive.
- * @since 3.5.0
+ * @param action A consumer function to be executed if the number is even.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifEven(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isEven) action(this)
     return this
 }
 /**
- * Validates that the current number is positive. If the number is not positive, an exception is thrown.
+ * Executes the provided action if the number is odd.
  *
- * @param callableName The name of the callable (e.g., function or method) associated with the validation, or null if not applicable.
- * @param parameter The parameter being validated, or null if not applicable.
- * @param message An optional custom message to include in the exception if validation fails. Defaults to a generic "is not positive" message.
- * @param causeOf An optional pre-existing throwable to be set as the cause of the thrown exception. If null, a new exception is constructed instead.
- * @param cause An optional underlying cause for the validation failure.
- * @return The current number if it passes the validation check.
- * @throws NumberSignException If the number is not positive and no `causeOf` is provided.
- * @since 3.5.0
+ * @param action A lambda that will be invoked with the number as its argument if the number is odd.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)))
-    return this
-}
-
-/**
- * Validates that the current number is not positive. If the number is positive,
- * it throws a `NumberSignException` with the specified cause or an initialized cause.
- *
- * @param causeOf The primary throwable cause to be used if the validation fails.
- *                If non-null, it will be augmented with a `NumberSignException`.
- * @param cause The secondary throwable cause. Used as the cause of the `NumberSignException`
- *              if the number is positive, and `causeOf` is null.
- * @return The current number instance if it is not positive.
- * @throws NumberSignException If the current number is positive.
- * @since 3.5.0
- */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException("Value is positive.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is positive.", cause?.invoke(this)))
+inline fun <T : Number> T.ifOdd(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isOdd) action(this)
     return this
 }
 /**
- * Validates that the number is not positive. If the number is positive, an exception is thrown.
+ * Executes the provided action if the number is a decimal (i.e., has a fractional part).
  *
- * @param causeOf An optional throwable that will serve as the main cause. If provided, it will be initialized with a
- * secondary cause describing the positive value validation failure.
- * @param cause An optional secondary throwable that may provide additional context for the exception.
- * @param lazyMessage A supplier that generates the message used in the exception if the number is positive.
- * @return The original number if it is not positive.
- * @throws NumberSignException If the number is positive. The exception will use the lazyMessage's output as its
- * message and may include the provided cause and/or causeOf for additional context.
- * @since 3.5.0
+ * @param action A lambda function that will be invoked with this number as a parameter
+ *               if it is a decimal.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+inline fun <T : Number> T.ifDecimal(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isDecimal) action(this)
     return this
 }
 /**
- * Validates that the current number is not positive. If the number is positive, a
- * `NumberSignException` is thrown.
+ * Executes the specified [action] if the number is not a decimal (i.e., it does not have a fractional component).
  *
- * @param property An optional `KProperty` providing metadata about the property being validated.
- *                 This can include contextual information such as the class, property name, and
- *                 return type. May be `null`.
- * @param variableName An optional name of the variable being validated for additional context.
- *                     If provided, it will be included in the exception message. May be `null`.
- * @param message An optional custom error message that will be appended to the
- *                exception message if the validation fails. May be `null`.
- * @param causeOf An optional `Throwable` that caused this validation error, allowing exception
- *                chaining. If provided, it is set as the cause of the exception. May be `null`.
- * @param cause An optional `Throwable` providing additional context for the exception. May be
- *              `null`.
- * @return Returns the current number if it is not positive.
- * @throws NumberSignException If the current number is positive.
- * @since 3.5.0
+ * @param action The lambda function to be executed if the condition is met.
+ * @return The original number.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifNotDecimal(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNotDecimal) action(this)
     return this
 }
 /**
- * Validates that the number is not positive.
+ * Executes the given action if the number is based on a decimal class.
  *
- * If the number is positive, a [NumberSignException] is thrown. The exception will include the provided property,
- * variable, an optional custom message, and optional cause details.
+ * The function takes a generic type parameter constrained to `Number`.
+ * If the invoking number meets the decimal class-based condition,
+ * the specified action is performed on it.
  *
- * @param property The primary property being validated. Can be `null` if not applicable.
- * @param variable An optional secondary property related to the validation. Can be `null` if not relevant.
- * @param message An optional custom message to include in the exception if thrown. Defaults to "is positive" if `null`.
- * @param causeOf An optional throwable that is considered the cause of this failure. If provided,
- *                it will be initialized as the cause of the created exception.
- * @param cause An optional root cause of this failure. If provided, it will be passed as part of the created exception.
- * @return Returns the same number instance if it is not positive.
- * @throws NumberSignException if the number is positive.
- * @since 3.5.0
+ * @param action A single action to be executed if the number is based on a decimal class.
+ * @return The original number instance.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifDecimalClassBased(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isDecimalClassBased) action(this)
     return this
 }
 /**
- * Validates that the number is not positive. If the number is positive, a `NumberSignException` is thrown.
+ * Executes the given action if the number is not of a decimal class type.
  *
- * @param callable The Kotlin function that the number parameter belongs to. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message A custom error message to provide additional context. Defaults to "is positive" if null.
- * @param causeOf A custom throwable that serves as the main exception. If provided, it is initialized with the
- *                `NumberSignException` as its cause.
- * @param cause A secondary throwable that serves as the cause of the exception. This is used if `causeOf` is null.
- * @return The number itself if the validation passes (i.e., the number is not positive).
- * @throws NumberSignException If the number is positive.
- * @since 3.5.0
+ * @param action A function to be invoked if the number is not decimal class-based.
+ * @return The original number on which the operation was invoked.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current number is not positive. If the number is positive, a `NumberSignException` is thrown.
- *
- * @param callable The function to which the parameter belongs, or null if not available.
- * @param parameter The specific parameter within the function that caused the validation, or null if not applicable.
- * @param message An optional descriptive message providing additional information about the validation failure.
- * @param causeOf An optional exception that acts as the underlying cause of the validation failure.
- * @param cause An optional exception to be used as the direct cause of the thrown `NumberSignException`.
- * @return The current number, if it is not positive.
- * @throws NumberSignException if the number is positive.
- * @since 3.5.0
- */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the number is not positive. If the number is positive, a `NumberSignException` is thrown.
- *
- * @param callableName The name of the callable associated with this validation, or `null`.
- * @param parameterName The name of the parameter being validated, or `null`.
- * @param message Additional details about the validation failure. Defaults to `null` if not specified.
- * @param causeOf An optional existing `Throwable`, which will have the thrown exception set as its cause.
- * @param cause The throwable that caused this validation to fail, or `null` if there is none.
- * @return The original number if it passes validation (not positive).
- * @throws NumberSignException If the number is positive.
- * @since 3.5.0
- */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the number is not positive. If the number is positive, a `NumberSignException` is thrown.
- *
- * @param callableName The name of the callable (e.g., function or method) associated with this validation, or null if not applicable.
- * @param parameter The parameter related to this validation, or null if not applicable.
- * @param message An optional message providing additional context if validation fails; defaults to "is positive" if not specified.
- * @param causeOf The desired root cause of the exception, or null if none exists.
- * @param cause An optional exception to associate as the cause; it will be attached as the `cause` of the thrown exception.
- * @return The validated number if it is not positive.
- * @throws NumberSignException if the number is positive.
- * @since 3.5.0
- */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)))
+inline fun <T : Number> T.ifNotDecimalClassBased(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNotDecimalClassBased) action(this)
     return this
 }
 
 /**
- * Validates that the number is negative. If the number is not negative, an exception is thrown.
+ * Executes the given action if the integer is within the specified range.
  *
- * @param causeOf An optional throwable that will be used as the cause of the exception if provided.
- * @param cause An optional throwable that will be set as the cause of the `NumberSignException` if `causeOf` is not provided.
- * @return The number instance if it is negative.
- * @throws NumberSignException if the number is not negative.
- * @since 3.5.0
+ * @param range The range to check the integer against.
+ * @param action The action to execute if the condition is met.
+ * @return The same integer on which the function was called.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException("Value is not negative.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is not negative.", cause?.invoke(this)))
+inline fun Int.ifIn(range: IntProgression, action: Consumer<Int>): Int {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates if the calling number instance is negative. If the number is not negative,
- * throws a [NumberSignException] with the specified message and optional cause.
+ * Executes the given action if this integer is within the specified range.
  *
- * @param causeOf An optional `Throwable` that, if provided, will have its cause set to
- *                a newly created [NumberSignException].
- * @param cause An optional `Throwable` representing the cause of the exception to be
- *              assigned to the [NumberSignException]. If null, no cause is set in the
- *              exception.
- * @param lazyMessage A supplier that generates the exception message if the number
- *                    fails the validation.
- * @return The current `Number` instance if the validation passes.
- * @throws NumberSignException If the number is not negative.
- * @since 3.5.0
+ * @param range the range to check if this integer is within.
+ * @param action the action to execute if the condition is met.
+ * @return this integer, regardless of whether the action was executed or not.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+inline fun Int.ifIn(range: IntRange, action: Consumer<Int>): Int {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the current number is negative. If the number is not negative, a [NumberSignException]
- * is thrown.
+ * Executes the given action if the integer is within the specified range, considering any exclusions.
  *
- * @param property The Kotlin property associated with the validation, providing contextual information
- *                 such as its owner class, name, and return type. May be `null`.
- * @param variableName An optional name of the variable related to the validation for additional context.
- *                     If provided, it will be included in the exception message. Defaults to `null`.
- * @param message An optional custom error message. If provided, it will be used in the exception.
- *                Defaults to `null`.
- * @param causeOf An optional `Throwable` that caused this validation failure, allowing exception chaining.
- *                If provided, it will be used to initialize the cause of the thrown exception. Defaults to `null`.
- * @param cause An optional `Throwable` to provide additional context in the exception. May be `null`.
- *              Defaults to `null`.
- * @return The current number if it passes the validation (is negative).
- * @throws NumberSignException If the number is not negative.
- * @since 3.5.0
+ * @param range Defines the range with possible exclusions to check against.
+ * @param action A function to be executed if the integer is within the range.
+ * @return The original integer.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)))
+inline fun Int.ifIn(range: IntRangeWithExclusions, action: Consumer<Int>): Int {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the current `Number` instance is negative.
- * If the number is not negative, a `NumberSignException` is thrown.
+ * Executes a given action if the integer is within the specified range.
  *
- * @param property The primary property associated with the validation. Can be null.
- * @param variable An optional secondary property used for additional context in the validation. Can be null.
- * @param message A custom error message to provide additional details about the exception. Optional and can be null.
- * @param causeOf An optional throwable that caused this exception. If provided, it is used as the cause of the exception.
- * @param cause An additional optional throwable that will be associated as the cause for the `NumberSignException`. Can be null.
- * @return The current `Number` instance if it is negative.
- * @throws NumberSignException If the number is not negative.
- * @since 3.5.0
+ * @param range the range of integers with conditions to evaluate against
+ * @param action the action to perform on the integer if it is within the range
+ * @return the original integer
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)))
+inline fun Int.ifIn(range: IntRangeWithConditions, action: Consumer<Int>): Int {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates if the current number is negative. Throws a [NumberSignException] if the number is not negative.
+ * Executes the given action if the unsigned integer is within the specified range.
  *
- * @param callable The Kotlin function that the parameter belongs to. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message Custom message providing additional context for the exception. Can be null, defaults to "is not negative".
- * @param causeOf The higher-level cause leading to this validation failure. Can be null.
- * @param cause The underlying exception causing this validation failure. Can be null.
- * @return The current number if the validation passes (i.e., the number is negative).
- * @throws NumberSignException If the current number is not negative.
- * @since 3.5.0
+ * @param range The progression of unsigned integers to check against.
+ * @param action The action to be executed if the value is within the range.
+ * @return The original unsigned integer.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)))
+inline fun UInt.ifIn(range: UIntProgression, action: Consumer<UInt>): UInt {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates if the current number is negative. Throws a `NumberSignException` if the number is not negative.
+ * Executes the given action if the current unsigned integer lies within the specified range.
  *
- * @param callable The function to which the parameter belongs, or null if not applicable.
- * @param parameter The specific parameter within the function to be validated, or null if not applicable.
- * @param message An optional message describing the validation failure, or null to use the default message.
- * @param causeOf An optional `Throwable` that serves as the root cause of the exception.
- * @param cause An optional `Throwable` providing additional context for the exception.
- * @return The current number if it is negative.
- * @throws NumberSignException If the number is not negative.
- * @since 3.5.0
+ * @param range The range of unsigned integers to check against.
+ * @param action The action to be executed if the current unsigned integer is within the range.
+ * @return The current unsigned integer.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)))
+inline fun UInt.ifIn(range: UIntRange, action: Consumer<UInt>): UInt {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that a number is negative. If the number is not negative, it throws a `NumberSignException`.
+ * Executes the given action if the unsigned integer is within the specified range,
+ * and then returns the original value.
  *
- * @param callableName The name of the callable associated with this validation, or null.
- * @param parameterName The name of the parameter being validated, or null.
- * @param message Additional details about the validation failure; defaults to "is not negative" if null.
- * @param causeOf An optional throwable that caused this validation failure. If provided, it will be chained.
- * @param cause An optional cause for the `NumberSignException`. If provided, it will be associated with the exception.
- * @return The number itself if it is negative.
- * @throws NumberSignException If the number is not negative.
- * @since 3.5.0
+ * @param range The range, including any exclusions, to check if the unsigned integer belongs to.
+ * @param action The action to be performed if this unsigned integer is within the specified range.
+ * @return The original unsigned integer value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)))
+inline fun UInt.ifIn(range: UIntRangeWithExclusions, action: Consumer<UInt>): UInt {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates if the current number is negative. Throws a `NumberSignException` if the number is not negative.
+ * Executes the given action if the current `UInt` is within the specified range.
  *
- * @param callableName The name of the function or callable associated with the validation, or null if not applicable.
- * @param parameter The parameter associated with the validation, or null if not applicable.
- * @param message An optional custom message for the exception, or null to use the default message.
- * @param causeOf The primary cause of the exception, or null if there is no prior throwable causing this validation failure.
- * @param cause The underlying cause of the `NumberSignException`, or null if no additional cause exists.
- * @return The current number (`this`) if it passes the validation check.
- * @throws NumberSignException if the number is not negative.
- * @since 3.5.0
+ * @param range the range of `UInt` values, potentially with additional conditions, to check against.
+ * @param action the action to perform if the current `UInt` is within the specified range.
+ * @return the original `UInt` value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)))
-    return this
-}
-
-/**
- * Validates that the calling number is not negative.
- * If the number is negative, it throws a `NumberSignException`.
- * Optionally, a custom cause or an overriding cause can be provided.
- *
- * @param causeOf An optional throwable used as the primary cause when initializing an exception chain.
- * @param cause An optional throwable used as the secondary cause for the exception.
- * @return The validated number if it is not negative.
- * @throws NumberSignException if the number is negative.
- * @since 3.5.0
- */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException("Value is negative.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is negative.", cause?.invoke(this)))
+inline fun UInt.ifIn(range: UIntRangeWithConditions, action: Consumer<UInt>): UInt {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the number is not negative. If the number is negative, throws a [NumberSignException].
+ * Evaluates the given action if the current Long value is within the specified range.
  *
- * @param causeOf An optional throwable to be used as the initial cause for the exception. If null,
- *                [NumberSignException] will be created as the root cause.
- * @param cause An optional throwable that can be specified as the secondary cause for the exception.
- * @param lazyMessage A lazily evaluated message supplier to generate the error message for the exception if thrown.
- * @return The current number if it is not negative.
- * @throws NumberSignException If the number is negative.
- * @since 3.5.0
+ * @param range The range of Long values to check against.
+ * @param action The action to perform if the Long value is within the specified range.
+ * @return The original Long value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+inline fun Long.ifIn(range: LongProgression, action: Consumer<Long>): Long {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the current number is not negative. If the number is negative, a
- * `NumberSignException` is thrown.
+ * Executes the given action if the current value is within the specified range.
  *
- * @param property The Kotlin property associated with the value being validated, providing
- *                 contextual information such as its owner class, name, and return type. May be `null`.
- * @param variableName An optional name for the variable being validated. If provided, this name will
- *                     be included in the exception message for easier identification. May be `null`.
- * @param message An optional custom error message that will be used if the validation fails. Defaults
- *                to "is negative" if not provided. May be `null`.
- * @param causeOf An optional `Throwable` that represents the cause of this validation failure. If not
- *                `null`, it will be initialized with a `NumberSignException` as its cause. May be `null`.
- * @param cause An optional `Throwable` that provides additional context for the default exception chaining. May be `null`.
- * @return The validated number if the validation passes and the number is not negative.
- * @throws NumberSignException If the number is negative, a `NumberSignException` is thrown with
- *                              appropriate contextual information and optional message or cause.
- * @since 3.5.0
+ * @param range the range to check if the current value is within.
+ * @param action the action to perform if the current value is within the range.
+ * @return the current value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)))
+inline fun Long.ifIn(range: LongRange, action: Consumer<Long>): Long {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the current number is not negative.
+ * Executes the given action if the current Long value is within the specified range,
+ * while respecting exclusions within the range.
  *
- * If the number is negative, a `NumberSignException` is thrown.
- * This method supports optional parameters for providing context about
- * the property or variable related to the exception, a custom message, and
- * an optional cause exception.
- *
- * @param property The primary property associated with this validation. Can be `null`.
- * @param variable An optional secondary property providing additional context. Can be `null`.
- * @param message A custom message to describe the exception if the number is negative. Defaults to `null`.
- * @param causeOf An optional throwable to serve as the cause of the exception. Defaults to `null`.
- * @param cause An optional secondary cause to provide further context. Defaults to `null`.
- * @return The current number if it is not negative.
- * @throws NumberSignException If the number is negative.
- * @since 3.5.0
+ * @param range The range, potentially with exclusions, to check the Long value against.
+ * @param action The action to be executed if the Long value is within the specified range.
+ * @return Returns the original Long value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)))
+inline fun Long.ifIn(range: LongRangeWithExclusions, action: Consumer<Long>): Long {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the number is not negative.
+ * Executes the given action if the current Long value is within the specified range.
  *
- * @param callable The function in which the validation is performed. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional message to customize the exception message if validation fails. Defaults to "is negative" if null.
- * @param causeOf The prior throwable cause, used to initialize the chain of exceptions. Can be null.
- * @param cause The root cause of the exception, if applicable. Can be null.
- * @return The number itself if it is not negative.
- * @throws NumberSignException If the number is negative.
- * @since 3.5.0
+ * @param range The range with conditions to check against the current Long value.
+ * @param action The consumer action to be performed if the current value is within the range.
+ * @return The original Long value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)))
+inline fun Long.ifIn(range: LongRangeWithConditions, action: Consumer<Long>): Long {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the current number is not negative. If the number is negative, a [NumberSignException] is thrown.
+ * Executes the given action if the current `ULong` value is within the specified range.
  *
- * @param callable The function to which the parameter belongs, or null if not applicable.
- * @param parameter The parameter involved in the validation, or null if not applicable.
- * @param message An optional message to include in the exception, or null for a default message ("is negative").
- * @param causeOf An optional throwable indicating the root cause of this validation failure, or null if not applicable.
- * @param cause An optional throwable to be set as the cause of the exception, or null if not applicable.
- * @return The current number if it is not negative.
- *
- * @throws NumberSignException if the number is negative.
- * @since 3.5.0
+ * @param range the range in which the check is performed.
+ * @param action a function to be executed if the value is within the range.
+ * @return the original `ULong` value.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)))
+inline fun ULong.ifIn(range: ULongProgression, action: Consumer<ULong>): ULong {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the current number is not negative. If the number is negative, a
- * `NumberSignException` is thrown. The exception can optionally include information about the
- * callable, parameter, custom message, and cause.
+ * Executes the given action if the current unsigned long value is within the specified range.
  *
- * @param callableName The name of the callable in which the validation is performed, or null.
- * @param parameterName The name of the parameter being validated, or null.
- * @param message An optional custom message to include in the exception if the validation fails.
- * @param causeOf An optional `Throwable` that serves as the primary cause of the exception.
- * @param cause An optional `Throwable` providing additional context for the exception.
- * @return The original number if the validation passes (i.e., the number is not negative).
- * @throws NumberSignException If the number is negative and validation fails.
- * @since 3.5.0
+ * @param range The range to check if the current value is within.
+ * @param action The action to execute if the current value is within the range.
+ * @return The current value of the unsigned long, regardless of whether the action was executed or not.
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)))
+inline fun ULong.ifIn(range: ULongRange, action: Consumer<ULong>): ULong {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 /**
- * Validates that the number is not negative. If the number is negative, throws a `NumberSignException`.
+ * Executes the provided action if the current `ULong` value is within the specified range
+ * while considering exclusions.
  *
- * @param callableName The name of the callable (e.g., function or method) associated with the value, or null if unassociated.
- * @param parameter The parameter involved in the validation, or null if not applicable.
- * @param message An optional detail message to include with the exception, or null for a default message.
- * @param causeOf An optional throwable that serves as the primary cause of this exception, or null if not applicable.
- * @param cause An optional secondary cause for the exception, or null if not applicable.
- * @return The validated number if it is not negative.
- * @throws NumberSignException If the number is negative.
- * @since 3.5.0
+ * @param range the range with exclusions to check against
+ * @param action the action to invoke if the value is in the range
+ * @return the current `ULong` value
+ * @since 5.0.0
  */
-@IgnorableReturnValue
-fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf.isNull()) NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)))
+inline fun ULong.ifIn(range: ULongRangeWithExclusions, action: Consumer<ULong>): ULong {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
+    return this
+}
+/**
+ * Executes the given action if the ULong value is within the specified range.
+ *
+ * @param range The range with conditions to check the value against.
+ * @param action The action to execute if the value is within the range.
+ * @return The original ULong value.
+ * @since 5.0.0
+ */
+inline fun ULong.ifIn(range: ULongRangeWithConditions, action: Consumer<ULong>): ULong {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in range) action(this)
     return this
 }
 

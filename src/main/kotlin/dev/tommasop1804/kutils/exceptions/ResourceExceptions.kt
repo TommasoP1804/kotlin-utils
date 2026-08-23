@@ -8,7 +8,6 @@ package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.before
-import dev.tommasop1804.kutils.isNotNull
 import kotlin.reflect.KClass
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -36,7 +35,7 @@ abstract class ResourceException : RuntimeException {
 open class ResourceDeletedException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` has been deleted.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` has been deleted.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` has been deleted.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -50,7 +49,7 @@ open class ResourceDeletedException : ResourceException {
 open class ResourceNotFoundException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` not found.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` not found.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` not found.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -64,7 +63,7 @@ open class ResourceNotFoundException : ResourceException {
 open class ResourceAlreadyExistsException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` already exists.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` already exists.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` already exists.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -79,7 +78,7 @@ open class ResourceAlreadyExistsException : ResourceException {
 open class ResourceLockedException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is locked.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is locked.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is locked.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -93,7 +92,7 @@ open class ResourceLockedException : ResourceException {
 open class ResourceUnaccessibleException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is unaccessible.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is unaccessible.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is unaccessible.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -108,7 +107,7 @@ open class ResourceUnaccessibleException : ResourceException {
 open class ResourceNotAcceptableException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is not acceptable.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is not acceptable.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is not acceptable.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -122,7 +121,7 @@ open class ResourceNotAcceptableException : ResourceException {
 open class ResourceConflictException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Conflict with actual state of the resource `${type.simpleName}`.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Edit of the resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is in conflict with the current state of the resource.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Edit of the resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is in conflict with the current state of the resource.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)
@@ -142,7 +141,7 @@ open class ResourceConflictException : ResourceException {
 open class ResourceInUseException : ResourceException {
     constructor() : super()
     constructor(type: KClass<*>, internalErrorCode: String? = null) : super("Resource of type `${type.simpleName}` is in use.", internalErrorCode = internalErrorCode)
-    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type.isNotNull()) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is in use.", internalErrorCode = internalErrorCode)
+    constructor(id: Any, type: KClass<*>?, internalErrorCode: String? = null) : super("Resource${if (type != null) " of type `${type.simpleName}`" else String.EMPTY} with id `$id` is in use.", internalErrorCode = internalErrorCode)
     constructor(message: String?, internalErrorCode: String? = null) : super(message, internalErrorCode = internalErrorCode)
     constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super(message, cause, internalErrorCode = internalErrorCode)
     constructor(cause: Throwable?, internalErrorCode: String? = null) : super(cause, internalErrorCode = internalErrorCode)

@@ -609,7 +609,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
      */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other.isNull() || this::class != other::class) return false
+        if (other == null || this::class != other::class) return false
 
         other as HttpHeader
 
@@ -1712,7 +1712,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      */
     operator fun plusAssign(header: HttpHeader) {
         get(header.name).let { origin ->
-            val other = if (origin.isNotNull()) HttpHeader(header.name, origin + header.values) else header
+            val other = if (origin != null) HttpHeader(header.name, origin + header.values) else header
             headers.removeIf { it.nameEquals(header.name) }
             headers += other
         }
@@ -1781,9 +1781,9 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      */
     operator fun minusAssign(header: HttpHeader) {
         get(header.name).let { origin ->
-            val other = if (origin.isNotNull()) HttpHeader(header.name, origin - header.values.toSet()) else null
+            val other = if (origin != null) HttpHeader(header.name, origin - header.values.toSet()) else null
             headers.removeIf { it.nameEquals(header.name) }
-            if (other.isNotNull()) headers += other
+            if (other != null) headers += other
         }
     }
     /**
@@ -1866,8 +1866,8 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @since 2.1.0
      */
     operator fun plus(other: HttpHeader) = get(other.name).let {
-        val other = if (it.isNotNull()) HttpHeader(other.name, it + other.values) else other
-        val headers = if (it.isNotNull()) headers.minus<HttpHeader>(getHeader(other.name)!!) else headers
+        val other = if (it != null) HttpHeader(other.name, it + other.values) else other
+        val headers = if (it != null) headers.minus<HttpHeader>(getHeader(other.name)!!) else headers
         HttpHeaders(headers.plus<HttpHeader>(other).toMSet())
     }
 
@@ -2024,7 +2024,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      */
     fun getAcceptLanguage(): List<LanguageRange> {
         val value = getFirstOrThrow(ACCEPT_LANGUAGE)
-        return if (value.isNotNullOrBlank())
+        return if (value.isNotNullOrBlank)
             tryOr({ emptyList() }) { LanguageRange.parse(value) }
         else emptyList()
     }
@@ -2426,7 +2426,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
             val portString = it.substring(separator + 1)
             tryOrNull { port = portString.toInt() }
         }
-        if (host.isNull()) host = it
+        if (host == null) host = it
         InetSocketAddress.createUnresolved(host, port)
     }
     /**

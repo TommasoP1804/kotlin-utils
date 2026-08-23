@@ -246,7 +246,7 @@ class XmlElementBuilder(val name: String) {
      * @since 3.9.0
      */
     infix fun String.to(value: String?) {
-        if (value.isNotNull()) attributes[this] = value
+        if (value != null) attributes[this] = value
     }
 
     /**
@@ -257,7 +257,7 @@ class XmlElementBuilder(val name: String) {
      */
     @JvmName("attrNumber")
     infix fun String.to(value: Number?) {
-        if (value.isNotNull()) attributes[this] = value.toString()
+        if (value != null) attributes[this] = value.toString()
     }
 
     /**
@@ -268,7 +268,7 @@ class XmlElementBuilder(val name: String) {
      */
     @JvmName("attrBoolean")
     infix fun String.to(value: Boolean?) {
-        if (value.isNotNull()) attributes[this] = value.toString()
+        if (value != null) attributes[this] = value.toString()
     }
 
     /**
@@ -279,7 +279,7 @@ class XmlElementBuilder(val name: String) {
      */
     @JvmName("attrAny")
     infix fun String.to(value: Any?) {
-        if (value.isNotNull()) attributes[this] = value.toString()
+        if (value != null) attributes[this] = value.toString()
     }
 
     // -- Text Children --
@@ -359,7 +359,7 @@ class XmlElementBuilder(val name: String) {
      * @since 3.9.0
      */
     infix fun String.`_`(value: String?): XmlElement =
-        element(this) { if (value.isNotNull()) text(value) }
+        element(this) { if (value != null) text(value) }
 
     /**
      * Adds a child element whose text content is the `toString` of the provided value.
@@ -369,7 +369,7 @@ class XmlElementBuilder(val name: String) {
      */
     @JvmName("textElementAny")
     infix fun String.`_`(value: Any?): XmlElement =
-        element(this) { if (value.isNotNull()) text(value) }
+        element(this) { if (value != null) text(value) }
 
     /**
      * Adds one child element per item in [values], each with the same tag name and
@@ -406,7 +406,7 @@ class XmlElementBuilder(val name: String) {
     fun build(): XmlElement = XmlElement(
         name,
         attributes.mapToMap { Pair(it.key, it.value?.toString()) }
-            .filterValues { it.isNotNull() }
+            .filterValues { it != null }
             .mapValues { it.value!! }
             .let { LinkedHashMap(it) },
         children.toList()

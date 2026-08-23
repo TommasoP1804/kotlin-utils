@@ -706,7 +706,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
          */
         private infix fun parse(value: String) = runCatching {
             val number = tryOrNull { RomanNumber(value.toLong()) }
-            if (number.isNotNull()) return@runCatching number
+            if (number != null) return@runCatching number
 
             val roman: String = +value.trim()
             var result = 0

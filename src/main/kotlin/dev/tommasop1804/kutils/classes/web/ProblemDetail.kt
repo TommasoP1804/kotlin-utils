@@ -92,12 +92,12 @@ data class ProblemDetail(
         class Serializer : ValueSerializer<ProblemDetail>() {
             override fun serialize(value: ProblemDetail, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
                 gen.writeStartObject()
-                value.type.ifNotNull { gen.writeStringProperty("type", this.toString()) }
-                value.title.ifNotNull { gen.writeStringProperty("title", this) }
-                value.status.ifNotNull { gen.writeNumberProperty("status", this.value) }
-                value.detail.ifNotNull { gen.writeStringProperty("detail", this) }
-                value.instance.ifNotNull { gen.writeStringProperty("instance", this.toString()) }
-                value.extensions.ifNotNull { gen.writePOJOProperty("extensions", this) }
+                value.type.ifNotNull { gen.writeStringProperty("type", it.toString()) }
+                value.title.ifNotNull { gen.writeStringProperty("title", it) }
+                value.status.ifNotNull { gen.writeNumberProperty("status", it.value) }
+                value.detail.ifNotNull { gen.writeStringProperty("detail", it) }
+                value.instance.ifNotNull { gen.writeStringProperty("instance", it.toString()) }
+                value.extensions.ifNotNull { gen.writePOJOProperty("extensions", it) }
                 gen.writeEndObject()
             }
         }
@@ -119,12 +119,12 @@ data class ProblemDetail(
         class OldSerializer : JsonSerializer<ProblemDetail>() {
             override fun serialize(value: ProblemDetail, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
-                value.type.ifNotNull { gen.writeStringField("type", this.toString()) }
-                value.title.ifNotNull { gen.writeStringField("title", this) }
-                value.status.ifNotNull { gen.writeNumberField("status", this.value) }
-                value.detail.ifNotNull { gen.writeStringField("detail", this) }
-                value.instance.ifNotNull { gen.writeStringField("instance", this.toString()) }
-                value.extensions.ifNotNull { gen.writePOJOField("extensions", this) }
+                value.type.ifNotNull { gen.writeStringField("type", it.toString()) }
+                value.title.ifNotNull { gen.writeStringField("title", it) }
+                value.status.ifNotNull { gen.writeNumberField("status", it.value) }
+                value.detail.ifNotNull { gen.writeStringField("detail", it) }
+                value.instance.ifNotNull { gen.writeStringField("instance", it.toString()) }
+                value.extensions.ifNotNull { gen.writePOJOField("extensions", it) }
                 gen.writeEndObject()
             }
         }

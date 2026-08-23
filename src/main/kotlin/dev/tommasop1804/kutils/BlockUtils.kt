@@ -1161,7 +1161,7 @@ inline fun expectFailure(
     } catch (t: Throwable) { t }
 
     val effectiveThrown = thrown?.takeUnless { t -> ignore.any { it.isInstance(t) } }
-    if (effectiveThrown.isNull()) throw lazyExceptionIfSuccess()
+    if (effectiveThrown == null) throw lazyExceptionIfSuccess()
 
     if (expect.isNotEmpty() && expect.none { it.isInstance(effectiveThrown) })
         throw lazyExceptionIfUnexpected(effectiveThrown)
@@ -1198,7 +1198,7 @@ inline fun Action.expectFailure(
     } catch (t: Throwable) { t }
 
     val effectiveThrown = thrown?.takeUnless { t -> ignore.any { it.isInstance(t) } }
-    if (effectiveThrown.isNull()) throw lazyExceptionIfSuccess()
+    if (effectiveThrown == null) throw lazyExceptionIfSuccess()
 
     if (expect.isNotEmpty() && expect.none { it.isInstance(effectiveThrown) })
         throw lazyExceptionIfUnexpected(effectiveThrown)

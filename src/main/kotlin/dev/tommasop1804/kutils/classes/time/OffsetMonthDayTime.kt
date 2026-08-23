@@ -644,7 +644,7 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<OffsetMonthDayTime?, String?> {
             override fun convertToDatabaseColumn(attribute: OffsetMonthDayTime?) = if (Objects.isNull(attribute)) null else attribute.toString()
-            override fun convertToEntityAttribute(dbData: String?) = if (dbData.isNull()) null else parse(dbData).getOrThrow()
+            override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
     }
 

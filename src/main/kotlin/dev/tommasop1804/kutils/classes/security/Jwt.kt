@@ -174,6 +174,12 @@ class Jwt private constructor(private val value: String) : CharSequence {
      */
     val pl_subject get() = payload["sub"] as? String
     /**
+     * [RFC 7519#4.1.2](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2)
+     *
+     * @since 5.0.0
+     */
+    val pl_subjectUuid get() = payload["sub"]?.toString()?.let(::Uuid)
+    /**
      * [RFC 7519#4.1.3](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3)
      *
      * @since 3.0.0
@@ -436,12 +442,12 @@ class Jwt private constructor(private val value: String) : CharSequence {
          * @since 3.0.0
          */
         @OptIn(RiskyApproximationOfTemporal::class)
-        @Suppress("KotlinConstantConditions", "UNCHECKED_CAST", "FunctionName")
+        @Suppress("KotlinConstantConditions", "UNCHECKED_CAST", "FunctionName", "USELESS_CAST")
         private fun _generateJwt(payload: DataMap, expiresTime: Duration? = null): JWTCreator.Builder {
             val builder = com.auth0.jwt.JWT.create()
             for ((key, value) in payload) {
                 when (value) {
-                    isNull() -> builder.withClaim(key, value as? String)
+                    null -> builder.withClaim(key, value as? String)
                     is Boolean -> builder.withClaim(key, value)
                     is Int -> builder.withClaim(key, value)
                     is Long -> builder.withClaim(key, value)

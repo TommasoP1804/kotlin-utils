@@ -142,11 +142,11 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
 
                 if (abs(crossProductZ) > TOLERANCE) {
                     val currentSignPositive = crossProductZ > 0
-                    if (sign.isNull()) sign = currentSignPositive
+                    if (sign == null) sign = currentSignPositive
                     else if (sign != currentSignPositive) return false
                 }
             }
-            return sign.isNotNull()
+            return sign != null
         }
     /**
      * A computed property that returns a list of the lengths of the sides of the polygon.

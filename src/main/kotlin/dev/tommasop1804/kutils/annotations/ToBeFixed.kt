@@ -4,7 +4,6 @@
 
 package dev.tommasop1804.kutils.annotations
 
-import dev.tommasop1804.kutils.isNotNull
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
@@ -53,7 +52,7 @@ annotation class ToBeFixed(
             val method = joinPoint.signature.toShortString()
             val annotation = try {
                 // Try to get annotation from the target method (for instance methods)
-                if (joinPoint.target.isNotNull()) {
+                if (joinPoint.target != null) {
                     val targetMethod = try {
                         joinPoint.target.javaClass.getDeclaredMethod(
                             joinPoint.signature.name,
@@ -78,7 +77,7 @@ annotation class ToBeFixed(
                 null
             }
 
-            if (annotation.isNotNull()) {
+            if (annotation != null) {
                 logger.warn("Function $method has to be fixed.")
                 if (annotation.reason.isNotEmpty())
                     logger.warn("Reason: ${annotation.reason}")

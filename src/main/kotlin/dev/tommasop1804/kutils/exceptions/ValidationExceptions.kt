@@ -5,6 +5,14 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.range.IntRangeWithConditions
+import dev.tommasop1804.kutils.classes.range.IntRangeWithExclusions
+import dev.tommasop1804.kutils.classes.range.LongRangeWithConditions
+import dev.tommasop1804.kutils.classes.range.LongRangeWithExclusions
+import dev.tommasop1804.kutils.classes.range.UIntRangeWithConditions
+import dev.tommasop1804.kutils.classes.range.UIntRangeWithExclusions
+import dev.tommasop1804.kutils.classes.range.ULongRangeWithConditions
+import dev.tommasop1804.kutils.classes.range.ULongRangeWithExclusions
 import kotlin.reflect.*
 
 /**
@@ -46,10 +54,9 @@ open class ValidationFailedException : RuntimeException {
      * @param variableName Optional name of the variable involved in the validation.
      *                     Included in the message if it is not null or blank.
      * @param message Additional descriptive information about the validation failure. Defaults to an empty string.
-     * @param cause The underlying throwable causing this exception, or null if not applicable.
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs a `ValidationFailedException` instance with detailed information about the
      * parameter that failed validation in a callable function.
@@ -62,7 +69,7 @@ open class ValidationFailedException : RuntimeException {
      *         inconsistent with the parameter's details in the `callable`.
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs a `ValidationFailedException` instance with detailed information about the
      * parameter that failed validation in a callable function.
@@ -75,7 +82,7 @@ open class ValidationFailedException : RuntimeException {
      *         inconsistent with the parameter's details in the `callable`.
      * @since 1.0.0
      */
-    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$$parameterName`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$$parameterName`$${if (message.isNotNullOrEmpty) " $message" else ""}")
 
     /**
      * Constructs an instance of `ValidationFailedException` with a detailed message
@@ -87,7 +94,7 @@ open class ValidationFailedException : RuntimeException {
      * Defaults to an empty string if not provided.
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs an instance of `ValidationFailedException` with a detailed message
      * derived from the provided `callable` function, its `parameter`, and an optional `message`.
@@ -98,7 +105,7 @@ open class ValidationFailedException : RuntimeException {
      * Defaults to an empty string if not provided.
      * @since 1.0.0
      */
-    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
 
     /**
      * Constructs a new ValidationFailedException with the specified cause.
@@ -135,7 +142,7 @@ open class ValidationFailedException : RuntimeException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "", cause: Throwable?) : super(
-        $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+        $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a new instance of the ValidationFailedException with a detailed error message and an optional cause.
      *
@@ -151,7 +158,7 @@ open class ValidationFailedException : RuntimeException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>? = null, message: String? = "", cause: Throwable?) : super(
-        $$"$${if (variable?.name.isNotNullOrBlank()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+        $$"$${if (variable?.name.isNotNullOrBlank) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a ValidationFailedException instance with a detailed message based on the provided callable's parameter
      * and optional custom message and cause for the exception.
@@ -163,7 +170,7 @@ open class ValidationFailedException : RuntimeException {
      *
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a new ValidationFailedException with details about the callable, parameter,
      * additional message, and underlying cause.
@@ -174,7 +181,7 @@ open class ValidationFailedException : RuntimeException {
      * @param cause the underlying cause of the exception, or null if no cause is specified
      * @since 1.0.0
      */
-    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a ValidationFailedException with detailed information about the callable, parameter, optional message, and cause.
      *
@@ -184,7 +191,7 @@ open class ValidationFailedException : RuntimeException {
      * @param cause the underlying cause of the validation failure, or null if no cause is specified
      * @since 1.0.0
      */
-    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a ValidationFailedException with details about the validation failure.
      *
@@ -203,7 +210,7 @@ open class ValidationFailedException : RuntimeException {
      * @param cause The underlying cause of the exception, or null if no cause is provided.
      * @since 1.0.0
      */
-    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
 }
 
 /**
@@ -236,7 +243,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(message: String?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message")
+    constructor(message: String?, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message")
     /**
      * Constructs a `MalformedInputException` with a message indicating that the input
      * should be formatted like the specified type.
@@ -245,7 +252,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(type: KType?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Input is not settable as a $type")
+    constructor(type: KType?, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Input is not settable as a $type")
     /**
      * Constructs a new `MalformedInputException` with a detail message indicating
      * that the input should be castable as an instance of the specified class.
@@ -254,7 +261,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(`class`: KClass<*>?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Input is not settable as a ${`class`?.qualifiedName}")
+    constructor(`class`: KClass<*>?, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Input is not settable as a ${`class`?.qualifiedName}")
     /**
      * Constructs a new `MalformedInputException` with the specified detail message and cause.
      *
@@ -267,7 +274,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
+    constructor(message: String?, cause: Throwable?, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
     /**
      * Constructs a `MalformedInputException` with the specified cause.
      *
@@ -280,7 +287,7 @@ open class MalformedInputException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code for identification purposes. Default is null.
      * @since 1.1.5
      */
-    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY, cause)
+    constructor(cause: Throwable?, internalErrorCode: String? = null) : super(if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY, cause)
 }
 
 /**
@@ -321,7 +328,7 @@ open class MalformedPropertyException : MalformedInputException {
      * and its expected type. If the class context is provided and valid, it includes the class name in the message.
      * @sice 3.2.0
      */
-    constructor(name: String, fieldType: KClass<*>, `class`: KClass<*>?, internalErrorCode: String? = null) : super("Property `$name`${if (`class`.isNotNull()) " of class `${`class`.simpleName}`" else String.EMPTY} is not a valid `$fieldType`", internalErrorCode)
+    constructor(name: String, fieldType: KClass<*>, `class`: KClass<*>?, internalErrorCode: String? = null) : super("Property `$name`${if (`class` != null) " of class `${`class`.simpleName}`" else String.EMPTY} is not a valid `$fieldType`", internalErrorCode)
     /**
      * Constructs a new MalformedPropertyException with the specified detail message, cause,
      * and an optional internal error code.
@@ -507,8 +514,8 @@ open class ExpectationMismatchException : ValidationFailedException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, expectation: Any?, value: Any?) : super(
-        $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+        $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}"
@@ -528,8 +535,8 @@ open class ExpectationMismatchException : ValidationFailedException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>? = null, expectation: Any?, value: Any?) : super(
-        $$"$${if (variable?.name.isNotNullOrBlank()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+        $$"$${if (variable?.name.isNotNullOrBlank) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}"
@@ -546,7 +553,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callable: KFunction<*>?, parameterName: String?, expectation: Any?, value: Any?) : super(
         $$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}"
@@ -563,7 +570,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callableName: String?, parameterName: String?, expectation: Any?, value: Any?) : super(
         $$"<parameters of `$$callableName`>$`$$parameterName`` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}"
@@ -583,7 +590,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callable: KFunction<*>?, parameter: KParameter?, expectation: Any?, value: Any?) : super(
         $$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}"
@@ -603,7 +610,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callableName: String?, parameter: KParameter?, expectation: Any?, value: Any?) : super(
         $$"<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.type}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}"
@@ -642,8 +649,8 @@ open class ExpectationMismatchException : ValidationFailedException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, expectation: Any?, value: Any?, cause: Throwable?) : super(
-        $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+        $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}", cause)
@@ -659,8 +666,8 @@ open class ExpectationMismatchException : ValidationFailedException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>? = null, expectation: Any?, value: Any?, cause: Throwable?) : super(
-        $$"$${if (variable?.name.isNotNullOrBlank()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+        $$"$${if (variable?.name.isNotNullOrBlank) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected $${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}", cause)
@@ -683,7 +690,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callable: KFunction<*>?, parameterName: String?, expectation: Any?, value: Any?, cause: Throwable?) : super(
         $$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}", cause)
@@ -700,7 +707,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callableName: String?, parameterName: String?, expectation: Any?, value: Any?, cause: Throwable?) : super(
         $$"<parameters of `$$callableName`>$`$$parameterName` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}", cause)
@@ -722,7 +729,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callable: KFunction<*>?, parameter: KParameter?, expectation: Any?, value: Any?, cause: Throwable?) : super(
         $$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}", cause)
@@ -742,7 +749,7 @@ open class ExpectationMismatchException : ValidationFailedException {
      */
     constructor(callableName: String?, parameter: KParameter?, expectation: Any?, value: Any?, cause: Throwable?) : super(
         $$"<parameters of `$${callableName}>`$`$${parameter?.name}` of type `$${parameter?.type}` was expected $${
-            if (expectation.isNull()) "to be null" else "as ${
+            if (expectation == null) "to be null" else "as ${
                 if (expectation.toString().isBlank()) "\"\"" else expectation
             }"
         }, but is $${if (value == "") "\"\"" else value}", cause)
@@ -793,7 +800,7 @@ open class ClassMismatchException : ExpectationMismatchException {
      * @since 1.0.0
      */
     constructor(expectedClass: KClass<*>?, actualClass: KClass<*>, cause: Throwable? = null) : super(
-        if (expectedClass.isNull()) "Actual class: ${actualClass.qualifiedName}"
+        if (expectedClass == null) "Actual class: ${actualClass.qualifiedName}"
         else "Expected class was $expectedClass, but got ${actualClass.qualifiedName}"
         , cause)
     /**
@@ -842,7 +849,7 @@ open class ClassMismatchException : ExpectationMismatchException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, expectedClass: KClass<*>) : super(
-        $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass.qualifiedName}`"
+        $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass.qualifiedName}`"
     )
     /**
      * Constructs a `ClassMismatchException` with the given properties and expected class type.
@@ -858,7 +865,7 @@ open class ClassMismatchException : ExpectationMismatchException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>? = null, expectedClass: KClass<*>?) : super(
-        $$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.qualifiedName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass?.qualifiedName}`"
+        $$"$${if (variable != null) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.qualifiedName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass?.qualifiedName}`"
     )
     /**
      * Constructs an instance of `ClassMismatchException` with a detailed message about the parameter and expected class type.
@@ -941,7 +948,7 @@ open class ClassMismatchException : ExpectationMismatchException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, expectedClass: KClass<*>?, cause: Throwable?) : super(
-        $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass?.qualifiedName}`",
+        $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass?.qualifiedName}`",
         cause
     )
     /**
@@ -959,7 +966,7 @@ open class ClassMismatchException : ExpectationMismatchException {
      * @since 1.0.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>? = null, expectedClass: KClass<*>?, cause: Throwable?) : super(
-        $$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass?.qualifiedName}`",
+        $$"$${if (variable != null) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}` was expected to be of type `$${expectedClass?.qualifiedName}`",
         cause
     )
     /**
@@ -1076,7 +1083,7 @@ open class DuplicatePropertyException : ValidationFailedException {
      * @param variableName an optional name of the variable to include in the exception message
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variableName: String? = null) : super($$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
+    constructor(property: KProperty<*>?, variableName: String? = null) : super($$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
      * Constructs a `DuplicatePropertyException` with a custom message based on the given properties.
      *
@@ -1084,12 +1091,12 @@ open class DuplicatePropertyException : ValidationFailedException {
      *                 Can be nullable.
      * @param variable An additional mandatory Kotlin property.
      *
-     * If `variable.isNotNull()` evaluates to `true`, its name is included in the exception message.
+     * If `variable != null` evaluates to `true`, its name is included in the exception message.
      * The exception message also incorporates the containing class name, property name, and its return type.
      *
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variable: KProperty<*>) : super($$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
+    constructor(property: KProperty<*>?, variable: KProperty<*>?) : super($$"$${if (variable != null) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`")
     /**
      * Constructs a new DuplicatePropertyException with a detailed message generated
      * from the provided callable function and parameter name.
@@ -1137,7 +1144,7 @@ open class DuplicatePropertyException : ValidationFailedException {
      * @param cause the cause of the exception, nullable
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variableName: String? = null, cause: Throwable?) : super($$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
+    constructor(property: KProperty<*>?, variableName: String? = null, cause: Throwable?) : super($$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
     /**
      * Constructor for the `DuplicatePropertyException` class.
      *
@@ -1152,7 +1159,7 @@ open class DuplicatePropertyException : ValidationFailedException {
      *
      * @since 3.2.0
      */
-    constructor(property: KProperty<*>?, variable: KProperty<*>?, cause: Throwable?) : super($$"$${if (variable.isNotNull()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
+    constructor(property: KProperty<*>?, variable: KProperty<*>?, cause: Throwable?) : super($$"$${if (variable != null) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`", cause)
     /**
      * Constructs a DuplicatePropertyException with a detailed message based on the provided callable function, parameter name,
      * and cause of the exception.
@@ -1241,7 +1248,7 @@ open class NumberSignException : ValidationFailedException {
      * @param message An optional custom message providing additional context about the exception. Defaults to an empty string.
      * @since 3.5.0
      */
-    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"($${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"($${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs a new instance of `NumberSignException`.
      *
@@ -1255,7 +1262,7 @@ open class NumberSignException : ValidationFailedException {
      * - An optional message if the provided `message` parameter is neither null nor empty.
      * @since 3.5.0
      */
-    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Secondary constructor for `NumberSignException`, initializing it with detailed information
      * about the callable name, parameter name, and optional message.
@@ -1265,7 +1272,7 @@ open class NumberSignException : ValidationFailedException {
      * @param message An optional additional message providing context for the exception. Defaults to an empty string.
      * @since 3.5.0
      */
-    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$$parameterName`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$$parameterName`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs an instance of `NumberSignException` with detailed information
      * about an invalid parameter in the given callable function.
@@ -1278,7 +1285,7 @@ open class NumberSignException : ValidationFailedException {
      * such as parameter names and types, concatenated with the provided message (if any).
      * @since 3.5.0
      */
-    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs an instance of `NumberSignException` with the provided callable name,
      * parameter, and optional message. The constructed exception message incorporates
@@ -1293,7 +1300,7 @@ open class NumberSignException : ValidationFailedException {
      *        exception. Defaults to an empty string if not provided.
      * @since 3.5.0
      */
-    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}")
+    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}")
     /**
      * Constructs a new instance of NumberSignException with the specified cause.
      *
@@ -1323,7 +1330,7 @@ open class NumberSignException : ValidationFailedException {
      * @since 3.5.0
      */
     constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "", cause: Throwable?) : super(
-        $$"$${if (variableName.isNotNullOrBlank()) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+        $$"$${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a new instance of NumberSignException.
      *
@@ -1340,7 +1347,7 @@ open class NumberSignException : ValidationFailedException {
      * @since 3.5.0
      */
     constructor(property: KProperty<*>?, variable: KProperty<*>? = null, message: String? = "", cause: Throwable?) : super(
-        $$"$${if (variable?.name.isNotNullOrBlank()) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+        $$"$${if (variable?.name.isNotNullOrBlank) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs an instance of the exception with detailed information about the parameter
      * of a callable function that caused the exception.
@@ -1354,7 +1361,7 @@ open class NumberSignException : ValidationFailedException {
      * formatted with additional context if a `message` is provided.
      * @since 3.5.0
      */
-    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Secondary constructor for the `NumberSignException` class. Initializes a new instance with
      * the provided `callableName`, `parameterName`, `message`, and `cause`.
@@ -1371,7 +1378,7 @@ open class NumberSignException : ValidationFailedException {
      * @param cause The throwable that caused this exception, or null if there is none.
      * @since 3.5.0
      */
-    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a new `NumberSignException` with detailed context about the parameter involved in an invalid operation.
      *
@@ -1381,7 +1388,7 @@ open class NumberSignException : ValidationFailedException {
      * @param cause The underlying cause of the exception, or null if not applicable.
      * @since 3.5.0
      */
-    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
     /**
      * Constructs a new instance of the `NumberSignException` class.
      *
@@ -1395,7 +1402,518 @@ open class NumberSignException : ValidationFailedException {
      * The `isNotNullOrEmpty` function is utilized to check if the message is non-null and non-empty before appending it.
      * @since 3.5.0
      */
-    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`$${if (message.isNotNullOrEmpty()) " $message" else ""}", cause)
+    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+}
+
+/**
+ * Exception thrown to indicate that a value is outside the expected range.
+ * This exception provides various constructors to supply additional context,
+ * including the range, property, callable, parameter, or custom messages that caused the exception.
+ * It can also include an optional cause to specify the underlying reason for the exception.
+ * @since 5.0.0
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class ValueOutOfRangeException : ValidationFailedException {
+    /**
+     * Default constructor for the ValueOutOfRangeException class.
+     * Initializes a new instance by invoking the superclass's default constructor.
+     * @since 5.0.0
+     */
+    constructor() : super()
+    /**
+     * Constructs a `ValueOutOfRangeException` with a message indicating
+     * the provided range within which the value is not included.
+     *
+     * @param range The range that the value is not within.
+     * @since 5.0.0
+     */
+    constructor(range: ClosedRange<*>) : super("Value is not in range $range")
+    /**
+     * Constructs a ValueOutOfRangeException with a detailed message indicating the specified
+     * range that was violated.
+     *
+     * @param range The range object which the value was expected to fall within.
+     * @since 5.0.0
+     */
+    constructor(range: OpenEndRange<*>) : super("Value is not in range $range")
+    /**
+     * Constructs a new ValueOutOfRangeException with the specified detail message.
+     *
+     * @param message The detail message providing more information about the exception.
+     * @since 5.0.0
+     */
+    constructor(message: String?) : super(message)
+    /**
+     * Constructs a `ValueOutOfRangeException` with detailed information about the property,
+     * variable name, and an optional message to describe the context of the exception.
+     *
+     * @param property The `KProperty` associated with the exception. Can be null if not applicable.
+     * @param variableName An optional name of the variable causing the exception; can be null.
+     *                     If provided and not blank, it will be included in the exception message.
+     * @param message An optional message providing additional context for the exception;
+     *                defaults to an empty string if not provided. If not empty, it will be
+     *                appended to the exception message.
+     * @since 5.0.0
+     */
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"($${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructor for creating an exception associated with a specific parameter of a callable function.
+     *
+     * @param callable The function whose parameter is associated with this exception. Can be null.
+     * @param parameterName The name of the parameter associated with this exception. Can be null.
+     * @param message An optional custom message providing additional context about the exception.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a new `ValueOutOfRangeException` instance with the given details.
+     *
+     * @param callableName The name of the callable function or context, if applicable.
+     * @param parameterName The name of the parameter associated with the out-of-range value.
+     * @param message An optional message providing additional context or details about the exception.
+     *                Defaults to an empty string if not provided.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"(<parameters of `$$callableName`>$`$$parameterName`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a ValueOutOfRangeException.
+     *
+     * @param callable The Kotlin function `KFunction` in which the error occurred. This is optional.
+     * @param parameter The Kotlin property `KProperty` representing the parameter related to the error. This is optional.
+     * @param message An optional message providing additional information about the exception's context. Default is an empty string.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructor for creating a `ValueOutOfRangeException` with specific details about the error.
+     *
+     * @param callableName The name of the callable where the error occurred, or null if not applicable.
+     * @param parameter The property (`KProperty`) involved in the exception, or null if not applicable.
+     * @param message An optional error message providing additional context about the exception. Defaults to an empty string.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"(<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructor for creating a ValueOutOfRangeException with a specific cause.
+     *
+     * @param cause The throwable cause of this exception, or null if no cause is specified.
+     * @since 5.0.0
+     */
+    constructor(cause: Throwable?) : super(cause)
+    /**
+     * Constructs a new ValueOutOfRangeException with the specified detail message and cause.
+     *
+     * @param message The detail message, which can be null.
+     * @param cause The cause of the exception, which can be null.
+     * @since 5.0.0
+     */
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    /**
+     * Constructs a new instance of the `ValueOutOfRangeException` class.
+     *
+     * @param property the reflective property information associated with this exception,
+     *                 typically representing the context or element where the value violation occurred.
+     *                 Nullable.
+     * @param variableName the name of the variable linked with this exception. Defaults to `null`.
+     *                     If provided and not blank, the name will be included in the exception message.
+     * @param message an additional message providing more context about the exception.
+     *                Defaults to an empty string if not provided.
+     * @param cause the underlying cause of the exception if applicable. Nullable.
+     * @since 5.0.0
+     */
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "", cause: Throwable?) : super(
+        $$"($${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a new `ValueOutOfRangeException` with a detailed message and an optional cause.
+     *
+     * The exception message is dynamically constructed based on the provided `property`,
+     * `variable`, and `message` parameters to include relevant contextual information.
+     *
+     * - If `variable` is provided and its name is non-null and not blank, its name is included
+     *   in the message along with a description.
+     * - The `property`'s class name, name, and return type are used to provide additional
+     *   details about the property that caused the exception.
+     * - If `message` is not null or empty, it is appended to the constructed message.
+     *
+     * @param property The primary property associated with this exception.
+     *                 Its class name, name, and return type are included in the message.
+     * @param variable An optional secondary property whose name might be included in the
+     *                 exception message if it is not null or blank.
+     * @param message  An optional additional message to append to the exception details.
+     * @param cause    An optional cause (another throwable) of this exception.
+     * @since 5.0.0
+     */
+    constructor(property: KProperty<*>?, variable: KProperty<*>? = null, message: String? = "", cause: Throwable?) : super(
+        $$"($${if (variable?.name.isNotNullOrBlank) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a `ValueOutOfRangeException` with detailed context about the parameter that caused
+     * the exception to be thrown.
+     *
+     * @param callable The Kotlin function that contains the parameter causing the exception, or null if unavailable.
+     *                 Used to provide context regarding where the issue occurred.
+     * @param parameterName The name of the parameter causing the exception, or null if unavailable.
+     *                      Used to identify the specific input leading to the error.
+     * @param message An optional detail message explaining the reason for the exception. If not provided,
+     *                a default description will be generated.
+     * @param cause The cause of the exception, or null if the cause is nonexistent or unknown.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a `ValueOutOfRangeException` instance with detailed context
+     * regarding the value and parameter where the exception was raised.
+     *
+     * @param callableName The name of the callable (e.g., function or method)
+     *                     where the exception occurred. May be null if unavailable.
+     * @param parameterName The name of the parameter associated with the out-of-range
+     *                      value. May be null if unavailable.
+     * @param message Optional additional information about the error. Defaults to an
+     *                empty string if not provided.
+     * @param cause The underlying cause of the exception. May be null.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty) " $message" else ""})", cause)
+    /**
+     * Constructs an exception indicating that a value provided to a callable
+     * function is out of the accepted range or invalid within the given context.
+     *
+     * @param callable The callable function where the out-of-range value was encountered.
+     *                 This may be `null` if no specific function context is available.
+     * @param parameter The parameter of the callable function associated with the invalid value.
+     *                  This may be `null` if no specific parameter context is applicable.
+     * @param message An optional error message providing further details about the exception.
+     *                Defaults to an empty string if not provided.
+     * @param cause The underlying cause of the exception, if any. This allows chaining of
+     *              exceptions to indicate the root cause of the error.
+     *
+     * The resulting exception message will dynamically include:
+     * - The name of the callable function, if provided.
+     * - The parameter's name and type associated with the invalid value, if both are available.
+     * - The custom error message, if provided and non-empty.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a `ValueOutOfRangeException` with details about the callable name, parameter,
+     * message, and cause of the exception.
+     *
+     * @param callableName The name of the callable function or property where the exception occurred.
+     *                     Can be null to indicate an unspecified callable.
+     * @param parameter The parameter of the callable that caused the exception. This can be null if the
+     *                  exception is not specific to a particular parameter.
+     * @param message An optional message providing additional information about the exception. Defaults
+     *                to an empty string if not provided.
+     * @param cause The underlying cause of the exception. This can be null if there is no specific cause.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+}
+
+/**
+ * Exception thrown to indicate that a numeric value is outside the allowed range.
+ *
+ * This exception provides several constructors to allow detailed information about the context
+ * in which the validation failed, including range boundaries, property metadata, function parameter
+ * details, or additional messages and causes.
+ *
+ * Each constructor allows the developer to supply varying levels of detail about the validation
+ * failure, enabling comprehensive error information for debugging and logging purposes.
+ * @since 5.0.0
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class NumberOutOfRangeException : ValueOutOfRangeException {
+    /**
+     * Constructs an instance of NumberOutOfRangeException using the default constructor.
+     * This initializes the exception without any additional parameters and invokes the super class's constructor.
+     * @since 5.0.0
+     */
+    constructor() : super()
+    /**
+     * Constructs a `NumberOutOfRangeException` with a predefined error message indicating
+     * that a number is not within the specified range.
+     *
+     * @param range The range of integers that is considered valid.
+     * @since 5.0.0
+     */
+    constructor(range: IntRange) : super("Number is not in range $range")
+    /**
+     * Constructs a NumberOutOfRangeException with a message indicating that a
+     * number is not within the specified range.
+     *
+     * @param range The range that the number is expected to fall within, where
+     * exclusions may be specified.
+     * @since 5.0.0
+     */
+    constructor(range: IntRangeWithExclusions) : super("Number is not in range $range")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a message indicating that
+     * a number is not within the specified range.
+     *
+     * @param range The range of integers with specific conditions that the number has not met.
+     * @since 5.0.0
+     */
+    constructor(range: IntRangeWithConditions) : super("Number is not in range $range")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a message indicating that
+     * the number is not within the specified range.
+     *
+     * @param range The range of valid numbers that was violated.
+     * @since 5.0.0
+     */
+    constructor(range: UIntRange) : super("Number is not in range $range")
+    /**
+     * Constructs a NumberOutOfRangeException with a message indicating that the number is not within the specified range.
+     *
+     * @param range The range with exclusions that the number is checked against.
+     * @since 5.0.0
+     */
+    constructor(range: UIntRangeWithExclusions) : super("Number is not in range $range")
+    /**
+     * Constructs a NumberOutOfRangeException with a message indicating that
+     * the number is not within the specified range.
+     *
+     * @param range The range against which the number was validated.
+     * @since 5.0.0
+     */
+    constructor(range: UIntRangeWithConditions) : super("Number is not in range $range")
+    /**
+     * Constructs a new instance of NumberOutOfRangeException with a message indicating the range.
+     *
+     * @param range The range that the number is expected to be within.
+     * @since 5.0.0
+     */
+    constructor(range: LongRange) : super("Number is not in range $range")
+    /**
+     * Constructs a NumberOutOfRangeException with a message indicating that
+     * a number is not within the specified range.
+     *
+     * @param range The range with exclusions against which the number is being compared.
+     * @since 5.0.0
+     */
+    constructor(range: LongRangeWithExclusions) : super("Number is not in range $range")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message indicating that a number is
+     * not within the specified range.
+     *
+     * @param range the range of numbers with conditions that is used to construct the exception message.
+     * @since 5.0.0
+     */
+    constructor(range: LongRangeWithConditions) : super("Number is not in range $range")
+    /**
+     * Constructs a [NumberOutOfRangeException] with a message indicating that a number
+     * is not within the specified range.
+     *
+     * @param range The range of unsigned long values that the number is expected to be in.
+     * @since 5.0.0
+     */
+    constructor(range: ULongRange) : super("Number is not in range $range")
+    /**
+     * Constructs a `NumberOutOfRangeException` with an error message indicating that a number
+     * is not within the provided range, including its exclusions.
+     *
+     * @param range The range, including any exclusions, that the number is expected to be within.
+     * @since 5.0.0
+     */
+    constructor(range: ULongRangeWithExclusions) : super("Number is not in range $range")
+    /**
+     * Constructs a NumberOutOfRangeException with a message indicating that the number
+     * is not within the specified range.
+     *
+     * @param range The range object specifying the allowable numeric bounds.
+     * @since 5.0.0
+     */
+    constructor(range: ULongRangeWithConditions) : super("Number is not in range $range")
+    /**
+     * Constructs a new exception indicating that a number is not within the specified range.
+     *
+     * @param range The range that the number is expected to be within.
+     * @since 5.0.0
+     */
+    constructor(range: ClosedRange<*>) : super("Number is not in range $range")
+    /**
+     * Constructs a NumberOutOfRangeException with a specific message indicating
+     * that a number is not within the specified open-ended range.
+     *
+     * @param range The open-ended range that does not contain the number.
+     * @since 5.0.0
+     */
+    constructor(range: OpenEndRange<*>) : super("Number is not in range $range")
+    /**
+     * Constructs a new NumberOutOfRangeException with the specified detail message.
+     *
+     * @param message The detail message, which can be retrieved later using the `message` property.
+     * @since 5.0.0
+     */
+    constructor(message: String?) : super(message)
+    /**
+     * Constructs a `NumberOutOfRangeException` with an optional property, variable name, and message.
+     *
+     * The constructor allows for providing details about the property and variable name that caused
+     * the exception, along with an optional custom message.
+     *
+     * @param property An optional KProperty representing the property associated with the exception.
+     *                 This provides metadata about the property such as its owning class, name, and return type.
+     * @param variableName An optional name of the variable that caused the exception. If non-null and not blank,
+     *                     it is used in the exception message to give additional context.
+     * @param message An optional custom message to include in the exception. If provided, it is appended
+     *                to the generated exception description.
+     * @since 5.0.0
+     */
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "") : super($$"($${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}$$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a new instance of the exception with detailed information about the parameter
+     * that caused the exception.
+     *
+     * @param callable The Kotlin function being evaluated. Can be null if no specific function context is provided.
+     * @param parameterName The name of the parameter associated with the exception. Can be null if the parameter is unknown.
+     * @param message An optional message providing additional context about the exception. Defaults to an empty string.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "") : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message composed of the provided callable name,
+     * parameter name, and an optional additional message.
+     *
+     * @param callableName The name of the callable containing the out-of-range parameter. Can be null.
+     * @param parameterName The name of the parameter which is out of range. Can be null.
+     * @param message An additional message providing further details about the exception. Defaults to an empty string.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameterName: String?, message: String? = "") : super($$"(<parameters of `$$callableName`>$`$$parameterName`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a new `NumberOutOfRangeException` with a detailed message indicating the invalid callable or parameter.
+     *
+     * @param callable The `KFunction` representing the function where the number is out of the acceptable range. May be null.
+     * @param parameter The `KProperty` representing the parameter that is associated with the out-of-range number. May be null.
+     * @param message An optional message providing additional context about the exception. Defaults to an empty string if not specified.
+     *
+     * The constructor constructs a detailed exception message that includes the callable's name, the parameter's name,
+     * and its type (if available), followed by the additional message if provided.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameter: KProperty<*>?, message: String? = "") : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a `NumberOutOfRangeException` instance with a specified callable name,
+     * parameter, and an optional message.
+     *
+     * @param callableName The name of the callable from which the exception originates.
+     * @param parameter The parameter involved when the exception occurred, represented as a KProperty.
+     * @param message An optional additional message to include in the exception details. Defaults to an empty string.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameter: KProperty<*>?, message: String? = "") : super($$"(<parameters of `$$callableName`>$`$${parameter?.name}` of type `$${parameter?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}")
+    /**
+     * Constructs a new NumberOutOfRangeException with the specified cause.
+     *
+     * @param cause the cause of this exception. This can be used to provide
+     * additional context or wrap another throwable that led to this exception.
+     * @since 5.0.0
+     */
+    constructor(cause: Throwable?) : super(cause)
+    /**
+     * Constructs a new NumberOutOfRangeException with the specified detail message and cause.
+     *
+     * @param message the detail message, providing additional information about the exception.
+     * @param cause the cause of the exception, which can be used to trace the root issue.
+     * @since 5.0.0
+     */
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    /**
+     * Constructs a `NumberOutOfRangeException` with an optional property reference, variable name,
+     * error message, and cause.
+     *
+     * The formatted message provides context regarding the variable or property causing the issue
+     * by including its name, type, and owner class information if available.
+     *
+     * @param property The optional `KProperty` reference associated with the exception.
+     *                 If provided, its type, name, and owner class will be included in the exception message.
+     * @param variableName The name of the variable involved in the exception, or null if not applicable.
+     *                     If not blank, it is included in the exception message.
+     * @param message An optional error message providing additional details.
+     *                If non-empty, it appends to the formatted message.
+     * @param cause The root cause of the exception, or null if not applicable.
+     * @since 5.0.0
+     */
+    constructor(property: KProperty<*>?, variableName: String? = null, message: String? = "", cause: Throwable?) : super(
+        $$"($${if (variableName.isNotNullOrBlank) "`$variableName` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message and an optional cause.
+     *
+     * The message is dynamically generated based on the provided `property`, `variable`, `message`, and their attributes.
+     * - If `variable` is provided and its `name` is not null or blank, it includes the variable name and its type in the message.
+     * - Includes the `property` owner class name, property name, and its return type in the message.
+     * - Appends the provided `message` if it is not null or empty.
+     *
+     * @param property The primary property involved in the exception, whose metadata may be used in the error message.
+     * @param variable An optional variable whose metadata may be additionally included in the error message.
+     * @param message An optional string providing additional information or context about the exception.
+     * @param cause An optional `Throwable` indicating the underlying cause of this exception.
+     * @since 5.0.0
+     */
+    constructor(property: KProperty<*>?, variable: KProperty<*>? = null, message: String? = "", cause: Throwable?) : super(
+        $$"($${if (variable?.name.isNotNullOrBlank) "`${variable.name}` of type " else ""}`$${property?.ownerClass?.simpleName}`$`$${property?.name}` of type `$${property?.returnType}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a NumberOutOfRangeException for a specific parameter within a callable function.
+     *
+     * This constructor generates a detailed exception message that includes the callable's name,
+     * the parameter's name, and its type, along with an optional custom message. It allows tracking
+     * of parameter-related range issues within callable functions.
+     *
+     * @param callable The KFunction instance representing the callable function where the exception occurred.
+     *                 If null, the message won't reference the callable's details.
+     * @param parameterName The name of the parameter within the callable function for which the exception was raised.
+     *                      If null, the message won't include the parameter's name or type.
+     * @param message An additional message to provide more details about the exception. Optional, defaults to an empty string.
+     * @param cause The underlying cause of the exception. Optional, can be null.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameterName }?.name}` of type `$${callable?.parameters?.find { it.name == parameterName }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a new `NumberOutOfRangeException` with details about the erroneous parameter
+     * and an optional custom message and cause.
+     *
+     * The exception retains information about the callable or function's name where the error
+     * occurred (`callableName`), the specific parameter causing the issue (`parameterName`),
+     * an optional explanatory `message`, and an optional `cause` encapsulating the underlying
+     * exception or error.
+     *
+     * @param callableName The name of the callable or function where the parameter error occurred,
+     *                     or null if unavailable.
+     * @param parameterName The name of the parameter causing the exception, or null if unavailable.
+     * @param message An optional message providing additional details about the exception,
+     *                defaulting to an empty string.
+     * @param cause An optional throwable representing the cause of this exception.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameterName: String?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callableName}`>$`$$parameterName`)$${if (message.isNotNullOrEmpty) " $message" else ""})", cause)
+    /**
+     * Constructor for creating a NumberOutOfRangeException with detailed information about the offending parameter.
+     *
+     * @param callable The KFunction instance representing the function to which the parameter belongs.
+     * @param parameter The KParameter instance representing the specific parameter that caused the exception.
+     * @param message An optional message providing additional context about the exception.
+     *                If not provided, a default description is generated based on the parameter and its type.
+     * @param cause The underlying Throwable that caused this exception to be thrown, if any.
+     *
+     * The exception message is dynamically constructed to include the following:
+     * - The name of the function (`callable?.name`), if available.
+     * - The parameter name (`parameter?.name`) and its type, if identified within the callable's parameters.
+     * - Additional context from the provided `message`, if it is not null or empty.
+     * @since 5.0.0
+     */
+    constructor(callable: KFunction<*>?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callable?.name}`>$`$${callable?.parameters?.find { it.name == parameter?.name }?.name}` of type `$${callable?.parameters?.find { it.name == parameter?.name }?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
+    /**
+     * Constructs a NumberOutOfRangeException for a specific function parameter.
+     *
+     * @param callableName The name of the callable function in which the exception occurred, or null if not applicable.
+     * @param parameter The parameter of the callable function that caused the exception, or null if not applicable.
+     * @param message Optional message providing additional context about the exception. Default is an empty string.
+     * @param cause The underlying cause of this exception, or null if none exists.
+     * @since 5.0.0
+     */
+    constructor(callableName: String?, parameter: KParameter?, message: String? = "", cause: Throwable?) : super($$"(<parameters of `$${callableName}`>$`$${parameter?.name}` of type `$${parameter?.type}`)$${if (message.isNotNullOrEmpty) " $message" else ""}", cause)
 }
 
 /**
@@ -1412,7 +1930,7 @@ open class NumberSignException : ValidationFailedException {
  */
 @Suppress("unused")
 open class JsonSchemaValidationException(errors: Iterable<SchemaError>, cause: Throwable? = null, internalErrorCode: String? = null) :
-    ValidationFailedException("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}Invalid JSON Schema:\n${errors.joinToString(";\n")}", cause = cause) {
+    ValidationFailedException("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Invalid JSON Schema:\n${errors.joinToString(";\n")}", cause = cause) {
 
     val errors: Set<SchemaError> = errors.toSet()
     val internalErrorCode: String?
@@ -1461,7 +1979,7 @@ open class XmlSchemaValidationException : ValidationFailedException {
      * @param internalErrorCode An optional code representing the internal error context. Defaults to null.
      * @since 3.9.0
      */
-    constructor(message: String, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message")
+    constructor(message: String, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message")
     /**
      * Constructs a new `XmlSchemaValidationException` with the specified message and an optional cause
      * and/or internal error code.
@@ -1471,7 +1989,7 @@ open class XmlSchemaValidationException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code providing additional context about the failure (defaults to `null`).
      * @since 3.9.0
      */
-    constructor(message: String, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
+    constructor(message: String, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
     /**
      * Constructs an instance of `XmlSchemaValidationException` with an optional cause and an optional internal error code.
      *
@@ -1483,5 +2001,5 @@ open class XmlSchemaValidationException : ValidationFailedException {
      * @param internalErrorCode An optional error code string to provide additional context about the error, or null if not applicable.
      * @since 3.9.0
      */
-    constructor(cause: Throwable? = null, internalErrorCode: String? = null) : super(if (internalErrorCode.isNotNull()) "$internalErrorCode @@@ " else null, cause)
+    constructor(cause: Throwable? = null, internalErrorCode: String? = null) : super(if (internalErrorCode != null) "$internalErrorCode @@@ " else null, cause)
 }

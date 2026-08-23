@@ -73,7 +73,7 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
      *
      * @since 4.0.0
      */
-    val hasFrontMatter: Boolean get() = stripFrontMatter().first.isNotNull()
+    val hasFrontMatter: Boolean get() = stripFrontMatter().first != null
     /**
      * The document body, i.e. the content with any leading YAML front matter removed.
      *
@@ -362,7 +362,7 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
                 }
             }
         }
-        if (fence.isNotNull()) codeBlocks += CodeBlock(fenceLang.ifBlank { null }?.toEnumConst(), buffer.toString().trimEnd('\n'))
+        if (fence != null) codeBlocks += CodeBlock(fenceLang.ifBlank { null }?.toEnumConst(), buffer.toString().trimEnd('\n'))
         return Scan(headings, codeBlocks, tasks, blockquotes, outside.toString())
     }
 

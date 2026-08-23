@@ -60,7 +60,7 @@ open class PageLimitPaginationSpec(
     init {
         page.validateNotNegative(::page)
         limit.validate(::limit, message = "must be null, -1 or positive") {
-            it.isNull() || it == -1 || it.isPositive
+            it == null || it == -1 || it.isPositive
         }
         this.limit = limit.letIf(limit == -1) { null }
     }
@@ -74,7 +74,7 @@ open class PageLimitPaginationSpec(
             ) {
                 gen.writeStartObject()
                 gen.writeNumberProperty("page", value.page)
-                if (value.limit.isNull()) gen.writeNullProperty("limit") else gen.writeNumberProperty("limit", value.limit)
+                if (value.limit == null) gen.writeNullProperty("limit") else gen.writeNumberProperty("limit", value.limit)
                 gen.writeArrayPropertyStart("filter")
                 value.filter.forEach { gen.writePOJO(it) }
                 gen.writeEndArray()
@@ -102,7 +102,7 @@ open class PageLimitPaginationSpec(
             override fun serialize(value: PageLimitPaginationSpec, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
                 gen.writeNumberField("page", value.page)
-                if (value.limit.isNull()) gen.writeNullField("limit") else gen.writeNumberField("limit", value.limit)
+                if (value.limit == null) gen.writeNullField("limit") else gen.writeNumberField("limit", value.limit)
                 gen.writeArrayFieldStart("filter")
                 value.filter.forEach { gen.writeObject(it) }
                 gen.writeEndArray()
@@ -230,7 +230,7 @@ open class CursorPaginationSpec(
 
     init {
         limit.validate(::limit, message = "must be null, -1 or positive") {
-            it.isNull() || it == -1 || it.isPositive
+            it == null || it == -1 || it.isPositive
         }
         this.limit = limit.letIf(limit == -1) { null }
     }
@@ -243,11 +243,11 @@ open class CursorPaginationSpec(
                 ctxt: SerializationContext
             ) {
                 gen.writeStartObject()
-                if (value.cursor.isNull()) gen.writeNullProperty("cursor") else gen.writeStringProperty(
+                if (value.cursor == null) gen.writeNullProperty("cursor") else gen.writeStringProperty(
                     "cursor",
                     value.cursor.toString()
                 )
-                if (value.limit.isNull()) gen.writeNullProperty("limit") else gen.writeNumberProperty(
+                if (value.limit == null) gen.writeNullProperty("limit") else gen.writeNumberProperty(
                     "limit",
                     value.limit
                 )
@@ -286,11 +286,11 @@ open class CursorPaginationSpec(
         class OldSerializer : JsonSerializer<CursorPaginationSpec>() {
             override fun serialize(value: CursorPaginationSpec, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeStartObject()
-                if (value.cursor.isNull()) gen.writeNullField("cursor") else gen.writeStringField(
+                if (value.cursor == null) gen.writeNullField("cursor") else gen.writeStringField(
                     "cursor",
                     value.cursor.toString()
                 )
-                if (value.limit.isNull()) gen.writeNullField("limit") else gen.writeNumberField("limit", value.limit)
+                if (value.limit == null) gen.writeNullField("limit") else gen.writeNumberField("limit", value.limit)
                 gen.writeArrayFieldStart("filter")
                 value.filter.forEach { gen.writeObject(it) }
                 gen.writeEndArray()

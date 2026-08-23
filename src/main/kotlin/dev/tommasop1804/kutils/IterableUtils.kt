@@ -23,13 +23,98 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
 import kotlin.collections.map as kMap
 import kotlin.collections.sortBy as kSortBy
 import kotlin.collections.sortByDescending as kSortByDescending
 import kotlin.collections.sortedBy as kSortedBy
+
+/**
+ * Extension property that checks if the collection is empty.
+ *
+ * @return `true` if the collection contains no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val <E> Collection<E>.isEmpty get() = isEmpty()
+/**
+ * Extension property for `Collection` that checks if the collection is not empty.
+ *
+ * @return `true` if the collection contains at least one element, `false` otherwise.
+ * @since 5.0.0
+ */
+val <E> Collection<E>.isNotEmpty get() = isNotEmpty()
+/**
+ * Extension property for collections that checks if the collection is either null or empty.
+ *
+ * @receiver A nullable collection of type E.
+ * @return `true` if the collection is null or contains no elements, otherwise `false`.
+ * @since 5.0.0
+ */
+val <E> Collection<E>?.isNullOrEmpty: Boolean get() {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return isNullOrEmpty()
+}
+/**
+ * Extension property to check whether a nullable collection is not null and not empty.
+ *
+ * This property is a shorthand for simultaneously verifying that a collection is neither null nor empty.
+ *
+ * @return `true` if the collection is not null and contains at least one element, `false` otherwise.
+ * @since 5.0.0
+ */
+val <E> Collection<E>?.isNotNullOrEmpty: Boolean get() {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return !isNullOrEmpty()
+}
+
+/**
+ * Extension property for `Iterable<E>` that checks if the elements in the collection
+ * are sorted in ascending order according to their natural ordering.
+ *
+ * This property evaluates lazily by iterating through the collection and comparing
+ * each element with the next one. If all elements satisfy `x <= y` for consecutive
+ * elements `x` and `y`, it returns `true`. If any pair of consecutive elements violates
+ * this condition, it returns `false`.
+ *
+ * Note that an empty collection or a collection with a single element is considered sorted.
+ *
+ * @return `true` if the elements are sorted in ascending order, otherwise `false`.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Iterable<E>.isSorted get() = isSorted()
+/**
+ * Extension property for `Iterable` that determines if the collection is not sorted.
+ *
+ * Checks whether the elements of the iterable are not in natural order.
+ *
+ * @receiver Iterable of elements implementing `Comparable`.
+ * @return `true` if the elements are not sorted, otherwise `false`.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Iterable<E>.isNotSorted get() = !isSorted()
+/**
+ * Extension property for [Iterable] that checks if the elements are sorted in descending order.
+ *
+ * This property evaluates whether the elements in the iterable are arranged in strictly
+ * non-increasing order based on their natural ordering, as defined by the [Comparable] interface.
+ *
+ * @receiver Iterable of elements implementing [Comparable].
+ * @return `true` if the elements are sorted in descending order or if the iterable is empty; `false` otherwise.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Iterable<E>.isSortedDescending get() = isSortedDescending()
+/**
+ * Extension property for `Iterable<E>` that checks whether the collection is not sorted in descending order.
+ *
+ * This property returns `true` if the elements of the iterable are not in strictly descending order
+ * based on their natural ordering as defined by `Comparable`. If the elements are sorted in
+ * descending order, the property will return `false`.
+ * @since 5.0.0
+ */
+val <E : Comparable<E>> Iterable<E>.isNotSortedDescending get() = !isSortedDescending()
 
 /**
  * Generates a map that represents the cardinality (frequency) of elements in the given iterable.
@@ -209,9 +294,9 @@ fun <E> MutableList<E>.addIfAbsent(element: E) {
  */
 @JvmName("addIfAbsentNullable")
 fun <E> MutableList<E?>.addIfAbsent(element: E?) {
-    if (element.isNull()) {
+    if (element == null) {
         for (e in this)
-            if (e.isNull()) return
+            if (e == null) return
         add(null)
     }
     if (!contains(element)) add(element)
@@ -702,25 +787,6 @@ fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predica
 }
 
 /**
- * Checks if the collection is not null and not empty.
- *
- * This method allows for safe checking of a nullable collection, ensuring it is both non-null
- * and contains elements.
- *
- * @receiver The nullable collection to be checked.
- * @return `true` if the collection is non-null and contains at least one element, otherwise `false`.
- * @since 1.0.0
- */
-@OptIn(ExperimentalContracts::class)
-@Suppress("kutils_null_check")
-fun <E> Collection<E>?.isNotNullOrEmpty(): Boolean {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return isNotNull() && isNotEmpty()
-}
-
-/**
  * Returns the original collection if it is not null and not empty; otherwise,
  * returns the result of `defaultValue` function.
  *
@@ -733,50 +799,127 @@ fun <E> Collection<E>?.isNotNullOrEmpty(): Boolean {
  * collection returned by the `defaultValue` function.
  * @since 1.0.0
  */
-@OptIn(ExperimentalContracts::class)
-inline fun <C : Collection<E>, E> C?.ifNullOrEmpty(defaultValue: Supplier<C>): C {
+inline fun <C : Collection<E>?, E> C.ifNullOrEmpty(defaultValue: Supplier<C>): C {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }
     return if (isNullOrEmpty()) defaultValue() else this
 }
 /**
- * Executes the given action if the collection is not empty.
+ * Executes the given action if the collection is not empty and returns the collection itself.
  *
- * @param action A transformer that will be executed if the collection is not empty.
- * @return The result of the action if the collection is not empty, or the collection itself otherwise.
- * @since 3.1.3
+ * @param action The action to be executed if the collection is not empty.
+ * @return The original collection.
+ * @since 5.0.0
  */
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <C : Collection<E>, E, R> C.ifNotEmpty(action: ReceiverTransformer<C, R>): R {
+inline fun <C : Collection<E>, E> C.ifNotEmpty(action: Consumer<C>): C {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return (if (isNotEmpty()) action(this) else this) as R
+    if (isNotEmpty()) action(this)
+    return this
 }
 /**
- * Performs the given [block] on the collection if it is not null and not empty.
+ * Executes the given block if the collection is not null and not empty.
  *
- * This method provides a safe way to execute an operation on a nullable collection only
- * when it contains elements. If the collection is null or empty, no action is performed
- * and the collection itself is returned.
+ * This function allows for safe invocation of a supplied block of code,
+ * which will only be executed if the collection is both non-null and contains elements.
  *
- * @param block The lambda function or transformation to be applied on the collection
- *               if it is not null and not empty.
- * @return The result of the [block] if the collection is not null and not empty,
- *         otherwise the collection itself as is.
- * @since 3.1.3
+ * @param block The block of code to execute if the collection satisfies the not-null and not-empty condition.
+ * @return The original collection, regardless of whether the block was executed or not.
+ * @since 5.0.0
  */
-@OptIn(ExperimentalExtendedContracts::class)
-@Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
-inline fun <C : Collection<E>?, E, R> C?.ifNotNullOrEmpty(block: ReceiverTransformer<C, R>): R {
+inline fun <C : Collection<E>, E> C?.ifNotNullOrEmpty(block: Consumer<C>): C? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         (this@ifNotNullOrEmpty != null) holdsIn block
+        (this@ifNotNullOrEmpty != null) implies returnsNotNull()
     }
-    return (if (isNotNullOrEmpty()) block(this) else this) as R
+    if (isNotNullOrEmpty) block(this)
+    return this
+}
+
+/**
+ * Executes the given action on the iterable if it contains the specified element.
+ *
+ * @param element The element to check for in the iterable.
+ * @param action The action to be performed if the element is found.
+ * @return The original iterable.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : Iterable<E>, E> C.ifContains(element: E, action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (contains(element)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the collection does not contain the specified element.
+ *
+ * @param element The element whose absence in the collection is to be checked.
+ * @param action The action to be executed if the element is not present in the collection.
+ * @return The same collection on which the method was invoked.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : Iterable<E>, E> C.ifNotContains(element: E, action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!contains(element)) action(this)
+    return this
+}
+
+/**
+ * Executes the given action on the collection if its size is equal to the specified value.
+ *
+ * @param size The size to compare with the collection's size.
+ * @param action The action to be invoked if the collection's size matches the specified value.
+ * @return The original collection.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : Collection<E>, E> C.ifSize(size: Int, action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this.size == size) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the collection size is not equal to the specified size.
+ *
+ * @param size The size to compare against the collection's size.
+ * @param action The action to execute if the collection size does not match the specified size.
+ * @return The original collection.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : Collection<E>, E> C.ifNotSize(size: Int, action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this.size != size) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the collection contains exactly one element.
+ *
+ * @param action A consumer that will be executed if the collection has a single element.
+ * @return The original collection.
+ * @since 5.0.0
+ */
+@IgnorableReturnValue
+inline fun <C : Collection<E>, E> C.ifSingleElement(action: Consumer<C>): C {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (size == 1) action(this)
+    return this
 }
 
 /**
@@ -800,12 +943,24 @@ infix fun <E> Iterable<E>.step(step: Int) =  filterIndexed { index, c -> index %
  * @return `true` if the collection is `null` or empty, `false` otherwise.
  * @since 1.0.0
  */
+@JvmName("nullableNot")
 operator fun <E> Collection<E>?.not(): Boolean {
     contract {
         returns(false) implies (this@not != null)
     }
     return isNullOrEmpty()
 }
+/**
+ * Checks whether the collection is empty.
+ *
+ * This operator function allows using the negation operator `!`
+ * as shorthand for checking if a collection contains no elements.
+ *
+ * @receiver The collection to check.
+ * @return `true` if the collection is empty, `false` otherwise.
+ * @since 5.0.0
+ */
+operator fun <E> Collection<E>.not() = isEmpty()
 
 /**
  * Repeats the elements of the list a specified number of times and returns the resulting list.
@@ -1409,7 +1564,7 @@ inline fun <E, K, V, M : MutableMap<in K, in V>> Iterable<E>.associateTo(
  * @since 1.0.0
  */
 inline infix fun <E, R> Iterable<E>.filterNotNull(element: Transformer<E, R>) =
-    filter { element(it).isNotNull() }
+    filter { element(it) != null }
 
 /**
  * Filters the elements of the given iterable where the value of the specified property is null.
@@ -1419,7 +1574,7 @@ inline infix fun <E, R> Iterable<E>.filterNotNull(element: Transformer<E, R>) =
  * @since 1.0.0
  */
 inline infix fun <E, R> Iterable<E>.filterNull(element: Transformer<E, R>) =
-    filter { element(it).isNull() }
+    filter { element(it) == null }
 
 /**
  * Removes elements from the collection that match the specified predicate.
@@ -1738,631 +1893,3 @@ fun <E> emptyMList(): MList<E> = mutableListOf()
  * @since 1.0.0
  */
 fun <E> emptyMSet(): MSet<E> = mutableSetOf()
-
-/**
- * Validates that the collection is not empty. If the collection is empty, a `ValidationFailedException` is thrown.
- * The exception may optionally have a cause provided by the `causeOf` or `cause` suppliers.
- *
- * @param causeOf a supplier that provides a throwable as the primary cause, or `null` if unused.
- * @param cause a supplier that provides a throwable as a secondary cause, or `null` if unused.
- * @return the original collection if it is not empty.
- * @throws ValidationFailedException if the collection is empty, with an optional cause or nested cause.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Ensures that the collection is not empty. If the collection is empty, throws a
- * `ValidationFailedException` with the provided lazy message, and optionally sets
- * the provided cause or initializes the cause from another throwable.
- *
- * @param causeOf an optional supplier for the throwable to set as the cause of the
- *                validation failure. If null, a `ValidationFailedException` is thrown directly.
- * @param cause an optional supplier for the underlying cause of the validation failure,
- *              which can be set in the exception using `initCause`.
- * @param lazyMessage a supplier for the error message to use in the exception when validation fails.
- * @return the original collection if it is not empty.
- * @throws ValidationFailedException if the collection is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not empty. If the collection is empty, a `ValidationFailedException` is thrown.
- *
- * @param property The property associated with the validation failure. Can be null if not applicable.
- * @param variableName An optional name for the variable involved in the validation. If provided, it is included in the exception message.
- * @param message An optional descriptive message for the validation failure. Defaults to "is empty" if not provided.
- * @param causeOf A supplier for the throwable that caused the validation failure, if applicable.
- * @param cause An optional supplier for an additional exception to be attached as the cause of `ValidationFailedException`.
- * @return The collection itself if it passes the validation.
- * @throws ValidationFailedException if the collection is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not empty. If the collection is empty, a `ValidationFailedException` is thrown.
- *
- * @param property the main KProperty associated with the validation, or null if not specified.
- * @param variable an optional secondary KProperty that provides additional context, or null if not specified.
- * @param message an optional message to include in the exception if validation fails; defaults to "is empty".
- * @param causeOf an optional supplier for the cause of the exception if validation fails.
- * @param cause an optional supplier for a chained cause of the exception if validation fails.
- * @return the collection itself if it is not empty.
- * @throws ValidationFailedException if the collection is empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a collection is not empty. If the collection is empty, a `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) to which the validation is related. Can be null.
- * @param parameterName The name of the parameter being validated. Used in the exception message. Can be null.
- * @param message Custom error message in case validation fails. Defaults to "is empty".
- * @param causeOf Supplier for a `Throwable` that will be thrown if the validation fails, overriding the default exception behavior. Can be null.
- * @param cause Supplier for the root cause `Throwable` to be attached to the exception if thrown. Can be null.
- * @return The collection itself if it is not empty.
- * @throws ValidationFailedException If the collection is empty and no `causeOf` is provided.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not empty. If the collection is empty, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] associated with this validation, or null if not applicable
- * @param parameter the [KParameter] being validated, or null if not applicable
- * @param message an optional custom error message to include in the exception if the validation fails
- * @param causeOf an optional supplier for the root cause of the validation failure, or null if no such cause exists
- * @param cause an optional supplier for the secondary cause of the validation failure, or null if no such cause exists
- * @return the validated collection if it is not empty
- * @throws ValidationFailedException if the collection is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not empty. If the collection is empty, a `ValidationFailedException`
- * is thrown with details about the failure.
- *
- * @param callableName the name of the callable (e.g., function or method) related to this validation
- * @param parameterName the name of the parameter being validated, or null if not specified
- * @param message a custom message describing the validation failure, or null to use the default message
- * @param causeOf a supplier for the cause of the exception, which will be used to initialize the root cause of the failure, or null
- * @param cause a supplier for an additional cause of the exception, or null
- * @return the original collection if it is not empty
- * @throws ValidationFailedException if the collection is empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not empty, throwing a `ValidationFailedException` if it is empty.
- *
- * @param callableName The name of the callable (e.g., function or property) where validation is performed. Can be null.
- * @param parameter The `KParameter` instance representing the parameter involved in the validation. Can be null.
- * @param message An optional error message providing more context if validation fails. Defaults to "is empty" if not specified.
- * @param causeOf A supplier for a throwable that can wrap the `ValidationFailedException`. Can be null.
- * @param cause A supplier for the cause of the `ValidationFailedException`. Can be null.
- * @return The same collection instance if it passes the validation.
- *
- * @throws ValidationFailedException if the collection is empty. The exception provides details such as the callable name,
- * parameter, message, or the underlying cause based on the inputs provided.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is neither `null` nor empty. If the validation fails, an exception is thrown.
- *
- * @param causeOf the supplier function for providing a custom exception to be thrown
- *                when the collection is `null` or empty. If this is `null`, a default exception is used.
- * @param cause additional supplier function for providing the cause of the exception, if necessary.
- *              This is optional and can also be `null`.
- * @return the original collection if it is valid (not `null` or empty).
- * @throws ValidationFailedException if the collection is `null` or empty, along with the specified or default cause.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not null or empty. If the validation fails,
- * a `ValidationFailedException` is thrown with the specified lazy message and optional cause.
- *
- * @param causeOf a supplier of the throwable to be used as the cause of the exception if provided.
- * @param cause a supplier of the throwable to be used as an additional cause of the exception if provided.
- * @param lazyMessage a supplier for the message to be included in the exception if the validation fails.
- * @return the original collection if it is not null or empty.
- * @throws ValidationFailedException if the collection is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given collection is not null or empty. If the collection is null or empty,
- * throws a [ValidationFailedException] with the specified parameters.
- *
- * @param property Optional property metadata associated with the collection being validated.
- * @param variableName Optional name of the variable involved in the validation. Included in the
- *                     exception message if provided.
- * @param message Optional custom message for the validation failure. Defaults to "is null or empty"
- *                if not provided.
- * @param causeOf Optional supplier for the primary cause of the validation failure, which is used
- *                to initialize the thrown exception.
- * @param cause Optional supplier for an additional cause to be included in the thrown exception.
- * @return The original collection if it is neither null nor empty.
- * @throws ValidationFailedException If the collection is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not null or empty.
- * If the collection is null or empty, it throws a [ValidationFailedException].
- *
- * @param property The primary property associated with the validation, or null if not specified.
- * @param variable An optional secondary property providing additional context, or null if not specified.
- * @param message An optional message providing details about the validation failure, or null to use a default message.
- * @param causeOf A supplier for the root exception cause, or null if no root cause is specified.
- * @param cause A supplier for the exception cause, or null if no cause is specified.
- * @return The collection itself if the validation is successful.
- * @throws ValidationFailedException if the collection is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is neither null nor empty. If the validation fails, throws a `ValidationFailedException`.
- *
- * @param callable The Kotlin function (`KFunction`) that is associated with the validation.
- *                 This helps in identifying the context in which the validation is performed. Can be null.
- * @param parameterName The name of the parameter in the function `callable` that is being validated. Can be null.
- * @param message An optional custom message to include in the exception if validation fails. Default is "is null or empty".
- * @param causeOf A supplier of the cause for the exception. If provided, it takes precedence over the `cause` parameter. Can be null.
- * @param cause A supplier of the underlying cause for the exception. Used if `causeOf` is not supplied. Can be null.
- * @since 4.2.0
- **/
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is neither null nor empty. If it is null or empty, a `ValidationFailedException` is thrown.
- *
- * @param callable the [KFunction] associated with the validation, or null if not applicable.
- * @param parameter the [KParameter] involved in the validation, or null if not applicable.
- * @param message an optional message providing additional context about the validation failure, defaulting to null.
- * @param causeOf an optional supplier for a custom exception cause, defaulting to null.
- * @param cause an optional supplier for the underlying cause of the validation failure, defaulting to null.
- * @return the original collection if the validation passes.
- * @throws ValidationFailedException if the collection is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not null or empty. If the validation fails, it throws a [ValidationFailedException].
- *
- * @param callableName The name of the callable (e.g., function or method) associated with the validation.
- * @param parameterName The name of the parameter being validated, or `null` if not applicable.
- * @param message An optional custom message providing additional details about the failure. Defaults to "is null or empty".
- * @param causeOf A supplier for the primary exception to be thrown if validation fails, or `null` if not provided.
- * @param cause A supplier for the underlying cause of the validation failure, or `null` if not provided.
- * @return The collection itself if validation passes.
- * @throws ValidationFailedException If the collection is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is not `null` or empty. If the collection is `null` or empty,
- * a `ValidationFailedException` is thrown with additional details about the callable name,
- * parameter, and an optional error message or cause.
- *
- * @param callableName The name of the callable (e.g., function or property) for context in case of validation failure, or `null` if not specified.
- * @param parameter The parameter related to this validation check, represented as a `KParameter` instance, or `null` if not applicable.
- * @param message An optional error message providing context about the validation failure, or `null` for a default message.
- * @param causeOf A supplier (`ThrowableSupplier`) for the cause of the validation failure, or `null` if not specified.
- * @param cause An additional supplier (`ThrowableSupplier`) for a deeper cause of validation failure, or `null` if not specified.
- * @return The original collection if it is not `null` and not empty.
- * @throws ValidationFailedException If the collection is `null` or empty, providing detailed contextual information.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNotNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNotNullOrEmpty != null)
-    }
-    if (isNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current collection is empty. If the collection is not empty, an exception is thrown.
- *
- * @param causeOf an optional supplier that provides a custom exception to be thrown if the validation fails.
- * @param cause an optional supplier that provides the underlying cause for the exception.
- * @return the current collection if it is empty.
- * @throws ValidationFailedException if the collection is not empty and no custom exception is provided.
- * @throws Throwable if a custom exception supplied by `causeOf` or its cause is provided.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is empty, throwing a [ValidationFailedException] if it is not.
- *
- * @param causeOf an optional supplier for a custom throwable that wraps the [ValidationFailedException].
- *                If null, the exception is not wrapped.
- * @param cause an optional supplier for the underlying cause of the [ValidationFailedException].
- * @param lazyMessage a supplier for the exception message to be used if validation fails.
- * @return the collection if it is empty.
- * @throws ValidationFailedException if the collection is not empty, optionally wrapped by the throwable provided by [causeOf].
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is empty. If the collection is not empty, a `ValidationFailedException` is thrown.
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName An optional name of the variable being validated. Used in the exception message if provided.
- * @param message An optional custom error message to include in the exception. Defaults to "is not empty".
- * @param causeOf A supplier for the primary throwable to throw if validation fails. If null, a default exception is created.
- * @param cause A supplier for the underlying cause of the validation failure. This will be set as the `cause` of the exception.
- * @return The collection itself if it passes validation.
- * @throws ValidationFailedException if the collection is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is empty. If the collection is not empty, a [ValidationFailedException] is thrown.
- *
- * @param property the main [KProperty] associated with the validation failure, or null if not specified
- * @param variable an optional secondary [KProperty] providing additional context, or null if not specified
- * @param message an optional message providing additional details about the validation failure; defaults to "is not empty" if null
- * @param causeOf a supplier providing the root cause of the exception, or null if not specified
- * @param cause a supplier providing the additional cause of the exception, or null if not specified
- * @return the original collection if the validation succeeds
- * @throws ValidationFailedException if the collection is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is empty. If the collection is not empty, a `ValidationFailedException` is thrown.
- *
- * @param callable The Kotlin function (`KFunction`) to which this validation is related. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional custom error message to be included in the exception. If not provided, a default message is used.
- * @param causeOf A supplier for a `Throwable` that represents the cause of the exception. Can be null.
- * @param cause A supplier for an additional `Throwable` to be used as the cause of the exception. Can be null.
- * @return The original collection if it is empty.
- * @throws ValidationFailedException If the collection is not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the current collection is empty. Throws a [ValidationFailedException] if the collection is not empty.
- *
- * @param callable an optional [KFunction] associated with the validation context
- * @param parameter an optional [KParameter] representing the parameter being validated
- * @param message an optional custom message to include in the exception if validation fails
- * @param causeOf an optional supplier for the cause of the exception, if needed
- * @param cause an optional supplier for the root cause of the exception
- * @return the collection itself if validation passes
- * @throws ValidationFailedException if the collection is not empty
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is empty. Throws a `ValidationFailedException` if the collection is not empty.
- *
- * @param callableName The name of the callable (e.g., function or method) related to the validation.
- * @param parameterName The name of the parameter being validated, or null if not applicable.
- * @param message An optional custom message for the validation failure, or null to use the default message.
- * @param causeOf A supplier for the root cause of the exception, or null if no specific cause is provided.
- * @param cause A supplier for the underlying cause of the exception, or null if no cause is specified.
- * @return The collection instance when validation passes.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the given collection is empty.
- *
- * Throws a [ValidationFailedException] if the collection is not empty.
- *
- * @param callableName The name of the callable (e.g., function or property) being validated, or null if not specified.
- * @param parameter The [KParameter] associated with the validation, or null if not applicable.
- * @param message An optional error message providing additional context for the validation failure.
- * @param causeOf A supplier for the root cause of the exception, or null if not provided.
- * @param cause A supplier for the underlying cause of the exception, or null if not provided.
- * @return The original collection if it passes the validation check.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a collection is either null or empty and throws an exception if it is not.
- *
- * The method checks the calling collection and ensures that it is either null or contains no elements.
- * If the collection is neither null nor empty, a `ValidationFailedException` is thrown with an optional custom cause.
- *
- * @param causeOf A supplier for a throwable that will be used as the main exception cause if the validation fails.
- * @param cause A supplier for an additional throwable that can be passed as the underlying cause
- *              when creating the main `ValidationFailedException`.
- * @return The same collection on which the method was called if it satisfies the null or empty condition.
- * @throws ValidationFailedException If the collection is not null or not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is null or empty. If it's not null or empty, a `ValidationFailedException`
- * is thrown with the specified lazy message and optional causes.
- *
- * @param causeOf A supplier for a specific cause of the validation failure, which can be used to wrap the
- *                exception. If `null`, a default exception will be used.
- * @param cause An additional supplier for the underlying cause of the validation failure, which will be
- *              attached to the exception.
- * @param lazyMessage A supplier for the error message to be used in the exception. The evaluation of this
- *                    supplier is deferred until the exception is created.
- * @return The original collection if the validation passes (i.e., the collection is null or empty).
- * @throws ValidationFailedException If the collection is not null and not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a collection is null or empty. If it is not, throws a [ValidationFailedException].
- *
- * @param property The property associated with the validation. Can be null if not applicable.
- * @param variableName The name of the variable being validated. Can be null; used in the exception message if provided.
- * @param message A custom message describing the validation failure. Defaults to a generic message if not provided.
- * @param causeOf A supplier for the throwable that will be thrown if validation fails. If null, a [ValidationFailedException] is thrown.
- * @param cause An optional supplier for the underlying cause to be associated with the exception.
- * @return The validated collection if it is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that a collection is either null or empty. If the collection is neither, a `ValidationFailedException`
- * is thrown with the provided details.
- *
- * This validation is useful for ensuring that nullable collections meet specific requirements regarding their
- * nullability and emptiness.
- *
- * @param property The primary `KProperty` associated with the validation, providing metadata about the collection being validated.
- * @param variable An optional secondary `KProperty` that provides additional context for the validation, or null if not specified.
- * @param message An optional error message to include in the exception if validation fails, or null for a default message.
- * @param causeOf A supplier for an alternative throwable to use as the main cause of the exception, or null to omit.
- * @param cause A supplier for an additional throwable to attach as the underlying cause of the validation failure, or null to omit.
- * @return The original collection if it passes validation, allowing fluent-style chaining.
- * @throws ValidationFailedException If the collection is neither null nor empty, with details about the failure included.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is either null or empty. If the validation fails, a `ValidationFailedException`
- * is thrown based on the provided arguments.
- *
- * @param callable The Kotlin function (`KFunction`) to which this validation is linked. Can be null.
- * @param parameterName The name of the parameter being validated. Can be null.
- * @param message An optional custom message for the validation failure. Defaults to "is not null or empty".
- * @param causeOf An optional supplier for a custom `Throwable` to be thrown if validation fails. Can be null.
- * @param cause An optional supplier for the cause of the validation failure. Can be null.
- * @return The original collection if it is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is either null or empty.
- *
- * If the collection is not null and not empty, a `ValidationFailedException` is thrown with the provided parameters.
- *
- * @param callable The [KFunction] associated with the validation, or null if not applicable.
- * @param parameter The [KParameter] associated with the validation, or null if not applicable.
- * @param message An optional custom message providing additional context about the validation failure. Defaults to null.
- * @param causeOf A supplier for a throwable that is the cause of the validation failure. Defaults to null.
- * @param cause A supplier for a throwable used as the underlying cause of the exception. Defaults to null.
- * @return The validated collection if it is null or empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is null or empty.
- *
- * This method checks the collection and throws a `ValidationFailedException` if the collection
- * is neither null nor empty. It supports customizable exception details, including the related
- * callable name, parameter name, custom message, and potential causes.
- *
- * @param callableName The name of the callable (e.g., function or method) where the validation is performed.
- * @param parameterName The name of the parameter being validated, or null if not applicable.
- * @param message An optional custom message describing the validation failure.
- * @param causeOf A supplier providing a throwable to be used as the primary cause of the failure, or null.
- * @param cause A supplier providing a throwable to be linked as the underlying cause, or null.
- * @return The collection itself if the validation passes, enabling method chaining.
- * @throws ValidationFailedException If the collection is not null or not empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}
-/**
- * Validates that the collection is null or empty, throwing a `ValidationFailedException` if it is not.
- *
- * This method is utilized to ensure that a given collection either has no elements or is null.
- * If the collection is neither null nor empty, it throws a `ValidationFailedException`.
- * Optionally, additional context such as a custom message or a cause may be provided to the exception.
- *
- * @param callableName The name of the callable (e.g., function or property) where the validation is performed. Can be null.
- * @param parameter The `KParameter` associated with the validation, if applicable. Can be null.
- * @param message An optional custom error message to include in the exception. If null, a default message will be used.
- * @param causeOf A `ThrowableSupplier` providing the main cause for the exception. If null, the default exception generation is used.
- * @param cause A `ThrowableSupplier` providing an additional cause for the exception. Can be null.
- * @return The validated collection if it is null or empty, allowing it to be further used in a fluent style.
- * @throws ValidationFailedException If the collection is neither null nor empty.
- * @since 4.2.0
- */
-@IgnorableReturnValue
-fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    contract {
-        (this@validateNullOrEmpty != null) implies returnsNotNull()
-        returnsNotNull() implies (this@validateNullOrEmpty != null)
-    }
-    if (isNotNullOrEmpty()) throw if (causeOf.isNull()) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
-    return this
-}

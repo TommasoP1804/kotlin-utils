@@ -114,7 +114,7 @@ class NullableValidated<T>(private var value: T? = null, private val predicates:
      * @since 3.7.2
      */
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T?) {
-        newValue.ifNotNull { predicates.forEach { validate(property, predicate = it) } }
+        newValue.ifNotNull { predicates.forEach { newValue.validate(property, predicate = it) } }
         value = newValue
     }
 }

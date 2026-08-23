@@ -208,7 +208,7 @@ open class MeasureUnit internal constructor(override val measure: String, overri
                 gen.writePOJOProperty("name", value.unitName)
                 gen.writeBooleanProperty("isSIUnit", value.isSIUnit)
                 gen.writeBooleanProperty("isAcceptedBySI", value.isAcceptedBySI)
-                if (value.symbol.isNotNull()) gen.writePOJOProperty("symbol", value.symbol)
+                if (value.symbol != null) gen.writePOJOProperty("symbol", value.symbol)
                 else gen.writeNullProperty("symbol")
                 gen.writeEndObject()
             }
@@ -234,7 +234,7 @@ open class MeasureUnit internal constructor(override val measure: String, overri
                 gen.writeObjectField("name", value.unitName)
                 gen.writeBooleanField("isSIUnit", value.isSIUnit)
                 gen.writeBooleanField("isAcceptedBySI", value.isAcceptedBySI)
-                if (value.symbol.isNotNull()) gen.writeObjectField("symbol", value.symbol)
+                if (value.symbol != null) gen.writeObjectField("symbol", value.symbol)
                 else gen.writeNullField("symbol")
                 gen.writeEndObject()
             }
