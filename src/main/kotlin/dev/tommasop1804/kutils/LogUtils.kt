@@ -137,7 +137,6 @@ fun Logger(name: String): Logger = LoggerFactory.getLogger(name)
  * @return A Logger instance associated with the specified class.
  * @since 1.0.0
  */
-@Deprecated("Use Logger<Class> instead", ReplaceWith("Logger<`class`>()"))
 fun Logger(`class`: KClass<*>): Logger = LoggerFactory.getLogger(`class`.java)
 /**
  * Provides a logger instance for the specified class type.

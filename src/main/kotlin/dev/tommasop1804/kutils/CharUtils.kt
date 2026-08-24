@@ -1169,19 +1169,3 @@ operator fun Char.unaryPlus() = uppercase()
  * @since 1.0.0
  */
 operator fun Char.unaryMinus() = lowercase()
-
-/**
- * Executes the specified action if the character exists within the given character sequence.
- *
- * @param cs The character sequence to check for the presence of this character.
- * @param action The action to be executed with this character if it is found in the character sequence.
- * @return The original character on which this function was called.
- * @since 5.0.0
- */
-inline fun Char.ifIn(cs: CharSequence, action: Consumer<Char>): Char {
-    contract {
-        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
-    }
-    if (cs.contains(this)) action(this)
-    return this
-}

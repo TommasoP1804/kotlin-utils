@@ -2059,6 +2059,139 @@ inline fun <T : CharSequence> T.ifNotContains(regex: Regex, action: Consumer<T>)
     if (regex !in this) action(this)
     return this
 }
+
+/**
+ * Executes the given action if the current character is present in the specified character sequence.
+ *
+ * @param cs the character sequence to check for the presence of the current character.
+ * @param action the action to perform if the current character is found within the character sequence.
+ * @return the current character.
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun Char.ifIn(cs: CharSequence, action: Consumer<Char>): Char {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in cs) action(this)
+    return this
+}
+/**
+ * Executes the given action if the current CharSequence is found within the specified CharSequence.
+ *
+ * @param cs the CharSequence in which to check for the current CharSequence's presence.
+ * @param action the action to be executed if the current CharSequence is found within the specified CharSequence.
+ * @return the current CharSequence.
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifIn(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in cs) action(this)
+    return this
+}
+/**
+ * Executes the specified action if this character sequence exists within the given character sequence,
+ * ignoring case considerations.
+ *
+ * @param cs the character sequence to check for the presence of this character sequence.
+ * @param action the action to perform if this character sequence is found within the specified character sequence.
+ * @return this character sequence.
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifInIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this inIgnoreCase cs) action(this)
+    return this
+}
+/**
+ * Checks if the regular expression is contained within the given character sequence.
+ * If the condition is met, executes the specified action with the regular expression as the parameter.
+ *
+ * @param cs the character sequence to check for the presence of the regular expression
+ * @param action the action to execute if the regular expression is present in the character sequence
+ * @return the original regular expression
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun Regex.ifIn(cs: CharSequence, action: Consumer<Regex>): Regex {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in cs) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the character is not present in the given character sequence.
+ *
+ * @param cs The character sequence to check against.
+ * @param action The action to be performed if the character is not in the given sequence.
+ * @return The original character regardless of whether the action was executed.
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun Char.ifNotIn(cs: CharSequence, action: Consumer<Char>): Char {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this !in cs) action(this)
+    return this
+}
+/**
+ * Performs the given [action] on the current [CharSequence] if it is not present in the specified [cs].
+ *
+ * @param cs the [CharSequence] to compare against.
+ * @param action the function to execute if the current [CharSequence] is not found within [cs].
+ * @return the original [CharSequence].
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotIn(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this !in cs) action(this)
+    return this
+}
+/**
+ * Invokes the specified action if the current character sequence does not exist as a substring
+ * in the given character sequence, ignoring case considerations.
+ *
+ * @param cs the character sequence to check against this character sequence.
+ * @param action the action to perform if the substring is not found, ignoring case.
+ * @return the original character sequence.
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun <T : CharSequence> T.ifNotInIgnoreCase(cs: CharSequence, action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this notInIgnoreCase cs) action(this)
+    return this
+}
+/**
+ * Executes the given action if the current regular expression is not found in the provided character sequence.
+ *
+ * @param cs The character sequence in which to check for the presence of the regular expression.
+ * @param action The action to execute if the regular expression is not found in the character sequence.
+ * @return The original regular expression instance.
+ * @since 5.0.2
+ */
+@IgnorableReturnValue
+inline fun Regex.ifNotIn(cs: CharSequence, action: Consumer<Regex>): Regex {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this !in cs) action(this)
+    return this
+}
+
 /**
  * Executes the given action if the CharSequence matches the provided regular expression.
  *
