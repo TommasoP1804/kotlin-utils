@@ -19,20 +19,11 @@ import java.math.BigInteger
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.div
-import kotlin.invoke
 import kotlin.math.*
 import kotlin.math.pow
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
-import kotlin.text.toDouble
-import kotlin.toString
 
 /**
  * Indicates whether the current number is not a decimal (i.e., it represents a whole number),
@@ -1058,6 +1049,7 @@ fun Number.toBigDecimal(): BigDecimal = BigDecimal.valueOf(toDouble())
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifPositive(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1072,6 +1064,7 @@ inline fun <T : Number> T.ifPositive(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifNegative(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1086,6 +1079,7 @@ inline fun <T : Number> T.ifNegative(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifNotPositive(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1100,6 +1094,7 @@ inline fun <T : Number> T.ifNotPositive(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifNotNegative(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1114,6 +1109,7 @@ inline fun <T : Number> T.ifNotNegative(action: Consumer<T>): T {
  * @return the original number
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifZero(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1128,6 +1124,7 @@ inline fun <T : Number> T.ifZero(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifNotZero(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1142,6 +1139,7 @@ inline fun <T : Number> T.ifNotZero(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifEven(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1156,6 +1154,7 @@ inline fun <T : Number> T.ifEven(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifOdd(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1171,6 +1170,7 @@ inline fun <T : Number> T.ifOdd(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifDecimal(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1185,6 +1185,7 @@ inline fun <T : Number> T.ifDecimal(action: Consumer<T>): T {
  * @return The original number.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifNotDecimal(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1203,6 +1204,7 @@ inline fun <T : Number> T.ifNotDecimal(action: Consumer<T>): T {
  * @return The original number instance.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifDecimalClassBased(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1217,6 +1219,7 @@ inline fun <T : Number> T.ifDecimalClassBased(action: Consumer<T>): T {
  * @return The original number on which the operation was invoked.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun <T : Number> T.ifNotDecimalClassBased(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1233,6 +1236,7 @@ inline fun <T : Number> T.ifNotDecimalClassBased(action: Consumer<T>): T {
  * @return The same integer on which the function was called.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Int.ifIn(range: IntProgression, action: Consumer<Int>): Int {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1248,6 +1252,7 @@ inline fun Int.ifIn(range: IntProgression, action: Consumer<Int>): Int {
  * @return this integer, regardless of whether the action was executed or not.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Int.ifIn(range: IntRange, action: Consumer<Int>): Int {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1263,6 +1268,7 @@ inline fun Int.ifIn(range: IntRange, action: Consumer<Int>): Int {
  * @return The original integer.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Int.ifIn(range: IntRangeWithExclusions, action: Consumer<Int>): Int {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1278,6 +1284,7 @@ inline fun Int.ifIn(range: IntRangeWithExclusions, action: Consumer<Int>): Int {
  * @return the original integer
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Int.ifIn(range: IntRangeWithConditions, action: Consumer<Int>): Int {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1293,6 +1300,7 @@ inline fun Int.ifIn(range: IntRangeWithConditions, action: Consumer<Int>): Int {
  * @return The original unsigned integer.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun UInt.ifIn(range: UIntProgression, action: Consumer<UInt>): UInt {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1308,6 +1316,7 @@ inline fun UInt.ifIn(range: UIntProgression, action: Consumer<UInt>): UInt {
  * @return The current unsigned integer.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun UInt.ifIn(range: UIntRange, action: Consumer<UInt>): UInt {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1324,6 +1333,7 @@ inline fun UInt.ifIn(range: UIntRange, action: Consumer<UInt>): UInt {
  * @return The original unsigned integer value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun UInt.ifIn(range: UIntRangeWithExclusions, action: Consumer<UInt>): UInt {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1339,6 +1349,7 @@ inline fun UInt.ifIn(range: UIntRangeWithExclusions, action: Consumer<UInt>): UI
  * @return the original `UInt` value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun UInt.ifIn(range: UIntRangeWithConditions, action: Consumer<UInt>): UInt {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1354,6 +1365,7 @@ inline fun UInt.ifIn(range: UIntRangeWithConditions, action: Consumer<UInt>): UI
  * @return The original Long value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Long.ifIn(range: LongProgression, action: Consumer<Long>): Long {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1369,6 +1381,7 @@ inline fun Long.ifIn(range: LongProgression, action: Consumer<Long>): Long {
  * @return the current value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Long.ifIn(range: LongRange, action: Consumer<Long>): Long {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1385,6 +1398,7 @@ inline fun Long.ifIn(range: LongRange, action: Consumer<Long>): Long {
  * @return Returns the original Long value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Long.ifIn(range: LongRangeWithExclusions, action: Consumer<Long>): Long {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1400,6 +1414,7 @@ inline fun Long.ifIn(range: LongRangeWithExclusions, action: Consumer<Long>): Lo
  * @return The original Long value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun Long.ifIn(range: LongRangeWithConditions, action: Consumer<Long>): Long {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1415,6 +1430,7 @@ inline fun Long.ifIn(range: LongRangeWithConditions, action: Consumer<Long>): Lo
  * @return the original `ULong` value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun ULong.ifIn(range: ULongProgression, action: Consumer<ULong>): ULong {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1430,6 +1446,7 @@ inline fun ULong.ifIn(range: ULongProgression, action: Consumer<ULong>): ULong {
  * @return The current value of the unsigned long, regardless of whether the action was executed or not.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun ULong.ifIn(range: ULongRange, action: Consumer<ULong>): ULong {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1446,6 +1463,7 @@ inline fun ULong.ifIn(range: ULongRange, action: Consumer<ULong>): ULong {
  * @return the current `ULong` value
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun ULong.ifIn(range: ULongRangeWithExclusions, action: Consumer<ULong>): ULong {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1461,6 +1479,7 @@ inline fun ULong.ifIn(range: ULongRangeWithExclusions, action: Consumer<ULong>):
  * @return The original ULong value.
  * @since 5.0.0
  */
+@IgnorableReturnValue
 inline fun ULong.ifIn(range: ULongRangeWithConditions, action: Consumer<ULong>): ULong {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
