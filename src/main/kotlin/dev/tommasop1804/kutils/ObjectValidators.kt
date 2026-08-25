@@ -1087,8 +1087,8 @@ fun <T> T?.validateNotNull(callableName: String?, parameter: KParameter?, messag
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException("Value is not in range $range.", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException("Value is not in range $range.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1103,8 +1103,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, causeOf: ThrowableSu
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1122,8 +1122,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, causeOf: ThrowableSu
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1143,8 +1143,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, property: KProperty<
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1162,8 +1162,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, property: KProperty<
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1182,8 +1182,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callable: KFunction<
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1205,8 +1205,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callable: KFunction<
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1225,8 +1225,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callableName: String
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1242,8 +1242,8 @@ fun <T : Comparable<T>> T.validateIn(range: ClosedRange<T>, callableName: String
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException("Value is not in range $range.", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException("Value is not in range $range.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1262,8 +1262,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, causeOf: ThrowableS
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1281,8 +1281,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, causeOf: ThrowableS
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1300,8 +1300,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, property: KProperty
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1320,8 +1320,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, property: KProperty
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1340,8 +1340,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callable: KFunction
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1360,8 +1360,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callable: KFunction
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1381,8 +1381,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: Strin
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this !in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1397,8 +1397,8 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: Strin
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException("Value is not in $iterable.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is not in $iterable.", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException("Value is not in $iterable.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is not in $iterable.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1415,8 +1415,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = null, 
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null, lazyMessage: Transformer<E, Any>): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1437,8 +1437,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = null, 
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is not in $iterable", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1456,8 +1456,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variableNam
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is not in $iterable", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1475,8 +1475,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variable: K
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is not in $iterable", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1494,8 +1494,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameterNa
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is not in $iterable", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1511,8 +1511,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: 
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is not in $iterable", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1530,8 +1530,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameterName
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is not in $iterable", cause?.invoke()))
+fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this !in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not in $iterable", cause?.invoke(this)))
     return this
 }
 
@@ -1547,8 +1547,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameter: KP
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException("Value is in range $range.", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException("Value is in range $range.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1565,8 +1565,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, causeOf: Throwabl
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1588,8 +1588,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, causeOf: Throwabl
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1607,8 +1607,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, property: KProper
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1626,8 +1626,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, property: KProper
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1645,8 +1645,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callable: KFuncti
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1664,8 +1664,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callable: KFuncti
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1682,8 +1682,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callableName: Str
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1697,8 +1697,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: ClosedRange<T>, callableName: Str
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException("Value is in range $range.", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException("Value is in range $range.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1714,8 +1714,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, causeOf: Throwab
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1733,8 +1733,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, causeOf: Throwab
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1752,8 +1752,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, property: KPrope
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1773,8 +1773,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, property: KPrope
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1794,8 +1794,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callable: KFunct
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1813,8 +1813,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callable: KFunct
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1834,8 +1834,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: St
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke()) else causeOf().initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke()))
+fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in range) throw if (causeOf == null) ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(ValueOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1849,8 +1849,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: St
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException("Value is in $iterable.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is in $iterable.", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException("Value is in $iterable.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is in $iterable.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1868,8 +1868,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = nul
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null, lazyMessage: Transformer<E, Any>): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1887,8 +1887,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: ThrowableSupplier? = nul
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is in $iterable", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1906,8 +1906,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variable
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is in $iterable", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1925,8 +1925,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variable
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is in $iterable", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1944,8 +1944,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, paramete
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is in $iterable", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1963,8 +1963,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, paramete
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is in $iterable", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is in $iterable", cause?.invoke(this)))
     return this
 }
 /**
@@ -1982,8 +1982,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameterN
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): E {
-    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is in $iterable", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is in $iterable", cause?.invoke()))
+fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<E, Throwable>? = null, cause: Transformer<E, Throwable>? = null): E {
+    if (this in iterable) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is in $iterable", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is in $iterable", cause?.invoke(this)))
     return this
 }
 
@@ -2000,8 +2000,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameter:
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException("Value is in lower than $other.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is in lower than $other.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException("Value is in lower than $other.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is in lower than $other.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2017,8 +2017,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, causeOf: Throwabl
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2036,8 +2036,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, causeOf: Throwabl
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is lower than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is lower than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is lower than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is lower than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2055,8 +2055,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, property: KProper
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is lower than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is lower than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is lower than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is lower than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2073,8 +2073,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, property: KProper
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is lower than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is lower than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is lower than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is lower than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2091,8 +2091,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callable: KFuncti
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is lower than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is lower than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is lower than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is lower than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2110,8 +2110,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callable: KFuncti
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is lower than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is lower than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is lower than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is lower than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2128,8 +2128,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callableName: Str
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this < other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is lower than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is lower than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this < other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is lower than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is lower than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2144,8 +2144,8 @@ fun <T : Comparable<T>> T.validateGreaterOrEqualThan(other: T, callableName: Str
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException("Value is in lower than or equal to $other.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is in lower than or equal to $other.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException("Value is in lower than or equal to $other.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is in lower than or equal to $other.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2163,8 +2163,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, causeOf: ThrowableSuppli
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2182,8 +2182,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, causeOf: ThrowableSuppli
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is lower than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is lower than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is lower than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is lower than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2201,8 +2201,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, property: KProperty<*>?,
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is lower than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is lower than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is lower than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is lower than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2221,8 +2221,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, property: KProperty<*>?,
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is lower than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is lower than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is lower than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is lower than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2240,8 +2240,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, callable: KFunction<*>?,
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is lower than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is lower than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is lower than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is lower than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2259,8 +2259,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, callable: KFunction<*>?,
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is lower than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is lower than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is lower than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is lower than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2279,8 +2279,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, callableName: String?, p
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateGreaterThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this <= other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is lower than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is lower than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateGreaterThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this <= other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is lower than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is lower than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2295,8 +2295,8 @@ fun <T : Comparable<T>> T.validateGreaterThan(other: T, callableName: String?, p
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException("Value is in greater than $other.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is in greater than $other.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException("Value is in greater than $other.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is in greater than $other.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2312,8 +2312,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, causeOf: ThrowableS
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2331,8 +2331,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, causeOf: ThrowableS
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is greater than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is greater than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is greater than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is greater than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2350,8 +2350,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, property: KProperty
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is greater than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is greater than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is greater than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is greater than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2368,8 +2368,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, property: KProperty
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is greater than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is greater than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is greater than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is greater than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2386,8 +2386,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callable: KFunction
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is greater than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is greater than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is greater than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is greater than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2404,8 +2404,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callable: KFunction
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is greater than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is greater than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is greater than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is greater than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2423,8 +2423,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callableName: Strin
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this > other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is greater than $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is greater than $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this > other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is greater than $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is greater than $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2440,8 +2440,8 @@ fun <T : Comparable<T>> T.validateLowerOrEqualThan(other: T, callableName: Strin
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException("Value is in greater than or equal to $other.", cause?.invoke()) else causeOf().initCause(ValidationFailedException("Value is in greater than or equal to $other.", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException("Value is in greater than or equal to $other.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is in greater than or equal to $other.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2459,8 +2459,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, causeOf: ThrowableSupplier
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null, lazyMessage: Supplier<Any>): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(lazyMessage().toString(), cause?.invoke()) else causeOf().initCause(ValidationFailedException(lazyMessage().toString(), cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2478,8 +2478,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, causeOf: ThrowableSupplier
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is greater than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variableName, message ?: "is greater than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is greater than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is greater than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2496,8 +2496,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, property: KProperty<*>?, v
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is greater than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(property, variable, message ?: "is greater than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is greater than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is greater than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2515,8 +2515,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, property: KProperty<*>?, v
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is greater than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameterName, message ?: "is greater than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is greater than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is greater than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2534,8 +2534,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, callable: KFunction<*>?, p
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is greater than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callable, parameter, message ?: "is greater than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is greater than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is greater than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2553,8 +2553,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, callable: KFunction<*>?, p
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is greater than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameterName, message ?: "is greater than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is greater than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is greater than or equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -2575,8 +2575,8 @@ fun <T : Comparable<T>> T.validateLowerThan(other: T, callableName: String?, par
  * @since 5.0.0
  */
 @IgnorableReturnValue
-fun <T : Comparable<T>> T.validateLowerThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: ThrowableSupplier? = null, cause: ThrowableSupplier? = null): T {
-    if (this >= other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is greater than or equal to $other", cause?.invoke()) else causeOf().initCause(ValidationFailedException(callableName, parameter, message ?: "is greater than or equal to $other", cause?.invoke()))
+fun <T : Comparable<T>> T.validateLowerThan(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this >= other) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is greater than or equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is greater than or equal to $other", cause?.invoke(this)))
     return this
 }
 

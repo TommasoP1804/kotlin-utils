@@ -722,9 +722,9 @@ fun <T> T.validateNotAfter(other: T, callableName: String?, parameter: KParamete
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
     if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(
-        "Temporal $this is not equals to $other",
+        "Temporal $this is not equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not equals to $other", cause?.invoke(this)))
+    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -767,7 +767,7 @@ fun <T> T.validateEquals(other: T, causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not equals to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -786,7 +786,7 @@ fun <T> T.validateEquals(other: T, property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not equals to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -806,7 +806,7 @@ fun <T> T.validateEquals(other: T, property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not equals to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -832,9 +832,9 @@ fun <T> T.validateEquals(other: T, callable: KFunction<*>?, parameter: KParamete
     if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(
         callable,
         parameter,
-        message ?: "is not equals to $other",
+        message ?: "is not equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not equals to $other", cause?.invoke(this)))
+    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -853,7 +853,7 @@ fun <T> T.validateEquals(other: T, callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not equals to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -872,8 +872,8 @@ fun <T> T.validateEquals(other: T, callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not equals to $other", cause?.invoke(this)) else causeOf(this).initCause(
-        ValidationFailedException(callableName, parameter, message ?: "is not equals to $other", cause?.invoke(this))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(
+        ValidationFailedException(callableName, parameter, message ?: "is not equal to $other", cause?.invoke(this))
     )
     return this
 }
@@ -893,9 +893,9 @@ fun <T> T.validateEquals(other: T, callableName: String?, parameter: KParameter?
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
     if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(
-        "Temporal $this is equals to $other",
+        "Temporal $this is equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is equals to $other", cause?.invoke(this)))
+    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -934,7 +934,7 @@ fun <T> T.validateNotEquals(other: T, causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is equals to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -956,7 +956,7 @@ fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variableName: Str
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is equals to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -975,7 +975,7 @@ fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variable: KProper
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is equals to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -985,7 +985,7 @@ fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameterName: St
  * @param other the object to compare the current object against
  * @param callable the [KFunction] associated with the validation context, or null if not applicable
  * @param parameter the [KParameter] representing the parameter involved in the validation, or null if not applicable
- * @param message an optional custom message describing the validation failure, defaulting to "is equals to $other" if not specified
+ * @param message an optional custom message describing the validation failure, defaulting to "is equal to $other" if not specified
  * @param causeOf an optional transformer function to generate a custom exception from the current object, applied before wrapping it in `ValidationFailedException`, or null if not
  *  used
  * @param cause an optional transformer function to generate the underlying cause of the exception from the current object, or null if not used
@@ -998,9 +998,9 @@ fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameter: KParam
     if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(
         callable,
         parameter,
-        message ?: "is equals to $other",
+        message ?: "is equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is equals to $other", cause?.invoke(this)))
+    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -1019,7 +1019,7 @@ fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameter: KParam
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is equals to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is equals to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -1041,8 +1041,328 @@ fun <T> T.validateNotEquals(other: T, callableName: String?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is equals to $other", cause?.invoke(this)) else causeOf(this).initCause(
-        ValidationFailedException(callableName, parameter, message ?: "is equals to $other", cause?.invoke(this))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(
+        ValidationFailedException(callableName, parameter, message ?: "is equal to $other", cause?.invoke(this))
+    )
+    return this
+}
+
+/**
+ * Validates that the temporal object is within the specified temporal interval.
+ * If the temporal object is not within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval within which the temporal object must be validated.
+ * @param causeOf A transformer that generates a `Throwable` based on the temporal object,
+ *                if the validation fails. This parameter is optional.
+ * @param cause An alternative transformer that generates a `Throwable` based on the temporal object,
+ *              if the validation fails. This parameter is optional.
+ * @return The temporal object itself if the validation succeeds.
+ * @throws ValidationFailedException If the temporal object is not within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(
+        "Temporal $this is not in interval $interval",
+        cause?.invoke(this)
+    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not in interval $this", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the current object is within the specified temporal interval.
+ * If the object does not fall within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval against which the validation is performed.
+ * @param causeOf A transformer function that generates the throwable cause of the validation failure.
+ *                If null, a default validation failure exception is used.
+ * @param cause A transformer function that generates an additional throwable to include as the cause
+ *              of the validation failure exception.
+ * @param lazyMessage A transformer function that generates a lazy message containing details
+ *                    about the validation failure.
+ * @return The validated object if it is within the specified temporal interval.
+ * @throws ValidationFailedException if the object does not fall within the interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates whether the current object falls within the specified temporal interval.
+ * If the object does not lie within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval against which the validation is performed.
+ * @param property The property associated with the value being validated. Can be null.
+ * @param variableName The name of the variable for error reporting purposes. Can be null.
+ * @param message The error message to use if validation fails. Can be null;
+ *                defaults to "is not in interval $interval".
+ * @param causeOf A transformer that produces a custom exception to throw if validation fails. Can be null.
+ * @param cause A transformer that produces the root cause exception to associate with the thrown exception. Can be null.
+ * @return The current object if validation passes.
+ * @throws ValidationFailedException if the object does not fall within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates if the current value is within the specified temporal interval. If the value is
+ * outside the interval, a validation exception is thrown.
+ *
+ * @param interval The temporal interval within which the value must lie.
+ * @param property The property associated with the value being validated, or null if not applicable.
+ * @param variable The variable associated with the value being validated, or null if not applicable.
+ * @param message An optional custom error message to include in the exception, or null for the default message.
+ * @param causeOf An optional transformer that provides a custom throwable cause when the validation fails.
+ * @param cause An optional transformer that provides an additional throwable cause when the validation fails.
+ * @return The validated value, if it lies within the specified interval.
+ * @throws ValidationFailedException if the value does not lie within the interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates if the invoking temporal value lies within the specified interval.
+ * Throws a `ValidationFailedException` if the value does not fall within the interval.
+ *
+ * @param interval The temporal interval within which the invoking value must lie.
+ * @param callable The callable function associated with the validation, if provided.
+ * @param parameterName The name of the parameter being validated, if applicable.
+ * @param message An optional custom error message to include in the exception.
+ * @param causeOf A transformer function that generates the root cause of the exception from the validated value, if applicable.
+ * @param cause A transformer function that provides a secondary cause of the exception from the validated value, if applicable.
+ * @return The invoking value if it satisfies the interval validation.
+ * @throws ValidationFailedException If the invoking value does not fall within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates whether the current object is within the specified temporal interval.
+ * Throws a ValidationFailedException if the object is not within the interval.
+ *
+ * @param interval The temporal interval against which the object will be validated.
+ * @param callable The function being validated, or null if not applicable.
+ * @param parameter The parameter being validated, or null if not applicable.
+ * @param message An optional custom error message to include in the exception.
+ * @param causeOf An optional transformer that generates a throwable cause based on the object,
+ * used to wrap the validation failure further.
+ * @param cause An optional transformer that generates a throwable cause based on the object.
+ * @return The object itself, if it passes the validation.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(
+        callable,
+        parameter,
+        message ?: "is not in interval $interval",
+        cause?.invoke(this)
+    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates whether the current temporal value falls within a specified interval.
+ * If the value is not within the interval, a validation exception is thrown.
+ *
+ * @param interval The temporal interval to validate against.
+ * @param callableName The name of the callable where the validation is applied (optional).
+ * @param parameterName The name of the parameter being validated (optional).
+ * @param message A custom message to include in the validation exception (optional).
+ * @param causeOf A transformer to generate the root cause of the validation failure exception (optional).
+ * @param cause A transformer to generate the cause of the exception for additional context (optional).
+ * @return The same value if it lies within the specified interval.
+ * @throws ValidationFailedException If the value is not within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates whether the current object is within the specified temporal interval.
+ * If the object is not within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval to validate against.
+ * @param callableName The name of the callable associated with the validation, or null if not applicable.
+ * @param parameter The parameter being validated, or null if not applicable.
+ * @param message An optional custom error message to include when the validation fails. Defaults to null.
+ * @param causeOf A transformer that generates the throwable to be thrown when validation fails, based on the provided value. Defaults to null.
+ * @param cause A transformer that generates the root cause of the validation failure, based on the provided value. Defaults to null.
+ * @return The original object if validation succeeds.
+ * @throws ValidationFailedException If the object is not within the specified interval, including the generated or customized cause, if provided.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateIn(interval: TemporalInterval, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(
+        ValidationFailedException(callableName, parameter, message ?: "is not in interval $interval", cause?.invoke(this))
+    )
+    return this
+}
+/**
+ * Validates that the current temporal value is not within the specified temporal interval.
+ * If the value is within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval to check against.
+ * @param causeOf A transformer function that generates a throwable cause when validation fails, or null.
+ * @param cause A transformer function that generates a throwable cause tied to the failure, or null.
+ * @return The current temporal value if the validation passes successfully.
+ * @throws ValidationFailedException if the temporal value is within the interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T : Temporal> T.validateNotIn(interval: TemporalInterval, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(
+        "Temporal $this is in interval $interval",
+        cause?.invoke(this)
+    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is in interval $this", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the given comparable temporal value is not within a specified temporal interval.
+ * If the value is within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval against which the value should be validated.
+ * @param causeOf An optional transformer to produce a throwable cause based on the value.
+ * @param cause An optional transformer to generate a throwable directly based on the value.
+ * @param lazyMessage A transformer to produce a detailed contextual message if the validation fails.
+ * @return The value itself, if the validation passes (not within the specified interval).
+ * @throws ValidationFailedException If the value is within the specified temporal interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the current value is not within the specified temporal interval.
+ * If the value is within the interval, a ValidationFailedException is thrown.
+ *
+ * @param interval The temporal interval to check against.
+ * @param property An optional property associated with the value being validated.
+ * @param variableName An optional name of the variable being validated.
+ * @param message An optional custom error message to use if validation fails.
+ * @param causeOf An optional transformer to produce a throwable cause based on the current value, which wraps the validation exception.
+ * @param cause An optional transformer to produce a throwable cause based on the current value for additional context when validation fails.
+ * @return The current value if it is not within the specified interval.
+ * @throws ValidationFailedException if the current value is within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the current value is not within the specified temporal interval.
+ * If the value is found to be within the interval, a validation exception is thrown.
+ *
+ * @param interval The temporal interval to check the value against.
+ * @param property The property associated with the value for additional context. Nullable.
+ * @param variable The variable associated with the value for additional context. Nullable.
+ * @param message An optional custom message to include in the validation exception.
+ * @param causeOf An optional transformer that provides a throwable as the cause for the exception.
+ * @param cause An optional transformer that derives a throwable cause specific to the value.
+ * @return The current value if it is not within the interval.
+ * @throws ValidationFailedException If the value is within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the given value is not within the specified temporal interval. If the value is within the interval,
+ * an exception is thrown.
+ *
+ * @param interval The temporal interval to check against.
+ * @param callable The function that is being validated, if available.
+ * @param parameterName The name of the parameter being validated, if specified.
+ * @param message An optional custom validation failure message.
+ * @param causeOf An optional transformer to create a more specific exception, derived from the validation context.
+ * @param cause An optional transformer to create the cause of the exception, based on the value.
+ * @return The validated value, if the validation passes.
+ * @throws ValidationFailedException If the value is within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the invoking object is not within the specified temporal interval.
+ * If the object is within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval to check against.
+ * @param callable The function where the validation is invoked, or null if not provided.
+ * @param parameter The parameter being validated, or null if not applicable.
+ * @param message An optional custom message for the validation failure.
+ * @param causeOf A transformer for generating a throwable to be thrown in case of failure, or null.
+ * @param cause A transformer for generating a throwable cause for the failure, or null.
+ * @return The invoking object if the validation is successful.
+ * @throws ValidationFailedException If the invoking object is within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(
+        callable,
+        parameter,
+        message ?: "is not in interval $interval",
+        cause?.invoke(this)
+    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the current temporal value is not within the specified temporal interval.
+ * If the value is found within the interval, a `ValidationFailedException` will be thrown.
+ *
+ * @param interval The temporal interval to check against.
+ * @param callableName The name of the callable where the validation is performed. Can be null.
+ * @param parameterName The name of the parameter being validated. Can be null.
+ * @param message An optional custom message for the exception. If null, a default message will be used.
+ * @param causeOf A transformer function to generate an alternative throwable which will wrap the validation exception as a cause. Can be null.
+ * @param cause A transformer function to generate a throwable to associate as the cause of the validation exception. Can be null.
+ * @return The validated temporal value if it is not within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is in interval $interval", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the invoking value is not within the specified temporal interval.
+ * If the value is within the interval, an exception is thrown.
+ *
+ * @param interval The temporal interval to check against.
+ * @param callableName The name of the callable in which the validation is performed, or null if not applicable.
+ * @param parameter The parameter being validated, or null if not applicable.
+ * @param message Optional custom error message, defaulting to a standard message if null.
+ * @param causeOf An optional transformer to generate a throwable cause for the exception from the value, or null if not used.
+ * @param cause An optional transformer to generate an additional throwable cause for the exception from the value, or null if not used.
+ * @return The original value if the validation passes.
+ * @throws ValidationFailedException If the invoking value is found within the specified interval.
+ * @since 5.0.4
+ */
+@IgnorableReturnValue
+fun <T> T.validateNotIn(interval: TemporalInterval, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(
+        ValidationFailedException(callableName, parameter, message ?: "is in interval $interval", cause?.invoke(this))
     )
     return this
 }
