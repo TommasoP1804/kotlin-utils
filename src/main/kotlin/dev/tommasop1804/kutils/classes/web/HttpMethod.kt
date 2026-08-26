@@ -13,6 +13,7 @@ import dev.tommasop1804.kutils.*
  * request and response bodies, security, idempotence, caching, and usage within 
  * HTML modules. 
  * 
+ * @property value The name of the HTTP method.
  * @property mayHaveRequestBody Indicates whether the HTTP method can include a request body.
  * @property mayHaveResponseBody Indicates whether the HTTP method can expect a response body.
  * @property secure Indicates whether the HTTP method is considered secure for idempotent or safe operations.
@@ -157,6 +158,17 @@ enum class HttpMethod(
 
     companion object {
         /**
+         * Transforms the `entries` collection by mapping each `HttpMethod` instance
+         * to its `value` property, producing a list of method names.
+         *
+         * This operation extracts the primary representation of each HTTP method,
+         * such as GET, POST, PUT, etc., by accessing the `value` field
+         * of the `HttpMethod` class for all the elements in the `entries` collection.
+         * @since 5.1.0
+         */
+        val values = entries.map(HttpMethod::value)
+
+        /**
          * Finds and returns the first entry in the list whose name matches the provided name,
          * ignoring case differences.
          *
@@ -168,6 +180,17 @@ enum class HttpMethod(
     }
 
     /**
+     * Destructures the `HttpMethod` instance to retrieve the `value` property.
+     *
+     * This operator function is part of the component destructuring mechanism,
+     * used to access the primary representation of the HTTP method, such as
+     * its name (e.g., GET, POST, PUT).
+     *
+     * @return The `value` property of the `HttpMethod` instance.
+     * @since 5.1.0
+     */
+    operator fun component1() = value
+    /**
      * Destructures the `HttpMethod` instance to retrieve the `canHasRequestBody` property.
      *
      * This operator function is part of the component destructuring mechanism,
@@ -175,9 +198,9 @@ enum class HttpMethod(
      *
      * @return A `Boolean` flag indicating the ability of the HTTP method to contain a request body.
      *
-     * @since 3.1.0
+     * @since 5.1.0
      */
-    operator fun component1() = mayHaveRequestBody
+    operator fun component2() = mayHaveRequestBody
     /**
      * Destructures the instance, providing the value of the `canHasResponseBody` property.
      *
@@ -185,9 +208,9 @@ enum class HttpMethod(
      * to be accessed when destructured.
      *
      * @return The value of the `canHasResponseBody` property.
-     * @since 3.1.0
+     * @since 5.1.0
      */
-    operator fun component2() = mayHaveResponseBody
+    operator fun component3() = mayHaveResponseBody
     /**
      * Provides access to the `secure` property of the `HttpMethod` class
      * as a component within a destructuring declaration.
@@ -197,9 +220,9 @@ enum class HttpMethod(
      * associated value for `secure`.
      *
      * @return The value of the `secure` property.
-     * @since 3.1.0
+     * @since 5.1.0
      */
-    operator fun component3() = secure
+    operator fun component4() = secure
     /**
      * Returns the `idempotent` property of the HttpMethod instance.
      *
@@ -208,25 +231,25 @@ enum class HttpMethod(
      * same effect as performing it once.
      *
      * @return The value of the `idempotent` property.
-     * @since 3.1.0
+     * @since 5.1.0
      */
-    operator fun component4() = idempotent
+    operator fun component5() = idempotent
     /**
      * Destructures the `HttpMethod` instance to extract the value of the `cacheable` property.
      * This component is used as part of the Kotlin destructuring declaration mechanism.
      *
      * @return A boolean value indicating whether the HTTP method is cacheable.
-     * @since 3.1.0
+     * @since 5.1.0
      */
-    operator fun component5() = cacheable
+    operator fun component6() = cacheable
     /**
      * Provides the sixth component of the HttpMethod instance when destructuring.
      * This component indicates whether the HTTP method can be used in HTML modules.
      *
      * @return A Boolean value representing if the method can be included in HTML modules.
-     * @since 3.1.0
+     * @since 5.1.0
      */
-    operator fun component6() = canBeInHtmlModules
+    operator fun component7() = canBeInHtmlModules
 
     /**
      * Returns a string representation of the `HttpMethod` instance.

@@ -6,6 +6,7 @@
 @file:Since("1.0.0")
 @file:Suppress("unused")
 @file:MustUseReturnValues
+@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 
@@ -25,6 +26,9 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.nio.file.Path
 import java.util.concurrent.Flow
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -554,3 +558,185 @@ fun URL.toUri(): Uri = toURI()
  * @since 3.0.3
  */
 fun URI.toUrl(): Url = toURL()
+
+/**
+ * Executes the provided action if the HTTP status is considered successful.
+ *
+ * @param action the action to perform if the HTTP status is successful
+ * @return the current HTTP status
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifSuccessful(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isSuccessful) action(this)
+    return this
+}
+/**
+ * Executes the given action if the HTTP status is not successful.
+ *
+ * @param action a consumer that accepts the current HttpStatus if it is not successful
+ * @return the current HttpStatus instance
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifNotSuccessful(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!isSuccessful) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the HTTP status represents an error.
+ *
+ * @param action a consumer function to be executed if the HTTP status is an error
+ * @return the same HTTP status instance on which the method was called
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifError(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isError) action(this)
+    return this
+}
+/**
+ * Executes the given action if the current HTTP status is not an error status.
+ *
+ * @param action the action to be executed if the HTTP status is not an error.
+ * @return the current HTTP status.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifNotError(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!isError) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the HTTP status represents a client error (4xx status code).
+ *
+ * @param action A function to be invoked with the current HTTP status if it is a client error.
+ * @return The current `HttpStatus` instance.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifClientError(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isClientError) action(this)
+    return this
+}
+/**
+ * Executes the given action if the HTTP status is not a client error (4xx).
+ *
+ * @param action A consumer that takes the current HTTP status as a parameter and performs an operation.
+ * @return The current HTTP status.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifNotClientError(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!isClientError) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the HTTP status represents a server error.
+ *
+ * @param action a consumer lambda that accepts the current HTTP status, executed if the status is a server error
+ * @return the current HTTP status
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifServerError(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isServerError) action(this)
+    return this
+}
+/**
+ * Executes the given action if the HTTP status does not represent a server error.
+ *
+ * @param action A consumer that takes the current HTTP status as input and performs an action.
+ * @return The current HTTP status, regardless of whether the action was executed.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifNotServerError(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!isServerError) action(this)
+    return this
+}
+/**
+ * Executes the given action if the HTTP status code is informational (1xx).
+ *
+ * @param action The action to be executed if the HTTP status is informational.
+ * @return The current HttpStatus instance.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifInformational(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isInformational) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the HTTP status is not informational.
+ *
+ * @param action The action to be performed on the HTTP status if it is not informational.
+ * @return The original HTTP status.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifNotInformational(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isInformational) action(this)
+    return this
+}
+/**
+ * Executes the given action if the HTTP status represents a redirection status code (3xx).
+ *
+ * @param action A consumer function that will be invoked with the current HTTP status
+ *               if it is a redirection status.
+ * @return The current HTTP status.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifRedirection(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isRedirection) action(this)
+    return this
+}
+/**
+ * Invokes the given action if the HTTP status is not a redirection status.
+ *
+ * @param action A consumer that performs an operation on the `HttpStatus` if it is not a redirection.
+ * @return The same `HttpStatus` instance on which the method was called.
+ * @since 5.1.0
+ */
+@IgnorableReturnValue
+inline fun HttpStatus.ifNotRedirection(action: Consumer<HttpStatus>): HttpStatus {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isRedirection) action(this)
+    return this
+}

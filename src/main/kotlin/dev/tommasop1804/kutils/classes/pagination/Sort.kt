@@ -67,6 +67,38 @@ data class SortOption(
     )
 
     /**
+     * Constructs a new instance of the `SortOption` class with the specified property
+     * and sorting direction. Validates the provided direction string and maps it to
+     * the corresponding `SortDirection` value.
+     *
+     * @param property The name of the property to be used for sorting.
+     * @param direction The sorting direction as a string, which is validated and
+     *                  converted to a `SortDirection`. Throws an `IllegalArgumentException`
+     *                  if the direction is invalid.
+     * @throws IllegalArgumentException If an invalid direction string is provided.
+     * @since 5.1.0
+     */
+    constructor(property: String, direction: String) : this(
+        property,
+        SortDirection.ofOperator(direction) ?: throw IllegalArgumentException("Invalid direction")
+    )
+
+    /**
+     * Secondary constructor for the SortOption class.
+     *
+     * Initializes a SortOption instance with the provided property and sorting direction.
+     *
+     * @param property A [KProperty] representing the property for sorting.
+     * @param direction A [String] representing the direction of sorting. Must be a valid sort direction.
+     * @throws IllegalArgumentException If the provided direction string is invalid or cannot be mapped to a [SortDirection].
+     * @since 5.1.0
+     */
+    constructor(property: KProperty<*>, direction: String) : this(
+        property,
+        SortDirection.ofOperator(direction) ?: throw IllegalArgumentException("Invalid direction")
+    )
+
+    /**
      * Constructs a [SortOption] instance by parsing the provided string.
      *
      * This constructor utilizes the `parse` method to process the input string,

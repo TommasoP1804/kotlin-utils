@@ -78,7 +78,7 @@ data class FilterOption(
      * @throws IllegalArgumentException If the provided operator string cannot be resolved to a `FilterOperator`.
      * @since 1.0.0
      */
-    constructor(property: String? = null, operator: String = FilterOperator.Equals.operator, value: Any?) : this(
+    constructor(property: String? = null, operator: String, value: Any?) : this(
         property,
         FilterOperator.ofOperator(operator) ?: throw IllegalArgumentException("Invalid operator"),
         value
@@ -98,7 +98,7 @@ data class FilterOption(
      * @throws IllegalArgumentException If the provided operator string is invalid or does not correspond to a valid `FilterOperator`.
      * @since 1.0.0
      */
-    constructor(property: KProperty<*>, operator: String = FilterOperator.Equals.operator, value: Any?) : this(
+    constructor(property: KProperty<*>, operator: String, value: Any?) : this(
         property.run {
             val type1 = (parameters.firstOrNull()?.type?.classifier as? KClass<*>)?.simpleName
             if (type1 != null) $$"$$type1$$${property.name}" else name
