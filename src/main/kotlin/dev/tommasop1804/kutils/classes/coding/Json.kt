@@ -12,6 +12,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.networknt.schema.JsonSchemaFactory
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.collections.NonEmptyCollectionsModule
+import dev.tommasop1804.kutils.classes.collections.NonEmptyCollectionsOldModule
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
@@ -201,6 +203,7 @@ open class Json private constructor(@param:Language("json") override val value: 
     companion object {
         val MAPPER = JsonMapper().rebuild()
             .addModule(KotlinModule.Builder().build())
+            .addModule(NonEmptyCollectionsModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false)
             .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -210,7 +213,8 @@ open class Json private constructor(@param:Language("json") override val value: 
             .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_SELF_REFERENCES, false)
             .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .registerModule(JavaTimeModule())!!
+            .registerModule(JavaTimeModule())
+            .registerModule(NonEmptyCollectionsOldModule())!!
 
         /**
          * Represents an empty JSON object as a string literal.
