@@ -20,6 +20,12 @@ import dev.tommasop1804.kutils.Instant
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
+import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
+import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
 import org.tomlj.TomlArray
 import org.tomlj.TomlParseResult
@@ -369,6 +375,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
             else -> emptyList()
         }
     }
+    fun <T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
     /**
      * Parses the TOML content stored in the current object and converts it into a mutable list of type [T].
      *
@@ -377,6 +384,19 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @since 3.11.0
      */
     fun <T> toMList() = runCatching { toList<T>()().toMList() }
+    /**
+     * Converts the invoking collection or iterable to a `NonEmptyMList`.
+     *
+     * This function attempts to generate a `NonEmptyMList` from the current context
+     * by first converting it to a regular list and wrapping it in a `NonEmptyMList` type.
+     * The operation is encapsulated in a `Result` to handle cases where the conversion fails.
+     *
+     * @param T The type of elements contained in the collection or iterable.
+     * @return A `Result` containing the `NonEmptyMList` if the conversion is successful,
+     *         or an exception if the conversion cannot be completed.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptyMList() = runCatching { toList<T>()().toNonEmptyMList() }
 
     /**
      * Converts the TOML content represented by `value` into a set of objects of type `T`.
@@ -387,12 +407,34 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      */
     fun <T> toSet() = runCatching { toList<T>()().toSet() }
     /**
+     * Converts the current collection or sequence into a non-empty set within a `Result` context.
+     *
+     * This method attempts to transform the collection or sequence into a `NonEmptySet`.
+     * If the transformation is successful, the resulting `NonEmptySet` is wrapped in a `Result`.
+     * If the collection is empty or the transformation fails, the `Result` will contain the exception.
+     *
+     * @param T The type of elements in the collection or sequence.
+     * @return A `Result` containing either the resulting `NonEmptySet` or an exception if the operation fails.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptySet() = runCatching { toList<T>()().toNonEmptySet() }
+    /**
      * Parses the TOML content stored in the `value` field and converts it into a mutable set of elements of type T.
      *
      * @return A `Result` wrapping a mutable set of type T, containing the parsed and distinct elements from the TOML content.
      * @since 3.11.0
      */
     fun <T> toMSet() = runCatching { toList<T>()().toMSet() }
+    /**
+     * Converts the calling collection or sequence into a `NonEmptyMSet`.
+     * The operation is wrapped in a `Result` to handle possible errors during the conversion.
+     *
+     * @param T The type of elements in the collection or sequence.
+     * @return A `Result` containing the `NonEmptyMSet` if the conversion succeeds,
+     *         or an exception if the operation fails.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptyMSet() = runCatching { toList<T>()().toNonEmptyMSet() }
 
     /**
      * Converts the underlying TOML content into a map structure of key-value pairs.
@@ -406,16 +448,42 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         (convertTomlValue(TomlJ.parse(value)) as Map<String, V>)
     }
     /**
+     * Transforms the current collection into a non-empty map of the specified type.
+     *
+     * This function first converts the collection into a map by calling `toMap`.
+     * It then wraps the resulting map in a result handler (`mapCatching`) and
+     * attempts to transform it into a non-empty map using the `toNonEmptyMap` operation.
+     *
+     * @param V The type of values in the resulting map.
+     * @return A result wrapping the non-empty map or an error if the transformation fails.
+     * @since 5.2.1
+     */
+    fun <V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
+    /**
      * Converts a TOML string value into a mutable map (`MMap`) with string keys and values of type `V`.
      *
      * @param V The type of the values in the resulting mutable map.
      * @return A `Result` containing the parsed `MMap<String, V>` on success, or an exception on failure.
      * @since 3.11.0
      */
-    fun <V> toMMap() = runCatching {
+    fun <V> toMMap(): Result<MMap<String, V>> = runCatching {
         @Suppress("UNCHECKED_CAST")
         (toMap<V>()().toMutableMap())
     }
+    /**
+     * Converts a map-like collection to a non-empty map structure of type `NonEmptyMMap`.
+     *
+     * This function first converts the original collection into an intermediate map structure
+     * using `toMMap`. It then attempts to transform the resulting map into a `NonEmptyMMap`
+     * using the `mapCatching` operation, which safely handles cases where the conversion
+     * might fail, such as when the resulting map is empty.
+     *
+     * @param V The type of values contained in the map-like collection.
+     * @return A result containing the `NonEmptyMMap` if the conversion is successful,
+     *         or an error if the map is empty or an issue arises during transformation.
+     * @since 5.2.1
+     */
+    fun <V> toNonEmptyMMap() = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
     /**
      * Converts the stored TOML content in the `value` field into a `DataMap` object.
      *
@@ -427,6 +495,17 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         (convertTomlValue(TomlJ.parse(value)) as DataMap)
     }
     /**
+     * Converts a data structure into a non-empty data map while maintaining its structure.
+     * This method processes the map, ensuring that all elements conform to the requirements
+     * of a non-empty data map transformation. Each element is mapped and validated
+     * through a safe `mapCatching` operation.
+     *
+     * @return A result containing the transformed non-empty data map if successful,
+     * or an error if the transformation fails for any element.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
+    /**
      * Converts the content of the current TOML instance to a mutable map representation of `DataMMap`.
      *
      * @return A `Result` containing the parsed `DataMMap` or the exception in case of a failure.
@@ -436,6 +515,15 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         @Suppress("UNCHECKED_CAST")
         (toDataMap()().toMutableMap())
     }
+    /**
+     * Converts the current instance to a `Result` containing a `NonEmptyDataMMap`.
+     * If the resulting `DataMMap` is empty or an error occurs, the operation will fail.
+     *
+     * @return a `Result` that encapsulates either a non-empty `NonEmptyDataMMap` or an exception if the conversion fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMap(): Result<NonEmptyDataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
+
     /**
      * Parses the TOML content stored in the `value` field and converts it into a non-nullable `DataMapNN` object.
      *
@@ -447,6 +535,16 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         (toDataMap()() as DataMapNN)
     }
     /**
+     * Converts the current object to a non-empty data map of type NonEmptyDataMMapNN.
+     * This method first transforms the object into a data map using `toDataMapNN`.
+     * It then attempts to ensure that the resulting map is non-empty by calling `toNonEmptyMMap`.
+     *
+     * @return A Result wrapping a NonEmptyDataMMapNN, where the operation may succeed with the transformed map
+     *         or fail with an exception if the map cannot be guaranteed to be non-empty.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMapNN(): Result<NonEmptyDataMMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMMap() }
+    /**
      * Attempts to parse the current TOML value into a non-nullable [DataMMapNN] object.
      *
      * @return [Result] containing either the successfully parsed [DataMMapNN] object or an exception.
@@ -456,6 +554,16 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         @Suppress("UNCHECKED_CAST")
         (toDataMMap()() as DataMMapNN)
     }
+    /**
+     * Converts the current data structure into a `Result` containing a `NonEmptyDataMMapNN` instance.
+     * This method attempts to perform the conversion by first invoking `toDataMMapNN`
+     * and then mapping its result to ensure the data meets the non-empty requirements.
+     *
+     * @return A `Result` containing a successfully converted `NonEmptyDataMMapNN` if the data is valid
+     *         and non-empty, or a failure if the conversion or validation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
 
     /**
      * Retrieves the element at the specified index from the value.

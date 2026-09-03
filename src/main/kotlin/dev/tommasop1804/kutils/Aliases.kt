@@ -12,6 +12,7 @@ package dev.tommasop1804.kutils
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.classes.pagination.*
 import dev.tommasop1804.kutils.classes.tuples.*
 import java.math.BigInteger
@@ -50,6 +51,15 @@ typealias MList<E> = MutableList<E>
  */
 typealias MultiList<E> = List<List<E>>
 /**
+ * A type alias for a nested non-empty list structure.
+ *
+ * Represents a list that is both non-empty at the outer level and at each inner level.
+ *
+ * @param E The type of the elements contained within the innermost lists.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiList<E> = NonEmptyList<NonEmptyList<E>>
+/**
  * A typealias for a mutable list of mutable lists.
  * Represents a nested list structure where each element is a mutable list.
  *
@@ -57,6 +67,16 @@ typealias MultiList<E> = List<List<E>>
  * @since 1.0.0
  */
 typealias MultiMList<E> = MList<MList<E>>
+/**
+ * A type alias for a non-empty mutable list where each element is itself a non-empty mutable list.
+ *
+ * This alias represents a nested structure of non-empty mutable lists, ensuring that both the
+ * outer and inner lists are guaranteed to have at least one element.
+ *
+ * @param E The type of elements contained in the innermost lists.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiMList<E> = NonEmptyMList<NonEmptyMList<E>>
 
 /**
  * A typealias for MutableSet<E>, providing a more concise name for usage in the codebase.
@@ -78,6 +98,17 @@ typealias MSet<E> = MutableSet<E>
  */
 typealias MultiSet<E> = Set<Set<E>>
 /**
+ * A type alias representing a non-empty multiset.
+ *
+ * This alias uses `NonEmptySet` to enforce the constraint that both the outer and inner collections are non-empty.
+ * Each inner `NonEmptySet` represents a group of elements, effectively functioning as an occurrence count for
+ * the multiset, while the outer `NonEmptySet` ensures that the multiset itself is not empty.
+ *
+ * @param E The type of elements contained in the multiset.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiSet<E> = NonEmptySet<NonEmptySet<E>>
+/**
  * A type alias representing a multiset of multisets. This allows creating collections
  * where each element is itself a multiset of elements.
  *
@@ -86,6 +117,17 @@ typealias MultiSet<E> = Set<Set<E>>
  * @since 1.0.0
  */
 typealias MultiMSet<E> = MSet<MSet<E>>
+/**
+ * A type alias representing a non-empty multiset of non-empty multisets.
+ *
+ * This can be utilized to define a nested multiset structure where each outer multiset element
+ * is itself a non-empty multiset, ensuring that both levels of the structure cannot be empty.
+ *
+ * @param E The type of elements contained within the innermost multisets.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiMSet<E> = NonEmptyMSet<NonEmptyMSet<E>>
+
 /**
  * A type alias for the [MutableCollection] interface, providing a shorthand way to refer to it.
  *
@@ -99,6 +141,7 @@ typealias MCollection<E> = MutableCollection<E>
  * @param T the type of elements contained within the iterable.
  * @since 3.0.0
  */
+
 typealias MIterable<T> = MutableIterable<T>
 /**
  * A typealias for `MutableIterator<T>`, which represents an iterator
@@ -108,6 +151,7 @@ typealias MIterable<T> = MutableIterable<T>
  * @since 4.4.0
  */
 typealias MIterator<T> = MutableIterator<T>
+
 /**
  * A typealias for MutableListIterator, providing a shorter, more concise way
  * to reference a mutable list iterator for a specified type.
@@ -175,6 +219,13 @@ typealias IntKeysMTable<V> = MTable<Int, Int, V>
  */
 typealias DataMapNN = Map<String, Any>
 /**
+ * A type alias representing a non-empty map with a String as the key
+ * and Any as the value. This is useful for scenarios where data maps
+ * are required to be non-empty and have arbitrary key-value pairs.
+ * @since 5.2.1
+ */
+typealias NonEmptyDataMapNN = NonEmptyMap<String, Any>
+/**
  * A type alias representing a map with String keys and values of type Any.
  * This alias is typically used to indicate a non-nullable data mapping structure.
  *
@@ -184,6 +235,12 @@ typealias DataMapNN = Map<String, Any>
  * @see Any
  */
 typealias DataMMapNN = MutableMap<String, Any>
+/**
+ * A type alias for a NonEmptyMMap where the key is a non-empty String
+ * and the value is of type Any.
+ * @since 5.2.1
+ */
+typealias NonEmptyDataMMapNN = NonEmptyMMap<String, Any>
 
 /**
  * A type alias representing a map with string keys and nullable values of any type.
@@ -197,6 +254,14 @@ typealias DataMMapNN = MutableMap<String, Any>
  */
 typealias DataMap = Map<String, Any?>
 /**
+ * A typealias representing a `NonEmptyMap` with `String` keys and nullable `Any` values.
+ *
+ * This is used to model a map structure that is guaranteed to have at least one key-value pair
+ * where the keys are always strings, and the values can be any nullable type.
+ * @since 5.2.1
+ */
+typealias NonEmptyDataMap = NonEmptyMap<String, Any?>
+/**
  * Type alias for a mutable map with `String` keys and nullable `Any?` values.
  * This alias can be used to simplify and improve readability for maps frequently
  * utilized to hold various types of data.
@@ -207,6 +272,13 @@ typealias DataMap = Map<String, Any?>
  * @see Any
  */
 typealias DataMMap = MutableMap<String, Any?>
+/**
+ * A typealias for a NonEmptyMMap with String keys and nullable Any values.
+ * Represents a map that is guaranteed to be non-empty, where keys are of type String
+ * and values can be of any nullable type.
+ * @since 5.2.1
+ */
+typealias NonEmptyDataMMap = NonEmptyMMap<String, Any?>
 
 /**
  * A type alias for a map that associates a `QuantityLevel` with an `Integer` value.
@@ -222,6 +294,13 @@ typealias DataMMap = MutableMap<String, Any?>
  */
 typealias QuantityMap = Map<QuantityLevel, Int>
 /**
+ * A type alias representing a non-empty map where the keys are of type QuantityLevel
+ * and the values are integers. This structure ensures that the map contains at least
+ * one key-value pair.
+ * @since 5.2.1
+ */
+typealias NonEmptyQuantityMap = NonEmptyMap<QuantityLevel, Int>
+/**
  * A typealias for a mutable map representing associations between `QuantityLevel` values
  * and corresponding integer values.
  *
@@ -236,6 +315,12 @@ typealias QuantityMap = Map<QuantityLevel, Int>
  * @see Int
  */
 typealias QuantityMMap = MutableMap<QuantityLevel, Int>
+/**
+ * A typealias for NonEmptyMMap with key type of QuantityLevel and value type of Int.
+ * Represents a non-empty map structure where the key is a QuantityLevel and the value is an Int.
+ * @since 5.2.1
+ */
+typealias NonEmptyQuantityMMap = NonEmptyMMap<QuantityLevel, Int>
 
 /**
  * A type alias representing a map with string keys and integer values. This can be used to store
@@ -248,6 +333,14 @@ typealias QuantityMMap = MutableMap<QuantityLevel, Int>
  */
 typealias CountMap<K> = Map<K, Int>
 /**
+ * A typealias representing a map that associates keys of type [K] with non-zero integer counts.
+ * It is guaranteed to be non-empty as it is based on [NonEmptyMap].
+ *
+ * @param K The type of the keys in the map.
+ * @since 5.2.1
+ */
+typealias NonEmptyCountMap<K> = NonEmptyMap<K, Int>
+/**
  * A typealias representing a mutable map where keys are strings and values are integers.
  * It is useful for scenarios where you need to track counts or frequencies of string keys.
  *
@@ -258,6 +351,15 @@ typealias CountMap<K> = Map<K, Int>
  * @see Int
  */
 typealias CountMMap<K> = MutableMap<K, Int>
+/**
+ * A typealias representing a non-empty multimap where the values associated with each key
+ * are integers. This is a specialization of the NonEmptyMMap data structure, which ensures
+ * that the map is always non-empty.
+ *
+ * @param K The type of keys in the multimap.
+ * @since 5.2.1
+ */
+typealias NonEmptyCountMMap<K> = NonEmptyMMap<K, Int>
 
 /**
  * A type alias representing a map where the keys are integers and values are of a generic type.
@@ -270,6 +372,15 @@ typealias CountMMap<K> = MutableMap<K, Int>
  */
 typealias IndexMap<V> = Map<Int, V>
 /**
+ * A typealias for a NonEmptyMap where the keys are of type Int.
+ * Represents a map that is guaranteed to contain at least one key-value pair
+ * with integer keys and values of a specified type.
+ *
+ * @param V The type of values stored in the map.
+ * @since 5.2.1
+ */
+typealias NonEmptyIndexMap<V> = NonEmptyMap<Int, V>
+/**
  * A type alias for a mutable map where the keys are integers and the values are of a generic type.
  *
  * This alias simplifies the representation and usage of a mutable map with integer keys in code.
@@ -279,6 +390,13 @@ typealias IndexMap<V> = Map<Int, V>
  * @since 1.0.0
  */
 typealias IndexMMap<V> = MutableMap<Int, V>
+/**
+ * A typealias representing a NonEmptyMMap where the key type is strictly an integer (Int).
+ *
+ * @param V The type of values held in the map.
+ * @since 5.2.1
+ */
+typealias NonEmptyIndexMMap<V> = NonEmptyMMap<Int, V>
 
 /**
  * Type alias representing a map with String keys and String values.
@@ -288,6 +406,13 @@ typealias IndexMMap<V> = MutableMap<Int, V>
  * @since 1.0.0
  */
 typealias StringMap = Map<String, String>
+/**
+ * A typealias for `NonEmptyMap` with both key and value types specified as `String`.
+ *
+ * Represents a non-empty map where both the keys and the values are of type `String`.
+ * @since 5.2.1
+ */
+typealias NonEmptyStringMap = NonEmptyMap<String, String>
 /**
  * A typealias for a mutable map with keys and values of type String.
  *
@@ -299,6 +424,13 @@ typealias StringMap = Map<String, String>
  */
 typealias StringMMap = MutableMap<String, String>
 /**
+ * A type alias for a `MutableMap` where both keys and values are non-empty strings.
+ * This alias enforces the use of non-empty string values as a convention,
+ * although it does not enforce this constraint at compile-time.
+ * @since 5.2.1
+ */
+typealias NonEmptyStringMMap = MutableMap<String, String>
+/**
  * A typealias representing a map where both the keys and the values are nullable strings.
  *
  * This can be useful when working with maps where either the keys, the values, or both
@@ -308,6 +440,15 @@ typealias StringMMap = MutableMap<String, String>
  */
 typealias NullableStringMap = Map<String, String?>
 /**
+ * A type alias for a [NonEmptyMap] where the keys are non-nullable [String] values
+ * and the values are nullable [String] values.
+ *
+ * This can be used to represent collections of key-value pairs where the keys
+ * are always non-empty strings, but the values can be either a string or null.
+ * @since 5.2.1
+ */
+typealias NonEmptyNullableStringMap = NonEmptyMap<String, String?>
+/**
  * A type alias representing a mutable map where both keys and values can be nullable strings.
  *
  * This alias is useful for simplifying code readability and maintenance when working
@@ -316,6 +457,15 @@ typealias NullableStringMap = Map<String, String?>
  * @since 1.0.0
  */
 typealias NullableStringMMap = MutableMap<String, String?>
+/**
+ * A type alias representing a non-empty multimap where the keys
+ * are non-nullable Strings and the values are nullable Strings.
+ *
+ * This is a specialized version of `NonEmptyMMap` to enforce that
+ * all keys are Strings and associates them with nullable String values.
+ * @since 5.2.1
+ */
+typealias NonEmptyNullableStringMMap = NonEmptyMMap<String, String?>
 
 /**
  * Type alias for a map where each key is associated with a list of values.
@@ -330,6 +480,17 @@ typealias NullableStringMMap = MutableMap<String, String?>
  * @see List
  */
 typealias MultiMap<K, V> = Map<K, List<V>>
+/**
+ * A typealias representing a map where each key is associated with a non-empty list of values.
+ *
+ * The `NonEmptyMultiMap` is a specialized version of a `NonEmptyMap` where the values associated
+ * with each key are guaranteed to be non-empty lists (`NonEmptyList`).
+ *
+ * @param K The type of keys in the map.
+ * @param V The type of values in the non-empty lists associated with the keys.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiMap<K, V> = NonEmptyMap<K, NonEmptyList<V>>
 /**
  * A type alias for a mutable multimap, which is represented as a `MutableMap` where
  * each key is associated with a `MutableList` of values. This allows storing multiple
@@ -346,6 +507,19 @@ typealias MultiMap<K, V> = Map<K, List<V>>
  * @see MutableList
  */
 typealias MultiMMap<K, V> = MutableMap<K, MList<V>>
+/**
+ * A typealias that represents a non-empty multimapping data structure.
+ *
+ * This is a specialized version of `NonEmptyMMap` where each key is associated
+ * with a non-empty list of values (`NonEmptyMList`). It allows creating mappings
+ * where every key has at least one associated value, and every list of values
+ * is guaranteed to be non-empty.
+ *
+ * @param K The type of keys in the map.
+ * @param V The type of values in the non-empty lists associated with each key.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiMMap<K, V> = NonEmptyMMap<K, NonEmptyMList<V>>
 
 /**
  * A typealias representing a map where each key maps to a set of values.
@@ -359,6 +533,18 @@ typealias MultiMMap<K, V> = MutableMap<K, MList<V>>
  */
 typealias SetMap<K, V> = Map<K, Set<V>>
 /**
+ * A type alias that represents a map where each key is associated with a non-empty set of values.
+ *
+ * This alias is based on `NonEmptyMap` and `NonEmptySet`, ensuring that:
+ * - The map itself is non-empty, meaning it must have at least one key-value pair.
+ * - Each value in the map is a `NonEmptySet`, meaning it contains at least one element.
+ *
+ * Example use cases could include representing relationships, categories, or groupings
+ * where both the set of keys and each set of values are guaranteed to be non-empty.
+ * @since 5.2.1
+ */
+typealias NonEmptySetMap<K, V> = NonEmptyMap<K, NonEmptySet<V>>
+/**
  * A type alias representing a mutable map where each key is associated with a mutable set of values.
  *
  * This can be used in scenarios where a key is mapped to a collection of unique elements, and
@@ -369,6 +555,18 @@ typealias SetMap<K, V> = Map<K, Set<V>>
  * @since 3.0.0
  */
 typealias SetMMap<K, V> = MutableMap<K, MSet<V>>
+/**
+ * A type alias that represents a multi-map where:
+ * - Keys (`K`) are mapped to values of type `NonEmptyMSet<V>`.
+ * - Each key is associated with a non-empty set of values.
+ *
+ * This ensures that for every key in the map, there is at least one value in the corresponding set.
+ *
+ * @param K The type of keys in the multi-map.
+ * @param V The type of elements in the non-empty sets associated with each key.
+ * @since 5.2.1
+ */
+typealias NonEmptySetMMap<K, V> = NonEmptyMMap<K, NonEmptyMSet<V>>
 
 /**
  * A type alias for a map where the keys are of type String, and the values are lists of Strings.
@@ -379,6 +577,13 @@ typealias SetMMap<K, V> = MutableMap<K, MSet<V>>
  */
 typealias MultiStringMap = Map<String, List<String>>
 /**
+ * A type alias representing a map where keys are non-empty strings and values are non-empty lists of strings.
+ * This ensures that the map has at least one key-value pair, each key is a non-empty string,
+ * and each associated value is a non-empty list of strings.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiStringMap = NonEmptyMap<String, NonEmptyList<String>>
+/**
  * A type alias representing a mutable map where the keys are strings and
  * the values are mutable lists of strings.
  * This can be used to associate a string key with multiple string values stored in a list.
@@ -386,6 +591,14 @@ typealias MultiStringMap = Map<String, List<String>>
  * @since 2.1.0
  */
 typealias MultiStringMMap = MutableMap<String, MList<String>>
+/**
+ * A type alias that represents a non-empty multimap where the keys are strings,
+ * and the values are non-empty lists of strings. Designed to ensure that both
+ * the map itself and all the lists it contains are non-empty, emphasizing the
+ * presence of data and preventing empty collections.
+ * @since 5.2.1
+ */
+typealias NonEmptyMultiStringMMap = NonEmptyMMap<String, NonEmptyMList<String>>
 
 /**
  * A type alias for the generic `Map<K, V>` interface, allowing for more concise and readable code.

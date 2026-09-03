@@ -19,6 +19,14 @@ import dev.tommasop1804.kutils.OffsetDateTime
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
+import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.maps.*
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.LoaderOptions
@@ -438,37 +446,74 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @throws ClassCastException If an element in the YAML content cannot be cast to the specified type `T`.
      * @since 3.0.0
      */
-    fun <T> toList() = runCatching { SNAKE_YAML.load<List<T>>(value) }
+    fun <T> toList(): Result<List<T>> = runCatching { SNAKE_YAML.load<List<T>>(value) }
+    /**
+     * Converts a collection or sequence of elements into a non-empty list wrapped in a Result.
+     *
+     * The method first converts the collection or sequence into a list.
+     * It then attempts to transform the resulting list into a non-empty list,
+     * ensuring that the result contains meaningful data.
+     *
+     * @return A [Result] wrapping the non-empty list if the transformation is successful,
+     *         or a failure if the conversion cannot produce a non-empty list.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
     /**
      * Parses the YAML content stored in the current object and converts it into a mutable list of type [T].
-     * 
+     *
      * Uses SnakeYAML to process the content and attempts to cast each deserialized element to the specified type.
-     * 
+     *
      * @param T The type of elements in the resulting mutable list.
      * @return A [Result] containing the mutable list of type [T], or an exception if the operation fails.
      * @throws ClassCastException If any element in the YAML content cannot be cast to the specified type [T].
      * @since 3.0.0
      */
     fun <T> toMList() = runCatching { SNAKE_YAML.load<List<T>>(value).toMList() }
+    /**
+     * Converts the current instance to a non-empty mutable list wrapped in a Result.
+     *
+     * This function attempts to map the result of `toMList<T>()` to a non-empty mutable list.
+     * If the list is empty or the conversion fails, the resulting `Result` will contain a failure.
+     *
+     * @param T The type of elements in the list.
+     * @return A [Result] containing a non-empty mutable list if the conversion is successful,
+     *         or a failure if the list is empty or another error occurs.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptyMList() = toMList<T>().mapCatching { it.toNonEmptyMList() }
 
     /**
      * Converts the YAML content represented by `value` into a set of objects of type `T`.
-     * This method uses SnakeYAML to parse the content and extract all objects, casting 
+     * This method uses SnakeYAML to parse the content and extract all objects, casting
      * each to the specified type `T` and collecting them into an immutable set.
-     * 
-     * Any exception encountered during parsing or casting will be encapsulated 
+     *
+     * Any exception encountered during parsing or casting will be encapsulated
      * within a `Result` using the `runCatching` construct.
      *
      * @param T The type of the elements in the resulting set.
-     * @return A `Result` containing the set of objects of type `T` or an exception 
+     * @return A `Result` containing the set of objects of type `T` or an exception
      *         if an error occurs.
      * @since 3.0.0
      */
     fun <T> toSet() = runCatching { SNAKE_YAML.load<List<T>>(value).toSet() }
     /**
+     * Converts the elements in the collection into a `NonEmptySet`.
+     *
+     * This method attempts to create a `NonEmptySet` from the elements of the collection
+     * by calling `toSet` to eliminate duplicates, and then safely maps the result to
+     * ensure it becomes a valid `NonEmptySet`. If the mapping is unsuccessful (e.g., the
+     * resulting set is empty), it returns the failure encapsulated in a `Result`.
+     *
+     * @return A `Result` containing the `NonEmptySet` if the conversion is successful,
+     * or a failure if the resulting set is empty.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptySet() = toSet<T>().mapCatching { it.toNonEmptySet() }
+    /**
      * Parses the YAML content stored in the `value` field and converts it into a mutable set of elements of type T.
      *
-     * The method uses the SnakeYAML library to process the YAML content, loading all elements and casting them to the 
+     * The method uses the SnakeYAML library to process the YAML content, loading all elements and casting them to the
      * specified type T. These elements are then collected and transformed into a mutable set.
      *
      * @return A `Result` wrapping a mutable set of type T, containing the parsed and distinct elements from the YAML content.
@@ -476,20 +521,42 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * @since 3.0.0
      */
     fun <T> toMSet() = runCatching { SNAKE_YAML.load<List<T>>(value).toMSet() }
+    /**
+     * Converts a collection or sequence into a non-empty multiset (MSet) representation.
+     *
+     * This method first transforms the elements into an intermediate multiset structure.
+     * Then, it attempts to map the result into a non-empty multiset, ensuring that the output
+     * contains at least one element. The operation returns a result wrapped in `Result`,
+     * capturing any failure that occurs during the conversion.
+     *
+     * @return A `Result` containing the non-empty multiset if the operation succeeds,
+     *         or an error if the conversion fails.
+     * @since 5.2.1
+     */
+    fun <T> toNonEmptyMSet() = toMSet<T>().mapCatching { it.toNonEmptyMSet() }
 
     /**
      * Converts the underlying YAML content into a map structure of key-value pairs.
      *
      * The method utilizes the SnakeYAML library to parse the YAML content stored in the `value` property
-     * and transform it into a `Map<String, T>`. If the parsing process encounters an error, the result 
+     * and transform it into a `Map<String, T>`. If the parsing process encounters an error, the result
      * is wrapped in a `Result` instance, allowing safe handling of potential exceptions.
      *
      * @param V The type of values expected in the resulting map.
      * @return A `Result<Map<String, T>>` containing the parsed map if successful or the exception if an error occurred.
-     * @throws IllegalStateException If the YAML content cannot be parsed due to formatting issues or data type mismatches.
      * @since 3.0.0
      */
     fun <V> toMap() = runCatching { SNAKE_YAML.load<Map<String, V>>(value)!! }
+    /**
+     * Converts the current collection into a non-empty map, where each element is transformed
+     * into a key-value pair. The operation wraps the conversion in a `mapCatching` block to handle
+     * potential errors during the conversion process.
+     *
+     * @param V The type of the values in the resulting map.
+     * @return A result containing the non-empty map if successful, or an exception if the conversion fails.
+     * @since 5.2.1
+     */
+    fun <V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
     /**
      * Converts a YAML string value into a mutable map (`MMap`) with string keys and values of type `T`.
      *
@@ -503,6 +570,18 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      */
     fun <V> toMMap() = runCatching { SNAKE_YAML.load<MMap<String, V>>(value)!! }
     /**
+     * Converts the current receiver into a `NonEmptyMMap` by first transforming it into an `MMap`
+     * and then attempting to map the result into a `NonEmptyMMap`.
+     *
+     * If the transformation to a `NonEmptyMMap` fails, the result will capture the failure as an error.
+     *
+     * @param V The type of values in the resulting `NonEmptyMMap`.
+     * @return A result containing the transformed `NonEmptyMMap` if successful, or an error if the
+     *         transformation fails.
+     * @since 5.2.1
+     */
+    fun <V> toNonEmptyMMap() = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
+    /**
      * Converts the stored YAML content in the `value` field into a `DataMap` object.
      * This method uses the SnakeYAML library to parse the YAML content.
      * If the conversion is successful, the resulting `DataMap` is returned wrapped in a `Result`.
@@ -513,6 +592,18 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      */
     fun toDataMap() = runCatching { SNAKE_YAML.load<DataMap>(value)!! }
     /**
+     * Converts the current instance to a [Result] containing a [NonEmptyDataMap].
+     * This method attempts to transform the instance into a [NonEmptyDataMap]
+     * using a mapping operation. If the transformation is successful, a successful
+     * [Result] wrapping the [NonEmptyDataMap] is returned; otherwise, a failure
+     * [Result] is returned.
+     *
+     * @return A [Result] that either contains a [NonEmptyDataMap] if the transformation
+     *         succeeds, or an exception if the transformation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
+    /**
      * Converts the content of the current YAML instance to a mutable map representation of `DataMMap`.
      * The method utilizes the SNAKE_YAML library to perform the YAML parsing and returns the result
      * wrapped in a `Result` object. Parsing errors are caught and encapsulated within the `Result`.
@@ -522,30 +613,56 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      */
     fun toDataMMap() = runCatching { SNAKE_YAML.load<DataMMap>(value)!! }
     /**
+     * Converts the current instance to a Result containing a NonEmptyDataMMap.
+     *
+     * The transformation is performed by first converting the instance to a DataMMap
+     * and then attempting to convert it to a NonEmptyDataMMap. If the conversion fails,
+     * the Result will contain the failure as an exception.
+     *
+     * @return a Result wrapping a NonEmptyDataMMap if the transformation succeeds,
+     * or a failure Result if the transformation cannot be performed.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMap(): Result<NonEmptyDataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
+    /**
      * Parses the YAML content stored in the `value` field and converts it into a non-nullable `DataMapNN` object.
      * Utilizes the SnakeYAML library to perform the deserialization.
-     *
      * @return A `Result` wrapping the successfully parsed `DataMapNN` object if the operation succeeds.
-     *         If the operation fails (e.g., due to invalid YAML structure or type mismatch), 
+     *         If the operation fails (e.g., due to invalid YAML structure or type mismatch),
      *         the result will contain the exception.
-     *
-     * @throws IllegalStateException If the YAML content is null or cannot be converted to `DataMapNN`.
-     *
      * @since 3.0.0
      */
     fun toDataMapNN() = runCatching { SNAKE_YAML.load<DataMapNN>(value)!! }
+    /**
+     * Converts the existing DataMapNN structure to a NonEmptyDataMapNN.
+     * Ensures that the resulting map is non-empty by transforming it using `toNonEmptyMap`.
+     *
+     * @return A [Result] containing the transformed [NonEmptyDataMapNN] if successful, or an exception if the operation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMapNN(): Result<NonEmptyDataMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMap() }
     /**
      * Attempts to parse the current YAML value into a non-nullable [DataMMapNN] object.
      *
      * This method uses the SnakeYAML library to deserialize the value into
      * an instance of [DataMMapNN]. If the value cannot be parsed or is null,
      * an exception is captured and returned as a failed [Result].
-     * 
+     *
      * @return [Result] containing either the successfully parsed [DataMMapNN] object or an exception.
      * @throws NullPointerException if the YAML value is parsed as `null`.
      * @since 3.0.0
      */
     fun toDataMMapNN() = runCatching { SNAKE_YAML.load<DataMMapNN>(value)!! }
+    /**
+     * Converts the current object to a `NonEmptyDataMMapNN` wrapped in a `Result`.
+     * The operation first attempts to transform the object using `toDataMMapNN` and then maps
+     * the result to a non-empty mutable map using `toNonEmptyMMap`.
+     *
+     * @return A `Result` containing a `NonEmptyDataMMapNN` if the transformation is successful,
+     * or a failure if any step of the transformation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
 
     /**
      * Retrieves the element at the specified index from the value.
@@ -1003,6 +1120,70 @@ class YamlNode(val rawValue: Any?) {
      */
     fun <T> asList(): List<T>? = (rawValue as? Iterable<*>)?.map { it as T }
     /**
+     * Converts the current object to a [NonEmptyList] if possible.
+     *
+     * @return A [NonEmptyList] containing elements of type `T` if the object can be cast to an `Iterable` and is non-empty,
+     * or `null` if the conversion is not possible or the iterable is empty.
+     * @since 5.2.1
+     */
+    fun <T> asNonEmptyList(): NonEmptyList<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toNonEmptyList()
+    /**
+     * Converts the `rawValue` to an `MList` of type `T` if `rawValue` is an `Iterable`.
+     *
+     * @return An `MList` containing elements of type `T` if the conversion is successful, or `null` if `rawValue` is not an `Iterable`.
+     * @since 5.2.1
+     */
+    fun <T> asMList(): MList<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toMList()
+    /**
+     * Converts the raw value to a `NonEmptyMList` if it can be interpreted as a non-empty list,
+     * otherwise returns null.
+     *
+     * @return A `NonEmptyMList<T>` if the conversion is successful and the resulting list is non-empty,
+     * or null if the conversion cannot occur or the list is empty.
+     * @since 5.2.1
+     */
+    fun <T> asNonEmptyMList(): NonEmptyMList<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toNonEmptyMList()
+    /**
+     * Converts the rawValue, if it is an Iterable, into a Set of the specified type.
+     *
+     * The method attempts to cast the elements of the Iterable to the specified type
+     * and returns a Set containing these elements. If the rawValue is not an Iterable
+     * or if the casting fails, it returns null.
+     *
+     * @return A Set of type T containing the elements of the rawValue if it is an Iterable,
+     *         or null if the conversion is not possible.
+     * @since 5.2.1
+     */
+    fun <T> asSet(): Set<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toSet()
+    /**
+     * Converts the underlying raw value to a NonEmptySet if possible.
+     *
+     * @return A NonEmptySet containing the elements of the rawValue interpreted as an Iterable,
+     *         or null if the conversion is not possible or the resulting set is empty.
+     * @since 5.2.1
+     */
+    fun <T> asNonEmptySet(): NonEmptySet<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toNonEmptySet()
+    /**
+     * Converts the raw value to an instance of MSet with elements of type T,
+     * if the raw value is an Iterable. If the conversion is not possible, returns null.
+     *
+     * @return an MSet containing the elements of the raw value cast to type T,
+     * or null if the conversion is not possible.
+     * @since 5.2.1
+     */
+    fun <T> asMSet(): MSet<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toMSet()
+    /**
+     * Converts the current object to a NonEmptyMSet<T> if possible.
+     *
+     * The method attempts to cast the rawValue to an Iterable, maps its elements to type T, and then converts
+     * the resulting collection to a NonEmptyMSet<T>. If the conversion fails or the resulting collection is empty,
+     * it returns null.
+     *
+     * @return A NonEmptyMSet<T> if the conversion is successful and the collection is non-empty, or null otherwise.
+     * @since 5.2.1
+     */
+    fun <T> asNonEmptyMSet(): NonEmptyMSet<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toNonEmptyMSet()
+    /**
      * Converts the raw value of this YAMLNode into a map representation.
      *
      * This function attempts to interpret the underlying `rawValue` as a map structure.
@@ -1014,7 +1195,93 @@ class YamlNode(val rawValue: Any?) {
      *         the `rawValue` is not a map or is null.
      * @since 3.0.0
      */
-    fun <T> asMap(): Map<String, T> = (rawValue as? Map<*, *>)?.mapKeys { it.key.toString() }?.mapValues { it.value as T } ?: emptyMap()
+    fun <T> asMap(): Map<String, T>? = (rawValue as? Map<*, *>)?.mapKeys { it.key.toString() }?.mapValues { it.value as T }
+    /**
+     * Converts the raw value to a `NonEmptyMap` with string keys and values of type `T`, if possible.
+     *
+     * If the raw value can be cast to a `Map`, this method transforms its keys to strings and attempts to create a `NonEmptyMap`.
+     * If the resulting map is empty or the raw value cannot be cast to a `Map`, the method returns null.
+     *
+     * @return A `NonEmptyMap` with string keys and values of type `T`, or null if the conversion is not possible or the map is empty.
+     * @since 5.2.1
+     */
+    fun <T> asNonEmptyMap(): NonEmptyMap<String, T>? = (rawValue as? Map<*, *>)?.mapKeys { it.key.toString() }?.mapValues { it.value as T }?.toNonEmptyMap()
+    /**
+     * Converts the underlying raw value to an MMap instance with String keys.
+     *
+     * This method attempts to cast the raw value to a Map and transforms its keys to strings, while maintaining the values as the specified generic type T.
+     * If the conversion is not possible, it returns null.
+     *
+     * @return An MMap instance with String keys and values of type T, or null if the conversion is not applicable.
+     * @since 5.2.1
+     */
+    fun <T> asMMap(): MMap<String, T>? = (rawValue as? Map<*, *>)?.mapKeys { it.key.toString() }?.mapValues { it.value as T }?.toMMap()
+    /**
+     * Converts the rawValue into a NonEmptyMMap<String, T> if possible.
+     * The conversion involves typecasting the keys to strings and values to type T.
+     * If the resulting map is empty or the conversion fails, returns null.
+     *
+     * @return A NonEmptyMMap<String, T> if the conversion succeeds and the map is not empty, otherwise null.
+     * @since 5.2.1
+     */
+    fun <T> asNonEmptyMMap(): NonEmptyMMap<String, T>? = (rawValue as? Map<*, *>)?.mapKeys { it.key.toString() }?.mapValues { it.value as T }?.toNonEmptyMMap()
+    /**
+     * Converts the current object to a DataMap representation.
+     *
+     * @return a DataMap instance if the object can be represented as a map, or null if not.
+     * @since 5.2.1
+     */
+    fun asDataMap(): DataMap? = asMap()
+    /**
+     * Converts the current object to a NonEmptyDataMap if possible.
+     *
+     * @return A NonEmptyDataMap instance if the conversion is successful, or null if the current object does not represent a non-empty map.
+     * @since 5.2.1
+     */
+    fun asNonEmptyDataMap(): NonEmptyDataMap? = asNonEmptyMap()
+    /**
+     * Converts the current object to a non-data [DataMMap] instance if applicable.
+     *
+     * @return A [DataMMap] instance if the object can be represented as a non-data map,
+     *         or null if the conversion is not possible.
+     * @since 5.2.1
+     */
+    fun asNonDataMMap(): DataMMap? = asNonEmptyMMap()
+    /**
+     * Converts the current instance to a NonEmptyDataMMap if possible.
+     *
+     * @return A NonEmptyDataMMap instance if the conversion is successful, or null if the current instance cannot be represented as a NonEmptyDataMMap.
+     * @since 5.2.1
+     */
+    fun asNonEmptyDataMMap(): NonEmptyDataMMap? = asNonEmptyMMap()
+    /**
+     * Converts the current object to a non-nullable DataMapNN representation, if possible.
+     *
+     * @return a DataMapNN instance if the conversion is successful, or null if the object cannot be converted.
+     * @since 5.2.1
+     */
+    fun asDataMapNN(): DataMapNN? = asMap()
+    /**
+     * Converts the current object to a NonEmptyDataMapNN if possible.
+     *
+     * @return A NonEmptyDataMapNN instance if the conversion is successful, or null if the object cannot be converted.
+     * @since 5.2.1
+     */
+    fun asNonEmptyDataMapNN(): NonEmptyDataMapNN? = asNonEmptyMap()
+    /**
+     * Converts the current instance to a non-data mutable map representation, ensuring null safety.
+     *
+     * @return A non-data mutable map instance if the current instance can be represented as such, or null otherwise.
+     * @since 5.2.1
+     */
+    fun asNonDataMMapNN(): DataMMapNN? = asNonEmptyMMap()
+    /**
+     * Converts the current instance to a NonEmptyDataMMapNN type if possible.
+     *
+     * @return A NonEmptyDataMMapNN instance if the conversion is successful, or null otherwise.
+     * @since 5.2.1
+     */
+    fun asNonEmptyDataMMapNN(): NonEmptyDataMMapNN? = asNonEmptyMMap()
     /**
      * Converts the current YAMLNode to a LocalDate object.
      *

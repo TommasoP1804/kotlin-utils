@@ -18,6 +18,9 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
+import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
 import dev.tommasop1804.kutils.exceptions.*
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
@@ -346,6 +349,16 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
     inline fun <reified T> toList() = runCatching {
         toJson().toList<T>()()
     }
+    /**
+     * Converts the CSV content into a list of objects of type [T].
+     *
+     * @param T The type to which each row will be converted.
+     * @return A [Result] wrapping the successfully parsed list.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyList() = runCatching {
+        toJson().toNonEmptyList<T>()()
+    }
 
     /**
      * Converts the CSV content into a mutable list of type [T].
@@ -355,6 +368,19 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
      * @since 3.13.0
      */
     inline fun <reified T> toMList() = runCatching { toList<T>()().toMList() }
+    /**
+     * Converts the CSV content into a mutable list of type [T], ensuring the resulting list is non-empty.
+     *
+     * This function leverages the `toNonEmptyList()` method to create a non-empty list of type [T],
+     * and then converts it into a mutable list (`NonEmptyMList`), guaranteeing that the resulting
+     * list always contains at least one element.
+     *
+     * @param T The type of elements in the resulting mutable list.
+     * @return A [Result] wrapping a non-empty mutable list of type [T].
+     * @throws TooFewElementsException If the CSV content does not contain enough data to create a non-empty list.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyMList() = toNonEmptyList<T>()().toNonEmptyMList()
 
     /**
      * Converts the CSV content into a set of objects of type [T].
@@ -364,6 +390,18 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
      * @since 3.13.0
      */
     inline fun <reified T> toSet() = runCatching { toList<T>()().toSet() }
+    /**
+     * Converts the CSV content into a non-empty set of objects of type [T].
+     *
+     * This method combines the functionality of `toList` and `toNonEmptySet` to ensure
+     * that the returned set is both unique and contains at least one element.
+     *
+     * @param T The type to which each row will be converted.
+     * @return A [Result] wrapping a non-empty set of type [T].
+     * @throws TooFewElementsException if the resulting set is empty.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptySet() = runCatching { toList<T>()().toNonEmptySet() }
 
     /**
      * Converts the CSV content into a mutable set of type [T].
@@ -372,6 +410,22 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
      * @since 3.13.0
      */
     inline fun <reified T> toMSet() = runCatching { toList<T>()().toMSet() }
+    /**
+     * Converts the CSV content into a mutable set of type [T], ensuring the result is wrapped in a [Result].
+     *
+     * This function first transforms the CSV content into a list of type [T] using the `toList` method.
+     * It then attempts to convert this list into a non-empty mutable set ([NonEmptyMSet]), ensuring
+     * that the resulting set always contains at least one element.
+     *
+     * If the CSV content is empty or the transformation fails, the returned [Result] will contain the failure reason.
+     *
+     * @param T The type of elements to be included in the mutable set.
+     * @return A [Result] that either contains a non-empty mutable set ([NonEmptyMSet])
+     *         of type [T], or the failure reason if the conversion is not successful.
+     * @throws TooFewElementsException If the CSV content is insufficient to produce a non empty mutable set.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyMSet() = runCatching { toList<T>()().toNonEmptyMSet() }
 
     /**
      * Converts the CSV content into a list of maps, where each map represents a row of the CSV data.

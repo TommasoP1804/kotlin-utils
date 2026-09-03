@@ -505,7 +505,7 @@ interface NonEmptyMCollection<E> : MCollection<E>, NonEmptyMIterable<E> {
  * @author Tommaso Pastorelli
  * @since 5.2.0
  */
-open class NonEmptyList<out E>(@PublishedApi internal val elements: List<E>) : List<E> by elements, NonEmptyCollection<E> {
+open class NonEmptyList<out E>(@PublishedApi internal val elements: List<E>) : List<E> by elements, NonEmptyCollection<E>, Iterable<E>, NonEmptyIterable<E> {
 
     /**
      * Secondary constructor for creating a [NonEmptyList] instance from a vararg of elements.
@@ -778,7 +778,7 @@ fun <E> nonEmptyListOf(head: E, vararg tail: E) =
  * @author Tommaso Pastorelli
  */
 @Suppress("UNCHECKED_CAST")
-class NonEmptyMList<E>(private val mElements: MList<E>) : MList<E> by mElements, NonEmptyList<E>(mElements), NonEmptyMCollection<E> {
+class NonEmptyMList<E>(private val mElements: MList<E>) : MList<E> by mElements, NonEmptyList<E>(mElements), NonEmptyMCollection<E>, MIterable<E>, NonEmptyMIterable<E> {
 
     /**
      * A guard to prevent operations that would leave the NonEmptyMList empty.
@@ -1202,7 +1202,7 @@ fun <E> nonEmptyMListOf(head: E, vararg tail: E) =
  * @since 5.2.0
  * @author Tommaso Pastorelli
  */
-open class NonEmptySet<out E>(@PublishedApi internal val elements: Set<E>) : Set<E> by elements, NonEmptyCollection<E> {
+open class NonEmptySet<out E>(@PublishedApi internal val elements: Set<E>) : Set<E> by elements, NonEmptyCollection<E>, Iterable<E>, NonEmptyIterable<E> {
     /**
      * Secondary constructor for creating a [NonEmptySet] from a variable number of elements.
      *
@@ -1430,7 +1430,7 @@ fun <E> nonEmptySetOf(head: E, vararg tail: E) =
  * @author Tommaso Pastorelli
  */
 @Suppress("UNCHECKED_CAST")
-class NonEmptyMSet<E>(private val mElements: MSet<E>) : MSet<E> by mElements, NonEmptySet<E>(mElements), NonEmptyMCollection<E> {
+class NonEmptyMSet<E>(private val mElements: MSet<E>) : MSet<E> by mElements, NonEmptySet<E>(mElements), NonEmptyMCollection<E>, MIterable<E>, NonEmptyMIterable<E> {
 
     /**
      * Returns the total number of elements in the collection.

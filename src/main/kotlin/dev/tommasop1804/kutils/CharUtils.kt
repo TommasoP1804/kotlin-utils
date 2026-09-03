@@ -12,8 +12,6 @@ package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 
 /**
@@ -884,6 +882,160 @@ val Char.Companion.LOWER_CONSONANT
  */
 val Char.Companion.UPPER_CONSONANT
     get() = charArrayOf('B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z')
+
+/**
+ * Indicates whether the character has a defined meaning in the Unicode specification.
+ *
+ * This property leverages the [isDefined()] function to determine if the character
+ * has an assigned code point in the Unicode standard, meaning it is a valid and
+ * recognized character.
+ * @since 5.2.1
+ */
+val Char.isDefined get() = isDefined()
+
+/**
+ * Extension property for the Char class that evaluates whether the character
+ * is an uppercase letter based on Unicode classification.
+ *
+ * @return `true` if the character is an uppercase letter, otherwise `false`.
+ * @since 5.2.1
+ */
+val Char.isUpperCase get() = isUpperCase()
+
+/**
+ * Extension property for the [Char] class that checks if the character is in lowercase.
+ * Returns `true` if the character is a lowercase letter as defined by the Unicode standard, otherwise `false`.
+ * @since 5.2.1
+ */
+val Char.isLowerCase get() = isLowerCase()
+
+/**
+ * Checks if the character is a titlecase character.
+ *
+ * A titlecase character is a type of uppercase character that typically
+ * signifies the beginning of a word in title-cased text.
+ *
+ * @return `true` if the character is categorized as titlecase, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isTitleCase get() = isTitleCase()
+
+/**
+ * Extension property for the [Char] class that determines whether
+ * the character is either a letter or a digit.
+ *
+ * @return `true` if the character is either a letter or a digit,
+ * otherwise `false`.
+ * @since 5.2.1
+ */
+val Char.isLetterOrDigit get() = isLetterOrDigit()
+
+/**
+ * Extension property for the [Char] class that checks if the character
+ * is a letter as defined by Unicode standards.
+ *
+ * Uses the [isLetter] function internally to determine whether the character
+ * is classified as a letter (e.g., 'a', 'Z', 'ж', '日').
+ *
+ * @return `true` if this character is a letter, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isLetter get() = isLetter()
+
+/**
+ * Extension property for the [Char] class that checks whether the character
+ * is a digit. A digit is defined as any character that belongs to the
+ * Unicode category of decimal digits.
+ *
+ * @return `true` if the character is a digit, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isDigit get() = isDigit()
+
+/**
+ * Determines whether the character is an ISO control character.
+ *
+ * An ISO control character is a non-printable character that is typically used for
+ * control purposes in text streams, such as signaling the start or end of a transmission.
+ * These characters are within the Unicode ranges `\u0000` through `\u001F` and `\u007F` through `\u009F`.
+ *
+ * @receiver The character to check.
+ * @return `true` if the character is an ISO control character, otherwise `false`.
+ * @since 5.2.1
+ */
+val Char.isIsoControl get() = isISOControl()
+
+/**
+ * Checks if the character is ignorable in a Unicode identifier context.
+ *
+ * A character is considered ignorable in a Unicode identifier if it is a non-spacing mark,
+ * a format control character, or a control character that is not part of the visible
+ * range of characters typically used within identifiers.
+ *
+ * @receiver The character to be checked.
+ * @return `true` if the character is ignorable in an identifier, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isIdentifierIgnorable get() = isIdentifierIgnorable()
+
+/**
+ * Indicates whether this character can be part of a Java identifier
+ * other than the initial character.
+ *
+ * A character is considered valid if it complies with the rules
+ * defined by the `Character.isJavaIdentifierPart(char)` method in Java.
+ *
+ * @return `true` if this character is a valid part of a Java identifier, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isJavaIdentifierPart get() = isJavaIdentifierPart()
+
+/**
+ * Extension property for the Char class that checks whether the character
+ * is valid as the first character of a Java identifier.
+ *
+ * This property delegates to the built-in `isJavaIdentifierStart` method
+ * to verify if the character satisfies the lexical rules defined by the
+ * Java Language Specification for starting an identifier.
+ * @since 5.2.1
+ */
+val Char.isJavaIdentifierStart get() = isJavaIdentifierStart()
+
+/**
+ * Extension property to determine if the character is a whitespace character.
+ *
+ * A whitespace character includes spaces, tabs, newlines, and other characters
+ * that are classified as whitespace according to Unicode standards.
+ *
+ * @receiver The character to be checked.
+ * @return `true` if the character is a whitespace character, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isWhitespace get() = isWhitespace()
+
+/**
+ * Checks if this character is a high surrogate.
+ *
+ * A high surrogate is a character in the Unicode range '\uD800' to '\uDBFF'.
+ * High surrogates are used in UTF-16 encoding as part of surrogate pairs that
+ * represent characters outside the Basic Multilingual Plane.
+ *
+ * @return `true` if this character is a high surrogate, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isHighSurrogate get() = isHighSurrogate()
+
+/**
+ * Checks if this character is a low surrogate in the Unicode surrogate pair.
+ *
+ * Low surrogates are characters in the range from '\uDC00' to '\uDFFF' and are
+ * used in conjunction with high surrogates to represent supplementary characters
+ * (i.e., characters outside the Basic Multilingual Plane) in UTF-16 encoding.
+ *
+ * @return `true` if this character is a low surrogate, `false` otherwise.
+ * @since 5.2.1
+ */
+val Char.isLowSurrogate get() = isLowSurrogate()
 
 /**
  * Determines whether the character is an ASCII character.

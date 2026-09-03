@@ -12,9 +12,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.networknt.schema.JsonSchemaFactory
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
-import dev.tommasop1804.kutils.classes.collections.NonEmptyCollectionsModule
-import dev.tommasop1804.kutils.classes.collections.NonEmptyCollectionsOldModule
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
+import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.maps.*
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
 import tools.jackson.core.JsonGenerator
@@ -787,6 +793,21 @@ open class Json private constructor(@param:Language("json") override val value: 
     inline fun <reified T> toList() = runCatching {
         MAPPER.readValue<List<T>>(value)
     }
+    /**
+     * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
+     *
+     * This function utilizes the Jackson ObjectMapper to deserialize the JSON representation into a Kotlin list.
+     * It uses a reified generic parameter to resolve the type information at runtime.
+     *
+     * The result of the function is wrapped in a [Result], allowing for safe execution and error handling.
+     * If the deserialization is successful, the resulting [List] is returned inside a successful [Result].
+     * If any exception occurs, it is captured and returned as a failure [Result].
+     *
+     * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
+     * @param T the type of objects contained in the resulting list.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
 
     /**
      * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
@@ -803,6 +824,21 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     inline fun <reified T> toMList() = runCatching { toList<T>().getOrThrow().toMList() }
+    /**
+     * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
+     *
+     * This function utilizes the Jackson ObjectMapper to deserialize the JSON representation into a Kotlin list.
+     * It uses a reified generic parameter to resolve the type information at runtime.
+     *
+     * The result of the function is wrapped in a [Result], allowing for safe execution and error handling.
+     * If the deserialization is successful, the resulting [List] is returned inside a successful [Result].
+     * If any exception occurs, it is captured and returned as a failure [Result].
+     *
+     * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
+     * @param T the type of objects contained in the resulting list.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyMList() = toMList<T>().mapCatching { it.toNonEmptyMList() }
 
     /**
      * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
@@ -819,6 +855,21 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     inline fun <reified T> toSet() = runCatching { toList<T>().getOrThrow().toSet() }
+    /**
+     * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
+     *
+     * This function attempts to deserialize the JSON representation stored in the `value` property
+     * of the containing object into a [Set] of elements of type [T]. The operation is executed
+     * using Jackson's `ObjectMapper` and its type construction utilities to ensure type safety.
+     *
+     * The result is wrapped in a [Result] object, providing a safe way to handle potential exceptions
+     * that might occur during the deserialization process, such as malformed JSON or type mismatches.
+     *
+     * @param T The type of elements expected in the resulting [Set].
+     * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptySet() = toSet<T>().mapCatching { it.toNonEmptySet() }
 
     /**
      * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
@@ -835,6 +886,21 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     inline fun <reified T> toMSet() = runCatching { toSet<T>().getOrThrow().toMSet() }
+    /**
+     * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
+     *
+     * This function attempts to deserialize the JSON representation stored in the `value` property
+     * of the containing object into a [Set] of elements of type [T]. The operation is executed
+     * using Jackson's `ObjectMapper` and its type construction utilities to ensure type safety.
+     *
+     * The result is wrapped in a [Result] object, providing a safe way to handle potential exceptions
+     * that might occur during the deserialization process, such as malformed JSON or type mismatches.
+     *
+     * @param T The type of elements expected in the resulting [Set].
+     * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyMSet() = toMSet<T>().mapCatching { it.toNonEmptyMSet() }
 
     /**
      * Converts the JSON representation of the current value into a strongly-typed [Map] with [String] keys
@@ -853,6 +919,21 @@ open class Json private constructor(@param:Language("json") override val value: 
     inline fun <reified V> toMap(): Result<Map<String, V>> = runCatching {
         MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V>
     }
+    /**
+     * Converts the JSON representation of the current value into a strongly-typed [Map] with [String] keys
+     * and values of type [V].
+     *
+     * The function leverages the Jackson library to deserialize the JSON content into a Kotlin [Map], where
+     * the value's type is determined at runtime using reified type parameters.
+     *
+     * The operation is encapsulated in a [Result], allowing callers to handle potential exceptions,
+     * such as deserialization errors or type mismatches.
+     *
+     * @param V The type of the values in the resulting [Map].
+     * @return A [Result] containing the deserialized [Map] on success, or an exception on failure.
+     * @since 5.2.1
+     */
+    inline fun <reified V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
 
     /**
      * Converts the current value to a DataMap instance using a JSON mapper.
@@ -864,6 +945,14 @@ open class Json private constructor(@param:Language("json") override val value: 
         MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap
     }
     /**
+     * Converts the current instance into a Result wrapping a NonEmptyDataMap.
+     * This operation ensures that the returned map contains non-empty data.
+     *
+     * @return A Result containing a NonEmptyDataMap if the transformation is successful.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
+    /**
      * Converts the current value to a DataMapNN instance using a JSON mapper.
      *
      * @return a [Result] containing the [DataMapNN] if the conversion is successful, or an error if it fails.
@@ -872,6 +961,16 @@ open class Json private constructor(@param:Language("json") override val value: 
     fun toDataMapNN(): Result<DataMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN
     }
+    /**
+     * Transforms the current object into a {@code Result} containing a non-empty data map.
+     *
+     * This method internally calls `toDataMapNN()` to retrieve a nullable map,
+     * and then maps it to a non-empty equivalent using `toNonEmptyMap()`.
+     *
+     * @return A result containing a non-empty data map representation of the object.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMapNN(): Result<NonEmptyDataMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMap() }
 
     /**
      * Converts the JSON representation of the current value into a strongly-typed [Map] with [String] keys
@@ -888,6 +987,16 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     inline fun <reified V> toMMap(): Result<MMap<String, V>> = runCatching { toMap<V>().getOrThrow().toMMap() }
+    /**
+     * Converts the current instance to a `NonEmptyMMap` wrapped in a `Result`.
+     * The operation involves transforming the underlying map and ensuring it meets the criteria
+     * for a non-empty map. If the conversion fails, the resulting `Result` will indicate the failure.
+     *
+     * @return A `Result` containing a `NonEmptyMMap` of type `<String, V>` if the conversion is successful,
+     *         or an error result if the conversion fails.
+     * @since 5.2.1
+     */
+    inline fun <reified V> toNonEmptyMMap(): Result<NonEmptyMMap<String, V>> = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
 
     /**
      * Converts the current value to a DataMMap instance using a JSON mapper.
@@ -899,6 +1008,15 @@ open class Json private constructor(@param:Language("json") override val value: 
         MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap
     }
     /**
+     * Converts the current data map to a `NonEmptyDataMMap` wrapped in a `Result`.
+     * Ensures that the resulting data map is non-empty.
+     *
+     * @return A `Result` containing a `NonEmptyDataMMap` if the conversion is successful,
+     * or an error if the data map is empty or the operation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMap(): Result<NonEmptyDataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
+    /**
      * Converts the current value to a DataMMapNN instance using a JSON mapper.
      *
      * @return a [Result] containing the [DataMMapNN] if the conversion is successful, or an error if it fails.
@@ -907,6 +1025,16 @@ open class Json private constructor(@param:Language("json") override val value: 
     fun toDataMMapNN(): Result<DataMMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN
     }
+    /**
+     * Converts the current instance into a `Result` containing a `NonEmptyDataMMapNN`.
+     * This operation attempts to transform the result of `toDataMMapNN` into a non-empty map.
+     *
+     * @return A `Result` wrapping a `NonEmptyDataMMapNN` if the transformation is successful,
+     * or a failure if the operation fails or the map is empty.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
+
     /**
      * Converts the provided value to a JsonNode representation using the predefined object mapper.
      *

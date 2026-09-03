@@ -17,6 +17,13 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.coding.Yaml.Companion.toYaml
+import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
+import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
+import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.maps.*
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
+import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -677,6 +684,19 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             children.filter { it.nodeName == firstName }.map { elementToObject<T>(it) }
         }
     }
+    /**
+     * Converts a collection or sequence of elements into a non-empty list of elements of the specified type [T].
+     *
+     * This function attempts to transform the elements into a non-empty list. If the conversion process fails for
+     * any element, this function will capture the exception and return the result of the operation wrapped
+     * in a Result type.
+     *
+     * @param T The type of elements expected in the non-empty list.
+     * @return A [Result] containing the successfully transformed list if all the elements are valid; otherwise,
+     *         a failure if an exception is encountered during the transformation process.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
 
     /**
      * Converts the XML content into a mutable list of objects of type [T].
@@ -685,6 +705,17 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     inline fun <reified T> toMList(): Result<MList<T>> = runCatching { toList<T>().getOrThrow().toMList() }
+    /**
+     * Converts the current context to a mutable list of type `T` and attempts to transform it
+     * into a `NonEmptyMList<T>`. This operation is wrapped in a `Result` to handle success
+     * or failure of the transformation.
+     *
+     * @param T The type of elements in the list.
+     * @return A `Result` containing a `NonEmptyMList<T>` if the transformation succeeds, or an
+     *         error if the list is empty.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyMList() = toMList<T>().mapCatching { it.toNonEmptyMList() }
 
     /**
      * Converts the XML content into a set of objects of type [T].
@@ -693,6 +724,15 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     inline fun <reified T> toSet(): Result<Set<T>> = runCatching { toList<T>().getOrThrow().toSet() }
+    /**
+     * Converts a collection to a non-empty set, wrapping the result in a Result instance.
+     * If the conversion fails or results in an empty set, the operation is handled as a failure.
+     *
+     * @receiver The collection to be converted to a non-empty set.
+     * @return A Result containing a non-empty set if the conversion is successful, or an error if the operation fails.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptySet() = toSet<T>().mapCatching { it.toNonEmptySet() }
 
     /**
      * Converts the XML content into a mutable set of objects of type [T].
@@ -701,6 +741,20 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     inline fun <reified T> toMSet(): Result<MSet<T>> = runCatching { toSet<T>().getOrThrow().toMSet() }
+    /**
+     * Converts a collection into a non-empty mutable set, if possible.
+     *
+     * This function first transforms the collection into a mutable set.
+     * Then, it attempts to wrap the resulting set in a non-empty mutable
+     * set representation. If this conversion fails, the result will
+     * indicate the failure.
+     *
+     * @param T The type of elements in the collection.
+     * @return A `Result` containing the non-empty mutable set if the
+     *         transformation succeeds, or a failure otherwise.
+     * @since 5.2.1
+     */
+    inline fun <reified T> toNonEmptyMSet() = toMSet<T>().mapCatching { it.toNonEmptyMSet() }
 
     /**
      * Converts the XML content into a map with string keys and values of type [V].
@@ -711,6 +765,16 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     inline fun <reified V> toMap(): Result<Map<String, V>> = runCatching {
         MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V>
     }
+    /**
+     * Converts the current collection to a non-empty map, ensuring that the resulting map is not empty.
+     *
+     * This method attempts to transform the elements of the collection into a map of the specified type [V],
+     * and wraps the result in a `Result` object to handle potential errors during the mapping process.
+     *
+     * @return A `Result` containing the resulting non-empty map if the transformation succeeds, or an error if the operation fails.
+     * @since 5.2.1
+     */
+    inline fun <reified V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
 
     /**
      * Converts the XML content into a mutable map with string keys and values of type [V].
@@ -719,6 +783,14 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     inline fun <reified V> toMMap(): Result<MMap<String, V>> = runCatching { toMap<V>().getOrThrow().toMMap() }
+    /**
+     * Converts the current instance to a `Result` containing a `NonEmptyMMap` with `String` keys and values of type `V`.
+     * This method ensures that the resulting map is non-empty.
+     *
+     * @return A `Result` wrapping a `NonEmptyMMap` if the conversion is successful, or an error if the conversion fails.
+     * @since 5.2.1
+     */
+    inline fun <reified V> toNonEmptyMMap(): Result<NonEmptyMMap<String, V>> = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
 
     /**
      * Converts the XML content into a [DataMap].
@@ -729,6 +801,16 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     fun toDataMap(): Result<DataMap> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap
     }
+    /**
+     * Transforms the current object into a [Result] containing a [NonEmptyDataMap].
+     * This is achieved by first converting the object to a data map and then attempting
+     * to convert that data map into a non-empty variant.
+     *
+     * @return A [Result] wrapping a [NonEmptyDataMap] if the transformation is successful,
+     * or an error result if the operation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
 
     /**
      * Converts the XML content into a [DataMMap].
@@ -739,6 +821,16 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     fun toDataMMap(): Result<DataMMap> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap
     }
+    /**
+     * Converts the current object to a `Result` containing a `DataMMap` instance
+     * with a non-empty state by transforming the result of `toDataMMap` and applying
+     * `toNonEmptyMMap` on its mapped content.
+     *
+     * @return A `Result` wrapping the non-empty `DataMMap` if the transformation is successful,
+     *         or a failure result if an error occurs during the process.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMap(): Result<DataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
 
     /**
      * Converts the XML content into a [DataMapNN].
@@ -749,6 +841,18 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     fun toDataMapNN(): Result<DataMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN
     }
+    /**
+     * Converts the current object to a Result containing a non-empty DataMapNN.
+     *
+     * The method invokes the `toDataMapNN` function and attempts to transform the resulting
+     * DataMapNN into a non-empty map using `toNonEmptyMap`. If the transformation succeeds,
+     * the resulting non-empty DataMapNN is encapsulated within a Result. Otherwise, the failure
+     * is propagated through the Result.
+     *
+     * @return A Result wrapping a non-empty DataMapNN if the transformation succeeds, or a failure if the operation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMapNN(): Result<DataMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMap() }
 
     /**
      * Converts the XML content into a [DataMMapNN].
@@ -759,6 +863,17 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     fun toDataMMapNN(): Result<DataMMapNN> = runCatching {
         MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN
     }
+    /**
+     * Transforms the current object into a `NonEmptyDataMMapNN` wrapped in a `Result`.
+     *
+     * This method attempts to convert the current data structure into a `DataMMapNN`,
+     * then further ensures that the resulting map is non-empty.
+     *
+     * @return A `Result` containing a `NonEmptyDataMMapNN` if the transformation succeeds,
+     *         or an exception if any step of the transformation fails.
+     * @since 5.2.1
+     */
+    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
 
     /**
      * Converts the provided value into a JSON object, optionally replacing specific placeholders in the output.
@@ -779,7 +894,6 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @return A Yaml object constructed from the input value.
      * @since 3.9.0
      */
-    @OptIn(Beta::class)
     fun toYaml(valueKey: String = String.EMPTY): Yaml = toJson(valueKey).toYaml()
 
     /**
