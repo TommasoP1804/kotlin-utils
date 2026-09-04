@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.durationTo
-import dev.tommasop1804.kutils.classes.time.RTemporalInterval.Companion.restrictedIntervalTo
-import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalTo
+import dev.tommasop1804.kutils.classes.time.RTemporalInterval.Companion.intervalTo
+import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalToUnrestricted
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.parseTemporal
 import jakarta.persistence.AttributeConverter
 import tools.jackson.core.JsonGenerator
@@ -70,7 +70,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
      * with `start` occurring before or simultaneously with `end`.
      * @since 3.4.0
      */
-    val temporalInterval = start intervalTo end
+    val temporalInterval = start intervalToUnrestricted end
 
     /**
      * Secondary constructor for the RTemporalInterval class.
@@ -86,6 +86,84 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
 
     companion object {
         /**
+         * Creates a `LocalDateInterval` representing the inclusive interval between the calling `LocalDate`
+         * and the specified `end` date.
+         *
+         * @param end The ending date of the interval.
+         * @return A `LocalDateInterval` spanning from the calling `LocalDate` to the specified `end` date.
+         * @since 5.2.2
+         */
+        infix fun LocalDate.intervalTo(end: LocalDate): LocalDateInterval = RTemporalInterval(this, end)
+        /**
+         * Calculates the temporal interval between this `LocalDateTime` and the specified end `LocalDateTime`.
+         *
+         * @param end The `LocalDateTime` representing the end of the interval.
+         * @return A `LocalDateTimeInterval` representing the interval between the two `LocalDateTime` instances.
+         * @since 5.2.2
+         */
+        infix fun LocalDateTime.intervalTo(end: LocalDateTime): LocalDateTimeInterval = RTemporalInterval(this, end)
+        /**
+         * Creates an interval between the current `OffsetDateTime` instance and the specified `end` parameter.
+         *
+         * This method returns an `OffsetDateTimeInterval` that represents the temporal interval
+         * starting from the current `OffsetDateTime` (receiver) to the given `end` parameter.
+         *
+         * @param end The `OffsetDateTime` representing the end of the interval.
+         * @return An `OffsetDateTimeInterval` representing the interval between the receiver and the `end`.
+         * @since 5.2.2
+         */
+        infix fun OffsetDateTime.intervalTo(end: OffsetDateTime): OffsetDateTimeInterval = RTemporalInterval(this, end)
+        /**
+         * Creates a `ZonedDateTimeInterval` representing the interval between this `ZonedDateTime` and the specified end `ZonedDateTime`.
+         *
+         * @param end The end of the interval, represented as a `ZonedDateTime`.
+         * @return A `ZonedDateTimeInterval` object representing the interval between the start and end points.
+         * @since 5.2.2
+         */
+        infix fun ZonedDateTime.intervalTo(end: ZonedDateTime): ZonedDateTimeInterval = RTemporalInterval(this, end)
+        /**
+         * Creates a `LocalTimeInterval` representing the interval between the current `LocalTime` instance and the specified end time.
+         *
+         * This method computes a temporal interval starting from the current `LocalTime` (the receiver) to the given `end` time.
+         *
+         * @param end The `LocalTime` marking the end of the interval.
+         * @return A `LocalTimeInterval` instance representing the interval between the start and end times.
+         * @since 5.2.2
+         */
+        infix fun LocalTime.intervalTo(end: LocalTime): LocalTimeInterval = RTemporalInterval(this, end)
+        /**
+         * Constructs an `OffsetTimeInterval` between this `OffsetTime` and the specified end `OffsetTime`.
+         *
+         * @param end The end `OffsetTime` for the interval.
+         * @return An `OffsetTimeInterval` representing the interval from this `OffsetTime` to the specified end `OffsetTime`.
+         * @since 5.2.2
+         */
+        infix fun OffsetTime.intervalTo(end: OffsetTime): OffsetTimeInterval = RTemporalInterval(this, end)
+        /**
+         * Creates an interval between the current `Instant` and the specified end `Instant`.
+         *
+         * @param end The ending point of the temporal interval.
+         * @return An `InstantInterval` representing the interval from the current `Instant` to the specified end `Instant`.
+         * @since 5.2.2
+         */
+        infix fun Instant.intervalTo(end: Instant): InstantInterval = RTemporalInterval(this, end)
+        /**
+         * Creates a `YearInterval` between this `Year` and the specified end `Year`.
+         *
+         * @param end The ending year of the interval.
+         * @return A `YearInterval` instance representing the interval between the two years.
+         * @since 5.2.2
+         */
+        infix fun Year.intervalTo(end: Year): YearInterval = RTemporalInterval(this, end)
+        /**
+         * Creates a `YearMonthInterval` representing the interval between two `YearMonth` instances.
+         *
+         * @param end The ending `YearMonth` of the interval.
+         * @return A `YearMonthInterval` instance encapsulating the interval between the start (this) and the specified end.
+         * @since 5.2.2
+         */
+        infix fun YearMonth.intervalTo(end: YearMonth): YearMonthInterval = RTemporalInterval(this, end)
+        /**
          * Creates a temporal interval between the invoking temporal object and the specified end temporal object.
          *
          * This function constructs an instance of `RTemporalInterval` with the current temporal object as the start
@@ -93,18 +171,18 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
          * in interval creation scenarios.
          *
          * @param end The temporal object that marks the end of the interval.
-         * @since 3.4.0
+         * @since 5.2.2
          */
-        infix fun <T1 : Temporal, T2 : Temporal> T1.restrictedIntervalTo(end: T2) = RTemporalInterval(this, end)
+        infix fun <T1 : Temporal, T2 : Temporal> T1.intervalTo(end: T2) = RTemporalInterval(this, end)
         /**
          * Restricts an interval starting from the current temporal instance to the specified duration.
          *
          * @param duration The duration that limits the length of the resulting temporal interval.
          * @return A new instance of RTemporalInterval representing the interval from the current temporal instance
          *         to the calculated end point after adding the given duration.
-         * @since 3.4.0
+         * @since 5.2.2
          */
-        infix fun <T1 : Temporal> T1.restrictedIntervalTo(duration: Duration) =
+        infix fun <T1 : Temporal> T1.intervalTo(duration: Duration) =
             RTemporalInterval(this, plus(duration) as T1, endDuration = true)
         /**
          * Creates a restricted temporal interval using the specified duration and end temporal object.
@@ -113,9 +191,9 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
          * @param end The temporal object that specifies the end point of the interval.
          *            Must be of a type that implements Temporal.
          * @return A new instance of RTemporalInterval representing the interval.
-         * @since 3.4.0
+         * @since 5.2.2
          */
-        infix fun <T2 : Temporal> Duration.restrictedIntervalTo(end: T2) =
+        infix fun <T2 : Temporal> Duration.intervalTo(end: T2) =
             RTemporalInterval(minus(this) as T2, end, startDuration = true)
 
         /**
@@ -395,7 +473,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
  * @since 3.4.0
  */
 fun <T1: Temporal> RTemporalInterval(start: T1, duration: Duration) =
-    start.restrictedIntervalTo(duration)
+    start.intervalTo(duration)
 /**
  * Constructs a restricted temporal interval based on the provided duration and end temporal point.
  *
@@ -405,7 +483,25 @@ fun <T1: Temporal> RTemporalInterval(start: T1, duration: Duration) =
  * @since 3.4.0
  */
 fun <T2: Temporal> RTemporalInterval(duration: Duration, end: T2) =
-    duration.restrictedIntervalTo(end)
+    duration.intervalTo(end)
+
+/**
+ * A list of all the dates within the interval defined by this LocalDateInterval.
+ *
+ * The list is constructed by iterating from the start date (inclusive) to the end date (exclusive)
+ * using the `datesUntil` method. The result includes each date in sequential order.
+ * @since 5.2.2
+ */
+val LocalDateInterval.dates: List<LocalDate> get() = start.datesUntil(end).toList()
+/**
+ * A list of `Year` objects representing the years within the interval defined
+ * by this `YearInterval`. The sequence starts from the `start` year and
+ * increments by one year at a time until the `end` year (inclusive).
+ * @since 5.2.2
+ */
+val YearInterval.years: List<Year> get() = generateSequence(start) { it.plusYears(1) }
+    .takeWhile { it <= end }
+    .toList()
 
 /**
  * A typealias that represents a temporal interval where both the lower and upper bounds

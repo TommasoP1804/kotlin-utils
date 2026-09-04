@@ -14,11 +14,10 @@ import dev.tommasop1804.kutils.Uri
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.asSet
 import dev.tommasop1804.kutils.classes.colors.*
 import dev.tommasop1804.kutils.classes.registry.*
-import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalTo
+import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalToUnrestricted
 import dev.tommasop1804.kutils.expectClass
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNotDecimal
-import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.memberPropertiesMap
 import dev.tommasop1804.kutils.validate
 import tools.jackson.databind.DeserializationContext
@@ -152,7 +151,7 @@ data class CalendarEvent(
         reminders: Set<Duration> = emptySet()
     ) : this(
         name = name,
-        period = if (end == null) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalTo start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalTo end,
+        period = if (end == null) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalToUnrestricted start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalToUnrestricted end,
         repeat = repeat,
         partecipants = partecipants,
         conferencing = conferencing,
@@ -199,7 +198,7 @@ data class CalendarEvent(
         reminders: Set<Duration> = emptySet()
     ) : this(
         name = name,
-        period = if (end == null) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalTo start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalTo end,
+        period = if (end == null) start.withHour(0).withMinute(0).withSecond(0).withNano(0) intervalToUnrestricted start.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1) else start intervalToUnrestricted end,
         repeat = repeat,
         partecipants = partecipants,
         conferencing = conferencing,

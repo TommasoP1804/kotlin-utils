@@ -991,6 +991,35 @@ operator fun LocalTime.invoke(pattern: String) = format(DateTimeFormatter.ofPatt
 operator fun OffsetTime.invoke(pattern: String) = format(DateTimeFormatter.ofPattern(pattern))!!
 
 /**
+ * Determines the last day of a given month, accounting for leap years in February.
+ *
+ * @param leapYear A boolean value indicating whether the year is a leap year. If true, February has 29 days; otherwise, it has 28 days.
+ * @return The last day of the specified month as an integer.
+ * @since 5.2.2
+ */
+fun Month.lastDay(leapYear: Boolean) = when (this) {
+    Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER -> 30
+    Month.FEBRUARY -> if (leapYear) 29 else 28
+    else -> 31
+}
+/**
+ * Calculates the last day of the given month in the specified year.
+ *
+ * @param year The year used to determine if it's a leap year, which affects the number of days in February.
+ * @return The last day of the month as an integer value.
+ * @since 5.2.2
+ */
+fun Month.lastDay(year: Year) = lastDay(year.isLeap)
+/**
+ * Determines the last day of the specified month for a given year.
+ *
+ * @param year The year used to determine if it is a leap year and calculate the last day of the month.
+ * @return The last day of the specified month for the given year.
+ * @since 5.2.2
+ */
+fun Month.lastDay(year: Int) = lastDay(Year(year).isLeap)
+
+/**
  * Adjusts this `LocalDateTime` instance to a specified `ZoneOffset`.
  *
  * Converts the current `LocalDateTime` from a given source time zone to the specified

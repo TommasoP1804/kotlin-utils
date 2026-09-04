@@ -147,9 +147,9 @@ interface TemporalInterval : Serializable {
          *
          * @param end the ending temporal object that defines the boundary of the interval
          * @return a `TemporalInterval` instance representing the interval between the invoking temporal and the specified end temporal
-         * @since 1.0.0
+         * @since 5.2.2
          */
-        infix fun Temporal.intervalTo(end: Temporal) = of(this, end)
+        infix fun Temporal.intervalToUnrestricted(end: Temporal) = of(this, end)
 
         /**
          * Parses a string representation of a temporal interval and returns a `Result` containing a `TemporalInterval`.

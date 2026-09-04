@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.exceptions.*
-import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.splitAndTrim
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
@@ -207,9 +206,9 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
          * to create a temporal interval representation.
          * @param duration the duration of the interval to be created
          * @return a [RepeatedTemporalInterval] instance representing the interval starting from this temporal and lasting for the specified duration.
-         * @since 1.0.0
+         * @since 5.2.2
          */
-        infix fun Temporal.intervalTo(duration: Duration) = of(this, duration)
+        infix fun Temporal.intervalToUnrestricted(duration: Duration) = of(this, duration)
         /**
          * Creates a temporal interval between the current `Duration` instance and the specified `Temporal` object.
          *
@@ -218,9 +217,9 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
          *
          * @param end the temporal object marking the endpoint of the interval
          * @return a [RepeatedTemporalInterval] instance representing the interval between the current `Duration` and the specified `Temporal` object.
-         * @since 1.0.0
+         * @since 5.2.2
          */
-        infix fun Duration.intervalTo(end: Temporal) = of(this, end)
+        infix fun Duration.intervalToUnrestricted(end: Temporal) = of(this, end)
 
         /**
          * Converts a `Duration` object into a `TemporalInterval` representation.
