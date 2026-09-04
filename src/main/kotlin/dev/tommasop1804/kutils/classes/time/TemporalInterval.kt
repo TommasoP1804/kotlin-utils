@@ -152,6 +152,22 @@ interface TemporalInterval : Serializable {
         infix fun Temporal.intervalToUnrestricted(end: Temporal) = of(this, end)
 
         /**
+         * Converts a [ClosedRange] of [Temporal] values into an unrestricted interval representation.
+         *
+         * This function takes a [ClosedRange] defined by its `start` and `endInclusive`
+         * properties and creates a representation that extends beyond the restrictions of
+         * Kotlin's [ClosedRange] implementation. It leverages the provided [start] and
+         * [endInclusive] bounds to define the interval.
+         *
+         * @receiver The [ClosedRange] of [Temporal] values to convert.
+         * @return The interval representation created from the `start` and `endInclusive` of the range.
+         * @param T The type of the range bounds, which must implement both [Comparable] and [Temporal].
+         * @since 5.2.2
+         */
+        fun <T> ClosedRange<T>.toUnrestrictedInterval() where T : Comparable<T>, T : Temporal =
+            of(start, endInclusive)
+
+        /**
          * Parses a string representation of a temporal interval and returns a `Result` containing a `TemporalInterval`.
          *
          * The method analyzes the input string to create a valid `TemporalInterval` or `RepeatedTemporalInterval`.

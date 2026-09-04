@@ -197,6 +197,120 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             RTemporalInterval(minus(this) as T2, end, startDuration = true)
 
         /**
+         * Converts the current `ClosedRange<LocalDate>` instance into a `LocalDateInterval`.
+         *
+         * The resulting interval is defined by the `start` and `endInclusive` values of the range,
+         * creating an equivalent representation as a `LocalDateInterval`.
+         *
+         * @return A `LocalDateInterval` representing the same start and end dates as the original range.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalLocalDate")
+        fun ClosedRange<LocalDate>.toInterval(): LocalDateInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts the current `ClosedRange<LocalDateTime>` into an instance of `LocalDateTimeInterval`.
+         *
+         * This method maps the start and endInclusive properties of the `ClosedRange`
+         * to the corresponding start and end values of a `LocalDateTimeInterval`.
+         *
+         * @return A `LocalDateTimeInterval` representing the interval defined by the `ClosedRange`.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalLocalDateTime")
+        fun ClosedRange<LocalDateTime>.toInterval(): LocalDateTimeInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts the current ClosedRange of OffsetDateTime instances into an OffsetDateTimeInterval.
+         *
+         * The resulting interval is derived from the start and endInclusive properties of the ClosedRange.
+         *
+         * @return An instance of OffsetDateTimeInterval representing the temporal interval defined by
+         *         the start and endInclusive values of this ClosedRange.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalOffsetDateTime")
+        fun ClosedRange<OffsetDateTime>.toInterval(): OffsetDateTimeInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts the current [ClosedRange] of [ZonedDateTime] into a [ZonedDateTimeInterval].
+         *
+         * This method generates a temporal interval corresponding to the start and end points
+         * of the [ClosedRange], creating an [RTemporalInterval] instance.
+         *
+         * @return A [ZonedDateTimeInterval] representing the temporal interval defined by the [ClosedRange].
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalZonedDateTime")
+        fun ClosedRange<ZonedDateTime>.toInterval(): ZonedDateTimeInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts a `ClosedRange` of `LocalTime` into a `LocalTimeInterval`.
+         *
+         * This method transforms the range defined by the `start` and `endInclusive` of the `ClosedRange`
+         * into an instance of `LocalTimeInterval`, preserving the temporal boundaries.
+         *
+         * @return A `LocalTimeInterval` representing the interval defined by this `ClosedRange`.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalLocalTime")
+        fun ClosedRange<LocalTime>.toInterval(): LocalTimeInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts the current `ClosedRange<OffsetTime>` instance into an `OffsetTimeInterval`.
+         *
+         * This function maps the start and endInclusive values of the closed range to create an interval
+         * that represents the temporal span between them as an `OffsetTimeInterval`.
+         *
+         * @return An `OffsetTimeInterval` instance representing the temporal interval derived from the range's start and endInclusive values.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalOffsetTime")
+        fun ClosedRange<OffsetTime>.toInterval(): OffsetTimeInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts the current `ClosedRange` of `Instant` into an `InstantInterval`.
+         *
+         * @return an instance of `InstantInterval` representing the same temporal range as the `ClosedRange`,
+         * where `start` maps to the range's `start` and `endInclusive` maps to the range's `end`.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalInstant")
+        fun ClosedRange<Instant>.toInterval(): InstantInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts a `ClosedRange<Year>` into a `YearInterval`.
+         *
+         * This method creates a `YearInterval` object using the start and
+         * end points of the closed range.
+         *
+         * @return A `YearInterval` instance representing the same range of years
+         *         as the original `ClosedRange<Year>`.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalYear")
+        fun ClosedRange<Year>.toInterval(): YearInterval = RTemporalInterval(start, endInclusive)
+        /**
+         * Converts a `ClosedRange<YearMonth>` to a `YearMonthInterval`.
+         *
+         * The resulting interval is defined by the start and end points
+         * of the provided `ClosedRange<YearMonth>`, where the start corresponds
+         * to the beginning of the range and the end corresponds to the inclusive endpoint.
+         *
+         * @return A `YearMonthInterval` representing the interval derived from the range.
+         * @since 5.2.2
+         */
+        @JvmName("toIntervalYearMonth")
+        fun ClosedRange<YearMonth>.toInterval(): YearMonthInterval = RTemporalInterval(start, endInclusive)
+
+        /**
+         * Converts the current `ClosedRange` instance into a `MonoTemporalInterval`.
+         *
+         * The resulting interval represents the temporal range defined by the start and end values
+         * of the `ClosedRange`.
+         *
+         * @return A new instance of `MonoTemporalInterval` initialized with the `start` and `endInclusive`
+         * values of the `ClosedRange`.
+         * @since 5.2.2
+         */
+        fun <T> ClosedRange<T>.toInterval(): MonoTemporalInterval<T> where T : Comparable<T>, T : Temporal =
+            RTemporalInterval(start, endInclusive)
+
+
+        /**
          * Parses a string representation of a temporal interval into an `RTemporalInterval` instance.
          *
          * This function supports intervals defined with temporal start and end values,
@@ -492,7 +606,7 @@ fun <T2: Temporal> RTemporalInterval(duration: Duration, end: T2) =
  * using the `datesUntil` method. The result includes each date in sequential order.
  * @since 5.2.2
  */
-val LocalDateInterval.dates: List<LocalDate> get() = start.datesUntil(end).toList()
+val LocalDateInterval.dates: List<LocalDate> get() = start.datesUntil(end.plusDays(1)).toList()
 /**
  * A list of `Year` objects representing the years within the interval defined
  * by this `YearInterval`. The sequence starts from the `start` year and

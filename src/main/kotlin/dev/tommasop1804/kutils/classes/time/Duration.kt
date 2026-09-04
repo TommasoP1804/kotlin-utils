@@ -558,6 +558,11 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
          */
         fun Number.asNanosOfDuration() = Duration(nanos = this)
 
+        private val UNITS_ORDER = listOf(
+            ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.DAYS,
+            ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS, ChronoUnit.NANOS,
+        )
+
         /**
          * Calculates the duration between two temporal objects, where the start is inclusive and the end is exclusive.
          *
@@ -570,52 +575,56 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
          * @since 1.0.0
          */
         private fun between(startInclusive: Temporal, endExclusive: Temporal): Duration {
-            var _startInclusive = startInclusive
-            var _endExclusive = endExclusive
-            if (_startInclusive is LocalTime && _endExclusive is LocalTime) {
-                return Duration(nanos = startInclusive.until(_endExclusive, ChronoUnit.NANOS))
+            val [start, end] = normalize(startInclusive, endExclusive)
+
+            if (start is Year && end is Year) {
+                return Duration(years = end.value - start.value)
             }
-            if (_startInclusive is LocalMonthDayTime && _endExclusive !is LocalMonthDayTime) _startInclusive =
-                _startInclusive.toLocalDateTime()
-            if (_endExclusive is LocalMonthDayTime && _startInclusive !is LocalMonthDayTime) _endExclusive =
-                _endExclusive.toLocalDateTime()
-            if (_startInclusive is YearMonth && _endExclusive !is YearMonth) _endExclusive =
-                YearMonth.from(_endExclusive)
-            if (_endExclusive is YearMonth && _startInclusive !is YearMonth) _startInclusive =
-                YearMonth.from(_startInclusive)
-            if (_startInclusive is LocalDate) _startInclusive = LocalDateTime(_startInclusive,LocalTime.MIDNIGHT)
-            if (_endExclusive is LocalDate) _endExclusive = LocalDateTime(_endExclusive,LocalTime.MIDNIGHT)
-
-            val years: Long = _startInclusive.until(_endExclusive, ChronoUnit.YEARS)
-            _startInclusive = _startInclusive.plus(years, ChronoUnit.YEARS)
-
-            val months: Long = _startInclusive.until(_endExclusive, ChronoUnit.MONTHS)
-            _startInclusive = _startInclusive.plus(months, ChronoUnit.MONTHS)
-
-            var days: Long = 0
-            if (_startInclusive !is YearMonth && _endExclusive !is YearMonth) {
-                days = _startInclusive.until(_endExclusive, ChronoUnit.DAYS)
-                _startInclusive = _startInclusive.plus(days, ChronoUnit.DAYS)
+            if (start is LocalTime && end is LocalTime) {
+                return Duration(nanos = start.until(end, ChronoUnit.NANOS))
             }
 
-            var hours: Long = 0
-            var minutes: Long = 0
-            var seconds: Long = 0
-            var nanos: Long = 0
-            if (_startInclusive !is YearMonth && _endExclusive !is YearMonth) {
-                hours = _startInclusive.until(_endExclusive, ChronoUnit.HOURS)
-                _startInclusive = _startInclusive.plus(hours, ChronoUnit.HOURS)
+            // YearMonth non supporta unità sotto il mese: limitiamo la lista, non serve
+            // guardarlo due volte come nell'originale.
+            val units = if (start is YearMonth) UNITS_ORDER.take(2) else UNITS_ORDER
 
-                minutes = _startInclusive.until(_endExclusive, ChronoUnit.MINUTES)
-                _startInclusive = _startInclusive.plus(minutes, ChronoUnit.MINUTES)
+            val amounts = units.fold(start to listOf<Long>()) { [cursor, amounts], unit ->
+                val amount = cursor.until(end, unit)
+                cursor.plus(amount, unit) to amounts + amount
+            }.second
 
-                seconds = _startInclusive.until(_endExclusive, ChronoUnit.SECONDS)
-                _startInclusive = _startInclusive.plus(seconds, ChronoUnit.SECONDS)
+            return Duration(
+                years = amounts.getOrElse(0) { 0L },
+                months = amounts.getOrElse(1) { 0L },
+                days = amounts.getOrElse(2) { 0L },
+                hours = amounts.getOrElse(3) { 0L },
+                minutes = amounts.getOrElse(4) { 0L },
+                seconds = amounts.getOrElse(5) { 0L },
+                nanos = amounts.getOrElse(6) { 0L },
+            )
+        }
 
-                nanos = _startInclusive.until(_endExclusive, ChronoUnit.NANOS)
+        private fun normalize(startInclusive: Temporal, endExclusive: Temporal): Pair<Temporal, Temporal> {
+            var start = startInclusive
+            var end = endExclusive
+
+            if (start is LocalMonthDayTime) start = start.toLocalDateTime()
+            if (end is LocalMonthDayTime) end = end.toLocalDateTime()
+
+            validate((start is Year) == (end is Year)) {
+                "Year non è confrontabile con un altro tipo di Temporal senza una regola esplicita: $start / $end"
+            }
+            validate((start is LocalTime) == (end is LocalTime)) {
+                "LocalTime non è confrontabile con un altro tipo di Temporal senza una regola esplicita: $start / $end"
             }
 
-            return Duration(years, months, days = days, hours = hours, minutes = minutes, seconds = seconds, nanos = nanos)
+            if (start is YearMonth && end !is YearMonth) end = YearMonth.from(end)
+            if (end is YearMonth && start !is YearMonth) start = YearMonth.from(start)
+
+            if (start is LocalDate) start = LocalDateTime.of(start, LocalTime.MIDNIGHT)
+            if (end is LocalDate) end = LocalDateTime.of(end, LocalTime.MIDNIGHT)
+
+            return start to end
         }
 
         class Serializer : ValueSerializer<Duration>() {
