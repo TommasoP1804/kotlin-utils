@@ -14,6 +14,12 @@ import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -231,6 +237,67 @@ value class NanoId(private val value: String) : CharSequence, Serializable {
                 else st.setString(index, value.value)
             }
         }
+
+        /**
+         * Defines a column in the table that stores a NanoId as a VARCHAR with a maximum length of 100.
+         * The column values will be automatically transformed between the NanoId object and its string representation.
+         *
+         * @param name the name of the column to be created, which will store the NanoId values.
+         * @since 5.3.0
+         */
+        fun Table.nanoId(name: String) = varchar(name, 100).transform(::NanoId, NanoId::toString)
+
+        /**
+         * Represents a table in the database with a primary key using a NanoId as its identifier.
+         *
+         * @constructor Creates a new instance of the NanoIdTable with the specified table name and column name.
+         * The table uses a transformation function to handle NanoId values as varchar strings in the database.
+         *
+         * @param name The name of the table. Defaults to an empty string.
+         * @param columnName The name of the column used as the primary key. Defaults to "id".
+         *
+         * Extends [IdTable] to provide support for custom NanoId-based primary keys. The primary key column is
+         * generated using a custom database column type that maps NanoId objects to varchar database fields.
+         * The primary key is uniquely identified by the [columnName].
+         *
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class NanoIdTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<NanoId>(name) {
+            override val id: Column<EntityID<NanoId>>
+                get() = nanoId(columnName).clientDefault { NanoId() }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract base class for entities identified by a NanoId.
+         *
+         * This class extends the generic `Entity` class, where the type parameter for the ID is specified as `NanoId`.
+         * It provides a foundation for entities that utilize NanoId-based unique identifiers.
+         *
+         * @param id The unique identifier for the entity, represented as an instance of `EntityID<NanoId>`.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class NanoIdEntity(id: EntityID<NanoId>) : Entity<NanoId>(id)
+
+        /**
+         * Represents an abstract class that provides the functionality to manage and operate on entities
+         * identified by NanoId values. This class serves as a specialization of the [EntityClass] for
+         * entities with [NanoId] as their primary key.
+         *
+         * @param E The type of the entity that this class manages. Must extend [NanoIdEntity].
+         * @param table The database table that corresponds to the entities managed by this class.
+         * @param entityType An optional Kotlin class that represents the type of the entity.
+         * @param entityCtor An optional transformer function to provide a custom constructor for entities.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class NanoIdEntityClass<out E : NanoIdEntity>(
+            table: IdTable<NanoId>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<NanoId>, E>? = null
+        ) : EntityClass<NanoId, E>(table, entityType, entityCtor)
     }
 
     /**

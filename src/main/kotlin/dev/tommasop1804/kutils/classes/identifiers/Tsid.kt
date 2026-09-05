@@ -15,6 +15,12 @@ import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -551,6 +557,69 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
                 else st.setLong(index, value.number)
             }
         }
+
+        /**
+         * Adds a Long column to the table and applies a transformation to convert
+         * between the TSID object and its underlying Long representation.
+         *
+         * @param name The name of the column to be added to the table.
+         * @return A column in the table that is transformed to represent a TSID.
+         * @since 5.3.0
+         */
+        fun Table.tsid(name: String) = long(name).transform(::Tsid, Tsid::toLong)
+
+        /**
+         * Represents a database table with a TSID (Time-Sorted Unique Identifier) as the primary key.
+         *
+         * This class extends the `IdTable<Tsid>` class and provides functionality to define a table
+         * with a default `id` column that uses TSID as its primary key. By default, the `id` column
+         * will be named "id" unless specified otherwise.
+         *
+         * @constructor Creates an instance of `TsidTable`.
+         * @param name The name of the table. Defaults to an empty string.
+         * @param columnName The name of the TSID column. Defaults to "id".
+         *
+         * @see IdTable
+         * @see Tsid
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class TsidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Tsid>(name) {
+            override val id: Column<EntityID<Tsid>>
+                get() = tsid(columnName).clientDefault { Tsid() }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract base class for an entity that is uniquely identified by a TSID (Time Sortable Identifier).
+         *
+         * This class extends the `Entity<Tsid>` class and acts as a base for entities
+         * that utilize TSID as their primary identifier. A TSID combines a timestamp
+         * with a random component, ensuring both temporal order and uniqueness.
+         *
+         * @constructor Initializes the entity with the specified TSID identifier.
+         * @param id The `EntityID<Tsid>` that uniquely identifies this entity.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class TsidEntity(id: EntityID<Tsid>) : Entity<Tsid>(id)
+
+        /**
+         * Abstract class representing a specialized entity class for managing `TsidEntity` objects.
+         *
+         * @param E The type of `TsidEntity` managed by this class. It must inherit from `TsidEntity`.
+         * @param table The database table associated with the entity. It extends `IdTable` parameterized with `Tsid`.
+         * @param entityType An optional `Class` reference to the `TsidEntity` type. Defaults to `null`.
+         * @param entityCtor An optional transformer function that defines how to construct an entity of type `E`
+         *        from an `EntityID` of type `Tsid`. Defaults to `null`.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class TsidEntityClass<out E : TsidEntity>(
+            table: IdTable<Tsid>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<Tsid>, E>? = null
+        ) : EntityClass<Tsid, E>(table, entityType, entityCtor)
     }
 
     /**

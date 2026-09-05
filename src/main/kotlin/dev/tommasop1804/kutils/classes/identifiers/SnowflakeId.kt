@@ -17,6 +17,12 @@ import jakarta.persistence.AttributeConverter
 import org.hibernate.type.SqlTypes
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -293,6 +299,85 @@ class SnowflakeId(val value: Long) : Number(), Comparable<SnowflakeId>, Serializ
                 else st.setLong(index, value.value)
             }
         }
+
+        /**
+         * Adds a column to the table that stores a `SnowflakeId` value and defines its transformation logic.
+         *
+         * The method creates a column with the specified name, mapping its storage type as a `long`,
+         * and applies transformations to ensure proper conversion between the column's native type
+         * and the `SnowflakeId` type.
+         *
+         * @param name The name of the column to be created in the table. This will be used to identify
+         *             the column in the database schema.
+         * @since 5.3.0
+         */
+        fun Table.snowflakeId(name: String) = long(name).transform(::SnowflakeId, SnowflakeId::toLong)
+
+        /**
+         * Represents a database table that uses Snowflake IDs as the primary key.
+         *
+         * This class extends the `IdTable` class and is specifically designed to
+         * work with Snowflake ID values for unique identifier fields within a table.
+         * The Snowflake ID is a globally unique identifier that is both timestamp-based
+         * and efficient for distributed systems.
+         *
+         * @property columnName The name of the column storing the Snowflake ID. Defaults to "id".
+         *
+         * @constructor
+         * Creates an instance of `SnowflakeIdTable` with a specific table name and column name for
+         * the unique identifier.
+         *
+         * @param name The name of the table. Defaults to an empty string.
+         * @param columnName The column name for the Snowflake ID. Defaults to "id".
+         *
+         * @see IdTable
+         * @see SnowflakeId
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class SnowflakeIdTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<SnowflakeId>(name) {
+            override val id: Column<EntityID<SnowflakeId>>
+                get() = snowflakeId(columnName).clientDefault { SnowflakeId() }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract entity with a unique identifier of type [SnowflakeId].
+         *
+         * This class serves as the foundation for entities that require identification
+         * via a globally unique and chronologically sortable identifier. Each instance
+         * of this entity is linked to a [SnowflakeId], which provides various utilities
+         * for data manipulation and type conversion.
+         *
+         * Subclasses of this entity can leverage the [id] property to uniquely associate
+         * domain-specific attributes and operations.
+         *
+         * @constructor Initializes the entity with the provided [id] of type [EntityID].
+         * @param id The unique identifier of this entity, encapsulated as [EntityID] for persistence support.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class SnowflakeIdEntity(id: EntityID<SnowflakeId>) : Entity<SnowflakeId>(id)
+
+        /**
+         * Represents an abstract class for managing entities with Snowflake IDs in a database table.
+         *
+         * This class serves as an extension of [EntityClass] specifically designed for managing
+         * entities associated with Snowflake-based identifiers. It provides a mechanism to map
+         * database tables to Kotlin objects where the primary key is a Snowflake ID.
+         *
+         * @param E The specific entity type that extends [SnowflakeIdEntity].
+         * @param table The table associated with the Snowflake ID entity.
+         * @param entityType Optional parameter specifying the entity type class.
+         * @param entityCtor Optional constructor function for creating entity instances.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class SnowflakeIdEntityClass<out E : SnowflakeIdEntity>(
+            table: IdTable<SnowflakeId>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<SnowflakeId>, E>? = null
+        ) : EntityClass<SnowflakeId, E>(table, entityType, entityCtor)
     }
 
     /**

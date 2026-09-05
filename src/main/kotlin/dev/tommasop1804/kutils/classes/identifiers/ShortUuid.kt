@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.BigInt
+import dev.tommasop1804.kutils.EMPTY
+import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.toUuid
@@ -17,6 +19,13 @@ import jakarta.persistence.AttributeConverter
 import org.hibernate.type.SqlTypes
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.core.java.javaUUID
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -321,6 +330,75 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
                 else st.setObject(index, value.toUuid(), SqlTypes.UUID)
             }
         }
+
+        /**
+         * Adds a column to the table that stores a shortened version of a UUID string.
+         * The UUID is transformed into a shorter, encoded format and can be decoded back into a full UUID.
+         *
+         * @param name The name of the column to store the shortened UUID.
+         * @since 5.3.0
+         */
+        fun Table.shortUuid(name: String) = javaUUID(name).transform(::ShortUuid, ShortUuid::toUuid)
+        /**
+         * Adds a column with a fixed-length character type (22 characters) to the table,
+         * designed to store shortened UUID representations. The transformation functions
+         * handle conversion between the database value and a `ShortUuid` instance.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.3.0
+         */
+        fun Table.shortUuidChar(name: String) = char(name, 22).transform(::ShortUuid, ShortUuid::toString)
+
+        /**
+         * Represents a table with a primary key of type [ShortUuid].
+         *
+         * This class extends the [IdTable] and is used to define database tables with a primary key
+         * based on a shortened UUID representation. It provides functionality to configure the primary
+         * key column and ensures it defaults to a generated [ShortUuid] instance.
+         *
+         * @property columnName The name of the primary key column in the database table. Defaults to "id".
+         * @constructor Initializes the table with an optional table name and the primary key column name.
+         *
+         * @param name The name of the table. Defaults to an empty string.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class ShortUuidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<ShortUuid>(name) {
+            override val id: Column<EntityID<ShortUuid>>
+                get() = shortUuid(columnName).clientDefault { ShortUuid() }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract database entity that utilizes a shortened UUID as its primary identifier.
+         * This class serves as a base class for entities that use `ShortUuid` as their ID type.
+         *
+         * @param id The entity ID of type `EntityID<ShortUuid>`, which uniquely identifies the entity in the database.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class ShortUuidEntity(id: EntityID<ShortUuid>) : Entity<ShortUuid>(id)
+
+        /**
+         * Represents an abstract entity class designed for database tables with `ShortUuid` as the primary key type.
+         *
+         * This class extends `EntityClass` and adds support for working with entities that use shortened UUIDs
+         * as identifiers. It provides functionality for performing operations such as querying, inserting,
+         * updating, and deleting rows in the associated table. The generic parameter [E] corresponds
+         * to the type of the entity that extends `ShortUuidEntity`.
+         *
+         * @param E The type of entity that extends `ShortUuidEntity`.
+         * @param table The database table associated with this entity class.
+         * @param entityType The Kotlin class of the entity, or `null` if it should be inferred.
+         * @param entityCtor A transformer function for converting an `EntityID<ShortUuid>` into an instance of [E].
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class ShortUuidEntityClass<out E : ShortUuidEntity>(
+            table: IdTable<ShortUuid>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<ShortUuid>, E>? = null
+        ) : EntityClass<ShortUuid, E>(table, entityType, entityCtor)
     }
 
     /**

@@ -429,6 +429,68 @@ fun <E> Iterable<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
 }
 
 /**
+ * Returns the last element of the iterable if it exists, or throws an exception provided by the given supplier.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if the iterable is empty.
+ * @return The last element of the iterable.
+ * @throws Throwable If the iterable is empty, the exception provided by the supplier is thrown.
+ * @since 5.3.0
+ */
+@IgnorableReturnValue
+fun <E> Iterable<E>.lastOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return lastOrNull() ?: throw lazyException()
+}
+/**
+ * Returns the last element matching the given [predicate] from the iterable, or throws an exception
+ * provided by the [lazyException] supplier if no such element is found.
+ *
+ * @param lazyException A supplier function that provides the exception to be thrown if no matching element is found.
+ * @param predicate A condition to determine which element to find as the last match.
+ * @return The last element that matches the given predicate.
+ * @throws Throwable The exception provided by [lazyException] if no matching element is found.
+ * @since 5.3.0
+ */
+@IgnorableReturnValue
+fun <E> Iterable<E>.lastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return lastOrNull(predicate) ?: throw lazyException()
+}
+/**
+ * Returns the last element of the iterable or the result of invoking the specified default supplier
+ * if the iterable is empty.
+ *
+ * @param default A supplier function that is invoked to provide a default value if the iterable is empty.
+ * @return The last element of the iterable or the result of the default supplier if the iterable is empty.
+ * @since 5.3.0
+ */
+fun <E> Iterable<E>.lastOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return lastOrNull() ?: default()
+}
+/**
+ * Returns the last element in the collection that matches the specified [predicate].
+ * If no such element is found, returns the result of the [default] supplier.
+ *
+ * @param default A supplier function that provides a default value if no element matches the [predicate].
+ * @param predicate A predicate function to test elements of the collection.
+ * @return The last element matching the [predicate], or the result of the [default] supplier if none match.
+ * @since 5.3.0
+ */
+fun <E> Iterable<E>.lastOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return lastOrNull(predicate) ?: default()
+}
+
+/**
  * Returns the second element of the list.
  *
  * @receiver The list from which the second element is to be accessed.

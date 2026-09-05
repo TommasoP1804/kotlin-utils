@@ -16,6 +16,12 @@ import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -164,6 +170,18 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
      * @since 3.0.0
      */
     constructor(instant: kotlin.time.Instant) : this(Generator.INSTANCE.newKsuid(instant.toJavaInstant()))
+    /**
+     * Constructs a new KSUID instance using the given byte array.
+     *
+     * This secondary constructor initializes the instance by assigning the provided
+     * byte array to the `ksuidBytes` field of the containing class. The input byte
+     * array must adhere to the expected structure and length of a KSUID, ensuring
+     * proper deserialization and representation.
+     *
+     * @param byteArray The byte array representing a KSUID.
+     * @since 5.3.0
+     */
+    constructor(byteArray: ByteArray) : this(ksuidBytes = byteArray)
     /**
      * Constructs a new instance of the KSUID class using a newly generated KSUID string.
      *
@@ -407,6 +425,81 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
                 else st.setBytes(index, value.toByteArray())
             }
         }
+
+        /**
+         * Adds a KSUID-based character column to the table with specified transformations.
+         *
+         * The method creates a character column in the table with a fixed size and applies
+         * transformations to handle KSUID objects. The transformation maps string representations
+         * to KSUID objects and vice versa.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.3.0
+         */
+        fun Table.ksuidChar(name: String) = char(name, TOTAL_BYTES)
+            .transform(::Ksuid, Ksuid::toString)
+        /**
+         * Defines a binary column in the table that stores KSUIDs as byte arrays.
+         *
+         * This function creates a database column with a fixed binary size that matches the
+         * size of a KSUID. It enables seamless conversion between the byte array storage
+         * format and the KSUID object representation.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.3.0
+         */
+        fun Table.ksuidBytea(name: String) = binary(name, TOTAL_BYTES)
+            .transform(::Ksuid, Ksuid::toByteArray)
+
+        /**
+         * Represents a database table for managing KSUID-based IDs.
+         *
+         * This class extends the `IdTable` class, providing integration with KSUIDs as primary keys.
+         *
+         * @param name The name of the database table. Defaults to an empty string.
+         * @param columnName The name of the primary key column in the table. Defaults to "id".
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class KsuidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Ksuid>(name) {
+            override val id: Column<EntityID<Ksuid>>
+                get() = ksuidChar(columnName).clientDefault { Ksuid() }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract entity that uses KSUIDs as unique identifiers.
+         *
+         * A KSUID (K-Sortable Unique Identifier) is a 20-byte unique identifier that combines
+         * a timestamp with a randomly generated payload, allowing for lexicographical sorting
+         * and compact representation of entities. This class provides the base structure for
+         * entities that utilize KSUIDs as their primary identifiers.
+         *
+         * @param id The KSUID wrapped in an `EntityID`, serving as the unique identifier for this entity.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class KsuidEntity(id: EntityID<Ksuid>) : Entity<Ksuid>(id)
+
+        /**
+         * Abstract class for managing and interacting with database entities that use KSUIDs as their unique identifiers.
+         *
+         * This class extends the generic `EntityClass` and is designed to provide functionalities specific to entities
+         * that are identified by a `Ksuid`. It serves as a base class for defining entity-specific logic while simplifying
+         * database operations for KSUID-based entities.
+         *
+         * @param E The specific type of `KsuidEntity` this class represents.
+         * @param table The `IdTable` associated with the entities of type `E`, using `Ksuid` as the primary key.
+         * @param entityType (Optional) The class type of the entity, useful for reflection or creating specific entity instances.
+         * @param entityCtor (Optional) Custom transformation logic for creating entities from database rows.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class KsuidEntityClass<out E : KsuidEntity>(
+            table: IdTable<Ksuid>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<Ksuid>, E>? = null
+        ) : EntityClass<Ksuid, E>(table, entityType, entityCtor)
     }
 
     /**

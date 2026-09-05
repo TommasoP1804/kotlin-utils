@@ -9,18 +9,25 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.Supplier
 import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.classes.identifiers.Ulid.Companion.generateHashUlid
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import dev.tommasop1804.kutils.expect
-import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.SqlTypes
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.core.java.javaUUID
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -1056,6 +1063,92 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
                 else st.setObject(index, value.toUuid(), SqlTypes.UUID)
             }
         }
+
+        /**
+         * Defines a ULID column for a database table by utilizing transformation
+         * between a UUID and a ULID instance.
+         *
+         * The method leverages the `javaUUID` function to generate a UUID-based column,
+         * and applies transformations to convert it into a ULID-compatible format.
+         *
+         * @param name The name of the column within the database table.
+         * @since 5.3.0
+         */
+        fun Table.ulid(name: String) = javaUUID(name)
+            .transform(::Ulid, Ulid::toUuid)
+        /**
+         * Defines a column in the table with a ULID (Universally Unique Lexicographically Sortable Identifier) representation,
+         * stored as a fixed-length character string.
+         *
+         * @param name The name of the column to be created in the table. This should be a unique identifier within the table's context.
+         * @since 5.3.0
+         */
+        fun Table.ulidChar(name: String) = char(name, ULID_BYTES)
+            .transform(::Ulid, Ulid::toString)
+        /**
+         * Defines a binary column in the database table that stores ULID (Universally Unique Lexicographically Sortable Identifier) values as byte arrays.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.3.0
+         */
+        fun Table.ulidBytea(name: String) = binary(name, ULID_BYTES)
+            .transform(::Ulid, Ulid::toByteArray)
+
+        /**
+         * Represents an extension of the `IdTable` class specifically designed to utilize ULIDs
+         * as the primary key for database tables. This class helps in managing ULID-based IDs
+         * with monotonic generation and ensures proper configuration of the primary key column.
+         *
+         * @constructor Creates an instance of `UlidTable` with the specified table name and column name.
+         * The ULID column will be set up with a default monotonic factory for ULID generation.
+         *
+         * @param name The name of the table. Defaults to an empty string if not specified.
+         * @param columnName The name of the primary key column. Defaults to `"id"` if not specified.
+         *
+         * @property id Overrides the `id` property from the `IdTable` class. It defines the ULID
+         * column, applying a default behavior for generating monotonic ULIDs. The column is marked
+         * as the entity ID.
+         *
+         * @property primaryKey Specifies the primary key for the table, which is based on the `id` property.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class UlidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Ulid>(name) {
+            override val id: Column<EntityID<Ulid>>
+                get() = ulid(columnName).clientDefault { Ulid(monotonic = true) }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract entity that is uniquely identified by a ULID (Universally Unique Lexicographically Sortable Identifier).
+         *
+         * This class serves as a base type for entities in a persistence layer, where each entity is assigned a unique ULID as its identifier.
+         *
+         * @param id The unique identifier of the entity, represented as an [EntityID] of type [Ulid].
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class UlidEntity(id: EntityID<Ulid>) : Entity<Ulid>(id)
+
+        /**
+         * Represents an abstract entity class specifically designed to work with ULID-based primary keys.
+         *
+         * This class extends the `EntityClass` class using `Ulid` as the ID type and provides
+         * a base structure for working with entities whose IDs are ULIDs (Universally Unique Lexicographically Sortable Identifiers).
+         * It helps initialize and manage entities in the context of a database table with ULID-based identifiers.
+         *
+         * @param E The type of ULID-based entity the class will handle.
+         * @param table The database table associated with this entity class.
+         * @param entityType The runtime `Class` instance representing the specific type of entity. Defaults to `null`.
+         * @param entityCtor The optional constructor transformer used to instantiate entities. Defaults to `null`.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class UlidEntityClass<out E : UlidEntity>(
+            table: IdTable<Ulid>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<Ulid>, E>? = null
+        ) : EntityClass<Ulid, E>(table, entityType, entityCtor)
     }
 
     /**

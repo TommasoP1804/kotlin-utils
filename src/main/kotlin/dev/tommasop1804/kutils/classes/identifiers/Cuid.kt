@@ -12,13 +12,21 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.BigInt
+import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.Instant
+import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.get
 import dev.tommasop1804.kutils.toBigInt
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -540,6 +548,73 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
                 else st.setString(index, value.value)
             }
         }
+
+        /**
+         * Adds a CUID column to the table schema with a custom name and configures it to
+         * map the database column to a `Cuid` type.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.3.0
+         */
+        fun Table.cuid(name: String) = varchar(name, LENGTH_V1).transform(::Cuid, Cuid::toString)
+
+        /**
+         * Represents a table structure with a column designed to utilize CUIDs (Collision-resistant Unique Identifiers)
+         * as primary keys. This class extends the `IdTable` class, where the ID field is customized to use the CUID format.
+         *
+         * The class allows specifying a table name and a column name for the CUID primary key during initialization.
+         * If no table name is provided, it defaults to an empty string. If no column name is provided, it defaults
+         * to "id". The primary key is generated using the `cuid` extension function, which ensures the column
+         * uses the CUID format for uniqueness.
+         *
+         * @constructor Creates a new instance of `CuidTable` with optional parameters for table and column names.
+         * The primary key column is automatically defined and uses a generated CUID value as its default value.
+         *
+         * @param name The name of the table. Defaults to an empty string.
+         * @param columnName The name of the column designated for the CUID primary key. Defaults to "id".
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        open class CuidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Cuid>(name) {
+            override val id: Column<EntityID<Cuid>>
+                get() = cuid(columnName).clientDefault { Cuid() }.entityId()
+            override val primaryKey = PrimaryKey(id)
+        }
+
+        /**
+         * Represents an abstract entity associated with a Compact Unique Identifier (CUID).
+         *
+         * This class serves as a base type for entities that utilize CUIDs as their primary keys.
+         * It extends the generic `Entity` class, providing a structure for working with CUID-based
+         * entities in the underlying database or context.
+         *
+         * @constructor Initializes an entity with the provided `EntityID` containing a CUID value.
+         * @param id An `EntityID<Cuid>` representing the unique identifier for the entity.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class CuidEntity(id: EntityID<Cuid>) : Entity<Cuid>(id)
+
+        /**
+         * Base class for managing entities that use `Cuid` as their identifier.
+         *
+         * This class is a specialized version of `EntityClass` for handling entities
+         * associated with a table where the primary key is of type `Cuid`. It provides
+         * the foundation for defining and working with entities in the context of
+         * object-relational mapping.
+         *
+         * @param E The entity type associated with this class. Must extend `CuidEntity`.
+         * @param table The table associated with this entity class.
+         * @param entityType Optional parameter specifying the entity type to use. Defaults to `null`.
+         * @param entityCtor Optional custom transformer for creating instances of the entity from their IDs. Defaults to `null`.
+         * @since 5.3.0
+         * @author Tommaso Pastorelli
+         */
+        abstract class CuidEntityClass<out E : CuidEntity>(
+            table: IdTable<Cuid>,
+            entityType: Class<E>? = null,
+            entityCtor: Transformer<EntityID<Cuid>, E>? = null
+        ) : EntityClass<Cuid, E>(table, entityType, entityCtor)
     }
 
     /**
