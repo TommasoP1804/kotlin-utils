@@ -841,21 +841,49 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOr(default: Supplier<T>) =
 fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOr(default: Supplier<T>, predicate: Predicate<T>) = all().lastOr(default, predicate)
 
 /**
+ * Retrieves the first entity that matches the given operation condition or returns null if no match is found.
+ *
+ * @param op The operation condition used to filter entities.
+ * @return The first entity matching the condition or null.
+ * @since 5.3.6
+ */
+operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.get(op: Op<Boolean>) = find(op).firstOrNull()
+/**
+ * Retrieves the first entity matching the given condition, or null if no such entity exists.
+ *
+ * @param op A supplier providing the condition encapsulated in an [Op] object.
+ *           This specifies the criteria used to filter entities.
+ * @return The first entity that matches the supplied condition, or null if no match is found.
+ * @since 5.3.6
+ */
+operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.get(op: Supplier<Op<Boolean>>) = find(op).firstOrNull()
+
+/**
+ * Checks if any entities in this EntityClass satisfy the given condition.
+ *
+ * @param op The condition represented as an instance of Op<Boolean>
+ *           to evaluate against the entities.
+ * @return True if at least one entity matches the condition, otherwise false.
+ * @since 5.3.6
+ */
+operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.contains(op: Op<Boolean>) = count(op) > 0
+
+/**
  * Checks whether an entity with the given ID exists in the associated entity class.
  *
  * @param id The ID of the entity to check for existence.
  * @return `true` if an entity with the specified ID exists, `false` otherwise.
  * @since 5.3.0
  */
-operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.contains(id: ID) = exists(id)
+operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.contains(id: ID) = existsById(id)
 /**
  * Checks if an entity with the specified ID exists.
  *
  * @param id The ID of the entity to check for existence.
  * @return `true` if an entity with the given ID exists, `false` otherwise.
- * @since 5.3.0
+ * @since 5.3.6
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.exists(id: ID): Boolean {
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.existsById(id: ID): Boolean {
     findById(id) ?: return false
     return true
 }
