@@ -108,7 +108,7 @@ abstract class StringEntityClass<out E : StringEntity>(
  * @return The created VARCHAR column.
  * @since 5.3.1
  */
-inline fun <reified T : Any> Table.varchar(name: String, collate: String? = null) = varchar(name, 255, collate)
+inline fun Table.varchar(name: String, collate: String? = null) = varchar(name, 255, collate)
 
 /**
  * Represents a custom column type for handling JSONB data in a database using Exposed.
