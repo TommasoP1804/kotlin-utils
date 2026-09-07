@@ -336,8 +336,7 @@ class SnowflakeId(val value: Long) : Number(), Comparable<SnowflakeId>, Serializ
          * @author Tommaso Pastorelli
          */
         open class SnowflakeIdTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<SnowflakeId>(name) {
-            override val id: Column<EntityID<SnowflakeId>>
-                get() = snowflakeId(columnName).clientDefault { SnowflakeId() }.entityId()
+            override val id: Column<EntityID<SnowflakeId>> = snowflakeId(columnName).clientDefault { SnowflakeId() }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

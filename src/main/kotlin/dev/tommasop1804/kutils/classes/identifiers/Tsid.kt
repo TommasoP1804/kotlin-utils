@@ -585,8 +585,7 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
          * @author Tommaso Pastorelli
          */
         open class TsidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Tsid>(name) {
-            override val id: Column<EntityID<Tsid>>
-                get() = tsid(columnName).clientDefault { Tsid() }.entityId()
+            override val id: Column<EntityID<Tsid>> = tsid(columnName).clientDefault { Tsid() }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

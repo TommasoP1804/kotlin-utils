@@ -364,8 +364,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
          * @author Tommaso Pastorelli
          */
         open class ShortUuidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<ShortUuid>(name) {
-            override val id: Column<EntityID<ShortUuid>>
-                get() = shortUuid(columnName).clientDefault { ShortUuid() }.entityId()
+            override val id: Column<EntityID<ShortUuid>> = shortUuid(columnName).clientDefault { ShortUuid() }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

@@ -19,6 +19,7 @@ import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.get
 import dev.tommasop1804.kutils.toBigInt
 import jakarta.persistence.AttributeConverter
+import org.hibernate.mapping.PrimaryKey
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
 import org.jetbrains.exposed.v1.core.Column
@@ -576,8 +577,7 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
          * @author Tommaso Pastorelli
          */
         open class CuidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Cuid>(name) {
-            override val id: Column<EntityID<Cuid>>
-                get() = cuid(columnName).clientDefault { Cuid() }.entityId()
+            override val id: Column<EntityID<Cuid>> = cuid(columnName).clientDefault { Cuid() }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

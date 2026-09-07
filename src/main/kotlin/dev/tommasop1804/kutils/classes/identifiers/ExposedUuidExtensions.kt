@@ -16,6 +16,7 @@ import org.jetbrains.exposed.v1.core.dao.id.IdTable
 import org.jetbrains.exposed.v1.core.java.UUIDColumnType
 import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.dao.java.UUIDEntity
+import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 
 /**
  * A type alias for UUIDColumnType.
@@ -29,6 +30,13 @@ typealias UuidColumnType = UUIDColumnType
  * @since 5.3.0
  */
 typealias UuidEntity = UUIDEntity
+/**
+ * A type alias for `UUIDEntityClass<E>`, simplifying its usage in the code.
+ *
+ * @param E The type of the Entity this class is associated with.
+ * @since 5.3.1
+ */
+typealias UuidEntityClass<E> = UUIDEntityClass<E>
 
 /**
  * Represents a specialized table for managing entities identified by UUIDs in a relational database.
@@ -45,7 +53,11 @@ typealias UuidEntity = UUIDEntity
  *                for generating the UUID.
  * @since 5.3.0
  */
-open class UuidTable(name: String = String.EMPTY, columnName: String = "id", version: dev.tommasop1804.kutils.classes.identifiers.UuidVersion) : IdTable<Uuid>(name) {
+open class UuidTable(
+    name: String = String.EMPTY,
+    columnName: String = "id",
+    version: dev.tommasop1804.kutils.classes.identifiers.UuidVersion = dev.tommasop1804.kutils.classes.identifiers.UuidVersion.V4
+) : IdTable<Uuid>(name) {
     final override val id: Column<EntityID<Uuid>> = javaUUID(columnName).clientDefault { Uuid(version) }.entityId()
     final override val primaryKey = PrimaryKey(id)
 }

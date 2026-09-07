@@ -264,8 +264,7 @@ value class NanoId(private val value: String) : CharSequence, Serializable {
          * @author Tommaso Pastorelli
          */
         open class NanoIdTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<NanoId>(name) {
-            override val id: Column<EntityID<NanoId>>
-                get() = nanoId(columnName).clientDefault { NanoId() }.entityId()
+            override val id: Column<EntityID<NanoId>> = nanoId(columnName).clientDefault { NanoId() }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

@@ -7,10 +7,10 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "dev.tommasop1804"
-version = "5.3.0"
+version = "5.3.1"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260905T163815Z
+// Last update: Tommaso Pastorelli | 20260907T074904Z
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.4.10"
@@ -80,6 +80,7 @@ dependencies {
     implementation("jakarta.mail:jakarta.mail-api:2.0.1")
     implementation("com.sun.mail:jakarta.mail:2.0.2")
     implementation("com.networknt:json-schema-validator:1.3.3")
+    implementation("org.postgresql:postgresql:42.7.10")
 }
 
 kotlin {

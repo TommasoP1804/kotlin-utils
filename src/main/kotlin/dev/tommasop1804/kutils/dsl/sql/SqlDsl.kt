@@ -26,7 +26,7 @@ import kotlin.contracts.contract
  * @author Tommaso Pastorelli
  */
 @Suppress("SqlNoDataSourceInspection")
-enum class JoinType(@param:Language("sql") val sqlKeyword: String, val onCondition: Boolean = true) {
+enum class JoinType(val sqlKeyword: String, val onCondition: Boolean = true) {
     Inner("INNER"),
     LeftOuter("LEFT"),
     RightOuter("RIGHT"),

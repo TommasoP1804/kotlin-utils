@@ -11,10 +11,14 @@ package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IdTable
 import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.core.statements.InsertStatement
 import org.jetbrains.exposed.v1.core.statements.StatementType
@@ -23,7 +27,201 @@ import org.jetbrains.exposed.v1.dao.EntityClass
 import org.jetbrains.exposed.v1.dao.InnerTableLink
 import org.jetbrains.exposed.v1.dao.Referrers
 import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.postgresql.util.PGobject
+import tools.jackson.core.type.TypeReference
 import java.sql.ResultSet
+
+/**
+ * Represents a database table with string-based primary keys.
+ *
+ * This class is designed to manage database tables where the primary key is a string column.
+ * It allows configuration of column name, length, and collation.
+ *
+ * @constructor Creates a StringTable with the specified parameters.
+ * @param name The name of the table. Defaults to an empty string.
+ * @param columnName The name of the primary key column. Defaults to "id".
+ * @param length The maximum length of the string column. Defaults to 255.
+ * @param collate The collation applied to the column. Defaults to null, indicating no explicit collation.
+ * @since 5.3.1
+ * @author Tommaso Pastorelli
+ */
+open class StringTable(
+    name: String = String.EMPTY,
+    private val columnName: String = "id",
+    private val length: Int = 255,
+    private val collate: String? = null
+) : IdTable<String>(name) {
+    /**
+     * Represents the unique identifier column for an entity in the database.
+     * This column is defined as a `varchar` with a specified name, length, and collation.
+     * The `entityId` function converts the `varchar` column into an `EntityID`, which is used as the primary key.
+     * @since 5.3.1
+     */
+    override val id: Column<EntityID<String>> = varchar(columnName, length, collate).entityId()
+    /**
+     * Represents the primary key of the table.
+     * Overrides the parent class's primary key definition.
+     * It is initialized with the `id` column of the table.
+     * @since 5.3.1
+     */
+    override val primaryKey = PrimaryKey(id)
+}
+/**
+ * Represents an entity with a String-based primary key. This is an abstract class
+ * intended to be extended by other entity classes that utilize a String as their ID type.
+ *
+ * @constructor Creates a new StringEntity with the specified primary key.
+ * @param id The primary key of the entity, represented as an EntityID of type String.
+ * @since 5.3.1
+ * @author Tommaso Pastorelli
+ */
+abstract class StringEntity(id: EntityID<String>) : Entity<String>(id)
+/**
+ * Represents an abstract entity class where the primary key is of type String.
+ * This class extends EntityClass and provides functionality to manage entities
+ * with String-based primary keys.
+ *
+ * @param E The type of entity, which must inherit from StringEntity.
+ * @param table The table associated with the entity type.
+ * @param entityType The runtime class of the entity type, used for reflection. Defaults to null.
+ * @param entityCtor A transformer function to create entity instances from EntityID objects. Defaults to null.
+ * @since 5.3.1
+ * @author Tommaso Pastorelli
+ */
+abstract class StringEntityClass<out E : StringEntity>(
+    table: IdTable<String>,
+    entityType: Class<E>? = null,
+    entityCtor: Transformer<EntityID<String>, E>? = null
+) : EntityClass<String, E>(table, entityType, entityCtor)
+
+/**
+ * Adds a VARCHAR column to the table with a specified name and optional collation.
+ * The length of the VARCHAR column is fixed to 255 characters.
+ *
+ * @param name The name of the VARCHAR column.
+ * @param collate An optional collation to apply to the column. Defaults to null.
+ * @return The created VARCHAR column.
+ * @since 5.3.1
+ */
+inline fun <reified T : Any> Table.varchar(name: String, collate: String? = null) = varchar(name, 255, collate)
+
+/**
+ * Represents a custom column type for handling JSONB data in a database using Exposed.
+ * This class is parameterized to support deserialization of JSONB data into specified type [T].
+ *
+ * @param T The data type the JSONB data will be deserialized into.
+ * @property typeRef The [TypeReference] implementation that facilitates type-specific deserialization.
+ * @since 5.3.1
+ * @author Tommaso Pastorelli
+ */
+class JsonbColumnType<T : Any>(private val typeRef: TypeReference<T>) : ColumnType<T>() {
+    companion object {
+        /**
+         * A constant representing the "jsonb" string, commonly used as an indicator
+         * of JSONB data type support. JSONB is a binary storage format for JSON data,
+         * offering indexing and advanced querying capabilities in databases like PostgreSQL.
+         * @since 5.3.1
+         */
+        const val JSONB = "jsonb"
+    }
+
+    /**
+     * Returns the SQL type for the column as a string.
+     *
+     * This method specifies the SQL type used for storing JSONB data.
+     * It is overridden to explicitly define that the column type
+     * is `jsonb` in PostgreSQL, which is optimized for JSON storage
+     * and operations.
+     *
+     * @return The SQL data type for the column, in this case, "jsonb".
+     * @since 5.3.1
+     */
+    override fun sqlType() = JSONB
+    /**
+     * Converts a database value into the appropriate type `T`.
+     *
+     * @param value The database value to be converted. This can be an instance of
+     *              supported types such as `PGobject`, `String`, `Json`, `ByteArray`,
+     *              or a fallback to `toString()` for unsupported types.
+     * @return The value converted to type `T` by applying the `read` function on the given input.
+     * @since 5.3.1
+     */
+    override fun valueFromDB(value: Any): T = when (value) {
+        is PGobject -> read(value.value)
+        is String -> read(value)
+        is Json -> read(value.value)
+        is ByteArray -> read(value.decodeToString())
+        else -> read(value.serialize())
+    }
+    /**
+     * Converts a non-null Kotlin object to a database-compatible value using the JSONB format.
+     * The object is serialized to a JSON string and encapsulated in a PostgreSQL PGobject.
+     *
+     * @param value The Kotlin object to be converted. Must not be null.
+     * @return A PGobject instance containing the JSON representation of the input object.
+     * @since 5.3.1
+     */
+    override fun notNullValueToDB(value: T): Any = PGobject().apply {
+        type = JSONB
+        this.value = MAPPER.writeValueAsString(value)
+    }
+    /**
+     * Converts a non-null value of type [T] to its JSON string representation, wrapped in single quotes.
+     *
+     * @param value the non-null value to be converted to a JSON string
+     * @return a string containing the JSON representation of the provided value, wrapped in single quotes
+     * @since 5.3.1
+     */
+    override fun nonNullValueToString(value: T) = "'${MAPPER.writeValueAsString(value)}'"
+    /**
+     * Reads and deserializes the given JSON string into an object of type T.
+     *
+     * @param json the JSON string to be deserialized; if null or empty, a default empty JSON value will be used
+     * @return the deserialized object of type T
+     * @since 5.3.1
+     */
+    private fun read(json: String?): T = MAPPER.readValue(json.orEmpty().ifEmpty { EMPTY_JSON.value }, typeRef)
+}
+
+/**
+ * Registers a column with JSONB (JSON binary) data type for the specified name in the table.
+ * This method is designed for use with PostgreSQL databases and provides support for storing and retrieving
+ * JSON objects in a strongly-typed manner based on the specified generic type [T].
+ *
+ * @param T The type of object that will be serialized to and deserialized from JSONB.
+ * @param name The name of the column in the table.
+ * @return A [Column] object representing the JSONB column with the specified type.
+ * @since 5.3.1
+ */
+inline fun <reified T : Any> Table.jsonb(name: String): Column<T> =
+    registerColumn(name, JsonbColumnType(object : TypeReference<T>() {}))
+
+/**
+ * Executes a database transaction and propagates exceptions based on specified transformation rules.
+ *
+ * This method wraps the execution of a database transaction within a try-catch block. If an exception
+ * occurs during the execution of the transaction, it is transformed using the provided `lazyException`
+ * transformer and then re-thrown. The method uses the `transaction` function to initiate and manage
+ * the transaction logic.
+ *
+ * @param T The return type of the block executed within the transaction.
+ * @param lazyException A transformer function that takes a throwable as input and produces a new throwable.
+ * It is used to transform exceptions before they are propagated. Defaults to wrapping exceptions
+ * as `DatabaseOperationException`.
+ * @param block The block of code representing the transactional logic to be executed. The block is executed
+ * within a JDBC transaction, and the result of this block is returned if no exception occurs.
+ *
+ * @return The result of the transactional block if it completes successfully.
+ *
+ * @throws Throwable If an exception occurs during the transaction and is transformed using `lazyException`.
+ * Default to [DatabaseOperationException].
+ * @since 5.3.1
+ */
+fun <T> transactionOrThrow(
+    lazyException: ThrowableTransformer = { DatabaseOperationException(it.message) },
+    block: ReceiverTransformer<JdbcTransaction, T>
+) = tryOrThrow(lazyException) { transaction(statement = block) }
 
 /**
  * Converts a `Table.UuidVersion` instance to its equivalent `UuidVersion` representation.
@@ -601,7 +799,7 @@ inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThr
  * @return `true` if the entity exists; otherwise, a ResourceNotFoundException is thrown.
  * @since 5.3.0
  */
-inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, internalErrorCode: String?, lazyMesage: Supplier<Any>): Boolean {
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, internalErrorCode: String?, lazyMesage: Supplier<Any>): Boolean {
     findById(id) ?: throw ResourceNotFoundException(lazyMesage().toString(), internalErrorCode)
     return true
 }
@@ -655,21 +853,8 @@ inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.findByIdOrThrow
  * @throws ResourceNotFoundException If no entity with the given ID is found.
  * @since 5.3.0
  */
-inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.findByIdOrThrow(id: ID, internalErrorCode: String?, lazyMesage: Supplier<Any>) =
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOrThrow(id: ID, internalErrorCode: String?, lazyMesage: Supplier<Any>) =
     findById(id) ?: throw ResourceNotFoundException(lazyMesage().toString(), internalErrorCode)
-/**
- * Finds an entity by its ID or returns a default value if the entity is not found.
- *
- * @param ID The type of the entity's ID.
- * @param T The type of the entity.
- * @param id The ID of the entity to find.
- * @param default A supplier function that provides a default entity if the entity is not found.
- * @return The entity with the specified ID or the default entity provided by the supplier.
- * @since 5.3.0
- */
-inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.findByIdOr(id: ID, default: Supplier<T>) =
-    findById(id) ?: default()
-
 /**
  * Finds an entity by its ID or throws a specified exception if it is not found, then applies
  * the provided update logic to the found entity.
@@ -692,6 +877,47 @@ inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.findByIdOrThrow
     block: Consumer<T>
 ): T {
     val result = find(table.id eq id).forUpdate().singleOrNull() ?: throw lazyException()
+    block(result)
+    return result
+}
+
+/**
+ * Finds an entity by its ID or returns a default value if the entity is not found.
+ *
+ * @param ID The type of the entity's ID.
+ * @param T The type of the entity.
+ * @param id The ID of the entity to find.
+ * @param default A supplier function that provides a default entity if the entity is not found.
+ * @return The entity with the specified ID or the default entity provided by the supplier.
+ * @since 5.3.0
+ */
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOr(id: ID, default: Supplier<T>) =
+    findById(id) ?: default()
+/**
+ * Finds an entity by its ID or creates and saves a new entity if none exists.
+ *
+ * @param ID The type of the primary key of the entity.
+ * @param T The type of the entity.
+ * @param id The primary key of the entity to find.
+ * @param new A lambda function that creates a new entity if none is found.
+ * @return The existing or newly created entity.
+ * @since 5.3.1
+ */
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOrSave(id: ID, new: ReceiverConsumer<T>) =
+    findById(id) ?: new(id, new)
+/**
+ * Finds an entity by its ID and locks it for update, or creates a new entity if none exists.
+ * If a new entity is created, the provided `new` function is used to initialize it.
+ * Once an entity is found or created, the specified `block` operation is applied to the entity.
+ *
+ * @param id The unique identifier of the entity to find or create.
+ * @param new A function that handles the creation of a new entity when no matching entity is found.
+ * @param block A function that performs an operation on the found or newly created entity.
+ * @return The entity that was found or created and updated.
+ * @since 5.3.1
+ */
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOrSaveAndUpdate(id: ID, new: ReceiverConsumer<T>, block: Consumer<T>): T {
+    val result = find(table.id eq id).forUpdate().singleOrNull() ?: new(id, new)
     block(result)
     return result
 }

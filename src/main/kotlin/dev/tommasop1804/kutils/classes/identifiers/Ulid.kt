@@ -1114,8 +1114,7 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * @author Tommaso Pastorelli
          */
         open class UlidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Ulid>(name) {
-            override val id: Column<EntityID<Ulid>>
-                get() = ulid(columnName).clientDefault { Ulid(monotonic = true) }.entityId()
+            override val id: Column<EntityID<Ulid>> = ulid(columnName).clientDefault { Ulid(monotonic = true) }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

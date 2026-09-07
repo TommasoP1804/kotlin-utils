@@ -462,8 +462,7 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          * @author Tommaso Pastorelli
          */
         open class KsuidTable(name: String = String.EMPTY, private val columnName: String = "id") : IdTable<Ksuid>(name) {
-            override val id: Column<EntityID<Ksuid>>
-                get() = ksuidChar(columnName).clientDefault { Ksuid() }.entityId()
+            override val id: Column<EntityID<Ksuid>> = ksuidChar(columnName).clientDefault { Ksuid() }.entityId()
             override val primaryKey = PrimaryKey(id)
         }
 

@@ -27,6 +27,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import tools.jackson.databind.node.ObjectNode
 import java.io.Serial
 import java.io.Serializable
+import java.sql.ResultSet
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.reflect.KProperty
@@ -2717,3 +2718,33 @@ inline fun <reified T : Any, R> Collection<T>.toTable(rowProperty: KProperty<R>)
  */
 @Suppress("unchecked_cast")
 inline fun <reified T : Any, R> Collection<T>.toMTable(rowProperty: KProperty<R>) = toTable<T, R>(rowProperty).toMTable()
+
+/**
+ * Converts a ResultSet into a Table structure with rows, column labels, and corresponding values.
+ *
+ * @return A Table instance where the row indices are Int, column labels are String,
+ *         and cell values are Any? representing the content of the ResultSet.
+ * @since 5.3.1
+ */
+fun ResultSet.toTable(): Table<Int, String, Any?> {
+    val metadata = metaData
+    return tableOf(
+        buildList {
+            var row = 0
+
+            while (next()) {
+                for (column in 1..metadata.columnCount) {
+                    add(
+                        Cell(
+                            row,
+                            metadata.getColumnLabel(column),
+                            getObject(column)
+                        )
+                    )
+                }
+
+                row++
+            }
+        }
+    )
+}
