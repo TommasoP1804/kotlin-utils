@@ -26,6 +26,134 @@ import kotlin.math.*
 import kotlin.math.pow
 
 /**
+ * A lambda function that when invoked returns the integer value `0`.
+ * Represents a constant and immutable zero value provider.
+ * @since 5.4.0
+ */
+val ZERO: Supplier<Int> = { 0 }
+/**
+ * Represents a lambda expression that returns the constant value `0L` of type `Long`.
+ * This can be utilized whenever a consistent zero value of type `Long` is needed.
+ * @since 5.4.0
+ */
+val ZERO_L: Supplier<Long> = { 0L }
+/**
+ * A lambda function that returns the floating-point value `0.0f`.
+ * This can be used as a convenient method to obtain a zero float value.
+ * @since 5.4.0
+ */
+val ZERO_F: Supplier<Float> = { 0f }
+/**
+ * A lambda expression that returns the double value `0.0`.
+ *
+ * This can be used as a constant supplier to provide the default
+ * zero value for calculations or initializations where a double-precision
+ * floating-point number is required.
+ * @since 5.4.0
+ */
+val ZERO_D: Supplier<Double> = { 0.0 }
+/**
+ * A constant supplier of the short value `0`.
+ *
+ * This supplier provides a consistent and stateless way
+ * to retrieve the short value `0` whenever invoked.
+ * It can be used in contexts where a default short value
+ * or placeholder is required.
+ * @since 5.4.0
+ */
+val ZERO_S: Supplier<Short> = { 0 }
+/**
+ * A constant supplier that provides the byte value `0`.
+ * This can be used wherever a consistent byte value of `0` is needed.
+ * @since 5.4.0
+ */
+val ZERO_B: Supplier<Byte> = { 0 }
+
+/**
+ * A constant supplier that always provides the integer value `1`.
+ * This can be used wherever a predefined, unchanging value of `1` is required.
+ * @since 5.4.0
+ */
+val ONE: Supplier<Int> = { 1 }
+/**
+ * A supplier that provides the constant value `1L` of type `Long`.
+ * @since 5.4.0
+ */
+val ONE_L: Supplier<Long> = { 1L }
+/**
+ * A constant supplier that provides the float value `1.0` whenever invoked.
+ * This can be used in scenarios where a consistent float value of `1.0` is required.
+ * @since 5.4.0
+ */
+val ONE_F: Supplier<Float> = { 1f }
+/**
+ * A constant supplier that always provides the value 1.0 of type Double.
+ * This can be used wherever a predefined constant value of 1.0 is required.
+ * @since 5.4.0
+ */
+val ONE_D: Supplier<Double> = { 1.0 }
+/**
+ * A constant supplier that provides the value `1` as a `Short`.
+ * This can be used wherever a default or constant short value of `1` is needed.
+ * @since 5.4.0
+ */
+val ONE_S: Supplier<Short> = { 1 }
+/**
+ * A constant supplier that always provides the Byte value 1.
+ *
+ * This supplier can be used wherever a consistent Byte value of 1 is required.
+ * @since 5.4.0
+ */
+val ONE_B: Supplier<Byte> = { 1 }
+
+/**
+ * A constant Supplier that provides the integer value `-1` whenever invoked.
+ * This can be used as a predefined value supplier in contexts where a negative one is required.
+ * @since 5.4.0
+ */
+val MINUS_ONE: Supplier<Int> = { -1 }
+/**
+ * A constant supplier that always provides the value `-1L`.
+ *
+ * This can be used in scenarios where a consistent supplier of the value `-1L` is required.
+ * @since 5.4.0
+ */
+val MINUS_ONE_L: Supplier<Long> = { -1L }
+/**
+ * A constant supplier that provides the float value -1.0.
+ * This can be used to consistently retrieve the same negative float value
+ * in situations where such a value is required.
+ * @since 5.4.0
+ */
+val MINUS_ONE_F: Supplier<Float> = { -1f }
+/**
+ * A supplier that provides a constant value of -1.0 as a Double.
+ * This can be used wherever a consistent supplier of the Double value -1.0 is required.
+ * @since 5.4.0
+ */
+val MINUS_ONE_D: Supplier<Double> = { -1.0 }
+/**
+ * A constant supplier that provides the value `-1` as a [Short].
+ * This supplier can be used whenever a consistent `-1` short value is required.
+ * @since 5.4.0
+ */
+val MINUS_ONE_S: Supplier<Short> = { -1 }
+/**
+ * A constant supplier that provides the byte value `-1`.
+ *
+ * This supplier can be used wherever a consistent `-1` byte value is needed.
+ * @since 5.4.0
+ */
+val MINUS_ONE_B: Supplier<Byte> = { -1 }
+
+/**
+ * Constant value representing that an index was not found.
+ * Typically used to signify the absence of a valid index in search operations.
+ * @since 5.4.0
+ */
+const val INDEX_NOT_FOUND = -1
+
+/**
  * Indicates whether the current number is not a decimal (i.e., it represents a whole number),
  * with the evaluation based solely on the type of the number.
  *
@@ -157,6 +285,38 @@ val Number.isZero
  */
 val Number.isNotZero
     get() = this != 0
+/**
+ * Extension property that checks if the number is equal to 1.
+ *
+ * @return `true` if the number equals 1, otherwise `false`.
+ * @since 5.4.0
+ */
+val Number.isOne
+    get() = this == 1
+/**
+ * A property that checks if the numeric value is not equal to 1.
+ *
+ * @return `true` if the value is not 1, otherwise `false`.
+ * @since 5.4.0
+ */
+val Number.isNotOne
+    get() = this != 1
+/**
+ * Extension property that checks if the number is equal to -1.
+ *
+ * @return `true` if the number equals -1, otherwise `false`.
+ * @since 5.4.0
+ */
+val Number.isMinusOne
+    get() = this == -1
+/**
+ * A property that checks if the numeric value is not equal to -1.
+ *
+ * @return `true` if the value is not -1, otherwise `false`.
+ * @since 5.4.0
+ */
+val Number.isNotMinusOne
+    get() = this != -1
 
 /**
  * Extension property that provides the positive integer representation of the Byte value.
@@ -569,6 +729,211 @@ val Short.words get() = NumberWords.toWords(toLong())
  * @since 4.0.0
  */
 val Byte.words get() = NumberWords.toWords(toLong())
+
+/**
+ * Returns the value of the Byte if it is non-null; otherwise, returns 0.
+ *
+ * This function is a convenient way to handle nullable Byte values
+ * by providing a default value of 0 when the value is null.
+ *
+ * @receiver The nullable Byte value.
+ * @return The non-null Byte value, or 0 if the receiver is null.
+ * @since 5.4.0
+ */
+fun Byte?.orZero() = this ?: 0
+/**
+ * Returns the value of the nullable [Short] if it is not null,
+ * or `0` if the value is null.
+ *
+ * This extension function provides a convenient way to handle nullable
+ * [Short] types by ensuring a non-null result.
+ *
+ * @receiver The nullable [Short] value being checked.
+ * @return The receiver value if it is not null, or `0` if it is null.
+ * @since 5.4.0
+ */
+fun Short?.orZero() = this ?: 0
+/**
+ * Returns the value of the integer if it is not null; otherwise, returns zero.
+ *
+ * This function is an extension on nullable integers, providing a convenient way
+ * to handle null values by substituting them with a zero.
+ *
+ * @receiver The nullable integer to be checked.
+ * @return The integer value if not null, or zero if the integer is null.
+ * @since 5.4.0
+ */
+fun Int?.orZero() = this ?: 0
+/**
+ * Returns the value of the nullable `Long` if it is not null,
+ * or returns 0L if the value is null.
+ *
+ * This function provides a default value of 0L for nullable `Long` objects.
+ *
+ * @receiver The nullable `Long` instance to evaluate.
+ * @return The current value if not null, or 0L if null.
+ * @since 5.4.0
+ */
+fun Long?.orZero() = this ?: 0L
+/**
+ * Returns the value of the Float if it is non-null, or `0f` if it is null.
+ *
+ * This function provides a safe way to handle nullable Float values by
+ * replacing `null` with a default value of `0f`.
+ *
+ * @receiver The nullable Float to be evaluated.
+ * @return The non-null Float value, or `0f` if the receiver is null.
+ * @since 5.4.0
+ */
+fun Float?.orZero() = this ?: 0f
+/**
+ * Returns the value of the nullable [Double] if it is non-null; otherwise, returns 0.0.
+ *
+ * This function provides a convenient way to handle nullable [Double] values by
+ * substituting a default value of 0.0 when the input is null.
+ *
+ * @receiver The nullable [Double] value to evaluate.
+ * @return The original value if it is non-null; otherwise, 0.0.
+ * @since 5.4.0
+ */
+fun Double?.orZero() = this ?: 0.0
+
+/**
+ * Returns the value of the Byte if it is not null; otherwise, returns 1.
+ *
+ * This function provides a safe way to handle nullable Byte values
+ * by substituting a default value of 1 when the value is null.
+ *
+ * @receiver The nullable Byte value on which the function is called.
+ * @return The Byte value if not null, or 1 if the Byte is null.
+ * @since 5.4.0
+ */
+fun Byte?.orOne() = this ?: 1
+/**
+ * Returns the value of the current Short if it is not null, or `1` if the value is null.
+ *
+ * This function provides a default value of `1` for nullable Short instances,
+ * ensuring that a non-null Short value is always returned.
+ *
+ * @receiver The nullable Short value to evaluate.
+ * @return The current Short value if it is not null, otherwise `1`.
+ * @since 5.4.0
+ */
+fun Short?.orOne() = this ?: 1
+/**
+ * Returns the integer value of the receiver if it is not null;
+ * otherwise, returns 1 as the default value.
+ *
+ * This extension function is useful in scenarios where a nullable integer
+ * needs to be replaced with a default value of 1 when null.
+ *
+ * @receiver The nullable integer to check.
+ * @return The value of the receiver if not null, or 1 if the receiver is null.
+ * @since 5.4.0
+ */
+fun Int?.orOne() = this ?: 1
+/**
+ * Returns the value of the Long if it is not null; otherwise, returns 1L.
+ *
+ * This function provides a default value of 1L for nullable Long values.
+ *
+ * @receiver The nullable Long value to check.
+ * @return The original Long value if it is not null, or 1L if the receiver is null.
+ * @since 5.4.0
+ */
+fun Long?.orOne() = this ?: 1L
+/**
+ * Returns the Float value if it is not null, or `1f` if the value is null.
+ *
+ * This extension function provides a default value of `1f` for nullable Float values.
+ *
+ * @receiver A nullable Float value.
+ * @return The original Float value if it is not null, otherwise `1f`.
+ * @since 5.4.0
+ */
+fun Float?.orOne() = this ?: 1f
+/**
+ * Returns the value of the Double if it is not null; otherwise, returns 1.0.
+ *
+ * This extension function provides a fallback value of 1.0 for nullable Double
+ * instances, commonly used to avoid null checks or provide default behavior.
+ *
+ * @receiver Nullable Double value.
+ * @return The original Double value if it is not null, otherwise 1.0.
+ * @since 5.4.0
+ */
+fun Double?.orOne() = this ?: 1.0
+
+/**
+ * Returns the value of the Byte if it is not null; otherwise, returns -1.
+ *
+ * This method provides a convenient way to handle nullable Byte values
+ * by replacing a null value with -1.
+ *
+ * @return The Byte value if it is not null, or -1 if it is null.
+ * @since 5.4.0
+ */
+fun Byte?.orMinusOne() = this ?: -1
+/**
+ * Returns the value of the nullable Short if it is not null;
+ * otherwise, returns -1.
+ *
+ * This extension function provides a default value of -1
+ * for nullable Short instances, simplifying operations
+ * where a default value is required if the original value is null.
+ *
+ * @receiver The nullable Short value to evaluate.
+ * @return The original Short value if not null, or -1 if the receiver is null.
+ * @since 5.4.0
+ */
+fun Short?.orMinusOne() = this ?: -1
+/**
+ * Returns the value of this nullable [Int], or `-1` if the value is `null`.
+ *
+ * This function provides a convenient way to handle nullable [Int] values
+ * by substituting `-1` when the value is absent (null), ensuring a non-null
+ * return value.
+ *
+ * @receiver A nullable [Int] that may be null.
+ * @return The value of the [Int] if it is not null; otherwise, `-1`.
+ * @since 5.4.0
+ */
+fun Int?.orMinusOne() = this ?: -1
+/**
+ * Returns the value of the nullable [Long] if it is not null, or `-1L` if it is null.
+ *
+ * This function provides a safe way to handle nullable [Long] values,
+ * ensuring a default value of `-1L` in cases where the receiver is null.
+ *
+ * @receiver The nullable [Long] value to evaluate.
+ * @return The receiver value if it is not null, or `-1L` if it is null.
+ * @since 5.4.0
+ */
+fun Long?.orMinusOne() = this ?: -1L
+/**
+ * Returns the value of the nullable Float if it is not null, or -1.0f if it is null.
+ *
+ * This function provides a way to handle nullable Float values gracefully
+ * by substituting a default value of -1.0f when the Float is null.
+ *
+ * @receiver The nullable Float value to evaluate.
+ * @return The original Float value if not null, or -1.0f if null.
+ * @since 5.4.0
+ */
+fun Float?.orMinusOne() = this ?: -1f
+/**
+ * Returns the value of the current nullable Double if it is not null,
+ * or returns -1.0 if the value is null.
+ *
+ * This extension function provides a default value of -1.0 for nullable
+ * Double instances, allowing for safe handling of null values without
+ * the need for additional checks.
+ *
+ * @receiver The nullable Double instance.
+ * @return The original value if not null, or -1.0 if the receiver is null.
+ * @since 5.4.0
+ */
+fun Double?.orMinusOne() = this ?: -1.0
 
 /**
  * Parses the content of the CharSequence as a numeric value represented in words and returns the result as a [Result].
@@ -1129,7 +1494,67 @@ inline fun <T : Number> T.ifNotZero(action: Consumer<T>): T {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    if (isZero) action(this)
+    if (isNotZero) action(this)
+    return this
+}
+/**
+ * Performs the specified action if the current number is equal to 1.
+ *
+ * @param action A function to be executed if the number is 1.
+ * @return The original number.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+inline fun <T : Number> T.ifOne(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isOne) action(this)
+    return this
+}
+/**
+ * Executes the given action if the number is not equal to 1.
+ *
+ * @param action The action to be executed if the number is not 1.
+ * @return The original number on which the method was called.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+inline fun <T : Number> T.ifNotOne(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNotOne) action(this)
+    return this
+}
+/**
+ * Performs the specified action if the current number is equal to -1.
+ *
+ * @param action A function to be executed if the number is -1.
+ * @return The original number.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+inline fun <T : Number> T.ifMinusOne(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isMinusOne) action(this)
+    return this
+}
+/**
+ * Executes the given action if the number is not equal to -1.
+ *
+ * @param action The action to be executed if the number is not -1.
+ * @return The original number on which the method was called.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+inline fun <T : Number> T.ifNotMinusOne(action: Consumer<T>): T {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (isNotMinusOne) action(this)
     return this
 }
 /**

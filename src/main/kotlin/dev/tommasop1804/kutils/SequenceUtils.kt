@@ -86,6 +86,18 @@ val  <E> Sequence<E>.isSingleElement: Boolean get() = singleOrNull() != null
 val <E> Sequence<E>.isNotSingleElement: Boolean get() = !isSingleElement
 
 /**
+ * Returns `null` if the sequence is empty; otherwise, returns the sequence itself.
+ *
+ * This function allows safely returning `null` for empty sequences instead of
+ * continuing to operate on an empty sequence.
+ *
+ * @receiver The sequence to check for emptiness.
+ * @return `null` if the sequence is empty; the sequence itself otherwise.
+ * @since 5.4.0
+ */
+fun <S : Sequence<E>, E> S.orNullIfEmpty() = if (isEmpty) null else this
+
+/**
  * Transforms a [Sequence] into a [Map] by applying the provided key and value mapping functions.
  *
  * @param key a function that defines how to transform each element of the sequence into a key.

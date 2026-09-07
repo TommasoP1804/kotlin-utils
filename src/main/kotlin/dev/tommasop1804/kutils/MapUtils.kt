@@ -145,6 +145,18 @@ val Map<*, *>.isNotSingleElement: Boolean get() = !isSingleElement
 val <V> Map<*, V>.valuesMode get() = values.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
 
 /**
+ * Returns `null` if the map is empty; otherwise, returns the map itself.
+ *
+ * This extension function allows for convenient nullability handling for maps,
+ * simplifying cases where an action or value depends on whether the map contains elements.
+ *
+ * @receiver The map on which the function is called.
+ * @return The map itself if it is not empty, or `null` if it is empty.
+ * @since 5.4.0
+ */
+fun <M : Map<K, V>, K, V> M.orNullIfEmpty() = ifEmpty { null }
+
+/**
  * Adds the specified entry to this map. If the key already exists in the map, 
  * the value associated with the key will be updated with the value from the provided entry.
  *

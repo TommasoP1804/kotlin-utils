@@ -37,6 +37,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.postgresql.util.PGobject
 import tools.jackson.core.type.TypeReference
+import java.math.BigDecimal
 import java.sql.ResultSet
 import java.sql.SQLException
 import kotlin.reflect.KClass
@@ -1111,3 +1112,373 @@ inline operator fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.minusA
  * @since 5.3.0
  */
 operator fun <T : Table> T.minusAssign(op: ReceiverTransformer<T, Op<Boolean>>) { deleteWhere(op = op) }
+
+/**
+ * Extracts a Byte value from the current row of a ResultSet at the specified column index.
+ * If the ResultSet has no more rows, a default value is returned.
+ *
+ * @param columnIndex The column index to fetch the Byte value from, defaults to 1.
+ * @param default A supplier function providing a default Byte value if the ResultSet has no more rows, defaults to null.
+ * @return A Transformer that takes a ResultSet and returns a Byte value from the specified column or the default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun byteFromResultSet(columnIndex: Int = 1, default: Supplier<Byte?> = { null }): Transformer<ResultSet, Byte?> = {
+    if (it.next()) it.getByte(columnIndex) else default()
+}
+/**
+ * Extracts a Byte value from the current row of a ResultSet using the specified column label.
+ * If the ResultSet is empty or the column value is unavailable, a default value is returned.
+ *
+ * @param columnLabel the label of the column from which the Byte value should be retrieved
+ * @param default a supplier that provides a default value if the ResultSet is empty or the column is unavailable
+ * @return a Transformer that processes a ResultSet and retrieves a Byte value or the default value
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun byteFromResultSet(columnLabel: String, default: Supplier<Byte?> = { null }): Transformer<ResultSet, Byte?> = {
+    if (it.next()) it.getByte(columnLabel) else default()
+}
+/**
+ * Transforms a ResultSet into an Int value by retrieving an integer from the specified column index,
+ * or returns a default value if the ResultSet is empty.
+ *
+ * @param columnIndex The index of the column from which to retrieve the integer. Defaults to 1.
+ * @param default A supplier function that provides a default integer value when the ResultSet is empty.
+ * @return A transformer function that processes a ResultSet and returns an Int value or the default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun intFromResultSet(columnIndex: Int = 1, default: Supplier<Int?> = { 0 }): Transformer<ResultSet, Int?> = {
+    if (it.next()) it.getInt(columnIndex) else default()
+}
+/**
+ * Extracts an integer value from the provided `ResultSet` for the specified column label.
+ *
+ * @param columnLabel The label of the column from which to retrieve the integer value.
+ * @return A transformer function that takes a `ResultSet` and returns an integer value or null
+ *         if the result set has no more rows or the value is SQL NULL.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun intFromResultSet(columnLabel: String): Transformer<ResultSet, Int?> = {
+    if (it.next()) it.getInt(columnLabel) else null
+}
+/**
+ * Retrieves a nullable Long value from a `ResultSet` by the specified column index or provides a default value if no result is found.
+ *
+ * @param columnIndex The index of the column to retrieve the value from. Defaults to 1.
+ * @param default A supplier function providing a default `Long` value in case the `ResultSet` has no result. Defaults to `0L`.
+ * @return A transformer function that, when invoked with a `ResultSet`, retrieves the `Long` value or returns the default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun longFromResultSet(columnIndex: Int = 1, default: Supplier<Long?> = { 0L }): Transformer<ResultSet, Long?> = {
+    if (it.next()) it.getLong(columnIndex) else default()
+}
+/**
+ * Extracts a `Long` value from the specified column in the current row of a `ResultSet`.
+ *
+ * @param columnLabel The label of the column to retrieve the `Long` value from.
+ * @param default A supplier function providing a default `Long` value if the column value is null or no rows exist.
+ * @return A transformer function that processes a `ResultSet` and returns a `Long` value or null.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun longFromResultSet(columnLabel: String, default: Supplier<Long?> = { 0L }): Transformer<ResultSet, Long?> = {
+    if (it.next()) it.getLong(columnLabel) else default()
+}
+/**
+ * Extracts a `Float` value from the given `ResultSet` using the specified column index.
+ *
+ * If the `ResultSet` does not contain a value at the specified column or no rows are available,
+ * the provided default supplier will be used to return a fallback `Float?` value.
+ *
+ * @param columnIndex The index of the column in the `ResultSet` to retrieve the `Float` value from. Defaults to `1`.
+ * @param default A supplier function providing the default `Float?` value to return if the `ResultSet` is empty or the column value is `null`. Defaults to a supplier returning `
+ * 0f`.
+ * @return A transformer function that takes a `ResultSet` and returns a `Float?` value from the specified column or the default value if applicable.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun floatFromResultSet(columnIndex: Int = 1, default: Supplier<Float?> = { 0f }): Transformer<ResultSet, Float?> = {
+    if (it.next()) it.getFloat(columnIndex) else default()
+}
+/**
+ * Extracts a floating-point value from the specified column in a `ResultSet`. If the `ResultSet`
+ * has no more rows, the value provided by the default supplier is returned.
+ *
+ * @param columnLabel The label of the column from which the floating-point value is to be extracted.
+ * @param default A supplier providing a default value to return if the `ResultSet` has no more rows.
+ * @return A transformer that maps a `ResultSet` to a nullable `Float` extracted from the specified column.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun floatFromResultSet(columnLabel: String, default: Supplier<Float?> = { 0f }): Transformer<ResultSet, Float?> = {
+    if (it.next()) it.getFloat(columnLabel) else default()
+}
+/**
+ * Transforms a given [ResultSet] to a nullable [Double] value by retrieving the value at the specified column index.
+ *
+ * @param columnIndex The index of the column to retrieve the [Double] value from. Defaults to 1.
+ * @param default A supplier function providing a default [Double?] value to return if the [ResultSet] does not have a next entry. Defaults to 0.0.
+ * @return A transformer function that takes a [ResultSet] and extracts the [Double?] value from the specified column,
+ * or returns the supplied default value if no next entry exists in the result set.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun doubleFromResultSet(columnIndex: Int = 1, default: Supplier<Double?> = { 0.0 }): Transformer<ResultSet, Double?> = {
+    if (it.next()) it.getDouble(columnIndex) else default()
+}
+/**
+ * Extracts a `Double` value from the specified column in the current row of the given `ResultSet`.
+ * If the `ResultSet` does not have any data or the column value is unavailable, the provided default value is used.
+ *
+ * @param columnLabel the label of the column from which the `Double` value should be extracted
+ * @param default a supplier for the default `Double` value to return if the column value is unavailable or the `ResultSet` has no data
+ * @return a transformer function that takes a `ResultSet` and returns a `Double?` value
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun doubleFromResultSet(columnLabel: String, default: Supplier<Double?> = { 0.0 }): Transformer<ResultSet, Double?> = {
+    if (it.next()) it.getDouble(columnLabel) else default()
+}
+/**
+ * Retrieves a boolean value from the current row in a ResultSet. If the ResultSet has no more rows,
+ * the default value is returned.
+ *
+ * @param columnIndex The index of the column to retrieve the boolean value from. Defaults to 1.
+ * @param default A supplier providing a default value if no rows are available in the ResultSet. Defaults to false.
+ * @return A transformer function that takes a ResultSet and returns the retrieved boolean value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun booleanFromResultSet(columnIndex: Int = 1, default: Supplier<Boolean?> = { false }): Transformer<ResultSet, Boolean?> = {
+    if (it.next()) it.getBoolean(columnIndex) else default()
+}
+/**
+ * Extracts a Boolean value from the given column in the ResultSet. If the column value is not found,
+ * the provided default value supplier is used instead.
+ *
+ * @param columnLabel The label of the column from which the Boolean value should be retrieved.
+ * @param default A supplier that provides a default Boolean value if the column value is not available.
+ * @return A Transformer that processes the ResultSet to extract the Boolean value or default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun booleanFromResultSet(columnLabel: String, default: Supplier<Boolean?> = { false }): Transformer<ResultSet, Boolean?> = {
+    if (it.next()) it.getBoolean(columnLabel) else default()
+}
+/**
+ * Extracts a string value from a given `ResultSet` based on the specified column index.
+ * If the `ResultSet` has no more rows or the string value is null, a default value is provided.
+ *
+ * @param columnIndex The index of the column from which to fetch the string value. Defaults to 1.
+ * @param default A supplier that provides the default value if the `ResultSet` has no rows or the value is null.
+ * @return A transformer function that takes a `ResultSet` as input and returns the string value or the default.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun stringFromResultSet(columnIndex: Int = 1, default: Supplier<String?> = { null }): Transformer<ResultSet, String?> = {
+    if (it.next()) it.getString(columnIndex) else default()
+}
+/**
+ * Extracts a string value from the specified column in the given ResultSet. If the ResultSet is empty or the column value is null,
+ * a default value provided by the supplier is returned.
+ *
+ * @param columnLabel The label of the column from which the string value is to be retrieved.
+ * @param default A supplier function that provides a default value when the column value is null or the ResultSet is empty.
+ *                Defaults to a supplier that returns `null`.
+ * @return A transformer function that takes a ResultSet as input and returns a nullable string from the specified column,
+ *         or the specified default value if the ResultSet is empty or the column value is null.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun stringFromResultSet(columnLabel: String, default: Supplier<String?> = { null }): Transformer<ResultSet, String?> = {
+    if (it.next()) it.getString(columnLabel) else default()
+}
+/**
+ * Extracts a SQL array from the given `ResultSet` at the specified column index.
+ * If the `ResultSet` has no more rows or the column value is null, a default value is returned.
+ *
+ * @param columnIndex The index of the column from which to retrieve the SQL array. Defaults to 1.
+ * @param default A supplier function providing a default value if no array is found. Defaults to returning null.
+ * @return A transformer function that processes a `ResultSet` and returns the extracted SQL array or the default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun arrayFromResultSet(columnIndex: Int = 1, default: Supplier<java.sql.Array?> = { null }): Transformer<ResultSet, java.sql.Array?> = {
+    if (it.next()) it.getArray(columnIndex) else default()
+}
+/**
+ * Extracts a SQL `Array` from the given `ResultSet` for the specified column label.
+ * If the `ResultSet` does not have a value for the specified column or no rows
+ * are available, the provided default supplier is used.
+ *
+ * @param columnLabel The label of the column from which to retrieve the SQL `Array`.
+ * @param default A supplier function that provides a default `Array` value if no value
+ *                is found in the `ResultSet`. Defaults to `null`.
+ * @return A `Transformer` that takes a `ResultSet` and returns a `java.sql.Array?`
+ *         for the given column label or the supplied default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun arrayFromResultSet(columnLabel: String, default: Supplier<java.sql.Array?> = { null }): Transformer<ResultSet, java.sql.Array?> = {
+    if (it.next()) it.getArray(columnLabel) else default()
+}
+/**
+ * Extracts a `ByteArray` from a `ResultSet` at the specified column index.
+ * If the `ResultSet` does not have a next row, a default value is supplied.
+ *
+ * @param columnIndex The index of the column from which to extract the `ByteArray`. Defaults to 1.
+ * @param default A supplier function that provides a default `ByteArray` value in case the `ResultSet`
+ *                does not have a next row. Defaults to `null`.
+ * @return A `Transformer` function that transforms a `ResultSet` into a `ByteArray?`.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun byteArrayFromResultSet(columnIndex: Int = 1, default: Supplier<ByteArray?> = { null }): Transformer<ResultSet, ByteArray?> = {
+    if (it.next()) it.getBytes(columnIndex) else default()
+}
+/**
+ * Transforms a `ResultSet` into a nullable `ByteArray` by extracting bytes from the specified column label.
+ *
+ * @param columnLabel The label of the column from which the byte array should be extracted.
+ * @param default A supplier function that provides a default value if the `ResultSet` is empty or no data can be retrieved.
+ * @return A transformer function that consumes a `ResultSet` and returns a nullable `ByteArray`.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun byteArrayFromResultSet(columnLabel: String, default: Supplier<ByteArray?> = { null }): Transformer<ResultSet, ByteArray?> = {
+    if (it.next()) it.getBytes(columnLabel) else default()
+}
+/**
+ * Extracts a BigDecimal value from a ResultSet at the specified column index or
+ * provides a default value if the column data is unavailable.
+ *
+ * @param columnIndex The column index from which the BigDecimal value is extracted. Defaults to 1.
+ * @param default A supplier function providing a default BigDecimal value if the ResultSet does not contain a value
+ *                at the specified column index.
+ * @return A transformer function that takes a ResultSet as input and produces a BigDecimal value or null
+ *         according to the extraction or default logic.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun bigDecimalFromResultSet(columnIndex: Int = 1, default: Supplier<BigDecimal?> = { null }): Transformer<ResultSet, BigDecimal?> = {
+    if (it.next()) it.getBigDecimal(columnIndex) else default()
+}
+/**
+ * Extracts a BigDecimal value from the specified column in the given ResultSet.
+ * If the ResultSet has no more rows or the column value is null, a default value is returned.
+ *
+ * @param columnLabel The label of the column from which to retrieve the BigDecimal value.
+ * @param default A supplier providing the default value to return if the column is null or if the ResultSet has no more rows.
+ * @return A transformer function that takes a ResultSet and returns a nullable BigDecimal.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun bigDecimalFromResultSet(columnLabel: String, default: Supplier<BigDecimal?> = { null }): Transformer<ResultSet, BigDecimal?> = {
+    if (it.next()) it.getBigDecimal(columnLabel) else default()
+}
+/**
+ * Extracts a LocalDate value from a ResultSet at the specified column index, or provides a default value if no date is found.
+ *
+ * @param columnIndex The index of the column in the ResultSet from which the date should be retrieved. Defaults to 1.
+ * @param default A supplier function providing a default LocalDate value when the column does not contain a date or the ResultSet is empty.
+ * @return A Transformer that processes a ResultSet and returns a LocalDate value or null, based on the ResultSet content and the default supplier.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun dateFromResultSet(columnIndex: Int = 1, default: Supplier<java.time.LocalDate?> = { null }): Transformer<ResultSet, java.time.LocalDate?> = {
+    if (it.next()) it.getDate(columnIndex)?.toLocalDate() else default()
+}
+/**
+ * Extracts a `LocalDate` value from a `ResultSet` based on the specified column label.
+ *
+ * @param columnLabel the label of the column in the `ResultSet` from which the `LocalDate` value should be extracted.
+ * @param default a supplier function that provides a default `LocalDate` value to return if the result set is empty
+ *                or the column value is `null`. Defaults to `null` if not specified.
+ * @return a transformer function that takes a `ResultSet` and produces a `LocalDate` value, or the default value if applicable.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun dateFromResultSet(columnLabel: String, default: Supplier<java.time.LocalDate?> = { null }): Transformer<ResultSet, java.time.LocalDate?> = {
+    if (it.next()) it.getDate(columnLabel)?.toLocalDate() else default()
+}
+/**
+ * Extracts a `java.time.LocalTime` from a `ResultSet` based on the specified column index.
+ * If no value is found or if the `ResultSet` is empty, the provided default value supplier is used.
+ *
+ * @param columnIndex The index of the column in the `ResultSet` to be retrieved. Defaults to 1.
+ * @param default A supplier providing the default value if no result is found in the `ResultSet`. Defaults to a supplier returning `null`.
+ * @return A Transformer that converts a `ResultSet` into a `java.time.LocalTime?`, or the default value if no result is available.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun timeFromResultSet(columnIndex: Int = 1, default: Supplier<java.time.LocalTime?> = { null }): Transformer<ResultSet, java.time.LocalTime?> = {
+    if (it.next()) it.getTime(columnIndex)?.toLocalTime() else default()
+}
+/**
+ * Extracts a `LocalTime` value from the provided `ResultSet` based on the specified column label.
+ * If the `ResultSet` is empty or the value is `null`, the provided default value is returned.
+ *
+ * @param columnLabel The label of the column from which the `LocalTime` value will be retrieved.
+ * @param default A supplier function that provides the default value to return if the `ResultSet` does not have a valid `LocalTime` in the specified column.
+ * @return A transformer function that processes a `ResultSet` and returns a `LocalTime` value, or the default value if applicable.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun timeFromResultSet(columnLabel: String, default: Supplier<java.time.LocalTime?> = { null }): Transformer<ResultSet, java.time.LocalTime?> = {
+    if (it.next()) it.getTime(columnLabel)?.toLocalTime() else default()
+}
+/**
+ * Extracts a `LocalDateTime` value from the specified column index of a `ResultSet` within the current `JdbcTransaction`.
+ *
+ * @param columnIndex The column index from which the `LocalDateTime` value is extracted. Defaults to 1.
+ * @param default A supplier function that provides a default `LocalDateTime?` value in case the result set does not contain a value
+ *                or the column value is `null`. Defaults to a function returning `null`.
+ * @return A transformer function that takes a `ResultSet` and returns the extracted `LocalDateTime?` value, or the default value
+ *         provided by the supplier if the result is unavailable or null.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun dateTimeFromResultSet(columnIndex: Int = 1, default: Supplier<java.time.LocalDateTime?> = { null }): Transformer<ResultSet, java.time.LocalDateTime?> = {
+    if (it.next()) it.getTimestamp(columnIndex)?.toLocalDateTime() else default()
+}
+/**
+ * Extracts a LocalDateTime value from the given ResultSet column based on the specified column label.
+ * If the column value is null or the ResultSet has no more rows, a default value is returned.
+ *
+ * @param columnLabel The label of the column from which to extract the LocalDateTime value.
+ * @param default A supplier providing a default LocalDateTime value to return if the column is null or no rows exist.
+ * @return A Transformer that extracts the LocalDateTime value from the ResultSet or provides the default value.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+fun dateTimeFromResultSet(columnLabel: String, default: Supplier<java.time.LocalDateTime?> = { null }): Transformer<ResultSet, java.time.LocalDateTime?> = {
+    if (it.next()) it.getTimestamp(columnLabel)?.toLocalDateTime() else default()
+}
+/**
+ * Transforms a given `ResultSet` into an object of type `T` using the specified column index.
+ *
+ * @param columnIndex The index of the column in the `ResultSet` to retrieve the object. Defaults to `1`.
+ * @param default A supplier that provides a default value of type `T?` in case the `ResultSet` has no more rows.
+ * @return A `Transformer` that extracts an object of type `T?` from the `ResultSet` or provides the default value if no data is available.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+inline fun <reified T> objectFromResultSet(columnIndex: Int = 1, crossinline default: Supplier<T?> = { null }): Transformer<ResultSet, T?> = {
+    if (it.next()) it.getObject(columnIndex, T::class.java) else default()
+}
+/**
+ * Transforms a [ResultSet] to an object of the specified type [T] using the given column label.
+ *
+ * @param columnLabel The name of the column to extract the value from in the [ResultSet].
+ * @param default A supplier for the default value to return if the [ResultSet] has no more rows.
+ * @return A function that takes a [ResultSet] as input and produces an object of type [T], or the default value if no rows are available.
+ * @since 5.4.0
+ */
+context(_: JdbcTransaction)
+inline fun <reified T> objectFromResultSet(columnLabel: String, crossinline default: Supplier<T?> = { null }): Transformer<ResultSet, T?> = {
+    if (it.next()) it.getObject(columnLabel, T::class.java) else default()
+}

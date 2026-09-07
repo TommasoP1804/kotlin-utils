@@ -204,6 +204,19 @@ val Collection<*>.isSingleElement get() = size == 1
 val Collection<*>.isNotSingleElement get() = size != 1
 
 /**
+ * Returns `null` if the collection is empty, otherwise returns the collection itself.
+ *
+ * This method is a convenient way to handle empty collections by converting them to `null`,
+ * which can be useful in cases where `null` signifies an absence of elements or is easier
+ * to handle in the application's logic.
+ *
+ * @receiver The collection to be checked.
+ * @return The original collection if it is not empty, or `null` if it is empty.
+ * @since 5.4.0
+ */
+fun <C : Collection<E>, E> C.orNullIfEmpty() = ifEmpty { null }
+
+/**
  * Checks if all elements in the iterable produce the same key when transformed by the given selector function.
  *
  * @param E The type of elements in the iterable.

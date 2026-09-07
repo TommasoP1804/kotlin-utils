@@ -2740,6 +2740,17 @@ operator fun <R, C, V> MTable<R, C, V>?.not(): Boolean {
  */
 fun <R, C, V> Table<R, C, V?>?.orEmpty() = this ?: emptyTable()
 /**
+ * Returns `null` if the table is empty; otherwise, returns the table itself.
+ *
+ * This function checks whether the table contains any elements. If the table is empty,
+ * it returns `null`. If the table is not empty, it returns the original table instance.
+ *
+ * @receiver The table to be checked for emptiness.
+ * @return The table itself if it is not empty, or `null` if it is empty.
+ * @since 5.4.0
+ */
+fun <R, C, V> Table<R, C, V?>.orNullIfEmpty() = if (isEmpty()) null else this
+/**
  * Returns the current instance of a nullable `MutableTable<R, C, V?>` if it is not null,
  * or an empty `MutableTable<R, C, V?>` if the current instance is null.
  *
@@ -2751,6 +2762,17 @@ fun <R, C, V> Table<R, C, V?>?.orEmpty() = this ?: emptyTable()
  * @since 1.0.0
  */
 fun <R, C, V> MTable<R, C, V?>?.orEmpty() = this ?: emptyMTable()
+/**
+ * Returns `null` if the table is empty; otherwise, returns the table itself.
+ *
+ * This function is an extension for a nullable value table (`MTable<R, C, V?>`) and provides
+ * a shorthand for handling cases where an empty table can be treated as a null value.
+ *
+ * @receiver The table being evaluated.
+ * @return The original table if it is not empty, or `null` if the table is empty.
+ * @since 5.4.0
+ */
+fun <R, C, V> MTable<R, C, V?>.orNullIfEmpty() = if (isEmpty()) null else this
 
 /**
  * Converts a collection of objects into a table representation where each object is represented as a row.

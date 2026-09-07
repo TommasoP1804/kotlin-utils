@@ -750,6 +750,96 @@ val BooleanArray.isNotDescendingSorted get() = !isSortedDescending()
 val CharArray.isNotDescendingSorted get() = !isSortedDescending()
 
 /**
+ * Returns the array itself if it is not empty, or `null` if the array is empty.
+ *
+ * @receiver The array to be checked.
+ * @return The array itself if it contains elements, or `null` if the array is empty.
+ * @since 5.4.0
+ */
+fun <E> Array<E>.orNullIfEmpty() = ifEmpty { null }
+/**
+ * Returns `null` if the byte array is empty; otherwise, returns the byte array itself.
+ *
+ * This method provides a way to convert an empty byte array into a `null` value, which can
+ * be useful in scenarios where `null` is used to represent the absence of a value.
+ *
+ * @receiver The byte array to evaluate.
+ * @return The original byte array if it is not empty, or `null` if it is empty.
+ * @since 5.4.0
+ */
+fun ByteArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns `null` if the array is empty, otherwise returns the array itself.
+ *
+ * This function can be used to simplify null checks and provide a null result
+ * when an empty array is not a valid or meaningful value in the context of usage.
+ *
+ * @receiver The ShortArray to be checked.
+ * @return The same ShortArray if it is not empty, or `null` if the array is empty.
+ * @since 5.4.0
+ */
+fun ShortArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns null if the array is empty; otherwise, returns the array itself.
+ *
+ * This function is useful for distinguishing between an empty array and a null value,
+ * providing a semantic way to handle cases where an empty array might carry a different meaning than null.
+ *
+ * @receiver An integer array.
+ * @return The original array if it is not empty, or null if the array is empty.
+ * @since 5.4.0
+ */
+fun IntArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns `null` if the array is empty, otherwise returns the array itself.
+ *
+ * This function is useful for avoiding unnecessary processing or representing
+ * an empty array as `null` in scenarios where `null` indicates the absence of a value.
+ *
+ * @receiver The array to evaluate.
+ * @return `null` if the array is empty, otherwise the original array.
+ * @since 5.4.0
+ */
+fun LongArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns the current FloatArray if it is not empty; otherwise, returns null.
+ *
+ * @receiver The FloatArray on which the function is called.
+ * @return The original FloatArray if it contains elements, or null if it is empty.
+ * @since 5.4.0
+ */
+fun FloatArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns `null` if the array is empty, otherwise returns the array itself.
+ *
+ * This function can be used to handle cases where an empty array is considered
+ * equivalent to a null value.
+ *
+ * @receiver The array to check for emptiness.
+ * @return `null` if the array is empty, otherwise the original array.
+ * @since 5.4.0
+ */
+fun DoubleArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns `null` if the boolean array is empty; otherwise, returns the array itself.
+ *
+ * @return The original array if it is not empty, or `null` if the array is empty.
+ * @since 5.4.0
+ */
+fun BooleanArray.orNullIfEmpty() = if (isEmpty) null else this
+/**
+ * Returns `null` if the character array is empty; otherwise, returns the array itself.
+ *
+ * This function provides a convenient way to handle empty character arrays,
+ * allowing you to return a `null` value instead of an empty array when needed.
+ *
+ * @receiver The character array to check.
+ * @return `null` if the array is empty, or the original array if it is not empty.
+ * @since 5.4.0
+ */
+fun CharArray.orNullIfEmpty() = if (isEmpty) null else this
+
+/**
  * Negates the state of the array by returning `true` if the array is either `null` or empty.
  *
  * This operator checks if the array reference is `null` or if it contains no elements.

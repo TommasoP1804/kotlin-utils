@@ -818,6 +818,30 @@ val String.isAscii get() = all { it.code < 128 }
 val String.matchedCases get() = TextCase.entries { it != TextCase.Standard && it(this) }
 
 /**
+ * Returns `null` if the character sequence is empty, otherwise returns the original character sequence.
+ *
+ * This function allows you to replace an empty character sequence with `null`, enabling easier null-coalescing
+ * or conditional logic when dealing with potentially empty strings or other character sequences.
+ *
+ * @receiver The character sequence to evaluate.
+ * @return The original character sequence if it is not empty, or `null` if it is empty.
+ * @since 5.4.0
+ */
+fun <C : CharSequence> C.orNullIfEmpty() = ifEmpty { null }
+/**
+ * Returns `null` if the character sequence is blank (empty or consists solely of whitespace characters),
+ * otherwise returns the original character sequence.
+ *
+ * This is a convenience function that simplifies the process of handling blank strings by allowing
+ * them to be mapped to `null` instead of requiring additional checks or conditions.
+ *
+ * @receiver The character sequence to be checked for blankness.
+ * @return The original character sequence if it is not blank, or `null` if it is blank.
+ * @since 5.4.0
+ */
+fun <C : CharSequence> C.orNullIfBlank() = ifBlank { null }
+
+/**
  * Checks if the string contains all the specified substrings.
  *
  * @param substrings The substrings to check for in the string.

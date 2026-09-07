@@ -8,20 +8,9 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
-import dev.tommasop1804.kutils.classes.range.IntRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.IntRangeWithExclusions
-import dev.tommasop1804.kutils.classes.range.LongRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.LongRangeWithExclusions
-import dev.tommasop1804.kutils.classes.range.UIntRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.UIntRangeWithExclusions
-import dev.tommasop1804.kutils.classes.range.ULongRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.ULongRangeWithExclusions
-import dev.tommasop1804.kutils.exceptions.ExpectationMismatchException
-import dev.tommasop1804.kutils.exceptions.NumberOutOfRangeException
-import dev.tommasop1804.kutils.exceptions.NumberSignException
-import dev.tommasop1804.kutils.exceptions.ValidationFailedException
-import kotlin.contracts.ExperimentalContracts
+import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.range.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
@@ -5030,5 +5019,552 @@ fun <T : Number> T.expectNotZero(callableName: String?, parameterName: String? =
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
     if (isZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is zero", cause?.invoke(this)))
+    return this
+}
+
+/**
+ * Checks if the current numerical value is 1. If the value is not 1, an exception is thrown.
+ *
+ * @param causeOf A transformer function that generates a specific throwable based on the current numerical value. Defaults to null.
+ * @param cause A transformer function that generates a throwable cause based on the current numerical value. Defaults to null.
+ * @return The current numerical value if it is 1.
+ * @throws ExpectationMismatchException If the value is not 1. The exception may include additional information derived from the specified transformer functions.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException("Value is not one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is not one.", cause?.invoke(this)))
+    return this
+}
+/**
+ * Verifies if the current number is equal to 1 and returns the number itself if the condition is met.
+ * Otherwise, throws an `ExpectationMismatchException` initialized with a message and optionally a cause.
+ *
+ * @param causeOf A transformer that provides a custom throwable based on the current value
+ *                to be used as the exception's cause. It is evaluated only if the number is not 1.
+ * @param cause A transformer that provides an additional throwable based on the current value.
+ *              This is used as a secondary cause in the exception when no custom `causeOf` is provided.
+ * @param lazyMessage A transformer that generates a lazy evaluation message based on the current value.
+ *                    This message is used in the exception if the condition fails.
+ * @return The current number if it is equal to 1.
+ * @throws ExpectationMismatchException If the current number is not equal to 1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value is equal to one (`1`) and throws an `ExpectationMismatchException` if it is not.
+ *
+ * @param property the property associated with this expectation, which can be used to provide more context in the error message; may be null
+ * @param variableName an optional name of the variable being validated, which can improve the error message clarity; may be null
+ * @param message an optional custom error message to include in the exception; may be null
+ * @param causeOf a transformer function to generate a throwable cause based on the current value when the expectation is not met; may be null
+ * @param cause an alternative transformer function to generate a throwable cause based on the current value; may be null
+ * @return the value if it is equal to one (`1`)
+ * @throws ExpectationMismatchException if the value is not equal to one (`1`)
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Verifies if the current numeric value is equal to `1`. If the condition is not met, it throws
+ * an `ExpectationMismatchException` with the provided details.
+ *
+ * @param property The primary property that is being evaluated. Can be null.
+ * @param variable An optional variable associated with the expectation. Can be null.
+ * @param message An optional custom message to include in the exception. Defaults to `null`.
+ * @param causeOf A transformer to produce the cause for the exception when the expectation fails. Can be null.
+ * @param cause An optional transformer to provide additional context or explanation for the exception. Can be null.
+ * @return The current value if it matches the expectation of being `1`.
+ *
+ * @throws ExpectationMismatchException If the value is not equal to `1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the current number is equal to 1. If the number is not 1, throws an `ExpectationMismatchException`.
+ *
+ * @param callable The callable function associated with this check, or null if unspecified. Used to provide context in case of a mismatch.
+ * @param parameterName The name of the parameter associated with the expectation, or null if unspecified. Provides additional context in error reporting.
+ * @param message An optional custom error message to include in the exception if the expectation is not met. Defaults to "is not one" if null.
+ * @param causeOf A transformer function that takes the current number and returns a custom throwable to be thrown instead of the default exception.
+ * @param cause A transformer function that takes the current number and generates a cause for the thrown exception. Useful for providing detailed context.
+ * @return The current number (`this`) if it equals 1.
+ * @throws ExpectationMismatchException If the number is not 1 and no custom exception is provided via `causeOf`.
+ * @throws Throwable If a custom throwable is generated using the `causeOf` function.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the invoking number is equal to `1`. If the condition fails, an `ExpectationMismatchException`
+ * is thrown with an optional custom message or cause.
+ *
+ * @param callable The callable (function) being evaluated, or null.
+ * @param parameter The parameter of the callable being validated, or null.
+ * @param message An optional custom message to include in the exception if the expectation is not met, default is null.
+ * @param causeOf A transformer to generate a more specific exception as the cause of failure based on the invoking object, or null.
+ * @param cause A transformer to provide an optional exception cause, or null.
+ * @return The invoking object of type `T` if the condition is satisfied.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the receiver value is equal to one, throwing an exception if the validation fails.
+ * This method can be used to enforce preconditions or expectations for callable functions.
+ *
+ * @param callableName The name of the callable function associated with the expectation, or null if unspecified.
+ * @param parameterName The name of the parameter being validated, or null if unspecified.
+ * @param message The custom message to use in the exception if the expectation is not met, or null to use the default message.
+ * @param causeOf A transformer function that generates the exception to throw, based on the receiver value,
+ *                or null to use the default exception type.
+ * @param cause A transformer function that generates the underlying cause for the exception,
+ *              based on the receiver value, or null if there is no underlying cause.
+ * @return The receiver value if the expectation is met.
+ * @throws ExpectationMismatchException if the receiver value is not equal to one.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the current number is equal to 1. Throws an exception if the validation fails.
+ *
+ * @param callableName The name of the function being evaluated, or null if unavailable.
+ * @param parameter The Kotlin reflection parameter being tested, or null if unavailable.
+ * @param message An optional custom message to include in the exception if the validation fails.
+ * @param causeOf A transformer function to produce a specific throwable that wraps the generated exception, or null.
+ * @param cause Another transformer function to produce a throwable to attach as the cause of the exception, or null.
+ * @return The value itself if the validation is successful.
+ * @throws ExpectationMismatchException If the value does not equal 1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not one", cause?.invoke(this)))
+    return this
+}
+
+/**
+ * Checks that the value of the current number is not equal to one. If it is equal to one, an
+ * exception is thrown. The exception can have a custom cause provided.
+ *
+ * @param causeOf A transformer function that takes the current value and returns a throwable
+ * to be thrown if the expectation is not met.
+ * @param cause A transformer function that takes the current value and returns a throwable
+ * that may serve as the underlying cause of the exception.
+ * @return The current value if the expectation is met.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException("Value is one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is one.", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the number is not equal to one. If the value is one, an exception is thrown.
+ *
+ * @param causeOf An optional transformer that generates a throwable for the failure based on the current value.
+ * @param cause An optional transformer that provides the underlying cause of the failure based on the current value.
+ * @param lazyMessage A transformer that generates the message used in the exception when the value is one.
+ * @return The original value if it is not one.
+ * @throws ExpectationMismatchException if the value is equal to one.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    return this
+}
+/**
+ * Verifies that the current value is not equal to one. If the value equals one, an exception is thrown.
+ *
+ * @param property the `KProperty` associated with the value being checked, or null if not applicable
+ * @param variableName an optional name for the variable being validated, used in the error message
+ * @param message an optional custom error message to include when the expectation fails
+ * @param causeOf an optional transformer to produce a throwable that wraps the cause of the failure
+ * @param cause an optional transformer to produce a throwable describing the specific failure
+ * @return the current value if it does not equal one
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the current number is not equal to one. If the number is equal to one, an exception
+ * of type `ExpectationMismatchException` is thrown.
+ *
+ * @param property The primary property being evaluated. Can be null.
+ * @param variable An optional variable associated with the expectation. Can be null.
+ * @param message An optional custom message describing the expectation failure. Defaults to null.
+ * @param causeOf A transformer applied to generate the root cause exception for the mismatch. Can be null.
+ * @param cause A transformer applied to generate the cause exception for the mismatch. Can be null.
+ * @return The current number if it is not equal to one.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the invoking number is not equal to one. If the number equals one, an exception is thrown.
+ *
+ * @param callable The callable function whose parameter is being validated, or null if unspecified.
+ * @param parameterName The name of the parameter being validated, or null if unspecified.
+ * @param message An optional custom error message to include in the exception if the validation fails.
+ * @param causeOf A transformer that generates the exception to be thrown when the validation fails, or null if unspecified.
+ * @param cause A transformer generating the underlying cause of the exception, or null if unspecified.
+ * @return The original value of the invoking number, if the validation passes.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the number is not equal to one. If the value equals one,
+ * an exception is thrown with the provided context, message, and optional cause transformation.
+ *
+ * @param callable The Kotlin function (`KFunction`) related to the context of the expectation, or null.
+ * @param parameter The parameter (`KParameter`) being evaluated, or null.
+ * @param message An optional custom message to describe the expectation mismatch if the value is one.
+ * @param causeOf An optional transformer function that generates a throwable cause given the current value.
+ * @param cause An optional transformer function to generate the root cause of the exception if the value is one.
+ * @return Returns the number itself if the value is not one.
+ * @throws ExpectationMismatchException if the value of the number equals one.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the current number is not equal to one. If the number equals one, an
+ * `ExpectationMismatchException` is thrown.
+ *
+ * @param callableName The name of the callable function associated with this check, or null if unspecified.
+ * @param parameterName The name of the parameter being validated, or null if unspecified.
+ * @param message A custom error message to use if the check fails, or null to use the default message.
+ * @param causeOf A transformer function that generates a throwable to be thrown, or null.
+ * @param cause An optional transformer function that generates an additional cause for the exception, or null.
+ * @return The current number if it is not one.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the number is not equal to one. If the number is one, throws an exception.
+ *
+ * @param callableName The name of the callable (function or property) whose parameter is being evaluated. Can be null.
+ * @param parameter The parameter of the callable that is being evaluated. Can be null.
+ * @param message A custom error message to be used when the expectation fails. Defaults to null.
+ * @param causeOf A transformer that generates a throwable as the direct cause of this exception. Defaults to null.
+ * @param cause A transformer that generates a throwable to describe the related issue. Defaults to null.
+ * @return The original number if it is not one.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is one", cause?.invoke(this)))
+    return this
+}
+
+/**
+ * Ensures the value of the receiver is `-1` or throws an exception if it is not.
+ *
+ * @param causeOf A transformer that generates the throwable cause based on the receiver when the expectation is not met. Defaults to `null`.
+ * @param cause A transformer that produces a throwable cause based on the receiver when the expectation is not met. Defaults to `null`.
+ * @return The receiver if its value is `-1`.
+ * @throws ExpectationMismatchException If the receiver is not equal to `-1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException("Value is not minus one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is not minus one.", cause?.invoke(this)))
+    return this
+}
+/**
+ * Verifies if the current number is `-1`. If not, an `ExpectationMismatchException` is thrown.
+ *
+ * @param causeOf A transformer that accepts the current number and returns a `Throwable` to use as the cause of the exception.
+ * @param cause A transformer that accepts the current number and returns a `Throwable` to use as the direct cause of the exception.
+ * @param lazyMessage A transformer that accepts the current number and provides a lazy-evaluated message for the exception.
+ * @return The current number if it equals `-1`.
+ * @throws ExpectationMismatchException if the current number is not `-1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the receiver is equal to -1; otherwise, throws an `ExpectationMismatchException`.
+ *
+ * @param property an optional `KProperty` associated with the expectation to aid in error reporting.
+ * @param variableName the name of the variable being validated, used in the error message if provided.
+ * @param message an optional custom error message to include in the exception if the expectation is not met.
+ * @param causeOf a transformer function to generate the root cause of the exception.
+ * @param cause a transformer function to generate an additional cause linked to the exception.
+ * @return the receiver value if it equals -1.
+ * @throws ExpectationMismatchException if the receiver is not equal to -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the receiver value is `-1`. If it is not, throws an `ExpectationMismatchException`.
+ *
+ * @param property The property being evaluated. Can be null.
+ * @param variable An optional variable associated with the property. Can be null.
+ * @param message An optional custom message for the exception. Defaults to a standard message if null.
+ * @param causeOf An optional transformer to create a custom throwable based on the receiver value.
+ * @param cause An optional transformer to create a cause throwable based on the receiver value.
+ * @return The receiver value if it equals `-1`.
+ * @throws ExpectationMismatchException if the receiver value is not `-1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the calling number is equal to -1. If not, throws an `ExpectationMismatchException`.
+ *
+ * @param callable The callable function whose parameter is being validated, or null if unspecified.
+ * @param parameterName The name of the parameter being validated, or null if unspecified.
+ * @param message The custom error message to include in the exception, or null to use the default message.
+ * @param causeOf A transformer function that produces a `Throwable` to be used as the cause of the exception,
+ *        or null if unspecified.
+ * @param cause A transformer function that produces a `Throwable` for the mismatch, or null if unspecified.
+ * @return The number itself if it equals -1.
+ * @throws ExpectationMismatchException If the number is not equal to -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates whether the invoking value of type `T` is equal to `-1`.
+ * If the value is not `-1`, an `ExpectationMismatchException` will be thrown.
+ *
+ * @param callable The function being checked, or null. Used for contextual information in the exception.
+ * @param parameter The parameter of the function being evaluated, or null. Used for contextual information in the exception.
+ * @param message An optional additional message to include in the exception if the expectation fails, or null.
+ * @param causeOf An optional transformer function to generate a custom `Throwable` as the root cause of the expectation mismatch.
+ * @param cause An optional transformer function to provide additional context for the mismatch cause.
+ * @return The original value of type `T` if it is `-1`.
+ * @throws ExpectationMismatchException If the value is not `-1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Verifies that the current number is equal to -1. If the value does not
+ * match, throws an `ExpectationMismatchException`.
+ *
+ * @param callableName The name of the callable function associated with this value, or null if unspecified.
+ * @param parameterName The name of the parameter being validated, or null if unspecified.
+ * @param message An optional custom error message if the expectation mismatch occurs.
+ * @param causeOf An optional transformer to generate a custom throwable cause based on the current value.
+ * @param cause An optional transformer to generate a secondary throwable cause based on the current value.
+ * @return The current number if it is equal to -1.
+ * @throws ExpectationMismatchException if the value is not -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Validates that the current number is equal to `-1`. If not, an `ExpectationMismatchException` is thrown.
+ *
+ * @param callableName The name of the callable (function or method) associated with this expectation check, or null.
+ * @param parameter The parameter of the callable being evaluated, or null.
+ * @param message An optional message to include with the exception if the expectation is not met, or null.
+ * @param causeOf A transformer function that generates the cause of the exception based on the current value, or null.
+ * @param cause Another transformer function that provides additional context for the cause of the exception, or null.
+ * @return The original number if it equals `-1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectMinusOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not minus one", cause?.invoke(this)))
+    return this
+}
+
+/**
+ * Ensures that the number is not equal to -1, throwing an exception if the expectation is violated.
+ *
+ * @param causeOf A transformer that generates a throwable cause based on the number if it equals -1. Can be null.
+ * @param cause A transformer that generates an additional throwable cause based on the number. Can be null.
+ * @return The original number if it is not equal to -1.
+ * @throws ExpectationMismatchException if the number is -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException("Value is minus one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is minus one.", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the current number is not equal to -1. If the value is -1, an exception is thrown.
+ *
+ * @param causeOf An optional transformer to generate a throwable as the primary cause.
+ * @param cause An optional transformer to provide additional context for the throwable.
+ * @param lazyMessage A lambda to generate a detailed message when the exception is thrown.
+ * @return The current number if it is not -1.
+ * @throws ExpectationMismatchException if the value is -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the specified numeric value is not equal to -1. If the value is -1, an exception is thrown.
+ *
+ * @param property the `KProperty` associated with this value, or null if not applicable
+ * @param variableName an optional variable name to include in the exception message, or null if not provided
+ * @param message an optional custom message for the exception, or null to use the default message
+ * @param causeOf a transformer function that determines the root cause of the exception, or null if not provided
+ * @param cause a transformer function to attach a specific cause to the exception, or null if not provided
+ * @return the numeric value if it is not -1
+ * @throws ExpectationMismatchException if this value equals -1
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the current number is not `-1`. If it is `-1`, an `ExpectationMismatchException` is thrown.
+ *
+ * @param property The primary property being evaluated, used for providing context in the exception. Can be null.
+ * @param variable An optional variable associated with the evaluation, used for providing additional context in the exception. Can be null.
+ * @param message An optional custom message to include in the exception if the value is `-1`. Defaults to a standard message.
+ * @param causeOf An optional transformer that generates the cause of the exception when the value is `-1`. Can be null.
+ * @param cause An optional transformer that supplies a custom cause for the exception additional to `causeOf`. Can be null.
+ * @return The current number if it is not `-1`.
+ * @throws ExpectationMismatchException If the value is `-1`, providing details about the mismatch.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the current `Number` instance is not equal to -1. If the value is -1,
+ * an `ExpectationMismatchException` is thrown, optionally wrapping another throwable with additional context.
+ *
+ * @param callable The callable function whose parameter is being validated, or null if unspecified.
+ *                 Used for contextual information when an exception is thrown.
+ * @param parameterName The name of the parameter being validated, or null if unspecified.
+ *                      Included in the exception message for better context.
+ * @param message An optional message providing additional context for the exception. If not provided,
+ *                a default message is used.
+ * @param causeOf A function transforming the current value into a throwable for advanced exception wrapping.
+ *                If null, a default behavior is applied.
+ * @param cause A function transforming the current value into a throwable used as the root cause of the
+ *              `ExpectationMismatchException`. This is nested within the exception if provided.
+ * @return The original instance of the `Number` if its value is not -1.
+ * @throws ExpectationMismatchException If the value of the `Number` is -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "not one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the number is not equal to -1. If the value is -1, an exception is thrown.
+ *
+ * @param callable The function whose parameter is being evaluated, or null.
+ * @param parameter The specific parameter of the function being checked, or null.
+ * @param message An optional message to include in the exception if the value is -1.
+ * @param causeOf A transformer that generates a specific exception for the mismatch, or null.
+ * @param cause A transformer that provides the underlying cause for the generated exception, or null.
+ * @return The current number if its value is not -1.
+ * @throws ExpectationMismatchException If the value is -1 and no custom transformer for exceptions is provided.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Ensures that the value of the current number is not -1. If the value is -1, throws an `ExpectationMismatchException`.
+ *
+ * @param callableName The name of the callable function associated with this check, or null if unspecified.
+ * @param parameterName The name of the parameter being checked, or null if unspecified.
+ * @param message An optional message to include in the exception if the expectation is violated.
+ * @param causeOf An optional transformer function that produces the root cause of the exception based on the current value.
+ * @param cause An optional transformer function that produces a secondary cause for the exception based on the current value.
+ * @return The current value if it is not -1.
+ * @throws ExpectationMismatchException if the current value is -1.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is minus one", cause?.invoke(this)))
+    return this
+}
+/**
+ * Verifies that the current numeric value is not `-1`. If the value is `-1`,
+ * an `ExpectationMismatchException` is thrown with a detailed message.
+ *
+ * @param callableName The name of the function where the check is being performed, or null.
+ * @param parameter The parameter being validated, represented as a `KParameter`, or null.
+ * @param message An optional custom error message to include in the exception, or null. If not provided, a default message is used.
+ * @param causeOf An optional transformer to generate a throwable cause based on the current value, or null.
+ * @param cause An optional transformer to attach as the cause for the exception based on the current value, or null.
+ * @return The original numeric value if it is not `-1`.
+ * @throws ExpectationMismatchException If the numeric value is `-1`.
+ * @since 5.4.0
+ */
+@IgnorableReturnValue
+fun <T : Number> T.expectNotMinusOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is minus one", cause?.invoke(this)))
     return this
 }

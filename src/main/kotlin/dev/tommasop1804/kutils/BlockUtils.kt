@@ -27,6 +27,26 @@ import kotlin.reflect.KClass
 import kotlin.system.measureNanoTime
 
 /**
+ * A lambda expression that consistently returns `null`.
+ *
+ * This variable can be used to explicitly represent or handle nullable values in a concise manner.
+ * It is primarily intended for use in scenarios where a function or higher-order construct is required
+ * but no specific non-null operation or value is needed.
+ * @since 5.4.0
+ */
+val NULL = { null }
+
+/**
+ * A functional property that represents the identity transformation for any given type [T].
+ * It returns a transformer function (of type `MonoTransformer<T>`) that outputs the same instance as input.
+ *
+ * @receiver The instance for which the identity transformer is defined.
+ * @return A transformer function that returns the receiver itself.
+ * @since 5.4.0
+ */
+val <T> T.itself: MonoTransformer<T> get() = { this }
+
+/**
  * Repeats the execution of the Action a specified number of times.
  *
  * @param n The number of times the Action should be executed. Must be a non-negative integer.

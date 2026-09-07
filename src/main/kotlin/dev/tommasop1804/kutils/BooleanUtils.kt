@@ -17,6 +17,21 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
+ * A higher-order constant representing a lambda function that always evaluates to `true`.
+ * This can be utilized in scenarios where a default boolean condition
+ * always returning `true` is required.
+ * @since 5.4.0
+ */
+val TRUE = { true }
+/**
+ * A lambda expression that consistently returns the boolean value `false`.
+ * This can be used as a placeholder or default implementation for predicate-like functional interfaces
+ * where a `false` result is required.
+ * @since 5.4.0
+ */
+val FALSE = { false }
+
+/**
  * Checks if any of the given Boolean values is `true`.
  *
  * This function evaluates the provided Boolean values and returns `true` if at least one
