@@ -26,11 +26,15 @@ import org.jetbrains.exposed.v1.dao.Entity
 import org.jetbrains.exposed.v1.dao.EntityClass
 import org.jetbrains.exposed.v1.dao.InnerTableLink
 import org.jetbrains.exposed.v1.dao.Referrers
+import org.jetbrains.exposed.v1.exceptions.DuplicateColumnException
+import org.jetbrains.exposed.v1.exceptions.LongQueryException
+import org.jetbrains.exposed.v1.exceptions.UnsupportedByDialectException
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.postgresql.util.PGobject
 import tools.jackson.core.type.TypeReference
 import java.sql.ResultSet
+import java.sql.SQLException
 
 /**
  * Represents a database table with string-based primary keys.
@@ -221,7 +225,10 @@ inline fun <reified T : Any> Table.jsonb(name: String): Column<T> =
 fun <T> transactionOrThrow(
     lazyException: ThrowableTransformer = { DatabaseOperationException(it.message) },
     block: ReceiverTransformer<JdbcTransaction, T>
-) = tryOrThrow(lazyException) { transaction(statement = block) }
+) = tryOrThrow(
+    lazyException,
+    overwriteOnly = setOf(SQLException::class, UnsupportedByDialectException::class, DuplicateColumnException::class, LongQueryException::class)
+) { transaction(statement = block) }
 
 /**
  * Converts a `Table.UuidVersion` instance to its equivalent `UuidVersion` representation.
