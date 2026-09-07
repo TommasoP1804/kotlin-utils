@@ -225,10 +225,17 @@ inline fun <reified T : Any> Table.jsonb(name: String): Column<T> =
 fun <T> transactionOrThrow(
     lazyException: ThrowableTransformer = { DatabaseOperationException(it.message) },
     block: ReceiverTransformer<JdbcTransaction, T>
-) = tryOrThrow(
-    lazyException,
-    overwriteOnly = setOf(SQLException::class, UnsupportedByDialectException::class, DuplicateColumnException::class, LongQueryException::class)
-) { transaction(statement = block) }
+) = try {
+    transaction(statement = block)
+} catch (e: SQLException) {
+    throw lazyException(e)
+} catch (e: UnsupportedByDialectException) {
+    throw lazyException(e)
+} catch (e: DuplicateColumnException) {
+    throw lazyException(e)
+} catch (e: LongQueryException) {
+    throw lazyException(e)
+}
 
 /**
  * Converts a `Table.UuidVersion` instance to its equivalent `UuidVersion` representation.
