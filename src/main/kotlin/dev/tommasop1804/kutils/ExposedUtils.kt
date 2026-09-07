@@ -13,9 +13,12 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
+import dev.tommasop1804.kutils.classes.collections.orEmpty
+import dev.tommasop1804.kutils.classes.collections.toTable
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
@@ -31,10 +34,15 @@ import org.jetbrains.exposed.v1.exceptions.LongQueryException
 import org.jetbrains.exposed.v1.exceptions.UnsupportedByDialectException
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.postgresql.util.PGobject
 import tools.jackson.core.type.TypeReference
 import java.sql.ResultSet
 import java.sql.SQLException
+import kotlin.reflect.KClass
+import kotlin.text.decodeToString
+import kotlin.text.ifEmpty
+import kotlin.text.orEmpty
 
 /**
  * Represents a database table with string-based primary keys.
@@ -108,7 +116,23 @@ abstract class StringEntityClass<out E : StringEntity>(
  * @return The created VARCHAR column.
  * @since 5.3.1
  */
-inline fun Table.varchar(name: String, collate: String? = null) = varchar(name, 255, collate)
+fun Table.varchar(name: String, collate: String? = null) = varchar(name, 255, collate)
+/**
+ * Maps a table column to a Kotlin Enum type using the enum's name for database storage.
+ *
+ * @param T The Enum type that this table column will map to.
+ * @param name The name of the table column to map to the Enum type.
+ * @since 5.3.5
+ */
+inline fun <reified T : Enum<T>> Table.enumerationByName(name: String) = enumerationByName<T>(name, 255)
+/**
+ * Maps a database column to an enumeration type using the provided name and enum class reference.
+ *
+ * @param name The name of the database column to map.
+ * @param kClass The KClass reference of the Enum type to map to.
+ * @since 5.3.5
+ */
+fun Table.enumerationByName(name: String, kClass: KClass<out Enum<*>>) = enumerationByName(name, 255, kClass)
 
 /**
  * Represents a custom column type for handling JSONB data in a database using Exposed.
@@ -202,31 +226,27 @@ inline fun <reified T : Any> Table.jsonb(name: String): Column<T> =
     registerColumn(name, JsonbColumnType(object : TypeReference<T>() {}))
 
 /**
- * Executes a database transaction and propagates exceptions based on specified transformation rules.
+ * Executes a database transaction, propagates exceptions using a custom transformer, and supports configurable behavior.
  *
- * This method wraps the execution of a database transaction within a try-catch block. If an exception
- * occurs during the execution of the transaction, it is transformed using the provided `lazyException`
- * transformer and then re-thrown. The method uses the `transaction` function to initiate and manage
- * the transaction logic.
- *
- * @param T The return type of the block executed within the transaction.
- * @param lazyException A transformer function that takes a throwable as input and produces a new throwable.
- * It is used to transform exceptions before they are propagated. Defaults to wrapping exceptions
- * as `DatabaseOperationException`.
- * @param block The block of code representing the transactional logic to be executed. The block is executed
- * within a JDBC transaction, and the result of this block is returned if no exception occurs.
- *
- * @return The result of the transactional block if it completes successfully.
- *
- * @throws Throwable If an exception occurs during the transaction and is transformed using `lazyException`.
- * Default to [DatabaseOperationException].
- * @since 5.3.1
+ * @param T The type of the result produced by the transaction block.
+ * @param lazyException A transformer used to wrap exceptions that occur during the transaction.
+ *                       The default implementation wraps exceptions in a `DatabaseOperationException`.
+ * @param db The database instance in which the transaction should be executed. If null, the default database is used.
+ * @param transactionIsolation The isolation level for the transaction. If null, the default isolation level of the database's transaction manager is used.
+ * @param readOnly Indicates whether the transaction should be executed in read-only mode. If null, the default value of the database's transaction manager is used.
+ * @param block The transactional block of code to be executed. It receives a `JdbcTransaction` as its receiver.
+ * @throws Throwable The exception returned by the `lazyException` transformer if an error occurs during the transaction.
+ *         Possible exceptions include `SQLException`, `UnsupportedByDialectException`, `DuplicateColumnException`, and `LongQueryException`.
+ * @since 5.3.5
  */
 fun <T> transactionOrThrow(
     lazyException: ThrowableTransformer = { DatabaseOperationException(it.message) },
+    db: Database? = null,
+    transactionIsolation: Int? = db?.transactionManager?.defaultIsolationLevel,
+    readOnly: Boolean? = db?.transactionManager?.defaultReadOnly,
     block: ReceiverTransformer<JdbcTransaction, T>
 ) = try {
-    transaction(statement = block)
+    transaction(db, transactionIsolation, readOnly, block)
 } catch (e: SQLException) {
     throw lazyException(e)
 } catch (e: UnsupportedByDialectException) {
@@ -485,6 +505,87 @@ fun <T> JdbcTransaction.exec(
     explicitStatementType: StatementType? = null,
     transform: Transformer<ResultSet, T?>
 ) = exec(query.value, args, explicitStatementType, transform)
+/**
+ * Executes an SQL statement within a `JdbcTransaction` context and converts the resulting
+ * `ResultSet` into a table structure. If the result is null, an empty table is returned.
+ *
+ * @param T The type of the table's cell values.
+ * @param stmt The SQL statement to be executed. It must match the SQL syntax.
+ * @param args A collection of pairs where each pair consists of a column type and a value
+ *             to be bound to the SQL statement. Defaults to an empty list if no arguments are provided.
+ * @param explicitStatementType An optional statement type to explicitly define whether
+ *                              the statement is a SELECT, UPDATE, etc. Can be null.
+ *
+ * @return A table constructed from the executed SQL result set, or an empty table if the
+ *         result set is null.
+ * @since 5.3.5
+ */
+fun <T> JdbcTransaction.execToTable(
+    @Language("sql") stmt: String,
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null
+) = exec(stmt, args, explicitStatementType) { rs -> rs.toTable<T>() }.orEmpty()
+/**
+ * Executes the provided SQL query within a transaction and maps the result set into a transformed collection
+ * of elements based on a specified transformation function. The result set is converted into a `Table`,
+ * and each row is processed and transformed accordingly.
+ *
+ * @param stmt The SQL statement to be executed, represented as a string.
+ * @param args Optional collection of pairs where each pair consists of an `IColumnType` and its
+ *             corresponding value. These pairs dictate the parameters to be substituted in the SQL
+ *             statement, if present. Defaults to an empty list.
+ * @param explicitStatementType Optional parameter specifying the type of SQL statement (e.g., SELECT,
+ *                              INSERT). If not provided, it will be inferred based on the query.
+ *                              Defaults to null.
+ * @param transform A transformation function that takes a row of the table (as an instance of
+ *                  `Row<Int, String, T>`) and produces a result of type `R`. Each row in the table
+ *                  will be transformed using this function.
+ * @return A list containing transformed elements of type `R`, derived from the rows of the result set.
+ * @since 5.3.5
+ */
+fun <T, R> JdbcTransaction.execToTable(
+    @Language("sql") stmt: String,
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null,
+    transform: Transformer<dev.tommasop1804.kutils.classes.collections.Table.Companion.Row<Int, String, T>, R>
+) = exec(stmt, args, explicitStatementType) { rs ->
+    rs.toTable<T>().rows.map { it.value }.map(transform)
+}.orEmpty()
+/**
+ * Executes the given SQL query within the current JDBC transaction and converts the result set into a data table.
+ *
+ * @param query The SQL query to execute, encapsulated in a SqlQuery object.
+ * @param args A collection of column type and value pairs used as parameters for the query. Defaults to an empty list.
+ * @param explicitStatementType An optional explicit statement type to override the default behavior. Defaults to null.
+ * @return A data table of type T created from the result set, or an empty table if the result set is null or empty.
+ * @since 5.3.5
+ */
+fun <T> JdbcTransaction.execToTable(
+    query: SqlQuery,
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null
+) = exec(query.value, args, explicitStatementType) { rs -> rs.toTable<T>() }.orEmpty()
+/**
+ * Executes a given SQL query within a `JdbcTransaction` and transforms the result into a list of objects of type `R`.
+ * The result set is first converted into a table of rows and then transformed using the provided transformer function.
+ *
+ * @param T The generic type parameter for the table rows.
+ * @param R The generic type parameter for the return type of the transformation.
+ * @param query The SQL query to execute.
+ * @param args A list of argument pairs consisting of an `IColumnType` and its corresponding value to bind to the query (optional, default is an empty list).
+ * @param explicitStatementType The explicit statement type to use for the query execution (optional, default is `null`).
+ * @param transform The transformation function to apply to each row in the table after conversion.
+ * @return A list of transformed objects of type `R`, or an empty list if the query execution fails or produces no results.
+ * @since 5.3.5
+ */
+fun <T, R> JdbcTransaction.execToTable(
+    query: SqlQuery,
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null,
+    transform: Transformer<dev.tommasop1804.kutils.classes.collections.Table.Companion.Row<Int, String, T>, R>
+) = exec(query.value, args, explicitStatementType) { rs ->
+    rs.toTable<T>().rows.map { it.value }.map(transform)
+}.orEmpty()
 
 /**
  * Indicates whether the entity class contains no records.

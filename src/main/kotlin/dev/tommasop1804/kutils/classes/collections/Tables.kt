@@ -717,7 +717,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      * @return A map where keys are row identifiers and values are lists of cells for those rows.
      * @since 1.0.0
      */
-    val rows: MultiMap<R, Cell<R, C, V?>>
+    val rows: Rows<R, C, V>
         get() {
             val rows = mutableMapOf<R, List<Cell<R, C, V?>>>()
             rowKeys.forEach { rowKey -> rows.getOrPut(rowKey) { cells.filter { it.rowKey == rowKey }} }
@@ -737,7 +737,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      *
      * @since 1.0.0
      */
-    val columns: MultiMap<C, Cell<R, C, V?>>
+    val columns: Columns<R, C, V>
         get() {
             val columns = mutableMapOf<C, List<Cell<R, C, V?>>>()
             columnKeys.forEach { columnKey -> columns.getOrPut(columnKey) { cells.filter { it.columnKey == columnKey }} }
@@ -886,6 +886,45 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
          * @since 4.0.0
          */
         operator fun <R, C, V> of(vararg entries: CellInterface<R, C, V?>) = tableOf(*entries)
+
+        /**
+         * Represents a type alias for a collection of rows where each row is associated
+         * with a collection of cells that map column identifiers to their corresponding values.
+         *
+         * @param R The type representing the row identifiers.
+         * @param C The type representing the column identifiers.
+         * @param V The type representing the values stored within the cells.
+         * @since 5.3.5
+         */
+        typealias Rows<R, C, V> = MultiMap<R, Cell<R, C, V?>>
+        /**
+         * A type alias representing a row in a table-like structure.
+         * Consists of a list of cells, where each cell holds a value of a potentially nullable type.
+         *
+         * @param R The type representing the row identifier or key.
+         * @param C The type representing the column identifier or key.
+         * @param V The type of the value contained within the cell. Can be nullable.
+         * @since 5.3.5
+         */
+        typealias Row<R, C, V> = List<Cell<R, C, V?>>
+        /**
+         * A type alias representing a mapping of columns to their corresponding cells within a multi-dimensional grid structure.
+         *
+         * @param R The type representing the rows in the grid.
+         * @param C The type representing the columns in the grid.
+         * @param V The type of the value contained within each cell, which can be nullable.
+         * @since 5.3.5
+         */
+        typealias Columns<R, C, V> = MultiMap<C, Cell<R, C, V?>>
+        /**
+         * A type alias representing a column in a table-like structure.
+         *
+         * @param R The type of the row key.
+         * @param C The type of the column key.
+         * @param V The type of the value contained within the cell, which is nullable.
+         * @since 5.3.5
+         */
+        typealias Column<R, C, V> = Cell<R, C, V?>
 
         class Serializer : ValueSerializer<Table<Any, Any, Any?>>() {
             override fun serialize(
@@ -1190,14 +1229,14 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
      */
     fun getCell(keys: Pair<R, C>): Cell<R, C, V?>? = cells.find { it.rowKey == keys.first && it.columnKey == keys.second }
 
-     /**
-      * Retrieves a map of column keys and their corresponding values for the specified row key.
-      *
-      * @param rowKey the key of the row for which the column-value mapping is to be retrieved.
-      * @return a map of column keys to their associated values for the given row.
-      * @since 1.0.0
-      */
-     fun getFromRow(rowKey: R): Map<C, V?> = cells.filter { it.rowKey == rowKey }.associate { it.columnKey to it.value }
+    /**
+     * Retrieves a map of column keys and their corresponding values for the specified row key.
+     *
+     * @param rowKey the key of the row for which the column-value mapping is to be retrieved.
+     * @return a map of column keys to their associated values for the given row.
+     * @since 1.0.0
+     */
+    fun getFromRow(rowKey: R): Map<C, V?> = cells.filter { it.rowKey == rowKey }.associate { it.columnKey to it.value }
 
     /**
      * Retrieves a map of column keys to non-null values for a given row key.
@@ -1579,7 +1618,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @return A map associating each row key with a list of mutable cells that are part of that row.
      * @since 1.0.0
      */
-    val rows: MultiMap<R, MCell<R, C, V?>>
+    val rows: Rows<R, C, V>
         get() {
             val rows = mutableMapOf<R, List<MCell<R, C, V?>>>()
             rowKeys.forEach { rowKey -> rows.getOrPut(rowKey) { cells.filter { it.rowKey == rowKey }} }
@@ -1597,7 +1636,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * @see cells
      * @since 1.0.0
      */
-    val columns: MultiMap<C, MCell<R, C, V?>>
+    val columns: Columns<R, C, V>
         get() {
             val columns = mutableMapOf<C, List<MCell<R, C, V?>>>()
             columnKeys.forEach { columnKey -> columns.getOrPut(columnKey) { cells.filter { it.columnKey == columnKey }} }
@@ -1737,6 +1776,45 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
          * @since 4.1.0
          */
         operator fun <R, C, V> of(vararg entries: CellInterface<R, C, V?>) = mTableOf(*entries)
+
+        /**
+         * Represents a type alias for a collection of rows where each row is associated
+         * with a collection of cells that map column identifiers to their corresponding values.
+         *
+         * @param R The type representing the row identifiers.
+         * @param C The type representing the column identifiers.
+         * @param V The type representing the values stored within the cells.
+         * @since 5.3.5
+         */
+        typealias Rows<R, C, V> = MultiMap<R, MCell<R, C, V?>>
+        /**
+         * A type alias representing a row in a table-like structure.
+         * Consists of a list of cells, where each cell holds a value of a potentially nullable type.
+         *
+         * @param R The type representing the row identifier or key.
+         * @param C The type representing the column identifier or key.
+         * @param V The type of the value contained within the cell. Can be nullable.
+         * @since 5.3.5
+         */
+        typealias Row<R, C, V> = List<MCell<R, C, V?>>
+        /**
+         * A type alias representing a mapping of columns to their corresponding cells within a multi-dimensional grid structure.
+         *
+         * @param R The type representing the rows in the grid.
+         * @param C The type representing the columns in the grid.
+         * @param V The type of the value contained within each cell, which can be nullable.
+         * @since 5.3.5
+         */
+        typealias Columns<R, C, V> = MultiMap<C, MCell<R, C, V?>>
+        /**
+         * A type alias representing a column in a table-like structure.
+         *
+         * @param R The type of the row key.
+         * @param C The type of the column key.
+         * @param V The type of the value contained within the cell, which is nullable.
+         * @since 5.3.5
+         */
+        typealias Column<R, C, V> = MCell<R, C, V?>
 
         class Serializer : ValueSerializer<MTable<Any, Any, Any?>>() {
             override fun serialize(
@@ -2551,11 +2629,11 @@ val Table<*, *, *>?.isNotNullOrEmpty: Boolean
 @Suppress("kutils_null_check")
 val Table<*, *, *>?.isNullOrEmpty: Boolean
     get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
+        contract {
+            returns(false) implies (this@isNullOrEmpty != null)
+        }
+        return this == null || this.isEmpty
     }
-    return this == null || this.isEmpty
-}
 
 /**
  * Checks if the Table instance is either `null` or empty.
@@ -2726,7 +2804,8 @@ inline fun <reified T : Any, R> Collection<T>.toMTable(rowProperty: KProperty<R>
  *         and cell values are Any? representing the content of the ResultSet.
  * @since 5.3.1
  */
-fun ResultSet.toTable(): Table<Int, String, Any?> {
+@Suppress("UNCHECKED_CAST")
+fun <T> ResultSet.toTable(): Table<Int, String, T?> {
     val metadata = metaData
     return tableOf(
         buildList {
@@ -2738,7 +2817,7 @@ fun ResultSet.toTable(): Table<Int, String, Any?> {
                         Cell(
                             row,
                             metadata.getColumnLabel(column),
-                            getObject(column)
+                            getObject(column) as T
                         )
                     )
                 }
