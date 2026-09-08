@@ -2835,23 +2835,6 @@ infix fun <R, C, V> Table.Companion.Row<R, C, V>.atColumn(column: C) = find { it
  * @since 5.4.1
  */
 infix fun <R, C, V> Table.Companion.Column<R, C, V>.atRow(row: R) = find { it.rowKey == row }?.value
-/**
- * Retrieves the value associated with the specified column in the current row.
- *
- * @param column The column key used to find the corresponding value.
- * @return The value associated with the given column, or null if no match is found.
- * @since 5.4.1
- */
-infix fun <R, C, V> MTable.Companion.Row<R, C, V>.atColumn(column: C) = find { it.columnKey == column }?.value
-/**
- * Retrieves the value from the table column corresponding to the specified row key.
- * Searches through the table to locate the entry where the row key matches the provided key.
- *
- * @param row The row key used to identify and retrieve the value associated with it.
- * @return The value matching the provided row key, or null if no match exists.
- * @since 5.4.1
- */
-infix fun <R, C, V> MTable.Companion.Column<R, C, V>.atRow(row: R) = find { it.rowKey == row }?.value
 
 /**
  * A typealias for a Table data structure where the row keys are of type Int,
