@@ -7,10 +7,10 @@ import io.freefair.gradle.plugins.aspectj.AspectjCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "dev.tommasop1804"
-version = "5.4.0"
+version = "5.4.1"
 // Kotlin-Utils
 // Tommaso Pastorelli
-// Last update: Tommaso Pastorelli | 20260907T173841Z
+// Last update: Tommaso Pastorelli | 20260908T105756Z
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.4.10"

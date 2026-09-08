@@ -924,7 +924,7 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
          * @param V The type of the value contained within the cell, which is nullable.
          * @since 5.3.5
          */
-        typealias Column<R, C, V> = Cell<R, C, V?>
+        typealias Column<R, C, V> = List<Cell<R, C, V?>>
 
         class Serializer : ValueSerializer<Table<Any, Any, Any?>>() {
             override fun serialize(
@@ -1814,7 +1814,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
          * @param V The type of the value contained within the cell, which is nullable.
          * @since 5.3.5
          */
-        typealias Column<R, C, V> = MCell<R, C, V?>
+        typealias Column<R, C, V> = List<MCell<R, C, V?>>
 
         class Serializer : ValueSerializer<MTable<Any, Any, Any?>>() {
             override fun serialize(
@@ -2820,6 +2820,51 @@ inline fun <reified T : Any, R> Collection<T>.toTable(rowProperty: KProperty<R>)
 inline fun <reified T : Any, R> Collection<T>.toMTable(rowProperty: KProperty<R>) = toTable<T, R>(rowProperty).toMTable()
 
 /**
+ * Retrieves the value associated with the specified column within the row.
+ *
+ * @param column The key of the column for which the corresponding value is to be fetched.
+ * @return The value associated with the specified column, or null if no match is found.
+ * @since 5.4.1
+ */
+infix fun <R, C, V> Table.Companion.Row<R, C, V>.atColumn(column: C) = find { it.columnKey == column }?.value
+/**
+ * Retrieves the column value associated with the given row key in the table.
+ *
+ * @param row The row key for which the column value needs to be retrieved.
+ * @return The value if the specified row key exists, or null if not found.
+ * @since 5.4.1
+ */
+infix fun <R, C, V> Table.Companion.Column<R, C, V>.atRow(row: R) = find { it.rowKey == row }?.value
+/**
+ * Retrieves the value associated with the specified column in the current row.
+ *
+ * @param column The column key used to find the corresponding value.
+ * @return The value associated with the given column, or null if no match is found.
+ * @since 5.4.1
+ */
+infix fun <R, C, V> MTable.Companion.Row<R, C, V>.atColumn(column: C) = find { it.columnKey == column }?.value
+/**
+ * Retrieves the value from the table column corresponding to the specified row key.
+ * Searches through the table to locate the entry where the row key matches the provided key.
+ *
+ * @param row The row key used to identify and retrieve the value associated with it.
+ * @return The value matching the provided row key, or null if no match exists.
+ * @since 5.4.1
+ */
+infix fun <R, C, V> MTable.Companion.Column<R, C, V>.atRow(row: R) = find { it.rowKey == row }?.value
+
+/**
+ * A typealias for a Table data structure where the row keys are of type Int,
+ * the column keys are of type String, and the values are nullable and of type T.
+ * It can be used to represent a grid or matrix-like structure where rows are identified
+ * by integers, columns by strings, and the cells contain nullable values of generic type T.
+ *
+ * @param T The type of the values stored in the table cells.
+ * @since 5.4.1
+ */
+typealias ResultTable<T> = Table<Int, String, T?>
+
+/**
  * Converts a ResultSet into a Table structure with rows, column labels, and corresponding values.
  *
  * @return A Table instance where the row indices are Int, column labels are String,
@@ -2827,7 +2872,7 @@ inline fun <reified T : Any, R> Collection<T>.toMTable(rowProperty: KProperty<R>
  * @since 5.3.1
  */
 @Suppress("UNCHECKED_CAST")
-fun <T> ResultSet.toTable(): Table<Int, String, T?> {
+fun <T> ResultSet.toTable(): ResultTable<T> {
     val metadata = metaData
     return tableOf(
         buildList {
