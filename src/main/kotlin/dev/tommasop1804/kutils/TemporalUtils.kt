@@ -22,7 +22,6 @@ package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.time.*
-import dev.tommasop1804.kutils.exceptions.*
 import java.time.*
 import java.time.chrono.ChronoLocalDateTime
 import java.time.format.DateTimeFormatter
@@ -37,8 +36,6 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 import kotlin.time.toJavaInstant
 
@@ -234,6 +231,21 @@ val RFC_7231_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter
     .withZone(ZoneId.of("GMT"))
 
 /**
+ * A formatter for PostgreSQL-compatible timestamp strings.
+ *
+ * This formatter parses and formats date-time values in the pattern
+ * "yyyy-MM-dd HH:mm:ss[.SSS]", where the fractional seconds part
+ * (.SSS) is optional.
+ * @since 5.4.3
+ */
+val PG_TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatterBuilder()
+    .appendPattern("yyyy-MM-dd HH:mm:ss")
+    .optionalStart()
+    .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+    .optionalEnd()
+    .toFormatter()
+
+/**
  * Parses the current [CharSequence] to a [LocalDateTime] object.
  *
  * This method attempts to interpret the [CharSequence] as an ISO-8601 compliant date-time string.
@@ -245,6 +257,14 @@ val RFC_7231_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter
 fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
     if (isEmpty()) return failure(DateTimeParseException("The input is empty.", toString(), 0))
     var dateTimeString = toString().trim()
+
+    if (' ' in dateTimeString && 'T' !in dateTimeString) {
+        return try {
+            success(LocalDateTime.parse(dateTimeString, PG_TIMESTAMP_FORMATTER))
+        } catch (e: DateTimeParseException) {
+            failure(DateTimeParseException("Invalid Postgres timestamp format: $dateTimeString", dateTimeString, 0))
+        }
+    }
 
     if ("." in dateTimeString) {
         val decimal = dateTimeString.substring(
@@ -315,11 +335,12 @@ fun CharSequence.parseToOffsetDateTime(): Result<OffsetDateTime> {
     return runCatching {
         dateTimeString.parseToLocalDateTime().getOrThrow().atOffset(
             if ("Z" in dateTimeString) ZoneOffset.UTC
-            else ZoneOffset.of(
+            else if ("+" in dateTimeString || "-" in dateTimeString after 'T') ZoneOffset.of(
                 dateTimeString.substring(
-                    if ("+" in dateTimeString) dateTimeString.indexOf("+") else dateTimeString.lastIndexOf("-")
+                    if ("+" in dateTimeString) dateTimeString.indexOf("+")
+                    else dateTimeString.lastIndexOf("-")
                 )
-            )
+            ) else ZoneOffset.UTC
         )
     }
 }
