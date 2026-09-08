@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import org.jetbrains.exposed.v1.core.Column
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -2828,6 +2829,14 @@ inline fun <reified T : Any, R> Collection<T>.toMTable(rowProperty: KProperty<R>
  */
 infix fun <R, C, V> Table.Companion.Row<R, C, V>.atColumn(column: C) = find { it.columnKey == column }?.value
 /**
+ * Retrieves the value associated with the specified column in the current row.
+ *
+ * @param column The column whose value is to be retrieved.
+ * @return The value associated with the specified column, or null if the column is not found.
+ * @since 5.4.2
+ */
+infix fun <V> Table.Companion.Row<Int, String, V>.atColumn(column: Column<*>) = find { it.columnKey == column.name }?.value
+/**
  * Retrieves the column value associated with the given row key in the table.
  *
  * @param row The row key for which the column value needs to be retrieved.
@@ -2846,6 +2855,14 @@ infix fun <R, C, V> Table.Companion.Column<R, C, V>.atRow(row: R) = find { it.ro
  * @since 5.4.1
  */
 typealias ResultTable<T> = Table<Int, String, T?>
+/**
+ * A typealias that represents a row within a table structure, mapping an integer key and a string
+ * identifier to a nullable value of type [T].
+ *
+ * @param T The type of the nullable value associated with the row.
+ * @since 5.4.2
+ */
+typealias ResultRow<T> = Table.Companion.Row<Int, String, T?>
 
 /**
  * Converts a ResultSet into a Table structure with rows, column labels, and corresponding values.

@@ -13,13 +13,14 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
-import dev.tommasop1804.kutils.classes.collections.orEmpty
-import dev.tommasop1804.kutils.classes.collections.toTable
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.collections.ResultRow
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
 import org.jetbrains.exposed.v1.core.java.javaUUID
@@ -40,24 +41,13 @@ import tools.jackson.core.type.TypeReference
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
-import java.sql.Clob
-import java.sql.NClob
-import java.sql.Ref
-import java.sql.ResultSet
-import java.sql.RowId
-import java.sql.SQLException
-import java.sql.SQLXML
-import java.sql.Time
-import java.sql.Timestamp
+import java.sql.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.util.Calendar
+import java.util.*
 import kotlin.reflect.KClass
-import kotlin.text.decodeToString
-import kotlin.text.ifEmpty
-import kotlin.text.orEmpty
 
 /**
  * Represents a database table with string-based primary keys.
@@ -562,7 +552,7 @@ fun <T, R> JdbcTransaction.execToTable(
     @Language("sql") stmt: String,
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null,
-    transform: Transformer<dev.tommasop1804.kutils.classes.collections.Table.Companion.Row<Int, String, T>, R>
+    transform: Transformer<ResultRow<T>, R>
 ) = exec(stmt, args, explicitStatementType) { rs ->
     rs.toTable<T>().rows.map { it.value }.map(transform)
 }.orEmpty()
@@ -597,7 +587,7 @@ fun <T, R> JdbcTransaction.execToTable(
     query: SqlQuery,
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null,
-    transform: Transformer<dev.tommasop1804.kutils.classes.collections.Table.Companion.Row<Int, String, T>, R>
+    transform: Transformer<ResultRow<T>, R>
 ) = exec(query.value, args, explicitStatementType) { rs ->
     rs.toTable<T>().rows.map { it.value }.map(transform)
 }.orEmpty()
