@@ -484,6 +484,7 @@ fun SetOperation.orderBy(vararg order: Pair<Expression<*>, SortDirection>) = ord
  *                               Defaults to null if not provided.
  * @since 5.4.4
  */
+@IgnorableReturnValue
 context(transaction: JdbcTransaction)
 fun SqlQuery.executeQuery(
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
@@ -543,10 +544,10 @@ fun <T> @receiver:Language("sql") String.executeQueryToTable(
  * @since 5.4.4
  */
 context(transaction: JdbcTransaction)
-fun <T> @receiver:Language("sql") String.executeQueryToTable(
+fun <T, R> @receiver:Language("sql") String.executeQueryToTable(
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null,
-    transform: Transformer<ResultSet, T?>
+    transform: Transformer<ResultRow<T>, R>
 ) = transaction.execToTable<T>(this, args, explicitStatementType)
 
 /**
@@ -570,10 +571,10 @@ fun <T> SqlQuery.executeQueryToTable(
  * @since 5.4.4
  */
 context(transaction: JdbcTransaction)
-fun <T> SqlQuery.executeQueryToTable(
+fun <T, R> SqlQuery.executeQueryToTable(
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null,
-    transform: Transformer<ResultSet, T?>
+    transform: Transformer<ResultRow<T>, R>
 ) = transaction.execToTable<T>(this, args, explicitStatementType)
 
 /**
@@ -587,6 +588,7 @@ fun <T> SqlQuery.executeQueryToTable(
  * @return The result of executing the query.
  * @since 5.3.0
  */
+@IgnorableReturnValue
 fun JdbcTransaction.exec(
     query: SqlQuery,
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
