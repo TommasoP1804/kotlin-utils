@@ -548,7 +548,7 @@ fun <T, R> @receiver:Language("sql") String.executeQueryToTable(
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null,
     transform: Transformer<ResultRow<T>, R>
-) = transaction.execToTable<T>(this, args, explicitStatementType)
+) = transaction.execToTable<T, R>(this, args, explicitStatementType, transform)
 
 /**
  * Executes an SQL query within the provided transaction context and maps the result to a table structure.
@@ -575,7 +575,7 @@ fun <T, R> SqlQuery.executeQueryToTable(
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null,
     transform: Transformer<ResultRow<T>, R>
-) = transaction.execToTable<T>(this, args, explicitStatementType)
+) = transaction.execToTable<T, R>(this, args, explicitStatementType, transform)
 
 /**
  * Executes the given SQL query within the current JDBC transaction context.
