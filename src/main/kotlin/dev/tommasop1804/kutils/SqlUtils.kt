@@ -476,6 +476,107 @@ fun SetOperation.orderBy(vararg order: Pair<Expression<*>, SortDirection>) = ord
 )
 
 /**
+ * Executes the specified SQL query within the context of the provided JDBC transaction.
+ *
+ * @param args A collection of pairs, where each pair consists of a column type and its associated value.
+ *             These are the arguments to be used in the SQL query. Defaults to an empty list if no arguments are provided.
+ * @param explicitStatementType An optional parameter to explicitly specify the type of SQL statement to execute.
+ *                               Defaults to null if not provided.
+ * @since 5.4.4
+ */
+context(transaction: JdbcTransaction)
+fun SqlQuery.executeQuery(
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null
+) = transaction.exec(this, args, explicitStatementType)
+/**
+ * Executes the provided SQL query within the given transactional context.
+ *
+ * @param args A list of pairs consisting of a column type and its corresponding value to be used as parameters for the query. Defaults to an empty list.
+ * @param explicitStatementType An optional statement type to override the default behavior of the query execution.
+ * @param transform A function that processes the query's result set and transforms it into the desired type.
+ * @return Transformed result of the query.
+ * @since 5.4.4
+ */
+context(transaction: JdbcTransaction)
+fun <T> SqlQuery.executeQuery(
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null,
+    transform: Transformer<ResultSet, T?>
+) = transaction.exec(this, args, explicitStatementType, transform)
+
+/**
+ * Executes the calling SQL string within a `JdbcTransaction` context and converts the result set
+ * into a table structure. Provides an abstraction for executing SQL queries and processing their
+ * results into a structured table output.
+ *
+ * @param T The type of the table's cell values.
+ * @param this The SQL query string to be executed. It must conform to SQL syntax.
+ * @param args A collection of pairs, where each pair consists of a column type and a value
+ *             to be bound to the respective parameter in the SQL query. Defaults to an empty list.
+ * @param explicitStatementType An optional parameter to explicitly specify the type of SQL statement
+ *                              being executed, such as SELECT, UPDATE, etc. Can be null.
+ * @receiver The SQL query string to execute.
+ * @since 5.4.4
+ */
+context(transaction: JdbcTransaction)
+fun <T> @receiver:Language("sql") String.executeQueryToTable(
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null
+) = transaction.execToTable<T>(this, args, explicitStatementType)
+/**
+ * Executes an SQL query string within a `JdbcTransaction` context and converts the resulting
+ * `ResultSet` into a table structure. Utilizes a custom transformation function to map the
+ * result set values into the desired type. If the query does not produce a result set,
+ * an empty table is returned.
+ *
+ * @receiver The SQL query string to be executed. It must conform to valid SQL syntax.
+ * @param args A collection of pairs where each pair consists of a column type and a value
+ *             that will be bound to the SQL statement. Defaults to an empty list if no arguments are provided.
+ * @param explicitStatementType An optional parameter to explicitly define the type of SQL statement
+ *                              (e.g., SELECT, UPDATE). Can be null.
+ * @param transform A transformation function applied to the `ResultSet` to map it into the desired type.
+ *                  This function determines how each entry in the result set is processed.
+ *
+ * @return A table structure containing the transformed rows of the query result. If the query
+ *         produces no result set, an empty table is returned.
+ * @since 5.4.4
+ */
+context(transaction: JdbcTransaction)
+fun <T> @receiver:Language("sql") String.executeQueryToTable(
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null,
+    transform: Transformer<ResultSet, T?>
+) = transaction.execToTable<T>(this, args, explicitStatementType)
+
+/**
+ * Executes an SQL query within the provided transaction context and maps the result to a table structure.
+ *
+ * @param args A collection of column type and value pairs representing the query parameters. Defaults to an empty list if no parameters are provided.
+ * @param explicitStatementType An optional explicit statement type for the query execution. If not provided, the default statement type is used.
+ * @since 5.4.4
+ */
+context(transaction: JdbcTransaction)
+fun <T> SqlQuery.executeQueryToTable(
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null
+) = transaction.execToTable<T>(this, args, explicitStatementType)
+/**
+ * Executes a SQL query within the provided transaction context and maps the resulting data into a table format.
+ *
+ * @param args A list of pairs representing the column type and its corresponding value to be included in the query execution.
+ * @param explicitStatementType An optional parameter to specify the explicit statement type, if needed.
+ * @param transform A function that transforms a ResultSet into the desired type T or null.
+ * @since 5.4.4
+ */
+context(transaction: JdbcTransaction)
+fun <T> SqlQuery.executeQueryToTable(
+    args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
+    explicitStatementType: StatementType? = null,
+    transform: Transformer<ResultSet, T?>
+) = transaction.execToTable<T>(this, args, explicitStatementType)
+
+/**
  * Executes the given SQL query within the current JDBC transaction context.
  *
  * @param query The SQL query to be executed.
@@ -486,7 +587,7 @@ fun SetOperation.orderBy(vararg order: Pair<Expression<*>, SortDirection>) = ord
  * @return The result of executing the query.
  * @since 5.3.0
  */
-fun <T> JdbcTransaction.exec(
+fun JdbcTransaction.exec(
     query: SqlQuery,
     args: Iterable<Pair<IColumnType<*>, Any?>> = emptyList(),
     explicitStatementType: StatementType? = null

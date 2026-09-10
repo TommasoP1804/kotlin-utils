@@ -721,15 +721,15 @@ infix fun Pair<String, Column<*>>.lte(property: Pair<String, Column<*>>) =
     "$first.${second.name} <= ${property.first}.${property.second.name}"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Column<CharSequence>.like(value: Any) =
+infix fun Column<*>.like(value: Any) =
     "$name LIKE '$value'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Column<CharSequence>.like(value: Any) =
+infix fun Column<*>.like(value: Any) =
     "$name LIKE '$value'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Column<CharSequence>.like(value: Any) =
+infix fun Column<*>.like(value: Any) =
     "$name LIKE '$value'"
 @SqlDslMarker
 context(_: SqlBuilder)
@@ -745,99 +745,99 @@ infix fun String.like(value: Any) =
     "$this LIKE '$value'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Column<CharSequence>.like(property: Column<CharSequence>) =
+infix fun Column<*>.like(property: Column<*>) =
     "$name LIKE '${property.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Column<CharSequence>.like(property: Column<CharSequence>) =
+infix fun Column<*>.like(property: Column<*>) =
     "$name LIKE '${property.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Column<CharSequence>.like(property: Column<CharSequence>) =
+infix fun Column<*>.like(property: Column<*>) =
     "$name LIKE '${property.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun String.like(property: Column<CharSequence>) =
+infix fun String.like(property: Column<*>) =
     "$this LIKE '${property.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun String.like(property: Column<CharSequence>) =
+infix fun String.like(property: Column<*>) =
     "$this LIKE '${property.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun String.like(property: Column<CharSequence>) =
+infix fun String.like(property: Column<*>) =
     "$this LIKE '${property.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Column<CharSequence>.like(property: Pair<String, Column<CharSequence>>) =
+infix fun Column<*>.like(property: Pair<String, Column<*>>) =
     "$name LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Column<CharSequence>.like(property: Pair<String, Column<CharSequence>>) =
+infix fun Column<*>.like(property: Pair<String, Column<*>>) =
     "$name LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Column<CharSequence>.like(property: Pair<String, Column<CharSequence>>) =
+infix fun Column<*>.like(property: Pair<String, Column<*>>) =
     "$name LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun String.like(property: Pair<String, Column<CharSequence>>) =
+infix fun String.like(property: Pair<String, Column<*>>) =
     "$this LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun String.like(property: Pair<String, Column<CharSequence>>) =
+infix fun String.like(property: Pair<String, Column<*>>) =
     "$this LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun String.like(property: Pair<String, Column<CharSequence>>) =
+infix fun String.like(property: Pair<String, Column<*>>) =
     "$this LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Pair<String, Column<CharSequence>>.like(value: Any) =
+infix fun Pair<String, Column<*>>.like(value: Any) =
     "$first.${second.name} LIKE '$value'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Pair<String, Column<CharSequence>>.like(value: Any) =
+infix fun Pair<String, Column<*>>.like(value: Any) =
     "$first.${second.name} LIKE '$value'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Pair<String, Column<CharSequence>>.like(value: Any) =
+infix fun Pair<String, Column<*>>.like(value: Any) =
     "$first.${second.name} LIKE '$value'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Pair<String, Column<CharSequence>>.like(property: Column<CharSequence>) =
+infix fun Pair<String, Column<*>>.like(property: Column<*>) =
     "$first.${second.name} LIKE '${property.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Pair<String, Column<CharSequence>>.like(property: Column<CharSequence>) =
+infix fun Pair<String, Column<*>>.like(property: Column<*>) =
     "$first.${second.name} LIKE '${property.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Pair<String, Column<CharSequence>>.like(property: Column<CharSequence>) =
+infix fun Pair<String, Column<*>>.like(property: Column<*>) =
     "$first.${second.name} LIKE '${property.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Pair<String, Column<CharSequence>>.like(property: Pair<String, Column<CharSequence>>) =
+infix fun Pair<String, Column<*>>.like(property: Pair<String, Column<*>>) =
     "$first.${second.name} LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Pair<String, Column<CharSequence>>.like(property: Pair<String, Column<CharSequence>>) =
+infix fun Pair<String, Column<*>>.like(property: Pair<String, Column<*>>) =
     "$first.${second.name} LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Pair<String, Column<CharSequence>>.like(property: Pair<String, Column<CharSequence>>) =
+infix fun Pair<String, Column<*>>.like(property: Pair<String, Column<*>>) =
     "$first.${second.name} LIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Column<CharSequence>.ilike(value: Any) =
+infix fun Column<*>.ilike(value: Any) =
     "$name ILIKE '$value'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Column<CharSequence>.ilike(value: Any) =
+infix fun Column<*>.ilike(value: Any) =
     "$name ILIKE '$value'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Column<CharSequence>.ilike(value: Any) =
+infix fun Column<*>.ilike(value: Any) =
     "$name ILIKE '$value'"
 @SqlDslMarker
 context(_: SqlBuilder)
@@ -853,88 +853,88 @@ infix fun String.ilike(value: Any) =
     "$this ILIKE '$value'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Column<CharSequence>.ilike(property: Column<CharSequence>) =
+infix fun Column<*>.ilike(property: Column<*>) =
     "$name ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Column<CharSequence>.ilike(property: Column<CharSequence>) =
+infix fun Column<*>.ilike(property: Column<*>) =
     "$name ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Column<CharSequence>.ilike(property: Column<CharSequence>) =
+infix fun Column<*>.ilike(property: Column<*>) =
     "$name ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun String.ilike(property: Column<CharSequence>) =
+infix fun String.ilike(property: Column<*>) =
     "$this ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun String.ilike(property: Column<CharSequence>) =
+infix fun String.ilike(property: Column<*>) =
     "$this ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun String.ilike(property: Column<CharSequence>) =
+infix fun String.ilike(property: Column<*>) =
     "$this ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Column<CharSequence>.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun Column<*>.ilike(property: Pair<String, Column<*>>) =
     "$name ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Column<CharSequence>.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun Column<*>.ilike(property: Pair<String, Column<*>>) =
     "$name ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Column<CharSequence>.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun Column<*>.ilike(property: Pair<String, Column<*>>) =
     "$name ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun String.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun String.ilike(property: Pair<String, Column<*>>) =
     "$this ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun String.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun String.ilike(property: Pair<String, Column<*>>) =
     "$this ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun String.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun String.ilike(property: Pair<String, Column<*>>) =
     "$this ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Pair<String, Column<CharSequence>>.ilike(value: Any) =
+infix fun Pair<String, Column<*>>.ilike(value: Any) =
     "$first.${second.name} ILIKE '$value'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Pair<String, Column<CharSequence>>.ilike(value: Any) =
+infix fun Pair<String, Column<*>>.ilike(value: Any) =
     "$first.${second.name} ILIKE '$value'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Pair<String, Column<CharSequence>>.ilike(value: Any) =
+infix fun Pair<String, Column<*>>.ilike(value: Any) =
     "$first.${second.name} ILIKE '$value'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Pair<String, Column<CharSequence>>.ilike(property: Column<CharSequence>) =
+infix fun Pair<String, Column<*>>.ilike(property: Column<*>) =
     "$first.${second.name} ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Pair<String, Column<CharSequence>>.ilike(property: Column<CharSequence>) =
+infix fun Pair<String, Column<*>>.ilike(property: Column<*>) =
     "$first.${second.name} ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Pair<String, Column<CharSequence>>.ilike(property: Column<CharSequence>) =
+infix fun Pair<String, Column<*>>.ilike(property: Column<*>) =
     "$first.${second.name} ILIKE '${property.name}'"
 @SqlDslMarker
 context(_: SqlBuilder)
-infix fun Pair<String, Column<CharSequence>>.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun Pair<String, Column<*>>.ilike(property: Pair<String, Column<*>>) =
     "$first.${second.name} ILIKE '${property.first}.${property.second.name}'"
 @SqlDslMarker
 context(_: WhereScope)
-infix fun Pair<String, Column<CharSequence>>.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun Pair<String, Column<*>>.ilike(property: Pair<String, Column<*>>) =
     "$first.${second.name} ILIKE '${property.first}.${property.second.name}'"
 
 @SqlDslMarker
 context(_: JoinScope)
-infix fun Pair<String, Column<CharSequence>>.ilike(property: Pair<String, Column<CharSequence>>) =
+infix fun Pair<String, Column<*>>.ilike(property: Pair<String, Column<*>>) =
     "$first.${second.name} ILIKE '${property.first}.${property.second.name}'"
 
 @SqlDslMarker
