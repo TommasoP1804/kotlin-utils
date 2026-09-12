@@ -14,21 +14,23 @@ import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
 import org.jetbrains.exposed.v1.core.java.UUIDColumnType
-import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.dao.java.UUIDEntity
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
+import kotlin.uuid.Uuid
 
 /**
  * A type alias for UUIDColumnType.
  * This allows the UUIDColumnType to be referred to with a shorter and more convenient name, UuidColumnType.
  * @since 5.3.0
  */
+@Deprecated("Prefer use of kotlin.uuid.Uuid instead", ReplaceWith("UuidColumnType", "org.jetbrains.exposed.v1.core.UuidColumnType"))
 typealias UuidColumnType = UUIDColumnType
 /**
  * A type alias for the UUIDEntity class.
  * This provides a shorter or alternative name to reference UUIDEntity in the codebase.
  * @since 5.3.0
  */
+@Deprecated("Prefer use of kotlin.uuid.Uuid instead", ReplaceWith("UuidEntity", "org.jetbrains.exposed.v1.core.UuidEntity"))
 typealias UuidEntity = UUIDEntity
 /**
  * A type alias for `UUIDEntityClass<E>`, simplifying its usage in the code.
@@ -36,6 +38,7 @@ typealias UuidEntity = UUIDEntity
  * @param E The type of the Entity this class is associated with.
  * @since 5.3.1
  */
+@Deprecated("Prefer use of kotlin.uuid.Uuid instead", ReplaceWith("UuidEntityClass<E>", "org.jetbrains.exposed.v1.core.UuidEntityClass"))
 typealias UuidEntityClass<E> = UUIDEntityClass<E>
 
 /**
@@ -51,13 +54,13 @@ typealias UuidEntityClass<E> = UUIDEntityClass<E>
  * @param columnName The name of the ID column in the table. Defaults to "id".
  * @param version The version of the UUID to be generated for this table. Determines the methodology used
  *                for generating the UUID.
- * @since 5.3.0
+ * @since 6.0.0
  */
 open class UuidTable(
     name: String = String.EMPTY,
     columnName: String = "id",
-    version: dev.tommasop1804.kutils.classes.identifiers.UuidVersion = dev.tommasop1804.kutils.classes.identifiers.UuidVersion.V4
+    version: dev.tommasop1804.kutils.classes.identifiers.UuidVersion
 ) : IdTable<Uuid>(name) {
-    final override val id: Column<EntityID<Uuid>> = javaUUID(columnName).clientDefault { Uuid(version) }.entityId()
+    final override val id: Column<EntityID<Uuid>> = uuid(columnName).clientDefault { Uuid(version) }.entityId()
     final override val primaryKey = PrimaryKey(id)
 }

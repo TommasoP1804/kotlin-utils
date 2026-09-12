@@ -4,8 +4,7 @@
 
 package dev.tommasop1804.kutils.classes.identifiers
 
-import dev.tommasop1804.kutils.*
-import java.util.*
+import kotlin.uuid.Uuid
 
 /**
  * Enum class representing predefined UUID namespaces as defined in RFC 4122.
@@ -27,7 +26,7 @@ enum class UuidNamespace(val predefinedNamespace: Uuid) {
      *
      * @since 3.0.0
      */
-    DNS(UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8")),
+    DNS(Uuid.parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8")),
     /**
      * Represents the UUID namespace for URLs, as defined in RFC 4122.
      *
@@ -35,7 +34,7 @@ enum class UuidNamespace(val predefinedNamespace: Uuid) {
      *
      * @since 3.0.0
      */
-    URL(UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8")),
+    URL(Uuid.parse("6ba7b811-9dad-11d1-80b4-00c04fd430c8")),
     /**
      * Represents the UUID namespace associated with Object Identifiers (OID).
      * This predefined namespace UUID is used for generating names based on the OID format.
@@ -43,7 +42,7 @@ enum class UuidNamespace(val predefinedNamespace: Uuid) {
      * @see UuidNamespace for other predefined namespaces.
      * @since 3.0.0
      */
-    OID(UUID.fromString("6ba7b812-9dad-11d1-80b4-00c04fd430c8")),
+    OID(Uuid.parse("6ba7b812-9dad-11d1-80b4-00c04fd430c8")),
     /**
      * Represents the X.500 namespace as defined for UUID-based generation.
      * This namespace is identified by the predefined UUID "6ba7b814-9dad-11d1-80b4-00c04fd430c8".
@@ -51,5 +50,5 @@ enum class UuidNamespace(val predefinedNamespace: Uuid) {
      *
      * @since 3.0.0
      */
-    X500(UUID.fromString("6ba7b814-9dad-11d1-80b4-00c04fd430c8"))
+    X500(Uuid.parse("6ba7b814-9dad-11d1-80b4-00c04fd430c8"))
 }

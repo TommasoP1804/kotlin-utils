@@ -48,6 +48,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.invoke
 import kotlin.ranges.rangeTo
 import kotlin.reflect.KClass
 import kotlin.text.endsWith
@@ -142,6 +143,30 @@ inline fun <reified T : Enum<T>> Table.enumerationByName(name: String) = enumera
  * @since 5.3.5
  */
 fun Table.enumerationByName(name: String, kClass: KClass<out Enum<*>>) = enumerationByName(name, 255, kClass)
+
+/**
+ * Declares a URI column in a database table with optional length specification.
+ * The column stores URI values in string format while providing transformation between
+ * the stored string and a [Uri] object for easy usage.
+ *
+ * @receiver The table in which the column is declared.
+ * @param name The name of the column in the database table.
+ * @param length The maximum length of the URI string stored in the column. Default is 2048.
+ * @since 5.5.0
+ */
+fun Table.uri(name: String, length: Int = 2048) = varchar(name, length)
+    .transform({ it.toUri()() }, Uri::toString)
+/**
+ * Defines a column in the table that stores URL values as strings, with an optional length restriction.
+ * The transformation functions are applied to convert the stored string value to a URL object
+ * and back to a string representation.
+ *
+ * @param name The name of the column.
+ * @param length The maximum length of the column's stored string. Defaults to 2048.
+ * @since 5.5.0
+ */
+fun Table.url(name: String, length: Int = 2048) = varchar(name, length)
+    .transform({ it.toUrl()() }, Url::toString)
 
 /**
  * Represents a custom column type for handling JSONB data in a database using Exposed.
@@ -1106,7 +1131,7 @@ fun SortDirection.toExposedSortOrder() = when (this) {
  * @param name The name of the UUID column to be added to the table.
  * @since 5.3.0
  */
-fun Table.javaUuid(name: String): Column<Uuid> = javaUUID(name)
+fun Table.javaUuid(name: String): Column<UUID> = javaUUID(name)
 
 /**
  * Specifies the sorting order for a window function based on the given column and sort direction.

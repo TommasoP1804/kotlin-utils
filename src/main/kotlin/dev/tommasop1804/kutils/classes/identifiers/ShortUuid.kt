@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.Uuid
 import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.toJavaUuid
 import dev.tommasop1804.kutils.toUuid
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.SqlTypes
@@ -23,7 +24,6 @@ import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
-import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.dao.Entity
 import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
@@ -39,6 +39,7 @@ import java.util.*
 import kotlin.math.ceil
 import kotlin.math.ln
 import kotlin.repeat
+import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
 /**
@@ -83,10 +84,22 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
      * @param uuid the UUID to encode into a shortened string.
      * @since 3.0.0
      */
-    constructor(uuid: Uuid) : this(encode(
+    constructor(uuid: UUID) : this(encode(
         BigInt(uuid.toString().replace("-", ""), 16),
         ceil((ln(25.0) / ln(ALPHABET.size.toDouble())) * 16).toInt()
     ))
+    /**
+     * Creates an instance of the [ShortUuid] class using a [UUID].
+     *
+     * This constructor encodes the given [UUID] into a shortened string format
+     * using a custom alphabet. The encoding process is performed by converting
+     * the UUID into a [BigInt], removing non-numeric characters, and encoding
+     * it using a specific length calculated based on the size of the custom alphabet.
+     *
+     * @param uuid the UUID to encode into a shortened string.
+     * @since 6.0.0
+     */
+    constructor(uuid: kotlin.uuid.Uuid) : this(uuid.toJavaUuid())
 
     /**
      * Default constructor for the ShortUUID class.
@@ -187,6 +200,17 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
          */
         fun UUID.toShortUuid() = ShortUuid(this)
         /**
+         * Converts this [UUID] into its shortened [ShortUuid] representation.
+         *
+         * This extension function utilizes the [ShortUuid] class constructor to generate
+         * a compact, encoded string representation of the UUID. The resulting [ShortUuid]
+         * provides a more concise alternative format for the UUID.
+         *
+         * @return A [ShortUuid] instance representing the shortened form of the original UUID.
+         * @since 6.0.0
+         */
+        fun kotlin.uuid.Uuid.toShortUuid() = ShortUuid(this)
+        /**
          * Converts a [CharSequence] into a `ShortUUID` representation.
          *
          * This extension function constructs a `ShortUUID` object from the current [CharSequence].
@@ -223,7 +247,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<ShortUuid?, UUID?> {
-            override fun convertToDatabaseColumn(attribute: ShortUuid?): UUID? = attribute?.value?.toUuid()()
+            override fun convertToDatabaseColumn(attribute: ShortUuid?): UUID? = attribute?.value?.toJavaUuid()?.getOrThrow()
             override fun convertToEntityAttribute(dbData: UUID?): ShortUuid? = dbData?.toShortUuid()
         }
 
@@ -338,7 +362,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
          * @param name The name of the column to store the shortened UUID.
          * @since 5.3.0
          */
-        fun Table.shortUuid(name: String) = javaUUID(name).transform(::ShortUuid, ShortUuid::toUuid)
+        fun Table.shortUuid(name: String) = uuid(name).transform(::ShortUuid, ShortUuid::toUuid)
         /**
          * Adds a column with a fixed-length character type (22 characters) to the table,
          * designed to store shortened UUID representations. The transformation functions
@@ -435,15 +459,15 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
      * Decodes a given shortened UUID string into its full UUID representation.
      *
      * @receiver The shortened UUID string to decode.
-     * @since 3.0.0
+     * @since 6.0.0
      */
-    fun toUuid(): Uuid = Uuid(decode(value.toCharArray()))
+    fun toUuid() = toJavaUuid().toKotlinUuid()
 
     /**
      * Decodes a given shortened UUID string into its full UUID representation.
      *
      * @receiver The shortened UUID string to decode.
-     * @since 3.0.0
+     * @since 6.0.0
      */
-    fun toKotlinUuid() = Uuid(decode(value.toCharArray())).toKotlinUuid()
+    fun toJavaUuid() = UUID.fromString(decode(value.toCharArray()))!!
 }

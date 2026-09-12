@@ -7,6 +7,7 @@ package dev.tommasop1804.kutils.classes.tree
 import dev.tommasop1804.kutils.*
 import java.util.*
 import kotlin.reflect.KProperty
+import kotlin.uuid.Uuid
 
 /**
  * Represents a node in a tree data structure.
@@ -20,14 +21,14 @@ import kotlin.reflect.KProperty
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@Suppress("unused", "kutils_collection_declaration")
 @MustUseReturnValues
+@Suppress("unused", "kutils_collection_declaration")
 class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: T?, children: MList<TreeNode<T>>)/*: Serializable*/ {
     /**
      * Represents the unique identifier for the TreeNode instance.
      * This identifier helps distinguish the node within a tree structure.
      *
-     * 
+     *
      * @since 1.0.0
      */
     var id: Uuid = id
@@ -38,7 +39,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * When the variable is assigned a new value, it is converted to a mutable list.
      * If the new value is empty, the parent ID of each child node is updated to match the ID of the current `TreeNode`.
      *
-     * 
+     *
      * @since 1.0.0
      */
     var children = children
@@ -51,7 +52,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      *
      * A leaf node is defined as a node that has no children.
      *
-     * 
+     *
      * @return `true` if this node has no children, `false` otherwise.
      * @since 1.0.0
      */
@@ -63,7 +64,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * This property evaluates to true if the `children` collection is not empty,
      * and false otherwise.
      *
-     * 
+     *
      * @return true if the node has one or more children, false otherwise.
      * @since 1.0.0
      */
@@ -72,7 +73,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
     /**
      * Indicates whether the current tree node has a parent node.
      *
-     * 
+     *
      * @return `true` if the node has a parent (i.e., the `parentId` is not null), otherwise `false`.
      * @since 1.0.0
      */
@@ -82,7 +83,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * Indicates whether this node is the root node in the tree structure.
      * A node is considered the root if it does not have a parent, in which case its `parentId` is `null`.
      *
-     * 
+     *
      * @since 1.0.0
      */
     val isRoot: Boolean
@@ -93,7 +94,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * The size is calculated dynamically by summing up the current node and recursively traversing
      * its child nodes to include all their sizes.
      *
-     * 
+     *
      * @since 1.0.0
      */
     val size: Int
@@ -108,7 +109,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * Retrieves a flattened list of all descendant nodes of the current TreeNode,
      * including the immediate children and their respective descendants.
      *
-     * 
+     *
      * @return A list of TreeNode objects representing the flattened hierarchy of descendants.
      * @since 1.0.0
      */
@@ -135,7 +136,8 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * @param children The list of child nodes, defaulting to an empty mutable list if not provided.
      * @since 1.0.0
      */
-    constructor(parentId: Uuid? = null, value: T? = null, children: List<TreeNode<T>> = mutableListOf<TreeNode<T>>()): this(Uuid(), parentId, value, children.toMutableList())
+    constructor(parentId: Uuid? = null, value: T? = null, children: List<TreeNode<T>> = mutableListOf<TreeNode<T>>()): this(
+        Uuid(), parentId, value, children.toMutableList())
 
     /*companion object {
         @Serial private const val serialVersionUID = 1L
@@ -191,12 +193,12 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      */
     @Suppress("UNCHECKED_CAST")
     operator fun <R> getValue(thisRef: Any?, property: KProperty<*>): R = _toMap().getValue(property.name) as R
-    
+
     /**
      * Adds a child node at the specified index within the current node's children list.
      * The parentId of the added child is set to the id of this node.
      *
-     * 
+     *
      * @param index The position at which the child node should be inserted in the children list.
      * @param child The child TreeNode to be added.
      * @since 1.0.0
@@ -209,7 +211,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
     /**
      * Adds a child node to the current node, establishing a parent-child relationship.
      *
-     * 
+     *
      * @param child The child node to be added.
      * @since 1.0.0
      */
@@ -217,12 +219,12 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
         child.parentId = id
         children.add(child)
     }
-    
+
     /**
      * Removes the specified child node from the current node's children.
      * Updates the parent reference of the child node to null.
      *
-     * 
+     *
      * @param child The child node to be removed from the current node's children.
      * @since 1.0.0
      */
@@ -230,12 +232,12 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
         child.parentId = null
         children.remove(child)
     }
-    
+
     /**
      * Removes the child node at the specified index from the list of children.
      * Additionally, clears the parent link of the child node being removed.
      *
-     * 
+     *
      * @param index The zero-based position of the child node to remove.
      * @throws IndexOutOfBoundsException If the index is out of bounds for the children list.
      * @since 1.0.0
@@ -244,29 +246,27 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
         children[index].parentId = null
         children.removeAt(index)
     }
-    
+
     /**
      * Checks if the given value is equal to the value of this tree node.
      *
-     * 
+     *
      * @param value The value to compare against the value of this tree node.
      * @since 1.0.0
      */
     operator fun contains(value: T) = this.value == value
-    
+
     /**
      * Checks if the specified value exists in the node's children or, optionally, includes the current node itself.
      *
-     * 
+     *
      * @param value The value to search for in the children of this node.
      * @param considerNode If true, includes the current node in the search. Defaults to false.
      * @return True if the value is found in the children or, if `considerNode` is true, in the current node; false otherwise.
      * @since 1.0.0
      */
-    fun childrenContains(value: T, considerNode: Boolean = false): Boolean {
-        if (considerNode && this.value == value) return true
-        return children.any { it.childrenContains(value, true) }
-    }
+    fun childrenContains(value: T, considerNode: Boolean = false): Boolean =
+        considerNode && this.value == value || children.any { it.childrenContains(value, true) }
 
     /**
      * Adds a child node to the current node, establishing a parent-child relationship.
@@ -311,20 +311,20 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
     }
 
     operator fun iterator() = children.iterator()
-    
+
     /**
      * Provides a string representation of the TreeNode instance, including its id, parentId, value, and children.
      *
-     * 
+     *
      * @return A string describing the current state of the TreeNode instance.
      * @since 1.0.0
      */
     override fun toString(): String = "TreeNode(id=$id, parentId=$parentId, value=$value, children=$children)"
-    
+
     /**
      * Compares this TreeNode instance with another object for equality.
      *
-     * 
+     *
      * @param other The object to be compared with the current TreeNode instance.
      * @return `true` if the other object is a TreeNode instance and all significant properties
      *         (parentId, value, id, children) are equal; `false` otherwise.
@@ -350,18 +350,18 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * The hash code is calculated using the `parentId`, `value`, `id`, and `children` properties.
      * The result ensures consistency with the `equals` method and can be used effectively in hash-based collections.
      *
-     * 
+     *
      * @return The hash code value for the [TreeNode] instance.
      * @since 1.0.0
      */
     override fun hashCode(): Int {
-        var result = parentId?.hashCode() ?: 0
-        result = 31 * result + (value?.hashCode() ?: 0)
+        var result = parentId.hashCode()
+        result = 31 * result + value.hashCode()
         result = 31 * result + id.hashCode()
         result = 31 * result + children.hashCode()
         return result
     }
-    
+
     /**
      * Computes the depth of the current node in the given tree.
      *
@@ -372,7 +372,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      */
     @Suppress("UNCHECKED_CAST")
     fun depth(tree: Tree<T>) = tree.getDepth(this as TreeNode<T?>)
-    
+
     /**
      * Determines if the current node is an ancestor of the specified node.
      *
@@ -386,7 +386,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
             if (child == other) return true
         return false
     }
-    
+
     /**
      * Determines if the current node is a descendant of the specified node within the given tree.
      *
@@ -397,7 +397,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      */
     @Suppress("UNCHECKED_CAST")
     fun isDescendantOf(other: TreeNode<T?>, tree: Tree<T>) = tree.checkDescendantOf(this as TreeNode<T?>, other)
-    
+
     /**
      * Checks whether the current tree node shares the same parent as the specified node.
      *
@@ -407,7 +407,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * @since 1.0.0
      */
     infix fun isSiblingOf(other: TreeNode<T>) = parentId == other.parentId
-    
+
     /**
      * Determines if this node is the parent of the given node.
      *
@@ -416,7 +416,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      * @since 1.0.0
      */
     infix fun isParentOf(other: TreeNode<T>) = parentId == other.id
-    
+
     /**
      * Computes the path from the current node to the root of the given tree.
      *
@@ -427,7 +427,7 @@ class TreeNode<T> private constructor(id: Uuid, var parentId: Uuid?, var value: 
      */
     @Suppress("UNCHECKED_CAST")
     fun pathToRoot(tree: Tree<T>) = tree.pathToRootOf(this as TreeNode<T?>)
-    
+
     /**
      * Retrieves the path of this `TreeNode` instance from the root node within the given tree.
      *

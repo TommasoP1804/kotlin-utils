@@ -25,7 +25,6 @@ import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
-import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.dao.Entity
 import org.jetbrains.exposed.v1.dao.EntityClass
 import tools.jackson.databind.DeserializationContext
@@ -64,6 +63,8 @@ import kotlin.code
 import kotlin.hashCode
 import kotlin.let
 import kotlin.runCatching
+import kotlin.uuid.toJavaUuid
+import kotlin.uuid.toKotlinUuid
 
 /**
  * Represents a Universally Unique Lexicographically Sortable Identifier (ULID).
@@ -242,7 +243,18 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * @param uuid The UUID from which the ULID will be constructed.
      * @since 3.0.0
      */
-    constructor(uuid: Uuid) : this(from(uuid))
+    constructor(uuid: UUID) : this(from(uuid))
+    /**
+     * Constructs a ULID instance from the given UUID.
+     *
+     * This constructor utilizes the `from` function to extract the most significant
+     * and least significant bits of the provided `Uuid` and initializes a new ULID
+     * instance with the derived values.
+     *
+     * @param uuid The UUID from which the ULID will be constructed.
+     * @since 6.0.0
+     */
+    constructor(uuid: kotlin.uuid.Uuid) : this(from(uuid.toJavaUuid()))
     /**
      * Constructs a ULID instance from the given byte array.
      *
@@ -1068,13 +1080,13 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * Defines a ULID column for a database table by utilizing transformation
          * between a UUID and a ULID instance.
          *
-         * The method leverages the `javaUUID` function to generate a UUID-based column,
+         * The method leverages the `uuid` function to generate a UUID-based column,
          * and applies transformations to convert it into a ULID-compatible format.
          *
          * @param name The name of the column within the database table.
          * @since 5.3.0
          */
-        fun Table.ulid(name: String) = javaUUID(name)
+        fun Table.ulid(name: String) = uuid(name)
             .transform(::Ulid, Ulid::toUuid)
         /**
          * Defines a column in the table with a ULID (Universally Unique Lexicographically Sortable Identifier) representation,
@@ -1180,9 +1192,20 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
      * maintains compatibility with systems or APIs that accept UUIDs.
      *
      * @return A `UUID` instance representing the same value as this ULID.
-     * @since 3.0.0
+     * @since 6.0.0
      */
-    fun toUuid(): Uuid = UUID(mostSignificantBits, leastSignificantBits)
+    fun toJavaUuid(): UUID = UUID(mostSignificantBits, leastSignificantBits)
+    /**
+     * Converts the current ULID instance to a UUID representation.
+     *
+     * This method combines the most significant bits and least significant bits
+     * of the ULID to form a standard `java.util.UUID` object. The resulting UUID
+     * maintains compatibility with systems or APIs that accept UUIDs.
+     *
+     * @return A `UUID` instance representing the same value as this ULID.
+     * @since 6.0.0
+     */
+    fun toUuid() = toJavaUuid().toKotlinUuid()
 
     /**
      * Converts the ULID to a byte array representation, with the most significant bits and least significant bits

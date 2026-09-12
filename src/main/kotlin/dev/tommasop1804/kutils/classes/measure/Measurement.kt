@@ -838,6 +838,76 @@ class RMeasurement<T : ScalarUnit>(override val value: Double, override val unit
          * @since 5.5.0
          */
         inline fun <reified T : ScalarUnit> Table.rMeasurement(name: String) = jsonb<RMeasurement<T>>(name)
+
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.dataSize(name: String) = jsonb<DataSize>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.length(name: String) = jsonb<Length>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.temperature(name: String) = jsonb<Temperature>(name)/**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.area(name: String) = jsonb<Area>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.volume(name: String) = jsonb<Volume>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.speed(name: String) = jsonb<Speed>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.acceleration(name: String) = jsonb<Acceleration>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.density(name: String) = jsonb<Density>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.planeAngle(name: String) = jsonb<PlaneAngle>(name)
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.1
+         */
+        fun Table.mass(name: String) = jsonb<Mass>(name)
     }
 }
 

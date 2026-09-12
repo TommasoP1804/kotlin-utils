@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.uuid.Uuid
 
 /**
  * An immutable set of conversions from raw, untyped values (typically the ones a JDBC driver hands back)
@@ -59,6 +60,7 @@ class RawReaders @PublishedApi internal constructor(
                 Float::class to { raw: Any -> (raw as? Number)?.toFloat() ?: raw.toString().trim().toFloatOrNull() },
                 BigDecimal::class to { raw: Any -> raw.toString().trim().toBigDecimalOrNull() },
                 UUID::class to { raw: Any -> runCatching { UUID.fromString(raw.toString().trim()) }.getOrNull() },
+                Uuid::class to { raw: Any -> runCatching { Uuid.parse(raw.toString().trim()) }.getOrNull() },
                 Instant::class to { raw: Any -> raw.asOffsetDateTime().toInstant() },
                 OffsetDateTime::class to { raw: Any -> raw.asOffsetDateTime() },
                 LocalDateTime::class to { raw: Any -> raw.asOffsetDateTime().toLocalDateTime() },

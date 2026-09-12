@@ -1847,6 +1847,7 @@ typealias BigInt = BigInteger
  *
  * @since 3.0.0
  */
+@Deprecated("Prefer use of kotlin.uuid.Uuid instead", ReplaceWith("Uuid", "kotlin.uuid.Uuid"))
 typealias Uuid = UUID
 
 /**

@@ -10,6 +10,7 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.exceptions.*
@@ -19,14 +20,33 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
+import kotlin.uuid.toJavaUuid
+import kotlin.uuid.toKotlinUuid
+import kotlin.uuid.Uuid as KUuid
 
+private const val GREGORIAN_TO_UNIX_100NS_INTERVALS: Long = 122_192_928_000_000_000L
+
+private fun gregorian100nsToInstant(gregorian100ns: Long): Instant {
+    val unix100ns = gregorian100ns - GREGORIAN_TO_UNIX_100NS_INTERVALS
+    val seconds = unix100ns / 10_000_000L
+    val remainder100ns = unix100ns % 10_000_000L
+    return Instant.ofEpochSecond(seconds, remainder100ns * 100L)
+}
+
+/**
+ * Represents a UUID value where all bits are set to zero.
+ * Often used to signify a "null" or "uninitialized" UUID.
+ *
+ * @since 6.0.0
+ */
+val KUuid.Companion.MAX get() = KUuid.parse("ffffffff-ffff-ffff-ffff-ffffffffffff")
 /**
  * Represents a UUID value where all bits are set to zero.
  * Often used to signify a "null" or "uninitialized" UUID.
  *
  * @since 1.0.0
  */
-val NIL_UUID: Uuid = UUID.fromString("00000000-0000-0000-0000-000000000000")
+val NIL_UUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 /**
  * A constant representing the maximum possible UUID value.
  *
@@ -38,7 +58,7 @@ val NIL_UUID: Uuid = UUID.fromString("00000000-0000-0000-0000-000000000000")
  *
  * @since 1.0.0
  */
-val MAX_UUID: Uuid = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff")
+val MAX_UUID: UUID = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff")
 
 /**
  * Extension property for `UUID` that converts the timestamp of the UUID to an `Instant` object.
@@ -51,22 +71,68 @@ val MAX_UUID: Uuid = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff")
  * @return An `Instant` corresponding to the UUID timestamp.
  * @since 1.0.0
  */
-val Uuid.instant: Instant
-    get() = if (version() == 1) Instant(timestamp()) else Ulid(this).instant
+val UUID.instant: Instant?
+    get() = when (version()) {
+        1 -> {
+            val msb = mostSignificantBits
+            val timeLow = (msb ushr 32) and 0xFFFFFFFFL
+            val timeMid = (msb ushr 16) and 0xFFFFL
+            val timeHi = msb and 0x0FFFL
+            gregorian100nsToInstant((timeHi shl 48) or (timeMid shl 32) or timeLow)
+        }
+        6 -> {
+            val msb = mostSignificantBits
+            val timeHigh = (msb ushr 32) and 0xFFFFFFFFL
+            val timeMid = (msb ushr 16) and 0xFFFFL
+            val timeLow = msb and 0x0FFFL
+            gregorian100nsToInstant((timeHigh shl 28) or (timeMid shl 12) or timeLow)
+        }
+        7 -> {
+            val unixMillis = mostSignificantBits ushr 16
+            return Instant.ofEpochMilli(unixMillis)
+        }
+        else -> null
+    }
+/**
+ * Extension property for `UUID` that converts the timestamp of the UUID to an `Instant` object.
+ *
+ * The timestamp of the UUID is interpreted in milliseconds since the epoch
+ * (1970-01-01T00:00:00Z) and converted into an `Instant`.
+ *
+ *
+ * @receiver The `UUID` object whose timestamp will be converted.
+ * @return An `Instant` corresponding to the UUID timestamp.
+ * @since 6.0.0
+ */
+val KUuid.instant: Instant?
+    get() = toJavaUuid().instant
 
 /**
  * An extension property for the `UUID` class that retrieves the corresponding version of the UUID
- * as an instance of the `UUIDVersion` enum.
+ * as an instance of the `UuidVersion` enum.
  *
  * This property determines the version of a `UUID` by invoking its internal `version()` function
- * and maps it to the appropriate `UUIDVersion` constant using the `UUIDVersion.fromVersion` method.
+ * and maps it to the appropriate `UuidVersion` constant using the `UuidVersion.fromVersion` method.
  *
  * @receiver The `UUID` instance for which the version is being determined.
- * @return The specific version of the `UUID` as a `UUIDVersion` enum value.
+ * @return The specific version of the `UUID` as a `UuidVersion` enum value.
  * @since 1.0.0
  */
-val Uuid.version: UuidVersion
+val UUID.version: UuidVersion
     get() = UuidVersion.fromVersion(version())!!
+/**
+ * An extension property for the `UUID` class that retrieves the corresponding version of the UUID
+ * as an instance of the `UuidVersion` enum.
+ *
+ * This property determines the version of a `UUID` by invoking its internal `version()` function
+ * and maps it to the appropriate `UuidVersion` constant using the `UuidVersion.fromVersion` method.
+ *
+ * @receiver The `UUID` instance for which the version is being determined.
+ * @return The specific version of the `UUID` as a `UuidVersion` enum value.
+ * @since 6.0.0
+ */
+val KUuid.version: UuidVersion
+    get() = toJavaUuid().version
 
 /**
  * Retrieves the variant of the UUID.
@@ -78,8 +144,20 @@ val Uuid.version: UuidVersion
  * @return The variant value as an integer.
  * @since 1.0.0
  */
-val Uuid.variant: Int
+val UUID.variant: Int
     get() = variant()
+/**
+ * Retrieves the variant of the UUID.
+ * The variant denotes the layout of the UUID.
+ *
+ * This property provides a convenient way to access the variant information
+ * directly from the UUID instance.
+ *
+ * @return The variant value as an integer.
+ * @since 6.0.0
+ */
+val KUuid.variant: Int
+    get() = toJavaUuid().variant
 
 /**
  * Retrieves the subvariant value of the UUID based on its 8th byte.
@@ -91,7 +169,7 @@ val Uuid.variant: Int
  * @return The subvariant of the UUID as an integer.
  * @since 1.0.0
  */
-val Uuid.subvariant: Int
+val UUID.subvariant: Int
     get() {
         val bb = ByteBuffer.allocate(16)
         bb.putLong(mostSignificantBits)
@@ -100,6 +178,18 @@ val Uuid.subvariant: Int
 
         return (bytes[8].toInt() and 0x30) shr 4
     }
+/**
+ * Retrieves the subvariant value of the UUID based on its 8th byte.
+ *
+ * The subvariant is calculated by decoding specific bits (0x30 mask applied,
+ * then shifted right by 4) of the UUID's byte representation.
+ *
+ * @receiver The UUID instance from which the subvariant is derived.
+ * @return The subvariant of the UUID as an integer.
+ * @since 1.0.0
+ */
+val KUuid.subvariant: Int
+    get() = toJavaUuid().subvariant
 
 /**
  * Extension property for `UUID` that returns the string representation of the UUID with all hyphens removed.
@@ -108,7 +198,16 @@ val Uuid.subvariant: Int
  *
  * @since 3.0.0
  */
-val Uuid.withoutHyphens: String
+val UUID.withoutHyphens: String
+    get() = toString() - '-'
+/**
+ * Extension property for `UUID` that returns the string representation of the UUID with all hyphens removed.
+ *
+ * This can be useful when a compact representation of the UUID is required.
+ *
+ * @since 3.0.0
+ */
+val KUuid.withoutHyphens: String
     get() = toString() - '-'
 
 /**
@@ -130,15 +229,15 @@ val Uuid.withoutHyphens: String
  * @param v8Type An optional parameter for UUIDv8. This parameter is ignored for other versions.
  * @param v8Strings An optional parameter for UUIDv8. This parameter is ignored for other versions.
  * @return A UUID instance corresponding to the specified version and provided inputs.
- * @since 3.0.0
+ * @since 6.0.0
  */
-fun Uuid(
+fun JavaUuid(
     version: UuidVersion = UuidVersion.V4,
-    namespaceAndName: Pair<Uuid, String>? = null,
+    namespaceAndName: Pair<UUID, String>? = null,
     timestamp: Instant? = null,
     v8Type: UuidV8Type? = null,
     v8Strings: Any2? = null
-): Uuid = when(version) {
+): UUID = when(version) {
     UuidVersion.V1 -> UuidGenerator.v1(timestamp?.toEpochMilli())
     UuidVersion.V2 -> throw UnsupportedOperationException("DCE_SECURITY generation is not supported .")
     UuidVersion.V3 -> UuidGenerator.v3(
@@ -170,7 +269,183 @@ fun Uuid(
  * @param v8Type An optional parameter for UUIDv8. This parameter is ignored for other versions.
  * @param v8String An optional parameter for UUIDv8. This parameter is ignored for other versions.
  * @return A UUID instance corresponding to the specified version and provided inputs.
- * @since 3.0.0
+ * @since 6.0.0
+ */
+fun JavaUuid(
+    version: UuidVersion,
+    timestamp: Instant? = null,
+    v8Type: UuidV8Type? = null,
+    v8String: String
+) = JavaUuid(version, timestamp = timestamp, v8Type = v8Type, v8Strings = v8String to String.EMPTY)
+/**
+ * Generates a UUID based on the specified version and a namespace-name pair.
+ * This method supports the creation of UUIDs compliant with the UUID standard,
+ * leveraging different generation methods determined by the provided version.
+ *
+ * - WARNING: UUIDv1 can expose MAC address.
+ * - WARNING: UUIDv6 can expose node identifier.
+ *
+ * @param version The version of the UUID to be generated. This determines the algorithm and specifications
+ *                for UUID creation, as defined in the `UUIDVersion` enum.
+ * @param namespaceAndName A pair consisting of a `UUIDNamespace` and a `String`. The namespace is a predefined
+ *                         UUID representing the context (e.g., DNS, URL, OID, X500), and the name is a
+ *                         specific identifier within that namespace. These are used in name-based UUID generation.
+ * @since 6.0.0
+ */
+@JvmName("JavaUuidUuidVersionUuidNamespaceString")
+fun JavaUuid(version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>) = JavaUuid(version, namespaceAndName.map(f1 = { it.predefinedNamespace.toJavaUuid() }))
+/**
+ * Generates a list of distinct UUIDs based on the specified parameters.
+ *
+ * This function creates multiple UUIDs using the specified version, and optionally
+ * a namespace and name for name-based UUIDs (UUIDv3 and UUIDv5). It ensures that
+ * the resulting list contains distinct UUIDs and appends additional UUIDs if duplicates
+ * are found during the generation process.
+ *
+ * @param number The number of UUIDs to generate.
+ * @param version The version of the UUIDs to generate. Supported versions include UUIDv1, UUIDv3, UUIDv4, UUIDv5, UUIDv6, and UUIDv7.
+ *                UUIDv2 is not supported and will throw an UnsupportedOperationException.
+ * @param namespaceAndName An optional pair containing a namespace UUID and a name string.
+ *                         This parameter is mandatory for name-based UUIDs (UUIDv3 and UUIDv5),
+ *                         and a RequiredParameterException will be thrown if it is null.
+ *                         It is ignored for other versions.
+ * @return A list of UUIDs of the specified version, ensuring all UUIDs in the list are distinct.
+ * @since 6.0.0
+ */
+fun JavaUuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UUID, String>? = null, timestamp: Instant? = null): List<UUID> {
+    val result = mutableListOf<UUID>()
+    for (i in 1..number.toLong())
+        result += JavaUuid(version, namespaceAndName, timestamp)
+    if (result.size != result.distinct().size)
+        return result.distinct() + JavaUuid(result.size - result.distinct().size, version, namespaceAndName, timestamp)
+    return result.toList()
+}
+/**
+ * Generates a list of unique UUIDs based on the specified version, namespace, and name, repeating the generation
+ * process as many times as specified by the number parameter. In the event that duplicate UUIDs are produced,
+ * adjustments will be made to ensure uniqueness within the resulting list.
+ *
+ * @param number The number of UUIDs to generate. Defines how many UUIDs will be created and included in the list.
+ * @param version The version of UUID generation to use. Determines the method for creating UUIDs,
+ *                as specified in the `UUIDVersion` enum.
+ * @param namespaceAndName A pair consisting of a `UUIDNamespace` and a `String`. The namespace defines the context
+ *                         (e.g., DNS, URL, etc.) and the name is the specific identifier within that namespace.
+ *                         Used in name-based UUID generation.
+ * @return A list of `UUID` objects, each generated according to the specified parameters.
+ *         If duplicates are detected, the method ensures that all UUIDs in the list are distinct.
+ * @since 6.0.0
+ */
+@JvmName("JavaUuidNumberUuidVersionUuidNamespaceString")
+fun JavaUuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>): List<UUID> {
+    val result = mutableListOf<UUID>()
+    for (i in 1..number.toLong())
+        result += JavaUuid(version, namespaceAndName)
+    if (result.size != result.distinct().size)
+        return result.distinct() + JavaUuid(result.size - result.distinct().size, version, namespaceAndName)
+    return result.toList()
+}
+/**
+ * Creates a UUID from the given string representation.
+ *
+ * @param string The string representation of the UUID.
+ * @return A UUID instance created from the input string.
+ * @throws IllegalArgumentException If the input string is not a valid UUID format.
+ * @since 6.0.0
+ */
+fun JavaUuid(string: String): UUID = UUID.fromString(string)!!
+/**
+ * Converts a given ULID to its corresponding UUID representation.
+ *
+ * @param ulid The ULID instance to be converted into a UUID.
+ * @return A UUID generated from the provided ULID.
+ * @since 6.0.0
+ */
+fun JavaUuid(ulid: Ulid) = ulid.toUuid()
+/**
+ * Converts a [ShortUuid] instance into its full [UUID] representation.
+ *
+ * This function decodes the shortened, compact [ShortUuid] string back into
+ * a standard [UUID] object, restoring the original full representation of the UUID.
+ * Useful for scenarios where a compact identifier needs to be reverted to its full counterpart.
+ *
+ * @param shortUuid The [ShortUuid] object to be converted to a standard [UUID].
+ * @return The full [UUID] representation derived from the given [ShortUuid].
+ * @since 6.0.0
+ */
+fun JavaUuid(shortUuid: ShortUuid) = shortUuid.toUuid()
+/**
+ * Converts the current [CharSequence] to a [UUID] instance. The method attempts to parse
+ * the [CharSequence] as a valid UUID string.
+ *
+ * The conversion process is encapsulated within a [Result] using `runCatching`,
+ * allowing the caller to handle parsing errors without throwing an exception.
+ *
+ * @return A [Result] containing the parsed [UUID] if successful, or the exception
+ *         thrown during parsing if the input is not a valid UUID string.
+ * @since 6.0.0
+ */
+fun CharSequence.toUuid(): Result<KUuid> = runCatching { KUuid.parse(toString()) }
+
+/**
+ * Generates a UUID based on the specified version and optional namespace and name.
+ *
+ * This function supports multiple UUID versions, each leveraging a specific methodology
+ * for UUID generation as dictated by the UUID standard. The version determines the algorithm
+ * used to generate the UUID, whether it's time-based, random-based, or hash-based.
+ *
+ * - WARNING: UUIDv1 can expose MAC address.
+ * - WARNING: UUIDv6 can expose node identifier.
+ *
+ * @param version The version of the UUID to generate. Supported versions include UUIDv1, UUIDv3, UUIDv4, UUIDv5, UUIDv6, UUIDv7 and custom UUIDv8.
+ *                UUIDv2 is not supported and will throw an UnsupportedOperationException.
+ * @param namespaceAndName An optional pair containing a namespace UUID and a name string. This parameter is mandatory for
+ *                         name-based UUIDs (UUIDv3 and UUIDv5), and a RequiredParameterException will be thrown if it is null.
+ *                         It is ignored for other versions.
+ * @param timestamp The timestamp of the UUID. Supported version include UUIDv1, UUIDv6, UUIDv7, pontentially UUIDv8.
+ * @param v8Type An optional parameter for UUIDv8. This parameter is ignored for other versions.
+ * @param v8Strings An optional parameter for UUIDv8. This parameter is ignored for other versions.
+ * @return A UUID instance corresponding to the specified version and provided inputs.
+ * @since 6.0.0
+ */
+fun Uuid(
+    version: UuidVersion = UuidVersion.V4,
+    namespaceAndName: Pair<KUuid, String>? = null,
+    timestamp: Instant? = null,
+    v8Type: UuidV8Type? = null,
+    v8Strings: Any2? = null
+) = when(version) {
+    UuidVersion.V1 -> UuidGenerator.v1(timestamp?.toEpochMilli())
+    UuidVersion.V2 -> throw UnsupportedOperationException("DCE_SECURITY generation is not supported .")
+    UuidVersion.V3 -> UuidGenerator.v3(
+        (namespaceAndName ?: throw RequiredParameterException("UUID", "namespaceAndName", NullPointerException("namespaceAndName"))).first.toJavaUuid(),
+        namespaceAndName.second
+    )
+    UuidVersion.V4 -> UUID.randomUUID()
+    UuidVersion.V5 -> UuidGenerator.v5(
+        (namespaceAndName ?: throw RequiredParameterException("UUID", "namespaceAndName", NullPointerException("namespaceAndName"))).first.toJavaUuid(),
+        namespaceAndName.second
+    )
+    UuidVersion.V6 -> UuidGenerator.v6(timestamp?.toEpochMilli())
+    UuidVersion.V7 -> UuidGenerator.v7(timestamp?.toEpochMilli())
+    UuidVersion.V8 -> UuidGenerator.v8(v8Type ?: throw RequiredParameterException("UUID", "v8Type"), timestamp?.toEpochMilli(), v8Strings ?: throw RequiredParameterException("UUID", "v8Strings"))
+}.toKotlinUuid()
+/**
+ * Generates a UUID based on the specified version and optional namespace and name.
+ *
+ * This function supports multiple UUID versions, each leveraging a specific methodology
+ * for UUID generation as dictated by the UUID standard. The version determines the algorithm
+ * used to generate the UUID, whether it's time-based, random-based, or hash-based.
+ *
+ * - WARNING: UUIDv1 can expose MAC address.
+ * - WARNING: UUIDv6 can expose node identifier.
+ *
+ * @param version The version of the UUID to generate. Supported versions include UUIDv1, UUIDv3, UUIDv4, UUIDv5, UUIDv6, UUIDv7 and custom UUIDv8.
+ *                UUIDv2 is not supported and will throw an UnsupportedOperationException.
+ * @param timestamp The timestamp of the UUID. Supported version include UUIDv1, UUIDv6, UUIDv7, pontentially UUIDv8.
+ * @param v8Type An optional parameter for UUIDv8. This parameter is ignored for other versions.
+ * @param v8String An optional parameter for UUIDv8. This parameter is ignored for other versions.
+ * @return A UUID instance corresponding to the specified version and provided inputs.
+ * @since 6.0.0
  */
 fun Uuid(
     version: UuidVersion,
@@ -191,7 +466,7 @@ fun Uuid(
  * @param namespaceAndName A pair consisting of a `UUIDNamespace` and a `String`. The namespace is a predefined
  *                         UUID representing the context (e.g., DNS, URL, OID, X500), and the name is a
  *                         specific identifier within that namespace. These are used in name-based UUID generation.
- * @since 3.0.0
+ * @since 6.0.0
  */
 @JvmName("UuidUuidVersionUuidNamespaceString")
 fun Uuid(version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>) = Uuid(version, namespaceAndName.map(f1 = UuidNamespace::predefinedNamespace))
@@ -211,15 +486,16 @@ fun Uuid(version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>) = 
  *                         and a RequiredParameterException will be thrown if it is null.
  *                         It is ignored for other versions.
  * @return A list of UUIDs of the specified version, ensuring all UUIDs in the list are distinct.
- * @since 3.0.0
+ * @since 6.0.0
  */
-fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<Uuid, String>? = null, timestamp: Instant? = null): List<Uuid> {
-    val result = mutableListOf<Uuid>()
+fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<KUuid, String>? = null, timestamp: Instant? = null): List<KUuid> {
+    val result = mutableListOf<UUID>()
     for (i in 1..number.toLong())
-        result += Uuid(version, namespaceAndName, timestamp)
+        result += Uuid(version, namespaceAndName, timestamp).toJavaUuid()
     if (result.size != result.distinct().size)
-        return result.distinct() + Uuid(result.size - result.distinct().size, version, namespaceAndName, timestamp)
-    return result.toList()
+        return (result.distinct() + Uuid(result.size - result.distinct().size, version, namespaceAndName, timestamp).map { it.toJavaUuid() })
+            .map { it.toKotlinUuid() }
+    return result.map { it.toKotlinUuid() }
 }
 /**
  * Generates a list of unique UUIDs based on the specified version, namespace, and name, repeating the generation
@@ -234,32 +510,26 @@ fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<Uuid, Stri
  *                         Used in name-based UUID generation.
  * @return A list of `UUID` objects, each generated according to the specified parameters.
  *         If duplicates are detected, the method ensures that all UUIDs in the list are distinct.
- * @since 3.0.0
+ * @since 6.0.0
  */
 @JvmName("UuidNumberUuidVersionUuidNamespaceString")
-fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>): List<Uuid> {
-    val result = mutableListOf<UUID>()
-    for (i in 1..number.toLong())
-        result += Uuid(version, namespaceAndName)
-    if (result.size != result.distinct().size)
-        return result.distinct() + Uuid(result.size - result.distinct().size, version, namespaceAndName)
-    return result.toList()
-}
+fun Uuid(number: Number, version: UuidVersion, namespaceAndName: Pair<UuidNamespace, String>) =
+    JavaUuid(number, version, namespaceAndName).map { it.toKotlinUuid() }
 /**
  * Creates a UUID from the given string representation.
  *
  * @param string The string representation of the UUID.
  * @return A UUID instance created from the input string.
  * @throws IllegalArgumentException If the input string is not a valid UUID format.
- * @since 3.0.0
+ * @since 6.0.0
  */
-fun Uuid(string: String): Uuid = UUID.fromString(string)!!
+fun Uuid(string: String) = KUuid.parse(string)
 /**
  * Converts a given ULID to its corresponding UUID representation.
  *
  * @param ulid The ULID instance to be converted into a UUID.
  * @return A UUID generated from the provided ULID.
- * @since 3.0.0
+ * @since 6.0.0
  */
 fun Uuid(ulid: Ulid) = ulid.toUuid()
 /**
@@ -271,7 +541,7 @@ fun Uuid(ulid: Ulid) = ulid.toUuid()
  *
  * @param shortUuid The [ShortUuid] object to be converted to a standard [UUID].
  * @return The full [UUID] representation derived from the given [ShortUuid].
- * @since 3.0.0
+ * @since 6.0.0
  */
 fun Uuid(shortUuid: ShortUuid) = shortUuid.toUuid()
 /**
@@ -283,21 +553,9 @@ fun Uuid(shortUuid: ShortUuid) = shortUuid.toUuid()
  *
  * @return A [Result] containing the parsed [UUID] if successful, or the exception
  *         thrown during parsing if the input is not a valid UUID string.
- * @since 3.0.0
+ * @since 6.0.0
  */
-fun CharSequence.toUuid(): Result<Uuid> = runCatching { UUID.fromString(toString())!! }
-/**
- * Converts the current [CharSequence] to a [Uuid] instance. The method attempts to parse
- * the [CharSequence] as a valid UUID string.
- *
- * The conversion process is encapsulated within a [Result] using `runCatching`,
- * allowing the caller to handle parsing errors without throwing an exception.
- *
- * @return A [Result] containing the parsed [Uuid] if successful, or the exception
- *         thrown during parsing if the input is not a valid UUID string.
- * @since 1.0.0
- */
-fun CharSequence.toKotlinUuid() = runCatching { kotlin.uuid.Uuid.parse(toString()) }
+fun CharSequence.toJavaUuid(): Result<UUID> = runCatching { UUID.fromString(toString())!! }
 
 /**
  * Validates whether the provided string is a valid UUID.
@@ -315,7 +573,44 @@ fun isValidUuid(string: String) = runCatching { UUID.fromString(string) }.isSucc
  * @return A hexadecimal string representation of the UUID without hyphens.
  * @since 5.0.1
  */
-fun Uuid.toHex() = Hex(withoutHyphens)
+fun UUID.toHex() = Hex(withoutHyphens)
+/**
+ * Converts the UUID to its hexadecimal string representation without hyphens.
+ *
+ * @receiver The UUID instance to be converted.
+ * @return A hexadecimal string representation of the UUID without hyphens.
+ * @since 6.0.0
+ */
+fun KUuid.toHex() = Hex(withoutHyphens)
+
+/**
+ * Converts a hexadecimal representation of a value to a UUID instance.
+ *
+ * This method interprets the hexadecimal string of the receiving `Hex` object
+ * and attempts to parse it into a UUID format. The resulting UUID is returned
+ * as a `Result` object, which encapsulates either the successful conversion
+ * or an exception if the operation fails.
+ *
+ * The parsing process ensures that the hexadecimal input is formatted without
+ * symbols and in lowercase.
+ *
+ * @return A `Result` containing the parsed UUID if successful, or an exception if the parsing fails.
+ * @since 6.0.0
+ */
+fun Hex.toUuid() = runCatching { KUuid.parseHex(toString(Hex.HexSymbol.None, TextCase.LowerCase)) }
+/**
+ * Converts the Hex object to a Java UUID representation.
+ *
+ * This method first transforms the Hex object into a UUID object
+ * and then maps the resulting UUID into a Java-compatible UUID
+ * representation for further use in Java-based systems or APIs.
+ *
+ * @receiver Hex The Hex object to be converted.
+ * @return A Result containing the Java UUID, or an error if the conversion fails.
+ *
+ * @since 6.0.0
+ */
+fun Hex.toJavaUuid() = toUuid().map { it.toJavaUuid() }
 
 /**
  * Returns the most significant bits of this UUID.
@@ -325,7 +620,7 @@ fun Uuid.toHex() = Hex(withoutHyphens)
  * @return The most significant 64 bits of the UUID as a `Long`.
  * @since 1.0.0
  */
-operator fun Uuid.component1() = mostSignificantBits
+operator fun UUID.component1() = mostSignificantBits
 /**
  * Operator function that extracts the least significant bits component
  * from a UUID instance. This allows destructuring declarations to
@@ -336,7 +631,28 @@ operator fun Uuid.component1() = mostSignificantBits
  * @return the least significant bits of the UUID as a Long value.
  * @since 1.0.0
  */
-operator fun Uuid.component2() = leastSignificantBits
+operator fun UUID.component2() = leastSignificantBits
+
+/**
+ * Extracts the most significant bits of this UUID as a single component.
+ *
+ * This operator function enables destructuring declarations for instances of KUuid.
+ * It retrieves the most significant 64 bits of the UUID as a Long.
+ *
+ * @return The most significant bits of the UUID.
+ * @since 6.0.0
+ */
+operator fun KUuid.component1() = toLongs { mostSignificantBits, _ -> mostSignificantBits }
+/**
+ * Extracts the least significant bits of the UUID in a destructuring operation.
+ *
+ * This operator function allows the use of the second component in a destructuring declaration,
+ * where it represents the least significant bits of the UUID.
+ *
+ * @return The least significant bits of the UUID as a Long.
+ * @since 6.0.0
+ */
+operator fun KUuid.component2() = toLongs { _, leastSignificantBits -> leastSignificantBits }
 
 /**
  * A utility object for generating UUIDs conforming to various versions (v1, v3, v5, v6, v7).
@@ -352,7 +668,7 @@ private object UuidGenerator {
      * @since 3.0.0
      */
     private const val GREGORIAN_EPOCH_OFFSET = 12219292800000L // Offset in millisecondi tra epoca Gregoriana e Unix
-    
+
     /**
      * An instance of `SecureRandom` used to generate cryptographically strong random values.
      * This variable provides a secure random number generator that uses the underlying operating
@@ -365,7 +681,7 @@ private object UuidGenerator {
      * @since 3.0.0
      */
     private val random = SecureRandom()
-    
+
     /**
      * Represents a unique identifier for a node, derived from the network interface's MAC address if available,
      * or generated randomly when a valid MAC address is unavailable or an error occurs.
@@ -413,7 +729,7 @@ private object UuidGenerator {
      * @return A UUID of type 1 (time-based UUID).
      * @since 3.0.0
      */
-    fun v1(ts: Long?): Uuid {
+    fun v1(ts: Long?): UUID {
         val timestamp = ts ?: System.currentTimeMillis()
 
         // UUID v1 usa timestamp da 15 ottobre 1582. Aggiustiamo grossolanamente.
@@ -451,7 +767,7 @@ private object UuidGenerator {
      * @return The generated Version 3 UUID.
      * @since 3.0.0
      */
-    fun v3(namespace: Uuid, name: String): Uuid {
+    fun v3(namespace: UUID, name: String): UUID {
         val md5 = MessageDigest.getInstance("MD5")
 
         val namespaceBytes = namespace.toBytes()
@@ -478,7 +794,7 @@ private object UuidGenerator {
      * @return A new UUID of version 5 that is derived from the provided namespace and name.
      * @since 3.0.0
      */
-    fun v5(namespace: Uuid, name: String): Uuid {
+    fun v5(namespace: UUID, name: String): UUID {
         val sha1 = MessageDigest.getInstance("SHA-1")
 
         val namespaceBytes = namespace.toBytes()
@@ -502,7 +818,7 @@ private object UuidGenerator {
      * @return A UUID object representing the generated Version 6 UUID.
      * @since 3.0.0
      */
-    fun v6(ts: Long?): Uuid {
+    fun v6(ts: Long?): UUID {
         val time = ts ?: ((System.currentTimeMillis() * 10000) + (GREGORIAN_EPOCH_OFFSET * 10))
 
         val timeHigh = (time shr 28) and 0xFFFFFFFFL
@@ -524,7 +840,7 @@ private object UuidGenerator {
      * @return a UUID instance that conforms to the version 7 UUID standard.
      * @since 3.0.0
      */
-    fun v7(ts: Long?): Uuid {
+    fun v7(ts: Long?): UUID {
         val timestamp = ts ?: System.currentTimeMillis()
         val randBytes = ByteArray(10)
         random.nextBytes(randBytes)
@@ -559,7 +875,7 @@ private object UuidGenerator {
      *                Throws a `RequiredParameterException` when mandatory fields are missing in certain types.
      * @since 3.0.0
      */
-    fun v8(type: UuidV8Type, timestamp: Long?, strings: Any2): Uuid = when (type) {
+    fun v8(type: UuidV8Type, timestamp: Long?, strings: Any2): UUID = when (type) {
         UuidV8Type.String -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
             sha1.update(strings.first.toString().toByteArray(Charsets.UTF_8))
@@ -584,7 +900,7 @@ private object UuidGenerator {
             uuidBytes[8] = (uuidBytes[8].toInt() and 0x0F or 0x90).toByte()
 
             val bb2 = ByteBuffer.wrap(uuidBytes)
-            Uuid(bb2.long, bb2.long)
+            UUID(bb2.long, bb2.long)
         }
         UuidV8Type.StringRandom -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
@@ -603,7 +919,7 @@ private object UuidGenerator {
             bytes[8] = (bytes[8].toInt() and 0x0F or 0xA0).toByte()
 
             val bb = ByteBuffer.wrap(bytes)
-            Uuid(bb.long, bb.long)
+            UUID(bb.long, bb.long)
         }
         UuidV8Type.StringString -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
@@ -618,7 +934,7 @@ private object UuidGenerator {
             bytes[8] = (bytes[8].toInt() and 0x0F or 0x80).toByte()
 
             val bb = ByteBuffer.wrap(bytes)
-            Uuid(bb.long, bb.long)
+            UUID(bb.long, bb.long)
         }
         UuidV8Type.TimestampStringString -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
@@ -640,7 +956,7 @@ private object UuidGenerator {
             bytes[8] = (bytes[8].toInt() and 0x0F or 0x90).toByte()
 
             val bb2 = ByteBuffer.wrap(bytes)
-            Uuid(bb2.long, bb2.long)
+            UUID(bb2.long, bb2.long)
         }
         UuidV8Type.StringStringRandom -> {
             val sha1 = MessageDigest.getInstance("SHA-1")
@@ -662,7 +978,7 @@ private object UuidGenerator {
             bytes[8] = (bytes[8].toInt() and 0x0F or 0xA0).toByte()
 
             val bb = ByteBuffer.wrap(bytes)
-            Uuid(bb.long, bb.long)
+            UUID(bb.long, bb.long)
         }
     }
 
@@ -676,7 +992,7 @@ private object UuidGenerator {
      * @return a ByteArray containing the 16-byte representation of the UUID.
      * @since 3.0.0
      */
-    private fun Uuid.toBytes(): ByteArray {
+    private fun UUID.toBytes(): ByteArray {
         val buffer = ByteBuffer.wrap(ByteArray(16))
         buffer.putLong(this.mostSignificantBits)
         buffer.putLong(this.leastSignificantBits)
@@ -691,10 +1007,10 @@ private object UuidGenerator {
      * @return A UUID object created from the ByteArray.
      * @since 3.0.0
      */
-    private fun ByteArray.toUuid(): Uuid {
+    private fun ByteArray.toUuid(): UUID {
         val buffer = ByteBuffer.wrap(this)
         val mostSigBits = buffer.long
         val leastSigBits = buffer.long
-        return Uuid(mostSigBits, leastSigBits)
+        return UUID(mostSigBits, leastSigBits)
     }
 }

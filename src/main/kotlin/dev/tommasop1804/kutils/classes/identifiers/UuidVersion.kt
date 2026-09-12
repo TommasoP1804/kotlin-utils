@@ -15,7 +15,7 @@ package dev.tommasop1804.kutils.classes.identifiers
  */
 @Suppress("unused")
 @MustUseReturnValues
-enum class UuidVersion(val description: String, val number: Int) {
+enum class UuidVersion(val description: String, val number: Int, val hasTimestamp: Boolean = false) {
     /**
      * Represents a UUID of version 1, commonly referred to as "time-based UUID."
      *
@@ -24,7 +24,7 @@ enum class UuidVersion(val description: String, val number: Int) {
      *
      * @since 3.0.0
      */
-    V1("This version generates a UUID using a 60-bit timestamp (with 100-nanosecond precision) and the 48-bit MAC address of the generating computer. A clock sequence is used to handle cases where the system clock is adjusted.", 1),
+    V1("This version generates a UUID using a 60-bit timestamp (with 100-nanosecond precision) and the 48-bit MAC address of the generating computer. A clock sequence is used to handle cases where the system clock is adjusted.", 1, true),
     /**
      * Represents the DCE Security version of a UUID, corresponding to version 2 of the UUID standard.
      *
@@ -67,7 +67,7 @@ enum class UuidVersion(val description: String, val number: Int) {
      *
      * @since 3.0.0
      */
-    V6("This version generates a UUID using a 60-bit timestamp (with 100-nanosecond precision) and the 48-bit MAC address of the generating computer. A clock sequence is used to handle cases where the system clock is adjusted.", 6),
+    V6("This version generates a UUID using a 60-bit timestamp (with 100-nanosecond precision) and the 48-bit MAC address of the generating computer. A clock sequence is used to handle cases where the system clock is adjusted.", 6, true),
     /**
      * Represents the UUID version 7 that generates a UUID using a random and time-based approach.
      *
@@ -76,7 +76,7 @@ enum class UuidVersion(val description: String, val number: Int) {
      *
      * @since 3.0.0
      */
-    V7("This version generates a UUID using a 64-bit timestamp (with 100-nanosecond precision) and 48-bit node identifier. A random number is used to handle cases where the node identifier is not available.", 7),
+    V7("This version generates a UUID using a 64-bit timestamp (with 100-nanosecond precision) and 48-bit node identifier. A random number is used to handle cases where the node identifier is not available.", 7, true),
     /**
      * Represents a custom implementation of UUID (Universally Unique Identifier) version 8.
      * This class contains a description associated with this specific version of UUID.

@@ -8,6 +8,7 @@ package dev.tommasop1804.kutils.classes.delegates
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.identifiers.*
+import java.util.UUID
 import kotlin.reflect.KProperty
 
 /**
@@ -21,7 +22,7 @@ import kotlin.reflect.KProperty
  * @since 3.7.0
  * @author Tommaso Pastorelli
  */
-class UuidRestrictedVersion(private var value: Uuid? = null, private val version: UuidVersion) {
+class UuidRestrictedVersion(private var value: UUID? = null, private val version: UuidVersion) {
     init { value?.validateVersion(version) }
 
     /**
@@ -43,7 +44,7 @@ class UuidRestrictedVersion(private var value: Uuid? = null, private val version
      * @throws IllegalArgumentException If the version of the provided [newValue] does not match the required version.
      * @since 3.7.0
      */
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: Uuid) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: UUID) {
         newValue.validateVersion(version, property)
         value = newValue
     }
@@ -59,7 +60,7 @@ class UuidRestrictedVersion(private var value: Uuid? = null, private val version
  * @since 3.7.0
  * @author Tommaso Pastorelli
  */
-class NullableUuidRestrictedVersion(private var value: Uuid? = null, private val version: UuidVersion) {
+class NullableUuidRestrictedVersion(private var value: UUID? = null, private val version: UuidVersion) {
     init { value?.validateVersion(version) }
 
     /**
@@ -80,7 +81,7 @@ class NullableUuidRestrictedVersion(private var value: Uuid? = null, private val
      *                  If the validation fails, a validation exception is thrown.
      * @since 3.7.0
      */
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: Uuid?) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: UUID?) {
         newValue?.validateVersion(version, property)
         value = newValue
     }

@@ -10,6 +10,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KProperty
+import kotlin.uuid.Uuid
 
 /**
  * Represents a tree structure with a root, leaves, and a size property. Provides methods for
@@ -140,7 +141,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Recursively collects all leaf nodes (nodes without children) of a tree starting from the given node.
      *
-     * 
+     *
      * @param node the starting node from which to collect leaf nodes
      * @return a list of all collected leaf nodes
      * @since 1.0.0
@@ -161,7 +162,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * Retrieves the depth of a specified node in the tree. The depth is the number of edges from the root
      * to the given node.
      *
-     * 
+     *
      * @param node The target TreeNode for which the depth is calculated.
      * @return The depth of the specified node in the tree, or -1 if the node cannot be found.
      * @since 1.0.0
@@ -171,7 +172,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Recursively computes the depth of the target node in the tree relative to the given current node.
      *
-     * 
+     *
      * @param current The current node being processed in the tree traversal. If `null`, the method returns -1.
      * @param target The node whose depth is to be computed relative to the root of the tree.
      * @param depth The current depth during the traversal, starting from 0. This increments with each recursive call.
@@ -191,7 +192,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Returns a string representation of the Tree object.
      *
-     * 
+     *
      * @return A string in the format "Tree(rootNode)" where "rootNode" is the string representation of the root node.
      * @since 1.0.0
      */
@@ -200,7 +201,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Compares this tree with another object for equality.
      *
-     * 
+     *
      * @param other The object to compare with this instance.
      * @return `true` if the specified object is equal to this tree, otherwise `false`.
      * @since 1.0.0
@@ -217,7 +218,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Computes the hash code for the `Tree` instance based on its root node.
      *
-     * 
+     *
      * @return The hash code of the root node of the tree.
      * @since 1.0.0
      */
@@ -227,7 +228,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * Performs a breadth-first search (BFS) traversal of the tree starting from the root,
      * and returns a flat list of all nodes in the tree.
      *
-     * 
+     *
      * @return A list of all nodes in the tree, traversed in BFS order.
      * @since 1.0.0
      */
@@ -241,7 +242,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * Populates the given mutable list with all nodes of the tree using a Breadth-First Search (BFS) approach.
      * Nodes are added to the list in the order they are traversed.
      *
-     * 
+     *
      * @param node The root node of the tree or subtree to be traversed using BFS.
      * @param flatList The mutable list where the nodes will be added as they are visited.
      * @since 1.0.0
@@ -259,7 +260,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Traverses the tree in a depth-first search (DFS) manner and generates a flat list of all nodes.
      *
-     * 
+     *
      * @return List<TreeNode<T>> A list containing all nodes within the tree in depth-first order.
      * @since 1.0.0
      */
@@ -272,7 +273,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Populates a flat list with the nodes of a tree using Depth-First Search (DFS) traversal.
      *
-     * 
+     *
      * @param flatList A mutable list that will contain the flat representation of the tree nodes.
      * @since 1.0.0
      */
@@ -287,7 +288,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * Traverses the tree using a breadth-first search (BFS) approach and
      * collects all node values into a flat list.
      *
-     * 
+     *
      * @return List<T> A list containing all node values in BFS traversal order.
      * @since 1.0.0
      */
@@ -300,7 +301,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Populates a flat list of values from a tree structure using a breadth-first search (BFS) strategy.
      *
-     * 
+     *
      * @param flatList The mutable list where values from the tree nodes will be added.
      * @since 1.0.0
      */
@@ -317,7 +318,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Retrieves a flattened list of all node values in the tree, traversed in depth-first order.
      *
-     * 
+     *
      * @return A list containing all node values in the tree following depth-first traversal.
      * @since 1.0.0
      */
@@ -330,7 +331,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Populates a given list with the values from a tree, using a depth-first search traversal.
      *
-     * 
+     *
      * @param node The current node being visited during the depth-first search.
      * @param flatList A mutable list to which values from the tree nodes are added.
      * @since 1.0.0
@@ -345,7 +346,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Removes a node with the specified value from the tree, if it exists.
      *
-     * 
+     *
      * @param value The value of the node to be removed.
      * @return `true` if the node was successfully removed, or `false` if the node was not found.
      * @since 1.0.0
@@ -360,7 +361,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * the method returns true; otherwise, it returns false.
      * The root node cannot be removed and attempting to do so will result in an exception.
      *
-     * 
+     *
      * @param nodeToRemove The node to be removed from the tree.
      * @return Boolean True if the node is successfully removed, false otherwise.
      * @throws IllegalOperationException If an attempt is made to remove the root node.
@@ -385,7 +386,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Checks whether a value exists within the tree using a breadth-first search (BFS) algorithm.
      *
-     * 
+     *
      * @param value the value to search for in the tree.
      * @since 1.0.0
      */
@@ -397,7 +398,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * This function performs a breadth-first search (BFS) starting from the root node
      * to determine if the provided node exists in the tree structure.
      *
-     * 
+     *
      * @param node The TreeNode to be checked for existence in the tree.
      * @return `true` if the specified node is found in the tree, `false` otherwise.
      * @since 1.0.0
@@ -418,7 +419,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * Starting from the given node, the method traverses all the child nodes in a level-by-level approach
      * until the node with the specified ID is found or all nodes are visited.
      *
-     * 
+     *
      * @param node The starting node for the search, default is the root node.
      * @param id The unique identifier of the node to find.
      * @return The tree node with the matching ID, or null if no such node exists in the tree.
@@ -443,7 +444,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Performs a depth-first search (DFS) to find a node with the specified ID in the tree.
      *
-     * 
+     *
      * @param node The starting node for the search. Defaults to the root.
      * @param id The unique identifier of the TreeNode<T> to search for.
      * @return The TreeNode<T> with the given ID if found, or null if not found.
@@ -462,7 +463,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Traverses the tree using Breadth-First Search (BFS) to find the node containing the specified value.
      *
-     * 
+     *
      * @param node The starting node for the search, defaulting to the root node.
      * @param data The value to search for within the tree.
      * @return The node containing the specified value, or null if no such node is found.
@@ -482,7 +483,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Searches for a node in the tree with the specified value using a Depth-First Search (DFS) approach.
      *
-     * 
+     *
      * @param node The tree node to begin the search from.
      * @param data The value to search for within the tree.
      * @return The first tree node with the specified value found during the traversal, or null if no such node exists.
@@ -500,7 +501,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Performs a breadth-first traversal starting from the given node and executes the provided block of code for each node's value.
      *
-     * 
+     *
      * @param node The starting node for the traversal. Defaults to the root node of the tree.
      * @param block A lambda function to be executed on the value of each traversed node.
      * @since 1.0.0
@@ -519,7 +520,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
      * Traverses the tree using the Depth-First Search (DFS) strategy starting from the given node.
      * Applies the provided block function to the value of each visited node.
      *
-     * 
+     *
      * @param node The starting node for the traversal. Defaults to the root node of the tree.
      * @param block A function to be applied to the value of each visited node.
      * @since 1.0.0
@@ -532,7 +533,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Reverses the order of the children of a tree node and recursively applies the same operation to its descendants.
      *
-     * 
+     *
      * @param node The starting node to mirror, defaulting to the root node of the tree.
      * @since 1.0.0
      */
@@ -544,7 +545,7 @@ class Tree<T> (var root: TreeNode<T?>): Iterable<TreeNode<T?>>/*, Serializable*/
     /**
      * Builds a path of UUIDs from the given node to the root of the tree.
      *
-     * 
+     *
      * @param node The node for which the path to the root is calculated.
      * @return A list of UUIDs representing the path from the given node to the root, starting with the given node's ID.
      * @since 1.0.0
