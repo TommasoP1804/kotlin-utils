@@ -12,10 +12,11 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.Double2
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.firstOr
-import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.jsonb
 import dev.tommasop1804.kutils.secondOr
 import dev.tommasop1804.kutils.thirdOr
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -283,6 +284,14 @@ class Point private constructor(var x: Double = 0.0, var y: Double = 0.0, var z:
             override fun convertToDatabaseColumn(attribute: Point?) = attribute?.toSimpleString()
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Maps the specified column in the table to a `Point` object using JSONB.
+         *
+         * @param name The name of the column to be mapped to a `Point`.
+         * @since 5.5.0
+         */
+        fun Table.point(name: String) = jsonb<Point>(name)
     }
 
     /**

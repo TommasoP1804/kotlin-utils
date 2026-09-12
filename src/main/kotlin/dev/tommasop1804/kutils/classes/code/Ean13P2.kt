@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -84,7 +85,7 @@ value class Ean13P2 private constructor(override val value: String) : CharSequen
          * @return `true` if the string is a valid EAN-13 P2 code; otherwise, `false`.
          * @since 3.0.0
          */
-        fun CharSequence.isValidEan13P2() = matches(Regex("[0-9]{13} ?[0-9]{2}")) && filter { it.isDigit() }.run { Ean13.computeCheckDigit(toString() - 3) == this[12] }
+        fun CharSequence.isValidEan13P2() = matches(Regex("[0-9]{13}[ -]?[0-9]{2}")) && filter { it.isDigit() }.run { Ean13.computeCheckDigit(toString() - 3) == this[12] }
 
         /**
          * Converts the current string into an instance of the `EAN13P2` class, encapsulating the EAN-13 P2 barcode logic.
@@ -96,7 +97,7 @@ value class Ean13P2 private constructor(override val value: String) : CharSequen
          * or an exception if the operation fails.
          * @since 3.0.0
          */
-        fun CharSequence.toEan13P2() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { Ean13P2(this) } }
+        fun CharSequence.toEan13P2() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean13P2(this) } }
 
         class Serializer : ValueSerializer<Ean13P2>() {
             override fun serialize(value: Ean13P2, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
@@ -122,6 +123,16 @@ value class Ean13P2 private constructor(override val value: String) : CharSequen
             override fun convertToDatabaseColumn(attribute: Ean13P2?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean13P2? = dbData?.let { Ean13P2(it) }
         }
+
+        /**
+         * Declares a varchar column in the table with a fixed length of 16 characters
+         * and provides transformation between the database representation and the Ean13P2 value object.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.ean13P2(name: String) = varchar(name, 16)
+            .transform(::Ean13P2, Ean13P2::toString)
     }
 
     /**

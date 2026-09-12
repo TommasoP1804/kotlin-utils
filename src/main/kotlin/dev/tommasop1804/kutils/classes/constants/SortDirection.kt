@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.constants
 
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 
 /**
  * Enum class representing the direction of sorting order.
@@ -58,6 +59,19 @@ enum class SortDirection(val operators: Set<String>, val symbol: Char, internal 
          * @since 3.0.2
          */
         infix fun ofSymbol(symbol: Char) = entries.find { it.symbol == symbol }
+
+        /**
+         * Maps a table column to the `SortDirection` enum using either the enum's name
+         * or its ordinal for database storage, based on the provided configuration.
+         *
+         * @param name The name of the table column to map to the `SortDirection` enum.
+         * @param byName A flag indicating whether the enum should be mapped using its name.
+         *               If `true`, the mapping uses the enum's name.
+         *               If `false`, the mapping uses the enum's ordinal instead.
+         * @since 5.5.0
+         */
+        fun Table.sortDirection(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<SortDirection>(name, 10) else enumeration<SortDirection>(name)
     }
     
     /**

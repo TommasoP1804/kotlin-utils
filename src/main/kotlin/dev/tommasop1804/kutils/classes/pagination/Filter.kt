@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -223,6 +224,17 @@ data class FilterOption(
                 )
             }
         }
+
+        /**
+         * Adds a JSONB column to the table with the specified name that maps to a [FilterOption] type.
+         *
+         * The column is designed to store and retrieve filter criteria represented as a [FilterOption] object.
+         * Used for scenarios requiring structured filtering options in database queries.
+         *
+         * @param name The name of the column in the table.
+         * @since 5.5.0
+         */
+        fun Table.filterOption(name: String) = jsonb<FilterOption>(name)
     }
 
     /**
@@ -491,6 +503,18 @@ enum class FilterOperator(
          * @since 3.0.2
          */
         infix fun ofSymbol(symbol: String) = FilterOperator.entries.find { it.symbol equalsIgnoreCase symbol }
+
+        /**
+         * Filters and retrieves a `FilterOperator` enum instance by its name.
+         *
+         * @param name The name of the `FilterOperator` to be retrieved.
+         * @param byName Determines if the lookup should be done explicitly by name. If true, the lookup
+         *               is performed using the `enumerationByName` function, otherwise the `enumeration`
+         *               function is used. Defaults to false.
+         * @since 5.5.0
+         */
+        fun Table.filterOperator(name: String, byName: Boolean = false) =
+            if (byName) enumerationByName<FilterOperator>(name, 19) else enumeration<FilterOperator>(name)
     }
 
     /**
@@ -585,6 +609,22 @@ enum class FilterOperator(
          *
          * @since 4.0.0
          */
-        ArraySearch
+        ArraySearch;
+
+        companion object {
+            /**
+             * Filters the operator category based on the specified name and retrieval mode.
+             *
+             * This method performs a lookup for a category within the table based on the given name.
+             * If the `byName` parameter is set to true, the filter will use a name-based enumeration lookup.
+             * Otherwise, it will use the default enumeration lookup.
+             *
+             * @param name The name of the category to filter.
+             * @param byName Determines whether the lookup should be performed by name. Defaults to false.
+             * @since 5.5.0
+             */
+            fun Table.filterOperatorCategory(name: String, byName: Boolean = false) =
+                if (byName) enumerationByName<Category>(name, 11) else enumeration<Category>(name)
+        }
     }
 }

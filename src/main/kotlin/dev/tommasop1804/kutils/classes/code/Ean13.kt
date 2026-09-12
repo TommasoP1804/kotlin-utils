@@ -16,6 +16,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -145,6 +146,17 @@ value class Ean13 private constructor(override val value: String) : CharSequence
             override fun convertToDatabaseColumn(attribute: Ean13?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean13? = dbData?.let { Ean13(it) }
         }
+
+        /**
+         * Adds an EAN-13 formatted column to the table schema.
+         * The column will store 13-character strings, which are validated and transformed into
+         * an `Ean13` instance during insertion or retrieval.
+         *
+         * @param name the name of the column to be added to the table schema. Must be unique within the table schema.
+         * @since 5.5.0
+         */
+        fun Table.ean13(name: String) = char(name, 13)
+            .transform(::Ean13, Ean13::toString)
     }
 
     /**

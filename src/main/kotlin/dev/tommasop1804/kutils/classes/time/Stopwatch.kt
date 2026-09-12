@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -210,6 +211,14 @@ class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Seria
                 )
             }
         }
+
+        /**
+         * Retrieves a JSONB column represented as a `Stopwatch` object from the table.
+         *
+         * @param name The name of the column to be interpreted as a `Stopwatch` object.
+         * @since 5.5.0
+         */
+        fun Table.stopwatch(name: String) = jsonb<Stopwatch>(name)
     }
 
     /**

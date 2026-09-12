@@ -25,6 +25,7 @@ import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -629,6 +630,14 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Xml =
                 Json(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString()).toXml()
         }
+
+        /**
+         * Converts the specified column in the table to the XML format.
+         *
+         * @param name The name of the column to be converted.
+         * @since 5.5.0
+         */
+        fun Table.xml(name: String) = jsonb<Xml>(name)
     }
 
     /**

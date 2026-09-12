@@ -17,12 +17,15 @@ import dev.tommasop1804.kutils.emptyMList
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isDecimal
-import dev.tommasop1804.kutils.isNull
 import dev.tommasop1804.kutils.tryOrThrow
 import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateInputFormat
 import dev.tommasop1804.kutils.words
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.ColumnType
+import org.jetbrains.exposed.v1.core.Table
+import org.postgresql.util.PGInterval
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -648,9 +651,106 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<Duration?, String?> {
             override fun convertToDatabaseColumn(attribute: Duration?) = attribute?.toString()
-
             override fun convertToEntityAttribute(dbData: String?): Duration? = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Represents a PostgreSQL "interval" column type, mapping it to a `Duration` representation in the application.
+         * This class provides methods for converting database interval values to application `Duration` objects and
+         * vice versa, as well as generating the SQL type and string representation for the database.
+         * @since 5.5.0
+         * @authoir Tommaso Pastorelli
+         */
+        class IntervalColumnType : ColumnType<Duration>() {
+            companion object {
+                /**
+                 * Represents the SQL type name for interval data types in the database.
+                 * Used in database schema definitions and interactions to specify
+                 * interval-based column types, commonly for date and time duration values.
+                 *
+                 * @since 5.5.0
+                 */
+                const val INTERVAL = "interval"
+            }
+
+            /**
+             * Returns the SQL type representation of the interval column.
+             *
+             * This method overrides the base implementation to specify the SQL type
+             * as "interval", which is commonly used to represent a time duration
+             * in PostgreSQL or other SQL databases that support interval types.
+             *
+             * @return A string representing the SQL type "interval".
+             * @since 5.5.0
+             */
+            override fun sqlType() = INTERVAL
+
+            /**
+             * Converts a database value to a `Duration` instance.
+             *
+             * @param value The value retrieved from the database, which can be an instance of `PGInterval`, `Duration`, or `String`.
+             * @return A `Duration` object constructed from the provided database value.
+             * @throws IllegalArgumentException If the input value is not of an expected type.
+             * @since 5.5.0
+             */
+            override fun valueFromDB(value: Any): Duration = when (value) {
+                is PGInterval -> {
+                    val totalSeconds = value.seconds
+                    val wholeSeconds = totalSeconds.toLong()
+                    val nanos = ((totalSeconds - wholeSeconds) * 1_000_000_000).toLong()
+                    Duration(
+                        years = value.years,
+                        months = value.months,
+                        days = value.days,
+                        hours = value.hours,
+                        minutes = value.minutes,
+                        seconds = wholeSeconds,
+                        nanos = nanos
+                    )
+                }
+                is Duration -> value
+                is String -> parse(value).getOrThrow()
+                else -> error("Unexpected value for interval: $value")
+            }
+
+            /**
+             * Converts a non-null `Duration` value into a database-compatible representation.
+             *
+             * @param value The `Duration` value to be converted. Must not be null.
+             * @return An `Any` object representing the database-compatible form of the input `Duration` value.
+             * @since 5.5.0
+             */
+            override fun notNullValueToDB(value: Duration): Any = value.toString(false)
+
+            /**
+             * Converts a non-null [Duration] value into its string representation.
+             *
+             * @param value The non-null [Duration] value to be converted to a string.
+             * @return The string representation of the given [Duration] value wrapped in single quotes.
+             * @since 5.5.0
+             */
+            override fun nonNullValueToString(value: Duration) = "'${value}'"
+        }
+
+        /**
+         * Generates a column for storing durations in the table.
+         *
+         * @param name The name of the column to be created.
+         * @return The column representing durations.
+         * @since 5.5.0
+         */
+        fun Table.duration(name: String): Column<Duration> = registerColumn(name, IntervalColumnType())
+
+        /**
+         * Defines a column in the table for storing string representations of durations,
+         * with the ability to transform between a Duration and its string representation.
+         *
+         * @param name The name of the column.
+         * @param length The maximum length of the column's string representation. Defaults to 60.
+         * @since 5.5.0
+         */
+        fun Table.durationString(name: String, length: Int = 60) = varchar(name, length)
+            .transform({ parse(it)() }, Duration::toString)
     }
 
     /**

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.asList
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -245,7 +246,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): ConsList<*> {
                 val node = p.objectReadContext().readTree<ObjectNode>(p)
                 @Suppress("kutils_collection_declaration")
-                return ConsList(node.asList<Any>())
+                return ConsList(node.asList<Any>()())
             }
         }
 
@@ -263,6 +264,14 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
                 return ConsList(node.map { it.asText() })
             }
         }
+
+        /**
+         * Retrieves a JSONB column from the table and maps it to a ConsList of a generic type.
+         *
+         * @param name The name of the column to be converted into a ConsList.
+         * @since 5.5.0
+         */
+        inline fun <reified E> Table.consList(name: String) = jsonb<ConsList<E>>(name)
     }
 
     private fun toString(first: Boolean, builder: StringBuilder = StringBuilder(String.EMPTY)): StringBuilder {

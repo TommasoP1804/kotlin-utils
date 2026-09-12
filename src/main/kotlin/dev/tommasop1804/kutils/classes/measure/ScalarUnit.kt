@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -222,4 +223,14 @@ interface ScalarUnit : Serializable {
             )
         }
     }
+
+    /**
+     * Configures a JSONB column in the current database table with a type of [ScalarUnit].
+     * This method utilizes the `jsonb` function to define a column for storing and retrieving
+     * `MeasureUnit` instances as JSON binary data.
+     *
+     * @param name The name of the column in the table to store the `MeasureUnit` data.
+     * @since 5.5.0
+     */
+    fun Table.scalarUnit(name: String) = jsonb<ScalarUnit>(name)
 }

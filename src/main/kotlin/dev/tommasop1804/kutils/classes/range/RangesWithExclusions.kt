@@ -10,8 +10,18 @@
 
 package dev.tommasop1804.kutils.classes.range
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.coding.Json.Companion.asList
+import org.jetbrains.exposed.v1.core.Table
+import tools.jackson.databind.*
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
 
 /**
  * Represents a closed range `[start, endInclusive]` with additional exclusions.
@@ -833,6 +843,10 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
  * @since 1.0.0
  * @author Tomaso Pastorelli
  */
+@JsonSerialize(using = IntRangeWithExclusions.Companion.Serializer::class)
+@JsonDeserialize(using = IntRangeWithExclusions.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = IntRangeWithExclusions.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = IntRangeWithExclusions.Companion.OldDeserializer::class)
 class IntRangeWithExclusions(
     override val start: Int,
     override val endInclusive: Int,
@@ -912,6 +926,62 @@ class IntRangeWithExclusions(
          */
         infix fun IntRange.exclude(elements: Iterable<Int>) =
             IntRangeWithExclusions(start, endInclusive, elements.toMList())
+
+        class Serializer : ValueSerializer<IntRangeWithExclusions>() {
+            override fun serialize(value: IntRangeWithExclusions, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeStartObject()
+                gen.writeNumberProperty("start", value.start)
+                gen.writeNumberProperty("endInclusive", value.endInclusive)
+                gen.writeArrayPropertyStart("excluded")
+                value.excluded.forEach { gen.writeNumber(it) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class Deserializer : ValueDeserializer<IntRangeWithExclusions?>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): IntRangeWithExclusions {
+                val node = p.objectReadContext().readTree<JsonNode>(p)
+                return IntRangeWithExclusions(
+                    node.get("start").asInt(),
+                    node.get("endInclusive").asInt(),
+                    node.get("excluded").asList<Int>()().toMList()
+                )
+            }
+        }
+
+        class OldSerializer : JsonSerializer<IntRangeWithExclusions>() {
+            override fun serialize(value: IntRangeWithExclusions, gen: JsonGenerator, serializers: SerializerProvider) {
+                gen.writeStartObject()
+                gen.writeNumberField("start", value.start)
+                gen.writeNumberField("endInclusive", value.endInclusive)
+                gen.writeArrayFieldStart("excluded")
+                value.excluded.forEach { gen.writeNumber(it) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<IntRangeWithExclusions?>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): IntRangeWithExclusions {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
+                return IntRangeWithExclusions(
+                    node.get("start").asInt(),
+                    node.get("endInclusive").asInt(),
+                    node.get("excluded").asList<Int>()().toMList()
+                )
+            }
+        }
+
+        /**
+         * Registers a column in the table for storing `IntRangeWithExclusions` data as JSONB.
+         * This method is designed specifically for PostgreSQL databases, enabling the representation
+         * of an integer range with exclusions as a strongly-typed JSONB column.
+         *
+         * @param name The name of the column in the table.
+         * @since 5.5.0
+         */
+        fun Table.intRangeWithExclusions(name: String) = jsonb<IntRangeWithExclusions>(name)
     }
 
     /**
@@ -1144,6 +1214,10 @@ class IntRangeWithExclusions(
  * @since 5.0.0
  * @author Tommaso Pastorelli
  */
+@JsonSerialize(using = UIntRangeWithExclusions.Companion.Serializer::class)
+@JsonDeserialize(using = UIntRangeWithExclusions.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = UIntRangeWithExclusions.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = UIntRangeWithExclusions.Companion.OldDeserializer::class)
 class UIntRangeWithExclusions(
     override val start: UInt,
     override val endInclusive: UInt,
@@ -1217,6 +1291,62 @@ class UIntRangeWithExclusions(
          */
         infix fun UIntRange.exclude(elements: Iterable<UInt>) =
             UIntRangeWithExclusions(start, endInclusive, elements.toMList())
+
+        class Serializer : ValueSerializer<UIntRangeWithExclusions>() {
+            override fun serialize(value: UIntRangeWithExclusions, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeStartObject()
+                gen.writeStringProperty("start", value.start.toString())
+                gen.writeStringProperty("endInclusive", value.endInclusive.toString())
+                gen.writeArrayPropertyStart("excluded")
+                value.excluded.forEach { gen.writeString(it.toString()) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class Deserializer : ValueDeserializer<UIntRangeWithExclusions?>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): UIntRangeWithExclusions {
+                val node = p.objectReadContext().readTree<JsonNode>(p)
+                return UIntRangeWithExclusions(
+                    node.get("start").asString().toUInt(),
+                    node.get("endInclusive").asString().toUInt(),
+                    node.get("excluded").asList<String>()().map(String::toUInt).toMList()
+                )
+            }
+        }
+
+        class OldSerializer : JsonSerializer<UIntRangeWithExclusions>() {
+            override fun serialize(value: UIntRangeWithExclusions, gen: JsonGenerator, serializers: SerializerProvider) {
+                gen.writeStartObject()
+                gen.writeStringField("start", value.start.toString())
+                gen.writeStringField("endInclusive", value.endInclusive.toString())
+                gen.writeArrayFieldStart("excluded")
+                value.excluded.forEach { gen.writeString(it.toString()) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<UIntRangeWithExclusions?>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): UIntRangeWithExclusions {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
+                return UIntRangeWithExclusions(
+                    node.get("start").asText().toUInt(),
+                    node.get("endInclusive").asText().toUInt(),
+                    node.get("excluded").asList<String>()().map(String::toUInt).toMList()
+                )
+            }
+        }
+
+        /**
+         * Registers a JSONB column in the table for handling a UIntRangeWithExclusions object.
+         * This method enables the storage and retrieval of a range of unsigned integers that includes
+         * exclusions, using PostgreSQL's JSONB data type.
+         *
+         * @param name The name of the column to register in the table, corresponding to the UIntRangeWithExclusions object.
+         * @since 5.5.0
+         */
+        fun Table.uIntRangeWithExclusions(name: String) = jsonb<UIntRangeWithExclusions>(name)
     }
 
     /**
@@ -2048,6 +2178,10 @@ class UIntRangeWithConditions(
  * @since 3.1.0
  * @author Tommaso Pastorelli
  */
+@JsonSerialize(using = LongRangeWithExclusions.Companion.Serializer::class)
+@JsonDeserialize(using = LongRangeWithExclusions.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = LongRangeWithExclusions.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = LongRangeWithExclusions.Companion.OldDeserializer::class)
 class LongRangeWithExclusions(
     override val start: Long,
     override val endInclusive: Long,
@@ -2134,6 +2268,63 @@ class LongRangeWithExclusions(
          */
         infix fun LongRange.exclude(elements: Iterable<Long>) =
             LongRangeWithExclusions(start, endInclusive, elements.toMList())
+
+        class Serializer : ValueSerializer<LongRangeWithExclusions>() {
+            override fun serialize(value: LongRangeWithExclusions, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeStartObject()
+                gen.writeNumberProperty("start", value.start)
+                gen.writeNumberProperty("endInclusive", value.endInclusive)
+                gen.writeArrayPropertyStart("excluded")
+                value.excluded.forEach { gen.writeNumber(it) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class Deserializer : ValueDeserializer<LongRangeWithExclusions?>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): LongRangeWithExclusions {
+                val node = p.objectReadContext().readTree<JsonNode>(p)
+                return LongRangeWithExclusions(
+                    node.get("start").asLong(),
+                    node.get("endInclusive").asLong(),
+                    node.get("excluded").asList<Long>()().toMList()
+                )
+            }
+        }
+
+        class OldSerializer : JsonSerializer<LongRangeWithExclusions>() {
+            override fun serialize(value: LongRangeWithExclusions, gen: JsonGenerator, serializers: SerializerProvider) {
+                gen.writeStartObject()
+                gen.writeNumberField("start", value.start)
+                gen.writeNumberField("endInclusive", value.endInclusive)
+                gen.writeArrayFieldStart("excluded")
+                value.excluded.forEach { gen.writeNumber(it) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<LongRangeWithExclusions?>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): LongRangeWithExclusions {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
+                return LongRangeWithExclusions(
+                    node.get("start").asLong(),
+                    node.get("endInclusive").asLong(),
+                    node.get("excluded").asList<Long>()().toMList()
+                )
+            }
+        }
+
+        /**
+         * Registers a JSONB (JSON binary) column in the table for the `LongRangeWithExclusions` type.
+         *
+         * This method allows the storage and retrieval of `LongRangeWithExclusions` objects in a database column,
+         * enabling persistence and querying of ranges with specified exclusions.
+         *
+         * @param name The name of the JSONB column to be created within the table.
+         * @since 5.5.0
+         */
+        fun Table.longRangeWithExclusions(name: String) = jsonb<LongRangeWithExclusions>(name)
     }
 
     /**
@@ -2372,6 +2563,10 @@ class LongRangeWithExclusions(
  * @since 5.0.0
  * @author Tommaso Pastorelli
  */
+@JsonSerialize(using = ULongRangeWithExclusions.Companion.Serializer::class)
+@JsonDeserialize(using = ULongRangeWithExclusions.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ULongRangeWithExclusions.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ULongRangeWithExclusions.Companion.OldDeserializer::class)
 class ULongRangeWithExclusions(
     override val start: ULong,
     override val endInclusive: ULong,
@@ -2444,6 +2639,62 @@ class ULongRangeWithExclusions(
          */
         infix fun ULongRange.exclude(elements: Iterable<ULong>) =
             ULongRangeWithExclusions(start, endInclusive, elements.toMList())
+
+        class Serializer : ValueSerializer<ULongRangeWithExclusions>() {
+            override fun serialize(value: ULongRangeWithExclusions, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeStartObject()
+                gen.writeStringProperty("start", value.start.toString())
+                gen.writeStringProperty("endInclusive", value.endInclusive.toString())
+                gen.writeArrayPropertyStart("excluded")
+                value.excluded.forEach { gen.writeString(it.toString()) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class Deserializer : ValueDeserializer<ULongRangeWithExclusions?>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): ULongRangeWithExclusions {
+                val node = p.objectReadContext().readTree<JsonNode>(p)
+                return ULongRangeWithExclusions(
+                    node.get("start").asString().toULong(),
+                    node.get("endInclusive").asString().toULong(),
+                    node.get("excluded").asList<String>()().map(String::toULong).toMList()
+                )
+            }
+        }
+
+        class OldSerializer : JsonSerializer<ULongRangeWithExclusions>() {
+            override fun serialize(value: ULongRangeWithExclusions, gen: JsonGenerator, serializers: SerializerProvider) {
+                gen.writeStartObject()
+                gen.writeStringField("start", value.start.toString())
+                gen.writeStringField("endInclusive", value.endInclusive.toString())
+                gen.writeArrayFieldStart("excluded")
+                value.excluded.forEach { gen.writeString(it.toString()) }
+                gen.writeEndArray()
+                gen.writeEndObject()
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<ULongRangeWithExclusions?>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): ULongRangeWithExclusions {
+                val node = p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p)
+                return ULongRangeWithExclusions(
+                    node.get("start").asText().toULong(),
+                    node.get("endInclusive").asText().toULong(),
+                    node.get("excluded").asList<String>()().map(String::toULong).toMList()
+                )
+            }
+        }
+
+        /**
+         * Registers a column of type `ULongRangeWithExclusions` in the table using a JSONB representation.
+         * The column stores a range of unsigned long integers (`ULong`) with specific excluded values,
+         * allowing for custom serialization and deserialization of the range and its exclusions.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.uLongRangeWithExclusions(name: String) = jsonb<ULongRangeWithExclusions>(name)
     }
 
     /**

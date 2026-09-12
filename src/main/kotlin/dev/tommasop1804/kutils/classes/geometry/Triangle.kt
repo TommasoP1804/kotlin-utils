@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -246,6 +247,18 @@ class Triangle (var a: Point = Point(), var b: Point = Point(), var c: Point = P
                 )
             }
         }
+
+        /**
+         * Adds a column representing a triangle (`JSONB` data type) to the table with the specified name.
+         *
+         * This method enables the storage and retrieval of triangle objects in a JSON binary format
+         * within a PostgreSQL database table. The stored triangle can include its vertices, area,
+         * perimeter, and additional properties.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.5.0
+         */
+        fun Table.triangle(name: String) = jsonb<Triangle>(name)
     }
 
     /**

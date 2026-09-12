@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.registry.Contact.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -33,6 +34,10 @@ import java.util.Currency
  */
 @Suppress("unused")
 @MustUseReturnValues
+@JsonSerialize(using = PaymentMethod.Companion.Serializer::class)
+@JsonDeserialize(using = PaymentMethod.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = PaymentMethod.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = PaymentMethod.Companion.OldDeserializer::class)
 sealed interface PaymentMethod {
     /**
      * Represents the display name of an entity, such as a user, product, or any identifiable item.
@@ -139,6 +144,39 @@ sealed interface PaymentMethod {
             ) as T
             else -> throw IllegalArgumentException()
         }
+
+        class Serializer : ValueSerializer<PaymentMethod>() {
+            override fun serialize(value: PaymentMethod, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writePOJO(value.serialize())
+            }
+        }
+
+        class Deserializer : ValueDeserializer<PaymentMethod>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): PaymentMethod = tryDeserialize(
+                p.objectReadContext().readTree<ObjectNode>(p)
+            )
+        }
+
+        class OldSerializer : JsonSerializer<PaymentMethod>() {
+            override fun serialize(value: PaymentMethod, gen: JsonGenerator, serializers: SerializerProvider) =
+                gen.writePOJO(value)
+        }
+
+        class OldDeserializer : JsonDeserializer<PaymentMethod>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): PaymentMethod = tryDeserialize(
+                p.codec.readTree<com.fasterxml.jackson.databind.node.ObjectNode>(p)
+            )
+        }
+
+        /**
+         * Registers a JSONB (JSON binary) column in the table for the specified payment method.
+         * The JSONB column stores and retrieves strongly-typed [PaymentMethod] objects,
+         * allowing seamless integration with PostgreSQL databases.
+         *
+         * @param name The name of the JSONB column representing the payment method.
+         * @since 5.5.0
+         */
+        fun Table.paymentMethod(name: String) = jsonb<PaymentMethod>(name)
     }
 
     /**
@@ -280,6 +318,15 @@ sealed interface PaymentMethod {
                     )
                 }
             }
+
+            /**
+             * Defines a column of type `jsonb` in the table, specifically tailored to work with `Card` instances.
+             * This column is used to store and retrieve JSON representations of `Card` objects in a PostgreSQL database.
+             *
+             * @param name The name of the column to be registered in the table.
+             * @since 5.5.0
+             */
+            fun Table.card(name: String) = jsonb<Card>(name)
         }
 
         /**
@@ -290,7 +337,7 @@ sealed interface PaymentMethod {
          * @param pan the PAN to compare with this instance's normalized PAN.
          * @since 3.1.0
          */
-        fun samePan(pan: String) = Pan(pan).value.hashingCompare(HashingAlgorithm.BLAKE3_256, panHash)
+        infix fun samePan(pan: String) = Pan(pan).value.hashingCompare(HashingAlgorithm.BLAKE3_256, panHash)
         /**
          * Compares the given `Pan` object with the current card's `pan` field for equality.
          *
@@ -298,7 +345,7 @@ sealed interface PaymentMethod {
          * @return `true` if the provided `pan` matches the current card's `pan`; otherwise, `false`.
          * @since 3.1.0
          */
-        fun samePan(pan: Pan) = pan.value.hashingCompare(HashingAlgorithm.BLAKE3_256, panHash)
+        infix fun samePan(pan: Pan) = pan.value.hashingCompare(HashingAlgorithm.BLAKE3_256, panHash)
         /**
          * Compares the PAN (Primary Account Number) of this card with another card's PAN.
          *
@@ -306,17 +353,16 @@ sealed interface PaymentMethod {
          * @return True if the PAN of both cards matches, false otherwise.
          * @since 3.1.0
          */
-        fun samePan(other: Card) = other.panHash == panHash
+        infix fun samePan(other: Card) = other.panHash == panHash
 
-        
-        /*
+        /**
          * Compares the provided security code with this card's `securityCode` field for equality.
          *
          * @param code The security code to compare with this card's `securityCode`.
          * @return `true` if the provided code matches the current card's `securityCode`; otherwise, `false`.
          * @since 3.1.0
          */
-        fun sameCvv(code: String) = code.hashingCompare(HashingAlgorithm.BLAKE3_256, cvvHash)
+        infix fun sameCvv(code: String) = code.hashingCompare(HashingAlgorithm.BLAKE3_256, cvvHash)
         /**
          * Compares the security code of this card with the security code of another card.
          *
@@ -324,7 +370,7 @@ sealed interface PaymentMethod {
          * @return `true` if the security codes of both cards match, `false` otherwise.
          * @since 3.1.0
          */
-        fun sameCvv(other: Card) = cvvHash == other.cvvHash
+        infix fun sameCvv(other: Card) = cvvHash == other.cvvHash
 
         /**
          * Returns a string representation of the card.
@@ -473,6 +519,18 @@ sealed interface PaymentMethod {
                 class OldDeserializer : JsonDeserializer<Issuer>() {
                     override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext) = Issuer.ofName(p.text)!!
                 }
+
+                /**
+                 * Retrieves an enumerated value of type Issuer from the table based on the given name.
+                 * Allows selecting the enumeration using either its name or ordinal representation.
+                 *
+                 * @param name The name of the enumeration value to retrieve.
+                 * @param byName Specifies if the retrieval should be based on the name of the enumeration (true)
+                 *               or by its ordinal position (false). Defaults to true.
+                 * @since 5.5.0
+                 */
+                fun Table.cardIssuer(name: String, byName: Boolean = true) =
+                    if (byName) enumerationByName<Issuer>(name, 15) else enumeration<Issuer>(name)
             }
         }
     }
@@ -593,6 +651,16 @@ sealed interface PaymentMethod {
                     )
                 }
             }
+
+            /**
+             * Registers a column in the table to store `BankTransfer` objects as JSONB (JSON binary) data type.
+             * This function is intended for use with PostgreSQL databases to enable the storage and retrieval
+             * of structured `BankTransfer` data in a strongly-typed manner.
+             *
+             * @param name The name of the column in the database table where `BankTransfer` objects will be stored.
+             * @since 5.5.0
+             */
+            fun Table.bankTransfer(name: String) = jsonb<BankTransfer>(name)
         }
 
         /**
@@ -715,6 +783,17 @@ sealed interface PaymentMethod {
                     )
                 }
             }
+
+            /**
+             * Adds a column to the table for storing data as a `DigitalWallet` object in JSONB format.
+             *
+             * This method leverages PostgreSQL's JSONB type to serialize and deserialize
+             * `DigitalWallet` objects, enabling flexible and efficient storage of structured data.
+             *
+             * @param name The name of the JSONB column in the table.
+             * @since 5.5.0
+             */
+            fun Table.digitalWallet(name: String) = jsonb<DigitalWallet>(name)
         }
 
         /**
@@ -821,6 +900,17 @@ sealed interface PaymentMethod {
                 class OldDeserializer : JsonDeserializer<Provider>() {
                     override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext) = Provider.ofName(p.text)
                 }
+
+                /**
+                 * Retrieves a digital wallet provider from the table based on the provided name.
+                 *
+                 * @param name The name of the digital wallet provider to be retrieved.
+                 * @param byName Determines whether the provider should be retrieved by name or by ordinal.
+                 *               If true, the provider is retrieved by name; otherwise, by ordinal.
+                 * @since 5.5.0
+                 */
+                fun Table.digitalWalletProvider(name: String, byName: Boolean = false) =
+                    if (byName) enumerationByName<Provider>(name, 10) else enumeration<Provider>(name)
             }
         }
     }
@@ -944,6 +1034,15 @@ sealed interface PaymentMethod {
                     )
                 }
             }
+
+            /**
+             * Registers a column in the table with the JSONB (JSON binary) data type for the `Cash` object.
+             * This allows the storage and retrieval of `Cash`-typed data in a PostgreSQL database.
+             *
+             * @param name The name of the column in the table.
+             * @since 5.5.0
+             */
+            fun Table.cash(name: String) = jsonb<Cash>(name)
         }
 
         /**

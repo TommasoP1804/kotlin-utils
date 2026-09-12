@@ -13,6 +13,7 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -191,6 +192,18 @@ value class Bic private constructor(val value: String) : CharSequence {
             override fun convertToDatabaseColumn(attribute: Bic?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Bic? = dbData?.let { Bic(it) }
         }
+
+        /**
+         * Adds a column to the table representing a BIC (Bank Identifier Code).
+         *
+         * This method creates a `varchar` column with a specified name and a fixed length of 11 characters.
+         * BIC is a standardized identifier used in banking and financial transactions.
+         *
+         * @param name The name of the column to be added, which represents the BIC field in the table.
+         * @since 5.5.0
+         */
+        fun Table.bic(name: String) = varchar(name, 11)
+            .transform(::Bic, Bic::toString)
     }
 
     /**

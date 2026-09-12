@@ -10,9 +10,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.exceptions.*
+import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.splitAndTrim
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -345,9 +347,21 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<RepeatedTemporalInterval?, String?> {
             override fun convertToDatabaseColumn(attribute: RepeatedTemporalInterval?) = attribute?.toString()
-
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Defines a column in the table to represent a repeated temporal interval.
+         * The column stores the interval as a string of up to 40 characters and
+         * applies transformations to map the string to a [RepeatedTemporalInterval] instance,
+         * and vice versa.
+         *
+         * @param name the name of the column in the database table; must not be null or empty.
+         * @return a configured column capable of storing repeated temporal intervals.
+         * @since 5.5.0
+         */
+        fun Table.repeatedTemporalInterval(name: String, length: Int = 100) = varchar(name, length)
+            .transform({ parse(it)() }, RepeatedTemporalInterval::toString)
     }
 
     /**

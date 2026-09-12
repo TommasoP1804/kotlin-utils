@@ -9,6 +9,7 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.exceptions.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -77,6 +78,31 @@ enum class LogLevel(val levelInt: Int) {
      */
     val levelName: String = +name
 
+    companion object {
+        /**
+         * Finds and returns the `LogLevel` instance that matches the specified logging level integer.
+         *
+         * This method searches through the available `LogLevel` entries and identifies
+         * the one whose `levelInt` property matches the given `level` parameter.
+         *
+         * @param level The integer value representing the desired logging level.
+         * @return The matching `LogLevel` instance, or `null` if no match is found.
+         * @since 5.5.0
+         */
+        infix fun ofLevel(level: Int) = entries.find { it.levelInt == level }
+        /**
+         * Retrieves an instance of `LogLevel` that matches the specified level name, ignoring case considerations.
+         *
+         * This method searches through the `LogLevel` entries to find a match where the `levelName` property
+         * matches the supplied [level]. The comparison is case-insensitive.
+         *
+         * @param level the name of the log level to search for, case-insensitive
+         * @return the matching `LogLevel` instance if found, or `null` if no match exists
+         * @since 5.5.0
+         */
+        infix fun ofLevel(level: String) = entries.find { it.levelName equalsIgnoreCase level }
+    }
+
     /**
      * Returns the string representation of the `LogLevel` instance.
      *
@@ -95,9 +121,12 @@ enum class LogLevel(val levelInt: Int) {
      * the associated SLF4J logging level.
      *
      * @return The corresponding `Level` from SLF4J for the current `LogLevel` instance.
+     * @throws NoSuchEntryException If the `levelName` does not correspond to a valid SLF4J `Level`.
      * @since 1.0.0
      */
-    fun toSlf4jLevel() = Level.valueOf(levelName)
+    fun toSlf4jLevel() = tryOrThrow({ -> NoSuchEntryException(Level::class, this) }) {
+        Level.valueOf(levelName)
+    }
     /**
      * Converts the current `LogLevel` instance to its corresponding `java.util.logging.Level`.
      *

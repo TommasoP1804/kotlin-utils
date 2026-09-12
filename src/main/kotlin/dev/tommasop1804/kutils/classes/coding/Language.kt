@@ -7,6 +7,7 @@ package dev.tommasop1804.kutils.classes.coding
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
+import org.jetbrains.exposed.v1.core.Table
 import java.time.Year
 
 /**
@@ -972,6 +973,19 @@ enum class Language(
          * @since 1.0.0
          */
         infix fun byCategory(category: Category) = entries.filter { it.category == category }.toSet()
+
+        /**
+         * Adds support for mapping a column in the database table to an enumeration of type `Language`.
+         * This function allows specifying the mapping using either the name or the ordinal of the enumeration.
+         *
+         * @param name The name of the column in the database table.
+         * @param byName Specifies whether the mapping should be based on the enumeration's name.
+         *               If `true`, maps the column to the enumeration using the name;
+         *               if `false`, maps using the ordinal value. Default is `true`.
+         * @since 5.5.0
+         */
+        fun Table.language(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<Language>(name, 20) else enumeration<Language>(name)
     }
 
     /**

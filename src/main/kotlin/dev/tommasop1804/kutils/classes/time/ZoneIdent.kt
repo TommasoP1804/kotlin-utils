@@ -11,7 +11,9 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.toLocalMonthDayTime
+import dev.tommasop1804.kutils.exceptions.NoSuchEntryException
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -32,10 +34,10 @@ import kotlin.reflect.KProperty
  * @since 1.0.0
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = ZoneIdent.Serializer::class)
-@JsonDeserialize(using = ZoneIdent.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ZoneIdent.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ZoneIdent.OldDeserializer::class)
+@JsonSerialize(using = ZoneIdent.Companion.Serializer::class)
+@JsonDeserialize(using = ZoneIdent.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = ZoneIdent.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = ZoneIdent.Companion.OldDeserializer::class)
 @Suppress("unused")
 @MustUseReturnValues
 interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
@@ -116,22 +118,22 @@ interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
          *
          * @param id The string identifier of the zone to be resolved.
          * @return The corresponding `ZoneIdent` for the provided identifier.
-         * @throws IllegalArgumentException if the identifier cannot be resolved into a valid time zone.
+         * @throws NoSuchEntryException if the identifier cannot be resolved into a valid time zone.
          * @since 1.0.0
          */
-        infix fun of(id: String): ZoneIdent = TimeZoneDesignator.of(id) ?: TimeZone.of(id).firstOrThrow { IllegalArgumentException("Invalid ZoneIdent: $id") }
+        infix fun of(id: String): ZoneIdent = TimeZoneDesignator.of(id) ?: TimeZone.of(id).firstOrThrow { NoSuchEntryException("Invalid ZoneIdent: $id") }
 
         /**
          * Converts the provided name of a time zone or military time zone into a `ZoneIdent` instance.
          *
          * The method first attempts to match the provided name with a time zone in the `TimeZone` enum.
-         * If no match is found, it then attempts to match it with a military time zone in the `MilitaryTimeZone` enum.
-         * If the name cannot be matched to either, an `IllegalArgumentException` is thrown.
+         * If no match is found, it then attempts to match it with a military time zone in the `TimeZoneDesignator` enum.
+         * If the name cannot be matched to either, an `NoSuchEntryException` is thrown.
          *
          * @param name The name of the time zone or military time zone to convert.
          * @return A `ZoneIdent` instance corresponding to the provided name.
          * @since 1.0.0
-         * @throws IllegalArgumentException If the name does not correspond to any valid `TimeZone` or `MilitaryTimeZone`.
+         * @throws NoSuchEntryException If the name does not correspond to any valid `TimeZone` or `TimeZoneDesignator`.
          */
         infix fun ofEnumName(name: String): ZoneIdent {
             return try {
@@ -140,7 +142,7 @@ interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
                 try {
                     TimeZoneDesignator.valueOf(name)
                 } catch(_: Exception) {
-                    throw IllegalArgumentException("Invalid ZoneIdent name: $name")
+                    throw NoSuchEntryException("Invalid ZoneIdent name: $name")
                 }
             }
         }
@@ -172,6 +174,41 @@ interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
          * @since 1.0.0
          */
         infix fun OffsetTime.hasOffsetAs(zoneIdent: ZoneIdent): Boolean = this.offset.id == zoneIdent.offset.id
+
+        class Serializer : ValueSerializer<ZoneIdent>() {
+            override fun serialize(value: ZoneIdent, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeString(value.toString())
+            }
+        }
+
+        class Deserializer : ValueDeserializer<ZoneIdent>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = of(p.string)
+        }
+
+        class OldSerializer : JsonSerializer<ZoneIdent>() {
+            override fun serialize(value: ZoneIdent, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(value.toString())
+        }
+
+        class OldDeserializer : JsonDeserializer<ZoneIdent>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext) = of(p.text)
+        }
+
+        @jakarta.persistence.Converter(autoApply = true)
+        class Converter : AttributeConverter<ZoneIdent?, String?> {
+            override fun convertToDatabaseColumn(attribute: ZoneIdent?) = attribute?.enumName
+            override fun convertToEntityAttribute(dbData: String?) = dbData?.let { ofEnumName(it) }
+        }
+
+        /**
+         * Defines a column in the table to store zone identifiers as a `VARCHAR` with a maximum length of 15.
+         * The column values are transformed into `ZoneIdent` instances when queried and back to their string
+         * representation when stored.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.zoneIdent(name: String) = varchar(name, 15)
+            .transform(::of, ZoneIdent::toString)
     }
 
     /**
@@ -293,27 +330,14 @@ interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
      */
     operator fun <R> getValue(thisRef: Any?, property: KProperty<*>): R
 
-    class Serializer : ValueSerializer<ZoneIdent>() {
-        override fun serialize(value: ZoneIdent, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
-            gen.writeString(value.toString())
-        }
-    }
-
-    class Deserializer : ValueDeserializer<ZoneIdent>() {
-        override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = of(p.string)
-    }
-
-    class OldSerializer : JsonSerializer<ZoneIdent>() {
-        override fun serialize(value: ZoneIdent, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(value.toString())
-    }
-
-    class OldDeserializer : JsonDeserializer<ZoneIdent>() {
-        override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext) = of(p.text)
-    }
-
-    @jakarta.persistence.Converter(autoApply = true)
-    class Converter : AttributeConverter<ZoneIdent?, String?> {
-        override fun convertToDatabaseColumn(attribute: ZoneIdent?) = attribute?.enumName
-        override fun convertToEntityAttribute(dbData: String?) = dbData?.let { ofEnumName(it) }
-    }
+    /**
+     * Returns a string representation of this ZoneIdent instance.
+     *
+     * The string representation combines relevant properties of the ZoneIdent class,
+     * including but not limited to offset, utcOffset, timeZoneDesignator, zoneId, and enumName.
+     *
+     * @return a string that represents the ZoneIdent instance in a readable and descriptive format.
+     * @since 5.5.0
+     */
+    override fun toString(): String
 }

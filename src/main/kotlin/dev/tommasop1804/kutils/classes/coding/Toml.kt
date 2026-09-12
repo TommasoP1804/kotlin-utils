@@ -22,11 +22,12 @@ import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
-import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
+import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import org.tomlj.TomlArray
 import org.tomlj.TomlParseResult
 import org.tomlj.TomlTable
@@ -319,6 +320,14 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Toml =
                 Json(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString()).toToml()
         }
+
+        /**
+         * Converts the specified column in the table to a Toml format handling.
+         *
+         * @param name The name of the column to be converted to Toml format.
+         * @since 5.5.0
+         */
+        fun Table.toml(name: String) = jsonb<Toml>(name)
 
         internal fun convertTomlValue(value: Any?): Any? = when (value) {
             null -> null

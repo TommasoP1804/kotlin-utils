@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geometry.Line.Companion.TOLERANCE
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -286,6 +287,14 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
                 )
             }
         }
+
+        /**
+         * Configures a database table column with a JSONB type representing a Line object.
+         *
+         * @param name The name of the table column to map to the Line object.
+         * @since 5.5.0
+         */
+        fun Table.line(name: String) = jsonb<Line>(name)
     }
 
     /**

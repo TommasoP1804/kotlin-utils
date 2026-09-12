@@ -21,6 +21,7 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.ValueDeserializer
 
 /**
@@ -129,6 +130,18 @@ open class NonEmptyMap<K, out V>(@PublishedApi internal val elements: Map<K, V>)
          */
         fun <K, V> Map<K, V>.toNonEmptyMapOrDefault(default: Supplier<NonEmptyMap<K, V>>) =
             tryOr({ default() }) { NonEmptyMap(this) }
+
+        /**
+         * Creates and registers a JSONB column in the table for a non-empty map with the specified name.
+         * The non-empty map ensures at least one key-value pair is always present in the column's value.
+         *
+         * @param K The type of keys in the non-empty map.
+         * @param V The type of values in the non-empty map.
+         * @param name The name of the column to be registered in the table.
+         * @return A `Column` object representing the JSONB column for a [NonEmptyMap] of the specified key and value types.
+         * @since 5.5.0
+         */
+        inline fun <reified K, reified V> Table.nonEmptyMap(name: String) = jsonb<NonEmptyMap<K, V>>(name)
     }
 
     /**
@@ -381,6 +394,18 @@ class NonEmptyMMap<K, V>(private val mElements: MMap<K, V>) : MMap<K, V> by mEle
          */
         fun <K, V> Map<K, V>.toNonEmptyMMapOrDefault(default: Supplier<NonEmptyMMap<K, V>>) =
             tryOr({ default() }) { NonEmptyMMap(toMMap()) }
+
+        /**
+         * Creates and registers a JSONB column in the table for a non-empty map with the specified name.
+         * The non-empty map ensures at least one key-value pair is always present in the column's value.
+         *
+         * @param K The type of keys in the non-empty map.
+         * @param V The type of values in the non-empty map.
+         * @param name The name of the column to be registered in the table.
+         * @return A `Column` object representing the JSONB column for a [NonEmptyMMap] of the specified key and value types.
+         * @since 5.5.0
+         */
+        inline fun <reified K, reified V> Table.nonEmptyMMap(name: String) = jsonb<NonEmptyMMap<K, V>>(name)
     }
 
     /**

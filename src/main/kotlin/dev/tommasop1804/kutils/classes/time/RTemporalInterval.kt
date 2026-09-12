@@ -18,6 +18,8 @@ import dev.tommasop1804.kutils.classes.time.RTemporalInterval.Companion.interval
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalToUnrestricted
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.parseTemporal
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
@@ -434,6 +436,148 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
             override fun convertToDatabaseColumn(attribute: RTemporalInterval<*, *>?) = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse<Temporal, Temporal>(dbData)()
         }
+
+        /**
+         * Creates a column in the table to represent a temporal interval with the specified name and length.
+         * The column values are transformed into an object representation of a temporal interval when read
+         * and back into a string representation when written.
+         *
+         * @param T1 the type of the start temporal (e.g., LocalDate, LocalDateTime).
+         * @param T2 the type of the end temporal (e.g., LocalDate, LocalDateTime).
+         * @param name the name of the column to be created in the table.
+         * @param length the maximum length of the column's values, defaults to 100.
+         * @return a column definition for temporal interval representation.
+         * @since 5.5.0
+         */
+        inline fun <reified T1 : Temporal, reified T2 : Temporal> Table.rTemporalInteval(name: String, length: Int = 100) = varchar(name, length)
+            .transform({ parse<T1, T2>(it)() }) { it.toString() }
+        /**
+         * Defines a mono-temporal interval column for a table, representing a time-based interval of type `T`.
+         * The method maps the column to a database `varchar` and applies transformations to parse and format the value.
+         *
+         * @param T The specific temporal type the interval represents (e.g., `LocalDate`, `LocalDateTime`).
+         * @param name The name of the column in the database.
+         * @param length The length of the `varchar` column in the database, with a default value of 100.
+         * @return A `Column` representing a `MonoTemporalInterval` of type `T`.
+         * @since 5.5.0
+         */
+        inline fun <reified T : Temporal> Table.monoTemporalInteval(name: String, length: Int = 100): Column<MonoTemporalInterval<T>> = varchar(name, length)
+            .transform({ parse<T, T>(it)() }) { it.toString() }
+        /**
+         * Creates a column in the database capable of storing `LocalDateInterval` values.
+         *
+         * This function defines a database column of type `varchar` with the specified name and length.
+         * It provides custom transformations for parsing and converting `LocalDateInterval` objects
+         * to and from `String` representations.
+         *
+         * @param name The name of the database column to be created.
+         * @param length The maximum length of the column in characters (default is 100).
+         * @return A `Column` that stores `LocalDateInterval` values, with transformations applied to parse
+         * from and convert to string representations.
+         * @since 5.5.0
+         */
+        fun Table.localDateInteval(name: String, length: Int = 100): Column<LocalDateInterval> = varchar(name, length)
+            .transform({ parse<LocalDate, LocalDate>(it)() }) { it.toString() }
+        /**
+         * Adds a column to the table that represents a `LocalDateTimeInterval`.
+         * This method transforms a varchar column into a column of `LocalDateTimeInterval`
+         * using the specified name and length.
+         *
+         * @param name The name of the column to be created.
+         * @param length The maximum length of the varchar representation. Defaults to 100 if not specified.
+         * @return A column of type `LocalDateTimeInterval` that is added to the table.
+         * @since 5.5.0
+         */
+        fun Table.localDateTimeInteval(name: String, length: Int = 100): Column<LocalDateTimeInterval> = varchar(name, length)
+            .transform({ parse<LocalDateTime, LocalDateTime>(it)() }) { it.toString() }
+        /**
+         * Defines a column within a table that represents an `OffsetDateTimeInterval`.
+         * This method leverages transformation logic to map string values to `OffsetDateTimeInterval`
+         * and vice versa when interacting with the database.
+         *
+         * @param name The name of the column.
+         * @param length The length of the column to store the interval as a string. Defaults to 100.
+         * @return A column object representing an `OffsetDateTimeInterval` with the specified attributes.
+         * @since 5.5.0
+         */
+        fun Table.offsetDateTimeInteval(name: String, length: Int = 100): Column<OffsetDateTimeInterval> = varchar(name, length)
+            .transform({ parse<OffsetDateTime, OffsetDateTime>(it)() }) { it.toString() }
+        /**
+         * Adds a column to the table that stores a `ZonedDateTimeInterval` as a string.
+         *
+         * This method enables the storage of a custom-defined interval of
+         * ZonedDateTime in the database by transforming the data to and from its string representation.
+         *
+         * @param name the name of the column to be added in the table.
+         * @param length the maximum length of the string to store the ZonedDateTimeInterval.
+         * Default value is 100.
+         * @return the column of type `Column<ZonedDateTimeInterval>` that has been added to the table.
+         * @since 5.5.0
+         */
+        fun Table.zonedDateTimeInteval(name: String, length: Int = 100): Column<ZonedDateTimeInterval> = varchar(name, length)
+            .transform({ parse<ZonedDateTime, ZonedDateTime>(it)() }) { it.toString() }
+        /**
+         * Creates a column that represents a local time interval within a database table.
+         *
+         * The local time interval is stored as a string representation in the database and is mapped
+         * to a custom `LocalTimeInterval` type in the application. The method leverages transformations
+         * for parsing and formatting the time interval to and from the database format.
+         *
+         * @param name the name of the column to be created.
+         * @param length the maximum length of the string representation of the interval in the database; defaults to 100.
+         * @return a column that represents a local time interval in the database table.
+         * @since 5.5.0
+         */
+        fun Table.localTimeInteval(name: String, length: Int = 100): Column<LocalTimeInterval> = varchar(name, length)
+            .transform({ parse<LocalTime, LocalTime>(it)() }) { it.toString() }
+        /**
+         * Creates a column within the table to store an offset-based time interval.
+         * The column is defined as a `varchar` type, with transformations applied to
+         * parse and convert the value to and from the `OffsetTimeInterval` type.
+         *
+         * @param name The name of the column to be created.
+         * @param length The maximum length of the column (default is 100).
+         * @return A `Column` instance of type `OffsetTimeInterval` representing the created column.
+         * @since 5.5.0
+         */
+        fun Table.offsetTimeInteval(name: String, length: Int = 100): Column<OffsetTimeInterval> = varchar(name, length)
+            .transform({ parse<OffsetTime, OffsetTime>(it)() }) { it.toString() }
+        /**
+         * Creates a database column for storing `InstantInterval` values with transformation logic.
+         *
+         * This method defines a `varchar` column and applies transformations to convert the value
+         * between its database representation and `InstantInterval` type.
+         *
+         * @param name The name of the column in the database table.
+         * @param length The maximum length of the column. Defaults to `100`.
+         * @return A `Column` instance configured to handle `InstantInterval` values.
+         * @since 5.5.0
+         */
+        fun Table.instantInteval(name: String, length: Int = 100): Column<InstantInterval> = varchar(name, length)
+            .transform({ parse<Instant, Instant>(it)() }) { it.toString() }
+        /**
+         * Defines a column in the table representing a year interval, with support for custom length.
+         * The column is internally treated as a varchar and transformed for YearInterval representation.
+         *
+         * @param name The name of the column.
+         * @param length The maximum length of the varchar column. Defaults to 100 if not specified.
+         * @return A column of type `YearInterval`.
+         * @since 5.5.0
+         */
+        fun Table.yearInteval(name: String, length: Int = 100): Column<YearInterval> = varchar(name, length)
+            .transform({ parse<Year, Year>(it)() }) { it.toString() }
+        /**
+         * Creates a column in the database table that represents a year-month interval.
+         * This method maps the year-month interval to a string column while providing
+         * transformation logic to parse the string into a `YearMonth` and back.
+         *
+         * @param name The name of the database column.
+         * @param length The length of the column for storing the string representation of the year-month interval. Defaults to 100.
+         * @return A column object representing the year-month interval in the database table.
+         * @since 5.5.0
+         */
+        fun Table.yearMonthInterval(name: String, length: Int = 100): Column<YearMonthInterval> = varchar(name, length)
+            .transform({ parse<YearMonth, YearMonth>(it)() }) { it.toString() }
     }
 
     /**

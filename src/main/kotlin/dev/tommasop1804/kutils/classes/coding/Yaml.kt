@@ -28,6 +28,7 @@ import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.constructor.Constructor
@@ -402,6 +403,14 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
         class OldDeserializer : JsonDeserializer<Yaml>() {
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Yaml = Json(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString()).toYaml()
         }
+
+        /**
+         * Converts the specified column in the current table to a JSONB field of type Yaml.
+         *
+         * @param name The name of the column to be converted into a JSONB field.
+         * @since 5.5.0
+         */
+        fun Table.yaml(name: String) = jsonb<Yaml>(name)
     }
 
     /**

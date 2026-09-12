@@ -21,6 +21,7 @@ import dev.tommasop1804.kutils.validateNotEmpty
 import dev.tommasop1804.kutils.validatePositive
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -79,6 +80,51 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
      * @since 1.0.0
      */
     constructor(number: Number) : this(+number.toLong().toString(16)) {
+        validate(number.toLong() >= 0) { "The number must be greater than zero" }
+    }
+    /**
+     * Secondary constructor that initializes the object with a hexadecimal string representation of the provided unsigned byte.
+     *
+     * @param number The unsigned byte value to be converted to hexadecimal and used for initialization.
+     * Must be non-negative; otherwise, a validation error will be thrown.
+     * @throws IllegalArgumentException if the number is less than zero.
+     * @since 5.5.0
+     */
+    constructor(number: UByte) : this(+number.toString(16)) {
+        validate(number.toLong() >= 0) { "The number must be greater than zero" }
+    }
+    /**
+     * Constructs an instance by converting the given unsigned short number
+     * to its hexadecimal string representation and validates that the number
+     * is non-negative.
+     *
+     * @param number The unsigned short number to be converted and validated.
+     * @throws IllegalArgumentException If the given number is negative.
+     * @since 5.5.0
+     */
+    constructor(number: UShort) : this(+number.toString(16)) {
+        validate(number.toLong() >= 0) { "The number must be greater than zero" }
+    }
+    /**
+     * Initializes a new instance of the class using the given unsigned integer.
+     * Converts the provided number to its hexadecimal string representation
+     * and invokes the primary constructor with it as a parameter.
+     *
+     * @param number The unsigned integer to be converted into a hexadecimal string for initialization.
+     * @throws IllegalArgumentException If the provided number is less than zero.
+     * @since 5.5.0
+     */
+    constructor(number: UInt) : this(+number.toString(16)) {
+        validate(number.toLong() >= 0) { "The number must be greater than zero" }
+    }
+    /**
+     * Secondary constructor that creates an instance using an unsigned long number.
+     *
+     * @param number An unsigned long value that will be used to initialize the instance.
+     * @throws IllegalArgumentException If the provided number is not greater than zero.
+     * @since 5.5.0
+     */
+    constructor(number: ULong) : this(+number.toString(16)) {
         validate(number.toLong() >= 0) { "The number must be greater than zero" }
     }
 
@@ -408,6 +454,118 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
             override fun convertToDatabaseColumn(attribute: Hex?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Hex? = dbData?.let { Hex(it) }
         }
+
+        /**
+         * Transforms a binary column in the table to and from its hexadecimal string representation.
+         *
+         * @param name The name of the binary column to be transformed.
+         * @since 5.5.0
+         */
+        fun Table.hexBytes(name: String) = binary(name)
+            .transform(::Hex, Hex::toByteArray)
+        /**
+         * Defines a VARCHAR column in the table with specific parameters and applies a transformation to handle hexadecimal strings.
+         *
+         * @param name The name of the column.
+         * @param length The maximum length of the column. Defaults to 255.
+         * @param collate The collation to be applied to the column. Defaults to null, meaning no specific collation.
+         * @since 5.5.0
+         */
+        fun Table.hexString(name: String, length: Int = 255, collate: String? = null) = varchar(name, length, collate)
+            .transform(::Hex, Hex::toString)
+        /**
+         * Adds a column to the table that stores binary data as a hexadecimal string.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName Optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.hexByte(name: String, checkConstraintName: String? = null) = byte(name, checkConstraintName)
+            .transform(::Hex, Hex::toByte)
+        /**
+         * Creates a column in the database table to store unsigned byte values,
+         * with the ability to transform the stored data to/from a hexadecimal representation.
+         *
+         * @param name the name of the column to be created.
+         * @param checkConstraintName the optional name of the check constraint to enforce column value limits.
+         **/
+        fun Table.hexUByte(name: String, checkConstraintName: String? = null) = ubyte(name, checkConstraintName)
+            .transform(::Hex, Hex::toUByte)
+        /**
+         * Adds a short integer column to the table with a transformation for hexadecimal representation.
+         *
+         * @param name The name of the column to be created in the table.
+         * @param checkConstraintName Optional parameter specifying the name of the check constraint, if any.
+         * @since 5.5.0
+         */
+        fun Table.hexShort(name: String, checkConstraintName: String? = null) = short(name, checkConstraintName)
+            .transform(::Hex, Hex::toShort)
+        /**
+         * Adds an unsigned short (UShort) column to the table, with values stored as hexadecimal strings.
+         * The column is transformed to and from its hexadecimal string representation using the specified transformation functions.
+         *
+         * @param name The name of the column to be added.
+         * @param checkConstraintName Optional name for a SQL check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.hexUShort(name: String, checkConstraintName: String? = null) = ushort(name, checkConstraintName)
+            .transform(::Hex, Hex::toUShort)
+        /**
+         * Defines an integer column in the table associated with hexadecimal transformations.
+         * This method helps enforce storing values in hexadecimal format within the database.
+         *
+         * @param name The name of the column within the table.
+         * @param checkConstraintName An optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.hexInt(name: String, checkConstraintName: String? = null) = integer(name, checkConstraintName)
+            .transform(::Hex, Hex::toInt)
+        /**
+         * Defines a column in the table for an unsigned integer value stored as a hexadecimal string.
+         * The value is transformed between the hexadecimal representation and its corresponding unsigned integer during database operations.
+         *
+         * @param name The name of the column in the table.
+         * @param checkConstraintName An optional name for the check constraint applied to the column, or null if no constraint is specified.
+         * @since 5.5.0
+         */
+        fun Table.hexUInt(name: String, checkConstraintName: String? = null) = uinteger(name, checkConstraintName)
+            .transform(::Hex, Hex::toUInt)
+        /**
+         * Adds a column to the table that stores long values and is associated with hexadecimal transformation.
+         * The column will be able to encode and decode values as hexadecimal strings.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName An optional name for a check constraint to be applied to this column.
+         * @since 5.5.0
+         */
+        fun Table.hexLong(name: String, checkConstraintName: String? = null) = long(name, checkConstraintName)
+            .transform(::Hex, Hex::toLong)
+        /**
+         * Maps a column in the table to an unsigned long value while applying a transformation to handle hexadecimal representation.
+         *
+         * @param name The name of the column that contains the value to be transformed.
+         * @since 5.5.0
+         */
+        fun Table.hexULong(name: String) = ulong(name)
+            .transform(::Hex, Hex::toULong)
+        /**
+         * Maps a float column in the database to a hexadecimal representation and back to a float.
+         *
+         * @param name The name of the column to be transformed.
+         * @since 5.5.0
+         */
+        fun Table.hexFloat(name: String) = float(name)
+            .transform(::Hex, Hex::toFloat)
+        /**
+         * Transforms a column of double values into their hexadecimal representation and vice versa.
+         * This method allows mapping the specified column for further operations by applying
+         * a transformation to and from hexadecimal format.
+         *
+         * @param name The name of the column containing double values to be converted.
+         * @since 5.5.0
+         */
+        fun Table.hexDouble(name: String) = double(name)
+            .transform(::Hex, Hex::toDouble)
     }
 
     /**

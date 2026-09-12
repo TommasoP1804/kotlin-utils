@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.classes.money.Pan.Companion.normalize
 import dev.tommasop1804.kutils.classes.money.PaymentMethod.Card.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -219,9 +220,20 @@ value class Pan private constructor(val value: String) : CharSequence {
 
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<Pan?, String?> {
-            override fun convertToDatabaseColumn(attribute: Pan?): String? = attribute?.value
+            override fun convertToDatabaseColumn(attribute: Pan?): String? = attribute?.normalized
             override fun convertToEntityAttribute(dbData: String?): Pan? = dbData?.let { Pan(it) }
         }
+
+        /**
+         * Defines a custom column in the table schema to store a PAN (Primary Account Number) value.
+         * This method creates a varchar column with a maximum length of 19 characters. The stored value
+         * is transformed into a [Pan] instance using the specified transformations.
+         *
+         * @param name the name of the column to be created in the table schema. Must be unique within the table.
+         * @since 5.5.0
+         */
+        fun Table.pan(name: String) = varchar(name, 19)
+            .transform(::Pan, Pan::normalized)
     }
 
     /**

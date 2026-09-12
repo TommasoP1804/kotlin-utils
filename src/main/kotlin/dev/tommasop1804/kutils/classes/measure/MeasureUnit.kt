@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -252,6 +253,16 @@ open class MeasureUnit internal constructor(override val measure: String, overri
                 )
             }
         }
+
+        /**
+         * Configures a JSONB column in the current database table with a type of [MeasureUnit].
+         * This method utilizes the `jsonb` function to define a column for storing and retrieving
+         * `MeasureUnit` instances as JSON binary data.
+         *
+         * @param name The name of the column in the table to store the `MeasureUnit` data.
+         * @since 5.5.0
+         */
+        fun Table.measureUnit(name: String) = jsonb<MeasureUnit>(name)
     }
 
     /**

@@ -15,6 +15,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -147,6 +148,17 @@ value class Ean8 private constructor(override val value: String) : CharSequence,
             override fun convertToDatabaseColumn(attribute: Ean8?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean8? = dbData?.let { Ean8(it) }
         }
+
+        /**
+         * Adds an EAN-8 (European Article Number) barcode field to the table schema.
+         * This field is represented as a fixed-length `char` field with a length of 8
+         * characters and can be transformed into an `EAN8` type for structured manipulation.
+         *
+         * @param name the name of the field to be added to the table.
+         * @since 5.5.0
+         */
+        fun Table.ean8(name: String) = char(name, 8)
+            .transform(::Ean8, Ean8::toString)
     }
 
     /**

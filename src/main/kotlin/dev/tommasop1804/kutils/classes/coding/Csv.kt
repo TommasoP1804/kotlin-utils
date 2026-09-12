@@ -22,6 +22,7 @@ import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNon
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
 import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -328,6 +329,16 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
             }
             return Csv(lines.joinToString("\n"), separator, hasHeaders)
         }
+
+        /**
+         * Registers a column with CSV data type for the specified name in the table.
+         * This method is tailored for handling CSV content stored in a PostgreSQL database,
+         * providing type-safe interaction with the CSV data through the [Csv] class.
+         *
+         * @param name The name of the CSV column to be registered in the table.
+         * @since 5.5.0
+         */
+        fun Table.csv(name: String) = jsonb<Csv>(name)
     }
 
     /**

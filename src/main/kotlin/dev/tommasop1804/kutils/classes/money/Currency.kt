@@ -9,6 +9,7 @@ import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import kotlin.reflect.KProperty
 
 /**
@@ -323,6 +324,16 @@ enum class Currency (
 		 * @since 1.0.0
 		 */
 		fun java.util.Currency.toConstCurrency() = of(this.currencyCode)
+
+		/**
+		 * Adds a currency column to the table schema, which can be stored as an enumeration.
+		 *
+		 * @param name The name of the column to be added in the table schema, representing the currency.
+		 * @param byName Indicates whether the currency should be stored and identified by its name (true) or by its ordinal value (false). Defaults to true.
+		 * @since 5.5.0
+		 */
+		fun Table.currency(name: String, byName: Boolean = true) =
+			if (byName) enumerationByName<Currency>(name, 3) else enumeration<Currency>(name)
     }
 
 	/**

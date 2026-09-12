@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.web
 
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 
 /**
  * Represents the various types of authentication mechanisms supported.
@@ -12,6 +13,7 @@ import dev.tommasop1804.kutils.*
  * @author Tommaso Pastorelli
  */
 @MustUseReturnValues
+@Suppress("unused")
 enum class AuthType {
     /**
      * Represents the HTTP Basic authentication type.
@@ -52,5 +54,18 @@ enum class AuthType {
          * @since 3.12.0
          */
         infix fun of(type: String) = entries.find { it.name equalsIgnoreCase (type - "_AUTH" - "Auth") }
+
+        /**
+         * Fetches an enumeration value of type `AuthType` from the current table based on the provided name.
+         * The method supports two lookup mechanisms: by name or by ordinal.
+         *
+         * @param name The name of the enumeration value to look up. It should match the name of an `AuthType` constant.
+         * @param byName Whether to perform the lookup by name. If true, the method attempts to retrieve the enumeration
+         *               value using a case-sensitive name match. If false, the enumeration is retrieved using an ordinal index.
+         *               Defaults to true.
+         * @since 5.5.0
+         */
+        fun Table.authType(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<AuthType>(name, 10) else enumeration(name)
     }
 }

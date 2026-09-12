@@ -12,8 +12,9 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.LocalMonthDayTime
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.toLocalMonthDayTime
 import dev.tommasop1804.kutils.get
-import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.invoke
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -28,6 +29,12 @@ import java.util.*
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.Long.Companion.MIN_VALUE
 import kotlin.reflect.KProperty
+import kotlin.text.contains
+import kotlin.text.indexOf
+import kotlin.text.isBlank
+import kotlin.text.lastIndexOf
+import kotlin.text.startsWith
+import kotlin.text.take
 import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 
@@ -682,6 +689,16 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
             override fun convertToDatabaseColumn(attribute: ZonedMonthDayTime?) = if (Objects.isNull(attribute)) null else attribute.toString()
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Defines a zoned month-day-time column in the table schema with a specific name and a maximum length of 50 characters.
+         * The column value is transformed between the string representation in the database and the ZonedMonthDayTime object.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.zonedMonthDayTime(name: String) = varchar(name, 50)
+            .transform({ parse(it)() }, ZonedMonthDayTime::toString)
     }
 
     /**

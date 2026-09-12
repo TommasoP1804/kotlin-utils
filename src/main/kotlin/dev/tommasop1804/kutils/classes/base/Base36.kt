@@ -16,6 +16,8 @@ import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
 import org.bouncycastle.util.encoders.Hex
+import org.jetbrains.exposed.v1.core.Table.Dual.transform
+import org.jetbrains.exposed.v1.core.Table.Dual.varchar
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -399,6 +401,19 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
             override fun convertToDatabaseColumn(attribute: Base36?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Base36? = dbData?.let { Base36(it) }
         }
+
+        /**
+         * Adds a column to the database table schema that stores Base36-encoded strings.
+         * This method creates a VARCHAR column with a specified maximum length and
+         * applies a transformation for encoding and decoding Base36 strings.
+         *
+         * @param name The name of the column to be added.
+         * @param length The maximum length of the VARCHAR column. Defaults to 255.
+         * @param collate The collation to be applied to the VARCHAR column. Defaults to null.
+         * @since 5.5.0
+         */
+        fun base36(name: String, length: Int = 255, collate: String? = null) = varchar(name, length, collate)
+            .transform(::Base36, Base36::toString)
     }
 
     /**

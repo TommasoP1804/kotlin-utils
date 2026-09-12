@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -77,7 +78,7 @@ value class Ean8P2 private constructor(override val value: String) : CharSequenc
          * @return `true` if the string is a valid EAN-8 P2 barcode, `false` otherwise.
          * @since 3.0.0
          */
-        fun CharSequence.isValidEan8P2() = matches(Regex("[0-9]{8} ?[0-9]{2}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 3) == this[7] }
+        fun CharSequence.isValidEan8P2() = matches(Regex("[0-9]{8}[ -]?[0-9]{2}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 3) == this[7] }
 
         /**
          * Converts the current string into an instance of `EAN8P2` while handling potential exceptions.
@@ -89,7 +90,7 @@ value class Ean8P2 private constructor(override val value: String) : CharSequenc
          * @return A `Result<EAN8P2>` containing the converted `EAN8P2` instance if successful, or the exception if an error occurred.
          * @since 3.0.0
          */
-        fun CharSequence.toEan8P2() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { Ean8P2(this) } }
+        fun CharSequence.toEan8P2() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean8P2(this) } }
 
         class Serializer : ValueSerializer<Ean8P2>() {
             override fun serialize(value: Ean8P2, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
@@ -115,6 +116,16 @@ value class Ean8P2 private constructor(override val value: String) : CharSequenc
             override fun convertToDatabaseColumn(attribute: Ean8P2?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean8P2? = dbData?.let { Ean8P2(it) }
         }
+
+        /**
+         * Adds a column to the table with a custom transformation for handling `Ean8P2` type values.
+         * The column is defined as a `varchar` with a length of 11 characters.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.5.0
+         */
+        fun Table.ean8P2(name: String) = varchar(name, 11)
+            .transform(::Ean8P2, Ean8P2::toString)
     }
 
     /**

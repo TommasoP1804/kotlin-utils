@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -104,6 +106,15 @@ class Cube (corner: Point = Point(), sideLength: Double = 0.0) : Cuboid(corner, 
                 )
             }
         }
+
+        /**
+         * Adds a JSONB-typed column to the current table schema, with data being mapped to the
+         * [Cube] type. This column can store data representing cube objects in a PostgreSQL database.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.5.0
+         */
+        fun Table.cube(name: String) = jsonb<Cube>(name)
     }
 
     /**

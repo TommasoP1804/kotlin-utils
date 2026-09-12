@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.time
 
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.*
@@ -426,6 +427,21 @@ enum class TimeZoneDesignator(
             }
             return result
         }
+
+		/**
+		 * Maps a time zone designation to its corresponding enumeration.
+		 *
+		 * The method allows retrieval of a `TimeZoneDesignator` enumeration constant either by its name or by a predefined
+		 * mapping, depending on the value of the `byName` parameter.
+		 *
+		 * @param name The name or identifier used to look up the time zone designation.
+		 * @param byName Indicates whether the lookup should be performed by the name of the time zone designation.
+		 *               If `true`, the method performs a lookup by name. If `false`, it uses an alternative mapping strategy.
+		 *               Defaults to `true`.
+		 * @since 5.5.0
+		 */
+		fun Table.timeZoneDesignator(name: String, byName: Boolean = true) =
+			if (byName) enumerationByName<TimeZoneDesignator>(name, 15) else enumeration<TimeZoneDesignator>(name)
     }
 
     /**

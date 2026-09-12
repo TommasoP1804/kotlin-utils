@@ -990,6 +990,14 @@ open class Table<R, C, V> internal constructor(entries: List<Cell<R, C, V?>>) : 
                 return Table(entries)
             }
         }
+
+        /**
+         * Creates a JSONB column in the table with the specified name.
+         *
+         * @param name The name of the JSONB column to be added to the table.
+         * @since 5.5.0
+         */
+        inline fun <reified R, reified C, reified V> org.jetbrains.exposed.v1.core.Table.table(name: String) = jsonb<Table<R, C, V>>(name)
     }
 
     /**
@@ -1880,6 +1888,14 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
                 return MTable(entries)
             }
         }
+
+        /**
+         * Creates a JSONB column in the table with the specified name.
+         *
+         * @param name The name of the JSONB column to be added to the table.
+         * @since 5.5.0
+         */
+        inline fun <reified R, reified C, reified V> org.jetbrains.exposed.v1.core.Table.mTable(name: String) = jsonb<MTable<R, C, V>>(name)
     }
 
     /**

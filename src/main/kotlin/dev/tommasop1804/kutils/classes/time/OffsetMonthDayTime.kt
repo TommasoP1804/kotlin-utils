@@ -14,8 +14,10 @@ import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.MICROS_
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.NANOS_PER_SECOND
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.SECONDS_PER_DAY
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.SECONDS_PER_MINUTE
+import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNull
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -646,6 +648,16 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
             override fun convertToDatabaseColumn(attribute: OffsetMonthDayTime?) = if (Objects.isNull(attribute)) null else attribute.toString()
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Maps a database column to an `OffsetMonthDayTime` type with transformation logic.
+         * Allows storing and retrieving temporal data including month, day, and time offsets.
+         *
+         * @param name The name of the database column to be mapped.
+         * @since 5.5.0
+         */
+        fun Table.offsetMonthDayTime(name: String) = varchar(name, 40)
+            .transform({ parse(it)() }, OffsetMonthDayTime::toString)
     }
 
     /**

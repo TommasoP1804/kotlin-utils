@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -120,6 +122,17 @@ class Circle(
                 )
             }
         }
+
+        /**
+         * Creates a JSONB column in the table for storing and retrieving `Circle` objects.
+         *
+         * This method utilizes the `jsonb` function, specifying `Circle` as the serialized type.
+         * It allows for strongly-typed storage and retrieval of `Circle` instances from the database.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.circle(name: String) = jsonb<Circle>(name)
     }
 
     /**

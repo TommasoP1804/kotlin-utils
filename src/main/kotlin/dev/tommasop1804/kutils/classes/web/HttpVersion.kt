@@ -6,6 +6,7 @@ package dev.tommasop1804.kutils.classes.web
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import java.net.http.HttpClient
 
 /**
@@ -83,6 +84,21 @@ enum class HttpVersion(val notation: String, val version: Double) {
          * @since 3.0.0
          */
         infix fun of(version: Number) = entries.find { it.version == version }
+
+        /**
+         * Retrieves an `HttpVersion` instance from a table column based on the provided name.
+         *
+         * This method allows fetching an HTTP version from a database `Table` by specifying the name
+         * of the column that holds the HTTP version value. The `byName` parameter determines whether
+         * the enumeration lookup should be performed by the name of the version.
+         *
+         * @param name The name of the table column that holds the `HttpVersion` values.
+         * @param byName A boolean flag indicating whether to match versions by their name. Defaults to `true`.
+         *               If `false`, versions are matched instead by their ordinal value in the enum.
+         * @since 5.5.0
+         */
+        fun Table.httpVersion(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<HttpVersion>(name, 8) else enumeration<HttpVersion>(name)
     }
 
     /**

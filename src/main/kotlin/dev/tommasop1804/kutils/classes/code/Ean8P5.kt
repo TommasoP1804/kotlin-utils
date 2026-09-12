@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -81,7 +82,7 @@ value class Ean8P5 private constructor(override val value: String) : CharSequenc
          * @return `true` if the input string is a valid EAN-8 with a 5-digit add-on, `false` otherwise.
          * @since 3.0.0
          */
-        fun CharSequence.isValidEan8P5() = matches(Regex("[0-9]{8} ?[0-9]{5}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 6) == this[7] }
+        fun CharSequence.isValidEan8P5() = matches(Regex("[0-9]{8}[ -]?[0-9]{5}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 6) == this[7] }
 
         /**
          * Converts the string to an instance of the EAN8P5 class.
@@ -96,7 +97,7 @@ value class Ean8P5 private constructor(override val value: String) : CharSequenc
          * or an exception otherwise.
          * @since 3.0.0
          */
-        fun CharSequence.toEan8P5() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { Ean8P5(this) } }
+        fun CharSequence.toEan8P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean8P5(this) } }
 
         class Serializer : ValueSerializer<Ean8P5>() {
             override fun serialize(value: Ean8P5, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
@@ -122,6 +123,16 @@ value class Ean8P5 private constructor(override val value: String) : CharSequenc
             override fun convertToDatabaseColumn(attribute: Ean8P5?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean8P5? = dbData?.let { Ean8P5(it) }
         }
+
+        /**
+         * Adds a column to the table that stores EAN-8 based product codes with a 5-digit supplementary extension,
+         * represented as a 14-character string.
+         *
+         * @param name The name of the database column to be created.
+         * @since 5.5.0
+         */
+        fun Table.ean8P5(name: String) = varchar(name, 14)
+            .transform(::Ean8P5, Ean8P5::toString)
     }
 
     /**

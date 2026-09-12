@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geometry.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -185,6 +186,15 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
                 )
             }
         }
+
+        /**
+         * Retrieves the bounding box of a specified table column as a JSONB object.
+         *
+         * @param name The name of the table column for which the bounding box should be retrieved.
+         * @return A JSONB representation of the bounding box.
+         * @since 5.5.0
+         */
+        fun Table.boundingBox(name: String) = jsonb<BoundingBox>(name)
 
         /**
          * Creates a BoundingBox from a Well-Known Text (WKT) polygon string.

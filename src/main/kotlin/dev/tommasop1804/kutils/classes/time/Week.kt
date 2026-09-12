@@ -4,11 +4,23 @@
 
 package dev.tommasop1804.kutils.classes.time
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
+import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
 import java.time.*
 import java.time.temporal.*
 import kotlin.reflect.KProperty
-import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 
 @Suppress("unused", "kutils_temporal_now_as_temporal", "kutils_temporal_of_as_temporal")
@@ -138,8 +150,8 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @return A list containing seven `LocalDate` objects in ascending order.
      * @since 1.0.0
      */
-    val days: List<LocalDate>
-        get() = (0..6).map { firstDay.plusDays(it.toLong()) }
+    val days: NonEmptyList<LocalDate>
+        get() = (0..6).map { firstDay.plusDays(it.toLong()) }.toNonEmptyList()
     /**
      * Represents a range of dates from a starting date (`firstDay`) to an ending date (`lastDay`), inclusive.
      *
@@ -207,7 +219,6 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @param zone The time zone to associate with the instant.
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zone: ZoneId) : this(from(instant.toJavaInstant().atZone(zone)))
     /**
      * Secondary constructor to initialize an instance from a given `Instant` and `ZoneIdent`.
@@ -216,7 +227,6 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
      * @param zone The `ZoneIdent` representing the time-zone information.
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zone: ZoneIdent) : this(from(instant.toJavaInstant().atZone(zone.zoneId)))
 
     /**
@@ -320,6 +330,23 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
                 .with(weekFields.weekOfMonth(), weekNumber.toLong())
                 .with(weekFields.dayOfWeek(), 1)
             )
+        }
+
+        /**
+         * Parses a given CharSequence to create a Week instance.
+         *
+         * The input CharSequence must adhere to the format "YYYY-Www",
+         * where "YYYY" represents the 4-digit year, and "ww" represents the 2-digit week number.
+         * Any leading and trailing whitespace in the input will be trimmed before processing.
+         *
+         * @param cs the character sequence to parse; must match the format "YYYY-Www".
+         * @return a Result wrapping the Week instance if parsing succeeds, or an exception if parsing fails.
+         * @since 5.5.0
+         */
+        fun parse(cs: CharSequence) = runCatching {
+            val s = cs.toString().trim()
+            s.validateInputFormat(Regex("[0-9]{4}-W[0-9]{2}"), Week::class)
+            Week._of(s.take(4).toInt(), s.after('W').toInt())
         }
 
         /**
@@ -482,6 +509,41 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          */
         val Instant.week
             get() = from(this)
+
+        class Serializer : ValueSerializer<Week>() {
+            override fun serialize(value: Week, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
+                gen.writeString(value.toString())
+            }
+        }
+
+        class Deserializer : ValueDeserializer<Week>() {
+            override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext) = parse(p.string).getOrThrow()
+        }
+
+        class OldSerializer : JsonSerializer<Week>() {
+            override fun serialize(value: Week, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(value.toString())
+        }
+
+        class OldDeserializer : JsonDeserializer<Week>() {
+            override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Week = parse(p.text).getOrThrow()
+        }
+
+        @jakarta.persistence.Converter(autoApply = true)
+        class Converter : AttributeConverter<Week?, String?> {
+            override fun convertToDatabaseColumn(attribute: Week?) = attribute?.toString()
+            override fun convertToEntityAttribute(dbData: String?): Week? = if (dbData == null) null else parse(dbData).getOrThrow()
+        }
+
+        /**
+         * Defines a column in the table for storing week-based data. The column will have a fixed length of 8 characters.
+         * The transformation ensures that the data is parsed into a `Week` object upon retrieval and converted
+         * to its string representation before storage.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.week(name: String) = char(name, 8)
+            .transform({ parse(it)() }, Week::toString)
     }
 
     /**
@@ -772,7 +834,6 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
         "weekOfMonth" to weekOfMonth,
         "firstDay" to firstDay,
         "lastDay" to lastDay,
-        "days" to days.toList(),
         "days" to days,
         "daysRange" to daysRange,
     )

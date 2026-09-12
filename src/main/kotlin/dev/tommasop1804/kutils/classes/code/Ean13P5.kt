@@ -9,11 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.SPACE
-import dev.tommasop1804.kutils.insert
-import dev.tommasop1804.kutils.minus
-import dev.tommasop1804.kutils.validateInputFormat
+import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -82,7 +80,7 @@ value class Ean13P5 private constructor(override val value: String) : CharSequen
          * @return `true` if the string is a valid EAN-13 P5 code, `false` otherwise.
          * @since 3.0.0
          */
-        fun CharSequence.isValidEan13P5() = matches(Regex("[0-9]{13} ?[0-9]{5}")) && filter { it.isDigit() }.run { Ean13.computeCheckDigit(toString() - 6) == this[12] }
+        fun CharSequence.isValidEan13P5() = matches(Regex("[0-9]{13}[ -]?[0-9]{5}")) && filter { it.isDigit() }.run { Ean13.computeCheckDigit(toString() - 6) == this[12] }
 
         /**
          * Attempts to create an instance of `EAN13P5` from the invoking string.
@@ -96,7 +94,7 @@ value class Ean13P5 private constructor(override val value: String) : CharSequen
          *         creation fails.
          * @since 3.0.0
          */
-        fun CharSequence.toEan13P5() = filter { it.isDigit() || it == Char.SPACE }.run { runCatching { Ean13P5(this) } }
+        fun CharSequence.toEan13P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean13P5(this) } }
 
         class Serializer : ValueSerializer<Ean13P5>() {
             override fun serialize(value: Ean13P5, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
@@ -122,6 +120,17 @@ value class Ean13P5 private constructor(override val value: String) : CharSequen
             override fun convertToDatabaseColumn(attribute: Ean13P5?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean13P5? = dbData?.let { Ean13P5(it) }
         }
+
+        /**
+         * Defines a column in the table to hold EAN-13 codes with an additional 5-digit
+         * packaging code (P5). The stored data is transformed into and from an `Ean13P5`
+         * instance for type safety and ease of use.
+         *
+         * @param name the name of the column in the database.
+         * @since 5.5.0
+         */
+        fun Table.ean13P5(name: String) = varchar(name, 19)
+            .transform(::Ean13P5, Ean13P5::toString)
     }
 
     /**

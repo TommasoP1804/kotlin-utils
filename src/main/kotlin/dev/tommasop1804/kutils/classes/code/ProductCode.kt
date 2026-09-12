@@ -19,6 +19,7 @@ import dev.tommasop1804.kutils.classes.code.Ean14.Companion.isValidEan14
 import dev.tommasop1804.kutils.classes.code.Ean8.Companion.isValidEan8
 import dev.tommasop1804.kutils.classes.code.Ean8P2.Companion.isValidEan8P2
 import dev.tommasop1804.kutils.classes.code.Ean8P5.Companion.isValidEan8P5
+import dev.tommasop1804.kutils.classes.code.Isbn.Companion.isValidIsbn
 import dev.tommasop1804.kutils.classes.code.ProductCode.Ean.Companion.isValidEan
 import dev.tommasop1804.kutils.classes.code.ProductCode.Ean.Companion.toEan
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.toUpc
@@ -28,6 +29,7 @@ import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -226,6 +228,18 @@ interface ProductCode {
             override fun convertToDatabaseColumn(attribute: ProductCode?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): ProductCode? = dbData?.let { ProductCode(it) }
         }
+
+        /**
+         * Configures a database table column to represent a product code as a `varchar` type.
+         * The method applies transformation logic to map the column value to a `ProductCode` object
+         * and vice versa.
+         *
+         * @param name The name of the column in the database table.
+         * @param length The length of the `varchar` column. Defaults to 27 if not specified.
+         * @since 5.5.0
+         */
+        fun Table.productCode(name: String, length: Int = 27) = varchar(name, length)
+            .transform(::ProductCode, ProductCode::value)
     }
 
     /**
@@ -283,7 +297,7 @@ interface ProductCode {
              * @since 3.0.0
              */
             fun CharSequence.toEan(): Result<Ean> = runCatching {
-                validateInputFormat(Ean::class) { matches(Regex("[0-9 ]+")) && length in 8..19 }
+                validateInputFormat(Ean::class) { matches(Regex("[0-9 -]+")) && length in 8..27 }
 
                 when {
                     isValidEan13() -> Ean13(this)
@@ -293,6 +307,7 @@ interface ProductCode {
                     isValidEan8P2() -> Ean8P2(this)
                     isValidEan8P5() -> Ean8P5(this)
                     isValidEan14() -> Ean14(this)
+                    isValidIsbn() -> Isbn(this)
                     else -> throw NoMatchingFormatException("No valid EAN format found.")
                 }
             }
@@ -321,6 +336,20 @@ interface ProductCode {
                 override fun convertToDatabaseColumn(attribute: Ean?): String? = attribute?.value
                 override fun convertToEntityAttribute(dbData: String?): Ean? = dbData?.let { it.toEan()() }
             }
+
+            /**
+             * Adds a varchar column to the `Table` and applies transformations for validating and mapping EAN (European Article Number) values.
+             *
+             * This method allows the creation of a varchar column with a specified name and length, and ensures that the stored values
+             * are convertible to a valid EAN format. The data transformation is performed using the `toEan` method for validation
+             * and mapping to the `Ean` type.
+             *
+             * @param name The name of the column to be created in the database table.
+             * @param length The length of the varchar column. Defaults to 27.
+             * @since 5.5.0
+             */
+            fun Table.ean(name: String, length: Int = 27) = varchar(name, length)
+                .transform({ it.toEan()() }, Ean::value)
         }
     }
     /**
@@ -413,6 +442,20 @@ interface ProductCode {
                 override fun convertToDatabaseColumn(attribute: Upc?): String? = attribute?.value
                 override fun convertToEntityAttribute(dbData: String?): Upc? = dbData?.let { it.toUpc()() }
             }
+
+            /**
+             * Adds a varchar column to the table with a transformation to and from a `UPC` representation.
+             * The column is based on a string value and is constrained to a maximum specified length.
+             * When retrieved, the value is automatically transformed into a `UPC` instance, and when stored,
+             * the `UPC` instance is converted back to its string value.
+             *
+             * @receiver The table to which the varchar column is being added.
+             * @param name The name of the column in the table.
+             * @param length The maximum length of the varchar field. Defaults to 12.
+             * @since 5.5.0
+             */
+            fun Table.upc(name: String, length: Int = 12) = varchar(name, length)
+                .transform({ it.toUpc()() }, Upc::value)
         }
     }
 }

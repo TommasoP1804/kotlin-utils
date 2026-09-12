@@ -25,6 +25,7 @@ import jakarta.persistence.NoResultException
 import jakarta.persistence.NonUniqueResultException
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
 import org.intellij.lang.annotations.Language
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -445,6 +446,16 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
             override fun convertToDatabaseColumn(attribute: SqlQuery?) = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?) = dbData?.let { SqlQuery(it) }
         }
+
+        /**
+         * Creates a SQL query column in the table with the specified name and optional collation.
+         *
+         * @param name The name of the SQL query column to be created.
+         * @param collate An optional collation sequence to be applied to the column. Defaults to null.
+         * @since 5.5.0
+         */
+        fun Table.sqlQuery(name: String, collate: String? = null) = text(name, collate)
+            .transform(::SqlQuery, SqlQuery::toString)
     }
 
     /**

@@ -23,6 +23,7 @@ import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMa
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.core.type.TypeReference
@@ -557,6 +558,32 @@ open class Json private constructor(@param:Language("json") override val value: 
             list.toList()
         }
         /**
+         * Converts the current `JsonNode` into a list of elements of the specified type.
+         * If the node is not an array, an exception is thrown.
+         * Supports common primitive types and `JsonNode`. For unsupported types, fallback serialization is used.
+         *
+         * @return A `Result` containing the list of elements of type `T` if conversion is successful,
+         *         or an exception if the node is not an array or if the conversion fails.
+         * @since 5.5.0
+         */
+        inline fun <reified T> com.fasterxml.jackson.databind.JsonNode.asList(): Result<List<T>> = runCatching {
+            val list = emptyMList<T>()
+            if (isArray) {
+                for (node in this) {
+                    when(T::class) {
+                        Int::class -> list.add(node.asInt() as T)
+                        Long::class -> list.add(node.asLong() as T)
+                        Double::class -> list.add(node.asDouble() as T)
+                        Boolean::class -> list.add(node.asBoolean() as T)
+                        String::class -> list.add(node.asText() as T)
+                        JsonNode::class -> list.add(node as T)
+                        else -> list.add(OLD_MAPPER.treeToValue(node, T::class.java))
+                    }
+                }
+            } else throw UnsupportedJsonTypeException(T::class.simpleName)
+            list.toList()
+        }
+        /**
          * Converts a JsonNode to a Result containing a Set of the specified type.
          *
          * If the JsonNode represents an array, each element is converted to the specified type using
@@ -577,6 +604,34 @@ open class Json private constructor(@param:Language("json") override val value: 
                         Boolean::class -> set.add(node.asBoolean() as T)
                         String::class -> set.add(node.asString() as T)
                         else -> set.add(MAPPER.treeToValue(node, T::class.java))
+                    }
+                }
+            } else throw UnsupportedJsonTypeException(T::class.simpleName)
+            set.toSet()
+        }
+        /**
+         * Converts a JsonNode to a Set of the specified type.
+         *
+         * The method attempts to map the elements of a JsonNode array to the given type [T].
+         * Supports conversion to common types such as Int, Long, Double, Boolean, and String.
+         * For other types, it utilizes a custom object mapping mechanism.
+         * If the JsonNode is not an array, an UnsupportedJsonTypeException is thrown.
+         *
+         * @return Result wrapping a Set of elements of type [T] if the conversion succeeds,
+         * or an exception if the operation fails.
+         * @since 5.5.0
+         */
+        inline fun <reified T> com.fasterxml.jackson.databind.JsonNode.asSet(): Result<Set<T>> = runCatching {
+            val set = emptyMSet<T>()
+            if (isArray) {
+                for (node in this) {
+                    when(T::class) {
+                        Int::class -> set.add(node.asInt() as T)
+                        Long::class -> set.add(node.asLong() as T)
+                        Double::class -> set.add(node.asDouble() as T)
+                        Boolean::class -> set.add(node.asBoolean() as T)
+                        String::class -> set.add(node.asText() as T)
+                        else -> set.add(OLD_MAPPER.treeToValue(node, T::class.java))
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
@@ -718,6 +773,14 @@ open class Json private constructor(@param:Language("json") override val value: 
             override fun deserialize(p: com.fasterxml.jackson.core.JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Json =
                 Json(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString())
         }
+
+        /**
+         * Creates a JSONB column representation for the specified column name.
+         *
+         * @param name The name of the column to be represented as JSONB.
+         * @since 5.5.0
+         */
+        fun Table.rawJson(name: String) = jsonb<Json>(name)
     }
 
     /**

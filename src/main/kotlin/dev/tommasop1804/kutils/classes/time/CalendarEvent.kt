@@ -18,8 +18,10 @@ import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalT
 import dev.tommasop1804.kutils.expectClass
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNotDecimal
+import dev.tommasop1804.kutils.jsonb
 import dev.tommasop1804.kutils.memberPropertiesMap
 import dev.tommasop1804.kutils.validate
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -309,6 +311,16 @@ data class CalendarEvent(
                 )
             }
         }
+
+        /**
+         * Creates a JSONB (JSON binary) column in the table for storing and managing data related to calendar events.
+         * The column is mapped to the `CalendarEvent` type, allowing structured data for events to be serialized
+         * and deserialized automatically.
+         *
+         * @param name The name of the column in the database table.
+         * @since 5.5.0
+         */
+        fun Table.calendarEvent(name: String) = jsonb<CalendarEvent>(name)
     }
 
     /**
@@ -433,6 +445,16 @@ data class CalendarEvent(
                     )
                 }
             }
+
+            /**
+             * Registers a column in the table for handling `CalendarEvent.Repeat` objects using JSONB storage.
+             * This method is specifically designed to work with PostgreSQL databases and leverages the `jsonb` mechanism
+             * to store and retrieve strongly-typed `CalendarEvent.Repeat` data.
+             *
+             * @param name The name of the column in the table where the `CalendarEvent.Repeat` values will be stored.
+             * @since 5.5.0
+             */
+            fun Table.calendarEventRepeat(name: String) = jsonb<CalendarEvent.Repeat>(name)
         }
 
         /**
@@ -627,6 +649,16 @@ data class CalendarEvent(
                     )
                 }
             }
+
+            /**
+             * Defines a JSONB column for storing and managing `EventPartecipation` objects in the table.
+             * This allows storing structured data related to event participation, including user, status, and reason,
+             * in a strongly-typed manner.
+             *
+             * @param name The name of the column in the table where `EventPartecipation` objects are stored.
+             * @since 5.5.0
+             */
+            fun Table.calendarEventPartecipation(name: String) = jsonb<EventPartecipation>(name)
         }
         
         /**
@@ -650,18 +682,18 @@ data class CalendarEvent(
         override fun toString(): String = "EventPartecipation(user=$user, status=$status, reason=$reason)"
 
         /**
-         * Represents the participation status of a user for an event along with a default color
-         * indicating the status visually.
+         * Represents the participation status of a user in an event.
          *
-         * Each status is associated with a specific color for better recognition:
-         * - YES: Represented by the color GREEN.
-         * - NO: Represented by the color RED.
-         * - MAYBE: Represented by the color LIGHT_ORANGE.
+         * This enumeration defines three states: affirmative, negative, and uncertain,
+         * each associated with a corresponding boolean value and a default color for visual representation.
          *
-         * @property defaultColor The default color associated with the participation status.
+         * @param booleanValue The boolean representation of the status, where `true` represents "Yes",
+         * `false` represents "No", and `null` represents "Maybe".
+         * @param defaultColor The default color used to visually represent the status.
+         *
          * @since 1.0.0
          */
-        enum class PartecipationStatus(val defaultColor: Color) {
+        enum class PartecipationStatus(val booleanValue: Boolean?, val defaultColor: Color) {
             /**
              * Represents a status indicating affirmative participation.
              *
@@ -670,14 +702,14 @@ data class CalendarEvent(
              *
              * @since 4.0.0
              */
-            Yes(Color.GREEN),
+            Yes(true, Color.GREEN),
             /**
              * Represents a "No" participation status with a default color of red.
              * This status indicates a negative response in the context of participation.
              *
              * @since 4.0.0
              */
-            No(Color.RED),
+            No(false, Color.RED),
             /**
              * Represents a participation status option where the answer is uncertain.
              *
@@ -686,7 +718,47 @@ data class CalendarEvent(
              *
              * @since 4.0.0
              */
-            Maybe(Color.LIGHT_ORANGE)
+            Maybe(null, Color.LIGHT_ORANGE);
+
+            companion object {
+                /**
+                 * Retrieves a participation status value from the table based on the specified name.
+                 * The method allows querying the participation status either by its string name
+                 * or using an enumeration method, depending on the value of the `byName` parameter.
+                 *
+                 * @param name The string name representing the participation status to retrieve.
+                 * @param byName A Boolean flag indicating the method of lookup. If true, the
+                 *               participation status value is retrieved by its name. If false,
+                 *               it is retrieved using a direct enumeration method. Defaults to true.
+                 * @since 5.5.0
+                 */
+                fun Table.participationStatus(name: String, byName: Boolean = true) =
+                    if (byName) enumerationByName<PartecipationStatus>(name, 5) else enumeration<PartecipationStatus>(name)
+            }
+
+            /**
+             * Returns the first component of the object.
+             *
+             * This operator function allows the object to be destructured,
+             * providing the value of the boolean property associated with the object.
+             *
+             * It is commonly used in destructuring declarations to simplify
+             * unpacking of object properties.
+             *
+             * @return The boolean value associated with the object's state.
+             * @since 5.5.0
+             */
+            operator fun component1() = booleanValue
+            /**
+             * Provides the second component of the object, which represents its default color.
+             * This function is commonly used in destructuring declarations.
+             *
+             * @return The default color associated with the object.
+             * @see component1
+             *
+             * @since 5.5.0
+             */
+            operator fun component2() = defaultColor
         }
     }
 }

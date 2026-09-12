@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -247,6 +248,17 @@ class Ellipse (var center: Point = Point(), xRadius: Double = 0.0, yRadius: Doub
                 )
             }
         }
+
+        /**
+         * Creates a JSONB column in the table for storing `Ellipse` objects.
+         *
+         * This method registers a column with the JSONB (JSON binary) data type for the specified name,
+         * allowing the storage and retrieval of serialized `Ellipse` objects in a strongly-typed manner.
+         *
+         * @param name The name of the column in the table that will store `Ellipse` objects.
+         * @since 5.5.0
+         */
+        fun Table.ellipse(name: String) = jsonb<Ellipse>(name)
     }
 
     /**

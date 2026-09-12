@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import tools.jackson.databind.*
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
 
 /**
  * Represents the specification for pagination, including filter and sort parameters.
@@ -48,6 +50,10 @@ interface PaginationSpec {
  * @since 4.5.0
  * @author Tommaso Pastorelli
  */
+@JsonSerialize(using = PageLimitPaginationSpec.Companion.Serializer::class)
+@JsonDeserialize(using = PageLimitPaginationSpec.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = PageLimitPaginationSpec.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = PageLimitPaginationSpec.Companion.OldDeserializer::class)
 open class PageLimitPaginationSpec(
     val page: Int = 0,
     limit: Int? = null,
@@ -168,9 +174,7 @@ open class PageLimitPaginationSpec(
      * @return A string representation of the PaginationSpec instance.
      * @since 4.5.0
      */
-    override fun toString(): String {
-        return "PaginationSpec(page=$page, limit=$limit, filter=$filter, sort=$sort)"
-    }
+    override fun toString(): String = "PaginationSpec(page=$page, limit=$limit, filter=$filter, sort=$sort)"
 
     /**
      * Deconstructs the object to provide the `page` property.
@@ -219,6 +223,10 @@ open class PageLimitPaginationSpec(
  * @since 4.5.0
  * @author Tommaso Pastorelli
  */
+@JsonSerialize(using = CursorPaginationSpec.Companion.Serializer::class)
+@JsonDeserialize(using = CursorPaginationSpec.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = CursorPaginationSpec.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = CursorPaginationSpec.Companion.OldDeserializer::class)
 open class CursorPaginationSpec(
     val cursor: Any? = null,
     limit: Int? = null,
@@ -365,9 +373,7 @@ open class CursorPaginationSpec(
      * @return a string containing the `cursor`, `limit`, `filter`, and `sort` values of the object.
      * @since 4.5.0
      */
-    override fun toString(): String {
-        return "CursorPaginationSpec(cursor=$cursor, limit=$limit, filter=$filter, sort=$sort)"
-    }
+    override fun toString(): String = "CursorPaginationSpec(cursor=$cursor, limit=$limit, filter=$filter, sort=$sort)"
 
     /**
      * Returns the value of the `cursor` property. This function is part of the

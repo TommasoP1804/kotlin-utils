@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.TimeZone
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -287,6 +288,17 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
         class OldDeserializer : JsonDeserializer<Money>() {
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): Money = parse(p.text)()
         }
+
+        /**
+         * Adds a money column to the table with the specified name, length, and optional collation.
+         *
+         * @param name The name of the column to be added.
+         * @param length The maximum length of the column. Defaults to 255.
+         * @param collate The collation rule to apply to the column. Defaults to null for no specific collation.
+         * @since 5.5.0
+         */
+        fun Table.money(name: String, length: Int = 255, collate: String? = null) = varchar(name, length, collate)
+            .transform({ parse(it)() }, Money::toString)
     }
 
     /**

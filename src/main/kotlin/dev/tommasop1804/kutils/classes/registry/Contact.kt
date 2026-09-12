@@ -15,6 +15,8 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -177,6 +179,16 @@ data class Contact(
                 )
             }
         }
+
+        /**
+         * Registers a column in the table to store data of the `Contact` type using the JSONB (JSON binary) format.
+         * This method utilizes PostgreSQL's JSONB data type to enable strongly-typed storage and retrieval
+         * of `Contact` objects in the associated database table.
+         *
+         * @param name The name of the column in the table where `Contact` data will be stored.
+         * @since 5.5.0
+         */
+        fun Table.contact(name: String) = jsonb<Contact>(name)
     }
 
     /**
@@ -316,6 +328,15 @@ data class Contact(
                     )
                 }
             }
+
+            /**
+             * Registers a JSONB column in the table for storing and retrieving `Name` objects.
+             * This column is designed to hold structured data representing various attributes of a person's name.
+             *
+             * @param name The name of the column in the database table.
+             * @since 5.5.0
+             */
+            fun Table.contactName(name: String) = jsonb<Name>(name)
         }
 
         /**
@@ -414,6 +435,16 @@ data class Contact(
                     )
                 }
             }
+
+            /**
+             * Defines a JSONB column in the table for storing objects of type [Job].
+             * This method facilitates interaction with PostgreSQL JSONB data types
+             * for objects that represent job-related information.
+             *
+             * @param name The name of the column in the table where the [Job] data will be stored.
+             * @since 5.5.0
+             */
+            fun Table.contactJob(name: String) = jsonb<Job>(name)
         }
         
         /**
@@ -579,6 +610,16 @@ data class Contact(
                     )
                 }
             }
+
+            /**
+             * Registers a JSONB (JSON binary) column for storing address data in the table.
+             * This method allows integrating the `Address` type with PostgreSQL's JSONB support,
+             * enabling structured address information to be stored and retrieved in a strongly-typed manner.
+             *
+             * @param name The name of the column in the table that will store the address data.
+             * @since 5.5.0
+             */
+            fun Table.contactAddress(name: String) = jsonb<Address>(name)
         }
         
         /**
@@ -776,6 +817,16 @@ data class Contact(
                 override fun convertToDatabaseColumn(attribute: Email?): String? = attribute?.value
                 override fun convertToEntityAttribute(dbData: String?): Email? = dbData?.let { Email(it) }
             }
+
+            /**
+             * Registers an email column with JSONB (JSON binary) data type in the table.
+             * This column is strongly typed as [Email] and is serialized and deserialized using the defined serializer.
+             *
+             * @param name The name of the column to be created in the table.
+             * @since 5.5.0
+             */
+            fun Table.email(name: String, length: Int = 255): Column<Email> = varchar(name, length)
+                .transform(::Email, Email::toString)
         }
 
         /**
@@ -1309,6 +1360,18 @@ data class Contact(
                 override fun convertToDatabaseColumn(attribute: PhoneNumber?): String? = attribute?.value
                 override fun convertToEntityAttribute(dbData: String?): PhoneNumber? = dbData?.let { PhoneNumber(it) }
             }
+
+            /**
+             * Adds a phone number column to the table with the specified name and length,
+             * transforming the stored value into a `PhoneNumber` object.
+             *
+             * @param name the name of the column to be created.
+             * @param length the maximum length of the column. Defaults to 30.
+             * @return a column of type `PhoneNumber`.
+             * @since 5.5.0
+             */
+            fun Table.phoneNumber(name: String, length: Int = 30): Column<PhoneNumber> = varchar(name, length)
+                .transform(::PhoneNumber, PhoneNumber::toString)
         }
 
         /**

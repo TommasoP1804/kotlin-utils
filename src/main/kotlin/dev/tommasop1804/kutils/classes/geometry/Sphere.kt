@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -130,6 +132,16 @@ class Sphere (var center: Point = Point(), radius: Double = 0.0) : Serializable,
                 )
             }
         }
+
+        /**
+         * Registers a JSONB column in the table for storing and retrieving `Sphere` objects.
+         * This method is tailored for PostgreSQL databases and supports strong typing for JSONB operations
+         * with the `Sphere` class, enabling storage and retrieval of `Sphere` instances in a JSONB format.
+         *
+         * @param name The name of the column to be registered in the table for `Sphere` objects.
+         * @since 5.5.0
+         */
+        fun Table.sphere(name: String) = jsonb<Sphere>(name)
     }
 
     /**

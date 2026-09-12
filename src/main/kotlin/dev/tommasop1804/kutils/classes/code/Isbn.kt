@@ -16,6 +16,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -231,6 +232,20 @@ value class Isbn private constructor(override val value: String) : CharSequence,
             override fun convertToDatabaseColumn(attribute: Isbn?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Isbn? = dbData?.let { Isbn(it) }
         }
+
+        /**
+         * Adds a column to the table for storing EAN-14 formatted values and applies
+         * a transformation between the database representation and the Ean14 type.
+         *
+         * The column will store values as a fixed-length string of 14 characters, ensuring
+         * proper representation of the EAN-14 standard. The transformation is applied
+         * bi-directionally: converting database values into Ean14 objects and back into strings.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.isbn(name: String) = varchar(name, 27)
+            .transform(::Isbn, Isbn::toString)
     }
 
     /**

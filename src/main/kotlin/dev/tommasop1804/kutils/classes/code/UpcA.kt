@@ -17,6 +17,7 @@ import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -119,6 +120,17 @@ value class UpcA private constructor(override val value: String) : CharSequence,
             override fun convertToDatabaseColumn(attribute: UpcA?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): UpcA? = dbData?.let { UpcA(it) }
         }
+
+        /**
+         * Defines a column of type `UPC_A` with a fixed length of 12 characters in the table.
+         * This method also applies a transformation to convert between the `String` representation
+         * and the `UpcA` object.
+         *
+         * @param name The name of the column to be defined in the table.
+         * @since 5.5.0
+         */
+        fun Table.upcA(name: String) = char(name, 12)
+            .transform(::UpcA, UpcA::toString)
     }
 
     /**

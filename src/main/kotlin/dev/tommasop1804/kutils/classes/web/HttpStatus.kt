@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.web
 
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 
 /**
  * Represents the enumeration of HTTP status codes as defined by the HTTP standard.
@@ -246,6 +247,17 @@ enum class HttpStatus(val value: Int, val family: Family, val reasonPhrase: Stri
          * @since 2.0.0
          */
         fun String.toHttpStatus() = ofReasonPhrase(this)
+
+        /**
+         * Create a column of a table of type `HttpStatus` (varchar with fixed length of 40)
+         *
+         * @param name The name of the column.
+         * @param byName A boolean flag indicating whether to save by status name (default is `true`) or by ordinal value.
+         * @return The `HttpStatus` object corresponding to the provided input.
+         * @since 5.5.0
+         */
+        fun Table.httpStatus(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<HttpStatus>(name, 40) else enumeration<HttpStatus>(name)
     }
 
     /**

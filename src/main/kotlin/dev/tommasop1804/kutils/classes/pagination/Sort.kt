@@ -18,6 +18,7 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -203,6 +204,18 @@ data class SortOption(
                 )
             }
         }
+
+        /**
+         * Creates a JSONB column for a `SortOption` object in the table.
+         *
+         * This method registers a column with a JSON binary type specifically designed to handle
+         * `SortOption` instances. It allows proper serialization and deserialization of sorting options
+         * based on their name, ensuring type safety and compatibility with PostgreSQL JSON support.
+         *
+         * @param name The name of the column in the table to store `SortOption` data.
+         * @since 5.5.0
+         */
+        fun Table.sortOption(name: String) = jsonb<SortOption>(name)
     }
 
     /**

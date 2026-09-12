@@ -198,7 +198,6 @@ val Number.isDecimalClassBased
  */
 val Number.isDecimal
     get() = isDecimal()
-
 /**
  * Checks if the number is even.
  *
@@ -222,7 +221,6 @@ val Number.isEven
  */
 val Number.isOdd
     get() = !isEven
-
 /**
  * Determines if the number is positive.
  *
@@ -317,6 +315,54 @@ val Number.isMinusOne
  */
 val Number.isNotMinusOne
     get() = this != -1
+/**
+ * Determines whether the number is a prime number.
+ *
+ * A prime number is a natural number greater than 1 that is not a product of two
+ * smaller natural numbers. This method evaluates the primality of the number by
+ * checking divisibility rules.
+ *
+ * @receiver Number The number to be checked for primality.
+ * @return `true` if this number is prime, otherwise `false`.
+ * @since 1.0.0
+ */
+val Number.isPrime
+    get() = when (this) {
+        0, 1 -> false
+        2 -> true
+        else -> (3..sqrt(toDouble()).toLong()).none { toDouble().toLong() % it == 0L }
+    }
+/**
+ * Determines if the receiver [Number] is a composite number.
+ *
+ * A composite number is a positive integer that has at least one positive divisor other than 1 and itself.
+ * Any number that is not prime and greater than 1 is considered composite.
+ *
+ * @receiver The [Number] to check for being composite.
+ * @return `true` if the number is composite, `false` otherwise.
+ * @since 1.0.0
+ */
+val Number.isComposite
+    get() = !isPrime
+/**
+ * Checks if the number is a perfect number.
+ * A perfect number is a positive integer that is equal to the sum of its proper divisors, excluding itself.
+ *
+ * @receiver The number to check. Must be convertible to a long.
+ * @return `true` if the number is a perfect number, otherwise `false`.
+ * @since 1.0.0
+ */
+val Number.isPerfectNumber: Boolean
+    get() {
+        var sum = 1L
+        for (i in 2..sqrt(toDouble()).toLong()) {
+            if (toLong() % i == 0L) {
+                sum += if (i == (toLong() / i)) i
+                else i + (toLong() / i)
+            }
+        }
+        return sum == toLong() && toLong() != 1L
+    }
 
 /**
  * Extension property that provides the positive integer representation of the Byte value.
@@ -387,7 +433,6 @@ val Float.positive
  */
 val Double.positive
     get() = positiveIfNot()
-
 /**
  * Retrieves the negative value of the current Byte as an Int, ensuring the result is negative.
  *
@@ -460,37 +505,6 @@ val Double.negative
     get() = negativeIfNot()
 
 /**
- * Determines whether the number is a prime number.
- *
- * A prime number is a natural number greater than 1 that is not a product of two
- * smaller natural numbers. This method evaluates the primality of the number by
- * checking divisibility rules.
- *
- * @receiver Number The number to be checked for primality.
- * @return `true` if this number is prime, otherwise `false`.
- * @since 1.0.0
- */
-val Number.isPrime
-    get() = when (this) {
-        0, 1 -> false
-        2 -> true
-        else -> (3..sqrt(toDouble()).toLong()).none { toDouble().toLong() % it == 0L }
-    }
-
-/**
- * Determines if the receiver [Number] is a composite number.
- *
- * A composite number is a positive integer that has at least one positive divisor other than 1 and itself.
- * Any number that is not prime and greater than 1 is considered composite.
- *
- * @receiver The [Number] to check for being composite.
- * @return `true` if the number is composite, `false` otherwise.
- * @since 1.0.0
- */
-val Number.isComposite
-    get() = !isPrime
-
-/**
  * Calculates and returns the square of the number.
  *
  * The method converts the receiver number to a double and computes its square
@@ -502,7 +516,6 @@ val Number.isComposite
  */
 val Number.square
     get() = toDouble().pow(2)
-
 /**
  * Calculates the cubic (third power) of the receiver number.
  *
@@ -515,7 +528,6 @@ val Number.square
  */
 val Number.cubic
     get() = toDouble().pow(3)
-
 /**
  * Computes the square root of the number.
  *
@@ -529,7 +541,6 @@ val Number.cubic
  */
 val Number.sqrt
     get() = sqrt(toDouble())
-
 /**
  * Calculates the cube root of the number.
  *
@@ -543,7 +554,6 @@ val Number.sqrt
  */
 val Number.cbrt
     get() = cbrt(toDouble())
-
 /**
  * Calculates the base-2 logarithm of the number.
  *
@@ -553,7 +563,6 @@ val Number.cbrt
  */
 val Number.log2
     get() = log(2.0)
-
 /**
  * Calculates the base-10 logarithm of the number.
  *
@@ -566,7 +575,6 @@ val Number.log2
  */
 val Number.log10
     get() = log(10.0)
-
 /**
  * Computes the natural logarithm (base e) of this number.
  *
@@ -579,27 +587,6 @@ val Number.log10
  */
 val Number.logE
     get() = log(Math.E)
-
-/**
- * Checks if the number is a perfect number.
- * A perfect number is a positive integer that is equal to the sum of its proper divisors, excluding itself.
- *
- * @receiver The number to check. Must be convertible to a long.
- * @return `true` if the number is a perfect number, otherwise `false`.
- * @since 1.0.0
- */
-val Number.isPerfectNumber: Boolean
-    get() {
-        var sum = 1L
-        for (i in 2..sqrt(toDouble()).toLong()) {
-            if (toLong() % i == 0L) {
-                sum += if (i == (toLong() / i)) i
-                else i + (toLong() / i)
-            }
-        }
-        return sum == toLong() && toLong() != 1L
-    }
-
 /**
  * Extension function to calculate the factorial of a number.
  *
@@ -619,7 +606,6 @@ val Number.factorial: BigInt
         for (i in 2..toLong()) result *= i.toBigInt()
         return result
     }
-
 /**
  * Extension property for the [Number] class that rounds up the value
  * to the nearest integer greater than or equal to this value.
@@ -634,7 +620,6 @@ val Number.factorial: BigInt
  */
 val Number.ceil
     get() = ceil(toDouble())
-
 /**
  * Returns the largest integer value less than or equal to the current numeric value.
  * This is calculated by using the mathematical floor operation on the value.
@@ -648,18 +633,16 @@ val Number.ceil
  */
 val Number.floor
     get() = floor(toDouble())
-
 /**
  * Extension property for rounding a numeric value to the nearest integer.
  * This property converts the current number to a double and applies a rounding operation.
  *
  * @receiver The numeric value to be rounded.
  * @return The rounded value as a double.
- * @since 1.0.0
+ * @since 5.5.0
  */
-val Number.round
+val Number.rounded
     get() = round(toDouble())
-
 /**
  * Extension property that returns the signum (sign) of this number.
  * The signum is determined as follows:
@@ -675,6 +658,275 @@ val Number.round
  */
 val Number.signum
     get() = sign(toDouble())
+/**
+ * An extension property that calculates the sine of a numeric value.
+ * The value is converted to a Double before computing the sine using the standard sine function.
+ *
+ * The result represents the sine of the numeric value, where the value is expected
+ * to be in radians. For degree-based calculations, the value must first be converted to radians.
+ *
+ * @receiver The numeric value for which the sine is to be calculated.
+ * @return The sine of the numeric value.
+ * @throws ArithmeticException If the computation overflows or results in any error.
+ * @since 5.5.0
+ */
+val Number.sin
+    get() = sin(toDouble())
+/**
+ * Extension property that calculates the cosine of this number.
+ * The number is first converted to a double, and then the cosine is computed.
+ * Returns the cosine of the angle, where the angle is in radians.
+ * Uses the standard library `cos` function under the hood.
+ *
+ * @receiver Number The number for which the cosine is to be calculated.
+ * @return Double The cosine of the number as a double value.
+ *
+ * @since 5.5.0
+ */
+val Number.cos
+    get() = cos(toDouble())
+/**
+ * Extension property for calculating the tangent of a number.
+ *
+ * This property computes the trigonometric tangent of the number,
+ * interpreting the value as an angle in radians.
+ *
+ * Note: The result may be undefined for angles where the tangent
+ * function approaches infinity (e.g., π/2, 3π/2, etc.).
+ *
+ * @receiver A numeric value representing an angle in radians.
+ * @return The tangent of the given angle.
+ * @throws ArithmeticException If the computation produces an undefined result.
+ * @since 5.5.0
+ */
+val Number.tan
+    get() = tan(toDouble())
+/**
+ * Computes the arcsine (inverse sine) of the number in radians.
+ * The value returned is in the range of -π/2 to π/2.
+ *
+ * This property accesses the value as a [kotlin.math.asin] computation,
+ * where the input is converted to a [Double] before evaluation.
+ *
+ * @receiver The number for which to calculate the arcsine.
+ * @return The arcsine of the input number in radians.
+ * @throws IllegalArgumentException If the input value is not in the range [-1.0, 1.0].
+ *
+ * @since 5.5.0
+ */
+val Number.asin
+    get() = asin(toDouble())
+/**
+ * Extension property that calculates the arc cosine (inverse cosine) of the number.
+ * The value is returned in radians, ranging from 0.0 to Pi.
+ *
+ * This property converts the number to a double before performing the calculation.
+ * If the number is outside the range [-1, 1], the result is NaN.
+ *
+ * @receiver Number on which the arc cosine operation is performed.
+ * @return The arc cosine of the number as a double.
+ * @throws ArithmeticException If the value is out of the domain for acos calculation.
+ *
+ * @since 5.5.0
+ */
+val Number.acos
+    get() = acos(toDouble())
+/**
+ * Extension property for Number to calculate the arc tangent (in radians) of
+ * the value represented by the Number instance.
+ * Converts the current Number to a Double prior to performing the calculation.
+ * The arc tangent is the inverse operation of the tangent, returning a value
+ * in the range of -π/2 to π/2.
+ *
+ * @receiver Number The numeric value for which the arc tangent is to be calculated.
+ * @return Double The arc tangent of the numeric value, in radians.
+ * @since 5.5.0
+ */
+val Number.atan
+    get() = atan(toDouble())
+/**
+ * Calculates the arctangent of the pair's components, treating the first component as the y-coordinate
+ * and the second component as the x-coordinate, using the `atan2` function. This represents the angle
+ * in radians from the x-axis to the point defined by the pair.
+ *
+ * The result is constrained to the range [-π, π].
+ *
+ * @receiver A `MonoPair` containing two `Number` values representing coordinates.
+ * @return The arctangent of the pair's components in radians.
+ * @since 5.5.0
+ */
+val MonoPair<Number>.atan
+    get() = atan2(first.toDouble(), second.toDouble())
+/**
+ * Returns the hyperbolic sine of this number.
+ *
+ * The hyperbolic sine function is defined as:
+ * sinh(x) = (e^x - e^(-x)) / 2
+ *
+ * This extension property computes the hyperbolic sine by converting the receiver
+ * to a Double and calculating the result using the standard mathematical formula.
+ *
+ * Note that this property applies to all numeric types through extension and
+ * returns the result as a Double.
+ *
+ * @receiver The number for which to calculate the hyperbolic sine.
+ * @return The hyperbolic sine of the receiver as a Double.
+ * @throws ArithmeticException If an exceptional condition arises while computing sinh, such as overflow.
+ * @since 5.5.0
+ */
+val Number.sinh
+    get() = sinh(toDouble())
+/**
+ * Extension property that computes the hyperbolic cosine (cosh) of a number.
+ *
+ * The hyperbolic cosine is defined as (e^x + e^(-x)) / 2, where x is the input number.
+ * This property converts the number to a Double before performing the calculation.
+ *
+ * @receiver The number for which the hyperbolic cosine is to be calculated.
+ * @return The hyperbolic cosine of the number as a Double.
+ * @since 5.5.0
+ */
+val Number.cosh
+    get() = cosh(toDouble())
+/**
+ * Calculates the hyperbolic tangent (tanh) of this number.
+ *
+ * The function returns the hyperbolic tangent of the value,
+ * which is defined as (e^x - e^(-x)) / (e^x + e^(-x)), where x is the input.
+ *
+ * The calculation is based on the double representation of the number.
+ *
+ * @receiver The number on which the hyperbolic tangent operation will be performed.
+ * @return The hyperbolic tangent of this number as a Double.
+ * @since 5.5.0
+ */
+val Number.tanh
+    get() = tanh(toDouble())
+/**
+ * Extension property that calculates the inverse hyperbolic sine (area hyperbolic sine)
+ * of a numeric value. The result is computed in radians.
+ *
+ * This property utilizes the `toDouble()` method to convert the number
+ * to a double-precision floating-point value before performing the calculation.
+ *
+ * @receiver The numeric value for which the inverse hyperbolic sine is computed.
+ * @return The inverse hyperbolic sine of the numeric value, in radians.
+ * @since 5.5.0
+ */
+val Number.asinh
+    get() = asinh(toDouble())
+/**
+ * Extension property that computes the inverse hyperbolic cosine (area hyperbolic cosine) of a numeric value.
+ * The value must be greater than or equal to 1. Results are computed in the natural logarithmic base (e).
+ *
+ * @receiver Number whose inverse hyperbolic cosine is to be calculated.
+ * @return The inverse hyperbolic cosine of the numeric value as a Double.
+ * @throws IllegalArgumentException if the value is less than 1.
+ *
+ * @since 5.5.0
+ */
+val Number.acosh
+    get() = acosh(toDouble())
+/**
+ * A property that calculates the inverse hyperbolic tangent (atanh) of a number.
+ * The value is computed by converting the current `Number` instance to a `Double`
+ * and applying the mathematical atanh function.
+ *
+ * @receiver The number for which to calculate the inverse hyperbolic tangent.
+ * @return The inverse hyperbolic tangent of the number as a `Double`.
+ * @since 5.5.0
+ */
+val Number.atanh
+    get() = atanh(toDouble())
+/**
+ * Computes the length of the hypotenuse of a right-angled triangle
+ * using the pair of numeric values as the lengths of the two perpendicular sides.
+ *
+ * The calculation is performed using the formula: √(a² + b²), where `a` and `b`
+ * are the numeric values from the pair.
+ *
+ * @receiver A pair of numeric values representing the lengths of the two sides.
+ * @return The length of the hypotenuse as a `Double`.
+ * @since 5.5.0
+ */
+val MonoPair<Number>.hypot
+    get() = hypot(first.toDouble(), second.toDouble())
+/**
+ * A property that calculates the truncated value of the number.
+ * For floating-point numbers, truncation removes the fractional part,
+ * leaving only the integer component.
+ *
+ * @receiver The number to be truncated.
+ * @return The truncated value as a number.
+ * @since 5.5.0
+ */
+val Number.truncated
+    get() = truncate(toDouble())
+/**
+ * An extension property that returns the absolute value of the number.
+ * Converts the number to a double internally before calculating the absolute value.
+ *
+ * This property is useful for retrieving non-negative values regardless of the
+ * sign of the original number.
+ *
+ * @receiver Number The original number whose absolute value will be calculated.
+ * @return Double The absolute value of the number.
+ * @since 5.5.0
+ */
+val Number.abs
+    get() = abs(toDouble())
+/**
+ * Represents the minimum value between the first and second numeric components
+ * of a `MonoPair<Number>` instance. Calculates the minimum by converting both
+ * numbers to `Double`.
+ *
+ * This property simplifies the process of comparing the two numeric values
+ * stored in the pair and obtaining the smaller of the two.
+ *
+ * @receiver A `MonoPair<Number>` instance containing two numeric values to compare.
+ * @return The smaller value between the first and second components as a `Double`.
+ * @since 5.5.0
+ */
+val MonoPair<Number>.min
+    get() = min(first.toDouble(), second.toDouble())
+/**
+ * Represents the maximum value between the first and second elements of a `MonoPair<Number>`
+ * after being converted to `Double`.
+ *
+ * This property computes the maximum by invoking the `max` function on the
+ * `toDouble` conversion of the pair's elements.
+ *
+ * Only applicable to instances of `MonoPair` containing numeric values.
+ *
+ * @since 5.5.0
+ */
+val MonoPair<Number>.max
+    get() = max(first.toDouble(), second.toDouble())
+/**
+ * Returns the floating-point value adjacent to this number in the direction of positive infinity.
+ *
+ * If this number is a finite value, this property returns the next larger representable floating-point value.
+ * If this number is positive infinity, the result is positive infinity.
+ * If this number is NaN (Not a Number), the result is NaN.
+ *
+ * This property ensures compatibility with IEEE 754 floating-point arithmetic standards.
+ *
+ * @since 5.5.0
+ */
+val Number.nextUp
+    get() = toDouble().nextUp()
+/**
+ * Retrieves the floating-point value that is immediately less than this number.
+ * If this number is a finite value, it returns the next representable double value
+ * closer to negative infinity. If the number is positive or negative infinity,
+ * it will return itself. For NaN (Not-a-Number) values, the behavior is undefined.
+ *
+ * @receiver The number for which the next lower representable value is to be retrieved.
+ * @return The next representable double value smaller than this number.
+ * @since 5.5.0
+ */
+val Number.nextDown
+    get() = toDouble().nextDown()
 
 /**
  * Provides a string representation of the current [Number] in words, including
@@ -1194,6 +1446,22 @@ fun gcd(a: Number, b: Number): Long {
 fun lcm(vararg numbers: Number): Long {
     if (numbers.isEmpty()) throw IllegalArgumentException("Numbers must not be empty")
     return numbers.map { it.toLong() }.reduce { acc, l -> (acc * l) / gcd(acc, l) }
+}
+
+/**
+ * Restricts a number to be within a specified closed range.
+ *
+ * @param range The closed range used for bounding the number.
+ * @return The number after being coerced within the specified closed range.
+ *         If the number is less than the start of the range, the start value is returned.
+ *         If the number is greater than the end of the range, the end value is returned.
+ *         Otherwise, the number itself is returned.
+ * @since 5.5.0
+ */
+infix fun <N> N.coercedIn(range: ClosedRange<N>) : N where N : Number, N : Comparable<N> {
+    if (this < range.start) return range.start
+    if (this > range.endInclusive) return range.endInclusive
+    return this
 }
 
 /**

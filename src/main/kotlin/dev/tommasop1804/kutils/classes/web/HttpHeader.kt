@@ -43,6 +43,7 @@ import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LAST_MODIFIED
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LOCATION
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -472,6 +473,16 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
             override fun convertToDatabaseColumn(attribute: HttpHeader?): String? = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?): HttpHeader? = dbData?.let { HttpHeader(it) }
         }
+
+        /**
+         * Defines an HTTP header column in the table with a specified name and length.
+         *
+         * @param name The name of the HTTP header column.
+         * @param length The maximum length of the HTTP header value. Defaults to 255.
+         * @since 5.5.0
+         */
+        fun Table.httpHeader(name: String, length: Int = 255) = varchar(name, length)
+            .transform(::HttpHeader, HttpHeader::toString)
     }
 
     /**
@@ -914,6 +925,14 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         class OldDeserializer : JsonDeserializer<HttpHeaders>() {
             override fun deserialize(p: JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext) = p.readValueAs(MultiStringMap::class.java).toHttpHeaders()
         }
+
+        /**
+         * Maps a column in the table to a JSONB type representing HTTP headers.
+         *
+         * @param name The name of the column to be mapped.
+         * @since 5.5.0
+         */
+        fun Table.httpHeaders(name: String) = jsonb<HttpHeaders>(name)
     }
 
     /**

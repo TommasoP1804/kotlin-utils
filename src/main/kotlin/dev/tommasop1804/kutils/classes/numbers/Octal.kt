@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -70,6 +71,38 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
      * @since 1.0.0
      */
     constructor(number: Number) : this(fromNumber(number))
+    /**
+     * Constructs an instance by converting the given unsigned byte number
+     * to its octal string representation.
+     *
+     * @param number The unsigned byte value to be converted to an octal string.
+     * @since 5.5.0
+     */
+    constructor(number: UByte) : this(number.toString(8))
+    /**
+     * Constructs an instance by converting the given unsigned short number into its octal string representation.
+     *
+     * @param number The unsigned short number to be converted to an octal string.
+     * @since 5.5.0
+     */
+    constructor(number: UShort) : this(number.toString(8))
+    /**
+     * Secondary constructor that initializes an instance using an unsigned integer.
+     * The provided number is converted to its octal string representation
+     * and passed to the primary constructor.
+     *
+     * @param number An unsigned integer to be converted to an octal string.
+     * @since 5.5.0
+     */
+    constructor(number: UInt) : this(number.toString(8))
+    /**
+     * Constructs an instance by converting the given unsigned long number to its octal
+     * string representation and delegating to another constructor.
+     *
+     * @param number The unsigned long number to be converted to its octal string representation.
+     * @since 5.5.0
+     */
+    constructor(number: ULong) : this(number.toString(8))
 
     init {
         value.all { it in "01234567oO#8" } || throw MalformedInputException("The string is not an octal number")
@@ -392,6 +425,113 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
             override fun convertToDatabaseColumn(attribute: Octal?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Octal? = dbData?.let { Octal(it) }
         }
+
+        /**
+         * Adds a column to the table with a name and length, representing an octal string.
+         * The column values are transformed to and from the Octal type during database operations.
+         *
+         * @param name The name of the column to be created.
+         * @param length The maximum length of the column (defaults to 255).
+         * @param collate The collation for the column, or null if no collation is specified.
+         * @since 5.5.0
+         */
+        fun Table.octalString(name: String, length: Int = 255, collate: String? = null) = varchar(name, length, collate)
+            .transform(::Octal, Octal::toString)
+        /**
+         * Defines a column in the table with octal byte transformation.
+         * The column will store bytes that are interpreted as octal values.
+         *
+         * @param name The name of the column to be added to the table.
+         * @param checkConstraintName An optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.octalByte(name: String, checkConstraintName: String? = null) = byte(name, checkConstraintName)
+            .transform(::Octal, Octal::toByte)
+        /**
+         * Defines an unsigned byte column in octal representation for a database table.
+         *
+         * @param name The name of the column in the database table.
+         * @param checkConstraintName An optional name for the check constraint to enforce column rules, or null if no constraint name is specified.
+         * @since 5.5.0
+         */
+        fun Table.octalUByte(name: String, checkConstraintName: String? = null) = ubyte(name, checkConstraintName)
+            .transform(::Octal, Octal::toUByte)
+        /**
+         * Adds a column to the table with the specified name, configured to handle octal short values.
+         * The transformation ensures that the column can store and retrieve values as an octal representation.
+         *
+         * @param name The name of the column to be added to the table.
+         * @param checkConstraintName Optional parameter specifying the name of the check constraint to be applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.octalShort(name: String, checkConstraintName: String? = null) = short(name, checkConstraintName)
+            .transform(::Octal, Octal::toShort)
+        /**
+         * Defines an unsigned short column in the table with values stored in an octal format.
+         * This method applies a transformation to handle storage and retrieval of octal values.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName The optional name of a check constraint for this column.
+         * @since 5.5.0
+         */
+        fun Table.octalUShort(name: String, checkConstraintName: String? = null) = ushort(name, checkConstraintName)
+            .transform(::Octal, Octal::toUShort)
+        /**
+         * Defines an integer column in the table that represents an octal number.
+         * The column is mapped to an `Octal` type and is transformed to and from an integer.
+         *
+         * @param name The name of the column to be created in the table.
+         * @param checkConstraintName The optional name of the check constraint for the column, if applicable.
+         * @since 5.5.0
+         */
+        fun Table.octalInt(name: String, checkConstraintName: String? = null) = integer(name, checkConstraintName)
+            .transform(::Octal, Octal::toInt)
+        /**
+         * Adds an unsigned integer column to the table with values represented in octal format.
+         * The column will store data as an unsigned integer but allow interaction using the octal representation.
+         *
+         * @param name The name of the column in the database table.
+         * @param checkConstraintName An optional name for the check constraint to enforce valid values for the column.
+         * @since 5.5.0
+         */
+        fun Table.octalUInt(name: String, checkConstraintName: String? = null) = uinteger(name, checkConstraintName)
+            .transform(::Octal, Octal::toUInt)
+        /**
+         * Defines a column in the table that stores values as long integers and applies a transformation
+         * to handle octal number representation.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName An optional name for the check constraint to validate the column values.
+         * @since 5.5.0
+         */
+        fun Table.octalLong(name: String, checkConstraintName: String? = null) = long(name, checkConstraintName)
+            .transform(::Octal, Octal::toLong)
+        /**
+         * Defines an unsigned long column in the table with values represented in octal format.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.octalULong(name: String) = ulong(name)
+            .transform(::Octal, Octal::toULong)
+        /**
+         * Maps a database column represented as a string in octal format to a float value.
+         * This method applies a transformation to allow interpreting octal string values as floats.
+         *
+         * @param name The name of the column in the database to be mapped and transformed.
+         * @since 5.5.0
+         */
+        fun Table.octalFloat(name: String) = float(name)
+            .transform(::Octal, Octal::toFloat)
+        /**
+         * Defines a transformation for a column of type double in the table, converting its values
+         * between an octal representation and double precision.
+         *
+         * @param name The name of the column in the table to apply the transformation.
+         * @since 5.5.0
+         */
+        fun Table.octalDouble(name: String) = double(name)
+            .transform(::Octal, Octal::toDouble)
     }
 
     /**

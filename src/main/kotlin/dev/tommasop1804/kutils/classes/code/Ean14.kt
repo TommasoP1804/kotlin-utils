@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -138,6 +139,20 @@ value class Ean14 private constructor(override val value: String) : CharSequence
             override fun convertToDatabaseColumn(attribute: Ean14?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Ean14? = dbData?.let { Ean14(it) }
         }
+
+        /**
+         * Adds a column to the table for storing EAN-14 formatted values and applies
+         * a transformation between the database representation and the Ean14 type.
+         *
+         * The column will store values as a fixed-length string of 14 characters, ensuring
+         * proper representation of the EAN-14 standard. The transformation is applied
+         * bi-directionally: converting database values into Ean14 objects and back into strings.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.ean14(name: String) = char(name, 14)
+            .transform(::Ean14, Ean14::toString)
     }
 
     /**

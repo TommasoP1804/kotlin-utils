@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.time
 
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -430,6 +431,20 @@ enum class TimeZone(
             }
             return result.toMap()
         }
+
+		/**
+		 * Retrieves a `TimeZone` enumeration value by its name or ordinal.
+		 *
+		 * The method allows querying a `TimeZone` by providing its name or ordinal value
+		 * in the database table containing time zone properties.
+		 *
+		 * @param name The name of the time zone to retrieve.
+		 * @param byName A boolean flag indicating whether the time zone should be retrieved
+		 *               by its name (`true`) or ordinal (`false`). Defaults to `true`.
+		 * @since 5.5.0
+		 */
+		fun Table.timeZone(name: String, byName: Boolean = true) =
+			if (byName) enumerationByName<TimeZone>(name, 10) else enumeration<TimeZone>(name)
     }
 
     /**

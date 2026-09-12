@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -260,6 +261,14 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
                 return Polygon(vertices)
             }
         }
+
+        /**
+         * Maps the specified column in the table to a `Point` object using JSONB.
+         *
+         * @param name The name of the column to be mapped to a `Point`.
+         * @since 5.5.0
+         */
+        fun Table.point(name: String) = jsonb<Point>(name)
     }
 
     /**

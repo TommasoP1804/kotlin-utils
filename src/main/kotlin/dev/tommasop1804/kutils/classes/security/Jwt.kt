@@ -21,6 +21,7 @@ import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.web.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -690,6 +691,15 @@ class Jwt private constructor(private val value: String) : CharSequence {
             override fun convertToDatabaseColumn(attribute: Jwt?): String? = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?): Jwt? = dbData?.let { Jwt(it) }
         }
+
+        /**
+         * Adds a textual column to the table and applies a transformation between the `Jwt` object
+         * and its string representation.
+         *
+         * @param name The name of the column to be added to the table.
+         * @since 5.5.0
+         */
+        fun Table.jwt(name: String)  = text(name).transform(::Jwt, Jwt::toString)
     }
 
     /**

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.builder.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -585,6 +586,17 @@ value class MimeType private constructor(val value: String) : CharSequence {
             override fun convertToDatabaseColumn(attribute: MimeType?): String? = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?): MimeType? = dbData?.let { MimeType(it) }
         }
+
+        /**
+         * Adds a column to the table for storing mime type information as a string,
+         * with optional maximum length specification.
+         *
+         * @param name The name of the column to be added to the table.
+         * @param length The maximum length of the column's string value. Defaults to 255.
+         * @since 5.5.0
+         */
+        fun Table.mimeType(name: String, length: Int = 255) = varchar(name, length)
+            .transform(::MimeType, MimeType::toString)
     }
 
     /**

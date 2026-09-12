@@ -6,6 +6,7 @@ package dev.tommasop1804.kutils.classes.constants
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import kotlin.reflect.KProperty
 
 /**
@@ -140,6 +141,19 @@ enum class TextCase(
                 throw ConversionException("Unable to convert text case from ${from.name} to ${to.name}", e)
             }
         }
+
+        /**
+         * Maps a table column to the `TextCase` enum using either the enum's name
+         * or ordinal for database storage, based on the provided configuration.
+         *
+         * @param name The name of the table column to map to the `TextCase` enum.
+         * @param byName A flag indicating whether the enum should be mapped using its name.
+         *               If `true`, the mapping uses the enum's name.
+         *               If `false`, the mapping uses the enum's ordinal instead.
+         * @since 5.5.0
+         */
+        fun Table.textCase(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<TextCase>(name, 14) else enumeration<TextCase>(name)
     }
 
     /**

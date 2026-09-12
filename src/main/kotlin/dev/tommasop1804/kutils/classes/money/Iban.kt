@@ -14,6 +14,7 @@ import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -423,6 +424,20 @@ value class Iban private constructor(val value: String) : CharSequence {
             override fun convertToDatabaseColumn(attribute: Iban?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Iban? = dbData?.let { Iban(it) }
         }
+
+        /**
+         * Adds a column to the table that stores International Bank Account Numbers (IBANs).
+         *
+         * This method creates a `varchar` column with a maximum length of 34 characters,
+         * which corresponds to the maximum length of an IBAN as per the IBAN standard.
+         * Values in this column are transformed into the `Iban` class when read and
+         * converted back to strings when written.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.iban(name: String) = varchar(name, 34)
+            .transform(::Iban, Iban::toString)
     }
     
     /**

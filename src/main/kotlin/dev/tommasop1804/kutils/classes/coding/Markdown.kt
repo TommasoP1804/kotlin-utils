@@ -16,6 +16,7 @@ import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMinutesOfDuration
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -310,6 +311,15 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
             override fun convertToDatabaseColumn(attribute: Markdown?) = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?) = dbData?.let { Markdown(it) }
         }
+
+        /**
+         * Defines a column in the table with `text` type and optionally applies a collation to it.
+         *
+         * @param name The name of the column.
+         * @param collate The collation to apply to the column, or `null` if no collation is specified.
+         */
+        fun Table.markdown(name: String, collate: String? = null) = text(name, collate)
+            .transform(::Markdown, Markdown::toString)
     }
 
     private fun stripFrontMatter(): Pair<String?, String> {

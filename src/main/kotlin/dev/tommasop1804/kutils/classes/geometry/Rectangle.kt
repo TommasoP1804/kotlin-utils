@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -214,6 +215,16 @@ open class Rectangle(var topLeft: Point = Point(), width: Double = 0.0, height: 
                 )
             }
         }
+
+        /**
+         * Registers a column in the table to represent a `Rectangle` object, serialized and deserialized
+         * as a JSONB (JSON binary) type. This is used specifically for tables in PostgreSQL databases
+         * to store and interact with strongly-typed `Rectangle` data.
+         *
+         * @param name The name of the column in the database table.
+         * @since 5.5.0
+         */
+        fun Table.rectangle(name: String) = jsonb<Rectangle>(name)
     }
 
     /**

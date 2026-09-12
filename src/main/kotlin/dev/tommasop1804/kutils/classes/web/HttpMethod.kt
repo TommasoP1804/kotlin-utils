@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.web
 
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 
 /**
  * Represents the HTTP methods defined in the HTTP/1.1 standard.
@@ -177,6 +178,18 @@ enum class HttpMethod(
          * @since 3.12.0
          */
         infix fun of(name: String) = entries.find { it.value equalsIgnoreCase name }
+
+        /**
+         * Create a column of type `HttpMethod` (varchar with fixed length of 7).
+         *
+         * @param name The name of the column.
+         * @param byName A flag indicating whether to save the HTTP method by its name. Defaults to `true`.
+         *               If `true`, the method uses the name to save the corresponding HTTP method.
+         *               If `false`, the method save the HTTP method by enumeration position.
+         * @since 5.5.0
+         */
+        fun Table.httpMethod(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<HttpMethod>(name, 7) else enumeration<HttpMethod>(name)
     }
 
     /**

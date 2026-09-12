@@ -13,8 +13,9 @@ import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.MICROS_P
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.NANOS_PER_SECOND
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.SECONDS_PER_DAY
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.SECONDS_PER_MINUTE
-import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.invoke
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -30,6 +31,13 @@ import java.util.*
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.Long.Companion.MIN_VALUE
 import kotlin.reflect.KProperty
+import kotlin.text.contains
+import kotlin.text.endsWith
+import kotlin.text.indexOf
+import kotlin.text.isBlank
+import kotlin.text.startsWith
+import kotlin.text.substring
+import kotlin.text.take
 import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 
@@ -550,9 +558,20 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<LocalMonthDayTime?, String?> {
             override fun convertToDatabaseColumn(attribute: LocalMonthDayTime?) = if (Objects.isNull(attribute)) null else attribute.toString()
-
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Adds a varchar column to the table for storing a date-time value
+         * represented in a "month-day-time" format. The database column has
+         * a maximum length of 30 characters and the value is transformed during read
+         * and write operations using custom parsing and formatting logic.
+         *
+         * @param name The name of the column in the database table.
+         * @since 5.5.0
+         */
+        fun Table.monthDayTime(name: String) = varchar(name, 30)
+            .transform({ parse(it)() }, LocalMonthDayTime::toString)
     }
 
     /**

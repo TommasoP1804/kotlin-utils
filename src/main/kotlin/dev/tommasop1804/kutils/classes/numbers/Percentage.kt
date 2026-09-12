@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -220,6 +221,86 @@ value class Percentage private constructor(internal val value: Double) : Compara
 
         if (!allowPositiveOverflow) validateInputFormat(value <= 100.0, lazyMessage = { "The percentage must be less than or equal to 100" })
         if (!allowNegativeOverflow) validateInputFormat(value >= 0.0, lazyMessage = { "The percentage must be greater than or equal to 0" })
+        value
+    })
+    /**
+     * Constructs an instance of the class by transforming a given unsigned byte value (UByte) into a double representation of a percentage.
+     * The value can optionally be scaled to a range from 0.0 to 100.0 or constrained by overflow rules.
+     *
+     * @param number The unsigned byte value to be converted to a percentage.
+     * @param from0to1 Specifies whether the input number is in the range [0,1] (scaled) or [0,100] (raw). If true, the number is scaled to the range [0,100].
+     * @param allowPositiveOverflow A flag indicating whether values exceeding 100.0 should be allowed. If false, an exception is thrown for values greater than 100.0.
+     * @throws MalformedInputException if `from0to1` is false, `allowPositiveOverflow` is false, and the input number results in a percentage value greater than 100.0.
+     * @since 5.5.0
+     */
+    constructor(
+        number: UByte,
+        from0to1: Boolean = false,
+        allowPositiveOverflow: Boolean = false,
+    ) : this(Unit.run {
+        val value = if (from0to1) number.toDouble() * 100.0 else number.toDouble()
+
+        if (!allowPositiveOverflow) validateInputFormat(value <= 100.0, lazyMessage = { "The percentage must be less than or equal to 100" })
+        value
+    })
+    /**
+     * Constructs an instance while validating and optionally transforming a percentage value.
+     *
+     * @param number The percentage value represented as an unsigned short.
+     * @param from0to1 A flag indicating if the input number is in a range of 0 to 1, where it will be scaled to a percentage (i.e., multiplied by 100). Default is false.
+     * @param allowPositiveOverflow A flag indicating if values over 100 are allowed. If false, an exception will be thrown for values above 100. Default is false.
+     * @since 5.5.0
+     */
+    constructor(
+        number: UShort,
+        from0to1: Boolean = false,
+        allowPositiveOverflow: Boolean = false,
+    ) : this(Unit.run {
+        val value = if (from0to1) number.toDouble() * 100.0 else number.toDouble()
+
+        if (!allowPositiveOverflow) validateInputFormat(value <= 100.0, lazyMessage = { "The percentage must be less than or equal to 100" })
+        value
+    })
+    /**
+     * Secondary constructor for initializing with additional configuration options.
+     *
+     * @param number The numeric value to be converted into a percentage.
+     *               If `from0to1` is true, the number should be in the range [0.0, 1.0]
+     *               and will be multiplied by 100.
+     * @param from0to1 Indicates whether the input number is within the range [0.0, 1.0].
+     *                 If true, the input will be scaled to a percentage value.
+     * @param allowPositiveOverflow A flag to allow values that exceed 100.0.
+     *                               If false, the input will be validated to ensure it is less than or equal to 100.0.
+     * @throws MalformedInputException If `allowPositiveOverflow` is false and the input value exceeds 100.0.
+     * @since 5.5.0
+     */
+    constructor(
+        number: UInt,
+        from0to1: Boolean = false,
+        allowPositiveOverflow: Boolean = false,
+    ) : this(Unit.run {
+        val value = if (from0to1) number.toDouble() * 100.0 else number.toDouble()
+
+        if (!allowPositiveOverflow) validateInputFormat(value <= 100.0, lazyMessage = { "The percentage must be less than or equal to 100" })
+        value
+    })
+    /**
+     * Constructs an object by taking a numeric value and performing validation and calculations based on the input parameters.
+     *
+     * @param number The unsigned long number representing the value to be processed.
+     * @param from0to1 Indicates whether the input number should be treated as a value ranging from 0 to 1 and scaled to a percentage.
+     * @param allowPositiveOverflow If true, the input percentage value is allowed to exceed 100; otherwise, an exception will be thrown for values greater than 100.
+     * @throws MalformedInputException If the input percentage exceeds 100 and `allowPositiveOverflow` is false.
+     * @since 5.5.0
+     */
+    constructor(
+        number: ULong,
+        from0to1: Boolean = false,
+        allowPositiveOverflow: Boolean = false,
+    ) : this(Unit.run {
+        val value = if (from0to1) number.toDouble() * 100.0 else number.toDouble()
+
+        if (!allowPositiveOverflow) validateInputFormat(value <= 100.0, lazyMessage = { "The percentage must be less than or equal to 100" })
         value
     })
 
@@ -565,6 +646,113 @@ value class Percentage private constructor(internal val value: Double) : Compara
             override fun convertToDatabaseColumn(attribute: Percentage?): Double? = attribute?.value
             override fun convertToEntityAttribute(dbData: Double?): Percentage? = dbData?.let { Percentage(it) }
         }
+
+        /**
+         * Adds a column to the table that stores a percentage value as a byte. The percentage value is transformed
+         * into a byte using the provided transformation logic and constraints on overflow behavior.
+         *
+         * @param name The name of the column to be added to the table.
+         * @param checkConstraintName Optional name of the check constraint to be applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.percentageByte(name: String, checkConstraintName: String? = null) = byte(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true, allowNegativeOverflow = true) }, Percentage::toByte)
+        /**
+         * Defines a column in the table with the specified name and an optional check constraint.
+         * The column will store unsigned byte (UByte) values and will allow percentage transformations.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName The optional name of the check constraint for the column, or null if none.
+         * @since 5.5.0
+         */
+        fun Table.percentageUByte(name: String, checkConstraintName: String? = null) = ubyte(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true) }, Percentage::toUByte)
+        /**
+         * Adds a column to the table with a percentage value, stored as a Short.
+         * The percentage is internally transformed to and from a Short representation.
+         * Allows positive overflow during percentage transformation.
+         *
+         * @param name The name of the column to be added.
+         * @param checkConstraintName An optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.percentageShort(name: String, checkConstraintName: String? = null) = short(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true) }, Percentage::toShort)
+        /**
+         * Defines a column in the table that represents a percentage value
+         * stored as an unsigned short. Applies a transformation to handle
+         * the percentage logic, allowing for positive overflow.
+         *
+         * @param name The name of the column in the table.
+         * @param checkConstraintName An optional name for the check constraint
+         *         associated with the column. Defaults to null if not specified.
+         * @since 5.5.0
+         */
+        fun Table.percentageUShort(name: String, checkConstraintName: String? = null) = ushort(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true) }, Percentage::toUShort)
+        /**
+         * Defines an integer column in the table that represents a percentage value.
+         * The value is transformed into a `Percentage` object with configurations to allow
+         * positive and negative overflow during database operations.
+         *
+         * @param name The name of the column in the table.
+         * @param checkConstraintName Optional name for the check constraint to be applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.percentageInt(name: String, checkConstraintName: String? = null) = integer(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true, allowNegativeOverflow = true) }, Percentage::toInt)
+        /**
+         * Adds an unsigned integer column to the table with a transformation
+         * to represent the value as a percentage. This method automatically
+         * applies a transformation to convert the column value into a `Percentage`
+         * object during retrieval, while storing its unsigned integer representation.
+         *
+         * @param name The name of the column in the database table.
+         * @param checkConstraintName The optional name for the check constraint
+         *                            to enforce value constraints on the database level.
+         *                            If null, no check constraint will be applied.
+         * @since 5.5.0
+         */
+        fun Table.percentageUInt(name: String, checkConstraintName: String? = null) = uinteger(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true) }, Percentage::toUInt)
+        /**
+         * Defines a column in the table to store long values representing percentages.
+         * The transformation applies constraints to allow overflow in positive or negative directions.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName Optional name of the check constraint to apply to the column. Defaults to null.
+         * @since 5.5.0
+         */
+        fun Table.percentageLong(name: String, checkConstraintName: String? = null) = long(name, checkConstraintName)
+            .transform({ Percentage(it, allowPositiveOverflow = true, allowNegativeOverflow = true) }, Percentage::toLong)
+        /**
+         * Adds a column to the table with a `ULong` type that represents a percentage value.
+         * The `Percentage` object is constructed with the given value, allowing positive overflow.
+         *
+         * @param name The name of the column to be added.
+         * @since 5.5.0
+         */
+        fun Table.percentageULong(name: String) = ulong(name)
+            .transform({ Percentage(it, allowPositiveOverflow = true) }, Percentage::toULong)
+        /**
+         * Defines a floating-point column in the table with transformations for handling percentage values.
+         *
+         * @param name The name of the column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.percentageFloat(name: String) = float(name)
+            .transform({ Percentage(it, allowPositiveOverflow = true, allowNegativeOverflow = true) }, Percentage::toFloat)
+        /**
+         * Maps a column in the table to a double representation of a percentage value.
+         *
+         * This function transforms the column values into Percentage objects with specific rules,
+         * allowing both positive and negative overflow, and then converts them back to double values.
+         *
+         * @param name The name of the column in the table to be transformed.
+         * @since 5.5.0
+         */
+        fun Table.percentageDouble(name: String) = double(name)
+            .transform({ Percentage(it, allowPositiveOverflow = true, allowNegativeOverflow = true) }, Percentage::toDouble)
     }
 
     /**
@@ -726,15 +914,42 @@ value class Percentage private constructor(internal val value: Double) : Compara
      */
     fun toByte() = value.toInt().toByte()
     /**
+     * Converts the current value to an unsigned byte (UByte).
+     * This method ensures that the value is transformed into an unsigned
+     * 8-bit integer representation, preventing negative values and extending the range
+     * to 0 through 255.
+     *
+     * @return The unsigned byte representation of the value.
+     * @throws ArithmeticException If the value cannot be represented as a UByte.
+     * @since 5.5.0
+     */
+    fun toUByte() = value.toInt().toUByte()
+    /**
      * Converts the encapsulated numerical value of the `Percentage` instance to a `Short`.
      *
-     * The conversion is performed by first converting the value to an `Int` and 
+     * The conversion is performed by first converting the value to an `Int` and
      * then casting it to a `Short`.
      *
      * @return The numerical value represented as a `Short`.
      * @since 1.0.0
      */
     fun toShort() = value.toInt().toShort()
+    /**
+     * Converts the current value to an unsigned short (UShort).
+     *
+     * The method performs the conversion by first converting the value
+     * to an integer and then converting the resulting integer to a UShort.
+     * This operation ensures compatibility with unsigned short types
+     * in Kotlin, which represent 16-bit unsigned integer values ranging
+     * from 0 to 65535.
+     *
+     * @return The unsigned short representation of the current value.
+     * @throws ArithmeticException If the value cannot be accurately represented
+     * as a UShort due to overflow.
+     *
+     * @since 5.5.0
+     */
+    fun toUShort() = value.toInt().toUShort()
     /**
      * Converts the value of this Percentage instance to an integer.
      *
@@ -746,8 +961,16 @@ value class Percentage private constructor(internal val value: Double) : Compara
      */
     fun toInt() = value.toInt()
     /**
+     * Converts the value of the current object to an unsigned integer representation.
+     *
+     * @return The unsigned integer representation of the current value.
+     * @throws ArithmeticException If the conversion results in an overflow for the unsigned integer type.
+     * @since 5.5.0
+     */
+    fun toUInt() = value.toUInt()
+    /**
      * Converts the encapsulated value to its `Long` representation.
-     * 
+     *
      * This method ensures that the value is transformed into the corresponding
      * `Long` type. The specific behavior depends on the underlying type of `value`.
      *
@@ -756,13 +979,24 @@ value class Percentage private constructor(internal val value: Double) : Compara
      */
     fun toLong() = value.toLong()
     /**
+     * Converts the current numeric `value` to an unsigned long (`ULong`).
+     *
+     * This method utilizes the `toULong` function to perform the conversion,
+     * ensuring that the result is an unsigned long representation of the value.
+     *
+     * @return The unsigned long (`ULong`) representation of the current numeric value.
+     * @throws NumberFormatException If the value cannot be converted to an unsigned long.
+     * @since 5.5.0
+     */
+    fun toULong() = value.toULong()
+    /**
      * Converts the percentage value to a floating-point representation.
      *
      * @param from0to1 A boolean flag indicating whether the result should be normalized within the range 0 to 1
      *                 or as a percentage value (default behavior). When true, the value is divided by 100.
      * @since 1.0.0
      */
-    fun toFloat(from0to1: Boolean = false) = if (from0to1) value.toFloat() else value / 100.0f
+    fun toFloat(from0to1: Boolean = false) = if (from0to1) value.toFloat() else (value / 100.0f).toFloat()
     /**
      * Converts the stored value to a Double representation.
      * If the parameter `from0to1` is true, the value is divided by 100.0.

@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -149,6 +151,16 @@ open class Cuboid (var minCorner: Point = Point(), width: Double = 0.0, height: 
                 )
             }
         }
+
+        /**
+         * Registers a JSONB (JSON binary) column in the current table for storing and retrieving
+         * `Cuboid` objects in a strongly-typed manner. This function is specifically designed
+         * for use with PostgreSQL databases to support JSONB data types.
+         *
+         * @param name The name of the column in the table where `Cuboid` objects will be stored.
+         * @since 5.5.0
+         */
+        fun Table.cuboid(name: String) = jsonb<Cuboid>(name)
     }
 
     /**

@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.constants
 
+import org.jetbrains.exposed.v1.core.Table
+
 /**
  * Represents different levels of quantity used to define constraints or expectations.
  *
@@ -42,5 +44,20 @@ enum class QuantityLevel {
      *
      * @since 4.0.0
      */
-    Exactly
+    Exactly;
+
+    companion object {
+        /**
+         * Maps a table column to the `QuantityLevel` enum using either the enum's name
+         * or ordinal for database storage, based on the provided configuration.
+         *
+         * @param name The name of the table column to map to the `QuantityLevel` enum.
+         * @param byName A flag indicating whether the enum should be mapped using its name.
+         *               If `true`, the mapping uses the enum's name.
+         *               If `false`, the mapping uses the enum's ordinal instead.
+         * @since 5.5.0
+         */
+        fun Table.quantityLevel(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<QuantityLevel>(name, 7) else enumeration<QuantityLevel>(name)
+    }
 }

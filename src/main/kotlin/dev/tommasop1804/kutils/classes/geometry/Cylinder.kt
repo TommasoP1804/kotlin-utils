@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -162,6 +164,18 @@ class Cylinder (var baseCenter: Point = Point(), radius: Double = 0.0, height: D
                 )
             }
         }
+
+        /**
+         * Registers a JSONB column in the table specifically for the `Cylinder` type.
+         *
+         * This method allows the creation of a column to store JSON serialized `Cylinder` objects
+         * in a strongly-typed manner. The data is stored in the PostgreSQL JSONB format and ensures
+         * compatibility with the `Cylinder` data model during serialization and deserialization processes.
+         *
+         * @param name The name of the column in the database table.
+         * @since 5.5.0
+         */
+        fun Table.cylinder(name: String) = jsonb<Cylinder>(name)
     }
 
     /**

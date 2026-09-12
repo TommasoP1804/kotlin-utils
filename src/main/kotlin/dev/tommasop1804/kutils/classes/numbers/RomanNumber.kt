@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -227,6 +228,50 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * @since 1.0.0
      */
     constructor(number: Number) : this(one = number.toLong(), 0, 0, 0, 0, 0, 0) {
+        validate(number.toInt() > 0) { "Roman number cannot be negative or zero: $number" }
+    }
+    /**
+     * Constructs a Roman number representation by taking an unsigned byte as input.
+     *
+     * @param number An unsigned byte value to be used for creating the Roman number.
+     *
+     * @throws IllegalArgumentException If the provided number is less than or equal to zero.
+     *
+     * @since 5.5.0
+     */
+    constructor(number: UByte) : this(one = number.toLong(), 0, 0, 0, 0, 0, 0) {
+        validate(number.toInt() > 0) { "Roman number cannot be negative or zero: $number" }
+    }
+    /**
+     * Constructs a Roman numeral object using the given unsigned short number.
+     *
+     * @param number The unsigned short number representing the value of the Roman numeral.
+     * @throws IllegalArgumentException If the provided number is zero or negative.
+     * @since 5.5.0
+     */
+    constructor(number: UShort) : this(one = number.toLong(), 0, 0, 0, 0, 0, 0) {
+        validate(number.toInt() > 0) { "Roman number cannot be negative or zero: $number" }
+    }
+    /**
+     * Constructs a new instance with the specified unsigned integer value.
+     *
+     * @param number An unsigned integer representing the value to initialize the instance with.
+     * @throws IllegalArgumentException if the provided number is less than or equal to zero.
+     * @since 5.5.0
+     */
+    constructor(number: UInt) : this(one = number.toLong(), 0, 0, 0, 0, 0, 0) {
+        validate(number.toInt() > 0) { "Roman number cannot be negative or zero: $number" }
+    }
+    /**
+     * Secondary constructor that initializes the object using an unsigned long number.
+     * Converts the provided `ULong` value to `Long` and passes it as a parameter to the primary constructor.
+     * Performs validation to ensure the number is greater than zero.
+     *
+     * @param number The unsigned long number to initialize with. Must be greater than zero.
+     * @throws IllegalArgumentException if the `number` is negative or zero.
+     * @since 5.5.0
+     */
+    constructor(number: ULong) : this(one = number.toLong(), 0, 0, 0, 0, 0, 0) {
         validate(number.toInt() > 0) { "Roman number cannot be negative or zero: $number" }
     }
     
@@ -774,6 +819,92 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
             override fun convertToDatabaseColumn(attribute: RomanNumber?): String? = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?): RomanNumber? = dbData?.let { parse(it)() }
         }
+
+        /**
+         * Defines a VARCHAR column in the table with specific parameters and applies a transformation to handle hexadecimal strings.
+         *
+         * @param name The name of the column.
+         * @param length The maximum length of the column. Defaults to 255.
+         * @param collate The collation to be applied to the column. Defaults to null, meaning no specific collation.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberString(name: String, length: Int = 255, collate: String? = null) = varchar(name, length, collate)
+            .transform(::RomanNumber, RomanNumber::toString)
+        /**
+         * Adds a column to the table that stores binary data as a hexadecimal string.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName Optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberByte(name: String, checkConstraintName: String? = null) = byte(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toByte)
+        /**
+         * Creates a column in the database table to store unsigned byte values,
+         * with the ability to transform the stored data to/from a hexadecimal representation.
+         *
+         * @param name the name of the column to be created.
+         * @param checkConstraintName the optional name of the check constraint to enforce column value limits.
+         **/
+        fun Table.romanNumberUByte(name: String, checkConstraintName: String? = null) = ubyte(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toUByte)
+        /**
+         * Adds a short integer column to the table with a transformation for hexadecimal representation.
+         *
+         * @param name The name of the column to be created in the table.
+         * @param checkConstraintName Optional parameter specifying the name of the check constraint, if any.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberShort(name: String, checkConstraintName: String? = null) = short(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toShort)
+        /**
+         * Adds an unsigned short (UShort) column to the table, with values stored as hexadecimal strings.
+         * The column is transformed to and from its hexadecimal string representation using the specified transformation functions.
+         *
+         * @param name The name of the column to be added.
+         * @param checkConstraintName Optional name for a SQL check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberUShort(name: String, checkConstraintName: String? = null) = ushort(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toUShort)
+        /**
+         * Defines an integer column in the table associated with hexadecimal transformations.
+         * This method helps enforce storing values in hexadecimal format within the database.
+         *
+         * @param name The name of the column within the table.
+         * @param checkConstraintName An optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberInt(name: String, checkConstraintName: String? = null) = integer(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toInt)
+        /**
+         * Defines a column in the table for an unsigned integer value stored as a hexadecimal string.
+         * The value is transformed between the hexadecimal representation and its corresponding unsigned integer during database operations.
+         *
+         * @param name The name of the column in the table.
+         * @param checkConstraintName An optional name for the check constraint applied to the column, or null if no constraint is specified.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberUInt(name: String, checkConstraintName: String? = null) = uinteger(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toUInt)
+        /**
+         * Adds a column to the table that stores long values and is associated with hexadecimal transformation.
+         * The column will be able to encode and decode values as hexadecimal strings.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName An optional name for a check constraint to be applied to this column.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberLong(name: String, checkConstraintName: String? = null) = long(name, checkConstraintName)
+            .transform(::RomanNumber, RomanNumber::toLong)
+        /**
+         * Maps a column in the table to an unsigned long value while applying a transformation to handle hexadecimal representation.
+         *
+         * @param name The name of the column that contains the value to be transformed.
+         * @since 5.5.0
+         */
+        fun Table.romanNumberULong(name: String) = ulong(name)
+            .transform(::RomanNumber, RomanNumber::toULong)
     }
 
     /**
@@ -1053,7 +1184,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
     /**
      * Converts the current RomanNumber instance to its equivalent Double representation.
      *
-     * 
+     *
      * @return The Double representation of the RomanNumber.
      * @since 1.0.0
      */
@@ -1063,7 +1194,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * The conversion is performed by first obtaining the Long representation of the instance
      * and then casting it to Float.
      *
-     * 
+     *
      * @return A Float representation of the RomanNumber instance.
      * @since 1.0.0
      */
@@ -1071,35 +1202,79 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
     /**
      * Converts the cu1rrent RomanNumber instance into its numeric representation as a `Long`.
      *
-     * 
+     *
      * @return The numeric value of the RomanNumber as a `Long`.
      * @since 1.0.0
      */
     override fun toLong(): Long = one + 5 * five + 10 * ten + 50 * fifty + 100 * hundred + 500 * fiveHundred + 1000 * thousand
     /**
+     * Converts the numeric value of the current object to an unsigned long representation.
+     *
+     * This function utilizes the `toLong()` method to first convert the value
+     * to a signed long, and then transforms it to an unsigned long using `toULong()`.
+     *
+     * @return The unsigned long representation of the current numeric value.
+     * @throws ArithmeticException If the conversion results in an out-of-range value.
+     * @since 5.5.0
+     */
+    fun toULong() = toLong().toULong()
+    /**
      * Converts the current RomanNumber instance to its integer representation.
      *
-     * 
+     *
      * @return The integer representation of this RomanNumber instance.
      * @since 1.0.0
      */
     override fun toInt(): Int = toLong().toInt()
     /**
+     * Converts the current value to an unsigned integer (UInt).
+     *
+     * This function first converts the value to a Long and then
+     * transforms it into its unsigned UInt representation.
+     *
+     * @return The unsigned integer representation of the value.
+     * @throws ArithmeticException If the conversion results in
+     * a value outside the range of UInt.
+     * @since 5.5.0
+     */
+    fun toUInt() = toLong().toUInt()
+    /**
      * Converts the current RomanNumber instance to its numeric value as a Short.
      *
-     * 
+     *
      * @return The numeric value of the RomanNumber as a Short.
      * @since 1.0.0
      */
     override fun toShort(): Short = toLong().toShort()
     /**
+     * Converts the numerical value of the current object to an unsigned short (UShort).
+     *
+     * This method first converts the value to a Long and then derives its unsigned short representation.
+     * It can be used when a smaller, unsigned representation of the value is required.
+     *
+     * @return The unsigned short (UShort) equivalent of the current value.
+     * @throws ArithmeticException If the value exceeds the range of UShort.
+     * @since 5.5.0
+     */
+    fun toUShort() = toLong().toUShort()
+    /**
      * Converts the numeric value of the RomanNumber instance to a Byte representation.
      *
-     * 
+     *
      * @return The Byte value representation of the RomanNumber.
      * @since 1.0.0
      */
     override fun toByte(): Byte = toLong().toByte()
+    /**
+     * Converts the numeric value of the receiver to an unsigned byte (UByte).
+     * This transformation is performed by first converting the receiver to a Long
+     * and then converting the resulting Long to a UByte.
+     *
+     * @return The unsigned byte representation of the receiver.
+     * @throws ArithmeticException If the value is out of range for UByte.
+     * @since 5.5.0
+     */
+    fun toUByte() = toLong().toUByte()
     
     /**
      * Computes the hash code for the object using the hash codes of its properties.

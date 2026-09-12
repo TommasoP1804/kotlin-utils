@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -1006,6 +1007,14 @@ open class Code(open val value: String, val language: Language) : CharSequence {
                 )
             }
         }
+
+        /**
+         * Creates a JSONB column in the table for storing and retrieving `Code` objects.
+         *
+         * @param name The name of the column in the table.
+         * @since 5.5.0
+         */
+        fun Table.code(name: String) = jsonb<Code>(name)
     }
 
     /**

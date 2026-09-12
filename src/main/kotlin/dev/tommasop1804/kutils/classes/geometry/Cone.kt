@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -192,6 +194,17 @@ class Cone(
                 )
             }
         }
+
+        /**
+         * Registers a JSONB column in the table for handling `Cone` objects.
+         *
+         * This method allows adding a strongly-typed JSONB column to the table for storing `Cone` instances.
+         * JSONB (JSON binary) is a PostgreSQL data type that stores JSON data in a highly efficient binary format.
+         *
+         * @param name The name of the column in the table.
+         * @since 5.5.0
+         */
+        fun Table.cone(name: String) = jsonb<Cone>(name)
     }
 
     /**

@@ -9,7 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
@@ -101,6 +103,15 @@ class Square (topLeft: Point = Point(), sideLength: Double = 0.0) : Rectangle(to
                 )
             }
         }
+
+        /**
+         * Registers a JSONB column in the table for storing and retrieving `Square` objects.
+         * The `Square` class is expected to contain properties and methods specific to the concept of a square.
+         *
+         * @param name The name of the column in the table that will store `Square` objects.
+         * @since 5.5.0
+         */
+        fun Table.square(name: String) = jsonb<Square>(name)
     }
 
     /**

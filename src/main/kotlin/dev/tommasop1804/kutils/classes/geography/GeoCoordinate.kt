@@ -21,6 +21,7 @@ import org.geolatte.geom.Geometry
 import org.geolatte.geom.codec.Wkt
 import org.geolatte.geom.crs.CoordinateReferenceSystem
 import org.geolatte.geom.crs.CrsRegistry
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -548,6 +549,17 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
             override fun convertToDatabaseColumn(attribute: GeoCoordinate?): String? = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?): GeoCoordinate? = dbData?.let { parse(it)() }
         }
+
+        /**
+         * Adds a column to the table for storing geographical coordinates in string format.
+         * The input value is transformed to and from a GeoCoordinate object for easier handling.
+         *
+         * @param name The name of the column to be created in the table.
+         * @param length The maximum allowed length for the column value. Default is 255.
+         * @since 5.5.0
+         */
+        fun Table.geoCoordinate(name: String, length: Int = 255) = varchar(name, length)
+            .transform({ parse(it)() }, GeoCoordinate::toString)
     }
 
     /**

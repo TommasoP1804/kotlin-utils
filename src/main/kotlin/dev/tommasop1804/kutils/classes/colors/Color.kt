@@ -15,11 +15,13 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.classes.numbers.*
+import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
 import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.FULL
 import dev.tommasop1804.kutils.classes.numbers.Percentage.Companion.ZERO_PERCENT
 import dev.tommasop1804.kutils.classes.tuples.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -1902,6 +1904,15 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
             override fun convertToDatabaseColumn(attribute: Color?) = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?) = dbData?.let { ofHEX(it) }
         }
+
+        /**
+         * Applies a color transformation to the specified column in the table.
+         *
+         * @param name The name of the column to which the color transformation will be applied.
+         * @since 5.5.0
+         */
+        fun Table.color(name: String) = binary(name, 4)
+            .transform({ ofHEX(it.toHex()) }) { it.toHEXA().toByteArray() }
     }
 
     /**

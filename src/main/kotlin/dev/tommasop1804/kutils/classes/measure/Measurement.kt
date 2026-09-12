@@ -19,6 +19,7 @@ import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companio
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTE_BINARY
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTE_DECIMAL
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -195,6 +196,14 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
                 )
             }
         }
+
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.0
+         */
+        fun Table.measurement(name: String) = jsonb<Measurement>(name)
     }
 
     /**
@@ -821,6 +830,14 @@ class RMeasurement<T : ScalarUnit>(override val value: Double, override val unit
                 )
             }
         }
+
+        /**
+         * Retrieves a JSONB representation of a measurement stored in the table.
+         *
+         * @param name the name of the measurement to retrieve.
+         * @since 5.5.0
+         */
+        inline fun <reified T : ScalarUnit> Table.rMeasurement(name: String) = jsonb<RMeasurement<T>>(name)
     }
 }
 

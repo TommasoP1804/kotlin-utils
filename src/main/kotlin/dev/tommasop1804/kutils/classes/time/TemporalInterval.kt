@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -265,6 +266,17 @@ interface TemporalInterval : Serializable {
             override fun convertToDatabaseColumn(attribute: TemporalInterval?) = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?) = if (dbData == null) null else parse(dbData).getOrThrow()
         }
+
+        /**
+         * Adds a temporal interval column to the table with the given name and specified length.
+         * The column values are transformed using a custom parser and the `toString` method of `TemporalInterval`.
+         *
+         * @param name The name of the temporal interval column.
+         * @param length The maximum length of the column in characters. Defaults to 100.
+         * @since 5.5.0
+         */
+        fun Table.temporalInterval(name: String, length: Int = 100) = varchar(name, length)
+            .transform({ parse(it)() }, TemporalInterval::toString)
     }
 
     /**

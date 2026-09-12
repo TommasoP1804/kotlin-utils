@@ -4,13 +4,19 @@
 
 package dev.tommasop1804.kutils.classes.coding
 
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import com.networknt.schema.ValidationMessage
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
-import tools.jackson.databind.JsonNode
+import org.jetbrains.exposed.v1.core.Table
+import tools.jackson.core.JsonGenerator
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 
@@ -26,10 +32,10 @@ import tools.jackson.databind.annotation.JsonSerialize
  * @since 3.8.1
  * @author Tommaso Pastorelli
  */
-@JsonSerialize(using = Json.Companion.Serializer::class)
-@JsonDeserialize(using = Json.Companion.Deserializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Json.Companion.OldSerializer::class)
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = Json.Companion.OldDeserializer::class)
+@JsonSerialize(using = JsonSchema.Companion.Serializer::class)
+@JsonDeserialize(using = JsonSchema.Companion.Deserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(using = JsonSchema.Companion.OldSerializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = JsonSchema.Companion.OldDeserializer::class)
 @Suppress("unused")
 @MustUseReturnValues
 class JsonSchema(val json: Json) : Json(json) {
@@ -796,6 +802,50 @@ class JsonSchema(val json: Json) : Json(json) {
             return factory.getSchema(java.net.URI(metaSchemaUri)).validate(json.toFasterXmlJsonNode())
         }
 
+        class Serializer : ValueSerializer<JsonSchema>() {
+            override fun serialize(value: JsonSchema, gen: JsonGenerator, ctxt: SerializationContext) {
+                val node = MAPPER.readTree(value.value)
+                when {
+                    node.isArray -> {
+                        val arrayValue = value.toList<Any>().getOrThrow()
+                        gen.writePOJO(arrayValue)
+                    }
+                    node.isObject -> {
+                        val mapValue = value.toMap<Any>().getOrThrow()
+                        gen.writePOJO(mapValue)
+                    }
+                    else -> gen.writeRaw(value.value)
+                }
+            }
+        }
+
+        class Deserializer : ValueDeserializer<JsonSchema>() {
+            override fun deserialize(p: JsonParser, ctxt: DeserializationContext) =
+                JsonSchema(p.objectReadContext().readTree<JsonNode>(p).toString())
+        }
+
+        class OldSerializer : JsonSerializer<JsonSchema>() {
+            override fun serialize(value: JsonSchema, gen: com.fasterxml.jackson.core.JsonGenerator, serializers: SerializerProvider) {
+                val node = MAPPER.readTree(value.value)
+                when {
+                    node.isArray -> {
+                        val arrayValue = value.toList<Any>().getOrThrow()
+                        gen.writeObject(arrayValue)
+                    }
+                    node.isObject -> {
+                        val mapValue = value.toMap<Any>().getOrThrow()
+                        gen.writeObject(mapValue)
+                    }
+                    else -> gen.writeRaw(value.value)
+                }
+            }
+        }
+
+        class OldDeserializer : JsonDeserializer<JsonSchema>() {
+            override fun deserialize(p: com.fasterxml.jackson.core.JsonParser, ctxt: com.fasterxml.jackson.databind.DeserializationContext): JsonSchema =
+                JsonSchema(p.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(p).toString())
+        }
+
         private fun detectSpecVersionFor(json: Json): SpecVersion.VersionFlag =
             when (json.getAsNode($$"$schema")?.asString()) {
                 "https://json-schema.org/draft/2020-12/schema" -> SpecVersion.VersionFlag.V202012
@@ -805,6 +855,17 @@ class JsonSchema(val json: Json) : Json(json) {
                 "http://json-schema.org/draft-04/schema#" -> SpecVersion.VersionFlag.V4
                 else -> SpecVersion.VersionFlag.V202012
             }
+
+        /**
+         * Registers a JSON Schema field with JSONB (JSON binary) data type for the specified column name in the table.
+         *
+         * This function is tailored to utilize PostgreSQL's JSONB type for storing and retrieving JSON Schema objects
+         * in a strongly-typed manner. The schema allows for defining constraints and structure for JSON data in the database.
+         *
+         * @param name The name of the column where the JSON Schema will be stored.
+         * @since 5.5.0
+         */
+        fun Table.jsonSchema(name: String) = jsonb<JsonSchema>(name)
     }
 
     /**

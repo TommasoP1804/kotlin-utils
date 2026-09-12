@@ -12,12 +12,14 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import java.math.BigInteger
 import kotlin.math.pow
 
 /**
@@ -63,6 +65,53 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
      * @since 1.0.0
      */
     constructor(number: Number, precision: Int = 10) : this(fromNumber(number, precision))
+    /**
+     * Constructs an instance using a given UByte.
+     * Converts the UByte to its binary string representation as the input for initialization.
+     *
+     * @param number The UByte value to be converted into a binary string.
+     * @since 5.5.0
+     */
+    constructor(number: UByte, precision: Int = 10) : this(number.toString(2))
+    /**
+     * Secondary constructor that creates an instance using a number.
+     * The number is converted to its binary string representation.
+     *
+     * @param number The unsigned short integer to be converted to a binary string.
+     * @since 5.5.0
+     */
+    constructor(number: UShort, precision: Int = 10) : this(number.toString(2))
+    /**
+     * Secondary constructor for creating an instance using an unsigned integer value.
+     *
+     * This constructor allows specifying the number as a `UInt`. The unsigned integer is
+     * internally converted to its binary string representation for further processing.
+     *
+     * @param number The unsigned integer value to initialize the instance.
+     * @since 5.5.0
+     */
+    constructor(number: UInt, precision: Int = 10) : this(number.toString(2))
+    /**
+     * Secondary constructor that initializes an instance using a numeric value
+     * Converts the provided unsigned long number to its binary string representation.
+     *
+     * @param number The unsigned long number to be converted to a binary string.
+     * @since 5.5.0
+     */
+    constructor(number: ULong, precision: Int = 10) : this(number.toString(2))
+
+    /**
+     * Constructs an instance by converting the given byte array into a binary string representation.
+     * An optional bit length can be specified to pad the binary string to the desired length.
+     *
+     * @param byteArray The byte array to be converted to a binary string.
+     * @param bitLength An optional length to pad the binary string with leading zeros. Defaults to null,
+     * in which case no padding is applied.
+     * @since 5.5.0
+     */
+    constructor(byteArray: ByteArray, bitLength: Int? = null) : this(BigInteger(1, byteArray)
+        .toString(2).letIf(bitLength != null) { it.padStart(bitLength, '0') }
+    )
 
     init {
         value.all { it in "bB01 .2#" } || throw MalformedInputException("The string is not a binary number")
@@ -398,6 +447,116 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
             override fun convertToDatabaseColumn(attribute: Binary?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): Binary? = dbData?.let { Binary(it) }
         }
+
+        /**
+         * Configures a binary column in a database table with a specified name and applies transformations.
+         *
+         * @param name The name of the binary column to be created in the table.
+         * @since 5.5.0
+         */
+        fun Table.binaryBytes(name: String) = binary(name)
+            .transform(::Binary, Binary::toByteArray)
+        /**
+         * Adds a binary string column to the table. This method allows handling binary data as string-like structures,
+         * enabling transformation into a `Binary` object and back to its string representation.
+         *
+         * @param name The name of the column to be added. It defines the identifier for the binary string field in the table.
+         * @since 5.5.0
+         */
+        fun Table.binaryString(name: String) = text(name)
+            .transform(::Binary, Binary::toString)
+        /**
+         * Defines a binary byte column in the table and applies a transformation to
+         * convert between the binary representation and a Byte object.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName Optional name of the check constraint to be applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.binaryByte(name: String, checkConstraintName: String? = null) = byte(name, checkConstraintName)
+            .transform(::Binary, Binary::toByte)
+        /**
+         * Defines an unsigned byte column in the table with an additional binary transformation.
+         *
+         * @param name The name of the column to be created.
+         * @param checkConstraintName Optional parameter specifying the name of the check constraint to enforce on this column.
+         * @since 5.5.0
+         */
+        fun Table.binaryUByte(name: String, checkConstraintName: String? = null) = ubyte(name, checkConstraintName)
+            .transform(::Binary, Binary::toUByte)
+        /**
+         * Defines a binary short column in the table. The column is represented as a short
+         * and is internally transformed to and from a Binary value during database operations.
+         *
+         * @param name The name of the column in the table.
+         * @param checkConstraintName An optional name for the check constraint to be applied on the column.
+         * @since 5.5.0
+         */
+        fun Table.binaryShort(name: String, checkConstraintName: String? = null) = short(name, checkConstraintName)
+            .transform(::Binary, Binary::toShort)
+        /**
+         * Adds a column to the table with an unsigned short integer stored in a binary format.
+         * The binary representation is transformed to and from an unsigned short integer during operations.
+         *
+         * @param name The name of the column to be added to the table.
+         * @param checkConstraintName Optional. The name of the check constraint to be applied on the column, if any.
+         * @since 5.5.0
+         */
+        fun Table.binaryUShort(name: String, checkConstraintName: String? = null) = ushort(name, checkConstraintName)
+            .transform(::Binary, Binary::toUShort)
+        /**
+         * Defines a binary integer column in the table with optional check constraint name.
+         * Transforms the integer value to a binary representation and vice versa.
+         *
+         * @param name The name of the column to be created.
+         * @param checkConstraintName Optional check constraint name for the column. Default is null.
+         * @since 5.5.0
+         */
+        fun Table.binaryInt(name: String, checkConstraintName: String? = null) = integer(name, checkConstraintName)
+            .transform(::Binary, Binary::toInt)
+        /**
+         * Creates a binary unsigned integer column in the table with the specified name and optional check constraint name.
+         *
+         * @param name The name of the column to be created.
+         * @param checkConstraintName The optional name of the check constraint to be applied to the column. Default is null.
+         * @since 5.5.0
+         */
+        fun Table.binaryUInt(name: String, checkConstraintName: String? = null) = uinteger(name, checkConstraintName)
+            .transform(::Binary, Binary::toUInt)
+        /**
+         * Defines a binary-long mapping for a column in the table.
+         *
+         * @param name The name of the column.
+         * @param checkConstraintName An optional name for the check constraint applied to the column.
+         * @since 5.5.0
+         */
+        fun Table.binaryLong(name: String, checkConstraintName: String? = null) = long(name, checkConstraintName)
+            .transform(::Binary, Binary::toLong)
+        /**
+         * Adds a column to the table that stores unsigned long values and transforms them to binary representation.
+         *
+         * @param name The name of the column to be added.
+         * @since 5.5.0
+         */
+        fun Table.binaryULong(name: String) = ulong(name)
+            .transform(::Binary, Binary::toULong)
+        /**
+         * Defines a binary-to-float transform operation on a table column.
+         *
+         * @param name The name of the column to apply the transformation to.
+         * @since 5.5.0
+         */
+        fun Table.binaryFloat(name: String) = float(name)
+            .transform(::Binary, Binary::toFloat)
+        /**
+         * Transforms a column named [name] in the table to a binary representation
+         * and then converts it to a double value.
+         *
+         * @param name the name of the column to be transformed
+         * @since 5.5.0
+         */
+        fun Table.binaryDouble(name: String) = double(name)
+            .transform(::Binary, Binary::toDouble)
     }
     
     /**
@@ -705,4 +864,15 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
      * @since 1.0.0
      */
     override fun toString(): String = toString(true)
+
+    /**
+     * Converts the binary string stored in `value` into a ByteArray.
+     * Each group of 8 bits is interpreted as a single byte.
+     * If the length of the binary string is not a multiple of 8, it is padded
+     * with leading zeros until the length is a multiple of 8.
+     *
+     * @return A ByteArray representing the binary string.
+     * @since 5.5.0
+     */
+    fun toByteArray(): ByteArray = BigInteger(value, 2).toByteArray()
 }

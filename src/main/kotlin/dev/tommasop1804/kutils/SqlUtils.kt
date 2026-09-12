@@ -9,6 +9,7 @@
 
 package dev.tommasop1804.kutils
 
+import dev.tommasop1804.kutils.JsonbColumnType.Companion.JSONB
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON
@@ -47,7 +48,10 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.ranges.rangeTo
 import kotlin.reflect.KClass
+import kotlin.text.endsWith
+import kotlin.toString
 
 /**
  * Represents a database table with string-based primary keys.
@@ -214,7 +218,7 @@ class JsonbColumnType<T : Any>(private val typeRef: TypeReference<T>) : ColumnTy
      * @return the deserialized object of type T
      * @since 5.3.1
      */
-    private fun read(json: String?): T = MAPPER.readValue(json.orEmpty().ifEmpty { EMPTY_JSON.value }, typeRef)
+    private fun read(json: String?): T = MAPPER.readValue(json, typeRef)
 }
 
 /**
@@ -229,6 +233,773 @@ class JsonbColumnType<T : Any>(private val typeRef: TypeReference<T>) : ColumnTy
  */
 inline fun <reified T : Any> Table.jsonb(name: String): Column<T> =
     registerColumn(name, JsonbColumnType(object : TypeReference<T>() {}))
+
+/**
+ * Retrieves a JSONB column as a Kotlin list of the specified type.
+ *
+ * @param name The name of the column to be mapped as a JSONB list.
+ * @return The JSONB column mapped as a list of the specified type.
+ * @since 5.5.0
+ */
+inline fun <reified E> Table.list(name: String) = jsonb<List<E>>(name)
+/**
+ * Registers a column of type [MList] for the specified name in the table. This column uses
+ * the JSONB data type to store the data, providing support for strongly-typed list structures
+ * with enhanced capabilities.
+ *
+ * @param E The type of elements stored within the [MList].
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified E> Table.mList(name: String) = jsonb<MList<E>>(name)
+/**
+ * Sets a column in the table with the specified name to be associated with
+ * a JSONB data type representing a Set of elements of type [E].
+ *
+ * @param name The name of the column in the table to be set.
+ * @since 5.5.0
+ */
+inline fun <reified E> Table.set(name: String) = jsonb<Set<E>>(name)
+/**
+ * Registers a column with the JSONB (JSON binary) data type that stores a set-like collection of elements.
+ * This method is specifically designed for use with PostgreSQL databases and supports strongly-typed
+ * storage and retrieval of JSONB-encoded sets based on the specified generic element type [E].
+ *
+ * @param E The type of elements contained in the set represented by the JSONB column.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified E> Table.mSet(name: String) = jsonb<MSet<E>>(name)
+/**
+ * Maps a column with a JSONB (JSON binary) data type to a strongly-typed map with keys of type [K]
+ * and values of type [V]. This method registers the column in the table with the specified name.
+ * Designed for use with PostgreSQL databases to enable typed storage and retrieval of JSON data.
+ *
+ * @param K The type of the keys in the map.
+ * @param V The type of the values in the map.
+ * @param name The name of the column in the table to be mapped.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.map(name: String) = jsonb<Map<K, V>>(name)
+/**
+ * Registers a column with a JSONB (JSON binary) data type in the table for the specified name.
+ * This column is designed to store and retrieve a map structure with generic key-value types
+ * in a strongly-typed manner.
+ *
+ * @param K The type of keys in the map.
+ * @param V The type of values in the map.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.mMap(name: String) = jsonb<MMap<K, V>>(name)
+/**
+ * Registers a column with JSONB (JSON binary) data type in the current table for storing and retrieving
+ * `DataMap` objects. This method facilitates strong typing for JSON data in PostgreSQL databases.
+ *
+ * @param name The name of the column to be created or accessed in the table.
+ * @since 5.5.0
+ */
+fun Table.dataMap(name: String) = jsonb<DataMap>(name)
+/**
+ * Adds a JSONB column of type [NonEmptyDataMap] to the table with the given name.
+ * This method is specific to PostgreSQL databases and enables strong typing
+ * for columns storing JSON data with a fixed structure.
+ *
+ * @param name The name of the column to be added to the table.
+ * @since 5.5.0
+ */
+fun Table.nonEmptyDataMap(name: String) = jsonb<NonEmptyDataMap>(name)
+/**
+ * Registers a column in the table with the `DataMap` type using the JSONB (JSON binary) data type.
+ * This utility is specific to PostgreSQL databases and enables the storage and retrieval of objects
+ * in a strongly-typed manner based on the `DataMap` class.
+ *
+ * @param name The name of the column to be added to the table.
+ * @since 5.5.0
+ */
+fun Table.dataMMap(name: String) = jsonb<DataMap>(name)
+/**
+ * Registers a column in the table with the JSONB data type and maps it to a strongly-typed
+ * [NonEmptyDataMap] object. This method allows seamless integration between the table schema
+ * and the corresponding Kotlin type, enabling both serialization and deserialization of
+ * the [NonEmptyDataMap] to and from JSONB format. Typically used for PostgreSQL databases.
+ *
+ * @param name The name of the JSONB column to be registered in the table.
+ * @since 5.5.0
+ */
+fun Table.nonEmptyDataMMap(name: String) = jsonb<NonEmptyDataMap>(name)
+/**
+ * Creates a column in the current table that maps to a JSONB (JSON binary) field, specifically for handling
+ * quantities stored in a [QuantityMap].
+ *
+ * @param name The name of the column in the table that will store the JSONB representation of the [QuantityMap] object.
+ * @since 5.5.0
+ */
+fun Table.quantityMap(name: String) = jsonb<QuantityMap>(name)
+/**
+ * Registers a column in the table with a JSONB (JSON binary) data type that maps to a strongly-typed
+ * representation of a non-empty quantity mapping.
+ *
+ * This method is specifically designed for use with PostgreSQL databases, ensuring the ability to work with
+ * structured JSON objects while preserving type safety.
+ *
+ * @param name The name of the JSONB column in the table.
+ * @since 5.5.0
+ */
+fun Table.nonEmptyQuantityMap(name: String) = jsonb<NonEmptyQuantityMap>(name)
+/**
+ * Registers a JSONB (JSON binary) column in the table to handle data of type [QuantityMMap].
+ * This method is specifically designed for working with PostgreSQL databases, allowing the
+ * storage and retrieval of JSONB-encoded objects with strong typing.
+ *
+ * @param name The name of the JSONB column to be registered in the table.
+ * @since 5.5.0
+ */
+fun Table.quantityMMap(name: String) = jsonb<QuantityMMap>(name)
+/**
+ * Registers a JSONB column with the data type [NonEmptyQuantityMMap] in the table.
+ * This method is designed for use with PostgreSQL databases and provides support for storing
+ * and retrieving non-empty quantity mappings as strongly-typed JSON objects.
+ *
+ * @param name The name of the JSONB column to be registered in the table.
+ * @since 5.5.0
+ */
+fun Table.nonEmptyQuantityMMap(name: String) = jsonb<NonEmptyQuantityMMap>(name)
+/**
+ * Registers a column in the table with the JSONB (JSON binary) data type that maps to a `CountMap` of the specified key type [K].
+ * This method facilitates the storage and retrieval of JSON objects that represent maps where the keys are of type [K]
+ * and the values are counts.
+ *
+ * @param K The type of the keys in the count map.
+ * @param name The name of the column in the table to be associated with the count map.
+ * @since 5.5.0
+ */
+inline fun <reified K> Table.countMap(name: String) = jsonb<CountMap<K>>(name)
+/**
+ * Creates a JSONB column in the table specifically mapped to a `NonEmptyCountMap` type with keys of type [K].
+ * This method is designed to simplify the registration of JSONB columns for non-empty count maps.
+ *
+ * @param K The type of the keys in the `NonEmptyCountMap`.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified K> Table.nonEmptyCountMap(name: String) = jsonb<NonEmptyCountMap<K>>(name)
+/**
+ * Registers a JSONB column in the table to store and retrieve data of type [CountMMap].
+ * This method utilizes a strongly-typed approach for working with JSON-encoded data,
+ * specifically for the generic key type [K].
+ *
+ * @param K The type of key used in the [CountMMap].
+ * @param name The name of the column in the table.
+ * @return A [Column] object representing the JSONB column configured for [CountMMap] with the specified key type.
+ * @since 5.5.0
+ */
+inline fun <reified K> Table.countMMap(name: String) = jsonb<CountMMap<K>>(name)
+/**
+ * Registers a column with the JSONB data type to store and retrieve values of type [NonEmptyCountMMap] with keys of type [K].
+ * This method simplifies the creation of JSONB columns specifically for strongly-typed mappings where each key has a non-empty associated count.
+ *
+ * @param K The type of the keys in the [NonEmptyCountMMap].
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified K> Table.nonEmptyCountMMap(name: String) = jsonb<NonEmptyCountMMap<K>>(name)
+/**
+ * Registers a column with the JSONB (JSON binary) data type for storing and retrieving
+ * an `IndexMap` type with the specified value type [V] in the table.
+ *
+ * @param V The type of the values contained in the `IndexMap`.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified V> Table.indexMap(name: String) = jsonb<IndexMap<V>>(name)
+/**
+ * Creates a JSONB column in the table for a non-empty index map with values of type [V].
+ * This method facilitates strong typing for storing and retrieving JSON objects
+ * represented as non-empty index maps in PostgreSQL databases.
+ *
+ * @param V The type of the values contained in the non-empty index map.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified V> Table.nonEmptyIndexMap(name: String) = jsonb<NonEmptyIndexMap<V>>(name)
+/**
+ * Creates a JSONB column with a data type of [IndexMMap] for the specified name in the table.
+ * This is intended for use with PostgreSQL databases to enable storing and retrieving
+ * strongly-typed mapped index structures.
+ *
+ * @param V The type of values stored within the [IndexMMap].
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified V> Table.indexMMap(name: String) = jsonb<IndexMMap<V>>(name)
+/**
+ * Registers a JSONB (binary JSON) column in the table that maps to a [NonEmptyIndexMMap] of type [V].
+ * This method allows for strongly-typed storage and retrieval of non-empty index-to-map structures in PostgreSQL databases.
+ *
+ * @param V The value type contained in the [NonEmptyIndexMMap].
+ * @param name The name of the JSONB column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified V> Table.nonEmptyIndexMMap(name: String) = jsonb<NonEmptyIndexMMap<V>>(name)
+/**
+ * Creates a column of type `StringMap` with JSONB data type in the table.
+ * This method is specifically intended for handling `StringMap` structures,
+ * which are JSON objects with string keys and string values, in a PostgreSQL database.
+ *
+ * @param name The name of the column to be created in the table.
+ * @since 5.5.0
+ */
+fun Table.stringMap(name: String) = jsonb<StringMap>(name)
+/**
+ * Creates a JSONB column with the specified name in the table for a strongly-typed
+ * map-like structure where keys and values are non-empty strings.
+ *
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+fun Table.nonEmptyStringMap(name: String) = jsonb<NonEmptyStringMap>(name)
+/**
+ * Registers a column in the table with the JSONB (JSON binary) data type and maps it to a `StringMMap`.
+ * This method is specifically designed for PostgreSQL databases and supports storing and retrieving
+ * JSON objects as a strongly-typed `StringMMap`.
+ *
+ * @param name The name of the JSONB column to be created or accessed in the database table.
+ * @since 5.5.0
+ */
+fun Table.stringMMap(name: String) = jsonb<StringMMap>(name)
+/**
+ * Registers a column with JSONB (JSON binary) data type for a non-empty string-to-map structure.
+ * This method is intended to define a column that stores and retrieves strongly-typed
+ * values of type [NonEmptyStringMMap] in PostgreSQL databases.
+ *
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+fun Table.nonEmptyStringMMap(name: String) = jsonb<NonEmptyStringMMap>(name)
+/**
+ * Registers a JSONB (JSON binary) column in the table as a strongly-typed multi-map structure.
+ * The `multiMap` method simplifies storing and retrieving data as a map structure
+ * where both the keys and values are strongly typed.
+ *
+ * @param K The type of the keys in the multi-map.
+ * @param V The type of the values in the multi-map.
+ * @param name The name of the column in the table.
+ * @return A [Column] of type [MultiMap] containing the specified key-value types.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.multiMap(name: String) = jsonb<MultiMap<K, V>>(name)
+/**
+ * Registers a column with JSONB (JSON binary) data type in the table, specialized for a
+ * non-empty multimap structure. This method allows strongly-typed interaction with
+ * JSONB columns that store values conforming to the [NonEmptyMultiMap] type.
+ *
+ * @param K The type of keys in the non-empty multimap.
+ * @param V The type of values associated with keys in the non-empty multimap.
+ * @param name The name of the column being added to the table.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.nonEmptyMultiMap(name: String) = jsonb<NonEmptyMultiMap<K, V>>(name)
+/**
+ * Registers a column in the table with a JSONB data type for handling a multi-map structure (`MultiMMap`)
+ * with specified key and value types [K] and [V]. This method leverages PostgreSQL's JSONB functionality
+ * for efficient storage and querying of complex data structures.
+ *
+ * @param K The key type of the multi-map structure.
+ * @param V The value type of the multi-map structure.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.multiMMap(name: String) = jsonb<MultiMMap<K, V>>(name)
+/**
+ * Registers a column to store a non-empty multi-map structure in JSONB format for the specified name.
+ * This column supports key-value pairs where multiple values can be associated with the same key, and it ensures that
+ * neither the map nor its value collections are empty. Values are serialized and deserialized in a strongly-typed manner.
+ *
+ * @param K The type of the keys in the multi-map.
+ * @param V The type of the values in the multi-map.
+ * @param name The name of the column in the table.
+ * @return A [Column] object representing the JSONB column of type [NonEmptyMultiMMap].
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.nonEmptyMultiMMap(name: String) = jsonb<NonEmptyMultiMMap<K, V>>(name)
+/**
+ * Registers a table column for storing a strongly-typed map represented as a `SetMap<K, V>` object
+ * in JSONB (JSON binary) format using a PostgreSQL database. This method allows you to create a column
+ * where data is stored and retrieved as JSON, facilitating seamless interaction with structured data.
+ *
+ * @param K The type of the keys in the map.
+ * @param V The type of the values in the map.
+ * @param name The name of the JSONB column to be created in the table.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.setMap(name: String) = jsonb<SetMap<K, V>>(name)
+/**
+ * Registers a column in the table with the JSONB (JSON binary) data type for non-empty set map values.
+ * This method enables strongly-typed storage and retrieval of data where the specified type is a map
+ * with non-empty sets as the values. It is designed for use with PostgreSQL databases to ensure
+ * accurate serialization and deserialization of such structures.
+ *
+ * @param K The type of the keys in the map.
+ * @param V The type of the values in the non-empty sets contained in the map.
+ * @param name The name of the column in the table.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.nonEmptySetMap(name: String) = jsonb<NonEmptySetMap<K, V>>(name)
+/**
+ * Registers a column in the table to store a map of sets (SetMMap) using the JSONB (JSON binary) data type.
+ * This function is specifically tailored for PostgreSQL databases and enables type-safe storage
+ * and retrieval of a map where keys are of type [K] and values are sets of elements of type [V].
+ *
+ * @param name The name of the column in the table.
+ * @param K The type of the keys in the map.
+ * @param V The type of the elements in the sets that are the values in the map.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.setMMap(name: String) = jsonb<SetMMap<K, V>>(name)
+/**
+ * Registers a column in the table with the JSONB (JSON binary) data type that stores values as a
+ * non-empty multi-map (i.e., a map where each key is associated with a non-empty set of values).
+ * This method is commonly used with PostgreSQL databases to store strongly-typed non-empty multi-map
+ * data structures in a JSONB column.
+ *
+ * @param K The type of the keys in the multi-map.
+ * @param V The type of the values in the sets associated with the keys.
+ * @param name The name of the column in the table where the non-empty multi-map data will be stored.
+ * @since 5.5.0
+ */
+inline fun <reified K, reified V> Table.nonEmptySetMMap(name: String) = jsonb<NonEmptySetMMap<K, V>>(name)
+
+/**
+ * Represents a column type for handling PostgreSQL `int4range` data type.
+ * This class is used to map `int4range` database values to Kotlin's `IntRange` type
+ * and vice versa. It provides methods for converting database values into `IntRange`
+ * objects, as well as serializing `IntRange` objects into the proper SQL representation.
+ *
+ * The `int4range` type in PostgreSQL represents a range of integer values.
+ * The range can be inclusive or exclusive, and this class ensures proper handling
+ * of these semantics during serialization and deserialization.
+ *
+ * @constructor Creates an instance of `IntRangeColumnType`.
+ * @since 5.5.0
+ * @author Tommaso Pastorelli
+ */
+class IntRangeColumnType : ColumnType<IntRange>() {
+    companion object {
+        /**
+         * Represents the PostgreSQL range type `int4range`, which is used to define
+         * ranges of 32-bit integers in the database.
+         *
+         * Typically used in database schema definitions or SQL operations involving
+         * range checking and manipulation.
+         *
+         * @since 5.5.0
+         */
+        const val INT_RANGE = "int4range"
+    }
+
+
+    /**
+     * Returns the SQL type specification for a PostgreSQL integer range (`int4range`).
+     *
+     * This method specifies the database column type used to represent an inclusive range
+     * of integers. The PostgreSQL `int4range` type is commonly used to store integer ranges
+     * with a defined start and end.
+     *
+     * @return The string "int4range", representing the SQL type for a PostgreSQL integer range.
+     * @see IntRangeColumnType
+     * @since 5.5.0
+     */
+    override fun sqlType() = INT_RANGE
+
+    /**
+     * Converts a database value into an [IntRange] representation.
+     *
+     * @param value the value retrieved from the database, expected to be either a `PGobject` or a `String`.
+     * @return the corresponding [IntRange] parsed from the input value.
+     * @throws IllegalStateException if the input value is not a supported type or cannot be parsed.
+     * @since 5.5.0
+     */
+    override fun valueFromDB(value: Any): IntRange = when (value) {
+        is PGobject -> parseRange(value.value!!)
+        is String -> parseRange(value)
+        else -> error("Unexpected value for int4range: $value")
+    }
+
+    /**
+     * Converts a non-null [IntRange] value into a database-compatible representation as a PostgreSQL int4range.
+     *
+     * @param value the non-null [IntRange] to be converted, represented as an inclusive range.
+     * @return a [PGobject] configured with the type "int4range" and the value formatted as "[start,end]".
+     * @since 5.5.0
+     */
+    override fun notNullValueToDB(value: IntRange): Any = PGobject().apply {
+        type = "int4range"
+        this.value = "[${value.first},${value.last}]" // inclusive-inclusive
+    }
+
+    /**
+     * Converts a non-null [IntRange] value into its string representation formatted as a PostgreSQL range.
+     *
+     * Represents the [IntRange] in the format '[start,end]', where the range is inclusive on both sides.
+     *
+     * @param value the non-null [IntRange] to be converted to a string representation
+     * @since 5.5.0
+     */
+    override fun nonNullValueToString(value: IntRange) = "'[${value.first},${value.last}]'"
+
+    /**
+     * Parses a PostgreSQL range string into an [IntRange]. The input string is expected to be
+     * in the format `"[start,end)"` or `"[start,end]"`, where the range is inclusive on the lower
+     * bound and can be either inclusive or exclusive on the upper bound.
+     *
+     * @param s the PostgreSQL range string to be parsed. It must represent a range in one of the
+     *          supported formats.
+     * @return an [IntRange] representing the parsed range. The lower bound is always inclusive,
+     *         and the upper bound is adjusted to be inclusive if originally exclusive in the input.
+     * @since 5.5.0
+     */
+    private fun parseRange(s: String): IntRange {
+        // formato Postgres: "[1,10)" oppure "[1,10]"
+        val trimmed = s.trim('[', ']', '(', ')')
+        val [start, endExclusive] = trimmed.split(",").map { it.trim().toInt() }
+        val inclusiveEnd = if (s.endsWith(")")) endExclusive - 1 else endExclusive
+        return start..inclusiveEnd
+    }
+}
+
+/**
+ * Registers a column in the table to handle PostgreSQL `int4range` data type,
+ * mapping it to a Kotlin [IntRange].
+ *
+ * @param name The name of the column to be registered.
+ * @return A [Column] of type [IntRange] associated with the specified column name.
+ * @since 5.5.0
+ */
+fun Table.intRange(name: String): Column<IntRange> = registerColumn(name, IntRangeColumnType())
+
+/**
+ * Represents a column type that maps a `UIntRange` value to a database column with JSONB support.
+ * This class is intended to handle serialization and deserialization of `UIntRange` objects
+ * to and from the database in JSON format.
+ *
+ * The `UIntRangeColumnType` handles:
+ * - Mapping the `UIntRange` values to a JSONB representation when storing them in the database.
+ * - Parsing the stored JSONB data back into a `UIntRange` object when retrieving it from the database.
+ *
+ * It requires proper JSON format to represent the `UIntRange`, where the JSON structure must
+ * include `start` and `endInclusive` fields as unsigned integers. For example:
+ * ```json
+ * {"start":1,"endInclusive":10}
+ * ```
+ *
+ * This implementation assumes PostgreSQL's JSONB type for the column type and uses `PGobject` for conversion.
+ *
+ * Methods overridden:
+ * - `sqlType`: Specifies the SQL type for the column as JSONB.
+ * - `valueFromDB`: Converts database values into a `UIntRange` object.
+ * - `notNullValueToDB`: Converts a `UIntRange` object into a JSONB representation for storage.
+ * - `nonNullValueToString`: Provides a string representation of the `UIntRange` for SQL operations.
+ *
+ * @since 5.5.0
+ * @author Tommaso Pastorelli
+ */
+class UIntRangeColumnType : ColumnType<UIntRange>() {
+    /**
+     * Returns the SQL type for the column represented by this `ColumnType` implementation.
+     * This method specifies the use of the `JSONB` type, which is a PostgreSQL
+     * JSON binary storage format that efficiently stores and processes JSON data.
+     *
+     * @return The SQL type as a string, specifically `JSONB`.
+     * @since 5.5.0
+     */
+    override fun sqlType() = JSONB
+
+    /**
+     * Converts a database value into a UIntRange object based on its type.
+     *
+     * @param value The database value to be converted. Supported types are:
+     *              PGobject, String, Json, ByteArray, or any other type that can be serialized.
+     * @return A UIntRange object representing the deserialized range.
+     * @since 5.5.0
+     */
+    override fun valueFromDB(value: Any): UIntRange = when (value) {
+        is PGobject -> read(value.value)
+        is String -> read(value)
+        is Json -> read(value.value)
+        is ByteArray -> read(value.decodeToString())
+        else -> read(value.serialize())
+    }
+
+    /**
+     * Converts a non-null `UIntRange` value into a database-acceptable representation.
+     *
+     * @param value The `UIntRange` to be converted. `value.first` represents the start of the range, and
+     *              `value.last` represents the inclusive end of the range.
+     * @return An `Any` representing a JSONB object configured to store the `UIntRange` as a JSON structure
+     *         with `start` and `endInclusive` fields.
+     * @since 5.5.0
+     */
+    override fun notNullValueToDB(value: UIntRange): Any = PGobject().apply {
+        type = JSONB
+        this.value = """{"start":${value.first},"endInclusive":${value.last}}"""
+    }
+
+    /**
+     * Converts a non-null [UIntRange] value into its string representation in JSON format.
+     * The function ensures both the start and the end of the range are serialized.
+     *
+     * @param value The [UIntRange] instance to be serialized to JSON. It must not be null.
+     * @since 5.5.0
+     */
+    override fun nonNullValueToString(value: UIntRange) = """'{"start":${value.first},"endInclusive":${value.last}}'"""
+
+    /**
+     * Reads a JSON string and deserializes it into a `UIntRange` object.
+     *
+     * @param json The JSON string representing the range. The JSON must include
+     *             fields "start" and "endInclusive" as unsigned integers.
+     * @return A `UIntRange` object representing the range defined in the JSON string.
+     * @throws IllegalArgumentException if the JSON string is null.
+     * @throws IllegalStateException if the "start" or "endInclusive" fields are
+     *                               missing or invalid in the JSON string.
+     * @since 5.5.0
+     */
+    private fun read(json: String?): UIntRange {
+        requireNotNull(json) { "Cannot deserialize UIntRange from null JSON" }
+        val node = Json(json)
+        val start = node.getAsNode("start")
+            ?.asString()?.toUInt()
+            ?: error("Missing or invalid 'start' in: $json")
+        val end = node.getAsNode("endInclusive")
+            ?.asString()?.toUInt()
+            ?: error("Missing or invalid 'endInclusive' in: $json")
+        return start..end
+    }
+}
+
+/**
+ * Registers a column in the table with the specified name to store values of type `UIntRange`.
+ *
+ * @param name The name of the column to be added to the table.
+ * @return The newly created column of type `UIntRange`.
+ * @since 5.5.0
+ */
+fun Table.uIntRange(name: String): Column<UIntRange> = registerColumn(name, UIntRangeColumnType())
+
+/**
+ * Represents a column type for PostgreSQL `int8range` (bigint range) data type.
+ *
+ * This class is used to map a PostgreSQL range type to a Kotlin `LongRange` during database
+ * interaction. It provides mechanisms to serialize/deserialize the `LongRange` between the database
+ * format and Kotlin data structures.
+ *
+ * Features:
+ * - Handles conversion of PostgreSQL `int8range` data to Kotlin `LongRange`.
+ * - Supports inclusive start and inclusive or exclusive end bound parsing.
+ * - Customizes SQL type declaration for database schema generation.
+ *
+ * Key functionality includes:
+ * - Parsing `int8range` strings from the database into `LongRange` objects.
+ * - Serializing `LongRange` objects back into SQL-compatible `int8range` strings.
+ *
+ * PostgreSQL `int8range` format can use square brackets `[ ]` to denote inclusive bounds or
+ * parentheses `( )` to denote exclusive bounds. For instance:
+ * - `[1,10)` translates to a range from `1` to `9` (inclusive-exclusive).
+ * - `[1,10]` translates to a range from `1` to `10` (inclusive-inclusive).
+ *
+ * @constructor Creates an instance of LongRangeColumnType.
+ * @since 5.5.0
+ * @author Tommaso Pastorelli
+ */
+class LongRangeColumnType : ColumnType<LongRange>() {
+    companion object {
+        /**
+         * Represents the SQL data type for an 8-byte integer range column.
+         * This constant is used to define the SQL type for columns
+         * that store a range of integers within the 8-byte signed integer range.
+         *
+         * @since 5.5.0
+         */
+        const val LONG_RANGE = "int8range"
+    }
+
+    /**
+     * Returns the SQL type representation for the `LongRangeColumnType`.
+     * This method specifies the proper type mapping for storing `LongRange` values in a database.
+     *
+     * @return The SQL type constant corresponding to a long range.
+     * @since 5.5.0
+     */
+    override fun sqlType() = LONG_RANGE
+
+    /**
+     * Converts a database value into a Kotlin `LongRange`.
+     *
+     * @param value The value retrieved from the database, expected to be of type `PGobject` or `String`.
+     * @return A `LongRange` object representing the range value parsed from the database input.
+     * @throws IllegalArgumentException if the input value type is unexpected.
+     * @since 5.5.0
+     */
+    override fun valueFromDB(value: Any): LongRange = when (value) {
+        is PGobject -> parseRange(value.value!!)
+        is String -> parseRange(value)
+        else -> error("Unexpected value for int4range: $value")
+    }
+
+    /**
+     * Converts a non-null `LongRange` into a database-compatible representation.
+     *
+     * @param value the `LongRange` object to be converted. The range is inclusive on both ends and
+     *              will be formatted as an "int8range" for use with PostgreSQL.
+     * @return a `PGobject` containing the converted range in the required database format.
+     * @since 5.5.0
+     */
+    override fun notNullValueToDB(value: LongRange): Any = PGobject().apply {
+        type = "int8range"
+        this.value = "[${value.first},${value.last}]" // inclusive-inclusive
+    }
+
+    /**
+     * Converts a non-null LongRange value into its string representation.
+     *
+     * @param value the LongRange value to be converted, where the first element
+     *              represents the starting value and the last element represents
+     *              the ending value of the range.
+     * @since 5.5.0
+     */
+    override fun nonNullValueToString(value: LongRange) = "'[${value.first},${value.last}]'"
+
+    /**
+     * Parses a PostgreSQL range string representation and converts it into a [LongRange].
+     * The input can be in formats like "[1,10)" (exclusive upper bound) or "[1,10]" (inclusive upper bound).
+     *
+     * @param s the range string to be parsed. It must conform to the PostgreSQL range format.
+     * @return a [LongRange] object representing the parsed range, with the correct bounds handling.
+     * @since 5.5.0
+     */
+    private fun parseRange(s: String): LongRange {
+        // formato Postgres: "[1,10)" oppure "[1,10]"
+        val trimmed = s.trim('[', ']', '(', ')')
+        val [start, endExclusive] = trimmed.split(",").map { it.trim().toLong() }
+        val inclusiveEnd = if (s.endsWith(")")) endExclusive - 1 else endExclusive
+        return start..inclusiveEnd
+    }
+}
+
+/**
+ * Registers a column of type `LongRange` in the table schema. This method maps the column to the
+ * PostgreSQL `int8range` data type, which represents a range of 64-bit integers.
+ *
+ * @param name The name of the column to be registered in the database schema.
+ * @return A `Column` instance that represents a database column storing `LongRange` values.
+ * @since 5.5.0
+ */
+fun Table.longRange(name: String): Column<LongRange> = registerColumn(name, LongRangeColumnType())
+
+/**
+ * A custom column type for handling `ULongRange` objects in database operations.
+ * This class is responsible for mapping `ULongRange` values to proper database types in both directions.
+ * The underlying database representation uses the JSONB data type to store `ULongRange` as structured JSON.
+ *
+ * The `ULongRangeColumnType` handles serialization and deserialization of the `ULongRange` from JSON format.
+ * It ensures correct behavior for database read and write operations, including value conversions.
+ *
+ * The JSON structure for a `ULongRange` is expected to have the following format:
+ * ```
+ * {
+ *   "start": <ULong>,
+ *   "endInclusive": <ULong>
+ * }
+ * ```
+ *
+ * This class inherits from `ColumnType<T>` to provide database type-specific customization for `ULongRange`.
+ *
+ * @constructor Creates a new instance of `ULongRangeColumnType`.
+ * @since 5.5.0
+ * @author Tommaso Pastorelli
+ */
+class ULongRangeColumnType : ColumnType<ULongRange>() {
+    /**
+     * Returns the SQL type representation for the `ULongRangeColumnType`.
+     * This method is overridden to specify that the `ULongRangeColumnType`
+     * uses the `JSONB` data type in the underlying database.
+     *
+     * @return A string constant `JSONB` representing the SQL type.
+     * @since 5.5.0
+     */
+    override fun sqlType() = JSONB
+
+    /**
+     * Converts a value from the database into a ULongRange instance.
+     *
+     * @param value The database value to be converted. This can be of types PGobject, String, Json, ByteArray, or other serializable types.
+     * @return A ULongRange instance representing the converted value.
+     * @since 5.5.0
+     */
+    override fun valueFromDB(value: Any): ULongRange = when (value) {
+        is PGobject -> read(value.value)
+        is String -> read(value)
+        is Json -> read(value.value)
+        is ByteArray -> read(value.decodeToString())
+        else -> read(value.serialize())
+    }
+
+    /**
+     * Converts a non-null ULongRange value to a database-compatible format.
+     *
+     * The function transforms the ULongRange into a JSONB representation
+     * with "start" and "endInclusive" keys indicating the range bounds.
+     *
+     * @param value The ULongRange value to be converted. It must not be null.
+     * @return A PGobject instance containing the JSONB string representation of the ULongRange.
+     * @since 5.5.0
+     */
+    override fun notNullValueToDB(value: ULongRange): Any = PGobject().apply {
+        type = JSONB
+        this.value = """{"start":${value.first},"endInclusive":${value.last}}"""
+    }
+
+    /**
+     * Converts the given non-null `ULongRange` value into its string representation
+     * formatted as a JSON object with "start" and "endInclusive" fields.
+     *
+     * @param value the non-null `ULongRange` instance to be converted to a string.
+     * @since 5.5.0
+     */
+    override fun nonNullValueToString(value: ULongRange) = """'{"start":${value.first},"endInclusive":${value.last}}'"""
+
+    /**
+     * Deserializes a JSON string into a ULongRange object.
+     *
+     * @param json The JSON string representing the ULongRange.
+     *             Must contain "start" and "endInclusive" fields with valid unsigned long values.
+     * @return The ULongRange object created from the JSON string.
+     * @throws IllegalArgumentException If the provided JSON is null.
+     * @throws IllegalStateException If the JSON is missing required fields or if the fields contain invalid data.
+     * @since 5.5.0
+     */
+    private fun read(json: String?): ULongRange {
+        requireNotNull(json) { "Cannot deserialize ULongRange from null JSON" }
+        val node = Json(json)
+        val start = node.getAsNode("start")
+            ?.asString()?.toULong()
+            ?: error("Missing or invalid 'start' in: $json")
+        val end = node.getAsNode("endInclusive")
+            ?.asString()?.toULong()
+            ?: error("Missing or invalid 'endInclusive' in: $json")
+        return start..end
+    }
+}
+
+/**
+ * Creates and registers a column of type ULongRange in the table schema.
+ *
+ * @param name The name of the column to be created in the table.
+ * @return The registered column as a `Column<ULongRange>`.
+ * @since 5.5.0
+ */
+fun Table.uLongRange(name: String): Column<ULongRange> = registerColumn(name, ULongRangeColumnType())
 
 /**
  * Executes a database transaction, propagates exceptions using a custom transformer, and supports configurable behavior.
@@ -985,6 +1756,14 @@ operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.contains(op: Op<Boole
  */
 operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.contains(id: ID) = existsById(id)
 /**
+ * Checks if any entity in the table satisfies the conditions defined by the given operation.
+ *
+ * @param op A supplier function that provides an operation (condition) to be applied to the table.
+ * @return True if at least one entity matches the condition, false otherwise.
+ * @since 5.5.0
+ */
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.exists(op: Supplier<Op<Boolean>>) = count(op()) > 0
+/**
  * Checks if an entity with the specified ID exists.
  *
  * @param id The ID of the entity to check for existence.
@@ -1008,6 +1787,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.existsById(id: ID): Boolean {
  *         if the entity is not found.
  * @since 5.3.0
  */
+@IgnorableReturnValue
 inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, lazyException: ThrowableSupplier = { ResourceNotFoundException(id, T::class) }): Boolean {
     findById(id) ?: throw lazyException()
     return true
@@ -1022,6 +1802,7 @@ inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThr
  * @throws ResourceNotFoundException if the entity with the given ID is not found.
  * @since 5.3.0
  */
+@IgnorableReturnValue
 @JvmName("existsByIdOrThrowLazyMessage")
 fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, lazyMessage: Supplier<Any>): Boolean {
     findById(id) ?: throw ResourceNotFoundException(lazyMessage().toString())
@@ -1035,6 +1816,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, lazy
  * @return `true` if the entity exists, otherwise a ResourceNotFoundException is thrown.
  * @since 5.3.0
  */
+@IgnorableReturnValue
 inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, internalErrorCode: String?): Boolean {
     findById(id) ?: throw ResourceNotFoundException(id, T::class, internalErrorCode)
     return true
@@ -1050,6 +1832,7 @@ inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThr
  * @return `true` if the entity exists; otherwise, a ResourceNotFoundException is thrown.
  * @since 5.3.0
  */
+@IgnorableReturnValue
 fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.existsByIdOrThrow(id: ID, internalErrorCode: String?, lazyMesage: Supplier<Any>): Boolean {
     findById(id) ?: throw ResourceNotFoundException(lazyMesage().toString(), internalErrorCode)
     return true
@@ -1122,6 +1905,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOrThrow(id: ID, intern
  * the `lazyException` supplier is thrown.
  * @since 5.3.0
  */
+@IgnorableReturnValue
 inline fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.findByIdOrThrowAndUpdate(
     id: ID,
     lazyException: ThrowableSupplier = { ResourceNotFoundException(id, T::class) },
@@ -1167,11 +1951,21 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOrSave(id: ID, new: Re
  * @return The entity that was found or created and updated.
  * @since 5.3.1
  */
+@IgnorableReturnValue
 fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.findByIdOrSaveAndUpdate(id: ID, new: ReceiverConsumer<T>, block: Consumer<T>): T {
     val result = find(table.id eq id).forUpdate().singleOrNull() ?: new(id, new)
     block(result)
     return result
 }
+
+/**
+ * Creates a new entity of the specified type with the given ID.
+ *
+ * @param id The ID of the new entity to be created.
+ * @return The newly created entity instance.
+ * @since 5.5.0
+ */
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.new(id: ID) = new(id) {}
 
 /**
  * Adds a new instance of an entity to the entity class using the specified initialization block.
@@ -1194,6 +1988,14 @@ operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.plusAssign(init: Rece
  */
 operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.plusAssign(init: Pair<ID, ReceiverConsumer<T>>) { new(init.first, init.second) }
 /**
+ * Adds a new entity with the specified ID to the entity class.
+ *
+ * @param id The unique identifier of the entity to be added.
+ * @since 5.5.0
+ */
+operator fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.plusAssign(id: ID) { new(id) {} }
+
+/**
  * Adds an insert operation to the table using the provided body.
  *
  * @param body A lambda function that consumes the table receiver and the insert statement,
@@ -1212,6 +2014,13 @@ operator fun <T : Table> T.plusAssign(body: ReceiverBiConsumer<T, InsertStatemen
  * @since 5.3.0
  */
 inline operator fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.minusAssign(id: ID) { findByIdOrThrow(id).delete() }
+/**
+ * Removes the specified entity from the database by invoking its delete method.
+ *
+ * @param entity The entity to be removed. It must be an instance of the type associated with this EntityClass.
+ * @since 5.5.0
+ */
+inline operator fun <ID : Any, reified T : Entity<ID>> EntityClass<ID, T>.minusAssign(entity: T) { entity.delete() }
 /**
  * Provides a shorthand operator for deleting rows from the table where the specified condition is met.
  *

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -114,6 +115,18 @@ open class MoneyTransfer(val money: Money, val method: PaymentMethod) {
                 return MoneyTransfer(money, PaymentMethod.tryDeserialize(node.get("method")))
             }
         }
+
+        /**
+         * Maps a column in the table to the `MoneyTransfer` type, enabling the storage and retrieval
+         * of `MoneyTransfer` objects as JSONB (JSON binary) data.
+         *
+         * This method is designed for use with PostgreSQL databases. It facilitates strongly-typed
+         * interaction with `MoneyTransfer` data stored in a JSONB column.
+         *
+         * @param name The name of the column in the table where `MoneyTransfer` objects will be stored.
+         * @since 5.5.0
+         */
+        fun Table.moneyTransfer(name: String) = jsonb<MoneyTransfer>(name)
     }
 
     /**

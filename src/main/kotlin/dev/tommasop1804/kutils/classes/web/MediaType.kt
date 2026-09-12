@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -460,6 +461,17 @@ data class MediaType(
             override fun convertToDatabaseColumn(attribute: MediaType?): String? = attribute?.toString()
             override fun convertToEntityAttribute(dbData: String?): MediaType? = dbData?.let { MediaType(it) }
         }
+
+        /**
+         * Adds a column to the table for storing media type information as a string,
+         * with optional maximum length specification.
+         *
+         * @param name The name of the column to be added to the table.
+         * @param length The maximum length of the column's string value. Defaults to 255.
+         * @since 5.5.0
+         */
+        fun Table.mediaType(name: String, length: Int = 255) = varchar(name, length)
+            .transform(::MediaType, MediaType::toString)
     }
 
     /**

@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.classes.constants
 
+import org.jetbrains.exposed.v1.core.Table
+
 /**
  * Represents the biological classification of sex, commonly used to define male and female.
  *
@@ -14,6 +16,7 @@ package dev.tommasop1804.kutils.classes.constants
  * @since 1.0.0
  */
 @MustUseReturnValues
+@Suppress("unused")
 enum class Sex(val symbol: Char) {
     /**
      * Represents the male sex with its associated symbol.
@@ -51,6 +54,19 @@ enum class Sex(val symbol: Char) {
             '♀', 'F', 'f' -> Female
             else -> null
         }
+
+        /**
+         * Maps a table column to the `Sex` enum using either the enum's name
+         * or ordinal for database storage, based on the provided configuration.
+         *
+         * @param name The name of the table column to map to the `Sex` enum.
+         * @param byName A flag indicating whether the enum should be mapped using its name.
+         *               If `true`, the mapping uses the enum's name.
+         *               If `false`, the mapping uses the enum's ordinal instead.
+         * @since 5.5.0
+         */
+        fun Table.sex(name: String, byName: Boolean = true) =
+            if (byName) enumerationByName<Sex>(name, 6) else enumeration<Sex>(name)
     }
 
     /**

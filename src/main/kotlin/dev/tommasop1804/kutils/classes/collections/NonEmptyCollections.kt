@@ -20,6 +20,7 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.exceptions.*
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.module.SimpleModule
 
@@ -646,6 +647,18 @@ open class NonEmptyList<out E>(@PublishedApi internal val elements: List<E>) : L
          * @since 5.2.0
          */
         fun CharArray.toNonEmptyList() = toList().toNonEmptyList()
+
+        /**
+         * Registers a JSONB column in the table for storing and retrieving non-empty lists of type [E].
+         *
+         * This method creates a strongly-typed column in the database that supports PostgreSQL's JSONB
+         * type for non-empty lists. Each element in the list is of the specified type [E].
+         *
+         * @param E The type of elements contained within the non-empty list.
+         * @param name The name of the column in the database table.
+         * @since 5.5.0
+         */
+        inline fun <reified E> Table.nonEmptyList(name: String) = jsonb<NonEmptyList<E>>(name)
     }
 
     /**
@@ -948,6 +961,18 @@ class NonEmptyMList<E>(private val mElements: MList<E>) : MList<E> by mElements,
          * @since 5.2.0
          */
         fun CharArray.toNonEmptyMList() = toMutableList().toNonEmptyMList()
+
+        /**
+         * Registers a JSONB column in the table for storing and retrieving non-empty mutable lists of type [E].
+         *
+         * This method creates a strongly-typed column in the database that supports PostgreSQL's JSONB
+         * type for non-empty lists. Each element in the list is of the specified type [E].
+         *
+         * @param E The type of elements contained within the non-empty list.
+         * @param name The name of the column in the database table.
+         * @since 5.5.0
+         */
+        inline fun <reified E> Table.nonEmptyMList(name: String) = jsonb<NonEmptyMList<E>>(name)
     }
 
     /**
@@ -1320,6 +1345,18 @@ open class NonEmptySet<out E>(@PublishedApi internal val elements: Set<E>) : Set
          * @since 5.2.0
          */
         fun CharArray.toNonEmptySet() = toSet().toNonEmptySet()
+
+        /**
+         * Creates a JSONB column in the table with support for strongly-typed `NonEmptySet<E>`.
+         *
+         * This method registers a column that stores data as a PostgreSQL JSONB type, allowing the
+         * storage and retrieval of `NonEmptySet` instances in a type-safe manner.
+         *
+         * @param E The type of elements contained in the `NonEmptySet`.
+         * @param name The name of the column in the table.
+         * @since 5.5.0
+         */
+        inline fun <reified E> Table.nonEmptySet(name: String) = jsonb<NonEmptySet<E>>(name)
     }
 
     /**
@@ -1571,6 +1608,18 @@ class NonEmptyMSet<E>(private val mElements: MSet<E>) : MSet<E> by mElements, No
          * @since 5.2.0
          */
         fun CharArray.toNonEmptyMSet() = toMutableSet().toNonEmptyMSet()
+
+        /**
+         * Creates a JSONB column in the table with support for strongly-typed `NonEmptyMSet<E>`.
+         *
+         * This method registers a column that stores data as a PostgreSQL JSONB type, allowing the
+         * storage and retrieval of `NonEmptyMSet` instances in a type-safe manner.
+         *
+         * @param E The type of elements contained in the `NonEmptyMSet`.
+         * @param name The name of the column in the table.
+         * @since 5.5.0
+         */
+        inline fun <reified E> Table.nonEmptyMSet(name: String) = jsonb<NonEmptyMSet<E>>(name)
     }
 
     /**

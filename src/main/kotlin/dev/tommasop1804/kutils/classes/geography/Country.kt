@@ -8,9 +8,9 @@ import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.TimeZone
 import dev.tommasop1804.kutils.classes.translators.*
 import dev.tommasop1804.kutils.equalsIgnoreCase
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.unaryPlus
+import org.jetbrains.exposed.v1.core.Table
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.reflect.KProperty
@@ -518,6 +518,18 @@ enum class Country(
 		 * @since 1.0.0
 		 */
 		fun translateCountryNamesWith(translator: Translator, property: KProperty1<Country, String> = Country::countryName) = translator.translate(entries.map(property))
+
+		/**
+		 * Retrieves a country enumeration from the database table based on the given name.
+		 *
+		 * @param name The name of the country to query.
+		 * @param byName Specifies whether the country should be queried by its name.
+		 *               If true, the method will use the `enumerationByName` function;
+		 *               otherwise, it will use the `enumeration` function. Default is true.
+		 * @since 5.5.0
+		 */
+		fun Table.country(name: String, byName: Boolean = true) =
+			if (byName) enumerationByName<Country>(name, 38) else enumeration<Country>(name)
     }
 
 	/**

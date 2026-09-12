@@ -17,6 +17,7 @@ import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
 import jakarta.persistence.AttributeConverter
+import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
@@ -127,6 +128,17 @@ value class UpcE private constructor(override val value: String) : CharSequence,
             override fun convertToDatabaseColumn(attribute: UpcE?): String? = attribute?.value
             override fun convertToEntityAttribute(dbData: String?): UpcE? = dbData?.let { UpcE(it) }
         }
+
+        /**
+         * Adds a column to the table that stores a UPC-E formatted string with a fixed length.
+         * The column is represented as an 8-character string and supports transformation to and from
+         * the `UpcE` type.
+         *
+         * @param name the name of the column to be added to the database table.
+         * @since 5.5.0
+         */
+        fun Table.upcE(name: String) = char(name, 8)
+            .transform(::UpcE, UpcE::toString)
     }
 
     /**

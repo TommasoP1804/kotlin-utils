@@ -4,6 +4,7 @@
 
 package dev.tommasop1804.kutils.classes.measure
 
+import org.jetbrains.exposed.v1.core.Table
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -114,6 +115,17 @@ enum class Measure(
 		 * @since 1.0.0
 		 */
 		val siMeasures = entries.filter { it.si }.toSet()
+
+		/**
+		 * Fetches a measure from the table by its name with an option to specify if the lookup should
+		 * be performed by the name or a direct match.
+		 *
+		 * @param name The name of the measure to search for.
+		 * @param byName If set to true (default), the search is done by the measure's name. Set to false to perform a direct match.
+		 * @since 5.5.0
+		 */
+		fun Table.measure(name: String, byName: Boolean = true) =
+			if (byName) enumerationByName<Measure>(name, 30) else enumeration<Measure>(name)
 	}
 
 	/**
