@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.COLON
 import dev.tommasop1804.kutils.DataMap
+import dev.tommasop1804.kutils.ExceptionTransformer
 import dev.tommasop1804.kutils.MList
-import dev.tommasop1804.kutils.ThrowableTransformer
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.minus
@@ -522,8 +522,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * exception handling.
      * @param includeCause a boolean indicating whether the cause of exceptions should be included in the transformed
      * exceptions. Defaults to true.
-     * @param overwriteOnly a set of exception classes for which only the specified transformations should be applied.
-     * @param dontOverwrite a set of exception classes excluded from custom transformations.
+     * @param only a set of exception classes for which only the specified transformations should be applied.
+     * @param except a set of exception classes excluded from custom transformations.
      *
      * @return the result of the count query as an integer.
      *
@@ -532,13 +532,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     fun executeCount(
         parameters: List<Any> = emptyList(),
-        defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        dontOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): Int {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = dontOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 Int::class.java
@@ -558,8 +558,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * exception handling.
      * @param includeCause a boolean indicating whether the cause of exceptions should be included in the transformed
      * exceptions. Defaults to true.
-     * @param overwriteOnly a set of exception classes for which only the specified transformations should be applied.
-     * @param notOverwrite a set of exception classes excluded from custom transformations.
+     * @param only a set of exception classes for which only the specified transformations should be applied.
+     * @param except a set of exception classes excluded from custom transformations.
      *
      * @return the result of the count query as an integer.
      *
@@ -568,13 +568,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     fun executeCount(
         parameters: DataMap,
-        defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): Int {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 Int::class.java
@@ -593,8 +593,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @param defaultException A lambda that transforms an exception into another throwable. Defaults to creating a `DatabaseOperationException`.
      * @param specificCases A map of specific exception types and their corresponding transformers. Defaults to an empty map.
      * @param includeCause A flag indicating whether to include the cause of exceptions. Defaults to `true`.
-     * @param overwriteOnly A set of exception types for which handling should be explicitly overwritten. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be overwritten. Defaults to an empty set.
+     * @param only A set of exception types for which handling should be explicitly overwritten. Defaults to an empty set.
+     * @param except A set of exception types that should not be overwritten. Defaults to an empty set.
      * @param noResultBehaviour Defines the behavior when no result is found. Defaults to `InvalidResultBehaviour.RETURN_NULL`.
      * @param tooManyResultsBehaviour Defines the behavior when too many results are found. Defaults to `InvalidResultBehaviour.THROW_EXCEPTION`.
      * @return A single result of the type `T`, or `null` if `noResultBehaviour` is set to `RETURN_NULL` and no results are found.
@@ -603,15 +603,15 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectSingleResult(
         parameters: List<Any> = emptyList(),
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet(),
         noResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ReturnNull,
         tooManyResultsBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ThrowException
     ): T? {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -645,8 +645,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @param defaultException A lambda that transforms an exception into another throwable. Defaults to creating a `DatabaseOperationException`.
      * @param specificCases A map of specific exception types and their corresponding transformers. Defaults to an empty map.
      * @param includeCause A flag indicating whether to include the cause of exceptions. Defaults to `true`.
-     * @param overwriteOnly A set of exception types for which handling should be explicitly overwritten. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be overwritten. Defaults to an empty set.
+     * @param only A set of exception types for which handling should be explicitly overwritten. Defaults to an empty set.
+     * @param except A set of exception types that should not be overwritten. Defaults to an empty set.
      * @param noResultBehaviour Defines the behavior when no result is found. Defaults to `InvalidResultBehaviour.RETURN_NULL`.
      * @param tooManyResultBehaviour Defines the behavior when too many results are found. Defaults to `InvalidResultBehaviour.THROW_EXCEPTION`.
      * @return A single result of the type `T`, or `null` if `noResultBehaviour` is set to `RETURN_NULL` and no results are found.
@@ -655,15 +655,15 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectSingleResult(
         parameters: DataMap,
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet(),
         noResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ReturnNull,
         tooManyResultBehaviour: InvalidResultBehaviour = InvalidResultBehaviour.ThrowException
     ): T? {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -704,9 +704,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *                      handling specific exceptions in a custom way. Defaults to an empty map.
      * @param includeCause A flag indicating whether the original cause should be included
      *                     when exceptions are transformed. Defaults to true.
-     * @param overwriteOnly A set of exception types that should only be transformed if they are
+     * @param only A set of exception types that should only be transformed if they are
      *                      explicitly listed here. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be transformed. Defaults
+     * @param except A set of exception types that should not be transformed. Defaults
      *                     to an empty set.
      * @return A list of results of type [T] obtained from the executed query.
      * @since 1.0.0
@@ -714,13 +714,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectMultipleResult(
         parameters: List<Any> = emptyList(),
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): List<T> {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -744,9 +744,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *                      handling specific exceptions in a custom way. Defaults to an empty map.
      * @param includeCause A flag indicating whether the original cause should be included
      *                     when exceptions are transformed. Defaults to true.
-     * @param overwriteOnly A set of exception types that should only be transformed if they are
+     * @param only A set of exception types that should only be transformed if they are
      *                      explicitly listed here. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be transformed. Defaults
+     * @param except A set of exception types that should not be transformed. Defaults
      *                     to an empty set.
      * @return A list of results of type [T] obtained from the executed query.
      * @since 1.0.0
@@ -754,13 +754,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectMultipleResult(
         parameters: DataMap,
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): List<T> {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -785,9 +785,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *                      handling specific exceptions in a custom way. Defaults to an empty map.
      * @param includeCause A flag indicating whether the original cause should be included
      *                     when exceptions are transformed. Defaults to true.
-     * @param overwriteOnly A set of exception types that should only be transformed if they are
+     * @param only A set of exception types that should only be transformed if they are
      *                      explicitly listed here. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be transformed. Defaults
+     * @param except A set of exception types that should not be transformed. Defaults
      *                     to an empty set.
      * @return A list of results of type [T] obtained from the executed query.
      * @since 1.0.0
@@ -795,13 +795,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectMultipleResultToSet(
         parameters: List<Any> = emptyList(),
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): Set<T> {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -825,9 +825,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *                      handling specific exceptions in a custom way. Defaults to an empty map.
      * @param includeCause A flag indicating whether the original cause should be included
      *                     when exceptions are transformed. Defaults to true.
-     * @param overwriteOnly A set of exception types that should only be transformed if they are
+     * @param only A set of exception types that should only be transformed if they are
      *                      explicitly listed here. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be transformed. Defaults
+     * @param except A set of exception types that should not be transformed. Defaults
      *                     to an empty set.
      * @return A list of results of type [T] obtained from the executed query.
      * @since 1.0.0
@@ -835,13 +835,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     inline fun <reified T : Any> executeSelectMultipleResultToSet(
         parameters: DataMap,
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): Set<T> {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -867,9 +867,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *                      handling specific exceptions in a custom way. Defaults to an empty map.
      * @param includeCause A flag indicating whether the original cause should be included
      *                     when exceptions are transformed. Defaults to true.
-     * @param overwriteOnly A set of exception types that should only be transformed if they are
+     * @param only A set of exception types that should only be transformed if they are
      *                      explicitly listed here. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be transformed. Defaults
+     * @param except A set of exception types that should not be transformed. Defaults
      *                     to an empty set.
      * @return A list of results of type [T] obtained from the executed query.
      * @since 1.0.0
@@ -878,13 +878,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     inline fun <reified T : Any, C : MutableCollection<T>> executeSelectMultipleResultTo(
         collection: C,
         parameters: List<Any> = emptyList(),
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): C {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -914,9 +914,9 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      *                      handling specific exceptions in a custom way. Defaults to an empty map.
      * @param includeCause A flag indicating whether the original cause should be included
      *                     when exceptions are transformed. Defaults to true.
-     * @param overwriteOnly A set of exception types that should only be transformed if they are
+     * @param only A set of exception types that should only be transformed if they are
      *                      explicitly listed here. Defaults to an empty set.
-     * @param notOverwrite A set of exception types that should not be transformed. Defaults
+     * @param except A set of exception types that should not be transformed. Defaults
      *                     to an empty set.
      * @return A list of results of type [T] obtained from the executed query.
      * @since 1.0.0
@@ -925,13 +925,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     inline fun <reified T : Any, C : MutableCollection<T>> executeSelectMultipleResultTo(
         collection: C,
         parameters: DataMap,
-        noinline defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        noinline defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): C {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(
                 value,
                 T::class.java
@@ -953,8 +953,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @param defaultException A lambda function to transform any exception into a specific throwable. Defaults to a `DatabaseOperationException`.
      * @param specificCases A map of specific exception types and their corresponding transformers. Defaults to an empty map.
      * @param includeCause Determines whether the original cause of the exception should be included. Defaults to true.
-     * @param overwriteOnly A set of exception classes for which the default exception transformation is strictly applied. Defaults to an empty set.
-     * @param notOverwrite A set of exception classes to exclude from being overwritten by the default exception transformation. Defaults to an empty set.
+     * @param only A set of exception classes for which the default exception transformation is strictly applied. Defaults to an empty set.
+     * @param except A set of exception classes to exclude from being overwritten by the default exception transformation. Defaults to an empty set.
      * @return The number of rows affected by the update query.
      * @since 1.0.0
      */
@@ -962,13 +962,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     fun executeUpdate(
         parameters: List<Any> = emptyList(),
-        defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): Int {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(value)
             parameters.forEachIndexed { i, it -> nativeQuery.setParameter(i + 1, it) }
             nativeQuery.executeUpdate()
@@ -981,8 +981,8 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
      * @param defaultException A lambda function to transform any exception into a specific throwable. Defaults to a `DatabaseOperationException`.
      * @param specificCases A map of specific exception types and their corresponding transformers. Defaults to an empty map.
      * @param includeCause Determines whether the original cause of the exception should be included. Defaults to true.
-     * @param overwriteOnly A set of exception classes for which the default exception transformation is strictly applied. Defaults to an empty set.
-     * @param notOverwrite A set of exception classes to exclude from being overwritten by the default exception transformation. Defaults to an empty set.
+     * @param only A set of exception classes for which the default exception transformation is strictly applied. Defaults to an empty set.
+     * @param except A set of exception classes to exclude from being overwritten by the default exception transformation. Defaults to an empty set.
      * @return The number of rows affected by the update query.
      * @since 1.0.0
      */
@@ -990,13 +990,13 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
     context(entityManager: EntityManager)
     fun executeUpdate(
         parameters: DataMap,
-        defaultException: ThrowableTransformer = { _ -> DatabaseOperationException(this) },
-        specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(),
+        defaultException: ExceptionTransformer = { _ -> DatabaseOperationException(this) },
+        specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(),
         includeCause: Boolean = true,
-        overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-        notOverwrite: Set<KClass<out Throwable>> = emptySet()
+        only: Set<KClass<out Exception>> = emptySet(),
+        except: Set<KClass<out Exception>> = emptySet()
     ): Int {
-        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, overwriteOnly = overwriteOnly, notOverwrite = notOverwrite) {
+        return tryOrThrow(defaultException, specificCases = specificCases, includeCause = includeCause, only = only, except = except) {
             val nativeQuery = entityManager.createNativeQuery(value)
             parameters.mapKeys { if (it.key startsWith Char.COLON) it.key.drop(1) else it.key }.forEach(nativeQuery::setParameter)
             nativeQuery.executeUpdate()

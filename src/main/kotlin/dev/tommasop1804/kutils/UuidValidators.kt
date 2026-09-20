@@ -33,7 +33,7 @@ import kotlin.uuid.Uuid
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)))
     return this
 }
 /**
@@ -53,7 +53,7 @@ fun UUID.validateVersion(version: UuidVersion, causeOf: Transformer<UUID, Throwa
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null, lazyMessage: Transformer<UUID, Any>): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -77,7 +77,7 @@ fun UUID.validateVersion(version: UuidVersion, causeOf: Transformer<UUID, Throwa
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -97,7 +97,7 @@ fun UUID.validateVersion(version: UuidVersion, property: KProperty<*>?, variable
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -116,7 +116,7 @@ fun UUID.validateVersion(version: UuidVersion, property: KProperty<*>?, variable
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -134,7 +134,7 @@ fun UUID.validateVersion(version: UuidVersion, callable: KFunction<*>?, paramete
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -152,7 +152,7 @@ fun UUID.validateVersion(version: UuidVersion, callable: KFunction<*>?, paramete
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -170,7 +170,7 @@ fun UUID.validateVersion(version: UuidVersion, callableName: String?, parameterN
  */
 @IgnorableReturnValue
 fun UUID.validateVersion(version: UuidVersion, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UUID, Throwable>? = null, cause: Transformer<UUID, Throwable>? = null): UUID {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 
@@ -190,7 +190,7 @@ fun UUID.validateVersion(version: UuidVersion, callableName: String?, parameter:
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Uuid is not an uuid of version ${version.number}.", cause?.invoke(this)))
     return this
 }
 /**
@@ -210,7 +210,7 @@ fun Uuid.validateVersion(version: UuidVersion, causeOf: Transformer<Uuid, Throwa
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null, lazyMessage: Transformer<Uuid, Any>): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -234,7 +234,7 @@ fun Uuid.validateVersion(version: UuidVersion, causeOf: Transformer<Uuid, Throwa
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -254,7 +254,7 @@ fun Uuid.validateVersion(version: UuidVersion, property: KProperty<*>?, variable
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -273,7 +273,7 @@ fun Uuid.validateVersion(version: UuidVersion, property: KProperty<*>?, variable
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -291,7 +291,7 @@ fun Uuid.validateVersion(version: UuidVersion, callable: KFunction<*>?, paramete
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -309,7 +309,7 @@ fun Uuid.validateVersion(version: UuidVersion, callable: KFunction<*>?, paramete
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }
 /**
@@ -327,6 +327,6 @@ fun Uuid.validateVersion(version: UuidVersion, callableName: String?, parameterN
  */
 @IgnorableReturnValue
 fun Uuid.validateVersion(version: UuidVersion, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Uuid, Throwable>? = null, cause: Transformer<Uuid, Throwable>? = null): Uuid {
-    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
+    if (this.version != version) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not an uuid of version ${version.number}", cause?.invoke(this)))
     return this
 }

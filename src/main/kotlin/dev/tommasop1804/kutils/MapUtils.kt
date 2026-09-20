@@ -740,7 +740,7 @@ fun <K, V> Map<K, V>.firstOr(default: Supplier<Pair<K, V>>, predicate: Predicate
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
-    return entries.firstOr({ default().toMapEntry() }, predicate)
+    return entries.findFirstOr({ default().toMapEntry() }, predicate)
 }
 /**
  * Returns the first entry in the map that matches the given predicate, or throws an exception

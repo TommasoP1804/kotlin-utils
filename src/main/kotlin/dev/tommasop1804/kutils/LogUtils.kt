@@ -124,7 +124,7 @@ enum class LogLevel(val levelInt: Int) {
      * @throws NoSuchEntryException If the `levelName` does not correspond to a valid SLF4J `Level`.
      * @since 1.0.0
      */
-    fun toSlf4jLevel() = tryOrThrow({ -> NoSuchEntryException(Level::class, this) }) {
+    fun toSlf4jLevel() = tryOrThrow({ NoSuchEntryException(Level::class, this) }) {
         Level.valueOf(levelName)
     }
     /**

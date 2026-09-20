@@ -357,7 +357,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
          */
         fun String.headerDateToInstant(): Instant =
             tryOr({
-                tryOrThrow({ -> MalformedInputException(Instant::class) }) {
+                tryOrThrow({ MalformedInputException(Instant::class) }) {
                     if (ISO_DATE_TIME_STANDARD_VALIDATOR(this)) return@tryOrThrow Instant(this)()
                     val splitted = this / Char.SPACE
                     val day = splitted[1].toInt()

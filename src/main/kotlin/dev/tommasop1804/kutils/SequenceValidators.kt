@@ -33,7 +33,7 @@ import kotlin.reflect.KProperty
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is empty.", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The sequence is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -50,7 +50,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? 
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -70,7 +70,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? 
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -87,7 +87,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableNam
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -105,7 +105,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: K
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -122,7 +122,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterNa
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -139,7 +139,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: 
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -156,7 +156,7 @@ fun <T : Sequence<E>, E> T.validateNotEmpty(callableName: String?, parameterName
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -178,7 +178,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throw
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is null or empty.", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The sequence is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -198,7 +198,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throw
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -220,7 +220,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, vari
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -242,7 +242,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, vari
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -263,7 +263,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, para
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -285,7 +285,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, para
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -307,7 +307,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parame
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -332,7 +332,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parame
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -347,7 +347,7 @@ fun <T : Sequence<E>?, E> T.validateNotNullOrEmpty(callableName: String?, parame
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is not empty.", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is not empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The sequence is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -366,7 +366,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = n
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -382,7 +382,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = n
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -403,7 +403,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: 
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -420,7 +420,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KPro
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -437,7 +437,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName:
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -454,7 +454,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KPa
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -473,7 +473,7 @@ fun <T : Sequence<E>, E> T.validateEmpty(callableName: String?, parameterName: S
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -494,7 +494,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwabl
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The sequence is not null or empty.", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The sequence is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -519,7 +519,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwabl
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -543,7 +543,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variabl
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -564,7 +564,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, variabl
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -585,7 +585,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, paramet
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -606,7 +606,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, paramet
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -628,7 +628,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -650,7 +650,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 
@@ -670,7 +670,7 @@ fun <T : Sequence<E>?, E> T.validateNullOrEmpty(callableName: String?, parameter
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException("$element is not in the sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$element is not in the sequence.", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException("$element is not in the sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$element is not in the sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -688,7 +688,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -708,7 +708,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -727,7 +727,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -746,7 +746,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -766,7 +766,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -785,7 +785,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -804,7 +804,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateContains(element: E, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -822,7 +822,7 @@ fun <T : Sequence<E>, E> T.validateContains(element: E, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException("$element is in the sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$element is in the sequence.", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException("$element is in the sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$element is in the sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -840,7 +840,7 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -859,7 +859,7 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -878,7 +878,7 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -897,7 +897,7 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -914,7 +914,7 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -933,7 +933,7 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -952,6 +952,6 @@ fun <T : Sequence<E>, E> T.validateNotContains(element: E, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : Sequence<E>, E> T.validateNotContains(element: E, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)))
     return this
 }

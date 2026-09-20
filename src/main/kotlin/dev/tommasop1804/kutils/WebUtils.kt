@@ -404,7 +404,7 @@ fun HttpRequest.Builder.timeout(timeout: Duration): HttpRequest.Builder =
  * @since 4.7.0
  */
 fun HttpRequest.Builder.version(version: HttpVersion): HttpRequest.Builder =
-    tryOrThrow({ -> UnsupportedOperationException("Cannot use that version of HTTP") }, overwriteOnly = NoSuchEntryException::class) {
+    tryOrThrow({ UnsupportedOperationException("Cannot use that version of HTTP") }, only = setOf(NoSuchEntryException::class)) {
         version(version.toJavaHttpVersion())
     }
 

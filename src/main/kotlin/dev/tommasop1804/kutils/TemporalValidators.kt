@@ -74,7 +74,7 @@ fun <T> T.validateBefore(other: T, causeOf: Transformer<T, Throwable>? = null, c
     if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is not before $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not before $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -91,7 +91,7 @@ fun <T> T.validateBefore(other: T, causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T> T.validateBefore(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -111,7 +111,7 @@ fun <T> T.validateBefore(other: T, causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T> T.validateBefore(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not before $other", cause?.invoke(this)))
+    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -129,7 +129,7 @@ fun <T> T.validateBefore(other: T, property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun <T> T.validateBefore(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not before $other", cause?.invoke(this)))
+    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -150,7 +150,7 @@ fun <T> T.validateBefore(other: T, property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun <T> T.validateBefore(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not before $other", cause?.invoke(this)))
+    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -174,7 +174,7 @@ fun <T> T.validateBefore(other: T, callable: KFunction<*>?, parameter: KParamete
         parameter,
         message ?: "is not before $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not before $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -193,7 +193,7 @@ fun <T> T.validateBefore(other: T, callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun <T> T.validateBefore(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not before $other", cause?.invoke(this)))
+    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -212,7 +212,7 @@ fun <T> T.validateBefore(other: T, callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun <T> T.validateBefore(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).initCause(
+    if (!checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not before $other", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is not before $other", cause?.invoke(this))
     )
     return this
@@ -233,7 +233,7 @@ fun <T> T.validateAfter(other: T, causeOf: Transformer<T, Throwable>? = null, ca
     if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is not after $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not after $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -251,7 +251,7 @@ fun <T> T.validateAfter(other: T, causeOf: Transformer<T, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun <T> T.validateAfter(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -272,7 +272,7 @@ fun <T> T.validateAfter(other: T, causeOf: Transformer<T, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun <T> T.validateAfter(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not after $other", cause?.invoke(this)))
+    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -291,7 +291,7 @@ fun <T> T.validateAfter(other: T, property: KProperty<*>?, variableName: String?
  */
 @IgnorableReturnValue
 fun <T> T.validateAfter(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not after $other", cause?.invoke(this)))
+    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -310,7 +310,7 @@ fun <T> T.validateAfter(other: T, property: KProperty<*>?, variable: KProperty<*
  */
 @IgnorableReturnValue
 fun <T> T.validateAfter(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not after $other", cause?.invoke(this)))
+    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -333,7 +333,7 @@ fun <T> T.validateAfter(other: T, callable: KFunction<*>?, parameter: KParameter
         parameter,
         message ?: "is not after $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not after $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -355,7 +355,7 @@ fun <T> T.validateAfter(other: T, callable: KFunction<*>?, parameter: KParameter
  */
 @IgnorableReturnValue
 fun <T> T.validateAfter(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not after $other", cause?.invoke(this)))
+    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -376,7 +376,7 @@ fun <T> T.validateAfter(other: T, callableName: String?, parameterName: String? 
  */
 @IgnorableReturnValue
 fun <T> T.validateAfter(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).initCause(
+    if (!checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not after $other", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is not after $other", cause?.invoke(this))
     )
     return this
@@ -397,7 +397,7 @@ fun <T> T.validateNotBefore(other: T, causeOf: Transformer<T, Throwable>? = null
     if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is after to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is before $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -414,7 +414,7 @@ fun <T> T.validateNotBefore(other: T, causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T> T.validateNotBefore(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -433,7 +433,7 @@ fun <T> T.validateNotBefore(other: T, causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T> T.validateNotBefore(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is before $other", cause?.invoke(this)))
+    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -452,7 +452,7 @@ fun <T> T.validateNotBefore(other: T, property: KProperty<*>?, variableName: Str
  */
 @IgnorableReturnValue
 fun <T> T.validateNotBefore(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not before $other", cause?.invoke(this)))
+    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -473,7 +473,7 @@ fun <T> T.validateNotBefore(other: T, property: KProperty<*>?, variable: KProper
  */
 @IgnorableReturnValue
 fun <T> T.validateNotBefore(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is before $other", cause?.invoke(this)))
+    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -497,7 +497,7 @@ fun <T> T.validateNotBefore(other: T, callable: KFunction<*>?, parameter: KParam
         parameter,
         message ?: "is before $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is before $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -516,7 +516,7 @@ fun <T> T.validateNotBefore(other: T, callable: KFunction<*>?, parameter: KParam
  */
 @IgnorableReturnValue
 fun <T> T.validateNotBefore(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is before $other", cause?.invoke(this)))
+    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is before $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -535,7 +535,7 @@ fun <T> T.validateNotBefore(other: T, callableName: String?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T> T.validateNotBefore(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).initCause(
+    if (checkIsBefore(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is before $other", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is before $other", cause?.invoke(this))
     )
     return this
@@ -558,7 +558,7 @@ fun <T> T.validateNotAfter(other: T, causeOf: Transformer<T, Throwable>? = null,
     if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is after to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is after $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -576,7 +576,7 @@ fun <T> T.validateNotAfter(other: T, causeOf: Transformer<T, Throwable>? = null,
  */
 @IgnorableReturnValue
 fun <T> T.validateNotAfter(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -595,7 +595,7 @@ fun <T> T.validateNotAfter(other: T, causeOf: Transformer<T, Throwable>? = null,
  */
 @IgnorableReturnValue
 fun <T> T.validateNotAfter(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is after $other", cause?.invoke(this)))
+    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -614,7 +614,7 @@ fun <T> T.validateNotAfter(other: T, property: KProperty<*>?, variableName: Stri
  */
 @IgnorableReturnValue
 fun <T> T.validateNotAfter(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not after $other", cause?.invoke(this)))
+    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -637,7 +637,7 @@ fun <T> T.validateNotAfter(other: T, property: KProperty<*>?, variable: KPropert
  */
 @IgnorableReturnValue
 fun <T> T.validateNotAfter(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is after $other", cause?.invoke(this)))
+    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -661,7 +661,7 @@ fun <T> T.validateNotAfter(other: T, callable: KFunction<*>?, parameter: KParame
         parameter,
         message ?: "is after $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is after $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -680,7 +680,7 @@ fun <T> T.validateNotAfter(other: T, callable: KFunction<*>?, parameter: KParame
  */
 @IgnorableReturnValue
 fun <T> T.validateNotAfter(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is after $other", cause?.invoke(this)))
+    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is after $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -699,7 +699,7 @@ fun <T> T.validateNotAfter(other: T, callableName: String?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun <T> T.validateNotAfter(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).initCause(
+    if (checkIsAfter(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is after $other", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is after $other", cause?.invoke(this))
     )
     return this
@@ -724,7 +724,7 @@ fun <T> T.validateEquals(other: T, causeOf: Transformer<T, Throwable>? = null, c
     if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is not equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not equal to $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -745,7 +745,7 @@ fun <T> T.validateEquals(other: T, causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -767,7 +767,7 @@ fun <T> T.validateEquals(other: T, causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not equal to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -786,7 +786,7 @@ fun <T> T.validateEquals(other: T, property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not equal to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -806,7 +806,7 @@ fun <T> T.validateEquals(other: T, property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not equal to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -834,7 +834,7 @@ fun <T> T.validateEquals(other: T, callable: KFunction<*>?, parameter: KParamete
         parameter,
         message ?: "is not equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not equal to $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -853,7 +853,7 @@ fun <T> T.validateEquals(other: T, callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not equal to $other", cause?.invoke(this)))
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -872,7 +872,7 @@ fun <T> T.validateEquals(other: T, callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun <T> T.validateEquals(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).initCause(
+    if (!checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is not equal to $other", cause?.invoke(this))
     )
     return this
@@ -895,7 +895,7 @@ fun <T> T.validateNotEquals(other: T, causeOf: Transformer<T, Throwable>? = null
     if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is equal to $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -915,7 +915,7 @@ fun <T> T.validateNotEquals(other: T, causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -934,7 +934,7 @@ fun <T> T.validateNotEquals(other: T, causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is equal to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -956,7 +956,7 @@ fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variableName: Str
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is equal to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -975,7 +975,7 @@ fun <T> T.validateNotEquals(other: T, property: KProperty<*>?, variable: KProper
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is equal to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -1000,7 +1000,7 @@ fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameter: KParam
         parameter,
         message ?: "is equal to $other",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is equal to $other", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -1019,7 +1019,7 @@ fun <T> T.validateNotEquals(other: T, callable: KFunction<*>?, parameter: KParam
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is equal to $other", cause?.invoke(this)))
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is equal to $other", cause?.invoke(this)))
     return this
 }
 /**
@@ -1041,7 +1041,7 @@ fun <T> T.validateNotEquals(other: T, callableName: String?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T> T.validateNotEquals(other: T, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).initCause(
+    if (checkEquality(other)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is equal to $other", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is equal to $other", cause?.invoke(this))
     )
     return this
@@ -1065,7 +1065,7 @@ fun <T> T.validateIn(interval: TemporalInterval, causeOf: Transformer<T, Throwab
     if (this !in interval) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is not in interval $interval",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is not in interval $this", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is not in interval $this", cause?.invoke(this)))
     return this
 }
 /**
@@ -1085,7 +1085,7 @@ fun <T> T.validateIn(interval: TemporalInterval, causeOf: Transformer<T, Throwab
  */
 @IgnorableReturnValue
 fun <T> T.validateIn(interval: TemporalInterval, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (this !in interval) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1105,7 +1105,7 @@ fun <T> T.validateIn(interval: TemporalInterval, causeOf: Transformer<T, Throwab
  */
 @IgnorableReturnValue
 fun <T> T.validateIn(interval: TemporalInterval, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this !in interval) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not in interval $interval", cause?.invoke(this)))
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1124,7 +1124,7 @@ fun <T> T.validateIn(interval: TemporalInterval, property: KProperty<*>?, variab
  */
 @IgnorableReturnValue
 fun <T> T.validateIn(interval: TemporalInterval, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this !in interval) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not in interval $interval", cause?.invoke(this)))
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1143,7 +1143,7 @@ fun <T> T.validateIn(interval: TemporalInterval, property: KProperty<*>?, variab
  */
 @IgnorableReturnValue
 fun <T> T.validateIn(interval: TemporalInterval, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)))
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1167,7 +1167,7 @@ fun <T> T.validateIn(interval: TemporalInterval, callable: KFunction<*>?, parame
         parameter,
         message ?: "is not in interval $interval",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not in interval $interval", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1186,7 +1186,7 @@ fun <T> T.validateIn(interval: TemporalInterval, callable: KFunction<*>?, parame
  */
 @IgnorableReturnValue
 fun <T> T.validateIn(interval: TemporalInterval, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)))
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1205,7 +1205,7 @@ fun <T> T.validateIn(interval: TemporalInterval, callableName: String?, paramete
  */
 @IgnorableReturnValue
 fun <T> T.validateIn(interval: TemporalInterval, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(
+    if (this !in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is not in interval $interval", cause?.invoke(this))
     )
     return this
@@ -1226,7 +1226,7 @@ fun <T : Temporal> T.validateNotIn(interval: TemporalInterval, causeOf: Transfor
     if (this in interval) throw if (causeOf == null) ValidationFailedException(
         "Temporal $this is in interval $interval",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException("Temporal $this is in interval $this", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException("Temporal $this is in interval $this", cause?.invoke(this)))
     return this
 }
 /**
@@ -1243,7 +1243,7 @@ fun <T : Temporal> T.validateNotIn(interval: TemporalInterval, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <T> T.validateNotIn(interval: TemporalInterval, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T where T : Comparable<T>, T : Temporal {
-    if (this in interval) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1262,7 +1262,7 @@ fun <T> T.validateNotIn(interval: TemporalInterval, causeOf: Transformer<T, Thro
  */
 @IgnorableReturnValue
 fun <T> T.validateNotIn(interval: TemporalInterval, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this in interval) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is in interval $interval", cause?.invoke(this)))
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1281,7 +1281,7 @@ fun <T> T.validateNotIn(interval: TemporalInterval, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun <T> T.validateNotIn(interval: TemporalInterval, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this in interval) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is in interval $interval", cause?.invoke(this)))
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1300,7 +1300,7 @@ fun <T> T.validateNotIn(interval: TemporalInterval, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun <T> T.validateNotIn(interval: TemporalInterval, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this in interval) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is in interval $interval", cause?.invoke(this)))
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1324,7 +1324,7 @@ fun <T> T.validateNotIn(interval: TemporalInterval, callable: KFunction<*>?, par
         parameter,
         message ?: "is not in interval $interval",
         cause?.invoke(this)
-    ) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is in interval $interval", cause?.invoke(this)))
+    ) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1342,7 +1342,7 @@ fun <T> T.validateNotIn(interval: TemporalInterval, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun <T> T.validateNotIn(interval: TemporalInterval, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is in interval $interval", cause?.invoke(this)))
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is in interval $interval", cause?.invoke(this)))
     return this
 }
 /**
@@ -1361,7 +1361,7 @@ fun <T> T.validateNotIn(interval: TemporalInterval, callableName: String?, param
  */
 @IgnorableReturnValue
 fun <T> T.validateNotIn(interval: TemporalInterval, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T where T : Comparable<T>, T : Temporal {
-    if (this in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).initCause(
+    if (this in interval) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is in interval $interval", cause?.invoke(this)) else causeOf(this).withRootCause(
         ValidationFailedException(callableName, parameter, message ?: "is in interval $interval", cause?.invoke(this))
     )
     return this

@@ -1032,8 +1032,8 @@ infix fun <T> Sequence<T>.getOrNull(index: Int) = tryOrNull { get(index) }
  *
  * @since 1.0.0
  */
-fun <E> Sequence<E>.getOrThrow(index: Int, lazyException: ThrowableSupplier = { NoSuchElementException("Index $index not present") }): E =
-    tryOrThrow(lazyException) { take(index).first() }
+fun <E> Sequence<E>.getOrThrow(index: Int, lazyException: ExceptionSupplier = { NoSuchElementException("Index $index not present") }): E =
+    runCatching { take(index).first() }.getOrThrow(lazyException = lazyException)
 
 /**
  * Sorts the elements of the sequence based on the specified sorting direction.

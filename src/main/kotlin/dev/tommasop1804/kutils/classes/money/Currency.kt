@@ -219,7 +219,7 @@ enum class Currency (
 		 * @return The matching entry for the given ISO code.
 		 * @since 1.0.0
 		 */
-		infix fun of(iso: String) = entries.firstOr({ ofNumeric(iso) }) { it?.name == +iso }
+		infix fun of(iso: String) = entries.findFirstOr({ ofNumeric(iso) }) { it?.name == +iso }
 
         /**
 		 * Finds an entry in the collection with the specified numeric code.

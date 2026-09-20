@@ -28,7 +28,7 @@ import kotlin.reflect.KProperty
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException("$this is not successful.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$this is not successful.", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException("$this is not successful.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$this is not successful.", cause?.invoke(this)))
     return this
 }
 /**
@@ -44,7 +44,7 @@ fun HttpStatus.validateSuccessfull(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null, lazyMessage: Transformer<HttpStatus, Any>): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -61,7 +61,7 @@ fun HttpStatus.validateSuccessfull(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not successful", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not successful", cause?.invoke(this)))
     return this
 }
 /**
@@ -80,7 +80,7 @@ fun HttpStatus.validateSuccessfull(property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not successful", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not successful", cause?.invoke(this)))
     return this
 }
 /**
@@ -97,7 +97,7 @@ fun HttpStatus.validateSuccessfull(property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not successful", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not successful", cause?.invoke(this)))
     return this
 }
 /**
@@ -120,7 +120,7 @@ fun HttpStatus.validateSuccessfull(callable: KFunction<*>?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not successful", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not successful", cause?.invoke(this)))
     return this
 }
 /**
@@ -137,7 +137,7 @@ fun HttpStatus.validateSuccessfull(callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not successful", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not successful", cause?.invoke(this)))
     return this
 }
 /**
@@ -154,7 +154,7 @@ fun HttpStatus.validateSuccessfull(callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateSuccessfull(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not successful", cause?.invoke(this)))
+    if (!isSuccessful) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not successful", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not successful", cause?.invoke(this)))
     return this
 }
 
@@ -170,7 +170,7 @@ fun HttpStatus.validateSuccessfull(callableName: String?, parameter: KParameter?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException("$this is not an error.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$this is not an error.", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException("$this is not an error.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$this is not an error.", cause?.invoke(this)))
     return this
 }
 /**
@@ -186,7 +186,7 @@ fun HttpStatus.validateError(causeOf: Transformer<HttpStatus, Throwable>? = null
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null, lazyMessage: Transformer<HttpStatus, Any>): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -206,7 +206,7 @@ fun HttpStatus.validateError(causeOf: Transformer<HttpStatus, Throwable>? = null
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not an error", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not an error", cause?.invoke(this)))
     return this
 }
 /**
@@ -224,7 +224,7 @@ fun HttpStatus.validateError(property: KProperty<*>?, variableName: String? = nu
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not an error", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not an error", cause?.invoke(this)))
     return this
 }
 /**
@@ -245,7 +245,7 @@ fun HttpStatus.validateError(property: KProperty<*>?, variable: KProperty<*>?, m
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not an error", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not an error", cause?.invoke(this)))
     return this
 }
 /**
@@ -266,7 +266,7 @@ fun HttpStatus.validateError(callable: KFunction<*>?, parameterName: String? = n
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not an error", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not an error", cause?.invoke(this)))
     return this
 }
 /**
@@ -284,7 +284,7 @@ fun HttpStatus.validateError(callable: KFunction<*>?, parameter: KParameter?, me
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not an error", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not an error", cause?.invoke(this)))
     return this
 }
 /**
@@ -302,7 +302,7 @@ fun HttpStatus.validateError(callableName: String?, parameterName: String? = nul
  */
 @IgnorableReturnValue
 fun HttpStatus.validateError(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isError) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not an error", cause?.invoke(this)))
+    if (!isError) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not an error", cause?.invoke(this)))
     return this
 }
 
@@ -317,7 +317,7 @@ fun HttpStatus.validateError(callableName: String?, parameter: KParameter?, mess
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException("$this is not a client error.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$this is not a client error.", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException("$this is not a client error.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$this is not a client error.", cause?.invoke(this)))
     return this
 }
 /**
@@ -332,7 +332,7 @@ fun HttpStatus.validateClientError(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null, lazyMessage: Transformer<HttpStatus, Any>): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -349,7 +349,7 @@ fun HttpStatus.validateClientError(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not a client error", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not a client error", cause?.invoke(this)))
     return this
 }
 /**
@@ -369,7 +369,7 @@ fun HttpStatus.validateClientError(property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not a client error", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not a client error", cause?.invoke(this)))
     return this
 }
 /**
@@ -386,7 +386,7 @@ fun HttpStatus.validateClientError(property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not a client error", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not a client error", cause?.invoke(this)))
     return this
 }
 /**
@@ -408,7 +408,7 @@ fun HttpStatus.validateClientError(callable: KFunction<*>?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not a client error", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not a client error", cause?.invoke(this)))
     return this
 }
 /**
@@ -427,7 +427,7 @@ fun HttpStatus.validateClientError(callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not a client error", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not a client error", cause?.invoke(this)))
     return this
 }
 /**
@@ -445,7 +445,7 @@ fun HttpStatus.validateClientError(callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateClientError(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not a client error", cause?.invoke(this)))
+    if (!isClientError) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not a client error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not a client error", cause?.invoke(this)))
     return this
 }
 
@@ -464,7 +464,7 @@ fun HttpStatus.validateClientError(callableName: String?, parameter: KParameter?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException("$this is not a server error.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$this is not a server error.", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException("$this is not a server error.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$this is not a server error.", cause?.invoke(this)))
     return this
 }
 /**
@@ -484,7 +484,7 @@ fun HttpStatus.validateServerError(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null, lazyMessage: Transformer<HttpStatus, Any>): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -503,7 +503,7 @@ fun HttpStatus.validateServerError(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not a server error", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not a server error", cause?.invoke(this)))
     return this
 }
 /**
@@ -525,7 +525,7 @@ fun HttpStatus.validateServerError(property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not a server error", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not a server error", cause?.invoke(this)))
     return this
 }
 /**
@@ -543,7 +543,7 @@ fun HttpStatus.validateServerError(property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not a server error", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not a server error", cause?.invoke(this)))
     return this
 }
 /**
@@ -560,7 +560,7 @@ fun HttpStatus.validateServerError(callable: KFunction<*>?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not a server error", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not a server error", cause?.invoke(this)))
     return this
 }
 /**
@@ -577,7 +577,7 @@ fun HttpStatus.validateServerError(callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not a server error", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not a server error", cause?.invoke(this)))
     return this
 }
 /**
@@ -595,7 +595,7 @@ fun HttpStatus.validateServerError(callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateServerError(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not a server error", cause?.invoke(this)))
+    if (!isServerError) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not a server error", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not a server error", cause?.invoke(this)))
     return this
 }
 
@@ -609,7 +609,7 @@ fun HttpStatus.validateServerError(callableName: String?, parameter: KParameter?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException("$this is not an informational code.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$this is not an informational code.", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException("$this is not an informational code.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$this is not an informational code.", cause?.invoke(this)))
     return this
 }
 /**
@@ -624,7 +624,7 @@ fun HttpStatus.validateInformational(causeOf: Transformer<HttpStatus, Throwable>
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null, lazyMessage: Transformer<HttpStatus, Any>): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -644,7 +644,7 @@ fun HttpStatus.validateInformational(causeOf: Transformer<HttpStatus, Throwable>
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not an informational code", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not an informational code", cause?.invoke(this)))
     return this
 }
 /**
@@ -662,7 +662,7 @@ fun HttpStatus.validateInformational(property: KProperty<*>?, variableName: Stri
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not an informational code", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not an informational code", cause?.invoke(this)))
     return this
 }
 /**
@@ -682,7 +682,7 @@ fun HttpStatus.validateInformational(property: KProperty<*>?, variable: KPropert
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not an informational code", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not an informational code", cause?.invoke(this)))
     return this
 }
 /**
@@ -700,7 +700,7 @@ fun HttpStatus.validateInformational(callable: KFunction<*>?, parameterName: Str
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not an informational code", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not an informational code", cause?.invoke(this)))
     return this
 }
 /**
@@ -717,7 +717,7 @@ fun HttpStatus.validateInformational(callable: KFunction<*>?, parameter: KParame
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not an informational code", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not an informational code", cause?.invoke(this)))
     return this
 }
 /**
@@ -734,7 +734,7 @@ fun HttpStatus.validateInformational(callableName: String?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun HttpStatus.validateInformational(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not an informational code", cause?.invoke(this)))
+    if (!isInformational) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not an informational code", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not an informational code", cause?.invoke(this)))
     return this
 }
 
@@ -752,7 +752,7 @@ fun HttpStatus.validateInformational(callableName: String?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException("$this is not a redirection.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$this is not a redirection.", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException("$this is not a redirection.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$this is not a redirection.", cause?.invoke(this)))
     return this
 }
 /**
@@ -771,7 +771,7 @@ fun HttpStatus.validateRedirection(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null, lazyMessage: Transformer<HttpStatus, Any>): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -792,7 +792,7 @@ fun HttpStatus.validateRedirection(causeOf: Transformer<HttpStatus, Throwable>? 
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not a redirection", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not a redirection", cause?.invoke(this)))
     return this
 }
 /**
@@ -808,7 +808,7 @@ fun HttpStatus.validateRedirection(property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not a redirection", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not a redirection", cause?.invoke(this)))
     return this
 }
 /**
@@ -828,7 +828,7 @@ fun HttpStatus.validateRedirection(property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not a redirection", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not a redirection", cause?.invoke(this)))
     return this
 }
 /**
@@ -851,7 +851,7 @@ fun HttpStatus.validateRedirection(callable: KFunction<*>?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not a redirection", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not a redirection", cause?.invoke(this)))
     return this
 }
 /**
@@ -870,7 +870,7 @@ fun HttpStatus.validateRedirection(callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not a redirection", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not a redirection", cause?.invoke(this)))
     return this
 }
 /**
@@ -887,6 +887,6 @@ fun HttpStatus.validateRedirection(callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun HttpStatus.validateRedirection(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<HttpStatus, Throwable>? = null, cause: Transformer<HttpStatus, Throwable>? = null): HttpStatus {
-    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not a redirection", cause?.invoke(this)))
+    if (!isRedirection) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not a redirection", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not a redirection", cause?.invoke(this)))
     return this
 }

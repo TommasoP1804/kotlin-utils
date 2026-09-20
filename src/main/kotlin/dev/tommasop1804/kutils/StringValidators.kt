@@ -30,7 +30,7 @@ import kotlin.reflect.KProperty
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The char sequence is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is empty.", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The char sequence is empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -51,7 +51,7 @@ fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -68,7 +68,7 @@ fun <T : CharSequence> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -85,7 +85,7 @@ fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variableName:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -102,7 +102,7 @@ fun <T : CharSequence> T.validateNotEmpty(property: KProperty<*>?, variable: KPr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -119,7 +119,7 @@ fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameterName
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -136,7 +136,7 @@ fun <T : CharSequence> T.validateNotEmpty(callable: KFunction<*>?, parameter: KP
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -154,7 +154,7 @@ fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameterName: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -174,7 +174,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwab
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -194,7 +194,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwab
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -216,7 +216,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variab
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -242,7 +242,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(property: KProperty<*>?, variab
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -265,7 +265,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parame
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -286,7 +286,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parame
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -308,7 +308,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, paramete
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -330,7 +330,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, paramete
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -344,7 +344,7 @@ fun <T : CharSequence?> T.validateNotNullOrEmpty(callableName: String?, paramete
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -364,7 +364,7 @@ fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -381,7 +381,7 @@ fun <T : CharSequence> T.validateEmpty(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -398,7 +398,7 @@ fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variableName: St
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -416,7 +416,7 @@ fun <T : CharSequence> T.validateEmpty(property: KProperty<*>?, variable: KPrope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -433,7 +433,7 @@ fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameterName: S
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -451,7 +451,7 @@ fun <T : CharSequence> T.validateEmpty(callable: KFunction<*>?, parameter: KPara
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -471,7 +471,7 @@ fun <T : CharSequence> T.validateEmpty(callableName: String?, parameterName: Str
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -492,7 +492,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -514,7 +514,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -537,7 +537,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variableN
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -562,7 +562,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(property: KProperty<*>?, variable:
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -583,7 +583,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -604,7 +604,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -624,7 +624,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameterNa
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -648,7 +648,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameter: 
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 
@@ -666,7 +666,7 @@ fun <T : CharSequence?> T.validateNullOrEmpty(callableName: String?, parameter: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException("The char sequence is blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is blank.", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException("The char sequence is blank.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -682,7 +682,7 @@ fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -702,7 +702,7 @@ fun <T : CharSequence> T.validateNotBlank(causeOf: Transformer<T, Throwable>? = 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -719,7 +719,7 @@ fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variableName:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -736,7 +736,7 @@ fun <T : CharSequence> T.validateNotBlank(property: KProperty<*>?, variable: KPr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -754,7 +754,7 @@ fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameterName
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -772,7 +772,7 @@ fun <T : CharSequence> T.validateNotBlank(callable: KFunction<*>?, parameter: KP
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -790,7 +790,7 @@ fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameterName: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)))
+    if (isBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -810,7 +810,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: Transformer<T, Throwab
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is null or blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -830,7 +830,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(causeOf: Transformer<T, Throwab
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -856,7 +856,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variab
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -877,7 +877,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(property: KProperty<*>?, variab
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -898,7 +898,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parame
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -920,7 +920,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callable: KFunction<*>?, parame
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -941,7 +941,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, paramete
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -967,7 +967,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, paramete
         (this@validateNotNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrBlank != null)
     }
-    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)))
+    if (isNullOrBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -984,7 +984,7 @@ fun <T : CharSequence?> T.validateNotNullOrBlank(callableName: String?, paramete
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is not blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1001,7 +1001,7 @@ fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1019,7 +1019,7 @@ fun <T : CharSequence> T.validateBlank(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1041,7 +1041,7 @@ fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variableName: St
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1059,7 +1059,7 @@ fun <T : CharSequence> T.validateBlank(property: KProperty<*>?, variable: KPrope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1077,7 +1077,7 @@ fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameterName: S
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1095,7 +1095,7 @@ fun <T : CharSequence> T.validateBlank(callable: KFunction<*>?, parameter: KPara
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1112,7 +1112,7 @@ fun <T : CharSequence> T.validateBlank(callableName: String?, parameterName: Str
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateBlank(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)))
+    if (isNotBlank()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1139,7 +1139,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(causeOf: Transformer<T, Throwable>
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The char sequence is not null or blank.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1163,7 +1163,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(causeOf: Transformer<T, Throwable>
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1186,7 +1186,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variableN
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1210,7 +1210,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(property: KProperty<*>?, variable:
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1235,7 +1235,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1259,7 +1259,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(callable: KFunction<*>?, parameter
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1281,7 +1281,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameterNa
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 /**
@@ -1305,7 +1305,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameter: 
         (this@validateNullOrBlank != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrBlank != null)
     }
-    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)))
+    if (isNotNullOrBlank) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not null or blank", cause?.invoke(this)))
     return this
 }
 
@@ -1322,7 +1322,7 @@ fun <T : CharSequence?> T.validateNullOrBlank(callableName: String?, parameter: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1339,7 +1339,7 @@ fun <T : CharSequence> T.validateContains(char: Char, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1358,7 +1358,7 @@ fun <T : CharSequence> T.validateContains(char: Char, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1376,7 +1376,7 @@ fun <T : CharSequence> T.validateContains(char: Char, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1395,7 +1395,7 @@ fun <T : CharSequence> T.validateContains(char: Char, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1414,7 +1414,7 @@ fun <T : CharSequence> T.validateContains(char: Char, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1433,7 +1433,7 @@ fun <T : CharSequence> T.validateContains(char: Char, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1452,7 +1452,7 @@ fun <T : CharSequence> T.validateContains(char: Char, callableName: String?, par
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1470,7 +1470,7 @@ fun <T : CharSequence> T.validateContains(char: Char, callableName: String?, par
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1489,7 +1489,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1509,7 +1509,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1527,7 +1527,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, property: KProperty<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1549,7 +1549,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, property: KProperty<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1568,7 +1568,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, callable: KFunction<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1586,7 +1586,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, callable: KFunction<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1606,7 +1606,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, callableName: String
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1624,7 +1624,7 @@ fun <T : CharSequence> T.validateContains(cs: CharSequence, callableName: String
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException("$regex is not in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$regex is not in the char sequence.", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException("$regex is not in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$regex is not in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1645,7 +1645,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1666,7 +1666,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $regex", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -1685,7 +1685,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $regex", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -1704,7 +1704,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -1723,7 +1723,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -1742,7 +1742,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -1763,7 +1763,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContains(regex: Regex, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)))
+    if (regex !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -1779,7 +1779,7 @@ fun <T : CharSequence> T.validateContains(regex: Regex, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$char is not in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1796,7 +1796,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1815,7 +1815,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1834,7 +1834,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, property: KPrope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1854,7 +1854,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, property: KPrope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1872,7 +1872,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callable: KFunct
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1893,7 +1893,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callable: KFunct
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1912,7 +1912,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callableName: St
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
+    if (char notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -1931,7 +1931,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(char: Char, callableName: St
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$cs is not in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1948,7 +1948,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, causeOf: T
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1967,7 +1967,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, causeOf: T
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -1986,7 +1986,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, property: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2005,7 +2005,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, property: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2024,7 +2024,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callable: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2043,7 +2043,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callable: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2062,7 +2062,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callableNa
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
+    if (cs notInIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2078,7 +2078,7 @@ fun <T : CharSequence> T.validateContainsIgnoreCase(cs: CharSequence, callableNa
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2098,7 +2098,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, causeOf: Transformer<T,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2120,7 +2120,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, causeOf: Transformer<T,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2139,7 +2139,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2158,7 +2158,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2179,7 +2179,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2198,7 +2198,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2217,7 +2217,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, callableName: String?, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)))
+    if (char in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2234,7 +2234,7 @@ fun <T : CharSequence> T.validateNotContains(char: Char, callableName: String?, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2251,7 +2251,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2270,7 +2270,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2289,7 +2289,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, property: KProper
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2309,7 +2309,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, property: KProper
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2328,7 +2328,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2346,7 +2346,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2365,7 +2365,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callableName: Str
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2381,7 +2381,7 @@ fun <T : CharSequence> T.validateNotContains(cs: CharSequence, callableName: Str
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException("$regex is in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$regex is in the char sequence.", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException("$regex is in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$regex is in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2398,7 +2398,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2417,7 +2417,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $regex", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -2436,7 +2436,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $regex", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -2455,7 +2455,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $regex", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -2475,7 +2475,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $regex", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -2494,7 +2494,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $regex", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -2517,7 +2517,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContains(regex: Regex, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (regex in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $regex", cause?.invoke(this)))
+    if (regex in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $regex", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $regex", cause?.invoke(this)))
     return this
 }
 /**
@@ -2533,7 +2533,7 @@ fun <T : CharSequence> T.validateNotContains(regex: Regex, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$char is in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2551,7 +2551,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, causeOf: Tran
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2570,7 +2570,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, causeOf: Tran
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2589,7 +2589,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, property: KPr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2608,7 +2608,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, property: KPr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2627,7 +2627,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callable: KFu
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2646,7 +2646,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callable: KFu
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2666,7 +2666,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callableName:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)))
+    if (char inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains char $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2685,7 +2685,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(char: Char, callableName:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$cs is in the char sequence.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2704,7 +2704,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, causeOf
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2723,7 +2723,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, causeOf
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2744,7 +2744,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, propert
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2764,7 +2764,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, propert
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2785,7 +2785,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2804,7 +2804,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -2823,7 +2823,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)))
+    if (cs inIgnoreCase this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $cs", cause?.invoke(this)))
     return this
 }
 
@@ -2840,7 +2840,7 @@ fun <T : CharSequence> T.validateNotContainsIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2858,7 +2858,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2876,7 +2876,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2895,7 +2895,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2914,7 +2914,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2935,7 +2935,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2954,7 +2954,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2973,7 +2973,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -2989,7 +2989,7 @@ fun <T : CharSequence> T.validateStartsWith(char: Char, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3006,7 +3006,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, causeOf: Transform
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3025,7 +3025,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, causeOf: Transform
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3044,7 +3044,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, property: KPropert
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3065,7 +3065,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, property: KPropert
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3084,7 +3084,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callable: KFunctio
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3103,7 +3103,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callable: KFunctio
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3124,7 +3124,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callableName: Stri
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3140,7 +3140,7 @@ fun <T : CharSequence> T.validateStartsWith(cs: CharSequence, callableName: Stri
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't start with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3157,7 +3157,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, causeOf: Trans
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3176,7 +3176,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, causeOf: Trans
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3195,7 +3195,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, property: KPro
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3214,7 +3214,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, property: KPro
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3233,7 +3233,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callable: KFun
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3252,7 +3252,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callable: KFun
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3272,7 +3272,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callableName: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3288,7 +3288,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(char: Char, callableName: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't start with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3305,7 +3305,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, causeOf:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3324,7 +3324,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, causeOf:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3343,7 +3343,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, property
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't start $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3362,7 +3362,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, property
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3381,7 +3381,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callable
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3401,7 +3401,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callable
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3420,7 +3420,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callable
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
+    if (this notStartsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't start with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3438,7 +3438,7 @@ fun <T : CharSequence> T.validateStartsWithIgnoreCase(cs: CharSequence, callable
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3455,7 +3455,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3474,7 +3474,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3493,7 +3493,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3512,7 +3512,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3531,7 +3531,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3550,7 +3550,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3569,7 +3569,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3585,7 +3585,7 @@ fun <T : CharSequence> T.validateNotStartsWith(char: Char, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3605,7 +3605,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, causeOf: Transf
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3624,7 +3624,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, causeOf: Transf
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3643,7 +3643,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, property: KProp
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3662,7 +3662,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, property: KProp
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3681,7 +3681,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callable: KFunc
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3700,7 +3700,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callable: KFunc
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3718,7 +3718,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callableName: S
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3734,7 +3734,7 @@ fun <T : CharSequence> T.validateNotStartsWith(cs: CharSequence, callableName: S
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence starts with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3751,7 +3751,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, causeOf: Tr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3770,7 +3770,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, causeOf: Tr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3789,7 +3789,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, property: K
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3808,7 +3808,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, property: K
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3829,7 +3829,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callable: K
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3848,7 +3848,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callable: K
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3867,7 +3867,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callableNam
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)))
+    if (this startsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "starts with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -3883,7 +3883,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(char: Char, callableNam
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence starts with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3900,7 +3900,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, cause
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3918,7 +3918,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, cause
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3937,7 +3937,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, prope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3955,7 +3955,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, prope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3974,7 +3974,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, calla
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -3993,7 +3993,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, calla
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4012,7 +4012,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, calla
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)))
+    if (this startsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "starts with $cs", cause?.invoke(this)))
     return this
 }
 
@@ -4029,7 +4029,7 @@ fun <T : CharSequence> T.validateNotStartsWithIgnoreCase(cs: CharSequence, calla
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4046,7 +4046,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4067,7 +4067,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4086,7 +4086,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4105,7 +4105,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4123,7 +4123,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4142,7 +4142,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4162,7 +4162,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, callableName: String?, par
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4179,7 +4179,7 @@ fun <T : CharSequence> T.validateEndsWith(char: Char, callableName: String?, par
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4196,7 +4196,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4218,7 +4218,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4236,7 +4236,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, property: KProperty<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4255,7 +4255,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, property: KProperty<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4276,7 +4276,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callable: KFunction<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4296,7 +4296,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callable: KFunction<
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4319,7 +4319,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callableName: String
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4335,7 +4335,7 @@ fun <T : CharSequence> T.validateEndsWith(cs: CharSequence, callableName: String
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't end with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4352,7 +4352,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4376,7 +4376,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4395,7 +4395,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, property: KPrope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4414,7 +4414,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, property: KPrope
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4433,7 +4433,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callable: KFunct
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4452,7 +4452,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callable: KFunct
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4472,7 +4472,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callableName: St
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4488,7 +4488,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(char: Char, callableName: St
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence doesn't end with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4505,7 +4505,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, causeOf: T
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4524,7 +4524,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, causeOf: T
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4543,7 +4543,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, property: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't end $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4566,7 +4566,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, property: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4585,7 +4585,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callable: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4604,7 +4604,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callable: 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4623,7 +4623,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callableNa
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
+    if (this notEndsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't end with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4639,7 +4639,7 @@ fun <T : CharSequence> T.validateEndsWithIgnoreCase(cs: CharSequence, callableNa
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4656,7 +4656,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, causeOf: Transformer<T,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4675,7 +4675,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, causeOf: Transformer<T,
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4694,7 +4694,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4713,7 +4713,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4732,7 +4732,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4751,7 +4751,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4770,7 +4770,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, callableName: String?, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWith char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4786,7 +4786,7 @@ fun <T : CharSequence> T.validateNotEndsWith(char: Char, callableName: String?, 
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4804,7 +4804,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4827,7 +4827,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4846,7 +4846,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, property: KProper
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4865,7 +4865,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, property: KProper
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4884,7 +4884,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4903,7 +4903,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4922,7 +4922,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callableName: Str
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWith cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -4938,7 +4938,7 @@ fun <T : CharSequence> T.validateNotEndsWith(cs: CharSequence, callableName: Str
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence ends with $char.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4955,7 +4955,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, causeOf: Tran
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4974,7 +4974,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, causeOf: Tran
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -4993,7 +4993,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, property: KPr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -5012,7 +5012,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, property: KPr
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -5031,7 +5031,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callable: KFu
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -5050,7 +5050,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callable: KFu
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -5072,7 +5072,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callableName:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)))
+    if (this endsWithIgnoreCase char) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "ends with $char", cause?.invoke(this)))
     return this
 }
 /**
@@ -5091,7 +5091,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(char: Char, callableName:
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Char sequence ends with $cs.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5108,7 +5108,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, causeOf
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5127,7 +5127,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, causeOf
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -5146,7 +5146,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, propert
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -5165,7 +5165,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, propert
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -5185,7 +5185,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -5204,7 +5204,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 /**
@@ -5224,7 +5224,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)))
+    if (this endsWithIgnoreCase cs) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "ends with $cs", cause?.invoke(this)))
     return this
 }
 
@@ -5244,7 +5244,7 @@ fun <T : CharSequence> T.validateNotEndsWithIgnoreCase(cs: CharSequence, callabl
  */
 @IgnorableReturnValue
 fun String.validateUppercase(causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException("The string is not uppercase.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The string is nuot uppercase.", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException("The string is not uppercase.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The string is nuot uppercase.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5259,7 +5259,7 @@ fun String.validateUppercase(causeOf: Transformer<String, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun String.validateUppercase(causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null, lazyMessage: Transformer<String, Any>): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5276,7 +5276,7 @@ fun String.validateUppercase(causeOf: Transformer<String, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun String.validateUppercase(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not uppercase", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not uppercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5293,7 +5293,7 @@ fun String.validateUppercase(property: KProperty<*>?, variableName: String? = nu
  */
 @IgnorableReturnValue
 fun String.validateUppercase(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not uppercase", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not uppercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5310,7 +5310,7 @@ fun String.validateUppercase(property: KProperty<*>?, variable: KProperty<*>?, m
  */
 @IgnorableReturnValue
 fun String.validateUppercase(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not uppercase", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not uppercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5328,7 +5328,7 @@ fun String.validateUppercase(callable: KFunction<*>?, parameterName: String? = n
  */
 @IgnorableReturnValue
 fun String.validateUppercase(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not uppercase", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not uppercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5346,7 +5346,7 @@ fun String.validateUppercase(callable: KFunction<*>?, parameter: KParameter?, me
  */
 @IgnorableReturnValue
 fun String.validateUppercase(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not uppercase", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not uppercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5363,7 +5363,7 @@ fun String.validateUppercase(callableName: String?, parameterName: String? = nul
  */
 @IgnorableReturnValue
 fun String.validateUppercase(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not uppercase", cause?.invoke(this)))
+    if (!isUpperCase) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not uppercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not uppercase", cause?.invoke(this)))
     return this
 }
 
@@ -5382,7 +5382,7 @@ fun String.validateUppercase(callableName: String?, parameter: KParameter?, mess
  */
 @IgnorableReturnValue
 fun String.validateLowercase(causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException("The string is not lowercase.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The string is nuot lowercase.", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException("The string is not lowercase.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The string is nuot lowercase.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5403,7 +5403,7 @@ fun String.validateLowercase(causeOf: Transformer<String, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun String.validateLowercase(causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null, lazyMessage: Transformer<String, Any>): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5421,7 +5421,7 @@ fun String.validateLowercase(causeOf: Transformer<String, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun String.validateLowercase(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not lowercase", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not lowercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5438,7 +5438,7 @@ fun String.validateLowercase(property: KProperty<*>?, variableName: String? = nu
  */
 @IgnorableReturnValue
 fun String.validateLowercase(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not lowercase", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not lowercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5455,7 +5455,7 @@ fun String.validateLowercase(property: KProperty<*>?, variable: KProperty<*>?, m
  */
 @IgnorableReturnValue
 fun String.validateLowercase(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not lowercase", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not lowercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5472,7 +5472,7 @@ fun String.validateLowercase(callable: KFunction<*>?, parameterName: String? = n
  */
 @IgnorableReturnValue
 fun String.validateLowercase(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not lowercase", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not lowercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5490,7 +5490,7 @@ fun String.validateLowercase(callable: KFunction<*>?, parameter: KParameter?, me
  */
 @IgnorableReturnValue
 fun String.validateLowercase(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not lowercase", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not lowercase", cause?.invoke(this)))
     return this
 }
 /**
@@ -5509,7 +5509,7 @@ fun String.validateLowercase(callableName: String?, parameterName: String? = nul
  */
 @IgnorableReturnValue
 fun String.validateLowercase(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<String, Throwable>? = null, cause: Transformer<String, Throwable>? = null): String {
-    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not lowercase", cause?.invoke(this)))
+    if (!isLowerCase) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not lowercase", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not lowercase", cause?.invoke(this)))
     return this
 }
 
@@ -5526,7 +5526,7 @@ fun String.validateLowercase(callableName: String?, parameter: KParameter?, mess
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException("The string is not of length $length.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("The string is not of length $length.", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException("The string is not of length $length.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("The string is not of length $length.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5543,7 +5543,7 @@ fun <T : CharSequence> T.expectLength(length: Int, causeOf: Transformer<T, Throw
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5561,7 +5561,7 @@ fun <T : CharSequence> T.expectLength(length: Int, causeOf: Transformer<T, Throw
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not of length $length", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is not of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5581,7 +5581,7 @@ fun <T : CharSequence> T.expectLength(length: Int, property: KProperty<*>?, vari
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not of length $length", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is not of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5600,7 +5600,7 @@ fun <T : CharSequence> T.expectLength(length: Int, property: KProperty<*>?, vari
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not of length $length", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is not of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5619,7 +5619,7 @@ fun <T : CharSequence> T.expectLength(length: Int, callable: KFunction<*>?, para
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not of length $length", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is not of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5638,7 +5638,7 @@ fun <T : CharSequence> T.expectLength(length: Int, callable: KFunction<*>?, para
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not of length $length", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5657,7 +5657,7 @@ fun <T : CharSequence> T.expectLength(length: Int, callableName: String?, parame
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectLength(length: Int, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not of length $length", cause?.invoke(this)))
+    if (this.length != length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is not of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5672,7 +5672,7 @@ fun <T : CharSequence> T.expectLength(length: Int, callableName: String?, parame
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException("The string is of length $length.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("The string is of length $length.", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException("The string is of length $length.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("The string is of length $length.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5688,7 +5688,7 @@ fun <T : CharSequence> T.expectNotLength(length: Int, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5707,7 +5707,7 @@ fun <T : CharSequence> T.expectNotLength(length: Int, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is of length $length", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5725,7 +5725,7 @@ fun <T : CharSequence> T.expectNotLength(length: Int, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is of length $length", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5743,7 +5743,7 @@ fun <T : CharSequence> T.expectNotLength(length: Int, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is of length $length", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5761,7 +5761,7 @@ fun <T : CharSequence> T.expectNotLength(length: Int, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is of length $length", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5779,7 +5779,7 @@ fun <T : CharSequence> T.expectNotLength(length: Int, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is of length $length", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is of length $length", cause?.invoke(this)))
     return this
 }
 /**
@@ -5797,6 +5797,6 @@ fun <T : CharSequence> T.expectNotLength(length: Int, callableName: String?, par
  */
 @IgnorableReturnValue
 fun <T : CharSequence> T.expectNotLength(length: Int, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is of length $length", cause?.invoke(this)))
+    if (this.length == length) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is of length $length", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is of length $length", cause?.invoke(this)))
     return this
 }

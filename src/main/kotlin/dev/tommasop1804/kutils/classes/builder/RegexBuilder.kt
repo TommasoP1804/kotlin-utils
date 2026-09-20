@@ -848,7 +848,7 @@ class RegexBuilder {
      * @since 1.0.0
      */
     @IgnorableReturnValue
-    fun build(vararg options: RegexOption): Regex = tryOrThrow({ -> MalformedInputException("Invalid regular expression") }) {
+    fun build(vararg options: RegexOption): Regex = tryOrThrow({ MalformedInputException("Invalid regular expression") }) {
         Regex(pattern.toString(), options.toSet())
     }
 

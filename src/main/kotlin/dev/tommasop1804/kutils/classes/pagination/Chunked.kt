@@ -316,7 +316,7 @@ data class Chunked<T>(
                 goodCollection += element
             }
             val totalElements = goodCollection.size
-            goodCollection = tryOr({ emptyMList() }, overwriteOnly = IndexOutOfBoundsException::class) {
+            goodCollection = tryOr({ emptyMList() }, only = setOf(IndexOutOfBoundsException::class)) {
                 if (limit == -1) goodCollection else (goodCollection.toList() % limit)[offset].toMList()
             }
 

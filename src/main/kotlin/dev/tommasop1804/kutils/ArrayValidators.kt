@@ -29,7 +29,7 @@ import kotlin.reflect.KProperty
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The array is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The array is empty.", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The array is empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The array is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -45,7 +45,7 @@ fun <E> Array<E>.validateNotEmpty(causeOf: Transformer<Array<E>, Throwable>? = n
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null, lazyMessage: Transformer<Array<E>, Any>): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -62,7 +62,7 @@ fun <E> Array<E>.validateNotEmpty(causeOf: Transformer<Array<E>, Throwable>? = n
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -79,7 +79,7 @@ fun <E> Array<E>.validateNotEmpty(property: KProperty<*>?, variableName: String?
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -96,7 +96,7 @@ fun <E> Array<E>.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -113,7 +113,7 @@ fun <E> Array<E>.validateNotEmpty(callable: KFunction<*>?, parameterName: String
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -130,7 +130,7 @@ fun <E> Array<E>.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -147,7 +147,7 @@ fun <E> Array<E>.validateNotEmpty(callableName: String?, parameterName: String? 
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -171,7 +171,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(causeOf: Transformer<Array<E>?, Throwab
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -195,7 +195,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(causeOf: Transformer<Array<E>?, Throwab
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -218,7 +218,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(property: KProperty<*>?, variableName: 
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -242,7 +242,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(property: KProperty<*>?, variable: KPro
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -266,7 +266,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(callable: KFunction<*>?, parameterName:
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -291,7 +291,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(callable: KFunction<*>?, parameter: KPa
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -321,7 +321,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(callableName: String?, parameterName: S
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -344,7 +344,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(callableName: String?, parameter: KPara
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -359,7 +359,7 @@ fun <E> Array<E>?.validateNotNullOrEmpty(callableName: String?, parameter: KPara
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -374,7 +374,7 @@ fun <E> Array<E>.validateEmpty(causeOf: Transformer<Array<E>, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null, lazyMessage: Transformer<Array<E>, Any>): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -395,7 +395,7 @@ fun <E> Array<E>.validateEmpty(causeOf: Transformer<Array<E>, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -412,7 +412,7 @@ fun <E> Array<E>.validateEmpty(property: KProperty<*>?, variableName: String? = 
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -429,7 +429,7 @@ fun <E> Array<E>.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -446,7 +446,7 @@ fun <E> Array<E>.validateEmpty(callable: KFunction<*>?, parameterName: String? =
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -465,7 +465,7 @@ fun <E> Array<E>.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, 
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -483,7 +483,7 @@ fun <E> Array<E>.validateEmpty(callableName: String?, parameterName: String? = n
  */
 @IgnorableReturnValue
 fun <E> Array<E>.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Array<E>, Throwable>? = null, cause: Transformer<Array<E>, Throwable>? = null): Array<E> {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -504,7 +504,7 @@ fun <E> Array<E>?.validateNullOrEmpty(causeOf: Transformer<Array<E>, Throwable>?
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -524,7 +524,7 @@ fun <E> Array<E>?.validateNullOrEmpty(causeOf: Transformer<Array<E>, Throwable>?
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -545,7 +545,7 @@ fun <E> Array<E>?.validateNullOrEmpty(property: KProperty<*>?, variableName: Str
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -568,7 +568,7 @@ fun <E> Array<E>?.validateNullOrEmpty(property: KProperty<*>?, variable: KProper
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -588,7 +588,7 @@ fun <E> Array<E>?.validateNullOrEmpty(callable: KFunction<*>?, parameterName: St
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -613,7 +613,7 @@ fun <E> Array<E>?.validateNullOrEmpty(callable: KFunction<*>?, parameter: KParam
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -634,7 +634,7 @@ fun <E> Array<E>?.validateNullOrEmpty(callableName: String?, parameterName: Stri
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -659,6 +659,6 @@ fun <E> Array<E>?.validateNullOrEmpty(callableName: String?, parameter: KParamet
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }

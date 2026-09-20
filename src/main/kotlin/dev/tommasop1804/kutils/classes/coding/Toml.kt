@@ -661,7 +661,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @since 3.11.0
      */
     infix fun mergePatch(patch: Toml) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
             toJson().mergePatch(patch.toJson())().toToml()
         }
     }
@@ -673,7 +673,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @since 3.11.0
      */
     infix fun mergePatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
             toJson().mergePatch(patch)().toToml()
         }
     }
@@ -685,7 +685,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @since 3.11.0
      */
     infix fun tomlPatch(patch: Toml) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2), e.cause) }, includeCause = false, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2), e.cause) }, includeCause = false, only = setOf(NoSuchJsonPathException::class)) {
             toJson().jsonPatch(patch.toJson())().toToml()
         }
     }
@@ -697,7 +697,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @since 3.11.0
      */
     infix fun tomlPatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
+        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
             toJson().jsonPatch(patch)().toToml()
         }
     }

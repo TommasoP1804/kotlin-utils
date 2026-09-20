@@ -24,6 +24,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KClass
 
 
@@ -426,6 +427,7 @@ inline fun <T1, reified T2> T1?.safeCastOr(transform: Transformer<T1?, T2>): T2 
  */
 @Suppress("UNCHECKED_CAST")
 @IgnorableReturnValue
+@Deprecated("Use expectClass<T> instead", ReplaceWith("this.expectClass<T>(causeOf = lazyException)"))
 inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = runCatching { this as T }.getOrThrow(lazyException = lazyException)
 
 /**
@@ -753,237 +755,115 @@ inline fun <T, R> T.letUnlessOr(condition: Boolean, default: Supplier<R>, block:
 }
 
 /**
- * Executes the provided block and returns its result, or null if an exception is thrown during execution.
+ * Executes the given block of code and catches exceptions based on the specified criteria.
+ * Returns `null` if an exception matching the criteria is caught, otherwise rethrows the exception.
  *
- * @param T the type of the result returned by the block
- * @param block the lambda function to be executed
- * @return the result of the block if successful, or null if an exception occurs
+ * @param only A set of exception types to include. If empty, all exception types are included by default.
+ * @param except A set of exception types to exclude. Exceptions in this set will not be caught even if included in [only].
+ * @param block The block of code to execute. This block is expected to return a value of type [T].
+ * @return The result of the block execution if it completes successfully, or `null` if an exception matching the criteria is caught.
+ * @throws ParametersInConflictException If both [only] and [except] contain the same exception type.
  * @since 1.0.0
  */
 @IgnorableReturnValue
 inline fun <T> tryOrNull(
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
     block: Supplier<T>
 ): T? {
+    (only intersect except).takeIf { it.isNotEmpty() }?.let {
+        throw ParametersInConflictException(
+            callableName = "tryOrLog",
+            parametersName = listOf("only", "except"),
+            valuesInConflict = it
+        )
+    }
+
     return try {
         block()
-    } catch (e: Throwable) {
-        if (overwriteOnly.isEmpty() && notOverwrite.isEmpty())
-            return null
-        else if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-        null
+    } catch (e: Exception) {
+        if (e is InterruptedException || e is CancellationException)
+            throw e
+        val included = only.isEmpty() || only.any { it.isInstance(e) }
+        val excluded = except.any { it.isInstance(e) }
+        if (included && !excluded) null else throw e
     }
 }
-/**
- * Executes the provided block and returns its result, or null if an exception is thrown during execution.
- *
- * @param T the type of the result returned by the block
- * @param overwriteOnly a specific type of Throwable to overwrite. If null, no specific overwrite is applied.
- * @param notOverwrite a set of Throwable types that should not be overwritten, even if overwriteOnly is specified.
- * @param block the lambda function to be executed
- * @return the result of the block if successful, or null if an exception occurs
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrNull(
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
-) = tryOrNull(overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
-/**
- * Executes the provided block and returns its result, or null if an exception is thrown during execution.
- *
- * This method allows optional filtering of exceptions to handle or ignore based on the provided parameters.
- *
- * @param T the type of the result returned by the block
- * @param overwriteOnly specifies a class of exceptions that should exclusively be handled as null (if provided).
- *        If null, no specific filtering is applied at this level.
- * @param notOverwrite specifies a class of exceptions that should not be handled as null (if provided).
- *        If null, no specific filtering is applied at this level.
- * @param block the lambda function to be executed
- * @return the result of the block if successful, or null if an exception occurs, considering the filter criteria
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrNull(
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOrNull(overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-/**
- * Executes the given block and returns its result, or null if an exception is thrown during execution.
- * Allows customization of exception handling based on the provided sets of exception classes.
- *
- * @param T the type of the result returned by the block
- * @param overwriteOnly a set of exception classes which can be overwritten to return null, unless present in notOverwrite
- * @param notOverwrite an optional exception class that overrides the overwriteOnly rule, causing the exception to be rethrown
- * @param block the lambda function to be executed
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrNull(
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOrNull(overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 
 /**
- * Executes the provided block of code within a try-catch block and handles exceptions by logging them
- * according to the specified configuration. This method allows flexible control over logging behavior
- * for general messages, specific exception cases, and whether to rethrow exceptions or not.
+ * Executes the given block of code and logs any exceptions that are thrown, according to the provided logging rules.
+ * Returns `null` if an exception is handled and logged.
  *
  * @param T The return type of the block of code to execute.
- * @param logger The logger instance used to log messages and exceptions.
- * @param message A transformer that return a pair consisting of a log message (nullable) and a default log level to use if no specific
- * exception handling rules match.
- * @param specificCases A map defining custom logging rules for specific exception types. Each entry maps
- * a class of exception (`KClass<out Throwable>`) to a pair of a custom log message and the log level to use.
- * Specific cases take precedence over the general logging behavior.
- * @param includeException A flag indicating whether the caught exception should be included in the log output.
- * Defaults to true.
- * @param overwriteOnly A set of exception types for which the general logging behavior defined by `message`
- * should be replaced with custom handling. If empty, no overwriting is applied.
- * @param notOverwrite A set of exception types for which the custom handling defined in `specificCases`
- * should not apply. Exceptions in this set will always be treated with the default logging rule.
+ * @param message A function to transform a throwable into a pair representing the log level and optional log message.
+ * @param specificCases A map of specific exception classes to logging preferences (log level and message).
+ *                      These take precedence over other logging configurations.
+ * @param includeException Whether to include exception details in the logged output.
+ * @param only A set of exception classes to explicitly handle and log. If empty, all exceptions are considered unless excluded.
+ * @param except A set of exception classes to explicitly exclude from handling and logging.
  * @param block The block of code to execute.
- * @return The result of the block of code, or `null` if an exception is handled and not rethrown.
- * @throws ParametersInConflictException If there are conflicting configurations between `overwriteOnly`,
- * `notOverwrite`, or `specificCases`.
+ * @return The result of the block if no exception occurs, or `null` if an exception is handled and logged.
+ *         Exceptions not handled by the specified rules are re-thrown.
+ * @throws ParametersInConflictException If the `only` and `except` sets intersect, or if the `specificCases` map keys conflict with the `except` set.
+ * @throws InterruptedException If the caught exception is an `InterruptedException`.
+ * @throws CancellationException If the caught exception is a `CancellationException`.
  * @since 1.0.0
  */
 @IgnorableReturnValue
 context(logger: Logger)
 inline fun <T> tryOrLog(
-    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
+    message: Transformer<Exception, Pair<LogLevel?, String?>>,
+    specificCases: Map<KClass<out Exception>, Pair<LogLevel?, String?>> = emptyMap(), // priority over only/except
     includeException: Boolean = true,
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
     block: Supplier<T>
 ): T? {
-    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryOrLog",
-        parametersName = listOf("overwriteOnly", "notOverwrite"),
-        valuesInConflict = overwriteOnly intersect notOverwrite
-    )
-    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryOrLog",
-        parametersName = listOf("specificCases", "notOverwrite"),
-        valuesInConflict = specificCases.keys intersect notOverwrite
-    )
+    (only intersect except).takeIf { it.isNotEmpty() }?.let {
+        throw ParametersInConflictException(
+            callableName = "tryOrLog",
+            parametersName = listOf("only", "except"),
+            valuesInConflict = it
+        )
+    }
+    (specificCases.keys intersect except).takeIf { it.isNotEmpty() }?.let {
+        throw ParametersInConflictException(
+            callableName = "tryOrLog",
+            parametersName = listOf("specificCases", "except"),
+            valuesInConflict = it
+        )
+    }
     return try {
         block()
-    } catch (e: Throwable) {
-        val message = message(e)
-        if (e::class in specificCases)
-            logWithOrWithoutException(logger, specificCases[e::class]!!.first ?: message.first ?: LogLevel.Error, specificCases[e::class]!!.second ?: e.message, includeException, e)
-        else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty())
-            logWithOrWithoutException(logger, message.first ?: LogLevel.Error, message.second ?: e.message, includeException, e)
-        else {
-            if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            logWithOrWithoutException(logger, message.first ?: LogLevel.Error, message.second ?: e.message, includeException, e)
-        }
+    } catch (e: Exception) {
+        if (e is InterruptedException || e is CancellationException) throw e
+
+        val specific = specificCases.entries
+            .filter { [type, _] -> type.isInstance(e) }
+            .minWithOrNull { a, b ->
+                when {
+                    a.key == b.key -> 0
+                    a.key.java.isAssignableFrom(b.key.java) -> 1
+                    else -> -1
+                }
+            }
+            ?.value
+
+        val handled = specific != null ||
+                ((only.isEmpty() || only.any { it.isInstance(e) }) && except.none { it.isInstance(e) })
+        if (!handled) throw e
+
+        val default = message(e)
+        logWithOrWithoutException(
+            logger,
+            specific?.first ?: default.first ?: LogLevel.Error,
+            specific?.second ?: default.second ?: e.message,
+            includeException,
+            e
+        )
         null
     }
 }
-/**
- * Executes the provided block of code within a try-catch block and handles exceptions by logging them
- * according to the specified configuration. This method provides flexibility in specifying default logging behavior,
- * custom handling for specific exceptions, and conditions for overwriting or excluding logging rules.
- *
- * @param T The return type of the block of code to execute.
- * @param logger The logger instance used to log messages and exceptions.
- * @param message A transformer that return a pair consisting of a log message (nullable) and a default log level to use if no specific
- * exception handling rules match.
- * @param specificCases A map defining custom logging rules for specific exception types. Each entry maps
- * a class of exception (`KClass<out Throwable>`) to a pair of a custom log message and the log level to use.
- * Specific cases take precedence over the general logging behavior.
- * @param includeException A flag indicating whether the caught exception should be included in the log output.
- * Defaults to true.
- * @param overwriteOnly A single exception type for which the general logging behavior defined by `message`
- * should be replaced with custom handling. If null, no overwriting is applied.
- * @param notOverwrite A set of exception types for which the custom handling defined in `specificCases`
- * should not apply. Exceptions in this set will always be treated with the default logging rule.
- * @param block The block of code to execute.
- * @return The result of the block of code, or `null` if an exception is handled and not rethrown.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-context(logger: Logger)
-inline fun <T> tryOrLog(
-    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeException: Boolean = true,
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
-): T? = tryOrLog(message, specificCases, includeException, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
-/**
- * Executes the provided block of code within a try-catch block and handles exceptions by logging them
- * based on the specified configuration. This method provides flexible control over logging behavior for
- * general cases, specific exceptions, and conditions for overwriting default behavior.
- *
- * @param T The return type of the block to execute.
- * @param logger The logger instance used to log messages and exceptions.
- * @param message A transformer that return a pair representing the default log message (nullable) and the default log level to use
- * if no specific exception handling rules apply.
- * @param specificCases A map specifying custom log messages and log levels for particular exception types.
- * Takes precedence over general logging behavior.
- * @param includeException Indicates whether the caught exception should be included in the log output.
- * Defaults to true.
- * @param overwriteOnly A specific exception type that, if encountered, will overwrite the general logging
- * rule with the default behavior provided by the `message` parameter.
- * @param notOverwrite A specific exception type that will not be overwritten and will strictly adhere to
- * custom handling rules from `specificCases`.
- * @param block A block of code to execute.
- * @return The result of the execution block or `null` if an exception is caught and not rethrown.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-context(logger: Logger)
-inline fun <T> tryOrLog(
-    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeException: Boolean = true,
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-): T? = tryOrLog(message, specificCases, includeException, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-/**
- * Executes the provided block of code within a try-catch block and handles exceptions by logging them
- * according to the specified configuration. This method allows flexible control over logging behavior
- * for general messages, specific exception cases, and whether to rethrow exceptions or not.
- *
- * @param T The return type of the block of code to execute.
- * @param logger The logger instance used to log messages and exceptions.
- * @param message A transformer that return a pair consisting of a log message (nullable) and a default log level to use if no specific
- * exception handling rules match.
- * @param specificCases A map defining custom logging rules for specific exception types. Each entry maps
- * a class of exception (`KClass<out Throwable>`) to a pair of a custom log message and the log level to use.
- * Specific cases take precedence over the general logging behavior.
- * @param includeException A flag indicating whether the caught exception should be included in the log output.
- * Defaults to true.
- * @param overwriteOnly A set of exception types for which the general logging behavior defined by `message`
- * should be replaced with custom handling. If empty, no overwriting is applied.
- * @param notOverwrite An exception type for which the custom handling defined in `specificCases`
- * should not apply. Exceptions of this type will always be treated with the default logging rule.
- * @param block The block of code to execute.
- * @return The result of the block of code, or `null` if an exception is handled and not rethrown.
- * @throws ParametersInConflictException If there are conflicting configurations between `overwriteOnly`,
- * `notOverwrite`, or `specificCases`.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-context(logger: Logger)
-inline fun <T> tryOrLog(
-    message: Transformer<Throwable, Pair<LogLevel?, String?>>,
-    specificCases: Map<KClass<out Throwable>, Pair<LogLevel?, String?>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeException: Boolean = true,
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-): T? = tryOrLog(message, specificCases, includeException, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 
 /**
  * Executes the given block of code, returning the result or applying fallback strategies in case of exceptions.
@@ -993,9 +873,9 @@ inline fun <T> tryOrLog(
  * @param default A fallback function to be invoked when no specific case or overwrite rule applies.
  * @param specificCases A map associating exception types with specific fallback functions for handling them.
  *                      These functions have the highest priority and take precedence over `overwriteOnly` and `notOverwrite`.
- * @param overwriteOnly A set of exception types for which the default fallback function should be applied, ignoring others.
+ * @param only A set of exception types for which the default fallback function should be applied, ignoring others.
  *                      Exceptions outside this set will be rethrown unless they have an entry in `specificCases`.
- * @param notOverwrite A set of exception types for which the default fallback function should not be applied, causing these exceptions to be rethrown unless they have an entry in
+ * @param except A set of exception types for which the default fallback function should not be applied, causing these exceptions to be rethrown unless they have an entry in
  *  `specificCases`.
  * @param block A supplier function representing the primary operation to execute.
  * @return Either the result of the executed block, or the result of the applied fallback strategy in case of an exception.
@@ -1006,107 +886,38 @@ inline fun <T> tryOrLog(
  */
 @IgnorableReturnValue
 inline fun <T> tryOr(
-    default: Transformer<Throwable, T>,
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+    default: Transformer<Exception, T>,
+    specificCases: Map<KClass<out Exception>, Transformer<Exception, T>> = emptyMap(), // priority over only/except
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
     block: Supplier<T>
 ): T {
-    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryOrThrow",
-        parametersName = listOf("overwriteOnly", "notOverwrite"),
-        valuesInConflict = overwriteOnly intersect notOverwrite
+    if (only intersects except) throw ParametersInConflictException(
+        callableName = "tryOr",
+        parametersName = listOf("only", "except"),
+        valuesInConflict = only intersect except
     )
-    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryOrThrow",
-        parametersName = listOf("specificCases", "notOverwrite"),
-        valuesInConflict = specificCases.keys intersect notOverwrite
+    if (specificCases.keys intersects except) throw ParametersInConflictException(
+        callableName = "tryOr",
+        parametersName = listOf("specificCases", "except"),
+        valuesInConflict = specificCases.keys intersect except
     )
     return try {
         block()
-    } catch (e: Throwable) {
-        return if (e::class in specificCases) specificCases[e::class]!!(e)
-        else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty()) default(e)
-        else {
-            if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            else default(e)
+    } catch (e: Exception) {
+        if (e is InterruptedException || e is CancellationException) throw e
+
+        val passes = (only.isEmpty() || only.any { it.isInstance(e) }) && except.none { it.isInstance(e) }
+        val specific = generateSequence<Class<*>>(e.javaClass) { it.superclass }
+            .firstNotNullOfOrNull { specificCases[it.kotlin] }
+
+        when {
+            specific != null -> specific(e)
+            passes -> default(e)
+            else -> throw e
         }
     }
 }
-/**
- * Executes a given block of code and provides specialized handling for potential exceptions.
- * The method attempts to execute the provided `block`, and if an exception is thrown, it determines
- * how to handle the exception based on the provided parameters. Specific exception handling takes precedence
- * over general controls such as `overwriteOnly` and `notOverwrite`.
- *
- * @param T The type of the result produced by the block or exception handlers.
- * @param default The default exception handler to be used if no more specific handler matches.
- * @param specificCases A map of specific exception types to their corresponding handlers.
- *                      These handlers take precedence over default handling and the `overwriteOnly` parameter.
- * @param overwriteOnly A single exception type which will be handled by the `default` handler even
- *                      if it exists in `notOverwrite`. Null will default to no `overwriteOnly` handling.
- * @param notOverwrite A set of exception types which should never be handled by the `default` handler.
- *                     These will always be rethrown unless matched by `specificCases`.
- * @param block The block of code to execute, which may throw exceptions.
- * @return The result produced by the block or the result from the corresponding exception handler.
- * @throws ParametersInConflictException If there are conflicts between the `overwriteOnly` and `notOverwrite`
- *                                        lists or between `specificCases` and `notOverwrite`.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOr(
-    default: Transformer<Throwable, T>,
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
-) = tryOr(default, specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
-/**
- * Executes the given block and handles exceptions using the specified handling strategy.
- * Defines a hierarchy of exception handling based on specific cases, overwrite rules, and a default fallback.
- *
- * @param T The return type of the block and the handling functions.
- * @param default A function to handle exceptions not covered by any specific cases or the overwrite rules.
- * @param specificCases A map where keys are specific exception classes and values are functions to handle those exceptions.
- *                       Exceptions in this map are handled with the highest priority.
- * @param overwriteOnly A set of exception classes that should only be handled by the default function, unless matched in specific cases.
- * @param notOverwrite A set of exception classes that should never be handled even by overwriteOnly or specificCases, and should propagate.
- * @param block The block of code to execute, which may throw exceptions.
- * @return The result of the block execution, or the fallback result from the provided handling strategy if an exception is encountered.
- * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` contain intersecting exception classes, or if `specificCases` and `notOverwrite` have conflicts.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOr(
-    default: Transformer<Throwable, T>,
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOr(default, specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-/**
- * Executes a block of code and handles exceptions using specified handlers.
- * Provides a default handler and optional specific exception handling logic.
- *
- * @param T The return type of the code block and handlers.
- * @param default The default handler that processes exceptions into a value of type [T].
- * @param specificCases A map of specific exception types to their corresponding handlers, giving priority
- * over the default handler. Handled exceptions matching these keys will use the corresponding function.
- * @param overwriteOnly A set of exception types where the default handler should always be applied unless
- * the exception is explicitly excluded in [notOverwrite].
- * @param notOverwrite A single exception type that should bypass the default handler, even if it is included
- * in [overwriteOnly]. If null, no exceptions are excluded in this way.
- * @param block The block of code to be executed that might throw exceptions.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOr(
-    default: Transformer<Throwable, T>,
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, T>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOr(default, specificCases, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
 
 /**
  * Attempts to execute a given block of code and determines the resulting boolean outcome
@@ -1119,9 +930,9 @@ inline fun <T> tryOr(
  * @param specificCases A map defining specific exceptions and their associated transformations
  * to return boolean values. If an exception type from this map is encountered, the corresponding
  * transformer is applied. Default is an empty map.
- * @param overwriteOnly A set of exception types for which the handling behavior is restricted to overwriting.
+ * @param only A set of exception types for which the handling behavior is restricted to overwriting.
  * Any exceptions not in this set will not be caught. Default is an empty set.
- * @param notOverwrite A set of exception types that are explicitly excluded from being handled.
+ * @param except A set of exception types that are explicitly excluded from being handled.
  * If an exception in this set is encountered, it will be thrown. Default is an empty set.
  * @param block An action block of code to execute which potentially throws an exception.
  * @return True if the block executes successfully without exceptions or if an exception is handled
@@ -1131,266 +942,19 @@ inline fun <T> tryOr(
  */
 @IgnorableReturnValue
 inline fun tryTrueOrFalse(
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+    specificCases: Map<KClass<out Exception>, Transformer<Exception, Boolean>> = emptyMap(), // priority over only/except
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
     block: Action
-): Boolean {
-    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryTrueOrFalse",
-        parametersName = listOf("overwriteOnly", "notOverwrite"),
-        valuesInConflict = overwriteOnly intersect notOverwrite
-    )
-    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryTrueOrFalse",
-        parametersName = listOf("specificCases", "notOverwrite"),
-        valuesInConflict = specificCases.keys intersect notOverwrite
-    )
-    return try {
-        block()
-        true
-    } catch (e: Throwable) {
-        return if (e::class in specificCases) specificCases[e::class]!!(e)
-        else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty()) false
-        else {
-            if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            else false
-        }
-    }
+): Boolean = tryOr(
+    default = { false },
+    specificCases = specificCases,
+    only = only,
+    except = except
+) {
+    block()
+    true
 }
-/**
- * Executes a provided block of code and returns a Boolean value based on the success or failure of the execution.
- * The behavior on exceptions can be customized through parameters such as specific exception handling,
- * overwriting, and exclusion rules.
- *
- * @param specificCases A map defining specific exception classes and their corresponding transformer functions
- * converting the exception to a Boolean value. These have the highest priority over other parameters.
- * @param overwriteOnly A specific exception class that, if thrown during execution of the block, indicates
- * whether the exception should be consumed or propagate.
- * @param notOverwrite A set of exception classes that should not be overwritten. Exceptions from this set are
- * rethrown even if other parameters are specified.
- * @param block An action representing the block of code to execute.
- * @return Boolean True if the block executes successfully or matches the rules to return true, false otherwise.
- * @throws ParametersInConflictException If `overwriteOnly` and `notOverwrite` share conflicting exception
- * classes, or if `specificCases` and `notOverwrite` overlap.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun tryTrueOrFalse(
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Action
-) = tryTrueOrFalse(specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
-/**
- * Attempts to execute a given block of code and returns true if it succeeds, or handles exceptions
- * based on the provided rules and returns a boolean indicating the result.
- *
- * @param specificCases A map specifying custom exception handling rules. It maps throwable classes
- * to transformers that determine how to handle a specific exception. Has the highest priority over
- * `overwriteOnly` and `notOverwrite`.
- * @param overwriteOnly A specific set of throwable classes where exceptions should always be caught
- * and handled as returning `false`, unless they clash with specific cases or other conditions.
- * @param notOverwrite A specific set of throwable classes where exceptions should not be caught, and
- * instead rethrown. If an exception class exists in both `overwriteOnly` and `notOverwrite`, it will
- * cause a conflict.
- * @param block The block of code to execute.
- * @return A boolean indicating whether the block succeeded (returns `true`) or was handled according
- * to the given exception handling logic (returns `false`) without rethrowing.
- * @throws ParametersInConflictException If there are conflicting parameters between `overwriteOnly`,
- * `notOverwrite`, or `specificCases`.
- * @throws Throwable Rethrows any exception not caught or specified by the handling rules.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryTrueOrFalse(
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: KClass<out Throwable>?,
-    block: Action
-) = tryTrueOrFalse(specificCases, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-/**
- * Executes the provided block and captures any thrown exceptions. Returns a Boolean value based on
- * specific handling rules configured via the parameters.
- *
- * @param specificCases a map associating specific exception types with transformers to handle them.
- *                      The transformer converts the exception into a Boolean. This map has the highest priority
- *                      over `overwriteOnly` and `notOverwrite`.
- * @param overwriteOnly a set of exception types that should be explicitly caught and processed
- *                      as false unless `notOverwrite` indicates otherwise.
- * @param notOverwrite a single exception type that should not be processed, even if it is in
- *                     `specificCases` or `overwriteOnly`.
- * @param block an action representing the code block to be executed, which may throw an exception.
- *              If no exception occurs, the method returns true.
- * @return true if the block executed successfully, or a Boolean result based on the specific rules
- *         defined by the parameters if exceptions occur.
- * @throws ParametersInConflictException if there are contradictions in the configuration, such as overlapping
- *                                       rules between `overwriteOnly`, `notOverwrite`, and `specificCases`.
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryTrueOrFalse(
-    specificCases: Map<KClass<out Throwable>, Transformer<Throwable, Boolean>> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: KClass<out Throwable>?,
-    block: Action
-) = tryTrueOrFalse(specificCases, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-
-/**
- * Executes the provided block of code and handles thrown exceptions based on the specified rules.
- *
- * This function attempts to execute the supplied block. If an exception is thrown, it applies custom handling based on
- * the provided parameters, such as specific cases for exceptions, inclusion of causes, or overwriting rules. If none of
- * the conditions are met, it propagates the exception or throws a new one as defined.
- *
- * @param lazyException A supplier for creating a throwable to be thrown if no specific case or rules apply.
- * @param specificCases A map of specific exception types to their respective throwable suppliers. If a caught exception matches a key
- * in this map, the corresponding supplier is invoked to provide the exception to be thrown.
- * @param includeCause Determines whether the original exception should be set as the cause of the newly thrown exception.
- * Default is true.
- * @param overwriteOnly A set of exception types. If a caught exception’s type is included in this set, and not in the
- * `notOverwrite` set, a new exception from `lazyException` is thrown, optionally including the original exception as its cause.
- * @param notOverwrite A set of exception types that should not be overwritten, even if they are present in the `overwriteOnly` set.
- * @param block The block of code to be executed. If it completes without throwing an exception, its result is returned.
- *
- * @return The result of the executed block if no exception is thrown or if exceptions are handled and not propagated.
- *
- * @throws ParametersInConflictException If there is a conflict between the values of `overwriteOnly` and `notOverwrite`,
- * or between the keys of `specificCases` and the `notOverwrite` set.
- * @throws Throwable If a specific case, overwrite rules, or new exception rules are not applicable,
- * the original or newly created exception is propagated.
- *
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableSupplier,
-    specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
-): T {
-    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryOrThrow",
-        parametersName = listOf("overwriteOnly", "notOverwrite"),
-        valuesInConflict = overwriteOnly intersect notOverwrite
-    )
-    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
-        callableName = "tryOrThrow",
-        parametersName = listOf("specificCases", "notOverwrite"),
-        valuesInConflict = specificCases.keys intersect notOverwrite
-    )
-    return try {
-        block()
-    } catch (e: Throwable) {
-        if (e::class in specificCases) throwWithOrWithoutCause(specificCases[e::class]!!, includeCause, e)
-        else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty())
-            throwWithOrWithoutCause(lazyException, includeCause, e)
-        else {
-            if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            else throwWithOrWithoutCause(lazyException, includeCause, e)
-        }
-    }
-}
-/**
- * Executes the provided block of code and handles thrown exceptions based on the specified rules.
- *
- * This function executes the given block of code and applies custom exception handling logic. It supports specifying
- * specific cases for exceptions, determining whether the original exception should be included as a cause, and defining
- * overwrite rules to influence the behavior. If no rules match, it either propagates the original exception or throws
- * a new one provided by `lazyException`.
- *
- * @param lazyException A supplier for creating a throwable to be thrown if no specific case or overwrite rules match.
- * @param specificCases A map of exception types to their associated throwable suppliers. If an exception matches a key
- * in this map, the corresponding supplier provides the exception to be thrown.
- * @param includeCause If true, includes the original exception as the cause of the newly thrown exception. Default is true.
- * @param overwriteOnly A class of the exception. If a caught exception matches this type, it is overwritten with
- * the exception provided by `lazyException`, unless excluded by `notOverwrite`.
- * @param notOverwrite A set of exception types that should not be overwritten, even if they match `overwriteOnly`.
- * @param block The block of code to execute. If completed successfully, its result is returned.
- *
- * @return The result of the executed block if no exceptions are thrown or if exceptions are not propagated further.
- *
- * @throws ParametersInConflictException If there is a conflict between `overwriteOnly` and `notOverwrite`,
- * or between `specificCases` and `notOverwrite`.
- * @throws Throwable If no specific handling rules apply, the original exception or a throwable from `lazyException` is propagated.
- *
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableSupplier,
-    specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
-) = tryOrThrow(lazyException, specificCases, includeCause, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
-/**
- * Executes the given block of code and applies custom exception handling based on the provided configuration.
- * If the block throws an exception, this function decides whether to suppress, propagate, or replace it with a new exception.
- *
- * @param lazyException A supplier that provides the throwable to be thrown if no specific case or rule overrides
- * apply to the encountered exception.
- * @param specificCases A map specifying exception types to be handled explicitly. For each key-value pair in the map,
- * if a caught exception matches the key, the associated supplier's throwable is thrown.
- * @param includeCause If true, includes the original exception as the cause of the newly thrown exception, if applicable.
- * Defaults to true.
- * @param overwriteOnly If specified, exceptions matching any type in this set will be replaced with the throwable
- * supplied by `lazyException`, unless excluded by `notOverwrite`.
- * @param notOverwrite Exceptions matching any type in this set will not be replaced, even if they are in the `overwriteOnly` set.
- * @param block The block of code to execute. If the block completes without throwing an exception, its result is returned.
- *
- * @return The result of the executed block if no exception occurs, or if thrown exceptions are handled without propagation.
- *
- * @throws ParametersInConflictException Thrown if there are conflicts between `overwriteOnly` and `notOverwrite`,
- * or between `specificCases` keys and `notOverwrite`.
- * @throws Throwable Propagates the original or newly created exception if no matching rule is applied.
- *
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableSupplier,
-    specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOrThrow(lazyException, specificCases, includeCause, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-/**
- * Executes the given block and manages exceptions based on the specified parameters.
- * Allows customization of exception handling, including specific cases, conditional overwriting,
- * and inclusion of original causes.
- *
- * @param lazyException A supplier for creating a throwable to be thrown if there are no matching cases
- * or applicable rules for exceptions.
- * @param specificCases A map where keys represent specific exception types, and values are suppliers
- * for creating custom throwables. If an exception of a matching type is caught, the corresponding
- * supplier is used to provide the throwable to throw.
- * @param includeCause A flag indicating whether the caught exception should be included as the cause
- * of the new throwable. Default is true.
- * @param overwriteOnly A set of exception types for which the caught exception should always be overwritten
- * with a new throwable provided by `lazyException`, unless specified otherwise by `notOverwrite`.
- * Defaults to an empty set.
- * @param notOverwrite A single exception type that should not be overwritten even if it is included in
- * `overwriteOnly`. This type of exception is rethrown as is.
- * @param block The block of code to invoke, potentially throwing exceptions that will be handled
- * in accordance with the provided parameters.
- *
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableSupplier,
-    specificCases: Map<KClass<out Throwable>, ThrowableSupplier> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOrThrow(lazyException, specificCases, includeCause, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-
 
 /**
  * Executes the provided block of code and handles thrown exceptions based on the specified rules.
@@ -1404,9 +968,9 @@ inline fun <T> tryOrThrow(
  * in this map, the corresponding supplier is invoked to provide the exception to be thrown.
  * @param includeCause Determines whether the original exception should be set as the cause of the newly thrown exception.
  * Default is true.
- * @param overwriteOnly A set of exception types. If a caught exception’s type is included in this set, and not in the
+ * @param only A set of exception types. If a caught exception’s type is included in this set, and not in the
  * `notOverwrite` set, a new exception from `lazyException` is thrown, optionally including the original exception as its cause.
- * @param notOverwrite A set of exception types that should not be overwritten, even if they are present in the `overwriteOnly` set.
+ * @param except A set of exception types that should not be overwritten, even if they are present in the `overwriteOnly` set.
  * @param block The block of code to be executed. If it completes without throwing an exception, its result is returned.
  *
  * @return The result of the executed block if no exception is thrown or if exceptions are handled and not propagated.
@@ -1420,133 +984,53 @@ inline fun <T> tryOrThrow(
  */
 @IgnorableReturnValue
 inline fun <T> tryOrThrow(
-    lazyException: ThrowableTransformer,
-    specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
+    lazyException: ExceptionTransformer,
+    specificCases: Map<KClass<out Exception>, ExceptionTransformer> = emptyMap(), // priority over only/except
     includeCause: Boolean = true,
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
     block: Supplier<T>
 ): T {
-    if (overwriteOnly intersects notOverwrite) throw ParametersInConflictException(
+    if (only intersects except) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("overwriteOnly", "notOverwrite"),
-        valuesInConflict = overwriteOnly intersect notOverwrite
+        valuesInConflict = only intersect except
     )
-    if (specificCases.keys intersects notOverwrite) throw ParametersInConflictException(
+    if (specificCases.keys intersects except) throw ParametersInConflictException(
         callableName = "tryOrThrow",
         parametersName = listOf("specificCases", "notOverwrite"),
-        valuesInConflict = specificCases.keys intersect notOverwrite
+        valuesInConflict = specificCases.keys intersect except
     )
+
     return try {
         block()
-    } catch (e: Throwable) {
-        if (e::class in specificCases) throwWithOrWithoutCause(specificCases[e::class]!!, includeCause, e)
-        else if (overwriteOnly.isEmpty() && notOverwrite.isEmpty())
-            throwWithOrWithoutCause(lazyException, includeCause, e)
-        else {
-            if (e::class !in overwriteOnly || e::class in notOverwrite) throw e
-            else throwWithOrWithoutCause(lazyException, includeCause, e)
+    } catch (e: Exception) {
+        if (e is InterruptedException || e is CancellationException) throw e
+
+        val passes = (only.isEmpty() || only.any { it.isInstance(e) }) && except.none { it.isInstance(e) }
+        val specific = generateSequence<Class<*>>(e.javaClass) { it.superclass }
+            .firstNotNullOfOrNull { specificCases[it.kotlin] }
+
+        when {
+            specific != null -> throwWithOrWithoutCause(specific, includeCause, e)
+            passes -> throwWithOrWithoutCause(lazyException, includeCause, e)
+            else -> throw e
         }
     }
 }
 /**
- * Executes the provided block of code and handles thrown exceptions based on the specified rules.
+ * Throws an exception supplied by the provided `laxyException` function.
+ * Optionally includes a cause for the thrown exception if `includeCause` is true.
  *
- * This function executes the given block of code and applies custom exception handling logic. It supports specifying
- * specific cases for exceptions, determining whether the original exception should be included as a cause, and defining
- * overwrite rules to influence the behavior. If no rules match, it either propagates the original exception or throws
- * a new one provided by `lazyException`.
- *
- * @param lazyException A transformer for creating a throwable to be thrown if no specific case or overwrite rules match.
- * @param specificCases A map of exception types to their associated throwable suppliers. If an exception matches a key
- * in this map, the corresponding supplier provides the exception to be thrown.
- * @param includeCause If true, includes the original exception as the cause of the newly thrown exception. Default is true.
- * @param overwriteOnly A class of the exception. If a caught exception matches this type, it is overwritten with
- * the exception provided by `lazyException`, unless excluded by `notOverwrite`.
- * @param notOverwrite A set of exception types that should not be overwritten, even if they match `overwriteOnly`.
- * @param block The block of code to execute. If completed successfully, its result is returned.
- *
- * @return The result of the executed block if no exceptions are thrown or if exceptions are not propagated further.
- *
- * @throws ParametersInConflictException If there is a conflict between `overwriteOnly` and `notOverwrite`,
- * or between `specificCases` and `notOverwrite`.
- * @throws Throwable If no specific handling rules apply, the original exception or a throwable from `lazyException` is propagated.
- *
+ * @param laxyException A supplier function that provides the exception to be thrown.
+ * @param includeCause Indicates whether to include the specified cause for the thrown exception.
+ * @param e The throwable to potentially set as the cause of the exception.
+ * @return Nothing, since this function always throws an exception.
  * @since 1.0.0
  */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableTransformer,
-    specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: Set<KClass<out Throwable>> = emptySet(),
-    block: Supplier<T>
-) = tryOrThrow(lazyException, specificCases, includeCause, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite, block)
-/**
- * Executes the given block of code and applies custom exception handling based on the provided configuration.
- * If the block throws an exception, this function decides whether to suppress, propagate, or replace it with a new exception.
- *
- * @param lazyException A transformer that provides the throwable to be thrown if no specific case or rule overrides
- * apply to the encountered exception.
- * @param specificCases A map specifying exception types to be handled explicitly. For each key-value pair in the map,
- * if a caught exception matches the key, the associated supplier's throwable is thrown.
- * @param includeCause If true, includes the original exception as the cause of the newly thrown exception, if applicable.
- * Defaults to true.
- * @param overwriteOnly If specified, exceptions matching any type in this set will be replaced with the throwable
- * supplied by `lazyException`, unless excluded by `notOverwrite`.
- * @param notOverwrite Exceptions matching any type in this set will not be replaced, even if they are in the `overwriteOnly` set.
- * @param block The block of code to execute. If the block completes without throwing an exception, its result is returned.
- *
- * @return The result of the executed block if no exception occurs, or if thrown exceptions are handled without propagation.
- *
- * @throws ParametersInConflictException Thrown if there are conflicts between `overwriteOnly` and `notOverwrite`,
- * or between `specificCases` keys and `notOverwrite`.
- * @throws Throwable Propagates the original or newly created exception if no matching rule is applied.
- *
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableTransformer,
-    specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: KClass<out Throwable>?,
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOrThrow(lazyException, specificCases, includeCause, overwriteOnly?.let { setOf(it) } ?: emptySet(), notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-/**
- * Executes the given block and manages exceptions based on the specified parameters.
- * Allows customization of exception handling, including specific cases, conditional overwriting,
- * and inclusion of original causes.
- *
- * @param lazyException A transformer for creating a throwable to be thrown if there are no matching cases
- * or applicable rules for exceptions.
- * @param specificCases A map where keys represent specific exception types, and values are suppliers
- * for creating custom throwables. If an exception of a matching type is caught, the corresponding
- * supplier is used to provide the throwable to throw.
- * @param includeCause A flag indicating whether the caught exception should be included as the cause
- * of the new throwable. Default is true.
- * @param overwriteOnly A set of exception types for which the caught exception should always be overwritten
- * with a new throwable provided by `lazyException`, unless specified otherwise by `notOverwrite`.
- * Defaults to an empty set.
- * @param notOverwrite A single exception type that should not be overwritten even if it is included in
- * `overwriteOnly`. This type of exception is rethrown as is.
- * @param block The block of code to invoke, potentially throwing exceptions that will be handled
- * in accordance with the provided parameters.
- *
- * @since 1.0.0
- */
-@IgnorableReturnValue
-inline fun <T> tryOrThrow(
-    lazyException: ThrowableTransformer,
-    specificCases: Map<KClass<out Throwable>, ThrowableTransformer> = emptyMap(), // has priority to overwriteOnly and notOverwrite
-    includeCause: Boolean = true,
-    overwriteOnly: Set<KClass<out Throwable>> = emptySet(),
-    notOverwrite: KClass<out Throwable>?,
-    block: Supplier<T>
-) = tryOrThrow(lazyException, specificCases, includeCause, overwriteOnly, notOverwrite?.let { setOf(it) } ?: emptySet(), block)
-
+@PublishedApi
+internal inline fun throwWithOrWithoutCause(laxyException: ExceptionSupplier, includeCause: Boolean, e: Exception): Nothing =
+    throw if (includeCause) laxyException() withRootCause e else laxyException()
 /**
  * Throws an exception supplied by the provided `laxyException` function.
  * Optionally includes a cause for the thrown exception if `includeCause` is true.
@@ -1558,23 +1042,8 @@ inline fun <T> tryOrThrow(
  * @since 1.0.0
  */
 @PublishedApi
-internal inline fun throwWithOrWithoutCause(laxyException: ThrowableSupplier, includeCause: Boolean, e: Throwable): Nothing =
-    throw if (includeCause) laxyException() causedBy e else laxyException()
-
-/**
- * Throws an exception supplied by the provided `laxyException` function.
- * Optionally includes a cause for the thrown exception if `includeCause` is true.
- *
- * @param laxyException A supplier function that provides the exception to be thrown.
- * @param includeCause Indicates whether to include the specified cause for the thrown exception.
- * @param e The throwable to potentially set as the cause of the exception.
- * @return Nothing, since this function always throws an exception.
- * @since 1.0.0
- */
-@PublishedApi
-internal inline fun throwWithOrWithoutCause(laxyException: ThrowableTransformer, includeCause: Boolean, e: Throwable): Nothing =
-    throw if (includeCause) laxyException(e) causedBy e else laxyException(e)
-
+internal inline fun throwWithOrWithoutCause(laxyException: ExceptionTransformer, includeCause: Boolean, e: Exception): Nothing =
+    throw if (includeCause) laxyException(e) withRootCause e else laxyException(e)
 /**
  * Logs a message at the specified logging level, with or without an associated exception.
  *
@@ -1586,9 +1055,9 @@ internal inline fun throwWithOrWithoutCause(laxyException: ThrowableTransformer,
  * @since 1.0.0
  */
 @PublishedApi
-internal fun logWithOrWithoutException(logger: Logger, level: LogLevel, message: String?, includeException: Boolean, e: Throwable) {
-    if (includeException) log(logger, level, message ?: e.message ?: String.EMPTY, e)
-    else log(logger, level, message ?: e.message ?: String.EMPTY)
+internal fun logWithOrWithoutException(logger: Logger, level: LogLevel, message: String?, includeException: Boolean, e: Exception) {
+    if (includeException) log(logger, level, message ?: e.message.orEmpty(), e)
+    else log(logger, level, message ?: e.message.orEmpty())
 }
 
 /**

@@ -26,7 +26,7 @@ import kotlin.reflect.KProperty
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException("Value is not positive.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is not positive.", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException("Value is not positive.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException("Value is not positive.", cause?.invoke(this)))
     return this
 }
 /**
@@ -41,7 +41,7 @@ fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -62,7 +62,7 @@ fun <T : Number> T.validatePositive(causeOf: Transformer<T, Throwable>? = null, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variableName, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -79,7 +79,7 @@ fun <T : Number> T.validatePositive(property: KProperty<*>?, variableName: Strin
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variable, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -96,7 +96,7 @@ fun <T : Number> T.validatePositive(property: KProperty<*>?, variable: KProperty
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameterName, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -114,7 +114,7 @@ fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameter, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -131,7 +131,7 @@ fun <T : Number> T.validatePositive(callable: KFunction<*>?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameterName, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -148,7 +148,7 @@ fun <T : Number> T.validatePositive(callableName: String?, parameterName: String
  */
 @IgnorableReturnValue
 fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotPositive) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)))
+    if (isNotPositive) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameter, message ?: "is not positive", cause?.invoke(this)))
     return this
 }
 
@@ -166,7 +166,7 @@ fun <T : Number> T.validatePositive(callableName: String?, parameter: KParameter
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException("Value is positive.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is positive.", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException("Value is positive.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException("Value is positive.", cause?.invoke(this)))
     return this
 }
 /**
@@ -183,7 +183,7 @@ fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -207,7 +207,7 @@ fun <T : Number> T.validateNotPositive(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variableName, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -228,7 +228,7 @@ fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variableName: St
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variable, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -246,7 +246,7 @@ fun <T : Number> T.validateNotPositive(property: KProperty<*>?, variable: KPrope
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameterName, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -263,7 +263,7 @@ fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameterName: S
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameter, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -280,7 +280,7 @@ fun <T : Number> T.validateNotPositive(callable: KFunction<*>?, parameter: KPara
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameterName, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 /**
@@ -297,7 +297,7 @@ fun <T : Number> T.validateNotPositive(callableName: String?, parameterName: Str
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isPositive) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)))
+    if (isPositive) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameter, message ?: "is positive", cause?.invoke(this)))
     return this
 }
 
@@ -312,7 +312,7 @@ fun <T : Number> T.validateNotPositive(callableName: String?, parameter: KParame
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException("Value is not negative.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is not negative.", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException("Value is not negative.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException("Value is not negative.", cause?.invoke(this)))
     return this
 }
 /**
@@ -332,7 +332,7 @@ fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -355,7 +355,7 @@ fun <T : Number> T.validateNegative(causeOf: Transformer<T, Throwable>? = null, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variableName, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -373,7 +373,7 @@ fun <T : Number> T.validateNegative(property: KProperty<*>?, variableName: Strin
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variable, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -390,7 +390,7 @@ fun <T : Number> T.validateNegative(property: KProperty<*>?, variable: KProperty
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameterName, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -407,7 +407,7 @@ fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameter, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -424,7 +424,7 @@ fun <T : Number> T.validateNegative(callable: KFunction<*>?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameterName, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -441,7 +441,7 @@ fun <T : Number> T.validateNegative(callableName: String?, parameterName: String
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotNegative) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)))
+    if (isNotNegative) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameter, message ?: "is not negative", cause?.invoke(this)))
     return this
 }
 
@@ -458,7 +458,7 @@ fun <T : Number> T.validateNegative(callableName: String?, parameter: KParameter
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException("Value is negative.", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException("Value is negative.", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException("Value is negative.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException("Value is negative.", cause?.invoke(this)))
     return this
 }
 /**
@@ -474,7 +474,7 @@ fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -497,7 +497,7 @@ fun <T : Number> T.validateNotNegative(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variableName, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -519,7 +519,7 @@ fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variableName: St
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(property, variable, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -536,7 +536,7 @@ fun <T : Number> T.validateNotNegative(property: KProperty<*>?, variable: KPrope
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameterName, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -554,7 +554,7 @@ fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameterName: S
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callable, parameter, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -573,7 +573,7 @@ fun <T : Number> T.validateNotNegative(callable: KFunction<*>?, parameter: KPara
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameterName, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 /**
@@ -590,7 +590,7 @@ fun <T : Number> T.validateNotNegative(callableName: String?, parameterName: Str
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNegative) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).initCause(NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)))
+    if (isNegative) throw if (causeOf == null) NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)) else causeOf(this).withRootCause(NumberSignException(callableName, parameter, message ?: "is negative", cause?.invoke(this)))
     return this
 }
 
@@ -606,7 +606,7 @@ fun <T : Number> T.validateNotNegative(callableName: String?, parameter: KParame
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException("Value is odd.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is odd.", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException("Value is odd.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Value is odd.", cause?.invoke(this)))
     return this
 }
 /**
@@ -625,7 +625,7 @@ fun <T : Number> T.validateEven(causeOf: Transformer<T, Throwable>? = null, caus
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -642,7 +642,7 @@ fun <T : Number> T.validateEven(causeOf: Transformer<T, Throwable>? = null, caus
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is odd", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is odd", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is odd", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is odd", cause?.invoke(this)))
     return this
 }
 /**
@@ -659,7 +659,7 @@ fun <T : Number> T.validateEven(property: KProperty<*>?, variableName: String? =
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is odd", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is odd", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is odd", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is odd", cause?.invoke(this)))
     return this
 }
 /**
@@ -676,7 +676,7 @@ fun <T : Number> T.validateEven(property: KProperty<*>?, variable: KProperty<*>?
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is odd", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is odd", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is odd", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is odd", cause?.invoke(this)))
     return this
 }
 /**
@@ -693,7 +693,7 @@ fun <T : Number> T.validateEven(callable: KFunction<*>?, parameterName: String? 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is odd", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is odd", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is odd", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is odd", cause?.invoke(this)))
     return this
 }
 /**
@@ -710,7 +710,7 @@ fun <T : Number> T.validateEven(callable: KFunction<*>?, parameter: KParameter?,
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is odd", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is odd", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is odd", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is odd", cause?.invoke(this)))
     return this
 }
 /**
@@ -728,7 +728,7 @@ fun <T : Number> T.validateEven(callableName: String?, parameterName: String? = 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateEven(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isOdd) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is odd", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is odd", cause?.invoke(this)))
+    if (isOdd) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is odd", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is odd", cause?.invoke(this)))
     return this
 }
 
@@ -745,7 +745,7 @@ fun <T : Number> T.validateEven(callableName: String?, parameter: KParameter?, m
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException("Value is even.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is even.", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException("Value is even.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Value is even.", cause?.invoke(this)))
     return this
 }
 /**
@@ -764,7 +764,7 @@ fun <T : Number> T.validateOdd(causeOf: Transformer<T, Throwable>? = null, cause
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -781,7 +781,7 @@ fun <T : Number> T.validateOdd(causeOf: Transformer<T, Throwable>? = null, cause
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is even", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is even", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is even", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is even", cause?.invoke(this)))
     return this
 }
 /**
@@ -798,7 +798,7 @@ fun <T : Number> T.validateOdd(property: KProperty<*>?, variableName: String? = 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is even", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is even", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is even", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is even", cause?.invoke(this)))
     return this
 }
 /**
@@ -815,7 +815,7 @@ fun <T : Number> T.validateOdd(property: KProperty<*>?, variable: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is even", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is even", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is even", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is even", cause?.invoke(this)))
     return this
 }
 /**
@@ -832,7 +832,7 @@ fun <T : Number> T.validateOdd(callable: KFunction<*>?, parameterName: String? =
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is even", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is even", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is even", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is even", cause?.invoke(this)))
     return this
 }
 /**
@@ -849,7 +849,7 @@ fun <T : Number> T.validateOdd(callable: KFunction<*>?, parameter: KParameter?, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is even", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is even", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is even", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is even", cause?.invoke(this)))
     return this
 }
 /**
@@ -868,7 +868,7 @@ fun <T : Number> T.validateOdd(callableName: String?, parameterName: String? = n
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateOdd(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEven) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is even", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is even", cause?.invoke(this)))
+    if (isEven) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is even", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is even", cause?.invoke(this)))
     return this
 }
 
@@ -884,7 +884,7 @@ fun <T : Number> T.validateOdd(callableName: String?, parameter: KParameter?, me
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException("Value is not decimal.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is not decimal.", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException("Value is not decimal.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Value is not decimal.", cause?.invoke(this)))
     return this
 }
 /**
@@ -900,7 +900,7 @@ fun <T : Number> T.validateDecimal(causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -917,7 +917,7 @@ fun <T : Number> T.validateDecimal(causeOf: Transformer<T, Throwable>? = null, c
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not decimal", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -934,7 +934,7 @@ fun <T : Number> T.validateDecimal(property: KProperty<*>?, variableName: String
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not decimal", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -951,7 +951,7 @@ fun <T : Number> T.validateDecimal(property: KProperty<*>?, variable: KProperty<
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not decimal", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -968,7 +968,7 @@ fun <T : Number> T.validateDecimal(callable: KFunction<*>?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not decimal", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -986,7 +986,7 @@ fun <T : Number> T.validateDecimal(callable: KFunction<*>?, parameter: KParamete
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not decimal", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -1004,7 +1004,7 @@ fun <T : Number> T.validateDecimal(callableName: String?, parameterName: String?
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateDecimal(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not decimal", cause?.invoke(this)))
+    if (isNotDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not decimal", cause?.invoke(this)))
     return this
 }
 
@@ -1022,7 +1022,7 @@ fun <T : Number> T.validateDecimal(callableName: String?, parameter: KParameter?
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException("Value is decimal.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("Value is decimal.", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException("Value is decimal.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("Value is decimal.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1040,7 +1040,7 @@ fun <T : Number> T.validateNotDecimal(causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1064,7 +1064,7 @@ fun <T : Number> T.validateNotDecimal(causeOf: Transformer<T, Throwable>? = null
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is decimal", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -1082,7 +1082,7 @@ fun <T : Number> T.validateNotDecimal(property: KProperty<*>?, variableName: Str
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is decimal", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -1099,7 +1099,7 @@ fun <T : Number> T.validateNotDecimal(property: KProperty<*>?, variable: KProper
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is decimal", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -1116,7 +1116,7 @@ fun <T : Number> T.validateNotDecimal(callable: KFunction<*>?, parameterName: St
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is decimal", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -1133,7 +1133,7 @@ fun <T : Number> T.validateNotDecimal(callable: KFunction<*>?, parameter: KParam
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is decimal", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is decimal", cause?.invoke(this)))
     return this
 }
 /**
@@ -1151,7 +1151,7 @@ fun <T : Number> T.validateNotDecimal(callableName: String?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T : Number> T.validateNotDecimal(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is decimal", cause?.invoke(this)))
+    if (isDecimal) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is decimal", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is decimal", cause?.invoke(this)))
     return this
 }
 
@@ -1170,7 +1170,7 @@ fun <T : Number> T.validateNotDecimal(callableName: String?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1187,7 +1187,7 @@ fun Int.validateIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = null
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null, lazyMessage: Transformer<Int, Any>): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1210,7 +1210,7 @@ fun Int.validateIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = null
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1228,7 +1228,7 @@ fun Int.validateIn(range: IntRange, property: KProperty<*>?, variableName: Strin
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1253,7 +1253,7 @@ fun Int.validateIn(range: IntRange, property: KProperty<*>?, variable: KProperty
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1276,7 +1276,7 @@ fun Int.validateIn(range: IntRange, callable: KFunction<*>?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1296,7 +1296,7 @@ fun Int.validateIn(range: IntRange, callable: KFunction<*>?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1315,7 +1315,7 @@ fun Int.validateIn(range: IntRange, callableName: String?, parameterName: String
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -1331,7 +1331,7 @@ fun Int.validateIn(range: IntRange, callableName: String?, parameter: KParameter
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1347,7 +1347,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, Thro
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null, lazyMessage: Transformer<Int, Any>): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1369,7 +1369,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, Thro
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1389,7 +1389,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1408,7 +1408,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1427,7 +1427,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1446,7 +1446,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1466,7 +1466,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -1483,7 +1483,7 @@ fun Int.validateIn(range: IntRangeWithExclusions, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1500,7 +1500,7 @@ fun Int.validateIn(range: IntRangeWithConditions, causeOf: Transformer<Int, Thro
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null, lazyMessage: Transformer<Int, Any>): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1518,7 +1518,7 @@ fun Int.validateIn(range: IntRangeWithConditions, causeOf: Transformer<Int, Thro
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1536,7 +1536,7 @@ fun Int.validateIn(range: IntRangeWithConditions, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1554,7 +1554,7 @@ fun Int.validateIn(range: IntRangeWithConditions, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1571,7 +1571,7 @@ fun Int.validateIn(range: IntRangeWithConditions, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1589,7 +1589,7 @@ fun Int.validateIn(range: IntRangeWithConditions, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1607,7 +1607,7 @@ fun Int.validateIn(range: IntRangeWithConditions, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun Int.validateIn(range: IntRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -1626,7 +1626,7 @@ fun Int.validateIn(range: IntRangeWithConditions, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1643,7 +1643,7 @@ fun UInt.validateIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? = n
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null, lazyMessage: Transformer<UInt, Any>): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1667,7 +1667,7 @@ fun UInt.validateIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? = n
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1686,7 +1686,7 @@ fun UInt.validateIn(range: UIntRange, property: KProperty<*>?, variableName: Str
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1708,7 +1708,7 @@ fun UInt.validateIn(range: UIntRange, property: KProperty<*>?, variable: KProper
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1734,7 +1734,7 @@ fun UInt.validateIn(range: UIntRange, callable: KFunction<*>?, parameterName: St
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1754,7 +1754,7 @@ fun UInt.validateIn(range: UIntRange, callable: KFunction<*>?, parameter: KParam
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1773,7 +1773,7 @@ fun UInt.validateIn(range: UIntRange, callableName: String?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -1789,7 +1789,7 @@ fun UInt.validateIn(range: UIntRange, callableName: String?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1806,7 +1806,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt, T
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null, lazyMessage: Transformer<UInt, Any>): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1823,7 +1823,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt, T
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1842,7 +1842,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1862,7 +1862,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1881,7 +1881,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1900,7 +1900,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1919,7 +1919,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -1936,7 +1936,7 @@ fun UInt.validateIn(range: UIntRangeWithExclusions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1952,7 +1952,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt, T
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null, lazyMessage: Transformer<UInt, Any>): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1971,7 +1971,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt, T
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -1989,7 +1989,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2007,7 +2007,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2026,7 +2026,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2044,7 +2044,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2062,7 +2062,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun UInt.validateIn(range: UIntRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2080,7 +2080,7 @@ fun UInt.validateIn(range: UIntRangeWithConditions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2098,7 +2098,7 @@ fun Long.validateIn(range: LongRange, causeOf: Transformer<Long, Throwable>? = n
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null, lazyMessage: Transformer<Long, Any>): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2117,7 +2117,7 @@ fun Long.validateIn(range: LongRange, causeOf: Transformer<Long, Throwable>? = n
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2136,7 +2136,7 @@ fun Long.validateIn(range: LongRange, property: KProperty<*>?, variableName: Str
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2154,7 +2154,7 @@ fun Long.validateIn(range: LongRange, property: KProperty<*>?, variable: KProper
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2175,7 +2175,7 @@ fun Long.validateIn(range: LongRange, callable: KFunction<*>?, parameterName: St
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2198,7 +2198,7 @@ fun Long.validateIn(range: LongRange, callable: KFunction<*>?, parameter: KParam
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2220,7 +2220,7 @@ fun Long.validateIn(range: LongRange, callableName: String?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2237,7 +2237,7 @@ fun Long.validateIn(range: LongRange, callableName: String?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2255,7 +2255,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, causeOf: Transformer<Long, T
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null, lazyMessage: Transformer<Long, Any>): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2273,7 +2273,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, causeOf: Transformer<Long, T
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2292,7 +2292,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2311,7 +2311,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2329,7 +2329,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2347,7 +2347,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2368,7 +2368,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2385,7 +2385,7 @@ fun Long.validateIn(range: LongRangeWithExclusions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2403,7 +2403,7 @@ fun Long.validateIn(range: LongRangeWithConditions, causeOf: Transformer<Long, T
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null, lazyMessage: Transformer<Long, Any>): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2424,7 +2424,7 @@ fun Long.validateIn(range: LongRangeWithConditions, causeOf: Transformer<Long, T
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2442,7 +2442,7 @@ fun Long.validateIn(range: LongRangeWithConditions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2461,7 +2461,7 @@ fun Long.validateIn(range: LongRangeWithConditions, property: KProperty<*>?, var
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2479,7 +2479,7 @@ fun Long.validateIn(range: LongRangeWithConditions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2497,7 +2497,7 @@ fun Long.validateIn(range: LongRangeWithConditions, callable: KFunction<*>?, par
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2515,7 +2515,7 @@ fun Long.validateIn(range: LongRangeWithConditions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun Long.validateIn(range: LongRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2536,7 +2536,7 @@ fun Long.validateIn(range: LongRangeWithConditions, callableName: String?, param
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2553,7 +2553,7 @@ fun ULong.validateIn(range: ULongRange, causeOf: Transformer<ULong, Throwable>? 
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null, lazyMessage: Transformer<ULong, Any>): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2572,7 +2572,7 @@ fun ULong.validateIn(range: ULongRange, causeOf: Transformer<ULong, Throwable>? 
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2591,7 +2591,7 @@ fun ULong.validateIn(range: ULongRange, property: KProperty<*>?, variableName: S
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2610,7 +2610,7 @@ fun ULong.validateIn(range: ULongRange, property: KProperty<*>?, variable: KProp
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2630,7 +2630,7 @@ fun ULong.validateIn(range: ULongRange, callable: KFunction<*>?, parameterName: 
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2650,7 +2650,7 @@ fun ULong.validateIn(range: ULongRange, callable: KFunction<*>?, parameter: KPar
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2669,7 +2669,7 @@ fun ULong.validateIn(range: ULongRange, callableName: String?, parameterName: St
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2686,7 +2686,7 @@ fun ULong.validateIn(range: ULongRange, callableName: String?, parameter: KParam
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2703,7 +2703,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, causeOf: Transformer<ULong
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null, lazyMessage: Transformer<ULong, Any>): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2723,7 +2723,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, causeOf: Transformer<ULong
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2742,7 +2742,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2764,7 +2764,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2782,7 +2782,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2801,7 +2801,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2819,7 +2819,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, callableName: String?, par
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2835,7 +2835,7 @@ fun ULong.validateIn(range: ULongRangeWithExclusions, callableName: String?, par
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is not in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2852,7 +2852,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, causeOf: Transformer<ULong
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null, lazyMessage: Transformer<ULong, Any>): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2870,7 +2870,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, causeOf: Transformer<ULong
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2889,7 +2889,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2907,7 +2907,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2924,7 +2924,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2945,7 +2945,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -2970,7 +2970,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, callableName: String?, par
  */
 @IgnorableReturnValue
 fun ULong.validateIn(range: ULongRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
+    if (this !in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is not in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -2989,7 +2989,7 @@ fun ULong.validateIn(range: ULongRangeWithConditions, callableName: String?, par
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3006,7 +3006,7 @@ fun Int.validateNotIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = n
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null, lazyMessage: Transformer<Int, Any>): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3025,7 +3025,7 @@ fun Int.validateNotIn(range: IntRange, causeOf: Transformer<Int, Throwable>? = n
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3044,7 +3044,7 @@ fun Int.validateNotIn(range: IntRange, property: KProperty<*>?, variableName: St
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3064,7 +3064,7 @@ fun Int.validateNotIn(range: IntRange, property: KProperty<*>?, variable: KPrope
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3082,7 +3082,7 @@ fun Int.validateNotIn(range: IntRange, callable: KFunction<*>?, parameterName: S
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3101,7 +3101,7 @@ fun Int.validateNotIn(range: IntRange, callable: KFunction<*>?, parameter: KPara
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3119,7 +3119,7 @@ fun Int.validateNotIn(range: IntRange, callableName: String?, parameterName: Str
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -3135,7 +3135,7 @@ fun Int.validateNotIn(range: IntRange, callableName: String?, parameter: KParame
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3155,7 +3155,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, T
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null, lazyMessage: Transformer<Int, Any>): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3174,7 +3174,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, causeOf: Transformer<Int, T
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3192,7 +3192,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, property: KProperty<*>?, va
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3211,7 +3211,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, property: KProperty<*>?, va
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3229,7 +3229,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, callable: KFunction<*>?, pa
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3249,7 +3249,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, callable: KFunction<*>?, pa
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3268,7 +3268,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, callableName: String?, para
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -3284,7 +3284,7 @@ fun Int.validateNotIn(range: IntRangeWithExclusions, callableName: String?, para
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3301,7 +3301,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, causeOf: Transformer<Int, T
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null, lazyMessage: Transformer<Int, Any>): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3319,7 +3319,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, causeOf: Transformer<Int, T
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3338,7 +3338,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, property: KProperty<*>?, va
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3357,7 +3357,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, property: KProperty<*>?, va
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3375,7 +3375,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, callable: KFunction<*>?, pa
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3394,7 +3394,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, callable: KFunction<*>?, pa
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3413,7 +3413,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, callableName: String?, para
  */
 @IgnorableReturnValue
 fun Int.validateNotIn(range: IntRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Int, Throwable>? = null, cause: Transformer<Int, Throwable>? = null): Int {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -3432,7 +3432,7 @@ fun Int.validateNotIn(range: IntRangeWithConditions, callableName: String?, para
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3448,7 +3448,7 @@ fun UInt.validateNotIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null, lazyMessage: Transformer<UInt, Any>): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3466,7 +3466,7 @@ fun UInt.validateNotIn(range: UIntRange, causeOf: Transformer<UInt, Throwable>? 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3486,7 +3486,7 @@ fun UInt.validateNotIn(range: UIntRange, property: KProperty<*>?, variableName: 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3505,7 +3505,7 @@ fun UInt.validateNotIn(range: UIntRange, property: KProperty<*>?, variable: KPro
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3527,7 +3527,7 @@ fun UInt.validateNotIn(range: UIntRange, callable: KFunction<*>?, parameterName:
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3547,7 +3547,7 @@ fun UInt.validateNotIn(range: UIntRange, callable: KFunction<*>?, parameter: KPa
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3566,7 +3566,7 @@ fun UInt.validateNotIn(range: UIntRange, callableName: String?, parameterName: S
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -3585,7 +3585,7 @@ fun UInt.validateNotIn(range: UIntRange, callableName: String?, parameter: KPara
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3601,7 +3601,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null, lazyMessage: Transformer<UInt, Any>): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3619,7 +3619,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, causeOf: Transformer<UInt
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3637,7 +3637,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3655,7 +3655,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3673,7 +3673,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3692,7 +3692,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3711,7 +3711,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -3729,7 +3729,7 @@ fun UInt.validateNotIn(range: UIntRangeWithExclusions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3746,7 +3746,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null, lazyMessage: Transformer<UInt, Any>): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3765,7 +3765,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, causeOf: Transformer<UInt
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3786,7 +3786,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3805,7 +3805,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3823,7 +3823,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3842,7 +3842,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3860,7 +3860,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun UInt.validateNotIn(range: UIntRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<UInt, Throwable>? = null, cause: Transformer<UInt, Throwable>? = null): UInt {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -3876,7 +3876,7 @@ fun UInt.validateNotIn(range: UIntRangeWithConditions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3893,7 +3893,7 @@ fun Long.validateNotIn(range: LongRange, causeOf: Transformer<Long, Throwable>? 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null, lazyMessage: Transformer<Long, Any>): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3912,7 +3912,7 @@ fun Long.validateNotIn(range: LongRange, causeOf: Transformer<Long, Throwable>? 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3931,7 +3931,7 @@ fun Long.validateNotIn(range: LongRange, property: KProperty<*>?, variableName: 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3951,7 +3951,7 @@ fun Long.validateNotIn(range: LongRange, property: KProperty<*>?, variable: KPro
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3971,7 +3971,7 @@ fun Long.validateNotIn(range: LongRange, callable: KFunction<*>?, parameterName:
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -3990,7 +3990,7 @@ fun Long.validateNotIn(range: LongRange, callable: KFunction<*>?, parameter: KPa
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4009,7 +4009,7 @@ fun Long.validateNotIn(range: LongRange, callableName: String?, parameterName: S
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -4024,7 +4024,7 @@ fun Long.validateNotIn(range: LongRange, callableName: String?, parameter: KPara
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4040,7 +4040,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, causeOf: Transformer<Long
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null, lazyMessage: Transformer<Long, Any>): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4059,7 +4059,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, causeOf: Transformer<Long
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4078,7 +4078,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4097,7 +4097,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4116,7 +4116,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4135,7 +4135,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4153,7 +4153,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -4169,7 +4169,7 @@ fun Long.validateNotIn(range: LongRangeWithExclusions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4185,7 +4185,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, causeOf: Transformer<Long
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null, lazyMessage: Transformer<Long, Any>): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4203,7 +4203,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, causeOf: Transformer<Long
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4221,7 +4221,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4240,7 +4240,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, property: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4258,7 +4258,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4277,7 +4277,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, callable: KFunction<*>?, 
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4296,7 +4296,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun Long.validateNotIn(range: LongRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<Long, Throwable>? = null, cause: Transformer<Long, Throwable>? = null): Long {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -4316,7 +4316,7 @@ fun Long.validateNotIn(range: LongRangeWithConditions, callableName: String?, pa
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4333,7 +4333,7 @@ fun ULong.validateNotIn(range: ULongRange, causeOf: Transformer<ULong, Throwable
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null, lazyMessage: Transformer<ULong, Any>): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4355,7 +4355,7 @@ fun ULong.validateNotIn(range: ULongRange, causeOf: Transformer<ULong, Throwable
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4373,7 +4373,7 @@ fun ULong.validateNotIn(range: ULongRange, property: KProperty<*>?, variableName
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4392,7 +4392,7 @@ fun ULong.validateNotIn(range: ULongRange, property: KProperty<*>?, variable: KP
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4411,7 +4411,7 @@ fun ULong.validateNotIn(range: ULongRange, callable: KFunction<*>?, parameterNam
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4430,7 +4430,7 @@ fun ULong.validateNotIn(range: ULongRange, callable: KFunction<*>?, parameter: K
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4451,7 +4451,7 @@ fun ULong.validateNotIn(range: ULongRange, callableName: String?, parameterName:
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRange, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -4467,7 +4467,7 @@ fun ULong.validateNotIn(range: ULongRange, callableName: String?, parameter: KPa
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4485,7 +4485,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, causeOf: Transformer<UL
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null, lazyMessage: Transformer<ULong, Any>): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4503,7 +4503,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, causeOf: Transformer<UL
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4521,7 +4521,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4541,7 +4541,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4559,7 +4559,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4578,7 +4578,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4596,7 +4596,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, callableName: String?, 
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithExclusions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -4613,7 +4613,7 @@ fun ULong.validateNotIn(range: ULongRangeWithExclusions, callableName: String?, 
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException("Value is in range $range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4629,7 +4629,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, causeOf: Transformer<UL
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null, lazyMessage: Transformer<ULong, Any>): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4648,7 +4648,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, causeOf: Transformer<UL
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variableName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4667,7 +4667,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(property, variable, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4686,7 +4686,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4707,7 +4707,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callable, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4726,7 +4726,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameterName, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 /**
@@ -4745,7 +4745,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, callableName: String?, 
  */
 @IgnorableReturnValue
 fun ULong.validateNotIn(range: ULongRangeWithConditions, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<ULong, Throwable>? = null, cause: Transformer<ULong, Throwable>? = null): ULong {
-    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).initCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
+    if (this in range) throw if (causeOf == null) NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)) else causeOf(this).withRootCause(NumberOutOfRangeException(callableName, parameter, message ?: "is in range $range", cause?.invoke(this)))
     return this
 }
 
@@ -4763,7 +4763,7 @@ fun ULong.validateNotIn(range: ULongRangeWithConditions, callableName: String?, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException("Value is not zero.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is not zero.", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException("Value is not zero.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("Value is not zero.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4778,7 +4778,7 @@ fun <T : Number> T.expectZero(causeOf: Transformer<T, Throwable>? = null, cause:
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4795,7 +4795,7 @@ fun <T : Number> T.expectZero(causeOf: Transformer<T, Throwable>? = null, cause:
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not zero", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is not zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4811,7 +4811,7 @@ fun <T : Number> T.expectZero(property: KProperty<*>?, variableName: String? = n
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not zero", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is not zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4828,7 +4828,7 @@ fun <T : Number> T.expectZero(property: KProperty<*>?, variable: KProperty<*>?, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not zero", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is not zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4845,7 +4845,7 @@ fun <T : Number> T.expectZero(callable: KFunction<*>?, parameterName: String? = 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not zero", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is not zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4863,7 +4863,7 @@ fun <T : Number> T.expectZero(callable: KFunction<*>?, parameter: KParameter?, m
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not zero", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4880,7 +4880,7 @@ fun <T : Number> T.expectZero(callableName: String?, parameterName: String? = nu
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectZero(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not zero", cause?.invoke(this)))
+    if (isNotZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is not zero", cause?.invoke(this)))
     return this
 }
 
@@ -4895,7 +4895,7 @@ fun <T : Number> T.expectZero(callableName: String?, parameter: KParameter?, mes
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException("Value is zero.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is zero.", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException("Value is zero.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("Value is zero.", cause?.invoke(this)))
     return this
 }
 /**
@@ -4913,7 +4913,7 @@ fun <T : Number> T.expectNotZero(causeOf: Transformer<T, Throwable>? = null, cau
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -4930,7 +4930,7 @@ fun <T : Number> T.expectNotZero(causeOf: Transformer<T, Throwable>? = null, cau
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is zero", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4950,7 +4950,7 @@ fun <T : Number> T.expectNotZero(property: KProperty<*>?, variableName: String? 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is zero", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4967,7 +4967,7 @@ fun <T : Number> T.expectNotZero(property: KProperty<*>?, variable: KProperty<*>
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "not zero", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "not zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -4983,7 +4983,7 @@ fun <T : Number> T.expectNotZero(callable: KFunction<*>?, parameterName: String?
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is zero", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -5000,7 +5000,7 @@ fun <T : Number> T.expectNotZero(callable: KFunction<*>?, parameter: KParameter?
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is zero", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is zero", cause?.invoke(this)))
     return this
 }
 /**
@@ -5018,7 +5018,7 @@ fun <T : Number> T.expectNotZero(callableName: String?, parameterName: String? =
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotZero(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is zero", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is zero", cause?.invoke(this)))
+    if (isZero) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is zero", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is zero", cause?.invoke(this)))
     return this
 }
 
@@ -5033,7 +5033,7 @@ fun <T : Number> T.expectNotZero(callableName: String?, parameter: KParameter?, 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException("Value is not one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is not one.", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException("Value is not one.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("Value is not one.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5052,7 +5052,7 @@ fun <T : Number> T.expectOne(causeOf: Transformer<T, Throwable>? = null, cause: 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5069,7 +5069,7 @@ fun <T : Number> T.expectOne(causeOf: Transformer<T, Throwable>? = null, cause: 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not one", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5088,7 +5088,7 @@ fun <T : Number> T.expectOne(property: KProperty<*>?, variableName: String? = nu
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not one", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5106,7 +5106,7 @@ fun <T : Number> T.expectOne(property: KProperty<*>?, variable: KProperty<*>?, m
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not one", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5123,7 +5123,7 @@ fun <T : Number> T.expectOne(callable: KFunction<*>?, parameterName: String? = n
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not one", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5143,7 +5143,7 @@ fun <T : Number> T.expectOne(callable: KFunction<*>?, parameter: KParameter?, me
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not one", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5160,7 +5160,7 @@ fun <T : Number> T.expectOne(callableName: String?, parameterName: String? = nul
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not one", cause?.invoke(this)))
+    if (this != 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is not one", cause?.invoke(this)))
     return this
 }
 
@@ -5177,7 +5177,7 @@ fun <T : Number> T.expectOne(callableName: String?, parameter: KParameter?, mess
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException("Value is one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is one.", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException("Value is one.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("Value is one.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5192,7 +5192,7 @@ fun <T : Number> T.expectNotOne(causeOf: Transformer<T, Throwable>? = null, caus
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5208,7 +5208,7 @@ fun <T : Number> T.expectNotOne(causeOf: Transformer<T, Throwable>? = null, caus
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is one", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5225,7 +5225,7 @@ fun <T : Number> T.expectNotOne(property: KProperty<*>?, variableName: String? =
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is one", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5241,7 +5241,7 @@ fun <T : Number> T.expectNotOne(property: KProperty<*>?, variable: KProperty<*>?
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "not one", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5259,7 +5259,7 @@ fun <T : Number> T.expectNotOne(callable: KFunction<*>?, parameterName: String? 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is one", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5276,7 +5276,7 @@ fun <T : Number> T.expectNotOne(callable: KFunction<*>?, parameter: KParameter?,
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is one", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5292,7 +5292,7 @@ fun <T : Number> T.expectNotOne(callableName: String?, parameterName: String? = 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is one", cause?.invoke(this)))
+    if (this == 1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is one", cause?.invoke(this)))
     return this
 }
 
@@ -5307,7 +5307,7 @@ fun <T : Number> T.expectNotOne(callableName: String?, parameter: KParameter?, m
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException("Value is not minus one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is not minus one.", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException("Value is not minus one.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("Value is not minus one.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5322,7 +5322,7 @@ fun <T : Number> T.expectMinusOne(causeOf: Transformer<T, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5339,7 +5339,7 @@ fun <T : Number> T.expectMinusOne(causeOf: Transformer<T, Throwable>? = null, ca
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not minus one", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is not minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5356,7 +5356,7 @@ fun <T : Number> T.expectMinusOne(property: KProperty<*>?, variableName: String?
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not minus one", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is not minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5374,7 +5374,7 @@ fun <T : Number> T.expectMinusOne(property: KProperty<*>?, variable: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not minus one", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is not minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5392,7 +5392,7 @@ fun <T : Number> T.expectMinusOne(callable: KFunction<*>?, parameterName: String
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not minus one", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is not minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5410,7 +5410,7 @@ fun <T : Number> T.expectMinusOne(callable: KFunction<*>?, parameter: KParameter
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not minus one", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5426,7 +5426,7 @@ fun <T : Number> T.expectMinusOne(callableName: String?, parameterName: String? 
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectMinusOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not minus one", cause?.invoke(this)))
+    if (this != -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is not minus one", cause?.invoke(this)))
     return this
 }
 
@@ -5441,7 +5441,7 @@ fun <T : Number> T.expectMinusOne(callableName: String?, parameter: KParameter?,
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException("Value is minus one.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("Value is minus one.", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException("Value is minus one.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("Value is minus one.", cause?.invoke(this)))
     return this
 }
 /**
@@ -5456,7 +5456,7 @@ fun <T : Number> T.expectNotMinusOne(causeOf: Transformer<T, Throwable>? = null,
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -5473,7 +5473,7 @@ fun <T : Number> T.expectNotMinusOne(causeOf: Transformer<T, Throwable>? = null,
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is minus one", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5490,7 +5490,7 @@ fun <T : Number> T.expectNotMinusOne(property: KProperty<*>?, variableName: Stri
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is minus one", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5513,7 +5513,7 @@ fun <T : Number> T.expectNotMinusOne(property: KProperty<*>?, variable: KPropert
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "not one", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "not one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5530,7 +5530,7 @@ fun <T : Number> T.expectNotMinusOne(callable: KFunction<*>?, parameterName: Str
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is minus one", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5547,7 +5547,7 @@ fun <T : Number> T.expectNotMinusOne(callable: KFunction<*>?, parameter: KParame
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is minus one", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is minus one", cause?.invoke(this)))
     return this
 }
 /**
@@ -5565,6 +5565,6 @@ fun <T : Number> T.expectNotMinusOne(callableName: String?, parameterName: Strin
  */
 @IgnorableReturnValue
 fun <T : Number> T.expectNotMinusOne(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is minus one", cause?.invoke(this)))
+    if (this == -1) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is minus one", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is minus one", cause?.invoke(this)))
     return this
 }

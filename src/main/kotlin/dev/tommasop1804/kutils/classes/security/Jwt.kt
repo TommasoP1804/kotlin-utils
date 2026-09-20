@@ -456,7 +456,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
                     is String -> builder.withClaim(key, value)
                     is Date -> builder.withClaim(key, value)
                     is Instant -> builder.withClaim(key, value)
-                    is Map<*, *> -> tryOrThrow({ -> IllegalArgumentException("Not a valid claim format.") }, includeCause = false) {
+                    is Map<*, *> -> tryOrThrow({ IllegalArgumentException("Not a valid claim format.") }, includeCause = false) {
                         builder.withClaim(key, value as DataMap)
                     }
                     is List<*> -> builder.withClaim(key, value)

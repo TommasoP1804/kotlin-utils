@@ -337,7 +337,7 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
                 val negative = text.startsWith("-")
                 validateInputFormat(!((text.contains("H") || text.contains("S")) && !text.contains("T"))) { "Text must contain 'T' if it contains 'H' or 'S'" }
                 if (text.startsWith("P") || text.startsWith("-P")) {
-                    tryOrThrow({ -> MalformedInputException(Duration::class) }) {
+                    tryOrThrow({ MalformedInputException(Duration::class) }) {
                         text = if (text.startsWith("-P")) text.substring(2) else text.substring(1)
                         if (text.contains("Y")) {
                             val y = (text before "Y").toLong()

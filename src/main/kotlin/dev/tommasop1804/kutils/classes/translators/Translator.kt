@@ -59,11 +59,11 @@ open class Translator(
          */
         infix fun String.translatedWith(translator: Translator): String {
             if (translator.file.extension == "yaml" || translator.file.extension == "yml") {
-                val yaml = tryOrThrow({ -> ConfigurationException("Not a valid YAML") }) { Yaml(translator.file) }
+                val yaml = tryOrThrow({ ConfigurationException("Not a valid YAML") }) { Yaml(translator.file) }
                 return yaml.getAsNode(this).asString() ?: throw TranslationException("Key '$this' not found in YAML file")
             }
             else if (translator.file.extension == "json") {
-                val json = tryOrThrow({ -> ConfigurationException("Not a valid JSON") }) { Json(translator.file) }
+                val json = tryOrThrow({ ConfigurationException("Not a valid JSON") }) { Json(translator.file) }
                 return json.getAsNode(this)?.asString() ?: throw TranslationException("Key '$this' not found in JSON file")
             }
             throw ConfigurationException("Unsupported file extension: ${translator.file.extension}")

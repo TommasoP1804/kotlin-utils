@@ -1115,6 +1115,33 @@ typealias ContextTriSupplier<C, R1, R2, R3> = context(C) () -> Triple<R1, R2, R3
  *
  * This can be used in scenarios where deferred creation of a Throwable is required.
  *
+ * @since 6.1.0
+ */
+typealias ExceptionSupplier = () -> Exception
+/**
+ * A typealias representing a function that takes an object as input
+ * and returns a transformed `Exception` as output. Commonly used for
+ * modifying or wrapping exceptions before rethrowing or handling them.
+ *
+ * @since 6.1.0
+ */
+typealias ExceptionTransformer = (Exception) -> Exception
+
+/**
+ * A type alias for a function that returns a nullable [Exception].
+ *
+ * This type alias is typically used when a function needs to supply
+ * an exception or indicate the absence of one by returning null.
+ *
+ * @since 6.1.0
+ */
+typealias NullableExceptionSupplier = () -> Exception?
+
+/**
+ * A type alias representing a supplier function that provides a Throwable instance.
+ *
+ * This can be used in scenarios where deferred creation of a Throwable is required.
+ *
  * @since 1.0.0
  */
 typealias ThrowableSupplier = () -> Throwable

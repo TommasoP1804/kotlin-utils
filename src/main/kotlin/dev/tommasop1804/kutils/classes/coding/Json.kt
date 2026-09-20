@@ -175,7 +175,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     constructor(@Language("json") json: CharSequence) : this(
-        tryOrThrow({ -> MalformedInputException("Input is not a valid JSON") }) {
+        tryOrThrow({ MalformedInputException("Input is not a valid JSON") }) {
             MAPPER.writeValueAsString(MAPPER.readTree(json.toString()))
     })
 
@@ -202,7 +202,7 @@ open class Json private constructor(@param:Language("json") override val value: 
     constructor(path: Path) : this(path.toFile())
 
     init {
-        tryOrThrow({ -> MalformedInputException(Json::class) }) {
+        tryOrThrow({ MalformedInputException(Json::class) }) {
             MAPPER.readTree(value)
         }
     }

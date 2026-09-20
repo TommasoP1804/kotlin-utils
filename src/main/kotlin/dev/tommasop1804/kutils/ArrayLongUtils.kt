@@ -2,7 +2,7 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
-@file:JvmName("ArrayUtilsKt")
+@file:JvmName("ArrayLongUtilsKt")
 @file:Since("1.0.0")
 @file:Suppress("unused", "kutils_null_check", "kutils_map_declaration", "kutils_collection_declaration",
     "kutils_sublist_as_int_invoke", "RedundantSuppression", "deprecation", "kutils_take_as_int_invoke",
@@ -28,45 +28,45 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
- * Extension property that checks if the array is empty.
+ * Extension property to check if the Long array is empty.
  *
- * @receiver The array instance on which this property is invoked.
- * @return `true` if the array contains no elements, `false` otherwise.
- * @since 5.0.0
+ * @receiver The Long array being checked.
+ * @return `true` if the Long array has no elements, otherwise `false`.
+ * @since 6.1.0
  */
-val <E> Array<E>.isEmpty get() = isEmpty()
+val LongArray.isEmpty get() = isEmpty()
 /**
- * Checks if the array is not empty.
+ * Extension property for `LongArray` that checks if the array is not empty.
  *
- * This property returns `true` if the array contains one or more elements,
- * otherwise returns `false`.
- * @since 5.0.0
+ * Returns `true` if the `LongArray` contains one or more elements.
+ * Returns `false` if the `LongArray` is empty.
+ * @since 6.1.0
  */
-val <E> Array<E>.isNotEmpty get() = isNotEmpty()
+val LongArray.isNotEmpty get() = isNotEmpty()
 /**
- * Extension property for nullable arrays that checks whether the array is either null or empty.
+ * Extension property to check if a nullable [LongArray] is either null or empty.
  *
- * @return `true` if the array is null or contains no elements, `false` otherwise.
- * @since 5.0.0
+ * @return `true` if the [LongArray] is null or has no elements, `false` otherwise.
+ * @since 6.1.0
  */
-val <E> Array<E>?.isNullOrEmpty: Boolean get() {
+val LongArray?.isNullOrEmpty: Boolean get() {
     contract {
         returns(false) implies (this@isNullOrEmpty != null)
     }
-    return isNullOrEmpty()
+    return this == null || isEmpty()
 }
-
 /**
- * Extension property for nullable arrays that checks whether the array is neither null nor empty.
+ * Extension property for nullable LongArray that checks if the array is not null and not empty.
  *
- * @return `true` if the array is not null and contains at least one element, `false` otherwise.
- * @since 5.0.0
+ * @receiver Nullable LongArray to be checked.
+ * @return `true` if the array is not null and contains elements, `false` otherwise.
+ * @since 6.1.0
  */
-val <E> Array<E>?.isNotNullOrEmpty: Boolean get() {
+val LongArray?.isNotNullOrEmpty: Boolean get() {
     contract {
         returns(true) implies (this@isNotNullOrEmpty != null)
     }
-    return !isNullOrEmpty()
+    return this != null && isNotEmpty()
 }
 
 /**
@@ -78,9 +78,9 @@ val <E> Array<E>?.isNotNullOrEmpty: Boolean get() {
  *
  * @receiver The array to evaluate for duplicate elements.
  * @return `true` if the array contains duplicate elements, `false` otherwise.
- * @since 2.1.0
+ * @since 6.1.0
  */
-val <E> Array<E>.containsDuplicates
+val LongArray.containsDuplicates
     get() = distinct().size != size
 
 /**
@@ -90,99 +90,95 @@ val <E> Array<E>.containsDuplicates
  *
  * @receiver The array to check.
  * @return `true` if the array has exactly one element, `false` otherwise.
- * @since 2.1.0
+ * @since 6.1.0
  */
-val Array<*>.isSingleElement get() = size == 1
+val LongArray.isSingleElement get() = size == 1
 /**
  * Extension property for arrays that checks whether the array does not contain
  * exactly one element.
  *
  * @return `true` if the array contains zero elements or more than one element,
  *         `false` if the array contains exactly one element.
- * @since 2.1.0
+ * @since 6.1.0
  */
-val Array<*>.isNotSingleElement get() = size != 1
+val LongArray.isNotSingleElement get() = size != 1
 
 /**
- * Extension property for an array of comparable elements that determines
- * whether the array is sorted in ascending order.
+ * Extension property that evaluates whether the LongArray is sorted in ascending order.
+ * It checks each element sequentially to determine if the current element is less than
+ * or equal to the next one.
  *
- * This property evaluates to `true` if the array's elements are sorted
- * such that each element is less than or equal to the next element.
- * For an empty array or a single-element array, this property
- * will always return `true`.
- *
- * @receiver Array of comparable elements.
- * @return `true` if the array is sorted in non-decreasing order, `false` otherwise.
- * @since 5.0.0
+ * This property is read-only and computes the result dynamically whenever accessed.
+ * @since 6.1.0
  */
-val <E : Comparable<E>> Array<E>.isSorted get() = isSorted()
+val LongArray.isSorted get() = isSorted()
 /**
- * Extension property for an array of comparable elements that checks
- * if the array is not sorted in ascending order.
+ * Extension property for LongArray that indicates whether the array is not sorted in ascending order.
  *
- * @return `true` if the array is not sorted, otherwise `false`.
- * @since 5.0.0
+ * This property returns `true` if the Long array is not sorted in ascending order, and `false` otherwise.
+ * It internally utilizes the `isSorted()` function to determine the sorting state of the array.
+ * @since 6.1.0
  */
-val <E : Comparable<E>> Array<E>.isNotSorted get() = !isSorted()
+val LongArray.isNotSorted get() = !isSorted()
 /**
- * Extension property for determining if an array is sorted in descending order.
+ * An extension property for the `LongArray` class that checks if the array's elements are sorted
+ * in descending order. The comparison is based on the natural order of the elements.
  *
- * This property operates on arrays where elements implement the `Comparable` interface.
- * It evaluates whether each element in the array is greater than or equal to the next element,
- * ensuring the entire array is sorted from the largest to the smallest value.
- *
- * @receiver The array of comparable elements to check.
  * @return `true` if the array is sorted in descending order, or `false` otherwise.
- * @since 5.0.0
+ * @since 6.1.0
  */
-val <E : Comparable<E>> Array<E>.isSortedDescending get() = isSortedDescending()
+val LongArray.isSortedDescending get() = isSortedDescending()
 /**
- * Extension property that evaluates whether the elements in the array are not sorted
- * in descending order. This is determined by checking if the array is not sorted
- * in the reverse of natural order for the elements.
+ * Extension property for `LongArray` that determines whether
+ * the array is not sorted in descending order.
  *
- * @receiver Array of elements that are comparable.
- * @return `true` if the array is not sorted in descending order, `false` otherwise.
- * @since 5.0.0
+ * @return `true` if the Long array is not sorted in strictly descending order, `false` otherwise.
+ * @since 6.1.0
  */
-val <E : Comparable<E>> Array<E>.isNotSortedDescending get() = !isSortedDescending()
+val LongArray.isNotDescendingSorted get() = !isSortedDescending()
 
 /**
  * Returns the array itself if it is not empty, or `null` if the array is empty.
  *
  * @receiver The array to be checked.
  * @return The array itself if it contains elements, or `null` if the array is empty.
- * @since 5.4.0
+ * @since 6.1.0
  */
-fun <E> Array<E>.orNullIfEmpty() = ifEmpty { null }
+fun LongArray.orNullIfEmpty() = if (isEmpty()) null else this
 
 /**
- * Negates the state of the array by returning `true` if the array is either `null` or empty.
+ * Returns the current LongArray if it is not null, or an empty LongArray if it is null.
  *
- * This operator checks if the array reference is `null` or if it contains no elements.
+ * This function provides a safe way to handle nullable LongArray instances by ensuring 
+ * that a non-null LongArray is always returned.
  *
- * @return `true` if the array is `null` or empty, otherwise `false`.
- * @since 1.0.0
+ * @return The original LongArray if it is non-null, otherwise an empty LongArray.
+ * @since 6.1.0
+ */
+fun LongArray?.orEmpty() = this ?: longArrayOf()
+
+/**
+ * Performs a logical NOT operation on the nullable [LongArray].
+ * This operator checks whether the [LongArray] is null or empty.
+ *
+ * @return `true` if the [LongArray] is null or empty, otherwise `false`.
+ * @since 6.1.0
  */
 @JvmName("nullableNot")
-operator fun Array<*>?.not(): Boolean {
+operator fun LongArray?.not(): Boolean {
     contract {
         returns(false) implies (this@not != null)
     }
-    return isNullOrEmpty()
+    return isNullOrEmpty
 }
 
 /**
- * Returns `true` if the array is empty, otherwise `false`.
+ * Operator function that checks whether the LongArray is empty.
  *
- * This operator function provides a not (~) operation for arrays,
- * allowing the empty state of the array to be evaluated conveniently.
- *
- * @return `true` if the array contains no elements, otherwise `false`.
- * @since 5.0.0
+ * @return true if the LongArray is empty, false otherwise.
+ * @since 6.1.0
  */
-operator fun Array<*>.not(): Boolean = isEmpty()
+operator fun LongArray.not(): Boolean = isEmpty
 
 /**
  * Merges the current array with one or more additional collections into a new array of the same type.
@@ -191,10 +187,10 @@ operator fun Array<*>.not(): Boolean = isEmpty()
  * @receiver the array of elements to merge; nullable.
  * @param collections additional collections of elements to merge with the current array.
  * @return a new array of the same type containing merged elements.
- * @since 1.0.0
+ * @since 6.1.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <reified E> Array<E>?.merge(vararg collections: Collection<E>) = orEmpty().toList().merge(*collections).toTypedArray()
+fun LongArray?.merge(vararg collections: Collection<Long>) = orEmpty().toList().merge(*collections).toLongArray()
 
 /**
  * Determines if two arrays share at least one common element.
@@ -204,9 +200,9 @@ inline fun <reified E> Array<E>?.merge(vararg collections: Collection<E>) = orEm
  *
  * @param other The array to compare with the calling array.
  * @return `true` if at least one element is common between the arrays, `false` otherwise.
- * @since 2.1.0
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.intersects(other: Array<E>) = (this intersect other.toSet()).isNotEmpty()
+infix fun LongArray.intersects(other: LongArray) = (this intersect other.toSet()).isNotEmpty()
 
 /**
  * Inserts the specified separator element between each element of the array, 
@@ -214,38 +210,38 @@ infix fun <E> Array<E>.intersects(other: Array<E>) = (this intersect other.toSet
  *
  * @param separator The element to be inserted between each pair of elements in the array.
  * @return A new array with the separator inserted between each element of the original array.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.intersperseWith(separator: E): Array<E> =
+infix fun LongArray.intersperseWith(separator: Long): LongArray =
     flatMapIndexed { index, item ->
         if (index == lastIndex) listOf(item)
         else listOf(item, separator)
-    }.toTypedArray()
+    }.toLongArray()
 
 /**
  * Checks if the array contains any of the specified elements.
  *
  * @param elements Vararg parameter representing the elements to check for in the array.
  * @return `true` if at least one of the specified elements is found in the array, `false` otherwise.
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> Array<E>.containsAny(vararg elements: E) = any { it in elements }
+fun LongArray.containsAny(vararg elements: Long) = any { it in elements }
 /**
  * Checks if none of the elements in the array are contained in the given set of elements.
  *
  * @param elements The elements to check against the array.
  * @return `true` if none of the elements in the array are present in the given set of elements, `false` otherwise.
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> Array<E>.containsNone(vararg elements: E) = none { it in elements }
+fun LongArray.containsNone(vararg elements: Long) = none { it in elements }
 /**
  * Checks if there is at least one element in the array that satisfies the given predicate.
  *
  * @param predicate A condition to test each element of the array.
  * @return `true` if any element matches the predicate, otherwise `false`.
- * @since 2.1.0
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.contains(predicate: Predicate<E>) = any { predicate(it) }
+operator fun LongArray.contains(predicate: Predicate<Long>) = any { predicate(it) }
 
 /**
  * Returns the first element of the array if it exists, or the result of the provided default supplier if the array is empty.
@@ -254,7 +250,7 @@ operator fun <E> Array<E>.contains(predicate: Predicate<E>) = any { predicate(it
  * @return The first element of the array, or the result of the default supplier if the array is empty.
  * @since 6.1.0
  */
-fun <E> Array<E>.firstOr(default: Supplier<E>): E {
+fun LongArray.firstOr(default: Supplier<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -271,7 +267,7 @@ fun <E> Array<E>.firstOr(default: Supplier<E>): E {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
+fun LongArray.firstOrThrow(lazyException: ThrowableSupplier): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -288,12 +284,12 @@ fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
  *
  * @receiver The array whose first element is to be retrieved.
  * @return An `Either` value where:
- *         - `Right<E>` contains the first element of the array.
- *         - `Left<Empty>` represents an error indicating that the array is empty.
+ *         - `Right<Long>` contains the first element of the array.
+ *         - `Left<Longmpty>` represents an error indicating that the array is empty.
  * @throws Throwable If any exception other than `NoSuchElementException` occurs during execution.
  * @since 6.1.0
  */
-fun <E> Array<E>.firstOrError() = either {
+fun LongArray.firstOrError() = either {
     catching({ first() }) { _: NoSuchElementException -> Empty }
 }
 /**
@@ -302,7 +298,6 @@ fun <E> Array<E>.firstOrError() = either {
  * If the array is empty, a `NoSuchElementException` is thrown. If no elements
  * in the array match the predicate, a `NoResultsException` is thrown.
  *
- * @param E The type of elements in the array.
  * @param predicate A predicate function used to test each element for a condition.
  * @return The first element that satisfies the predicate.
  * @throws NoSuchElementException If the array is empty.
@@ -310,7 +305,7 @@ fun <E> Array<E>.firstOrError() = either {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findFirst(predicate: Predicate<E>): E {
+fun LongArray.findFirst(predicate: Predicate<Long>): Long {
     val list = toList()
     if (list.isEmpty()) throw NoSuchElementException()
     val filtered = list.filter(predicate)
@@ -326,7 +321,7 @@ fun <E> Array<E>.findFirst(predicate: Predicate<E>): E {
  * @return The first element matching the [predicate], or the value produced by [default] if no match is found.
  * @since 6.1.0
  */
-fun <E> Array<E>.findFirstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+fun LongArray.findFirstOr(default: Supplier<Long>, predicate: Predicate<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -342,7 +337,7 @@ fun <E> Array<E>.findFirstOr(default: Supplier<E>, predicate: Predicate<E>): E {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+fun LongArray.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -357,7 +352,7 @@ fun <E> Array<E>.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: P
  * or `Either.Right` containing the first element that matches the predicate.
  * @since 6.1.0
  */
-fun <E> Array<E>.findFirstOrError(predicate: Predicate<E>): Either<NotFirstResultErrors, E> = either {
+fun LongArray.findFirstOrError(predicate: Predicate<Long>): Either<NotFirstResultErrors, Long> = either {
     catching({ findFirst(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -372,7 +367,7 @@ fun <E> Array<E>.findFirstOrError(predicate: Predicate<E>): Either<NotFirstResul
  * @return The last element of the array, or the default value supplied by the given supplier if the array is empty.
  * @since 6.1.0
  */
-fun <E> Array<E>.lastOr(default: Supplier<E>): E {
+fun LongArray.lastOr(default: Supplier<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -389,7 +384,7 @@ fun <E> Array<E>.lastOr(default: Supplier<E>): E {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.lastOrThrow(lazyException: ThrowableSupplier): E {
+fun LongArray.lastOrThrow(lazyException: ThrowableSupplier): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -401,16 +396,16 @@ fun <E> Array<E>.lastOrThrow(lazyException: ThrowableSupplier): E {
  * This method attempts to retrieve the last element of an array. If the array is empty, a `NoSuchElementException`
  * is caught and transformed into a predefined `Empty` error type within the `Raise` context.
  *
- * @receiver Array<E> The array from which the last element is to be retrieved.
+ * @receiver LongArray The array from which the last element is to be retrieved.
  * @return An `Either` where:
- *         - `Right<E>` contains the last element of the array if it exists.
- *         - `Left<Empty>` represents an error raised when the array is empty.
+ *         - `Right<Long>` contains the last element of the array if it exists.
+ *         - `Left<Longmpty>` represents an error raised when the array is empty.
  * @throws RaiseSignal If the underlying `either` or `catching` functions raise a signal during execution.
  * @see either
  * @see catching
  * @since 6.1.0
  */
-fun <E> Array<E>.lastOrError() = either {
+fun LongArray.lastOrError() = either {
     catching({ last() }) { _: NoSuchElementException -> Empty }
 }
 /**
@@ -421,7 +416,6 @@ fun <E> Array<E>.lastOrError() = either {
  * `NoSuchElementException` is thrown. If no elements match the predicate, a
  * `NoResultsException` is thrown.
  *
- * @param E The type of elements in the array.
  * @param predicate A predicate function used to filter elements in the array.
  *                  The function takes an element of type `E` as an input and
  *                  returns a boolean indicating whether the element matches
@@ -432,7 +426,7 @@ fun <E> Array<E>.lastOrError() = either {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findLast(predicate: Predicate<E>): E {
+fun LongArray.findLast(predicate: Predicate<Long>): Long {
     val list = toList()
     if (list.isEmpty()) throw NoSuchElementException()
     val filtered = list.filter(predicate)
@@ -449,7 +443,7 @@ fun <E> Array<E>.findLast(predicate: Predicate<E>): E {
  * @return The last element matching the [predicate], or the result of [default] if no match is found.
  * @since 6.1.0
  */
-fun <E> Array<E>.findLastOr(default: Supplier<E>, predicate: Predicate<E>): E {
+fun LongArray.findLastOr(default: Supplier<Long>, predicate: Predicate<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -466,7 +460,7 @@ fun <E> Array<E>.findLastOr(default: Supplier<E>, predicate: Predicate<E>): E {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+fun LongArray.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -476,12 +470,11 @@ fun <E> Array<E>.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * Attempts to find the last element in the array that satisfies the given predicate.
  * If no such element exists, it returns an error wrapped in an `Either` type.
  *
- * @param E The type of elements in the array.
  * @param predicate A function that determines whether an element satisfies the condition.
  * @return An `Either` containing the last matching element, or an error of type `NotLastResultsErrors` if no match is found.
  * @since 6.1.0
  */
-fun <E> Array<E>.findLastOrError(predicate: Predicate<E>): Either<NotLastResultsErrors, E> = either {
+fun LongArray.findLastOrError(predicate: Predicate<Long>): Either<NotLastResultsErrors, Long> = either {
     catching({ findLast(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -499,7 +492,7 @@ fun <E> Array<E>.findLastOrError(predicate: Predicate<E>): Either<NotLastResults
  * @throws NoSuchElementException If the array contains less than two elements.
  * @since 6.1.0
  */
-fun <E> Array<E>.second() = if (size < 2) throw NoSuchElementException("List size $size doesn't allow to get second element.") else this[1]
+fun LongArray.second() = if (size < 2) throw NoSuchElementException("List size $size doesn't allow to get second element.") else this[1]
 /**
  * Returns the second element of the array if the array contains at least two elements,
  * or `null` if the array contains fewer than two elements.
@@ -511,7 +504,7 @@ fun <E> Array<E>.second() = if (size < 2) throw NoSuchElementException("List siz
  *
  * @since 6.1.0
  */
-fun <E> Array<E>.secondOrNull() = if (size < 2) null else this[1]
+fun LongArray.secondOrNull() = if (size < 2) null else this[1]
 /**
  * Returns the second element of the array if it exists, or the result
  * of the [default] supplier if the array has fewer than two elements.
@@ -520,7 +513,7 @@ fun <E> Array<E>.secondOrNull() = if (size < 2) null else this[1]
  * @return The second element of the array, or the result of the [default] supplier.
  * @since 6.1.0
  */
-fun <E> Array<E>.secondOr(default: Supplier<E>): E {
+fun LongArray.secondOr(default: Supplier<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -536,7 +529,7 @@ fun <E> Array<E>.secondOr(default: Supplier<E>): E {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
+fun LongArray.secondOrThrow(lazyException: ThrowableSupplier): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -552,7 +545,7 @@ fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
  * @return An `Either` containing the second element of the array on success or a `NotInnerElementErrors` error on failure.
  * @since 6.1.0
  */
-fun <E> Array<E>.secondOrError(): Either<NotInnerElementErrors, E> = either {
+fun LongArray.secondOrError(): Either<NotInnerElementErrors, Long> = either {
     catching({ second() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(1) }
 }
 /**
@@ -566,7 +559,7 @@ fun <E> Array<E>.secondOrError(): Either<NotInnerElementErrors, E> = either {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findSecond(predicate: Predicate<E>): E {
+fun LongArray.findSecond(predicate: Predicate<Long>): Long {
     val list = toList()
     if (list.isEmpty()) throw NoSuchElementException()
     val filtered = list.filter(predicate)
@@ -586,7 +579,7 @@ fun <E> Array<E>.findSecond(predicate: Predicate<E>): E {
  * @return The second element matching the predicate, or `null` if fewer than two elements match.
  * @since 6.1.0
  */
-fun <E> Array<E>.findSecondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+fun LongArray.findSecondOrNull(predicate: Predicate<Long>) = filter(predicate).secondOrNull()
 /**
  * Filters the array using the provided predicate and returns the second element that matches the predicate.
  * If there are fewer than two matching elements, the default value provided by the supplier is returned.
@@ -596,7 +589,7 @@ fun <E> Array<E>.findSecondOrNull(predicate: Predicate<E>) = filter(predicate).s
  * @return The second element that matches the predicate, or the result of invoking the default supplier if fewer than two elements match.
  * @since 6.1.0
  */
-fun <E> Array<E>.findSecondOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+fun LongArray.findSecondOr(default: Supplier<Long>, predicate: Predicate<Long>) = filter(predicate).secondOr(default)
 /**
  * Filters the elements of the array based on the given predicate and returns the second matching
  * element if it exists, or throws an exception provided by the given `lazyException` supplier if
@@ -608,7 +601,7 @@ fun <E> Array<E>.findSecondOr(default: Supplier<E>, predicate: Predicate<E>) = f
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+fun LongArray.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>) = filter(predicate).secondOrThrow(lazyException)
 /**
  * Searches for the second element in the array that matches the given predicate.
  * If a second matching element is found, it is returned wrapped in `Either.Right`.
@@ -620,7 +613,7 @@ fun <E> Array<E>.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: 
  * wrapped in `Either.Left` if no matching element or insufficient results are found.
  * @since 6.1.0
  */
-fun <E> Array<E>.findSecondOrError(predicate: Predicate<E>): Either<NotInnerResultErrors, E> = either {
+fun LongArray.findSecondOrError(predicate: Predicate<Long>): Either<NotInnerResultErrors, Long> = either {
     catching({ findSecond(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -640,7 +633,7 @@ fun <E> Array<E>.findSecondOrError(predicate: Predicate<E>): Either<NotInnerResu
  * @throws NoSuchElementException if the array size is less than 3.
  * @since 6.1.0
  */
-fun <E> Array<E>.third() = if (size < 3) throw NoSuchElementException("List size $size doesn't allow to get third element.") else this[2]
+fun LongArray.third() = if (size < 3) throw NoSuchElementException("List size $size doesn't allow to get third element.") else this[2]
 /**
  * Returns the third element of the array if the array contains at least three elements,
  * or `null` if the array has fewer than three elements.
@@ -649,7 +642,7 @@ fun <E> Array<E>.third() = if (size < 3) throw NoSuchElementException("List size
  * @return The third element of the array, or `null` if the array size is less than 3.
  * @since 6.1.0
  */
-fun <E> Array<E>.thirdOrNull() = if (size < 3) null else this[2]
+fun LongArray.thirdOrNull() = if (size < 3) null else this[2]
 /**
  * Returns the third element of the array if it exists; otherwise, returns the value
  * provided by the given default supplier.
@@ -658,7 +651,7 @@ fun <E> Array<E>.thirdOrNull() = if (size < 3) null else this[2]
  * @return The third element of the array or the value provided by the default supplier.
  * @since 6.1.0
  */
-fun <E> Array<E>.thirdOr(default: Supplier<E>): E {
+fun LongArray.thirdOr(default: Supplier<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -676,7 +669,7 @@ fun <E> Array<E>.thirdOr(default: Supplier<E>): E {
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
+fun LongArray.thirdOrThrow(lazyException: ThrowableSupplier): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -691,7 +684,7 @@ fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
  * @return An `Either` containing the third element of the array or a `NotInnerElementErrors`.
  * @since 6.1.0
  */
-fun <E> Array<E>.thirdOrError(): Either<NotInnerElementErrors, E> = either {
+fun LongArray.thirdOrError(): Either<NotInnerElementErrors, Long> = either {
     catching({ third() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(2) }
 }
 /**
@@ -704,7 +697,7 @@ fun <E> Array<E>.thirdOrError(): Either<NotInnerElementErrors, E> = either {
  * @throws TooFewResultsException if fewer than three elements satisfy the predicate.
  * @since 6.1.0
  */
-fun <E> Array<E>.findThird(predicate: Predicate<E>): E {
+fun LongArray.findThird(predicate: Predicate<Long>): Long {
     val list = toList()
     if (list.isEmpty()) throw NoSuchElementException()
     val filtered = list.filter(predicate)
@@ -721,7 +714,7 @@ fun <E> Array<E>.findThird(predicate: Predicate<E>): E {
  * @return The third element that matches the predicate, or `null` if no such element exists.
  * @since 6.1.0
  */
-fun <E> Array<E>.findThirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
+fun LongArray.findThirdOrNull(predicate: Predicate<Long>) = filter(predicate).thirdOrNull()
 /**
  * Filters the array based on the provided predicate and returns the third element if it exists;
  * otherwise, evaluates and returns the result of the provided default supplier.
@@ -733,7 +726,7 @@ fun <E> Array<E>.findThirdOrNull(predicate: Predicate<E>) = filter(predicate).th
  * by the supplier.
  * @since 6.1.0
  */
-fun <E> Array<E>.findThirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
+fun LongArray.findThirdOr(default: Supplier<Long>, predicate: Predicate<Long>) = filter(predicate).thirdOr(default)
 /**
  * Finds the third element in the array that matches the specified predicate and returns it.
  * If no such element is found, the provided exception supplier is used to throw an exception.
@@ -744,7 +737,7 @@ fun <E> Array<E>.findThirdOr(default: Supplier<E>, predicate: Predicate<E>) = fi
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
+fun LongArray.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>) = filter(predicate).thirdOrThrow(lazyException)
 /**
  * Searches for the third element in the array that matches the given predicate.
  * Returns the element wrapped in an `Either` if found, or an error if no such element or too few elements exist.
@@ -753,7 +746,7 @@ fun <E> Array<E>.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: P
  * @return An `Either` containing the third matching element if it exists, or an error of type `NotInnerResultErrors`.
  * @since 6.1.0
  */
-fun <E> Array<E>.findThirdOrError(predicate: Predicate<E>): Either<NotInnerResultErrors, E> = either {
+fun LongArray.findThirdOrError(predicate: Predicate<Long>): Either<NotInnerResultErrors, Long> = either {
     catching({ findThird(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -773,9 +766,9 @@ fun <E> Array<E>.findThirdOrError(predicate: Predicate<E>): Either<NotInnerResul
  * @return The only element in the array.
  * @throws NoSuchElementException if the array is empty.
  * @throws TooManyElementsException if the array contains more than one element.
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> Array<E>.onlyElement() = toList().run {
+fun LongArray.onlyElement() = toList().run {
     if (isEmpty()) throw NoSuchElementException()
     else if (size == 1) first() else throw TooManyElementsException(size)
 }
@@ -786,17 +779,17 @@ fun <E> Array<E>.onlyElement() = toList().run {
  * @receiver The array to evaluate.
  * @return The single element of the array, or `null` if the array is empty or has more than one element.
  * 
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> Array<E>.onlyElementOrNull() = toList().run { if (size == 1) first() else null }
+fun LongArray.onlyElementOrNull() = toList().run { if (size == 1) first() else null }
 /**
  * Returns the single element of the array if it contains exactly one element, or the value
  * provided by the supplied default function otherwise.
  *
  * @param default A supplier function to provide a default value if the array does not contain exactly one element.
- * @since 2.1.0
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.onlyElementOr(default: Supplier<E>): E {
+infix fun LongArray.onlyElementOr(default: Supplier<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -809,10 +802,10 @@ infix fun <E> Array<E>.onlyElementOr(default: Supplier<E>): E {
  * @param lazyException A supplier function that provides the exception to be thrown 
  * if the array does not contain exactly one element.
  * @throws Throwable If the array does not contain exactly one element.
- * @since 2.1.0
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
+infix fun LongArray.onlyElementOrThrow(lazyException: ThrowableSupplier): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -822,13 +815,13 @@ infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
  * Returns the single element of the array wrapped inside an `Either` if the array contains exactly one element,
  * or returns an appropriate error wrapped in an `Either` if the array is empty or has more than one element.
  *
- * @return `Either<NotOnlyElementErrors, E>` where the right value is the single element of the array if present,
+ * @return `Either<NotOnlyElementErrors, Long>` where the right value is the single element of the array if present,
  * or the left value contains a `NotOnlyElementErrors` indicating the error condition:
  * - `Empty` if the array is empty.
  * - `TooManyElement` if the array contains more than one element.
  * @since 6.1.0
  */
-fun <E> Array<E>.onlyElementOrError(): Either<NotOnlyElementErrors, E> = either {
+fun LongArray.onlyElementOrError(): Either<NotOnlyElementErrors, Long> = either {
     catching({ onlyElement() }) { e: Exception -> when (e) {
         is NoSuchElementException -> Empty
         is TooManyElementsException -> TooManyElement
@@ -847,7 +840,7 @@ fun <E> Array<E>.onlyElementOrError(): Either<NotOnlyElementErrors, E> = either 
  * @throws TooManyResultsException if more than one element matches the predicate.
  * @since 6.1.0
  */
-infix fun <E> Array<E>.findOnlyElement(predicate: Predicate<E>) = toList()
+infix fun LongArray.findOnlyElement(predicate: Predicate<Long>) = toList()
     .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter(predicate).run {
         if (isEmpty()) throw NoResultsException()
@@ -862,7 +855,7 @@ infix fun <E> Array<E>.findOnlyElement(predicate: Predicate<E>) = toList()
  * @return The single element matching the predicate or null if none or more than one match is found.
  * @since 6.1.0
  */
-infix fun <E> Array<E>.findOnlyElementOrNull(predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else null }
+infix fun LongArray.findOnlyElementOrNull(predicate: Predicate<Long>) = filter(predicate).run { if (size == 1) first() else null }
 /**
  * Finds the only element in the array that matches the given predicate. If no such element exists or
  * if more than one element matches, the provided default value is returned.
@@ -873,7 +866,7 @@ infix fun <E> Array<E>.findOnlyElementOrNull(predicate: Predicate<E>) = filter(p
  *         exists or multiple elements match.
  * @since 6.1.0
  */
-fun <E> Array<E>.findOnlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
+fun LongArray.findOnlyElementOr(default: Supplier<Long>, predicate: Predicate<Long>): Long {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -893,7 +886,7 @@ fun <E> Array<E>.findOnlyElementOr(default: Supplier<E>, predicate: Predicate<E>
  * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+fun LongArray.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>): Long {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
@@ -907,7 +900,7 @@ fun <E> Array<E>.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predic
  *         too many matching elements, or another exception occurs, or the single matching element if exactly one exists.
  * @since 6.1.0
  */
-fun <E> Array<E>.findOnlyElementOrError(predicate: Predicate<E>): Either<NotOnlyResultErrors, E> = either {
+fun LongArray.findOnlyElementOrError(predicate: Predicate<Long>): Either<NotOnlyResultErrors, Long> = either {
     catching({ findOnlyElement(predicate) }) { e: Exception ->
         when (e) {
             is NoResultsException -> NoResults
@@ -923,16 +916,15 @@ fun <E> Array<E>.findOnlyElementOrError(predicate: Predicate<E>): Either<NotOnly
  * immediately before an element that satisfies the given predicate, and a new chunk
  * will start after that element.
  *
- * @param E the type of elements contained in the array.
  * @param predicate a function that evaluates each element to determine chunk boundaries.
  * @return a list of lists, where each sublist represents a chunk of the original array
  *         split according to the predicate.
- * @since 2.1.0
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.chunkedWhile(predicate: Predicate<E>): List<List<E>> = toList().run {
+infix fun LongArray.chunkedWhile(predicate: Predicate<Long>): List<List<Long>> = toList().run {
     if (isEmpty()) return@run emptyList()
-    val result = mutableListOf<MutableList<E>>()
-    var current = mutableListOf<E>()
+    val result = mutableListOf<MutableList<Long>>()
+    var current = mutableListOf<Long>()
     for (i in indices) {
         current.add(this[i])
         if (predicate(this[i])) {
@@ -949,10 +941,10 @@ infix fun <E> Array<E>.chunkedWhile(predicate: Predicate<E>): List<List<E>> = to
  *
  * @param n The number of times each element in the array should be repeated. Must be a non-negative integer.
  * @return A list containing the elements of the original array repeated the specified number of times.
- * @since 2.1.0
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.repeatEach(n: Int): List<E> {
-    val resultList = mutableListOf<E>()
+infix fun LongArray.repeatEach(n: Int): List<Long> {
+    val resultList = mutableListOf<Long>()
     forEach {
         { resultList += it } * n
     }
@@ -966,9 +958,9 @@ infix fun <E> Array<E>.repeatEach(n: Int): List<E> {
  * the first one encountered is returned.
  *
  * @return The mode of the array, or `null` if the array is empty.
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> Array<E>.mode(): E? = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+fun LongArray.mode(): Long? = toTypedArray().groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
 
 /**
  * Searches for the specified element in the array and returns its index. If the element is not found,
@@ -980,7 +972,7 @@ fun <E> Array<E>.mode(): E? = groupingBy { it }.eachCount().maxByOrNull { it.val
  * @return The index of the element in the array if it exists.
  * @since 6.1.0
  */
-fun <E> Array<E>.indexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
+fun LongArray.indexOfOrThrow(element: Long, lazyException: ThrowableSupplier) =
     indexOf(element).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
 /**
  * Searches for the last occurrence of the specified element within the array and
@@ -992,7 +984,7 @@ fun <E> Array<E>.indexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
  * @return The index of the last occurrence of the specified element if it exists in the array.
  * @since 6.1.0
  */
-fun <E> Array<E>.lastIndexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
+fun LongArray.lastIndexOfOrThrow(element: Long, lazyException: ThrowableSupplier) =
     lastIndexOf(element).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
 /**
  * Finds the index of the first element in the array that matches the given predicate.
@@ -1004,7 +996,7 @@ fun <E> Array<E>.lastIndexOfOrThrow(element: E, lazyException: ThrowableSupplier
  * @throws Throwable The exception provided by `lazyException` if no element matches the predicate.
  * @since 6.1.0
  */
-fun <E> Array<E>.indexOfFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) =
+fun LongArray.indexOfFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>) =
     indexOfFirst(predicate).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
 /**
  * Returns the index of the last element in the array that matches the given [predicate].
@@ -1016,7 +1008,7 @@ fun <E> Array<E>.indexOfFirstOrThrow(lazyException: ThrowableSupplier, predicate
  * @return The index of the last element that matches the [predicate].
  * @since 6.1.0
  */
-fun <E> Array<E>.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) =
+fun LongArray.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Long>) =
     indexOfLast(predicate).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
 /**
  * Searches the array for the specified element and returns its index, or raises a `NotFound` error
@@ -1025,13 +1017,12 @@ fun <E> Array<E>.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate:
  * The method uses the `either` scope to handle potential errors functionally. If the element is found,
  * its index is returned; otherwise, a `NotFound` error is raised.
  *
- * @param E The type of the elements in the array.
  * @param element The element to search for within the array.
  * @return The index of the given element in the array if it is found.
  * @throws NotFound If the element is not found in the array.
  * @since 6.1.0
  */
-fun <E> Array<E>.indexOfOrError(element: E) = either {
+fun LongArray.indexOfOrError(element: Long) = either {
     val index = indexOf(element)
     ensure(index != INDEX_NOT_FOUND) { NotFound(element) }
     index
@@ -1047,7 +1038,7 @@ fun <E> Array<E>.indexOfOrError(element: E) = either {
  * @throws NotFound Raised if the specified element is not found in the array.
  * @since 6.1.0
  */
-fun <E> Array<E>.lastIndexOfOrError(element: E) = either {
+fun LongArray.lastIndexOfOrError(element: Long) = either {
     val index = lastIndexOf(element)
     ensure(index != INDEX_NOT_FOUND) { NotFound(element) }
     index
@@ -1059,14 +1050,13 @@ fun <E> Array<E>.lastIndexOfOrError(element: E) = either {
  * This function utilizes the `either` scope for functional-style error handling,
  * ensuring short-circuiting if no match is found.
  *
- * @param E The type of elements contained in the array.
  * @param predicate A predicate function used to evaluate each element in the array.
  *                  The function should return `true` for the desired element.
  * @return The index of the first element that matches the [predicate].
  * @throws NoResults If no element matching the [predicate] is found.
  * @since 6.1.0
  */
-fun <E> Array<E>.indexOfFirstOrError(predicate: Predicate<E>) = either {
+fun LongArray.indexOfFirstOrError(predicate: Predicate<Long>) = either {
     val index = indexOfFirst(predicate)
     ensure(index != INDEX_NOT_FOUND) { NoResults }
     index
@@ -1078,14 +1068,13 @@ fun <E> Array<E>.indexOfFirstOrError(predicate: Predicate<E>) = either {
  * This function uses the `either` scope to handle the case where no matching element is found
  * by raising an error of type `NoResults`.
  *
- * @param E The type of elements in the array.
- * @param predicate A lambda function that takes an element of type [E] and returns `true`
+ * @param predicate A lambda function that takes an element of type [Long] and returns `true`
  *                  if the element matches the condition, or `false` otherwise.
  * @return The index of the last element in the array that matches the given [predicate].
  * @throws NoResults If no element matches the [predicate].
  * @since 6.1.0
  */
-fun <E> Array<E>.indexOfLastOrError(predicate: Predicate<E>) = either {
+fun LongArray.indexOfLastOrError(predicate: Predicate<Long>) = either {
     val index = indexOfLast(predicate)
     ensure(index != INDEX_NOT_FOUND) { NoResults }
     index
@@ -1097,13 +1086,13 @@ fun <E> Array<E>.indexOfLastOrError(predicate: Predicate<E>) = either {
  *
  * @param defaultValue A supplier function that provides a default array when the original array is null or empty.
  * @return The original array if it is not null or empty, otherwise the result of invoking `defaultValue`.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline fun <E> Array<E>?.ifNullOrEmpty(defaultValue: Supplier<Array<E>>): Array<E> {
+inline fun LongArray?.ifNullOrEmpty(defaultValue: Supplier<LongArray>): LongArray {
     contract {
         callsInPlace(defaultValue, InvocationKind.AT_MOST_ONCE)
     }
-    return if (isNullOrEmpty()) defaultValue() else this
+    return if (isNullOrEmpty) defaultValue() else this
 }
 
 /**
@@ -1113,7 +1102,7 @@ inline fun <E> Array<E>?.ifNullOrEmpty(defaultValue: Supplier<Array<E>>): Array<
  * @return The original array.
  */
 @IgnorableReturnValue
-inline fun <E> Array<E>.ifNotEmpty(action: Consumer<Array<E>>): Array<E> {
+inline fun LongArray.ifNotEmpty(action: Consumer<LongArray>): LongArray {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
@@ -1130,7 +1119,7 @@ inline fun <E> Array<E>.ifNotEmpty(action: Consumer<Array<E>>): Array<E> {
  * @return The original array, or null if the array is null or empty.
  */
 @IgnorableReturnValue
-inline fun <E> Array<E>?.ifNotNullOrEmpty(action: Consumer<Array<E>>): Array<E>? {
+inline fun LongArray?.ifNotNullOrEmpty(action: Consumer<LongArray>): LongArray? {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
         (this@ifNotNullOrEmpty != null) implies returnsNotNull()
@@ -1145,10 +1134,10 @@ inline fun <E> Array<E>?.ifNotNullOrEmpty(action: Consumer<Array<E>>): Array<E>?
  * @param element The element to check for in the array.
  * @param action The action to execute if the element is found.
  * @return The original array, regardless of whether the action was executed.
- * @since 5.0.0
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-inline fun <E> Array<E>.ifContains(element: E, action: Consumer<Array<E>>): Array<E> {
+inline fun LongArray.ifContains(element: Long, action: Consumer<LongArray>): LongArray {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
@@ -1161,10 +1150,10 @@ inline fun <E> Array<E>.ifContains(element: E, action: Consumer<Array<E>>): Arra
  * @param element The element to check for in the array.
  * @param action The action to be performed if the array does not contain the specified element.
  * @return The original array after performing the action, if applicable.
- * @since 5.0.0
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-inline fun <E> Array<E>.ifNotContains(element: E, action: Consumer<Array<E>>): Array<E> {
+inline fun LongArray.ifNotContains(element: Long, action: Consumer<LongArray>): LongArray {
     contract {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
@@ -1177,9 +1166,9 @@ inline fun <E> Array<E>.ifNotContains(element: E, action: Consumer<Array<E>>): A
  *
  * @param step The interval at which elements are selected from the array. Must be a positive integer.
  * @return A list containing elements at indices divisible by the specified step.
- * @since 2.1.0
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.step(step: Int) =  filterIndexed { index, c -> index % step == 0 }
+infix fun LongArray.step(step: Int) =  filterIndexed { index, c -> index % step == 0 }
 
 /**
  * Repeats the elements of the array a specified number of times and returns a new array.
@@ -1187,9 +1176,9 @@ infix fun <E> Array<E>.step(step: Int) =  filterIndexed { index, c -> index % st
  * @receiver The array whose elements will be repeated.
  * @param n The number of times the elements of the array should be repeated.
  * @return An array containing the elements of the array repeated n times.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.times(n: Int) = (1..n).flatMap { toList() }.toTypedArray()
+operator fun LongArray.times(n: Int) = (1..n).flatMap { toList() }.toLongArray()
 
 /**
  * Splits the array into two collections based on a given predicate.
@@ -1199,43 +1188,43 @@ inline operator fun <reified E> Array<E>.times(n: Int) = (1..n).flatMap { toList
  * containing elements that do not.
  *
  * @param predicate A condition used to evaluate each element in the array.
- * @since 2.1.0
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.div(predicate: Predicate<E>) = partition(predicate)
+operator fun LongArray.div(predicate: Predicate<Long>) = partition(predicate)
 
 /**
  * Splits the array into a list of smaller lists (chunks), each of the specified size.
  *
  * @param chunkSize the size of each chunk into which the array will be divided
  * @return a MultiList containing the chunked lists
- * @since 2.1.0
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.rem(chunkSize: Int): MultiList<E> = toList().chunked(chunkSize)
+operator fun LongArray.rem(chunkSize: Int): MultiList<Long> = toList().chunked(chunkSize)
 /**
  * Divides the elements of the array into a list of sublists based on the provided predicate.
  * Each sublist contains consecutive elements until the predicate returns false.
  *
  * @param predicate A condition used to split the array into multiple sublists.
  * @return A MultiList containing all sublists, where each sublist satisfies the chunked condition.
- * @since 2.1.0
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.rem(predicate: Predicate<E>): MultiList<E> = chunkedWhile(predicate)
+operator fun LongArray.rem(predicate: Predicate<Long>): MultiList<Long> = chunkedWhile(predicate)
 
 /**
  * Decrements the size of the array by removing the last element and returns a new array containing the remaining elements.
  *
  * @return A new array of the same type containing all elements of the original array except the last one.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.dec(): Array<E> = toList().subList(0, lastIndex).toTypedArray()
+operator fun LongArray.dec(): LongArray = toList().subList(0, lastIndex).toLongArray()
 /**
  * Creates a new array containing a range of elements from the start of the array up to and including the specified end index.
  *
  * @param endIndex The inclusive end index of the range to be included in the new array. Must be within the valid bounds of the array.
  * @return A new array containing the specified range of elements from the original array.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.rangeTo(endIndex: Int) = toList().subList(0, endIndex + 1).toTypedArray()
+operator fun LongArray.rangeTo(endIndex: Int) = toList().subList(0, endIndex + 1).toLongArray()
 
 /**
  * Returns a new array containing elements from the original array based on circular indexing and a specified step value.
@@ -1248,13 +1237,13 @@ inline operator fun <reified E> Array<E>.rangeTo(endIndex: Int) = toList().subLi
  * @return A new array containing the elements selected from the circular iteration.
  * @throws IllegalArgumentException If [step] is not greater than zero.
  * @throws NoSuchElementException If the array is empty.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.invoke(circularStartIndex: Int, circularEndIndex: Int, step: Int = 1): Array<E> {
+operator fun LongArray.invoke(circularStartIndex: Int, circularEndIndex: Int, step: Int = 1): LongArray {
     validate(step > 0) { "The step value must be greater than zero." }
     if (isEmpty()) throw NoSuchElementException("List cannot be empty.")
 
-    val result = mutableListOf<E>()
+    val result = mutableListOf<Long>()
     if (circularEndIndex >= circularStartIndex)
         for (i in circularStartIndex until circularEndIndex step step) {
             result.add(invoke(i))
@@ -1265,7 +1254,7 @@ inline operator fun <reified E> Array<E>.invoke(circularStartIndex: Int, circula
             if ((i + 1) % size == circularEndIndex % size) break
         }
     }
-    return result.toTypedArray()
+    return result.toLongArray()
 }
 /**
  * Enables invoking an array with a circular range to access elements in the specified step order.
@@ -1273,9 +1262,9 @@ inline operator fun <reified E> Array<E>.invoke(circularStartIndex: Int, circula
  * 
  * @param circularRange The range of indices to iterate over. Indices can wrap around circularly within the array bounds.
  * @param step The step value for iteration. Defaults to 1 if not specified.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.invoke(circularRange: IntRange, step: Int = 1) = 
+operator fun LongArray.invoke(circularRange: IntRange, step: Int = 1) =
     invoke(circularRange.first, circularRange.last + 1, step)
 /**
  * Invokes each index in the given circular progression on the array, producing a new array
@@ -1284,14 +1273,14 @@ inline operator fun <reified E> Array<E>.invoke(circularRange: IntRange, step: I
  * @param circularProgression The progression of indices to invoke on the array. Can wrap around if indices exceed bounds.
  * @return A new array containing elements at the indices defined by the circular progression.
  * @throws IndexOutOfBoundsException If the array is empty.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.invoke(circularProgression: IntProgression): Array<E> {
+operator fun LongArray.invoke(circularProgression: IntProgression): LongArray {
     if (isEmpty()) throw IndexOutOfBoundsException("List cannot be null.")
 
-    val result = mutableListOf<E>()
+    val result = mutableListOf<Long>()
     for (i in circularProgression) result.add(invoke(i))
-    return result.toTypedArray()
+    return result.toLongArray()
 }
 /**
  * Provides a way to access elements of an array using a circular indexing mechanism.
@@ -1300,9 +1289,9 @@ inline operator fun <reified E> Array<E>.invoke(circularProgression: IntProgress
  * @param circularIndex The index to access, which may exceed the array bounds and will wrap around circularly.
  * @return The element at the resolved circular index in the array.
  * @throws IndexOutOfBoundsException if the array is empty.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.invoke(circularIndex: Int): E {
+operator fun LongArray.invoke(circularIndex: Int): Long {
     if (isEmpty()) throw IndexOutOfBoundsException("List cannot be null.")
     val actualIndex = circularIndex.mod(size)
     return this[actualIndex]
@@ -1314,12 +1303,12 @@ inline operator fun <reified E> Array<E>.invoke(circularIndex: Int): E {
  *
  * @param filter The predicate to apply to each element of the array.
  * @return A new array containing the elements that satisfy the predicate.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <reified E> Array<E>.invoke(filter: Predicate<E>): Array<E> {
-    val destination = ArrayList<E>()
+inline operator fun LongArray.invoke(filter: Predicate<Long>): LongArray {
+    val destination = ArrayList<Long>()
     for (element in this) if (filter(element)) destination.add(element)
-    return destination.toTypedArray()
+    return destination.toLongArray()
 }
 
 /**
@@ -1328,9 +1317,9 @@ inline operator fun <reified E> Array<E>.invoke(filter: Predicate<E>): Array<E> 
  * @param find A predicate function that evaluates each element to determine
  *             if it matches the desired condition.
  * @return The first element that satisfies the predicate, or `null` if no such element is found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline operator fun <E> Array<E>.get(find: Predicate<E>): E? {
+inline operator fun LongArray.get(find: Predicate<Long>): Long? {
     for (element in this) if (find(element)) return element
     return null
 }
@@ -1342,9 +1331,9 @@ inline operator fun <E> Array<E>.get(find: Predicate<E>): E? {
  * @param lazyException A supplier that provides the exception to be thrown if no element matches.
  * @return The element that matches the predicate.
  * @throws Throwable The exception provided by `lazyException` if no matching element is found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier): E {
+operator fun LongArray.get(find: Predicate<Long>, lazyException: ThrowableSupplier): Long {
     for (element in this) if (find(element)) return element
     throw lazyException()
 }
@@ -1356,19 +1345,19 @@ operator fun <E> Array<E>.get(find: Predicate<E>, lazyException: ThrowableSuppli
  * @param filterNot A predicate used to filter out elements from the array.
  *                  Elements that satisfy this predicate will be excluded from the result.
  * @return A new array without the elements that match the given predicate.
- * @since 3.5.2
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.minus(filterNot: Predicate<E>) = filterNot(filterNot)
+operator fun LongArray.minus(filterNot: Predicate<Long>) = filterNot(filterNot)
 
 /**
  * Retrieves a subarray from the current array based on the specified range.
  *
  * @param range The range of indices to extract from the array. The range should be defined as an `IntProgression`.
  * @return A new array containing the elements within the specified range.
- * @since 2.1.0
+ * @since 6.1.0
  */
 @Suppress("deprecation")
-inline operator fun <reified E> Array<E>.get(range: IntProgression) = toList().subList(range).toTypedArray()
+operator fun LongArray.get(range: IntProgression) = toList().subList(range).toLongArray()
 
 /**
  * Retrieves the element at the specified [index] from the array. If the element at the given index
@@ -1379,9 +1368,9 @@ inline operator fun <reified E> Array<E>.get(range: IntProgression) = toList().s
  *                       Defaults to a supplier of NoSuchElementException.
  * @return The element at the specified [index].
  * @throws Throwable The exception supplied by [lazyException] if the index is out of bounds.
- * @since 2.1.0
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.get(index: Int, lazyException: ThrowableSupplier = { IndexOutOfBoundsException("Index $index not present") }): E =
+operator fun LongArray.get(index: Int, lazyException: ThrowableSupplier = { IndexOutOfBoundsException("Index $index not present") }): Long =
     try { this[index] } catch (_: Exception) { throw lazyException() }
 /**
  * Returns the element at the position corresponding to the given percentage
@@ -1392,9 +1381,9 @@ operator fun <E> Array<E>.get(index: Int, lazyException: ThrowableSupplier = { I
  * @return The element at the specified percentage-based position in the array.
  * @throws IndexOutOfBoundsException If the array is empty.
  * @throws IllegalArgumentException If the percentage is not in the valid range [0, 100].
- * @since 4.6.1
+ * @since 6.1.0
  */
-operator fun <E> Array<E>.get(percentage: Percentage) = percent(percentage)
+operator fun LongArray.get(percentage: Percentage) = percent(percentage)
 
 /**
  * Sorts the array based on the specified sorting direction.
@@ -1406,9 +1395,9 @@ operator fun <E> Array<E>.get(percentage: Percentage) = percent(percentage)
  * @param direction The `SortDirection` specifying whether the sorting should be
  * performed in ascending or descending order.
  * 
- * @since 2.1.0
+ * @since 6.1.0
  */
-infix fun <E: Comparable<E>> Array<E>.sorted(direction: SortDirection) = when (direction) {
+infix fun LongArray.sorted(direction: SortDirection) = when (direction) {
     SortDirection.Ascending -> sorted()
     SortDirection.Descending -> sortedDescending()
 }
@@ -1422,9 +1411,9 @@ infix fun <E: Comparable<E>> Array<E>.sorted(direction: SortDirection) = when (d
  * @param direction The direction to sort the array in, either [SortDirection.Ascending] or [SortDirection.Descending].
  * @param selector A lambda function that transforms each element of the array into a value of type [R?],
  * which is used to determine the sort order.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline fun <E, R : Comparable<R>> Array<E>.sortedBy(direction: SortDirection, crossinline selector: Transformer<E, R?>) = when (direction) {
+inline fun <R : Comparable<R>> LongArray.sortedBy(direction: SortDirection, crossinline selector: Transformer<Long, R?>) = when (direction) {
     SortDirection.Ascending -> sortedBy(selector)
     SortDirection.Descending -> sortedByDescending(selector)
 }
@@ -1437,9 +1426,9 @@ inline fun <E, R : Comparable<R>> Array<E>.sortedBy(direction: SortDirection, cr
  * all elements that are positioned before this element in the array.
  * @return A subarray of elements before the specified element or an empty array if
  * the element is not found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.before(element: E) = if (contains(element)) get(0..<indexOf(element)) else emptyArray<E>()
+infix fun LongArray.before(element: Long) = if (contains(element)) get(0..<indexOf(element)) else longArrayOf()
 /**
  * Returns a subarray from the beginning of the array up to and including the specified element.
  * If the element is not found in the array, an empty array is returned.
@@ -1447,18 +1436,18 @@ inline infix fun <reified E> Array<E>.before(element: E) = if (contains(element)
  * @param element The element up to which the subarray should be extracted, inclusive.
  * @return A new array containing all elements from the beginning of the array up to and including the specified element,
  * or an empty array if the element is not found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.beforeIncluding(element: E) = if (contains(element)) get(0..indexOf(element)) else emptyArray<E>()
+infix fun LongArray.beforeIncluding(element: Long) = if (contains(element)) get(0..indexOf(element)) else longArrayOf()
 /**
  * Returns a new array containing all elements before the last occurrence of the specified element in the array.
  * If the specified element is not found, an empty array is returned.
  *
  * @param element The element whose last occurrence determines the cutoff point in the array.
  * @return A new array containing elements before the last occurrence of the specified element, or an empty array if the element is not found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.beforeLast(element: E) = if (contains(element)) get(0..<lastIndexOf(element)) else emptyArray<E>()
+infix fun LongArray.beforeLast(element: Long) = if (contains(element)) get(0..<lastIndexOf(element)) else longArrayOf()
 /**
  * Retrieves a subarray from the current array, starting from the first element and up to and including
  * the last occurrence of the specified element. If the element is not present in the array, returns an empty array.
@@ -1466,44 +1455,43 @@ inline infix fun <reified E> Array<E>.beforeLast(element: E) = if (contains(elem
  * @param element The element up to which the subarray should be extracted, including the element itself.
  * @return An array containing elements from the start up to and including the last occurrence of the provided element,
  *         or an empty array if the element is not found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.beforeLastIncluding(element: E) = if (contains(element)) get(0..lastIndexOf(element)) else emptyArray<E>()
+infix fun LongArray.beforeLastIncluding(element: Long) = if (contains(element)) get(0..lastIndexOf(element)) else longArrayOf()
 /**
  * Returns a new array containing the elements that appear after the specified element in the original array.
  * If the given element is not found in the array, an empty array is returned.
  *
- * @param E the type of elements in the array.
  * @param element the element after which the sub-array should be returned.
  * @return a new array containing elements following the given element, or an empty array if the element is not found.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.after(element: E) = if (contains(element)) get(indexOf(element) + 1..<size) else emptyArray<E>()
+infix fun LongArray.after(element: Long) = if (contains(element)) get(indexOf(element) + 1..<size) else longArrayOf()
 /**
  * Returns a new array containing the elements starting from the specified [element], inclusive, 
  * and up to the end of the array. If the [element] is not found in the array, an empty array is returned.
  *
  * @param element The element from which the resulting array should start, including this element.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.afterIncluding(element: E) = if (contains(element)) get(indexOf(element)..size) else emptyArray<E>()
+infix fun LongArray.afterIncluding(element: Long) = if (contains(element)) get(indexOf(element)..size) else longArrayOf()
 /**
  * Returns a sub-array containing elements that appear after the last occurrence 
  * of the specified element in the current array. If the element does not exist 
  * in the array, an empty array is returned.
  *
  * @param element The element whose last occurrence in the array determines the starting point of the sub-array.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.afterLast(element: E) = if (contains(element)) get(lastIndexOf(element) + 1..<size) else emptyArray<E>()
+infix fun LongArray.afterLast(element: Long) = if (contains(element)) get(lastIndexOf(element) + 1..<size) else longArrayOf()
 /**
  * Returns a new array containing all elements from the specified element's last occurrence (inclusive) 
  * to the end of the original array. If the specified element is not found, returns an empty array.
  *
  * @param element The element in the array from which to start the subarray, including the element itself.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <reified E> Array<E>.afterLastIncluding(element: E) = if (contains(element)) get(lastIndexOf(element)..size) else emptyArray<E>()
+infix fun LongArray.afterLastIncluding(element: Long) = if (contains(element)) get(lastIndexOf(element)..size) else longArrayOf()
 
 /**
  * Returns the element at the position corresponding to the given percentage 
@@ -1514,10 +1502,10 @@ inline infix fun <reified E> Array<E>.afterLastIncluding(element: E) = if (conta
  * @return The element at the specified percentage-based position in the array.
  * @throws IndexOutOfBoundsException If the array is empty.
  * @throws IllegalArgumentException If the percentage is not in the valid range [0, 100].
- * @since 2.1.0
+ * @since 6.1.0
  */
 @Deprecated("Use get operator instead", replaceWith = ReplaceWith("this[p]"))
-infix fun <E> Array<E>.percent(p: Percentage): E {
+infix fun LongArray.percent(p: Percentage): Long {
     isNotEmpty() || throw IndexOutOfBoundsException("List is empty.")
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()
@@ -1532,7 +1520,7 @@ infix fun <E> Array<E>.percent(p: Percentage): E {
  * @return Either an `IndexOutOfBoundsErrors` if the index is invalid or the element at the calculated position.
  * @since 6.1.0
  */
-infix fun <E> Array<E>.percentOrError(p: Percentage): Either<IndexOutOfBoundsErrors, E> = either {
+infix fun LongArray.percentOrError(p: Percentage): Either<IndexOutOfBoundsErrors, Long> = either {
     ensure(isNotEmpty()) { Empty }
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()
@@ -1548,9 +1536,9 @@ infix fun <E> Array<E>.percentOrError(p: Percentage): Either<IndexOutOfBoundsErr
  *
  * @param key A function that returns the key for a map entry from the given element.
  * @param value A function that returns the value for a map entry from the given element.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline fun <E, K, V> Array<E>.associate(key: Transformer<E, K>, value: Transformer<E, V>) =
+inline fun <K, V> LongArray.associate(key: Transformer<Long, K>, value: Transformer<Long, V>) =
     associate { key(it) to value(it) }
 
 /**
@@ -1560,30 +1548,30 @@ inline fun <E, K, V> Array<E>.associate(key: Transformer<E, K>, value: Transform
  * @param destination The mutable map to be populated with the key-value pairs.
  * @param key A function that transforms an element of the array into a key.
  * @param value A function that transforms an element of the array into a value.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline fun <E, K, V, M : MutableMap<in K, in V>> Array<E>.associateTo(
+inline fun <K, V, M : MutableMap<in K, in V>> LongArray.associateTo(
     destination: M,
-    key: Transformer<E, K>,
-    value: Transformer<E, V>
+    key: Transformer<Long, K>,
+    value: Transformer<Long, V>
 ) = associateTo(destination) { key(it) to value(it) }
 
 /**
  * Filters the elements of the array by applying the given transformer and retaining only the non-null results.
  * 
- * @param element A transformer function that takes an element of type [E] and returns a result of type [R].
- * @since 2.1.0
+ * @param element A transformer function that takes an element of type [Long] and returns a result of type [R].
+ * @since 6.1.0
  */
-inline infix fun <E, R> Array<E>.filterNotNull(element: Transformer<E, R>) =
+inline infix fun <R> LongArray.filterNotNull(element: Transformer<Long, R>) =
     filter { element(it) != null }
 
 /**
  * Filters the elements of the array based on a transformation function that checks for null values.
  *
  * @param element A transformation function that converts each element of the array into a result which is then checked for nullability.
- * @since 2.1.0
+ * @since 6.1.0
  */
-inline infix fun <E, R> Array<E>.filterNull(element: Transformer<E, R>) =
+inline infix fun <R> LongArray.filterNull(element: Transformer<Long, R>) =
     filter { element(it) == null }
 
 /**
@@ -1591,13 +1579,12 @@ inline infix fun <E, R> Array<E>.filterNull(element: Transformer<E, R>) =
  * The block has access to the receiver [LoopContext] and the current element, enabling
  * controlled breaking and continuation operations using the [Break] and [Continue] exceptions.
  *
- * @param E the type of elements in the array
  * @param block a lambda with [LoopContext] as receiver and the current element as parameter
  * used for processing each element in the array
- * @since 2.1.0
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-inline fun <E> Array<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
+inline fun LongArray.cForEach(block: ReceiverBiConsumer<LoopContext, Long>) = apply {
     with(LoopContext()) {
         for (element in this@cForEach) {
             try {
@@ -1618,10 +1605,10 @@ inline fun <E> Array<E>.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = ap
  * @param block A lambda function that takes a [LoopContext], the current index, and the value at that index.
  *              The lambda is invoked for each element in the array.
  *
- * @since 2.1.0
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-inline fun <E> Array<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
+inline fun LongArray.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, Long>) = apply {
     with(LoopContext()) {
         for ([index, element] in withIndex()) {
             try {
@@ -1641,15 +1628,14 @@ inline fun <E> Array<E>.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, 
  * This method allows for additional control flows such as `Break` and `Continue` by leveraging
  * a custom implementation. It carries a loop context that can be accessed within the action.
  *
- * @param E the type of elements within the array.
  * @param R the generic result type returned if a `Break` exception is thrown during iteration.
- * @param action a function that accepts a loop context and an element of type `E`. 
+ * @param action a function that accepts a loop context and an element of type `Long`. 
  * It contains the operation to be performed for each element.
  * @return an optional result of type `R` if the loop is interrupted by a `Break` exception, or `null` if the iteration completes normally.
- * @since 2.1.0
+ * @since 6.1.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <E, R> Array<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E>): R? {
+inline fun <R> LongArray.rForEach(action: ReceiverBiConsumer<LoopContext, Long>): R? {
     with(LoopContext()) {
         for (element in this@rForEach) {
             try {
@@ -1671,10 +1657,10 @@ inline fun <E, R> Array<E>.rForEach(action: ReceiverBiConsumer<LoopContext, E>):
  * It defines the action to be executed for each element.
  * @return The result of the iteration if the `Break` exception is thrown with a result. Returns `null` if the iteration completes normally or only `Continue` exceptions are thrown
  * .
- * @since 2.1.0
+ * @since 6.1.0
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <E, R> Array<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, E>): R? {
+inline fun <R> LongArray.rForEachIndexed(action: ReceiverTriConsumer<LoopContext, Int, Long>): R? {
     with(LoopContext()) {
         for ([index, element] in withIndex()) {
             try {
@@ -1687,23 +1673,4 @@ inline fun <E, R> Array<E>.rForEachIndexed(action: ReceiverTriConsumer<LoopConte
         }
     }
     return null
-}
-
-/**
- * Invokes the function-like behavior on an integer value, allowing for manipulation
- * of the provided array based on the integer's value. A positive integer will select
- * the first `n` elements from the array, a negative integer will drop the first `n` 
- * elements, and zero will result in an empty array.
- *
- * @param E the type of elements in the array.
- * @param array the array to be manipulated based on the integer's value.
- * @return an array of type `E` resulting from the operation defined by
- *         the integer's value.
- * @since 2.1.0
- */
-@Deprecated("Use take or drop instead")
-inline operator fun <reified E> Int.invoke(array: Array<E>): Array<E> {
-    if (this == 0) return emptyArray()
-    if (isPositive) return array.take(this).toTypedArray<E>()
-    return array.drop(-this).toTypedArray<E>()
 }

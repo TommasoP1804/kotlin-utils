@@ -32,7 +32,7 @@ import kotlin.toString
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is empty.", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -43,7 +43,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>
  * @param causeOf an optional supplier for the throwable to set as the cause of the
  *                validation failure. If null, a `ValidationFailedException` is thrown directly.
  * @param cause an optional supplier for the underlying cause of the validation failure,
- *              which can be set in the exception using `initCause`.
+ *              which can be set in the exception using `withRootCause`.
  * @param lazyMessage a supplier for the error message to use in the exception when validation fails.
  * @return the original collection if it is not empty.
  * @throws ValidationFailedException if the collection is empty.
@@ -51,7 +51,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -68,7 +68,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(causeOf: Transformer<T, Throwable>
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -85,7 +85,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variableN
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -102,7 +102,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(property: KProperty<*>?, variable:
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -119,7 +119,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -137,7 +137,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callable: KFunction<*>?, parameter
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -156,7 +156,7 @@ fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameterNa
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -176,7 +176,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Thr
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -196,7 +196,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(causeOf: Transformer<T, Thr
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -221,7 +221,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, va
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -243,7 +243,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(property: KProperty<*>?, va
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -263,7 +263,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, pa
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -284,7 +284,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callable: KFunction<*>?, pa
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -305,7 +305,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, para
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -328,7 +328,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, para
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -343,7 +343,7 @@ fun <T : Collection<E>?, E> T.validateNotNullOrEmpty(callableName: String?, para
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The collection is not empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -359,7 +359,7 @@ fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? =
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -376,7 +376,7 @@ fun <T : Collection<E>, E> T.validateEmpty(causeOf: Transformer<T, Throwable>? =
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -393,7 +393,7 @@ fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variableName
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -410,7 +410,7 @@ fun <T : Collection<E>, E> T.validateEmpty(property: KProperty<*>?, variable: KP
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -427,7 +427,7 @@ fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameterNam
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -443,7 +443,7 @@ fun <T : Collection<E>, E> T.validateEmpty(callable: KFunction<*>?, parameter: K
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -461,7 +461,7 @@ fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameterName:
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -483,7 +483,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwa
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The collection is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -506,7 +506,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(causeOf: Transformer<T, Throwa
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -526,7 +526,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, varia
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -551,7 +551,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(property: KProperty<*>?, varia
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -572,7 +572,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, param
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -594,7 +594,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callable: KFunction<*>?, param
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -619,7 +619,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, paramet
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -644,7 +644,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, paramet
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 
@@ -662,7 +662,7 @@ fun <T : Collection<E>?, E> T.validateNullOrEmpty(callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException("$element is not in the iterable.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$element is not in the iterable.", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException("$element is not in the iterable.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$element is not in the iterable.", cause?.invoke(this)))
     return this
 }
 /**
@@ -679,7 +679,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -699,7 +699,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, causeOf: Transformer<T, 
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -720,7 +720,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -739,7 +739,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -757,7 +757,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -776,7 +776,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -795,7 +795,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateContains(element: E, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
+    if (element !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -811,7 +811,7 @@ fun <T : Iterable<E>, E> T.validateContains(element: E, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException("$element is in the iterable.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$element is in the iterable.", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException("$element is in the iterable.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$element is in the iterable.", cause?.invoke(this)))
     return this
 }
 /**
@@ -827,7 +827,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -845,7 +845,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -864,7 +864,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -882,7 +882,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -902,7 +902,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -921,7 +921,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 /**
@@ -939,7 +939,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : Iterable<E>, E> T.validateNotContains(element: E, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)))
+    if (element in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $element", cause?.invoke(this)))
     return this
 }
 
@@ -956,7 +956,7 @@ fun <T : Iterable<E>, E> T.validateNotContains(element: E, callableName: String?
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException("The collection is not of size $size.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("The collection is not of size $size.", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException("The collection is not of size $size.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("The collection is not of size $size.", cause?.invoke(this)))
     return this
 }
 /**
@@ -973,7 +973,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, causeOf: Transformer<T, Throw
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -991,7 +991,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, causeOf: Transformer<T, Throw
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1011,7 +1011,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, property: KProperty<*>?, vari
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1030,7 +1030,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, property: KProperty<*>?, vari
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1049,7 +1049,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, callable: KFunction<*>?, para
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1068,7 +1068,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, callable: KFunction<*>?, para
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1086,7 +1086,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, callableName: String?, parame
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectSize(size: Int, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1102,7 +1102,7 @@ fun <T : Collection<E>, E> T.expectSize(size: Int, callableName: String?, parame
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException("The collection is of size $size.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("The collection is of size $size.", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException("The collection is of size $size.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("The collection is of size $size.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1122,7 +1122,7 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1143,7 +1143,7 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, causeOf: Transformer<T, Th
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1162,7 +1162,7 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1182,7 +1182,7 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, property: KProperty<*>?, v
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1201,7 +1201,7 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1220,7 +1220,7 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, callable: KFunction<*>?, p
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1238,6 +1238,6 @@ fun <T : Collection<E>, E> T.expectNotSize(size: Int, callableName: String?, par
  */
 @IgnorableReturnValue
 fun <T : Collection<E>, E> T.expectNotSize(size: Int, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }

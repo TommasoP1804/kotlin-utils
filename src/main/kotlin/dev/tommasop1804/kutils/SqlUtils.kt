@@ -12,7 +12,6 @@ package dev.tommasop1804.kutils
 import dev.tommasop1804.kutils.JsonbColumnType.Companion.JSONB
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.*
-import dev.tommasop1804.kutils.classes.coding.Json.Companion.EMPTY_JSON
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.classes.collections.ResultRow
@@ -48,11 +47,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.util.*
-import kotlin.invoke
-import kotlin.ranges.rangeTo
 import kotlin.reflect.KClass
 import kotlin.text.endsWith
-import kotlin.toString
 
 /**
  * Represents a database table with string-based primary keys.
@@ -1562,7 +1558,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.firstOrThrow(lazyException: Th
  * @param predicate a condition used to determine the matching entity
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<T>) = all().limit(1).firstOrThrow(lazyException, predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<T>) = all().limit(1).findFirstOrThrow(lazyException, predicate)
 /**
  * Returns the first entity in the query result if it exists, otherwise returns the value produced by the provided [default] function.
  *
@@ -1580,7 +1576,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.firstOr(default: Supplier<T>) 
  * @param predicate a condition to be checked against each entity in the collection.
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.firstOr(default: Supplier<T>, predicate: Predicate<T>) = all().limit(1).firstOr(default, predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.firstOr(default: Supplier<T>, predicate: Predicate<T>) = all().limit(1).findFirstOr(default, predicate)
 
 /**
  * Returns the single entity in the query result if it contains exactly one entity.
@@ -1605,7 +1601,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElement() = all().onlyElem
  * @throws TooManyResultsException if more than one element satisfies the predicate
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElement(predicate: Predicate<T>) = all().onlyElement(predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElement(predicate: Predicate<T>) = all().findOnlyElement(predicate)
 /**
  * Returns the single entity in the collection if it contains exactly one entity,
  * or `null` if the collection is empty or contains more than one entity.
@@ -1623,7 +1619,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOrNull() = all().on
  * should return `true` for entities to be included in the operation.
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOrNull(predicate: Predicate<T>) = all().onlyElementOrNull(predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOrNull(predicate: Predicate<T>) = all().findOnlyElementOrNull(predicate)
 /**
  * Retrieves the only element in the entity query or throws an exception if the query does not yield exactly one result.
  *
@@ -1644,7 +1640,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOrThrow(lazyExcepti
  * @throws Throwable the exception supplied by [lazyException] if no entity or more than one entity matches.
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<T>) = all().onlyElementOrThrow(lazyException, predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<T>) = all().findOnlyElementOrThrow(lazyException, predicate)
 /**
  * Returns the single entity in the query result if it contains exactly one entity; otherwise,
  * it returns the value supplied by the provided [default] supplier.
@@ -1664,7 +1660,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOr(default: Supplie
  * @param predicate A predicate to filter the entities in the collection.
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOr(default: Supplier<T>, predicate: Predicate<T>) = all().onlyElementOr(default, predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.onlyElementOr(default: Supplier<T>, predicate: Predicate<T>) = all().findOnlyElementOr(default, predicate)
 
 /**
  * Retrieves the last entity from the collection of all entities managed by this [EntityClass].
@@ -1724,7 +1720,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOrThrow(lazyException: Thr
  * @throws Throwable The exception supplied by [lazyException] if no entity matches the given [predicate].
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<T>) = all().lastOrThrow(lazyException, predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<T>) = all().findLastOrThrow(lazyException, predicate)
 /**
  * Returns the last entity of the collection or the result of invoking the specified default supplier
  * if the collection is empty.
@@ -1742,7 +1738,7 @@ fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOr(default: Supplier<T>) =
  * @param predicate A predicate function to evaluate entities of the class.
  * @since 5.3.0
  */
-fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOr(default: Supplier<T>, predicate: Predicate<T>) = all().lastOr(default, predicate)
+fun <ID : Any, T : Entity<ID>> EntityClass<ID, T>.lastOr(default: Supplier<T>, predicate: Predicate<T>) = all().findLastOr(default, predicate)
 
 /**
  * Retrieves the first entity that matches the given operation condition or returns null if no match is found.

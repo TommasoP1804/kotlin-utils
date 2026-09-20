@@ -175,7 +175,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 3.9.0
      */
     constructor(@IJLanguage("XML") xml: CharSequence) : this(
-        tryOrThrow({ -> MalformedInputException("Input is not a valid XML") }) {
+        tryOrThrow({ MalformedInputException("Input is not a valid XML") }) {
             documentToString(parseDocument(xml.toString()))
         }
     )
@@ -202,7 +202,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     constructor(path: Path) : this(path.toFile())
 
     init {
-        tryOrThrow({ -> MalformedInputException(Xml::class) }) {
+        tryOrThrow({ MalformedInputException(Xml::class) }) {
             parseDocument(value)
         }
     }

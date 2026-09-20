@@ -5,14 +5,7 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.range.IntRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.IntRangeWithExclusions
-import dev.tommasop1804.kutils.classes.range.LongRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.LongRangeWithExclusions
-import dev.tommasop1804.kutils.classes.range.UIntRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.UIntRangeWithExclusions
-import dev.tommasop1804.kutils.classes.range.ULongRangeWithConditions
-import dev.tommasop1804.kutils.classes.range.ULongRangeWithExclusions
+import dev.tommasop1804.kutils.classes.range.*
 import kotlin.reflect.*
 
 /**
