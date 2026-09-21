@@ -21,7 +21,9 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.*
+import dev.tommasop1804.kutils.errors.InvalidFormat
 import java.time.*
 import java.time.chrono.ChronoLocalDateTime
 import java.time.format.DateTimeFormatter
@@ -34,8 +36,6 @@ import java.time.temporal.TemporalAccessor
 import java.time.zone.ZoneRules
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.Result.Companion.failure
-import kotlin.Result.Companion.success
 import kotlin.reflect.KProperty
 import kotlin.time.toJavaInstant
 
@@ -246,23 +246,30 @@ val PG_TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatterBuilder()
     .toFormatter()
 
 /**
- * Parses the current [CharSequence] to a [LocalDateTime] object.
+ * Parses the current [CharSequence] into a [LocalDateTime].
  *
- * This method attempts to interpret the [CharSequence] as an ISO-8601 compliant date-time string.
- * It supports various formats, including those with fractional seconds and time zone designators (e.g., 'Z' or offsets like '+01:00').
-
- * @return The parsed [LocalDateTime] if the input is valid, wrapped in a [Result].
- * @since 1.0.0
+ * This method attempts to parse the receiver string into a [LocalDateTime] object.
+ * It supports various date-time formats, including ISO-8601 and Postgres timestamp formats.
+ * The method handles cases where fractions of a second are present, ensuring compatibility
+ * with multiple granularity levels in the input.
+ *
+ * If the input string is empty, improperly formatted, or does not conform to any supported
+ * date-time format, a [DateTimeParseException] will be thrown.
+ *
+ * @receiver The [CharSequence] to parse into a [LocalDateTime].
+ * @return A [LocalDateTime] representation of the input string.
+ * @throws [DateTimeParseException] If the input string is empty or improperly formatted.
+ * @since 6.1.0
  */
-fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
-    if (isEmpty()) return failure(DateTimeParseException("The input is empty.", toString(), 0))
+fun CharSequence.parseToLocalDateTime(): LocalDateTime {
+    if (isEmpty()) throw DateTimeParseException("The input is empty.", toString(), 0)
     var dateTimeString = toString().trim()
 
     if (' ' in dateTimeString && 'T' !in dateTimeString) {
         return try {
-            success(LocalDateTime.parse(dateTimeString, PG_TIMESTAMP_FORMATTER))
+            LocalDateTime.parse(dateTimeString, PG_TIMESTAMP_FORMATTER)
         } catch (e: DateTimeParseException) {
-            failure(DateTimeParseException("Invalid Postgres timestamp format: $dateTimeString", dateTimeString, 0))
+            throw DateTimeParseException("Invalid Postgres timestamp format: $dateTimeString", dateTimeString, 0)
         }
     }
 
@@ -286,7 +293,7 @@ fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
         else dateTimeString.length
     )
     if (ISO_DATE_TIME_STANDARD_VALIDATOR(dateTimeString)) {
-        if ("-" in dateTimeString && ":" in dateTimeString) return success(LocalDateTime.of(
+        if ("-" in dateTimeString && ":" in dateTimeString) return LocalDateTime.of(
             LocalDate.of(
                 dateTimeString.take(4).toInt(),
                 dateTimeString.substring(5, 7).toInt(),
@@ -297,8 +304,8 @@ fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
                 if (subDateTimeString.length >= 17 && dateTimeString[16] == ':') dateTimeString.substring(17, 19).toInt() else 0,
                 if (subDateTimeString.length >= 17 && dateTimeString[16] == ':') (if ("." in dateTimeString) dateTimeString.substring(20, 23).toInt() * 1000000 else 0) else 0
             )
-        ))
-        return success(LocalDateTime.of(
+        )
+        return LocalDateTime.of(
             LocalDate.of(
                 dateTimeString.take(4).toInt(),
                 dateTimeString.substring(4, 6).toInt(),
@@ -312,53 +319,88 @@ fun CharSequence.parseToLocalDateTime(): Result<LocalDateTime> {
                     (if ("." in dateTimeString) dateTimeString.substring(16, 19).toInt() * 1000000 else 0)
                 else 0
             )
-        ))
-    }
-    return failure(DateTimeParseException("Invalid ISO-8601 date-time format: $dateTimeString", dateTimeString, 0))
-}
-
-/**
- * Parses the given [CharSequence] to an [OffsetDateTime].
- * This method attempts to interpret the input as a date-time with an offset,
- * conforming to ISO-8601 standards. The input string is trimmed of leading
- * and trailing spaces before processing. If the string contains UTC (Z)
- * or a specified offset (+/-), the offset will be applied to produce an
- * [OffsetDateTime].
- *
- * @return the parsed [OffsetDateTime] instance, wrapped in a [Result].
- * @since 1.0.0
- */
-fun CharSequence.parseToOffsetDateTime(): Result<OffsetDateTime> {
-    if (isEmpty()) return failure(DateTimeParseException("The input is empty.", toString(), 0))
-    val dateTimeString = toString().trim()
-
-    return runCatching {
-        dateTimeString.parseToLocalDateTime().getOrThrow().atOffset(
-            if ("Z" in dateTimeString) ZoneOffset.UTC
-            else if ("+" in dateTimeString || "-" in dateTimeString after 'T') ZoneOffset.of(
-                dateTimeString.substring(
-                    if ("+" in dateTimeString) dateTimeString.indexOf("+")
-                    else dateTimeString.lastIndexOf("-")
-                )
-            ) else ZoneOffset.UTC
         )
     }
+    throw DateTimeParseException("Invalid ISO-8601 date-time format: $dateTimeString", dateTimeString, 0)
+}
+/**
+ * Parses the current [CharSequence] to a [LocalDateTime] object.
+ *
+ * This method attempts to interpret the [CharSequence] as an ISO-8601 compliant date-time string.
+ * It supports various formats, including those with fractional seconds and time zone designators (e.g., 'Z' or offsets like '+01:00').
+
+ * @return The parsed [LocalDateTime] if the input is valid, wrapped in a [Result].
+ * @since 6.1.0
+ */
+fun CharSequence.parseToLocalDateTimeOrError() = either {
+    catching({ this@parseToLocalDateTimeOrError.parseToLocalDateTime() }) { e: DateTimeParseException ->
+        InvalidFormat(e.parsedString, LocalDateTime::class)
+    }
 }
 
 /**
- * Parses the current CharSequence into a LocalDate object if it is in a valid ISO date or datetime format.
+ * Parses the current [CharSequence] into an [OffsetDateTime].
  *
- * The method supports both `yyyy-MM-dd` and `yyyyMMdd` formats.
+ * This method attempts to parse the receiver string into an [OffsetDateTime] object.
+ * It supports various date-time formats, including ISO-8601 and PostgreSQL timestamp formats,
+ * and accounts for different offsets (e.g., `Z`, `+01:00`, `-08:00`).
  *
- * @return a LocalDate object representing the parsed date, wrapped in a [Result].
- * @since 1.0.0
+ * @return the parsed [OffsetDateTime] instance
+ * @throws DateTimeParseException if the input cannot be parsed into a valid [OffsetDateTime]
+ * @since 6.1.0
  */
-fun CharSequence.parseToLocalDate(): Result<LocalDate> {
-    if (isEmpty()) return failure(DateTimeParseException("The input is empty.", toString(), 0))
+fun CharSequence.parseToOffsetDateTime(): OffsetDateTime {
+    if (isEmpty()) throw DateTimeParseException("The input is empty.", toString(), 0)
+    val dateTimeString = toString().trim()
+
+    return dateTimeString.parseToLocalDateTime().atOffset(
+        if ("Z" in dateTimeString) ZoneOffset.UTC
+        else if ("+" in dateTimeString || "-" in dateTimeString after 'T') ZoneOffset.of(
+            dateTimeString.substring(
+                if ("+" in dateTimeString) dateTimeString.indexOf("+")
+                else dateTimeString.lastIndexOf("-")
+            )
+        ) else ZoneOffset.UTC
+    )
+}
+/**
+ * Parses the [CharSequence] into an [OffsetDateTime], or returns a [InvalidFormat] wrapped in an [Either].
+ *
+ * This function attempts to parse the [CharSequence] using the [parseToOffsetDateTime] function.
+ * If parsing fails with a [DateTimeParseException], it catches the exception and converts it into
+ * a [InvalidFormat] with details about the failure (e.g., the invalid string and error index).
+ * The result is returned as an [Either], where:
+ * - `Right<OffsetDateTime>` represents a successful parse.
+ * - `Left<DateTimeParsingError>` represents a parsing error.
+ *
+ * @receiver The [CharSequence] to be parsed into an [OffsetDateTime].
+ * @return An [Either] containing:
+ *         - A [Either.Right] with the parsed [OffsetDateTime] if successful.
+ *         - A [Either.Left] with a [InvalidFormat] if parsing fails.
+ * @since 6.1.0
+ */
+fun CharSequence.parseToOffsetDateTimeOrError() = either {
+    catching({ this@parseToOffsetDateTimeOrError.parseToOffsetDateTime() }) { e: DateTimeParseException ->
+        InvalidFormat(e.parsedString, OffsetDateTime::class)
+    }
+}
+
+/**
+ * Parses the `CharSequence` into a `LocalDate` object, interpreting the content
+ * as an ISO-8601 compliant date string. Accepts strings in both basic and
+ * extended ISO-8601 date formats (e.g., "YYYY-MM-DD" or "YYYYMMDD").
+ *
+ * @return the parsed `LocalDate` object representing the date in the input string
+ * @throws DateTimeParseException if the input is empty or if the format is invalid
+ * @since 6.1.0
+ */
+fun CharSequence.parseToLocalDate(): LocalDate {
+    if (isEmpty()) throw DateTimeParseException("The input is empty.", toString(), 0)
+    parseToLocalDateTimeOrError().onRight { return it.toLocalDate() }
     val dateString = toString().trim()
 
     return if (ISO_DATE_TIME_STANDARD_VALIDATOR(dateString) || ISO_DATE_STANDARD_VALIDATOR(dateString)) {
-        success(if ("-" in dateString) LocalDate.of(
+        if ("-" in dateString) LocalDate.of(
             dateString.take(4).toInt(),
             dateString.substring(5, 7).toInt(),
             dateString.substring(8, 10).toInt()
@@ -367,8 +409,29 @@ fun CharSequence.parseToLocalDate(): Result<LocalDate> {
             dateString.take(4).toInt(),
             dateString.substring(4, 6).toInt(),
             dateString.substring(6, 8).toInt()
-        ))
-    } else failure(DateTimeParseException("Invalid ISO-8601 date format: $dateString", dateString, 0))
+        )
+    } else throw DateTimeParseException("Invalid ISO-8601 date format: $dateString", dateString, 0)
+}
+/**
+ * Attempts to parse the current [CharSequence] into a [LocalDate]. If parsing fails due to a
+ * [DateTimeParseException], returns an error encapsulated in an [Either.Left].
+ *
+ * The method first tries to parse the [CharSequence] to a [LocalDate] using the
+ * `parseToLocalDate()` method. In case of a failure, it captures the thrown [DateTimeParseException]
+ * and encapsulates the parsing error in a [InvalidFormat].
+ *
+ * @receiver The [CharSequence] to parse into a [LocalDate].
+ * @return An [Either] containing the successfully parsed [LocalDate] on the right or a
+ * [InvalidFormat] describing the parsing failure on the left.
+ * @throws IllegalArgumentException If the [CharSequence] is invalid for parsing and
+ * the exception is not handled within the [catching] block.
+ *
+ * @since 6.1.0
+ */
+fun CharSequence.parseToLocalDateOrError() = either {
+    catching({ this@parseToLocalDateOrError.parseToLocalDate() }) { e: DateTimeParseException ->
+        InvalidFormat(e.parsedString, LocalDate::class)
+    }
 }
 
 /**
@@ -377,11 +440,12 @@ fun CharSequence.parseToLocalDate(): Result<LocalDate> {
  * The method processes the input [CharSequence] to handle ISO 8601 time and date-time formats.
  * It trims and validates the input, handling fractional seconds and optional timezone or offset designators.
  *
- * @return a [LocalTime] instance if the input [CharSequence] is valid, wrapped in a [Result].
- * @since 1.0.0
+ * @return a [LocalTime] instance if the input [CharSequence] is valid.
+ * @throws DateTimeParseException if the input [CharSequence] is invalid for parsing.
+ * @since 6.1.0
  */
-fun CharSequence.parseToLocalTime(): Result<LocalTime> {
-    if (isEmpty()) return failure(DateTimeParseException("The input is empty.", toString(), 0))
+fun CharSequence.parseToLocalTime(): LocalTime {
+    if (isEmpty()) throw DateTimeParseException("The input is empty.", toString(), 0)
     var timeString = toString().trim()
 
     if ("." in timeString) {
@@ -403,47 +467,95 @@ fun CharSequence.parseToLocalTime(): Result<LocalTime> {
     val subTimeString = timeString.take(if ("Z" in timeString) length - 1 else if ("+" in timeString) timeString.indexOf("+")
     else if ("-" in timeString) timeString.indexOf("-") else timeString.length)
     if (ISO_DATE_TIME_STANDARD_VALIDATOR(timeString) || ISO_TIME_VALIDATOR(timeString)) {
-        if (":" in timeString) return success(LocalTime.of(
+        if (":" in timeString) return LocalTime.of(
             timeString.take(2).toInt(),
             timeString.substring(3, 5).toInt(),
             if (subTimeString.length > 6 && timeString[6].toString().isNumber()) timeString.substring(6, 8).toInt() else 0,
             if (subTimeString.length > 8 && timeString[9].toString().isNumber())
                 (if ("." in timeString) timeString.substring(9, 12).toInt() * 1000000 else 0)
             else 0
-        ))
-        return success(LocalTime.of(
+        )
+        return LocalTime.of(
             timeString.take(2).toInt(),
             timeString.substring(2, 4).toInt(),
             if (subTimeString.length > 4) timeString.substring(4, 6).toInt() else 0,
             if (subTimeString.length > 6 && timeString[7].toString().isNumber())
                 (if ("." in timeString) timeString.substring(7, 10).toInt() * 1000000 else 0)
             else 0
-        ))
+        )
     }
-    return failure(DateTimeParseException("Invalid ISO-8601 time format: $timeString", timeString, 0))
+    throw DateTimeParseException("Invalid ISO-8601 time format: $timeString", timeString, 0)
+}
+/**
+ * Parses the current [CharSequence] into a [LocalTime] object or returns a [InvalidFormat] in case of failure.
+ *
+ * This method attempts to parse the [CharSequence] using ISO 8601 time and date-time formats by invoking
+ * the [parseToLocalTime] method. If the parsing operation fails and throws a [DateTimeParseException],
+ * it maps the exception into a [InvalidFormat] containing details about the invalid input,
+ * the index at which the parsing error occurred, and the target class ([LocalTime]).
+ *
+ * Internally, this function leverages the `either` block to encapsulate error handling in a functional style,
+ * and uses the `catching` function to transform parsing exceptions into meaningful domain errors
+ * represented by [InvalidFormat].
+ *
+ * @receiver The [CharSequence] to be parsed into a [LocalTime] object.
+ * @return An `Either` value where:
+ *         - `Right<LocalTime>` contains the successfully parsed [LocalTime] instance.
+ *         - `Left<DateTimeParsingError>` encapsulates details about the parsing failure.
+ * @throws RaiseSignal If there is a signal for unwinding the stack during error handling.
+ * @since 6.1.0
+ */
+fun CharSequence.parseToLocalTimeOrError() = either {
+    catching({ this@parseToLocalTimeOrError.parseToLocalTime() }) { e: DateTimeParseException ->
+        InvalidFormat(e.parsedString, LocalTime::class)
+    }
 }
 
 /**
- * Parses the [CharSequence] into an [OffsetTime].
+ * Parses the current [CharSequence] to an [OffsetTime] object.
  *
- * The input string should represent a valid ISO-8601 time with an offset, such as "10:15:30+01:00" or "10:15:30Z".
+ * This method processes the input [CharSequence] assumed to follow ISO 8601 format, including time and
+ * optional offset information. It trims and validates the input, converting it into an [OffsetTime] instance.
+ * The method extracts the time and offset components to construct the result. It supports both 'Z' (UTC)
+ * and numeric offsets (e.g., +01:00 or -07:00).
  *
- * @return the parsed [OffsetTime] if the input is valid, wrapped in a [Result].
- * @since 1.0.0
+ * @return an [OffsetTime] instance derived from the input [CharSequence].
+ * @throws DateTimeParseException if the input [CharSequence] is empty or invalid for parsing.
+ * @since 6.1.0
  */
-fun CharSequence.parseToOffsetTime(): Result<OffsetTime> {
-    if (isEmpty()) return failure(DateTimeParseException("The input is empty.", toString(), 0))
+fun CharSequence.parseToOffsetTime(): OffsetTime {
+    if (isEmpty()) throw DateTimeParseException("The input is empty.", toString(), 0)
     val dateTimeString = toString().trim()
 
-    return runCatching {
-        dateTimeString.parseToLocalTime().getOrThrow().atOffset(
-            if ("Z" in dateTimeString) ZoneOffset.UTC
-            else ZoneOffset.of(
-                dateTimeString.substring(
-                    if ("+" in dateTimeString) dateTimeString.indexOf("+") else dateTimeString.lastIndexOf("-")
-                )
+    return dateTimeString.parseToLocalTime().atOffset(
+        if ("Z" in dateTimeString) ZoneOffset.UTC
+        else ZoneOffset.of(
+            dateTimeString.substring(
+                if ("+" in dateTimeString) dateTimeString.indexOf("+") else dateTimeString.lastIndexOf("-")
             )
         )
+    )
+}
+/**
+ * Parses the current `CharSequence` into an `OffsetTime`. If parsing fails, the method
+ * captures the `DateTimeParseException` and returns a `DateTimeParsingError` wrapped in an `Either` type.
+ *
+ * This method leverages a functional approach for error handling, using the `either` function to
+ * encapsulate the parsing logic and allow for a clean separation of success and failure cases.
+ *
+ * The parsing operation expects the `CharSequence` to represent a valid `OffsetTime` format.
+ * If the input is invalid or parsing fails, an error is returned containing details
+ * about the failure, including the invalid value, the error index, and the target class (`OffsetTime::class`).
+ *
+ * @receiver The `CharSequence` to parse as an `OffsetTime`.
+ * @return An `Either` containing:
+ *         - A `Right<OffsetTime>` if parsing succeeds.
+ *         - A `Left<DateTimeParsingError>` if parsing fails.
+ * @since 6.1.0
+ */
+fun CharSequence.parseToOffsetTimeOrError() = either {
+    catching({ this@parseToOffsetTimeOrError.parseToOffsetTime() }) { e: DateTimeParseException ->
+        InvalidFormat(e.parsedString, OffsetTime::class)
     }
 }
 

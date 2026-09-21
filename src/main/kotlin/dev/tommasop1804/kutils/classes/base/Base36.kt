@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
@@ -26,6 +28,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * A class that represents a Base36-encoded value. The Base36 encoding consists of alphanumeric
@@ -140,7 +143,11 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
          * or an error if a failure occurs.
          * @since 1.0.0
          */
-        fun CharSequence.toBase36() = runCatching { Base36(toString()) }
+        fun CharSequence.toBase36() = either {
+            catching({ Base36(this@toBase36.toString()) }) { t: Throwable ->
+                InvalidFormat(this@toBase36, typeOf<Base36>(), t)
+            }
+        }
 
         /**
          * Adds a Base36 number to a Byte and returns the result as an Int.

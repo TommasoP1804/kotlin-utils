@@ -15,6 +15,8 @@ import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -27,6 +29,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents an International Standard Book Number (ISBN) value with extended functionality for validation,
@@ -63,23 +66,26 @@ value class Isbn private constructor(override val value: String) : CharSequence,
     /**
      * Provides the EAN prefix for an ISBN-13 value if the value contains exactly four dashes ('-').
      * The EAN prefix is computed by applying a custom substring operation to the underlying value.
-     * If the dash count does not match four, the result is `null`.
+     * If the dash count does not match four, the result is [Uncomputable].
      *
      * This property is designed for use exclusively with ISBN-13 format codes that conform
      * to the specified dash requirement.
      *
-     * @since 3.0.0
+     * @since 6.1.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val eanPrefix
-        get() = if (count { it == Char.HYPEN } == 4) value.take(3) else null
+        get() = either {
+            ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
+            value.take(3)
+        }
 
     /**
      * Represents the linguistic group extracted from an ISBN-13 code.
      *
      * This property retrieves the linguistic group segment of an ISBN-13 code,
      * provided the code contains exactly four dashes ('-') as delimiters.
-     * If the dash count is different from four, the value of this property will be `null`.
+     * If the dash count is different from four, the value of this property will be [Uncomputable].
      *
      * When valid, the property calculates the linguistic group segment by dividing
      * the string representation of the ISBN using the dash character as a delimiter
@@ -92,18 +98,21 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      * For reference to the meaning of the linguistic group, see the
      * [List of ISBN registration groups](https://en.wikipedia.org/wiki/List_of_ISBN_registration_groups) article on Wikipedia.
      *
-     * @since 3.0.0
+     * @since 6.1.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val linguisticGroup
-        get() = if (count { it == Char.HYPEN } == 4) (value / Char.HYPEN)[1] else null
+        get() = either {
+            ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
+            (value / Char.HYPEN)[1]
+        }
 
     /**
      * Retrieves the publisher information from the ISBN value.
      *
      * This property is designed to extract the publisher component of an ISBN-13 formatted string,
      * which must include exactly four dashes ('-'). If the format does not meet this requirement,
-     * the property will return `null`.
+     * the property will return [Uncomputable].
      *
      * The publisher field represents the third segment of an ISBN-13 code when split by dashes.
      *
@@ -116,31 +125,37 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      * articles on Wikipedia.
      *
      * @return The publisher segment of the ISBN-13 value or `null` if the format is invalid.
-     * @since 3.0.0
+     * @since 6.1.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val publisher
-        get() = if (count { it == Char.HYPEN } == 4) (value / Char.HYPEN)[2] else null
+        get() = either {
+            ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
+            (value / Char.HYPEN)[2]
+        }
 
     /**
      * Represents the title component extracted from the ISBN-13 code.
      *
      * This property retrieves the title value from an ISBN-13 code formatted with exactly four dashes.
-     * If the code does not meet the required format, the value will be `null`.
+     * If the code does not meet the required format, the value will be [Uncomputable].
      *
      * The title component is determined by splitting the `value` string using dashes as delimiters and
      * accessing the fourth segment (zero-based index 3) of the resulting collection.
      *
      * Usage of this property is marked as requiring caution and is annotated with [OnlyForSpecificType]
      * because incorrect formatting of the ISBN-13 code (e.g., missing or additional dashes)
-     * may lead to unexpected results or a `null` value.
+     * may lead to unexpected results or a [Uncomputable] value.
      *
-     * @return the title segment from the ISBN-13 code, or `null` if the format is invalid.
-     * @since 3.0.0
+     * @return the title segment from the ISBN-13 code, or [Uncomputable] if the format is invalid.
+     * @since 6.1.0
      */
     @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val title
-        get() = if (count { it == Char.HYPEN } == 4) (value / Char.HYPEN)[3] else null
+        get() = either {
+            ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
+            (value / Char.HYPEN)[3]
+        }
 
     /**
      * Represents the check digit of an ISBN value.
@@ -194,7 +209,11 @@ value class Isbn private constructor(override val value: String) : CharSequence,
          * @return A `Result` containing the successfully constructed `ISBN` object or capturing an exception if the conversion fails.
          * @since 3.0.0
          */
-        fun CharSequence.toIsbn() = filter { it.isDigit() || it == Char.HYPEN }.run { runCatching { Isbn(this) } }
+        fun CharSequence.toIsbn() = filter { it.isDigit() || it == Char.HYPEN }.run { either {
+            catching({ Isbn(this@toIsbn) }) { t: Throwable ->
+                InvalidFormat(this@toIsbn, typeOf<Isbn>(), t)
+            }
+        } }
 
         /**
          * Computes the check digit for an input code string using the EAN-13 checksum algorithm.

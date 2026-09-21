@@ -133,9 +133,9 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
      * Filters the current map to include only the specified properties.
      *
      * This function creates a new `PropertiesMap` instance containing only the key-value
-     * pairs where the keys are included in the provided iterable of properties.
+     * pairs where the keys are included in the provided iterables of properties.
      *
-     * @param properties An iterable collection of property references (`KProperty1`)
+     * @param properties An iterables collection of property references (`KProperty1`)
      *                   that determine which key-value pairs to include in the result.
      * @return A `PropertiesMap` instance containing only the specified properties.
      * @since 3.10.0
@@ -155,7 +155,7 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
     /**
      * Filters the current `PropertiesMap` to retain only the entries whose keys match the specified property names.
      *
-     * @param properties An iterable of property names to retain within the resulting `PropertiesMap`.
+     * @param properties An iterables of property names to retain within the resulting `PropertiesMap`.
      *                   Only entries with keys matching these names will be included in the final map.
      * @return A new `PropertiesMap` instance containing only the filtered entries.
      * @since 3.10.0

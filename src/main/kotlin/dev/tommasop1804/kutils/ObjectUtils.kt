@@ -160,10 +160,10 @@ inline fun <T : Comparable<T>> T.ifIn(range: OpenEndRange<T>, action: Consumer<T
     return this
 }
 /**
- * Executes the specified action if the current element is found within the given iterable.
+ * Executes the specified action if the current element is found within the given iterables.
  *
  * @param iterable The collection to check for the presence of the current element.
- * @param action The action to execute if the element is found in the iterable.
+ * @param action The action to execute if the element is found in the iterables.
  * @return The current element.
  * @since 5.0.0
  */
@@ -173,6 +173,39 @@ inline fun <E> E.ifIn(iterable: Iterable<E>, action: Consumer<E>): E {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
     if (this in iterable) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the current key-value pair exists in the specified map.
+ *
+ * @param map The map against which the key-value pair will be checked for existence.
+ * @param action The action to execute if the key-value pair is present in the map.
+ *               It receives the current key-value pair as an input.
+ * @return The current key-value pair, regardless of whether the action was executed.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <K, V> Pair<K, V>.ifIn(map: Map<K, V>, action: Consumer<Pair<K, V>>): Pair<K, V> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in map) action(this)
+    return this
+}
+/**
+ * Executes the provided action if the current key exists in the specified map.
+ *
+ * @param map the map to check if the key exists in.
+ * @param action the action to be performed on the key if it is present in the map.
+ * @return the original key.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <K> K.ifIn(map: Map<K, *>, action: Consumer<K>): K {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this in map) action(this)
     return this
 }
 /**
@@ -253,6 +286,38 @@ inline fun <E> E.ifNotIn(iterable: Iterable<E>, action: Consumer<E>): E {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
     if (this !in iterable) action(this)
+    return this
+}
+/**
+ * Executes the given action if the key-value pair is not present in the specified map.
+ *
+ * @param map the map in which the presence of the key-value pair will be checked.
+ * @param action the action to perform if the key-value pair is not present in the map.
+ * @return the receiver key-value pair.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <K, V> Pair<K, V>.ifNotIn(map: Map<K, V>, action: Consumer<Pair<K, V>>): Pair<K, V> {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this !in map) action(this)
+    return this
+}
+/**
+ * Executes the given action if the key is not present in the specified map.
+ *
+ * @param map the map in which the key presence is checked
+ * @param action the action to be performed if the key is not in the map
+ * @return the key itself
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <K> K.ifNotIn(map: Map<K, *>, action: Consumer<K>): K {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this !in map) action(this)
     return this
 }
 /**
@@ -1162,7 +1227,7 @@ inline infix fun <reified T : Enum<T>> String.like(enumClass: KClass<T>): T? {
  */
 inline fun <reified T : Enum<T>> String.toEnumConst(): T {
     val candidates = matchedCases.ifEmpty { listOf(TextCase.Standard) }
-    return enumValues<T>().firstOrThrow({ NoSuchEntryException(T::class, this) }) { entry ->
+    return enumValues<T>().findFirstOrThrow({ NoSuchEntryException(T::class, this) }) { entry ->
         candidates.any { case -> convertCase(from = case, to = TextCase.PascalCase) equalsIgnoreCase entry.name }
     }
 }

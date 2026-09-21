@@ -408,7 +408,7 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
      * with the combined vertices from the current polygon and the provided vertices.
      *
      * 
-     * @param vertices The iterable collection of [Point] objects to be added as vertices.
+     * @param vertices The iterables collection of [Point] objects to be added as vertices.
      * @since 1.0.0
      */
     operator fun plus(vertices: Iterable<Point>) = Polygon((this.vertices + vertices).toMutableList())

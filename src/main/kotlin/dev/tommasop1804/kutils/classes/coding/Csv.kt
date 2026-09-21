@@ -19,8 +19,8 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
-import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
-import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
@@ -28,6 +28,7 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.File
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents a CSV (Comma-Separated Values) dataset with various utility methods for processing
@@ -150,42 +151,66 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
         }
 
         /**
-         * Checks if the String represents valid CSV content.
+         * Checks if the string is in a valid CSV format based on the provided separator and header configuration.
          *
-         * @receiver The String to be validated as CSV.
-         * @return A [Result] that succeeds if the String is valid CSV; fails otherwise.
-         * @since 3.13.0
+         * @param separator The character used to separate fields in the CSV. Defaults to ','.
+         * @param hasHeaders Indicates whether the CSV content includes a header row. Defaults to true.
+         * @return A boolean indicating whether the string is valid CSV content.
+         * @since 6.1.0
          */
-        fun String.isValidCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = runCatching { Csv(this, separator, hasHeaders) }
+        fun String.isValidCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) =
+            runCatching { Csv(this, separator, hasHeaders) }.isSuccess
 
         /**
-         * Converts the file content into a Csv object.
+         * Converts the current [File] into a [Csv] representation.
          *
-         * This extension function allows you to create a Csv instance from the content of the current file.
-         * It internally validates the file and ensures it complies with the CSV format.
+         * The method parses the file content, applying the specified separator
+         * and handling headers if applicable. The resulting [Csv] object can be
+         * used for further manipulation or data extraction.
          *
-         * @receiver The file to be converted into a Csv object.
-         * @return A [Result] wrapping the Csv instance on success, or an exception on failure.
-         * @since 3.13.0
+         * @param separator The character used to separate values in the CSV file. Defaults to ','.
+         * @param hasHeaders A boolean indicating whether the CSV file contains headers. Defaults to true.
+         * @return An `Either` wrapping a [Csv] object on success, or an [InvalidConversion] error if the conversion fails.
+         * @since 6.1.0
          */
-        fun File.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = runCatching { Csv(this, separator, hasHeaders) }
+        fun File.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
+            catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
+                InvalidConversion(this@toCsv, typeOf<File>(), typeOf<Csv>(), t)
+            }
+        }
         /**
-         * Attempts to create a `Csv` instance by reading the content of the file at the given path.
+         * Converts the content of the file at the given path into a CSV representation.
          *
-         * @receiver The file path from which the CSV content is read.
-         * @return A [Result] containing the `Csv` instance if successful, or an error if the operation fails.
-         * @since 3.13.0
+         * This method attempts to parse the file at the specified `Path` into a `Csv` object.
+         * It allows customization of the separator character and whether headers are present in the data.
+         * If the conversion fails, an `InvalidConversion` error is returned wrapped in an `Either`.
+         *
+         * @param separator The character used to separate CSV values. Defaults to `Char.COMMA`.
+         * @param hasHeaders A flag indicating whether the CSV data contains headers. Defaults to `true`.
+         * @return An `Either` containing a `Csv` object on success, or an `InvalidConversion` error on failure.
+         * @since 6.1.0
          */
-        fun Path.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = runCatching { Csv(this, separator, hasHeaders) }
+        fun Path.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
+            catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
+                InvalidConversion(this@toCsv, typeOf<Path>(), typeOf<Csv>(), t)
+            }
+        }
 
         /**
-         * Converts the current String into a CSV representation.
+         * Converts the string to a CSV representation, creating an instance of the `Csv` class.
+         * The method handles any exceptions by returning an error representation.
          *
-         * @receiver The String to be converted to CSV.
-         * @return A [Result] containing the parsed [Csv] object or an exception if parsing fails.
-         * @since 3.13.0
+         * @param separator The character used to separate values in the CSV. Defaults to `Char.COMMA`.
+         * @param hasHeaders Whether the CSV content includes headers. Defaults to `true`.
+         * @return An `Either` wrapping the result, where the left side contains an `InvalidFormat` error
+         *         in case of failure, and the right side contains the successfully created `Csv` instance.
+         * @since 6.1.0
          */
-        fun String.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = runCatching { Csv(this, separator, hasHeaders) }
+        fun String.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
+            catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
+                InvalidFormat(this@toCsv, typeOf<Csv>(), t)
+            }
+        }
 
         /**
          * Converts the current JSON instance into its equivalent CSV representation.
@@ -269,7 +294,8 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          * @return A [Result] containing the array of type [T].
          * @since 3.13.0
          */
-        inline fun <reified T> readArrayFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<Array<T>> = runCatching { readListFromFile<T>(file, separator, hasHeaders)().toTypedArray() }
+        inline fun <reified T> readArrayFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<Array<T>> =
+            runCatching { readListFromFile<T>(file, separator, hasHeaders)().toTypedArray() }
 
         /**
          * Reads and parses a list of objects from the specified CSV file.
@@ -278,7 +304,8 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          * @return A [Result] containing the parsed list of objects of type [T].
          * @since 3.13.0
          */
-        inline fun <reified T> readListFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<List<T>> = runCatching { Csv(file.readText(), separator, hasHeaders).toList<T>()() }
+        inline fun <reified T> readListFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<List<T>> =
+            runCatching { Csv(file.readText(), separator, hasHeaders).toList<T>()() }
 
         /**
          * Reads the content of a given file, parses it as CSV, and converts it to a set of type [T].
@@ -342,101 +369,167 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
     }
 
     /**
-     * Converts the CSV content into an array of type [T].
+     * Converts a collection into a list of arrays of the specified type.
      *
-     * @param T The type of the array elements.
-     * @return A [Result] containing an array of type [T].
-     * @since 3.13.0
+     * This function processes the elements in the underlying collection
+     * and maps each item to a typed array of the specified generic type [T].
+     * It uses the `toList` function to gather elements and applies
+     * a transformation using `map` to create the result.
+     *
+     * The function requires the reified type parameter [T] to ensure
+     * type information is available at runtime.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @param T The type of the elements in the resulting arrays.
+     * @return A list of arrays, where each array is of type [T].
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toArray() = runCatching { toList<T>()().toTypedArray() }
+    inline fun <reified T> toArray() = toJson().toArray<T>()
 
     /**
-     * Converts the CSV content into a list of objects of type [T].
+     * Converts the current value to a list of the specified type [T].
+     * Utilizes a JSON mapper to perform the deserialization into a list.
+     * If an error occurs during deserialization, wraps it in a `MappingError`.
      *
-     * @param T The type to which each row will be converted.
-     * @return A [Result] wrapping the successfully parsed list.
-     * @since 3.13.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @param T The type of elements in the resulting list.
+     * @return Either a successfully deserialized list of type [T] or a `MappingError` detailing the issue.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toList() = runCatching {
-        toJson().toList<T>()()
-    }
+    inline fun <reified T> toList() = toJson().toList<T>()
     /**
-     * Converts the CSV content into a list of objects of type [T].
+     * Converts the current context to a non-empty list of the specified type [T].
+     * This method ensures that the resulting list is not empty by wrapping
+     * the operation in a safe transformation, preserving the type information.
      *
-     * @param T The type to which each row will be converted.
-     * @return A [Result] wrapping the successfully parsed list.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @param T The type of elements within the resulting non-empty list.
+     * @return A non-empty list containing elements of type [T].
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyList() = runCatching {
-        toJson().toNonEmptyList<T>()()
-    }
+    inline fun <reified T> toNonEmptyList() = toJson().toNonEmptyList<T>()
 
     /**
-     * Converts the CSV content into a mutable list of type [T].
+     * Transforms the elements of a list to a mutable list of the specified type.
      *
-     * @param T The type of elements in the resulting mutable list.
-     * @return A [Result] containing the mutable list of type [T].
-     * @since 3.13.0
+     * This function leverages reified type parameters to infer the type of the list's elements at runtime.
+     * It converts the elements of the source list to mutable lists using the provided mapping logic.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @param T The type of elements contained in the resulting mutable list.
+     * @return A new list where each element is a mutable list of type T.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toMList() = runCatching { toList<T>()().toMList() }
+    inline fun <reified T> toMList() = toJson().toMList<T>()
     /**
-     * Converts the CSV content into a mutable list of type [T], ensuring the resulting list is non-empty.
+     * Converts the current receiver into a mutable non-empty list of the specified type [T].
      *
-     * This function leverages the `toNonEmptyList()` method to create a non-empty list of type [T],
-     * and then converts it into a mutable list (`NonEmptyMList`), guaranteeing that the resulting
-     * list always contains at least one element.
+     * This operation leverages `toMList` for initial conversion, followed by verifying
+     * and ensuring the result is a non-empty mutable list. If the transformation does not
+     * produce a valid non-empty mutable list, the function will signal an error encapsulated
+     * in an `Either` construct.
      *
-     * @param T The type of elements in the resulting mutable list.
-     * @return A [Result] wrapping a non-empty mutable list of type [T].
-     * @throws TooFewElementsException If the CSV content does not contain enough data to create a non-empty list.
-     * @since 5.2.1
+     * This method is particularly useful when enforcing non-empty constraints on lists
+     * while still retaining mutability.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the resulting list is empty
+     *
+     * @param T The type of elements in the resulting list.
+     * @return An `Either` containing the successfully transformed non-empty mutable list
+     *         or an error indicating the conversion was unsuccessful.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyMList() = toNonEmptyList<T>()().toNonEmptyMList()
+    inline fun <reified T> toNonEmptyMList() = toNonEmptyList<T>().map { it.toNonEmptyMList() }
 
     /**
-     * Converts the CSV content into a set of objects of type [T].
+     * Converts a collection of collections into a list of corresponding sets.
      *
-     * @param T The type of the elements in the resulting set.
-     * @return A [Result] containing the set of objects.
-     * @since 3.13.0
+     * This function iterates through a collection of collections, converts each
+     * individual collection into a set, and returns the results as a list.
+     * The operation ensures that elements in each inner collection are unique
+     * within their respective sets.
+     *
+     * Inline and reified modifiers allow for type inference at compile time,
+     * ensuring the function works generically with the type parameter [T].
+     *
+     * @return A list of sets, where each set corresponds to a distinct collection
+     *         converted from the original data.
+     *
+     * @throws UnsupportedOperationException If the function is not called
+     *         on a collection or list-like structure.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toSet() = runCatching { toList<T>()().toSet() }
+    inline fun <reified T> toSet() = toJson().toSet<T>()
     /**
-     * Converts the CSV content into a non-empty set of objects of type [T].
+     * Converts the receiving collection into a non-empty set.
+     * Requires the collection to contain at least one element; otherwise, the operation will fail.
+     * Utilizes the `toSet` function to transform the collection into a standard set
+     * and subsequently ensures the resulting set is non-empty.
      *
-     * This method combines the functionality of `toList` and `toNonEmptySet` to ensure
-     * that the returned set is both unique and contains at least one element.
+     * This function is inlined and uses reified generics to preserve the type information of the elements
+     * during the transformation process.
      *
-     * @param T The type to which each row will be converted.
-     * @return A [Result] wrapping a non-empty set of type [T].
-     * @throws TooFewElementsException if the resulting set is empty.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @param T The type of elements contained in the collection.
+     * @return A non-empty set containing the elements from the original collection.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptySet() = runCatching { toList<T>()().toNonEmptySet() }
+    inline fun <reified T> toNonEmptySet() = toJson().toNonEmptySet<T>()
 
     /**
-     * Converts the CSV content into a mutable set of type [T].
+     * Converts elements of type `T` into a mutable set (`MSet`).
      *
-     * @return A [Result] wrapping the mutable set.
-     * @since 3.13.0
+     * This function operates on a collection or sequence to transform its elements into
+     * a mutable set. The method utilizes the reified type parameter `T` to ensure type safety
+     * and implicitly infers the type, making it convenient for generic conversions.
+     *
+     * It starts by creating a standard set from the elements and then applies the `toMSet`
+     * conversion on the resulting set.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return A new mutable set (`MSet`) containing the transformed elements.
+     * @param T The type of elements included in the set.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toMSet() = runCatching { toList<T>()().toMSet() }
+    inline fun <reified T> toMSet() = toJson().toMSet<T>()
     /**
-     * Converts the CSV content into a mutable set of type [T], ensuring the result is wrapped in a [Result].
+     * Converts the invoking collection or sequence into a `NonEmptyMSet`.
      *
-     * This function first transforms the CSV content into a list of type [T] using the `toList` method.
-     * It then attempts to convert this list into a non-empty mutable set ([NonEmptyMSet]), ensuring
-     * that the resulting set always contains at least one element.
+     * This function first attempts to convert the collection into an `MSet`.
+     * If the resulting set is empty, an `IterableError.Empty` is returned as a failure.
+     * Otherwise, the result is wrapped in a successful `Either` containing a `NonEmptyMSet`.
      *
-     * If the CSV content is empty or the transformation fails, the returned [Result] will contain the failure reason.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
      *
-     * @param T The type of elements to be included in the mutable set.
-     * @return A [Result] that either contains a non-empty mutable set ([NonEmptyMSet])
-     *         of type [T], or the failure reason if the conversion is not successful.
-     * @throws TooFewElementsException If the CSV content is insufficient to produce a non empty mutable set.
-     * @since 5.2.1
+     * @return An `Either` where the left represents an `Error` and the right represents a `NonEmptyMSet`.
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyMSet() = runCatching { toList<T>()().toNonEmptyMSet() }
+    inline fun <reified T> toNonEmptyMSet() = toJson().toNonEmptyMSet<T>()
 
     /**
      * Converts the CSV content into a list of maps, where each map represents a row of the CSV data.

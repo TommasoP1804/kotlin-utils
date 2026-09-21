@@ -3,7 +3,7 @@
  */
 
 @file:JvmName("ArrayFloatUtilsKt")
-@file:Since("1.0.0")
+@file:Since("6.1.0")
 @file:Suppress("unused", "kutils_null_check", "kutils_map_declaration", "kutils_collection_declaration",
     "kutils_sublist_as_int_invoke", "RedundantSuppression", "deprecation", "kutils_take_as_int_invoke",
     "kutils_drop_as_int_invoke"
@@ -19,8 +19,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
-import dev.tommasop1804.kutils.errors.iterable.*
-import dev.tommasop1804.kutils.errors.iterable.IterableErrors.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
@@ -336,7 +335,7 @@ fun FloatArray.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: Pre
  * or `Either.Right` containing the first element that matches the predicate.
  * @since 6.1.0
  */
-fun FloatArray.findFirstOrError(predicate: Predicate<Float>): Either<NotFirstResultErrors, Float> = either {
+fun FloatArray.findFirstOrError(predicate: Predicate<Float>): Either<NotFirstResultError, Float> = either {
     catching({ findFirst(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -458,7 +457,7 @@ fun FloatArray.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Pred
  * @return An `Either` containing the last matching element, or an error of type `NotLastResultsErrors` if no match is found.
  * @since 6.1.0
  */
-fun FloatArray.findLastOrError(predicate: Predicate<Float>): Either<NotLastResultsErrors, Float> = either {
+fun FloatArray.findLastOrError(predicate: Predicate<Float>): Either<NotLastResultsError, Float> = either {
     catching({ findLast(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -529,7 +528,7 @@ fun FloatArray.secondOrThrow(lazyException: ThrowableSupplier): Float {
  * @return An `Either` containing the second element of the array on success or a `NotInnerElementErrors` error on failure.
  * @since 6.1.0
  */
-fun FloatArray.secondOrError(): Either<NotInnerElementErrors, Float> = either {
+fun FloatArray.secondOrError(): Either<NotInnerElementError, Float> = either {
     catching({ second() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(1) }
 }
 /**
@@ -597,7 +596,7 @@ fun FloatArray.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * wrapped in `Either.Left` if no matching element or insufficient results are found.
  * @since 6.1.0
  */
-fun FloatArray.findSecondOrError(predicate: Predicate<Float>): Either<NotInnerResultErrors, Float> = either {
+fun FloatArray.findSecondOrError(predicate: Predicate<Float>): Either<NotInnerResultError, Float> = either {
     catching({ findSecond(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -668,7 +667,7 @@ fun FloatArray.thirdOrThrow(lazyException: ThrowableSupplier): Float {
  * @return An `Either` containing the third element of the array or a `NotInnerElementErrors`.
  * @since 6.1.0
  */
-fun FloatArray.thirdOrError(): Either<NotInnerElementErrors, Float> = either {
+fun FloatArray.thirdOrError(): Either<NotInnerElementError, Float> = either {
     catching({ third() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(2) }
 }
 /**
@@ -730,7 +729,7 @@ fun FloatArray.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: Pre
  * @return An `Either` containing the third matching element if it exists, or an error of type `NotInnerResultErrors`.
  * @since 6.1.0
  */
-fun FloatArray.findThirdOrError(predicate: Predicate<Float>): Either<NotInnerResultErrors, Float> = either {
+fun FloatArray.findThirdOrError(predicate: Predicate<Float>): Either<NotInnerResultError, Float> = either {
     catching({ findThird(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -805,10 +804,10 @@ infix fun FloatArray.onlyElementOrThrow(lazyException: ThrowableSupplier): Float
  * - `TooManyElement` if the array contains more than one element.
  * @since 6.1.0
  */
-fun FloatArray.onlyElementOrError(): Either<NotOnlyElementErrors, Float> = either {
+fun FloatArray.onlyElementOrError(): Either<NotOnlyElementError, Float> = either {
     catching({ onlyElement() }) { e: Exception -> when (e) {
         is NoSuchElementException -> Empty
-        is TooManyElementsException -> TooManyElement
+        is TooManyElementsException -> TooManyElements
         else -> throw IllegalStateException()
     } }
 }
@@ -880,11 +879,11 @@ fun FloatArray.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predicat
  * Finds the only element in the array that matches the given predicate or returns an error if the conditions are not met.
  *
  * @param predicate A function that tests whether an element satisfies the desired condition.
- * @return Either an error encapsulated in a [NotOnlyResultErrors] object if the array has no matching element,
+ * @return Either an error encapsulated in a [NotOnlyResultError] object if the array has no matching element,
  *         too many matching elements, or another exception occurs, or the single matching element if exactly one exists.
  * @since 6.1.0
  */
-fun FloatArray.findOnlyElementOrError(predicate: Predicate<Float>): Either<NotOnlyResultErrors, Float> = either {
+fun FloatArray.findOnlyElementOrError(predicate: Predicate<Float>): Either<NotOnlyResultError, Float> = either {
     catching({ findOnlyElement(predicate) }) { e: Exception ->
         when (e) {
             is NoResultsException -> NoResults
@@ -980,7 +979,6 @@ fun FloatArray.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate: P
  * @param predicate A predicate function used to evaluate each element in the array.
  *                  The function should return `true` for the desired element.
  * @return The index of the first element that matches the [predicate].
- * @throws NoResults If no element matching the [predicate] is found.
  * @since 6.1.0
  */
 fun FloatArray.indexOfFirstOrError(predicate: Predicate<Float>) = either {
@@ -998,7 +996,6 @@ fun FloatArray.indexOfFirstOrError(predicate: Predicate<Float>) = either {
  * @param predicate A lambda function that takes an element of type [Float] and returns `true`
  *                  if the element matches the condition, or `false` otherwise.
  * @return The index of the last element in the array that matches the given [predicate].
- * @throws NoResults If no element matches the [predicate].
  * @since 6.1.0
  */
 fun FloatArray.indexOfLastOrError(predicate: Predicate<Float>) = either {
@@ -1339,7 +1336,7 @@ infix fun FloatArray.percent(p: Percentage): Float {
  * @return Either an `IndexOutOfBoundsErrors` if the index is invalid or the element at the calculated position.
  * @since 6.1.0
  */
-infix fun FloatArray.percentOrError(p: Percentage): Either<IndexOutOfBoundsErrors, Float> = either {
+infix fun FloatArray.percentOrError(p: Percentage): Either<IndexOutOfBoundsError, Float> = either {
     ensure(isNotEmpty()) { Empty }
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()

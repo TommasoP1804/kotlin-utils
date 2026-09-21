@@ -16,6 +16,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -28,6 +30,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents a UPC-A barcode, which is a 12-digit numeric product code standardized for product identification.
@@ -87,14 +90,24 @@ value class UpcA private constructor(override val value: String) : CharSequence,
         fun CharSequence.isValidUpcA() = matches(Regex("[0-9]{12}")) && computeCheckDigit(toString() - 1) == this[11]
 
         /**
-         * Converts the string to a UPC-A representation by filtering out all non-digit characters.
-         * The resulting string is then used to create a UPC_A object.
+         * Converts the given CharSequence into a UPC-A representation by filtering out non-digit characters and
+         * attempting to construct an instance of the `UpcA` class.
          *
-         * @receiver The original string to be converted.
-         * @return A [Result] containing the [UpcA] object if successful, or an exception if the conversion fails.
-         * @since 3.0.0
+         * This method filters the input to retain only numeric characters and attempts to construct a valid
+         * `UpcA` instance. If the construction fails, it returns an error of type `InvalidFormat`, encapsulating
+         * the original input and the `UpcA` target class. Errors during the conversion are captured and handled
+         * using the `either` and `catching` functional constructs.
+         *
+         * @receiver The input CharSequence that needs to be converted to UPC-A format.
+         * @return An `Either` that contains either a successful `UpcA` instance (`Right`) or an `InvalidFormat`
+         *         error (`Left`) if the conversion fails.
+         * @since 6.1.0
          */
-        fun CharSequence.toUpcA() = filter { it.isDigit() }.run { runCatching { UpcA(this) } }
+        fun CharSequence.toUpcA() = filter { it.isDigit() }.run { either {
+            catching({ UpcA(this@toUpcA) }) { t: Throwable ->
+                InvalidFormat(this@toUpcA, typeOf<UpcA>(), t)
+            }
+        } }
 
         class Serializer : ValueSerializer<UpcA>() {
             override fun serialize(value: UpcA, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

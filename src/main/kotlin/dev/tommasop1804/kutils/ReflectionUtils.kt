@@ -86,6 +86,52 @@ val KClass<*>.memberPropertiesNames: Set<String> get() = memberProperties
     .toSet()
 
 /**
+ * Retrieves the simple name of the underlying classifier if it is a Kotlin class.
+ *
+ * This property fetches the name of the class represented by the `KType` instance,
+ * if the classifier is of type `KClass<*>`. Returns `null` if the classifier is not
+ * a Kotlin class or does not have a simple name.
+ *
+ * @return The simple name of the classifier or `null` if unavailable.
+ * @since 6.1.0
+ */
+val KType.simpleName: String?
+    get() = (classifier as? KClass<*>)?.simpleName
+
+/**
+ * A property extension for `KType` that computes a string representation of the type's simple name,
+ * including its type arguments and nullability information.
+ *
+ * - For types classified by `KClass` (representing a class or interface), the simple name of the
+ *   class or interface is used as the base name.
+ * - For types represented by `KTypeParameter` (type parameters in generics), the name of the type
+ *   parameter is used as the base name.
+ * - If the classifier is not a `KClass` or `KTypeParameter`, the base name is set to "?".
+ *
+ * If the type has arguments, they are appended in angle brackets (`<...>`) with each argument's own
+ * `simpleNameWithArgs` representation or `*` if none is available.
+ *
+ * Nullability is represented by adding a `?` at the end of the string if the type is marked nullable.
+ *
+ * @receiver The `KType` whose simple name, type arguments, and nullability are to be computed.
+ * @return A string representation of the type's simple name, including its arguments and nullability.
+ * @since 6.1.0
+ */
+val KType.simpleNameWithArgs: String
+    get() {
+        val base = when (val c = classifier) {
+            is KClass<*> -> c.simpleName ?: "?"
+            is KTypeParameter -> c.name
+            else -> "?"
+        }
+        val args = arguments
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString(", ", "<", ">") { it.type?.simpleNameWithArgs ?: "*" }
+            .orEmpty()
+        return base + args + if (isMarkedNullable) "?" else ""
+    }
+
+/**
  * Retrieves all member properties of the class as a set.
  *
  * This operator function allows the invocation of a `KClass` to directly obtain
@@ -177,7 +223,7 @@ operator fun <T : Any> KClass<T>.get(name: String) = getProperty(name)
  */
 inline fun <reified T: Any> T.getPropertyOrThrow(name: String, noinline lazyException: ThrowableSupplier = { PropertyNotFoundException(name, T::class) }) =
     T::class.memberProperties
-        .findOrThrow(lazyException) { it.name == name }
+        .findFirstOrThrow(lazyException) { it.name == name }
 /**
  * Retrieves a property of the given class by its name or throws an exception if it is not found.
  *
@@ -189,7 +235,7 @@ inline fun <reified T: Any> T.getPropertyOrThrow(name: String, noinline lazyExce
  */
 fun <T: Any> KClass<T>.getPropertyOrThrow(name: String, lazyException: ThrowableSupplier = { PropertyNotFoundException(name, this) }) =
     memberProperties
-        .findOrThrow(lazyException) { it.name == name } as KProperty<T>?
+        .findFirstOrThrow(lazyException) { it.name == name } as KProperty<T>?
 
 /**
  * Retrieves a property of the current object that matches the specified predicate.

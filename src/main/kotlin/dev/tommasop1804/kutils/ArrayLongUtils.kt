@@ -3,7 +3,7 @@
  */
 
 @file:JvmName("ArrayLongUtilsKt")
-@file:Since("1.0.0")
+@file:Since("6.1.0")
 @file:Suppress("unused", "kutils_null_check", "kutils_map_declaration", "kutils_collection_declaration",
     "kutils_sublist_as_int_invoke", "RedundantSuppression", "deprecation", "kutils_take_as_int_invoke",
     "kutils_drop_as_int_invoke"
@@ -19,8 +19,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
-import dev.tommasop1804.kutils.errors.iterable.*
-import dev.tommasop1804.kutils.errors.iterable.IterableErrors.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
@@ -352,7 +351,7 @@ fun LongArray.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: Pred
  * or `Either.Right` containing the first element that matches the predicate.
  * @since 6.1.0
  */
-fun LongArray.findFirstOrError(predicate: Predicate<Long>): Either<NotFirstResultErrors, Long> = either {
+fun LongArray.findFirstOrError(predicate: Predicate<Long>): Either<NotFirstResultError, Long> = either {
     catching({ findFirst(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -474,7 +473,7 @@ fun LongArray.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Predi
  * @return An `Either` containing the last matching element, or an error of type `NotLastResultsErrors` if no match is found.
  * @since 6.1.0
  */
-fun LongArray.findLastOrError(predicate: Predicate<Long>): Either<NotLastResultsErrors, Long> = either {
+fun LongArray.findLastOrError(predicate: Predicate<Long>): Either<NotLastResultsError, Long> = either {
     catching({ findLast(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -545,7 +544,7 @@ fun LongArray.secondOrThrow(lazyException: ThrowableSupplier): Long {
  * @return An `Either` containing the second element of the array on success or a `NotInnerElementErrors` error on failure.
  * @since 6.1.0
  */
-fun LongArray.secondOrError(): Either<NotInnerElementErrors, Long> = either {
+fun LongArray.secondOrError(): Either<NotInnerElementError, Long> = either {
     catching({ second() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(1) }
 }
 /**
@@ -613,7 +612,7 @@ fun LongArray.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: Pre
  * wrapped in `Either.Left` if no matching element or insufficient results are found.
  * @since 6.1.0
  */
-fun LongArray.findSecondOrError(predicate: Predicate<Long>): Either<NotInnerResultErrors, Long> = either {
+fun LongArray.findSecondOrError(predicate: Predicate<Long>): Either<NotInnerResultError, Long> = either {
     catching({ findSecond(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -684,7 +683,7 @@ fun LongArray.thirdOrThrow(lazyException: ThrowableSupplier): Long {
  * @return An `Either` containing the third element of the array or a `NotInnerElementErrors`.
  * @since 6.1.0
  */
-fun LongArray.thirdOrError(): Either<NotInnerElementErrors, Long> = either {
+fun LongArray.thirdOrError(): Either<NotInnerElementError, Long> = either {
     catching({ third() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(2) }
 }
 /**
@@ -746,7 +745,7 @@ fun LongArray.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: Pred
  * @return An `Either` containing the third matching element if it exists, or an error of type `NotInnerResultErrors`.
  * @since 6.1.0
  */
-fun LongArray.findThirdOrError(predicate: Predicate<Long>): Either<NotInnerResultErrors, Long> = either {
+fun LongArray.findThirdOrError(predicate: Predicate<Long>): Either<NotInnerResultError, Long> = either {
     catching({ findThird(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -821,10 +820,10 @@ infix fun LongArray.onlyElementOrThrow(lazyException: ThrowableSupplier): Long {
  * - `TooManyElement` if the array contains more than one element.
  * @since 6.1.0
  */
-fun LongArray.onlyElementOrError(): Either<NotOnlyElementErrors, Long> = either {
+fun LongArray.onlyElementOrError(): Either<NotOnlyElementError, Long> = either {
     catching({ onlyElement() }) { e: Exception -> when (e) {
         is NoSuchElementException -> Empty
-        is TooManyElementsException -> TooManyElement
+        is TooManyElementsException -> TooManyElements
         else -> throw IllegalStateException()
     } }
 }
@@ -896,11 +895,11 @@ fun LongArray.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predicate
  * Finds the only element in the array that matches the given predicate or returns an error if the conditions are not met.
  *
  * @param predicate A function that tests whether an element satisfies the desired condition.
- * @return Either an error encapsulated in a [NotOnlyResultErrors] object if the array has no matching element,
+ * @return Either an error encapsulated in a [NotOnlyResultError] object if the array has no matching element,
  *         too many matching elements, or another exception occurs, or the single matching element if exactly one exists.
  * @since 6.1.0
  */
-fun LongArray.findOnlyElementOrError(predicate: Predicate<Long>): Either<NotOnlyResultErrors, Long> = either {
+fun LongArray.findOnlyElementOrError(predicate: Predicate<Long>): Either<NotOnlyResultError, Long> = either {
     catching({ findOnlyElement(predicate) }) { e: Exception ->
         when (e) {
             is NoResultsException -> NoResults
@@ -1019,7 +1018,6 @@ fun LongArray.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  *
  * @param element The element to search for within the array.
  * @return The index of the given element in the array if it is found.
- * @throws NotFound If the element is not found in the array.
  * @since 6.1.0
  */
 fun LongArray.indexOfOrError(element: Long) = either {
@@ -1035,7 +1033,6 @@ fun LongArray.indexOfOrError(element: Long) = either {
  *
  * @param element The element to search for in the array.
  * @return The last index of the specified element in the array if it exists.
- * @throws NotFound Raised if the specified element is not found in the array.
  * @since 6.1.0
  */
 fun LongArray.lastIndexOfOrError(element: Long) = either {
@@ -1053,7 +1050,6 @@ fun LongArray.lastIndexOfOrError(element: Long) = either {
  * @param predicate A predicate function used to evaluate each element in the array.
  *                  The function should return `true` for the desired element.
  * @return The index of the first element that matches the [predicate].
- * @throws NoResults If no element matching the [predicate] is found.
  * @since 6.1.0
  */
 fun LongArray.indexOfFirstOrError(predicate: Predicate<Long>) = either {
@@ -1071,7 +1067,6 @@ fun LongArray.indexOfFirstOrError(predicate: Predicate<Long>) = either {
  * @param predicate A lambda function that takes an element of type [Long] and returns `true`
  *                  if the element matches the condition, or `false` otherwise.
  * @return The index of the last element in the array that matches the given [predicate].
- * @throws NoResults If no element matches the [predicate].
  * @since 6.1.0
  */
 fun LongArray.indexOfLastOrError(predicate: Predicate<Long>) = either {
@@ -1520,7 +1515,7 @@ infix fun LongArray.percent(p: Percentage): Long {
  * @return Either an `IndexOutOfBoundsErrors` if the index is invalid or the element at the calculated position.
  * @since 6.1.0
  */
-infix fun LongArray.percentOrError(p: Percentage): Either<IndexOutOfBoundsErrors, Long> = either {
+infix fun LongArray.percentOrError(p: Percentage): Either<IndexOutOfBoundsError, Long> = either {
     ensure(isNotEmpty()) { Empty }
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()

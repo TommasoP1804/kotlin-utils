@@ -8,7 +8,7 @@
 
 package dev.tommasop1804.kutils
 
-import dev.tommasop1804.kutils.annotations.Since
+import dev.tommasop1804.kutils.annotations.*
 
 /**
  * A no-operation method that performs no actions or side effects.

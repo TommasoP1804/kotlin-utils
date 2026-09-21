@@ -1094,7 +1094,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      */
     infix fun mergePatch(patch: Json): Result<Xml> = runCatching {
         val root = rootName
-        toJson().mergePatch(patch).getOrThrow().toXml(root)
+        toJson().mergePatch(patch).toXml(root)
     }
 
     /**

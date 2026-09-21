@@ -1004,7 +1004,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchElementException If no header matches the given key.
      * @since 2.1.0
      */
-    fun getFirst(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first()
+    fun getFirst(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first()
     /**
      * Retrieves the first value of a specific type associated with the given key from the headers.
      *
@@ -1017,7 +1017,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Exception If the header cannot be found or if deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()
+    inline fun <reified T> getFirstTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()
     /**
      * Retrieves and deserializes the first value associated with the specified header key,
      * casting it to the desired type. This method is considered unsafe as it does not perform
@@ -1029,7 +1029,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchElementException If no header with the specified key exists.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()()
+    inline fun <reified T> getFirstTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()()
 
     /**
      * Retrieves the first value associated with the given key from the headers or returns null if no match is found.
@@ -1073,7 +1073,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Throwable An exception provided by the lazyException supplier if no matching key or value is found.
      * @since 2.1.0
      */
-    fun getFirstOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException)
+    fun getFirstOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException)
     /**
      * Retrieves and deserializes the first value associated with the specified key from the headers
      * into the expected type [T]. Throws a lazily-supplied exception if the key or value is not found.
@@ -1083,7 +1083,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *                      if the key or value is not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getFirstTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the first value associated with the specified key from the headers and deserializes it into the specified type.
      * Throws a lazily-supplied exception if the value is not found or cannot be deserialized.
@@ -1095,7 +1095,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Throwable The lazily-supplied exception if the key is not found or if deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getFirstTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the first value associated with the specified key from the headers. 
@@ -1106,7 +1106,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return The first value associated with the specified key, or the value from the default supplier if the key is not present.
      * @since 2.1.0
      */
-    fun getFirstOr(key: String, default: Supplier<String>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default)
+    fun getFirstOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default)
     /**
      * Retrieves the first value associated with the specified key or a typed default value if the key is not found.
      * The value is serialized and deserialized into the specified type `T`.
@@ -1115,7 +1115,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param default A supplier providing a default value of type `T` if the key is not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getFirstTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the first value associated with the specified key from the headers, attempting to cast it
      * to the provided type `T`. If no value is found, it uses the provided default supplier.
@@ -1127,7 +1127,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return The first value associated with the key, cast to the specified type `T`, or the default value if not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getFirstTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getFirstTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the second value associated with the specified key from the headers.
@@ -1142,7 +1142,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws IndexOutOfBoundsException If the header does not contain at least two values.
      * @since 2.1.0
      */
-    fun getSecond(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second()
+    fun getSecond(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second()
     /**
      * Retrieves the second value associated with the given key from headers, serializes 
      * it, and deserializes it into the specified type.
@@ -1151,7 +1151,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return The second value associated with the key, deserialized into the specified type.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()
+    inline fun <reified T> getSecondTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()
     /**
      * Retrieves the second value associated with the given key from the `headers`,
      * performs serialization and deserialization, and returns the result as the specified type [T].
@@ -1164,7 +1164,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchElementException If the key is not found or there is no second value.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()()
+    inline fun <reified T> getSecondTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()()
 
     /**
      * Retrieves the second value associated with the specified key from the headers.
@@ -1213,7 +1213,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * @param key The key used to search for the header entry.
      * @param lazyException A supplier*/
-    fun getSecondOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException)
+    fun getSecondOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException)
     /**
      * Retrieves and deserializes the second value associated with the given key from the headers,
      * ensuring that the value is of the specified type. If the key or second value is not found,
@@ -1226,7 +1226,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Throwable The exception provided by the supplier if the key or second value is not found.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getSecondTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the second value associated with a specific header key, performs serialization and 
      * deserialization, and returns it as a typed object. If the second value is not found, an exception is thrown.
@@ -1241,7 +1241,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Throwable If the second value is not found or if deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getSecondTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the second value associated with the specified header key, or falls back to the default value if no such value exists.
@@ -1252,7 +1252,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchElementException If the key is not found in the headers.
      * @since 2.1.0
      */
-    fun getSecondOr(key: String, default: Supplier<String>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default)
+    fun getSecondOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default)
     /**
      * Retrieves the second value associated with the given key from the headers, converting it to the specified type.
      * If the second value is not present, the provided default value is used instead.
@@ -1262,7 +1262,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return The second value associated with the key, converted to the type `T`, or the provided default value.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getSecondTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the second value associated with a specified key from a headers collection, or a default value
      * of the specified type if the second value does not exist. The type is determined at runtime and deserialized
@@ -1274,7 +1274,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchElementException if the key is not found in the headers collection.
      * @since 2.1.0
      */
-    inline fun <reified T> getSecondTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getSecondTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the third value corresponding to a specified key from the headers.
@@ -1286,7 +1286,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * there is no third value for the key.
      * @since 2.1.0
      */
-    fun getThird(key: String) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third()
+    fun getThird(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third()
     /**
      * Retrieves the third item from the list of values associated with the provided key,
      * deserializes it into the specified type [T], and returns the result.
@@ -1297,7 +1297,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws NoSuchElementException If the header with the provided key is not found.
      * @since 3.0.0
      */
-    inline fun <reified T> getThirdTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()
+    inline fun <reified T> getThirdTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()
     /**
      * Retrieves the third value associated with the specified key, attempts to serialize and 
      * deserialize it into the provided type [T], and returns it. This method is considered unsafe 
@@ -1309,7 +1309,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()()
+    inline fun <reified T> getThirdTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()()
 
     /**
      * Retrieves the third value associated with the specified key from the headers, or null if either the key is not found
@@ -1352,7 +1352,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * or third value does not exist.
      * @since 2.1.0
      */
-    fun getThirdOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException)
+    fun getThirdOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException)
     /**
      * Retrieves the third value from the headers corresponding to the specified key, deserializes it
      * into the specified type [T], or throws an exception if the value cannot be found or deserialized.
@@ -1366,7 +1366,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *                   cannot be found or deserialized.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getThirdTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the third value associated with the given key from the headers, performs type deserialization, 
      * and throws a lazily supplied exception if the key or value cannot be resolved.
@@ -1382,7 +1382,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Throwable The lazily supplied exception if the key or third value does not exist or deserialization fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getThirdTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the third value associated with the given key from the headers.
@@ -1392,7 +1392,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param default A supplier function that provides a default value if the third value is unavailable.
      * @since 2.1.0
      */
-    fun getThirdOr(key: String, default: Supplier<String>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default)
+    fun getThirdOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default)
     /**
      * Retrieves the third value associated with the specified key from the headers, or provides a default value.
      * If a third value exists in the header's values list, it is returned after being serialized and deserialized
@@ -1405,7 +1405,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return The third value associated with the key, deserialized to type T.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getThirdTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the third value associated with the specified key from the headers, or a default value if the key does not exist,
      * and attempts to deserialize it into the specified type. The operation is performed unsafely, and type mismatches may result in runtime exceptions.
@@ -1417,7 +1417,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws RuntimeException If the deserialization process fails due to a type mismatch or other errors.
      * @since 2.1.0
      */
-    inline fun <reified T> getThirdTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getThirdTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the only element associated with the specified key from the headers.
@@ -1427,11 +1427,12 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * @param key The key of the header whose single associated value is to be retrieved.
      * @return The single element associated with the specified key.
+     * @throws NoSuchHeaderException If no matching key is found.
      * @throws NoSuchElementException If no matching key is found.
      * @throws IllegalStateException If multiple values are associated with the key.
      * @since 2.1.0
      */
-    fun getOnlyElement(key: String) = headers.findOrThrow { it.nameEquals(key) }.values.onlyElement()
+    fun getOnlyElement(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement()
     /**
      * Retrieves and processes a single element of a specified type from a collection identified by the given key.
      *
@@ -1445,7 +1446,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * 
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTyped(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()
+    inline fun <reified T> getOnlyElementTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()
     /**
      * Retrieves the only element of type [T] from the specified header key. This method assumes
      * that the provided key exists, the header contains exactly one value, and it can be safely
@@ -1458,7 +1459,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * elements.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafe(key: String) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()()
+    inline fun <reified T> getOnlyElementTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()()
 
     /**
      * Retrieves the only element associated with the specified key if it exists, or returns null
@@ -1502,7 +1503,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param lazyException A supplier that provides the exception to be thrown if the conditions are not met.
      * @since 2.1.0
      */
-    fun getOnlyElementOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException)
+    fun getOnlyElementOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException)
     /**
      * Retrieves and deserializes the only element from the headers' values associated with the specified key.
      * If there are no elements or more than one element, the provided exception supplier is invoked to throw an exception.
@@ -1514,7 +1515,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws Exception Thrown with the exception supplied by lazyException if the single element retrieval fails.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()
+    inline fun <reified T> getOnlyElementTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()
     /**
      * Retrieves the only element of a given type from the headers associated with the specified key, or throws 
      * an exception if the conditions are not met.
@@ -1530,7 +1531,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param lazyException A supplier of a throwable exception, used in case of errors during searching or deserialization.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()()
+    inline fun <reified T> getOnlyElementTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()()
 
     /**
      * Retrieves the only occurrence of a value associated with the specified key. If no such element
@@ -1541,7 +1542,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @return The value associated with the key if found, otherwise the supplied default value.
      * @since 2.1.0
      */
-    fun getOnlyElementOr(key: String, default: Supplier<String>) = headers.findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default)
+    fun getOnlyElementOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default)
     /**
      * Retrieves the only element associated with the specified key from the headers and deserializes it into the specified type.
      * If no element is found, the provided default value is used.
@@ -1553,7 +1554,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @throws IllegalStateException If there are multiple elements associated with the key.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()
+    inline fun <reified T> getOnlyElementTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()
     /**
      * Retrieves the only element associated with the provided key as a deserialized type-safe object.
      * 
@@ -1569,7 +1570,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param default A supplier function to provide a default value if the key is not present or no value exists.
      * @since 2.1.0
      */
-    inline fun <reified T> getOnlyElementTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()()
+    inline fun <reified T> getOnlyElementTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()()
 
     /**
      * Retrieves the value associated with the specified key from the headers
@@ -1750,7 +1751,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * Adds the given collection of HTTP headers to the existing headers.
      * This operator allows combining multiple headers into the current set of headers.
      *
-     * @param headers An iterable collection of HTTP headers to be added.
+     * @param headers An iterables collection of HTTP headers to be added.
      * @since 3.0.0
      */
     operator fun plusAssign(headers: Iterable<HttpHeader>) {
@@ -1761,7 +1762,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * If a header with the same key already exists, its values will be appended.
      *
      * @param headers a map where each key is the name of the header and the corresponding value is 
-     *                an iterable collection of header values to add.
+     *                an iterables collection of header values to add.
      * @since 3.0.0
      */
     operator fun plusAssign(headers: Map<String, Iterable<Any>>) {
@@ -1771,7 +1772,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * Adds the given header entry to the HTTP headers. This operator function is designed
      * to merge or append the specified header into the existing collection of headers.
      *
-     * @param header a key-value pair where the key is a header name, and the value is an iterable
+     * @param header a key-value pair where the key is a header name, and the value is an iterables
      * of any objects representing the header values.
      * @since 3.0.0
      */
@@ -1828,7 +1829,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     /**
      * Removes the specified headers from the current collection by subtracting them.
      *
-     * @param headers a map of header names to their corresponding iterable values to be removed.
+     * @param headers a map of header names to their corresponding iterables values to be removed.
      * @since 3.0.0
      */
     operator fun minusAssign(headers: Map<String, Iterable<Any>>) {
@@ -1838,7 +1839,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * Removes the specified HTTP header from the current collection of headers.
      *
      * @param header a map entry representing the HTTP header to be removed, 
-     * consisting of a key as the header name and a value as an iterable of the header's values.
+     * consisting of a key as the header name and a value as an iterables of the header's values.
      * @since 3.0.0
      */
     operator fun minusAssign(header: Map.Entry<String, Iterable<Any>>) {
@@ -1857,9 +1858,9 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         minusAssign(HttpHeader(header))
     }
     /**
-     * Removes headers from the current collection if their names are contained within the provided iterable of keys.
+     * Removes headers from the current collection if their names are contained within the provided iterables of keys.
      *
-     * @param key An iterable collection of strings representing the keys of the headers to be removed.
+     * @param key An iterables collection of strings representing the keys of the headers to be removed.
      * @since 3.0.0
      */
     @JvmName("minusAssignIterableString")

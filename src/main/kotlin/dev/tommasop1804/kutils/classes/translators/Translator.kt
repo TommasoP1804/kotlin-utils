@@ -83,7 +83,7 @@ open class Translator(
         /**
          * Translates a collection of keys into their corresponding values from a configuration file.
          *
-         * This method processes each key in the provided iterable and retrieves the mapped value
+         * This method processes each key in the provided iterables and retrieves the mapped value
          * from the file associated with the provided `Translator` instance. Supported configuration file
          * formats include YAML and JSON. If a key is not found, a `TranslationException` is thrown.
          *
@@ -137,11 +137,11 @@ open class Translator(
     /**
      * Translates a collection of keys into their corresponding values from a configuration file.
      *
-     * This method processes each key in the provided iterable and retrieves the mapped value
+     * This method processes each key in the provided iterables and retrieves the mapped value
      * from the file associated with this `Translator` instance. Supported configuration file
      * formats include YAML and JSON. If a key is not found, a `NoSuchElementException` is thrown.
      *
-     * @param keys An iterable collection of keys to be translated.
+     * @param keys An iterables collection of keys to be translated.
      * @return A list of strings containing the translated values for the provided keys.
      * @throws ConfigurationException If the file format is unsupported or the configuration file is invalid.
      * @throws TranslationException If any of the keys are not found in the configuration file.

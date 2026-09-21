@@ -225,7 +225,7 @@ value class Iban private constructor(val value: String) : CharSequence {
                 98 - (bban + value.take(2) + "00")
                     .map { EUROPEAN_CHECK_DIGITS_CONVERSION[it]!! }
                     .joinToString(String.EMPTY)
-                    .toBigInt()()
+                    .toBigInt()
                     .mod(97.toBigInt()).toInt()
                 ).toString()
         if (checkDigits.length == 1) checkDigits = "0$checkDigits"

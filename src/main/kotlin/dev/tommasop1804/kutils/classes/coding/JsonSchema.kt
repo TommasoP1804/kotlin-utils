@@ -11,6 +11,8 @@ import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import com.networknt.schema.ValidationMessage
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.v1.core.Table
@@ -19,6 +21,7 @@ import tools.jackson.core.JsonParser
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents a JSON Schema parsed and evaluated from a JSON structure.
@@ -93,8 +96,8 @@ class JsonSchema(val json: Json) : Json(json) {
      * `definitions` exist or can be parsed.
      * @since 3.8.1
      */
-    val defs: Map<String, JsonSchema>? get() = node.get($$"$defs")?.asJson()?.getOrThrow()?.toMap<JsonSchema>()?.getOrThrow()
-        ?: node.get("definitions")?.asJson()?.getOrThrow()?.toMap<JsonSchema>()?.getOrThrow()
+    val defs: Map<String, JsonSchema>? get() = node.get($$"$defs")?.asJson()?.toMap<JsonSchema>()?.getOrThrow()
+        ?: node.get("definitions")?.asJson()?.toMap<JsonSchema>()?.getOrThrow()
     /**
      * The `comment` property retrieves the value of the "$comment" key from the JSON node as a nullable string.
      * "$comment" is a standard keyword in JSON Schema used to add comments or annotations within the schema.
@@ -667,14 +670,14 @@ class JsonSchema(val json: Json) : Json(json) {
      * @param json The JsonNode object to be parsed and used for initialization.
      * @since 3.8.1
      */
-    constructor(json: JsonNode) : this(json.asJson()())
+    constructor(json: JsonNode) : this(json.asJson())
     /**
      * Constructs an instance using the provided JsonNode.
      *
      * @param json The JsonNode object to be parsed and used for initialization.
      * @since 3.8.1
      */
-    constructor(json: com.fasterxml.jackson.databind.JsonNode) : this(json.asJson()())
+    constructor(json: com.fasterxml.jackson.databind.JsonNode) : this(json.asJson())
 
     init {
         try {
@@ -737,57 +740,87 @@ class JsonSchema(val json: Json) : Json(json) {
          */
         fun com.fasterxml.jackson.databind.JsonNode.isValidJsonSchema() = runCatching { JsonSchema(this) }.isSuccess
         /**
-         * Converts a string containing a JSON schema definition into a `JsonSchema` object.
+         * Parses the string into a `JsonSchema` object.
          *
-         * This method attempts to parse the string as a JSON Schema and wraps the result
-         * in a `Result` object. If the operation succeeds, the `Result` will contain the
-         * `JsonSchema` instance; otherwise, it will contain the exception that was thrown
-         * during parsing.
+         * This function attempts to transform the receiver `String` into a `JsonSchema` instance.
+         * Any exceptions that occur during the transformation will be caught, and an error
+         * encapsulating details about the invalid format will be returned instead.
          *
-         * @receiver The JSON schema in string format to be parsed.
-         * @return A `Result` object containing either the successfully parsed `JsonSchema`
-         *         or an exception if parsing fails.
-         * @since 3.8.1
+         * The function uses a functional error-handling approach, returning an `Either`
+         * where the result is either:
+         * - A `Right` containing a `JsonSchema` object if the conversion is successful.
+         * - A `Left` containing an `InvalidFormat` error if a parsing failure occurs.
+         *
+         * @receiver A JSON string to be parsed into a `JsonSchema` instance.
+         * @return An `Either` wrapping the result of the conversion.
+         * - `Right<JsonSchema>`: If the JSON string is successfully parsed into a `JsonSchema`.
+         * - `Left<InvalidFormat>`: If the JSON string cannot be parsed, encapsulating the error details.
+         * @throws IllegalArgumentException If the input string is empty or invalid.
+         * @since 6.1.0
          */
-        fun @receiver:Language("json") String.toJsonSchema() = runCatching { JsonSchema(this) }
+        fun @receiver:Language("json") String.toJsonSchema() = either {
+            catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
+                InvalidFormat(this@toJsonSchema, typeOf<JsonSchema>(), t)
+            }
+        }
         /**
-         * Converts a `JsonNode` into a `JsonSchema` object wrapped in a `Result`.
+         * Converts a `JsonNode` into a `JsonSchema`.
          *
-         * This method attempts to construct a `JsonSchema` instance based on the provided
-         * JSON node. If the conversion is successful, the `JsonSchema` instance is returned
-         * within a `Result`. In case of failure, the exception is captured inside the `Result`.
+         * This function attempts to create a `JsonSchema` instance from the invoking `JsonNode`.
+         * If the conversion is successful, the result is wrapped in an `Either.Right`.
+         * If the conversion fails due to an exception, an `InvalidConversion` error is raised and
+         * wrapped in an `Either.Left`.
          *
-         * @receiver The `JsonNode` that is being transformed into a `JsonSchema`.
-         * @return A `Result` containing the `JsonSchema` instance if the operation is successful,
-         *         or an exception if the conversion fails.
-         * @since 3.8.1
+         * The conversion utilizes the `JsonSchema` constructor which parses the input `JsonNode`.
+         * Any throwable encountered during this process is captured and transformed into an error
+         * of type `InvalidConversion` to provide detailed information about the failed operation.
+         *
+         * @receiver The `JsonNode` instance to be converted into a `JsonSchema`.
+         * @return An `Either` containing:
+         *         - `Right<JsonSchema>` if the conversion succeeds.
+         *         - `Left<InvalidConversion>` if the conversion fails.
+         * @since 6.1.0
          */
-        fun JsonNode.toJsonSchema() = runCatching { JsonSchema(this) }
+        fun JsonNode.toJsonSchema() = either {
+            catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
+                InvalidConversion(this@toJsonSchema, typeOf<JsonNode>(), typeOf<JsonSchema>(), t)
+            }
+        }
         /**
-         * Converts the current `JsonNode` instance into a `JsonSchema`.
+         * Converts a [com.fasterxml.jackson.databind.JsonNode] instance to a corresponding [JsonSchema].
          *
-         * This extension function attempts to create a `JsonSchema` object
-         * using the invoking JSON node. The operation is performed within
-         * a `runCatching` block, which captures any exceptions that might occur
-         * during the schema creation process and returns the result as a `Result` object.
+         * This function attempts to create a [JsonSchema] object from the current [JsonNode].
+         * If the conversion fails, an [InvalidConversion] error is returned encapsulating
+         * the details of the failure, including the source node, the expected target type,
+         * and the encountered exception.
          *
-         * @receiver The `JsonNode` from which a `JsonSchema` instance is derived.
-         * @return A `Result` containing the created `JsonSchema` instance if successful,
-         *         or a failure with the thrown exception if the operation fails.
-         * @since 3.8.1
+         * @receiver The [JsonNode] to be converted.
+         * @return An [Either] containing the resulting [JsonSchema] if the conversion is successful,
+         *         or an [InvalidConversion] error if the conversion fails.
+         * @since 6.1.0
          */
-        fun com.fasterxml.jackson.databind.JsonNode.toJsonSchema() = runCatching { JsonSchema(this) }
+        fun com.fasterxml.jackson.databind.JsonNode.toJsonSchema() = either {
+            catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
+                InvalidConversion(this@toJsonSchema, typeOf<com.fasterxml.jackson.databind.JsonNode>(), typeOf<JsonSchema>(), t)
+            }
+        }
         /**
-         * Converts the current `Json` instance into a `JsonSchema`.
+         * Converts the current `Json` instance into a `JsonSchema` representation.
          *
-         * This function attempts to create a `JsonSchema` object from the current `Json` instance.
-         * The operation is encapsulated in a `Result` to handle potential failures during the conversion process.
+         * This function encapsulates the logic for creating a `JsonSchema` from a `Json` object
+         * and ensures any exceptions encountered during the conversion process are gracefully handled.
+         * If an exception is caught, it returns an instance of `InvalidConversion` indicating
+         * the source data, target type, and the cause of the failure.
          *
-         * @receiver The `Json` instance to be converted into a `JsonSchema`.
-         * @return A `Result` encapsulating the created `JsonSchema` on success, or a failure otherwise.
-         * @since 3.8.1
+         * @return A result represented by an `Either` type containing the successfully created `JsonSchema`
+         *         or an `InvalidConversion` in case of failure.
+         * @since 6.1.0
          */
-        fun Json.toJsonSchema() = runCatching { JsonSchema(this) }
+        fun Json.toJsonSchema() = either {
+            catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
+                InvalidConversion(this@toJsonSchema, typeOf<Json>(), typeOf<JsonSchema>(), t)
+            }
+        }
 
         private fun validateAgainstMetaSchema(json: Json): Set<ValidationMessage> {
             val specVersion = detectSpecVersionFor(json)
@@ -941,6 +974,21 @@ class JsonSchema(val json: Json) : Json(json) {
      * @since 3.8.1
      */
     infix fun validateJson(json: Json) = json.validateWithSchema(this, version)
+
+    /**
+     * Represents an error encountered during schema validation or processing.
+     *
+     * @property path The location or identifier within the schema where the error occurred.
+     * @property message A descriptive message detailing the nature of the error.
+     * @property details Additional contextual information about the error, if available.
+     * @since 6.1.0
+     * @author Tommaso Pastorelli
+     */
+    data class SchemaError(
+        val path: String,
+        val message: String,
+        val details: Map<String, Any>? = null
+    )
 
     /**
      * Represents a set of predefined types with their corresponding string values.

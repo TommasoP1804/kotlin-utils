@@ -12,9 +12,10 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMinutesOfDuration
-import dev.tommasop1804.kutils.exceptions.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
@@ -27,6 +28,7 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.io.File
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 import org.intellij.lang.annotations.Language as IJLanguage
 
 /**
@@ -240,51 +242,106 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
         fun String.isValidMarkdown() = runCatching { Markdown(this) }
 
         /**
-         * Converts the current file to a `Markdown` instance encapsulated within a `Result`.
+         * Converts the contents of a `File` instance into a `Markdown` object, encapsulating
+         * the transformation logic and error handling in a functional style.
          *
-         * @receiver The file whose content is to be parsed as Markdown.
-         * @return A `Result` wrapping the `Markdown` instance if the parsing succeeds, or an exception if it fails.
-         * @since 4.0.0
+         * This method attempts to create a `Markdown` instance by reading the contents of
+         * the given `File`. If the conversion is successful, the operation returns a `Right`
+         * containing the `Markdown` instance. If an error occurs (e.g., the file is not readable,
+         * the contents are invalid, or there's an unexpected exception), the error is captured
+         * as a `Left` containing an `InvalidConversion` instance.
+         *
+         * The `InvalidConversion` object provides details about the erroneous value, the source type,
+         * the target type of the conversion, and any underlying exception that caused the failure.
+         *
+         * @receiver The `File` to be converted into a `Markdown` object.
+         * @return An `Either` instance containing:
+         *         - `Right<Markdown>` on a successful conversion.
+         *         - `Left<InvalidConversion>` when an error occurs during the conversion process.
+         *
+         * @since 6.1.0
          */
-        fun File.toMarkdown() = runCatching { Markdown(this) }
+        fun File.toMarkdown() = either {
+            catching({ Markdown(this@toMarkdown) }) { t: Throwable ->
+                InvalidConversion(this@toMarkdown, typeOf<File>(), typeOf<Markdown>(), t)
+            }
+        }
         /**
-         * Converts the content of the given file path to its Markdown representation, wrapped in a `Result`.
+         * Converts the invoking `Path` into a `Markdown` instance, wrapping the result in an `Either`.
          *
-         * @receiver The file path to be read and converted into Markdown.
-         * @return A `Result` containing the Markdown representation of the file content, or an error if it fails.
-         * @since 4.0.0
+         * This method tries to construct a `Markdown` object by reading the content from the file
+         * referenced by the `Path`. If the operation fails, it captures the exception and produces an
+         * `InvalidConversion` error containing details about the failed attempt.
+         *
+         * The conversion operation is performed within the context of an `either` block, allowing for
+         * functional-style error handling. Specifically:
+         * - On success, a `Right` containing the `Markdown` instance is returned.
+         * - On failure, a `Left` containing the `InvalidConversion` error is returned.
+         *
+         * @receiver The `Path` object representing the location of the file.
+         * @return An `Either` instance:
+         *         - `Right<Markdown>` if the conversion is successful.
+         *         - `Left<InvalidConversion>` if the conversion fails due to an exception.
+         *
+         * @since 6.1.0
          */
-        fun Path.toMarkdown() = runCatching { Markdown(this) }
+        fun Path.toMarkdown() = either {
+            catching({ Markdown(this@toMarkdown) }) { t: Throwable ->
+                InvalidConversion(this@toMarkdown, typeOf<Path>(), typeOf<Markdown>(), t)
+            }
+        }
         /**
-         * Converts the current `String` into a Markdown representation and wraps the operation in a `Result`.
+         * Converts the current string, interpreted as Markdown content, into a `Markdown` instance.
          *
-         * @receiver The `String` to be converted to Markdown.
-         * @return A `Result` that either contains the parsed Markdown object or an exception if parsing fails.
-         * @since 4.0.0
+         * This method encapsulates the parsing of the string into a `Markdown` object,
+         * logging any potential errors related to an invalid format during the conversion process.
+         * If an error occurs, the method returns an `Either.Left` containing an `InvalidFormat` error
+         * with details about the issue.
+         *
+         * @receiver The string to be interpreted and parsed as Markdown content.
+         * @return An `Either` value where:
+         *         - `Right<Markdown>` contains the successfully parsed `Markdown` instance.
+         *         - `Left<InvalidFormat>` contains an error if the string cannot be parsed into a valid `Markdown` format.
+         * @since 6.1.0
          */
-        fun @receiver:IJLanguage("Markdown") String.toMarkdown() = runCatching { Markdown(this) }
+        fun @receiver:IJLanguage("Markdown") String.toMarkdown() = either {
+            catching({ Markdown(this@toMarkdown) }) { t: Throwable ->
+                InvalidFormat(this@toMarkdown, typeOf<Markdown>(), t)
+            }
+        }
         /**
-         * Converts the current instance of `Code` to a `Markdown` object if the language is Markdown.
-         * If the language is not Markdown, an [ExpectationMismatchException] is thrown (into the result).
+         * Converts the current `Code` instance to a `Markdown` representation if the language of the instance is Markdown.
          *
-         * @receiver The `Code` instance that contains the details necessary for conversion.
-         * @return A `Result` wrapping the resulting `Markdown` instance or an exception if the conversion fails.
-         * @since 4.0.0
+         * If the `language` field of the `Code` instance matches `Language.Markdown`, a new `Markdown` instance is created
+         * using the `value` field of the `Code`. Otherwise, it returns an error indicating a mismatch between the expected
+         * and actual languages.
+         *
+         * @receiver The `Code` instance to be converted to Markdown.
+         * @return A `Markdown` instance if the language of the `Code` is Markdown, or a `ValidationError` otherwise.
+         * @since 6.1.0
          */
-        fun Code.toMarkdown() = runCatching {
+        fun Code.toMarkdown() = either {
             if (language == Language.Markdown) Markdown(value)
-            else throw ExpectationMismatchException("Language must be Markdown")
+            else raise(ValidationError.ExpectationMismatch(::language, Language.Markdown, language))
         }
 
         /**
-         * Reads the content of the specified file and parses it into a Markdown object.
+         * Reads content from the specified file and attempts to create a `Markdown` instance
+         * from the content. If an error is encountered during the conversion process, such as
+         * an invalid file format or an unreadable file, it captures the error and wraps it into
+         * an `InvalidConversion` error.
          *
-         * @param file the file to be read and parsed as Markdown.
-         * @return a Result containing the parsed Markdown object if the operation is successful,
-         *         or an exception if an error occurs.
-         * @since 4.0.0
+         * @param file The file to read and parse into a `Markdown` instance.
+         * @return An `Either` that contains:
+         *         - `Right<Markdown>` if the `Markdown` instance is successfully created.
+         *         - `Left<InvalidConversion>` if there is an error during the conversion process.
+         * @since 6.1.0
          */
-        fun readFromFile(file: File): Result<Markdown> = runCatching { Markdown(file) }
+        fun readFromFile(file: File) = either {
+            catching({ Markdown(file) }) { t: Throwable ->
+                InvalidConversion(file, typeOf<File>(), typeOf<Markdown>(), t)
+            }
+        }
 
         class Serializer : ValueSerializer<Markdown>() {
             override fun serialize(value: Markdown, gen: JsonGenerator, ctxt: SerializationContext) {

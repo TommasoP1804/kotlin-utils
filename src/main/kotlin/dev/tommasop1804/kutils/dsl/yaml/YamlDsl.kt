@@ -416,41 +416,41 @@ class YamlObjectBuilder {
     infix fun String.to(value: Nothing?) { entries[this] = YamlNull }
 
     /**
-     * Associates the current string (key) with a YAML sequence constructed from the provided iterable of strings.
+     * Associates the current string (key) with a YAML sequence constructed from the provided iterables of strings.
      * The resulting `YamlArray` object is added to the `entries` map with the string as its key.
      *
-     * @param array The iterable collection of strings to be converted into a `YamlArray`
+     * @param array The iterables collection of strings to be converted into a `YamlArray`
      *              and associated with the current string key.
      * @since 3.11.0
      */
     @JvmName("toIterableString")
     infix fun String.to(array: Iterable<String>) { entries[this] = YamlArray(array.map { YamlString(it) }) }
     /**
-     * Associates a string key with an iterable collection of numeric values, converting the numbers
+     * Associates a string key with an iterables collection of numeric values, converting the numbers
      * into instances of `YamlNumber`. The association is stored in the `entries` map as a `YamlArray`.
      *
-     * @param array An iterable collection of numbers to associate with the string key. Each number
+     * @param array An iterables collection of numbers to associate with the string key. Each number
      *              in the collection is converted to a `YamlNumber` and included in the `YamlArray`.
      * @since 3.11.0
      */
     @JvmName("toIterableNumber")
     infix fun String.to(array: Iterable<Number>) { entries[this] = YamlArray(array.map { YamlNumber(it) }) }
     /**
-     * Associates the current string (key) with the provided iterable of Boolean values in the `entries` map.
-     * Each Boolean value in the iterable is converted to a `YamlBoolean` and grouped into a `YamlArray`.
+     * Associates the current string (key) with the provided iterables of Boolean values in the `entries` map.
+     * Each Boolean value in the iterables is converted to a `YamlBoolean` and grouped into a `YamlArray`.
      *
-     * @param array An iterable collection of Boolean values to associate with the key. Each value is
+     * @param array An iterables collection of Boolean values to associate with the key. Each value is
      *              wrapped as a `YamlBoolean` and stored in a `YamlArray`.
      * @since 3.11.0
      */
     @JvmName("toIterableBoolean")
     infix fun String.to(array: Iterable<Boolean>) { entries[this] = YamlArray(array.map { YamlBoolean(it) }) }
     /**
-     * Associates the current string (key) with an iterable collection of [YamlValue]s
+     * Associates the current string (key) with an iterables collection of [YamlValue]s
      * in the `entries` map. The collection is converted to a [YamlArray] before being
      * associated with the key.
      *
-     * @param array The iterable collection of [YamlValue]s to associate with the key.
+     * @param array The iterables collection of [YamlValue]s to associate with the key.
      * @since 3.11.0
      */
     @JvmName("toIterableYamlValue")

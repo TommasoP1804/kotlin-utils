@@ -15,6 +15,8 @@ import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -27,6 +29,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents an EAN-13 code as a value class that enforces validation and provides
@@ -90,19 +93,25 @@ value class Ean13 private constructor(override val value: String) : CharSequence
         fun CharSequence.isValidEan13() = matches(Regex("[0-9]{13}")) && computeCheckDigit(toString() - 1) == this[12]
 
         /**
-         * Converts a string to an instance of the EAN13 class, encapsulating a valid EAN-13 barcode.
+         * Converts the current [CharSequence] into an EAN-13 representation.
          *
-         * This method uses the provided string to construct an `EAN13` object. If the string does not
-         * conform to the expected requirements of an EAN-13 barcode, an exception will be thrown and
-         * caught, returning a `Result` encapsulating the failure. This ensures safe handling of
-         * potential parsing issues.
+         * The method filters out non-digit characters from the [CharSequence],
+         * then attempts to create an instance of the `Ean13` class with the resulting value.
+         * If an exception occurs during this process, it captures the error and returns
+         * it as a `ParsingError` wrapped in an `Either` construct.
          *
-         * @receiver the string to be converted.
-         * @return a `Result` containing the `EAN13` object if the conversion succeeds, or the exception
-         * if it fails.
-         * @since 3.0.0
+         * @receiver The [CharSequence] to be converted to an EAN-13 value.
+         * @return An `Either` object, where:
+         *         - `Right<Ean13>` contains the successfully parsed EAN-13 value.
+         *         - `Left<ParsingError>` contains the error raised if parsing fails,
+         *           including the invalid value and the target class.
+         * @since 6.1.0
          */
-        fun CharSequence.toEan13() = filter { it.isDigit() }.run { runCatching { Ean13(this) } }
+        fun CharSequence.toEan13() = filter { it.isDigit() }.run { either {
+            catching({ Ean13(this@toEan13) }) { t: Throwable ->
+                InvalidFormat(this@toEan13, typeOf<Ean13>(), t)
+            }
+        } }
 
         /**
          * Computes the check digit for a given string code based on the EAN checksum algorithm.

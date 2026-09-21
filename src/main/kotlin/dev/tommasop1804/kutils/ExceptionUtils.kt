@@ -16,6 +16,17 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
+ * Represents a code path that should never be reachable under normal circumstances.
+ *
+ * This value generates a runtime error when accessed, explicitly signaling that execution
+ * has reached a location in the program that was assumed to be logically impossible.
+ * Its primary use is for ensuring exhaustiveness in certain control structures, such as `when` expressions.
+ *
+ * @since 6.1.0
+ */
+val UNREACHABLE: Nothing = error("Unreachable")
+
+/**
  * Extension property that retrieves the root cause of a [Throwable].
  *
  * This property traverses the chain of throwable causes and returns

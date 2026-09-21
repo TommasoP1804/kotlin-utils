@@ -11,8 +11,9 @@ import dev.tommasop1804.kutils.COLON
 import dev.tommasop1804.kutils.DataMap
 import dev.tommasop1804.kutils.ExceptionTransformer
 import dev.tommasop1804.kutils.MList
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.minus
 import dev.tommasop1804.kutils.startsWith
 import dev.tommasop1804.kutils.startsWithIgnoreCase
@@ -35,6 +36,7 @@ import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.reflect.KClass
+import kotlin.reflect.typeOf
 import kotlin.text.endsWith
 
 /**
@@ -377,7 +379,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
 
     init {
         validate(value.isNotBlank()) { "SQL query cannot be blank" }
-        tryOrThrow({ it -> MalformedInputException("Invalid SQL query: ${it.message?.minus("net.sf.jsqlparser.parser.ParseException: ")}") }, includeCause = false) {
+        tryOrThrow({ MalformedInputException("Invalid SQL query: ${it.message?.minus("net.sf.jsqlparser.parser.ParseException: ")}") }, includeCause = false) {
             CCJSqlParserUtil.parse(value)
         }
     }
@@ -397,28 +399,38 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
         fun String.isValidSqlQuery() = tryTrueOrFalse { SqlQuery(this) }
         
         /**
-         * Converts the invoking string into an instance of `SqlQuery` wrapped in a `Result`.
-         * This function leverages the `runCatching` scope to capture any potential exceptions
-         * that might occur during the creation of the `SqlQuery` instance.
+         * Converts the current string receiver, assumed to be a SQL query, into a `SqlQuery` object.
          *
-         * @receiver The string to be transformed into an `SqlQuery`.
-         * @return A `Result` containing the successfully constructed `SqlQuery` instance
-         *         or the exception encountered during the attempt.
-         * @since 1.0.0
+         * This function attempts to parse the receiver as a valid `SqlQuery`. If the parsing succeeds,
+         * it returns either the parsed `SqlQuery` or a failure encapsulated as an `InvalidFormat` error.
+         *
+         * The receiver string must be a valid SQL query format; otherwise, an exception will be caught
+         * and wrapped in an `InvalidFormat` object, containing the original input, the expected type,
+         * and the thrown exception.
+         *
+         * @receiver A string assumed to represent a SQL query.
+         * @return An `Either` containing the successfully parsed `SqlQuery` or an `InvalidFormat` error
+         *         in case of failure.
+         * @since 6.1.0
          */
-        fun @receiver:Language("sql") String.toSqlQuery() = runCatching { SqlQuery(this) }
-
+        fun @receiver:Language("sql") String.toSqlQuery() = either {
+            catching({ SqlQuery(this@toSqlQuery) }) { t: Throwable ->
+                InvalidFormat(this@toSqlQuery, typeOf<SqlQuery>(), t)
+            }
+        }
         /**
-         * Converts the current instance of `Code` to an `SqlQuery` object if the language is SQL.
-         * If the language is not SQL, an [ExpectationMismatchException] is thrown (into the result).
+         * Converts the current `Code` instance to a `SqlQuery` if the `language` property
+         * is of type `Language.Sql`. If not, it raises a `ValidationError` indicating a
+         * mismatch in the expected and actual `language` values.
          *
-         * @receiver The `Code` instance that contains the details necessary for conversion.
-         * @return A `Result` wrapping the resulting `SqlQuery` instance or an exception if the conversion fails.
-         * @since 1.0.0
+         * @receiver The `Code` instance to be converted.
+         * @return An `Either` type containing the `SqlQuery` if the `language` matches,
+         *         otherwise a `ValidationError`.
+         * @since 6.1.0
          */
-        fun Code.toSqlQuery() = runCatching {
+        fun Code.toSqlQuery() = either {
             if (language == dev.tommasop1804.kutils.classes.coding.Language.Sql) SqlQuery(value)
-            else throw ExpectationMismatchException("Language must be SQL")
+            else raise(ValidationError.ExpectationMismatch(::language, dev.tommasop1804.kutils.classes.coding.Language.Sql, language))
         }
 
         class Serializer : ValueSerializer<SqlQuery>() {

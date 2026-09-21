@@ -138,7 +138,7 @@ typealias MCollection<E> = MutableCollection<E>
 /**
  * A typealias for `MutableIterable<T>` that simplifies the usage of its type declaration.
  *
- * @param T the type of elements contained within the iterable.
+ * @param T the type of elements contained within the iterables.
  * @since 3.0.0
  */
 
@@ -1866,16 +1866,6 @@ typealias KDuration = Duration
  * @see BigInteger
  */
 typealias BigInt = BigInteger
-
-/**
- * A typealias for the `UUID` class, representing a universally unique identifier.
- *
- * This typealias provides a more concise and readable way to refer to `UUID` in the codebase.
- *
- * @since 3.0.0
- */
-@Deprecated("Prefer use of kotlin.uuid.Uuid instead", ReplaceWith("Uuid", "kotlin.uuid.Uuid"))
-typealias Uuid = UUID
 
 /**
  * Type alias for the `URI` class from the `java.net` package. This allows the `URI` class to be referenced

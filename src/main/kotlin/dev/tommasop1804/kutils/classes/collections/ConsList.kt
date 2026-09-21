@@ -246,7 +246,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): ConsList<*> {
                 val node = p.objectReadContext().readTree<ObjectNode>(p)
                 @Suppress("kutils_collection_declaration")
-                return ConsList(node.asList<Any>()())
+                return ConsList(node.asList<Any>())
             }
         }
 

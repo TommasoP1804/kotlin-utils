@@ -1373,14 +1373,14 @@ fun <T : Comparable<T>> T.validateIn(range: OpenEndRange<T>, callableName: Strin
     return this
 }
 /**
- * Ensures that the value is present within the specified iterable. If the value is not found,
+ * Ensures that the value is present within the specified iterables. If the value is not found,
  * an exception is thrown with an optional cause or error-producing logic.
  *
- * @param iterable The iterable collection to validate the value against.
+ * @param iterable The iterables collection to validate the value against.
  * @param causeOf An optional supplier for a throwable to be used as the primary exception.
  * @param cause An optional supplier for a throwable to be used as the root cause of the exception.
- * @return The validated value if it exists in the iterable.
- * @throws ValidationFailedException if the value is not found in the iterable.
+ * @return The validated value if it exists in the iterables.
+ * @throws ValidationFailedException if the value is not found in the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1389,7 +1389,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? 
     return this
 }
 /**
- * Validates that the current element is present in the given iterable collection.
+ * Validates that the current element is present in the given iterables collection.
  * If the element is not found, this method throws a `ValidationFailedException` with the
  * provided lazy message and optional cause(s).
  *
@@ -1398,7 +1398,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? 
  * @param cause An optional supplier for a secondary throwable to provide additional context for the validation exception.
  * @param lazyMessage A supplier for the validation failure message, evaluated only if the validation fails.
  * @return The current element, if validation is successful.
- * @throws ValidationFailedException if the current element is not present in the given iterable.
+ * @throws ValidationFailedException if the current element is not present in the given iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1407,20 +1407,20 @@ fun <E> E.validateIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable>? 
     return this
 }
 /**
- * Validates that the current object is present in the provided iterable collection.
+ * Validates that the current object is present in the provided iterables collection.
  *
- * If the object is not found in the iterable, a `ValidationFailedException` is thrown. The exception
+ * If the object is not found in the iterables, a `ValidationFailedException` is thrown. The exception
  * can optionally include details such as the associated property, variable name, a custom message, and
  * a cause for the validation failure.
  *
- * @param iterable The iterable collection to check against.
+ * @param iterable The iterables collection to check against.
  * @param property The property associated with the validation context, if applicable.
  * @param variableName The name of the variable being validated, used for more descriptive messages. Optional.
  * @param message An optional custom message to include in the exception if validation fails. Defaults to a generic message.
  * @param causeOf Supplier of a `Throwable` to be used as the primary cause for the exception, if applicable. Optional.
  * @param cause Supplier of a secondary `Throwable` to be attached, if applicable. Optional.
- * @return Returns the current object if it is present in the iterable.
- * @throws ValidationFailedException If the object is not found in the iterable.
+ * @return Returns the current object if it is present in the iterables.
+ * @throws ValidationFailedException If the object is not found in the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1429,7 +1429,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variableNam
     return this
 }
 /**
- * Validates that the current object exists within the given `iterable`.
+ * Validates that the current object exists within the given `iterables`.
  * If the object is not found, a `ValidationFailedException` is thrown with the specified details.
  *
  * @param iterable the collection of elements to check the current object against
@@ -1439,7 +1439,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variableNam
  * @param causeOf an optional supplier for a custom throwable to serve as the main exception, or null if not specified
  * @param cause an optional supplier for a throwable to serve as the cause of the exception, or null if not specified
  * @return the current object if validation succeeds
- * @throws ValidationFailedException if the object is not found in the provided `iterable`
+ * @throws ValidationFailedException if the object is not found in the provided `iterables`
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1448,17 +1448,17 @@ fun <E> E.validateIn(iterable: Iterable<E>, property: KProperty<*>?, variable: K
     return this
 }
 /**
- * Validates that the caller object is present within the given iterable. If the object is not
- * found in the iterable, a `ValidationFailedException` is thrown.
+ * Validates that the caller object is present within the given iterables. If the object is not
+ * found in the iterables, a `ValidationFailedException` is thrown.
  *
- * @param iterable The iterable collection to check against.
+ * @param iterable The iterables collection to check against.
  * @param callable The Kotlin function (`KFunction`) to which the validation is related. This can be null.
  * @param parameterName The name of the parameter being validated. This can be null.
  * @param message An optional custom message to include in the exception if validation fails. Defaults to null.
  * @param causeOf A supplier for a throwable that should act as the primary cause of the failure. Defaults to null.
  * @param cause A supplier for the underlying cause of the exception. Defaults to null.
  * @return The validated object if the validation succeeds.
- * @throws ValidationFailedException If the object is not present in the given iterable.
+ * @throws ValidationFailedException If the object is not present in the given iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1467,17 +1467,17 @@ fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameterNa
     return this
 }
 /**
- * Validates that the current element is contained within the specified iterable. If the element is not found
- * in the iterable, a `ValidationFailedException` is thrown.
+ * Validates that the current element is contained within the specified iterables. If the element is not found
+ * in the iterables, a `ValidationFailedException` is thrown.
  *
- * @param iterable the iterable collection against which the current element is validated
+ * @param iterable the iterables collection against which the current element is validated
  * @param callable the Kotlin function (`KFunction`) related to this validation, or null if not applicable
  * @param parameter the function parameter (`KParameter`) involved in the validation, or null if not applicable
  * @param message an optional custom validation failure message, or null if no message is provided
  * @param causeOf a supplier for a throwable to be used as the primary cause of the validation failure, or null
  * @param cause a supplier for a secondary throwable cause of the failure, or null
- * @return the validated element if it is present in the iterable
- * @throws ValidationFailedException if the element is not found within the iterable
+ * @return the validated element if it is present in the iterables
+ * @throws ValidationFailedException if the element is not found within the iterables
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1486,7 +1486,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: 
     return this
 }
 /**
- * Validates if the current element exists in the provided iterable. If not, throws a ValidationFailedException.
+ * Validates if the current element exists in the provided iterables. If not, throws a ValidationFailedException.
  *
  * @param iterable the collection of elements to validate against
  * @param callableName the name of the callable, such as a function or method, associated with the validation
@@ -1494,7 +1494,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, callable: KFunction<*>?, parameter: 
  * @param message an optional custom message to include in the exception if validation fails
  * @param causeOf a supplier that provides the throwable representing the primary cause of validation failure (optional)
  * @param cause a supplier that provides an additional throwable cause chained to the exception (optional)
- * @return the validated element if it exists in the iterable
+ * @return the validated element if it exists in the iterables
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1503,8 +1503,8 @@ fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameterName
     return this
 }
 /**
- * Validates that the current object is contained within the given iterable.
- * If the object is not found in the iterable, a `ValidationFailedException` is thrown.
+ * Validates that the current object is contained within the given iterables.
+ * If the object is not found in the iterables, a `ValidationFailedException` is thrown.
  *
  * @param iterable The collection of elements to validate against.
  * @param callableName The name of the callable (e.g., function or property) where this validation occurs, or null if not specified.
@@ -1513,7 +1513,7 @@ fun <E> E.validateIn(iterable: Iterable<E>, callableName: String?, parameterName
  * @param causeOf An optional supplier for a custom throwable, which will be used to wrap the `ValidationFailedException`.
  * @param cause An optional supplier for the cause of the `ValidationFailedException`.
  * @return The current object if validation passes, allowing for method chaining.
- * @throws ValidationFailedException If the object is not found in the specified iterable.
+ * @throws ValidationFailedException If the object is not found in the specified iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1826,8 +1826,8 @@ fun <T : Comparable<T>> T.validateNotIn(range: OpenEndRange<T>, callableName: St
     return this
 }
 /**
- * Validates that the calling element is not present in the provided iterable.
- * If the element exists within the iterable, an exception is thrown.
+ * Validates that the calling element is not present in the provided iterables.
+ * If the element exists within the iterables, an exception is thrown.
  *
  * @param iterable The collection of elements to check against.
  * @param causeOf An optional supplier for the root cause of the exception to be thrown.
@@ -1841,17 +1841,17 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable
     return this
 }
 /**
- * Validates that the current object is not present in the provided iterable.
- * If the object is found in the iterable, an exception is thrown with the
+ * Validates that the current object is not present in the provided iterables.
+ * If the object is found in the iterables, an exception is thrown with the
  * supplied error message or cause.
  *
- * @param iterable The iterable collection against which the object is being validated.
+ * @param iterable The iterables collection against which the object is being validated.
  * @param causeOf A supplier for a custom throwable to be thrown if the validation fails.
  *                This can be null.
  * @param cause A supplier for an additional throwable cause to be attached. This can be null.
  * @param lazyMessage A supplier for a custom message to include in the exception
  *                    if the validation fails.
- * @return The current object if it is not found in the iterable.
+ * @return The current object if it is not found in the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1860,17 +1860,17 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, causeOf: Transformer<E, Throwable
     return this
 }
 /**
- * Validates that the current instance is not contained within the specified iterable.
- * If the instance is found within the iterable, a [ValidationFailedException] is thrown.
+ * Validates that the current instance is not contained within the specified iterables.
+ * If the instance is found within the iterables, a [ValidationFailedException] is thrown.
  *
  * @param iterable The collection to check against for the presence of the instance.
  * @param property Optional metadata about the property being validated.
  * @param variableName Optional name of the variable involved in validation for improved debugging.
- * @param message Custom validation failure message. Defaults to a message indicating the instance is in the iterable.
+ * @param message Custom validation failure message. Defaults to a message indicating the instance is in the iterables.
  * @param causeOf A supplier for a custom throwable to be thrown as the root cause, if validation fails.
  * @param cause A supplier for a cause throwable to be attached to the generated exception (if applicable).
  * @return The original instance if validation passes.
- * @throws ValidationFailedException if the instance is found within the iterable.
+ * @throws ValidationFailedException if the instance is found within the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1879,17 +1879,17 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variable
     return this
 }
 /**
- * Validates that the receiver object is not contained within the specified iterable.
- * If the receiver is found in the iterable, a `ValidationFailedException` is thrown.
+ * Validates that the receiver object is not contained within the specified iterables.
+ * If the receiver is found in the iterables, a `ValidationFailedException` is thrown.
  *
- * @param iterable An iterable collection to check for the presence of the receiver.
+ * @param iterable An iterables collection to check for the presence of the receiver.
  * @param property An optional KProperty associated with the main validation context, or null if not applicable.
  * @param variable An optional secondary KProperty that provides additional validation context, or null if not applicable.
  * @param message An optional custom message for the validation failure. If null, a default message is used.
  * @param causeOf An optional supplier of the primary cause exception to be thrown instead of the default exception.
  * @param cause An optional supplier for the underlying cause to be attached to the exception if thrown.
- * @return Returns the receiver instance if validation passes (i.e., it is not in the iterable).
- * @throws ValidationFailedException if the receiver object is found in the iterable.
+ * @return Returns the receiver instance if validation passes (i.e., it is not in the iterables).
+ * @throws ValidationFailedException if the receiver object is found in the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1898,17 +1898,17 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, property: KProperty<*>?, variable
     return this
 }
 /**
- * Validates that the current object is not contained in the provided iterable collection.
- * If the object is found in the iterable, a `ValidationFailedException` is thrown.
+ * Validates that the current object is not contained in the provided iterables collection.
+ * If the object is found in the iterables, a `ValidationFailedException` is thrown.
  *
- * @param iterable The iterable collection to check against.
+ * @param iterable The iterables collection to check against.
  * @param callable The Kotlin function (`KFunction`) associated with the validation context. Can be null.
  * @param parameterName The name of the parameter being validated. Can be null.
  * @param message An optional custom message to use when the validation fails. Default is null.
  * @param causeOf A supplier for a custom exception to throw when validation fails. Default is null.
  * @param cause A supplier for the cause of the exception. Default is null.
- * @return Returns the object being validated if it is not found in the iterable.
- * @throws ValidationFailedException if the object is found in the iterable.
+ * @return Returns the object being validated if it is not found in the iterables.
+ * @throws ValidationFailedException if the object is found in the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1917,7 +1917,7 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, paramete
     return this
 }
 /**
- * Validates that the object is not present in the provided iterable. If the object is found in the iterable,
+ * Validates that the object is not present in the provided iterables. If the object is found in the iterables,
  * throws a `ValidationFailedException` with detailed information.
  *
  * @param iterable the collection of elements to validate against
@@ -1926,8 +1926,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, paramete
  * @param message an optional message providing additional context about the validation failure, defaults to null
  * @param causeOf a supplier for the primary exception to be thrown, defaults to null
  * @param cause a supplier for the underlying cause of the exception, defaults to null
- * @return the validated object if it is not in the iterable
- * @throws ValidationFailedException if the object is found in the iterable
+ * @return the validated object if it is not in the iterables
+ * @throws ValidationFailedException if the object is found in the iterables
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1936,8 +1936,8 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, paramete
     return this
 }
 /**
- * Validates that the receiver object is not contained within the specified `iterable`. If the receiver is found in
- * the `iterable`, a `ValidationFailedException` is thrown with the provided details.
+ * Validates that the receiver object is not contained within the specified `iterables`. If the receiver is found in
+ * the `iterables`, a `ValidationFailedException` is thrown with the provided details.
  *
  * @param iterable the collection of elements to check against
  * @param callableName the name of the callable (e.g., function or method) associated with this validation
@@ -1946,7 +1946,7 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callable: KFunction<*>?, paramete
  * @param causeOf a supplier for the exception to be thrown, which may include additional details or logic
  * @param cause a supplier for the underlying cause of the exception, or null if no specific cause is provided
  * @return the receiver object itself if validation passes without throwing an exception
- * @throws ValidationFailedException if the receiver object is found within the specified `iterable`
+ * @throws ValidationFailedException if the receiver object is found within the specified `iterables`
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -1955,17 +1955,17 @@ fun <E> E.validateNotIn(iterable: Iterable<E>, callableName: String?, parameterN
     return this
 }
 /**
- * Validates that the current object is not present in the specified iterable.
- * If the object is found in the iterable, a `ValidationFailedException` is thrown.
+ * Validates that the current object is not present in the specified iterables.
+ * If the object is found in the iterables, a `ValidationFailedException` is thrown.
  *
- * @param iterable The iterable collection to check against.
+ * @param iterable The iterables collection to check against.
  * @param callableName The name of the callable (e.g., function or property) where the validation is performed, or null.
  * @param parameter The parameter associated with the validation, or null.
  * @param message An optional error message providing details about the validation failure.
  * @param causeOf An optional supplier providing a custom `Throwable` to be used as the exception, instead of the default.
  * @param cause An optional supplier providing the underlying cause of the exception.
- * @return The current object (`this`) if it is not found in the iterable.
- * @throws ValidationFailedException If the object is found in the iterable.
+ * @return The current object (`this`) if it is not found in the iterables.
+ * @throws ValidationFailedException If the object is found in the iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue

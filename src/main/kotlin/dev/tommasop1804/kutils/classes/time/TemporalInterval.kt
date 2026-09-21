@@ -219,21 +219,21 @@ interface TemporalInterval : Serializable {
         internal fun <T: Temporal> parseTemporal(input: String): T {
             if ("T" in input) {
                 return if ("Z" in input || "+" in input || "-" in input.drop(10)) {
-                    (input.parseToOffsetDateTime()).getOrThrow() as T
+                    input.parseToOffsetDateTime() as T
                 } else {
-                    (input.parseToLocalDateTime()).getOrThrow() as T
+                    input.parseToLocalDateTime() as T
                 }
             } else if ("Z" in input || "+" in input || "-" in input) {
                 return try {
-                    (input.parseToOffsetTime()).getOrThrow() as T
+                    input.parseToOffsetTime() as T
                 } catch (_: Exception) {
-                    (input.parseToLocalDate()).getOrThrow() as T
+                    input.parseToLocalDate() as T
                 }
             }
             return try {
-                (input.parseToLocalTime()).getOrThrow() as T
+                input.parseToLocalTime() as T
             } catch (_: Exception) {
-                (input.parseToLocalDate()).getOrThrow() as T
+                input.parseToLocalDate() as T
             }
         }
 

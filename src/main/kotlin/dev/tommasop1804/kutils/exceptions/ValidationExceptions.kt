@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.coding.JsonSchema
 import dev.tommasop1804.kutils.classes.range.*
 import kotlin.reflect.*
 
@@ -1922,27 +1923,12 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-open class JsonSchemaValidationException(errors: Iterable<SchemaError>, cause: Throwable? = null, internalErrorCode: String? = null) :
+open class JsonSchemaValidationException(errors: Iterable<JsonSchema.SchemaError>, cause: Throwable? = null, internalErrorCode: String? = null) :
     ValidationFailedException("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Invalid JSON Schema:\n${errors.joinToString(";\n")}", cause = cause) {
 
-    val errors: Set<SchemaError> = errors.toSet()
+    val errors: Set<JsonSchema.SchemaError> = errors.toSet()
     val internalErrorCode: String?
         get() = message?.before(" @@@ ")?.ifBlank { null }
-
-    /**
-     * Represents an error encountered during schema validation or processing.
-     *
-     * @property path The location or identifier within the schema where the error occurred.
-     * @property message A descriptive message detailing the nature of the error.
-     * @property details Additional contextual information about the error, if available.
-     * @since 3.8.0
-     * @author Tommaso Pastorelli
-     */
-    data class SchemaError(
-        val path: String,
-        val message: String,
-        val details: Map<String, Any>? = null
-    )
 }
 
 /**

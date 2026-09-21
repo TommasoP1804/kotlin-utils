@@ -6,7 +6,6 @@
 @file:Suppress("unused")
 @file:Since("1.0.0")
 @file:MustUseReturnValues
-@file:OptIn(ExperimentalContracts::class)
 
 package dev.tommasop1804.kutils
 

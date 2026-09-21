@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -18,6 +20,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents an EAN-13 barcode with an additional 5-digit add-on (EAN-13 P5).
@@ -32,7 +35,7 @@ import tools.jackson.databind.annotation.JsonSerialize
  * @author Tommaso Pastorelli
  */
 @JvmInline
-@Suppress("unused", "functionName", "ClassName")
+@Suppress("unused", "functionName")
 @JsonSerialize(using = Ean13P5.Companion.Serializer::class)
 @JsonDeserialize(using = Ean13P5.Companion.Deserializer::class)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = Ean13P5.Companion.OldSerializer::class)
@@ -83,18 +86,24 @@ value class Ean13P5 private constructor(override val value: String) : CharSequen
         fun CharSequence.isValidEan13P5() = matches(Regex("[0-9]{13}[ -]?[0-9]{5}")) && filter { it.isDigit() }.run { Ean13.computeCheckDigit(toString() - 6) == this[12] }
 
         /**
-         * Attempts to create an instance of `EAN13P5` from the invoking string.
+         * Converts the current [CharSequence] to an `EAN13P5` instance while handling potential parsing errors.
          *
-         * This method wraps the construction of the `EAN13P5` object within a `runCatching` block,
-         * allowing potential exceptions resulting from invalid input or other errors to be safely
-         * captured and handled.
+         * The method filters the input sequence to retain only numeric digits, spaces, and hyphen characters.
+         * The filtered sequence is then processed in the context of a functional error-handling mechanism (`either`).
+         * If the creation of the `EAN13P5` instance succeeds, the result is wrapped as a `Right<EAN13P5>`.
+         * Otherwise, a `ParsingError` with details of the failure is returned as a `Left<ParsingError>`.
          *
-         * @receiver the string to be parsed into an `EAN13P5` object.
-         * @return a `Result` containing the `EAN13P5` instance if successful, or an error if the
-         *         creation fails.
-         * @since 3.0.0
+         * @receiver The [CharSequence] to be converted to an `EAN13P5` instance.
+         * @return An `Either<ParsingError, EAN13P5>` value where:
+         *         - `Right<EAN13P5>` contains the successfully created `EAN13P5` instance.
+         *         - `Left<ParsingError>` contains error details if the parsing fails.
+         * @since 6.1.0
          */
-        fun CharSequence.toEan13P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean13P5(this) } }
+        fun CharSequence.toEan13P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { either {
+            catching({ Ean13P5(this@toEan13P5) }) { t: Throwable ->
+                InvalidFormat(this@toEan13P5, typeOf<Ean13P5>(), t)
+            }
+        } }
 
         class Serializer : ValueSerializer<Ean13P5>() {
             override fun serialize(value: Ean13P5, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

@@ -254,13 +254,13 @@ data class CalendarEvent(
                     name = node["name"].asString(),
                     period = TemporalInterval.parse(node["period"].asString()).getOrThrow(),
                     repeat = node["repeat"]?.let { ctxt.readValue(it.traverse(p.objectReadContext()), Repeat::class.java) },
-                    partecipants = node["partecipants"]?.asSet<EventPartecipation>()?.getOrNull() ?: emptySet(),
+                    partecipants = node["partecipants"]?.asSet<EventPartecipation>() ?: emptySet(),
                     conferencing = node["conferencing"]?.let { URI(it.asString()) },
                     description = node["description"]?.asString(),
                     location = node["location"]?.asString(),
                     busy = node["busy"].asBoolean(),
                     private = node["private"].asBoolean(),
-                    reminders = node["reminders"]?.asSet<Duration>()?.getOrNull() ?: emptySet()
+                    reminders = node["reminders"]?.asSet<Duration>() ?: emptySet()
                 )
             }
         }
@@ -403,7 +403,7 @@ data class CalendarEvent(
                     }
                     return Repeat(
                         every = Duration.parse(node["every"].asString()).getOrThrow(),
-                        weekDays = node["weekDays"]?.asSet<String>()?.getOrNull()
+                        weekDays = node["weekDays"]?.asSet<String>()
                                 ?.map(DayOfWeek::valueOf)
                                 ?.toSet()
                             ?: emptySet(),

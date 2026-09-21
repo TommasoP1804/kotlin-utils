@@ -1028,6 +1028,7 @@ fun Table.uLongRange(name: String): Column<ULongRange> = registerColumn(name, UL
  * @param T The type of the result produced by the transaction block.
  * @param lazyException A transformer used to wrap exceptions that occur during the transaction.
  *                       The default implementation wraps exceptions in a `DatabaseOperationException`.
+ * @param includeCause Indicates whether the original exception should be included in the wrapped exception.
  * @param db The database instance in which the transaction should be executed. If null, the default database is used.
  * @param transactionIsolation The isolation level for the transaction. If null, the default isolation level of the database's transaction manager is used.
  * @param readOnly Indicates whether the transaction should be executed in read-only mode. If null, the default value of the database's transaction manager is used.
@@ -1038,6 +1039,7 @@ fun Table.uLongRange(name: String): Column<ULongRange> = registerColumn(name, UL
  */
 fun <T> transactionOrThrow(
     lazyException: ThrowableTransformer = { DatabaseOperationException(it.message) },
+    includeCause: Boolean = true,
     db: Database? = null,
     transactionIsolation: Int? = db?.transactionManager?.defaultIsolationLevel,
     readOnly: Boolean? = db?.transactionManager?.defaultReadOnly,
@@ -1045,13 +1047,13 @@ fun <T> transactionOrThrow(
 ) = try {
     transaction(db, transactionIsolation, readOnly, block)
 } catch (e: SQLException) {
-    throw lazyException(e)
+    throw lazyException(e) withRootCause e
 } catch (e: UnsupportedByDialectException) {
-    throw lazyException(e)
+    throw lazyException(e) withRootCause e
 } catch (e: DuplicateColumnException) {
-    throw lazyException(e)
+    throw lazyException(e) withRootCause e
 } catch (e: LongQueryException) {
-    throw lazyException(e)
+    throw lazyException(e) withRootCause e
 }
 
 /**
@@ -1210,12 +1212,12 @@ fun <ParentID : Any, Parent : Entity<ParentID>, ChildID : Any, Child : Entity<Ch
  * - The first item is an [Expression] to be used as a sorting criterion.
  * - The second item is a [SortDirection], determining whether the sorting is ascending or descending.
  *
- * The method applies the specified order criteria to the iterable and transforms the [SortDirection]
+ * The method applies the specified order criteria to the iterables and transforms the [SortDirection]
  * of each pair into the corresponding Exposed framework's [SortOrder].
  *
  * @param order One or more pairs of [Expression] and [SortDirection] defining the sorting conditions.
  *              The pairs specify which expressions should be used for sorting and their respective directions.
- * @return A new iterable with the elements sorted according to the provided order conditions.
+ * @return A new iterables with the elements sorted according to the provided order conditions.
  * @since 5.3.0
  */
 fun <T> SizedIterable<T>.orderBy(vararg order: Pair<Expression<*>, SortDirection>) =
@@ -1390,7 +1392,7 @@ fun JdbcTransaction.exec(
  * Executes a SQL query within the context of a JDBC transaction.
  *
  * @param query The SQL query to be executed, represented as an instance of SqlQuery.
- * @param args An iterable collection of column type and value pairs to be used as parameters for the query.
+ * @param args An iterables collection of column type and value pairs to be used as parameters for the query.
  *             Defaults to an empty list if no parameters are specified.
  * @param explicitStatementType An optional parameter representing the statement type to be explicitly used
  *                               for the query execution. Defaults to null if not provided.

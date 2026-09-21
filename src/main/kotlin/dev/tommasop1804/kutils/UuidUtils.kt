@@ -11,8 +11,10 @@ package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.identifiers.*
 import dev.tommasop1804.kutils.classes.numbers.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.net.NetworkInterface
 import java.nio.ByteBuffer
@@ -374,17 +376,25 @@ fun JavaUuid(ulid: Ulid) = ulid.toUuid()
  */
 fun JavaUuid(shortUuid: ShortUuid) = shortUuid.toUuid()
 /**
- * Converts the current [CharSequence] to a [UUID] instance. The method attempts to parse
- * the [CharSequence] as a valid UUID string.
+ * Converts the current [CharSequence] into a [KUuid], wrapped in an `Either` construct for functional error handling.
  *
- * The conversion process is encapsulated within a [Result] using `runCatching`,
- * allowing the caller to handle parsing errors without throwing an exception.
+ * The transformation attempts to parse the string representation of the [CharSequence] into a UUID object ([KUuid]).
+ * In the event of a parsing failure, an instance of [InvalidFormat] is returned, encapsulating the input
+ * that caused the failure.
  *
- * @return A [Result] containing the parsed [UUID] if successful, or the exception
- *         thrown during parsing if the input is not a valid UUID string.
- * @since 6.0.0
+ * This method leverages the `either` construct to encapsulate success and failure states within an `Either` result.
+ * If the conversion is successful, the result is returned as a `Right` containing the parsed [KUuid]. In case of failure,
+ * the result is returned as a `Left` containing the generated [InvalidFormat].
+ *
+ * @return An `Either` where:
+ *   - `Right<KUuid>` contains the successfully parsed UUID.
+ *   - `Left<InvalidFormat>` contains an error indicating invalid input format.
+ * @throws Throwable If the underlying implementation encounters an unhandled exception outside of the defined scope.
+ * @since 6.1.0
  */
-fun CharSequence.toUuid(): Result<KUuid> = runCatching { KUuid.parse(toString()) }
+fun CharSequence.toUuid() = either {
+    catching({ KUuid.parse(this@toUuid.toString()) }) { _: Exception -> InvalidFormat(this@toUuid, KUuid::class) }
+}
 
 /**
  * Generates a UUID based on the specified version and optional namespace and name.
@@ -545,17 +555,25 @@ fun Uuid(ulid: Ulid) = ulid.toUuid()
  */
 fun Uuid(shortUuid: ShortUuid) = shortUuid.toUuid()
 /**
- * Converts the current [CharSequence] to a [UUID] instance. The method attempts to parse
- * the [CharSequence] as a valid UUID string.
+ * Converts the `CharSequence` into a `UUID` object using Java's `UUID.fromString` method.
  *
- * The conversion process is encapsulated within a [Result] using `runCatching`,
- * allowing the caller to handle parsing errors without throwing an exception.
+ * This method attempts to parse the current `CharSequence` as a valid UUID. If the conversion
+ * succeeds, the resulting `UUID` is wrapped in a `Right`. If the conversion fails due to an
+ * invalid format or other parsing issues, an error of type `UuidError.InvalidFormat` is returned
+ * in a `Left`, encapsulating the invalid format data.
  *
- * @return A [Result] containing the parsed [UUID] if successful, or the exception
- *         thrown during parsing if the input is not a valid UUID string.
- * @since 6.0.0
+ * The method utilizes the `either` function to handle errors functionally and ensure computation
+ * short-circuits upon encountering a parsing issue.
+ *
+ * @receiver The `CharSequence` to be converted to a `UUID`.
+ * @return An `Either` where:
+ *         - `Right<UUID>` contains the successfully parsed `UUID`.
+ *         - `Left<UuidError.InvalidFormat>` contains the parsing error with details.
+ * @since 6.1.0
  */
-fun CharSequence.toJavaUuid(): Result<UUID> = runCatching { UUID.fromString(toString())!! }
+fun CharSequence.toJavaUuid() = either {
+    catching({ UUID.fromString(this@toJavaUuid.toString())!! }) { _: Exception -> InvalidFormat(this@toJavaUuid, UUID::class) }
+}
 
 /**
  * Validates whether the provided string is a valid UUID.
@@ -584,31 +602,27 @@ fun UUID.toHex() = Hex(withoutHyphens)
 fun KUuid.toHex() = Hex(withoutHyphens)
 
 /**
- * Converts a hexadecimal representation of a value to a UUID instance.
+ * Converts a hexadecimal string to a UUID representation.
  *
- * This method interprets the hexadecimal string of the receiving `Hex` object
- * and attempts to parse it into a UUID format. The resulting UUID is returned
- * as a `Result` object, which encapsulates either the successful conversion
- * or an exception if the operation fails.
+ * This function attempts to parse the current hexadecimal value into a UUID format.
+ * If the parsing fails due to an invalid format, an error is returned encapsulated in `UuidError.InvalidFormat`.
  *
- * The parsing process ensures that the hexadecimal input is formatted without
- * symbols and in lowercase.
- *
- * @return A `Result` containing the parsed UUID if successful, or an exception if the parsing fails.
- * @since 6.0.0
+ * @receiver The hexadecimal value to be converted.
+ * @return An `Either` containing the parsed UUID if successful, or a `UuidError.InvalidFormat` error if the conversion fails.
+ * @since 6.1.0
  */
-fun Hex.toUuid() = runCatching { KUuid.parseHex(toString(Hex.HexSymbol.None, TextCase.LowerCase)) }
+fun Hex.toUuid() = either {
+    catching({ KUuid.parseHex(toString(Hex.HexSymbol.None, TextCase.LowerCase)) }) { _: Exception -> InvalidFormat(this@toUuid, KUuid::class) }
+}
 /**
- * Converts the Hex object to a Java UUID representation.
+ * Converts a hexadecimal string to a UUID representation.
  *
- * This method first transforms the Hex object into a UUID object
- * and then maps the resulting UUID into a Java-compatible UUID
- * representation for further use in Java-based systems or APIs.
+ * This function attempts to parse the current hexadecimal value into a UUID format.
+ * If the parsing fails due to an invalid format, an error is returned encapsulated in `UuidError.InvalidFormat`.
  *
- * @receiver Hex The Hex object to be converted.
- * @return A Result containing the Java UUID, or an error if the conversion fails.
- *
- * @since 6.0.0
+ * @receiver The hexadecimal value to be converted.
+ * @return An `Either` containing the parsed UUID if successful, or a `UuidError.InvalidFormat` error if the conversion fails.
+ * @since 6.1.0
  */
 fun Hex.toJavaUuid() = toUuid().map { it.toJavaUuid() }
 

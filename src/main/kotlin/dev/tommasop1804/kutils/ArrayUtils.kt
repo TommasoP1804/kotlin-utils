@@ -19,8 +19,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
-import dev.tommasop1804.kutils.errors.iterable.*
-import dev.tommasop1804.kutils.errors.iterable.IterableErrors.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
@@ -357,7 +356,7 @@ fun <E> Array<E>.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: P
  * or `Either.Right` containing the first element that matches the predicate.
  * @since 6.1.0
  */
-fun <E> Array<E>.findFirstOrError(predicate: Predicate<E>): Either<NotFirstResultErrors, E> = either {
+fun <E> Array<E>.findFirstOrError(predicate: Predicate<E>): Either<NotFirstResultError, E> = either {
     catching({ findFirst(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -481,7 +480,7 @@ fun <E> Array<E>.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Pr
  * @return An `Either` containing the last matching element, or an error of type `NotLastResultsErrors` if no match is found.
  * @since 6.1.0
  */
-fun <E> Array<E>.findLastOrError(predicate: Predicate<E>): Either<NotLastResultsErrors, E> = either {
+fun <E> Array<E>.findLastOrError(predicate: Predicate<E>): Either<NotLastResultsError, E> = either {
     catching({ findLast(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -552,7 +551,7 @@ fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
  * @return An `Either` containing the second element of the array on success or a `NotInnerElementErrors` error on failure.
  * @since 6.1.0
  */
-fun <E> Array<E>.secondOrError(): Either<NotInnerElementErrors, E> = either {
+fun <E> Array<E>.secondOrError(): Either<NotInnerElementError, E> = either {
     catching({ second() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(1) }
 }
 /**
@@ -620,7 +619,7 @@ fun <E> Array<E>.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: 
  * wrapped in `Either.Left` if no matching element or insufficient results are found.
  * @since 6.1.0
  */
-fun <E> Array<E>.findSecondOrError(predicate: Predicate<E>): Either<NotInnerResultErrors, E> = either {
+fun <E> Array<E>.findSecondOrError(predicate: Predicate<E>): Either<NotInnerResultError, E> = either {
     catching({ findSecond(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -691,7 +690,7 @@ fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
  * @return An `Either` containing the third element of the array or a `NotInnerElementErrors`.
  * @since 6.1.0
  */
-fun <E> Array<E>.thirdOrError(): Either<NotInnerElementErrors, E> = either {
+fun <E> Array<E>.thirdOrError(): Either<NotInnerElementError, E> = either {
     catching({ third() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(2) }
 }
 /**
@@ -753,7 +752,7 @@ fun <E> Array<E>.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: P
  * @return An `Either` containing the third matching element if it exists, or an error of type `NotInnerResultErrors`.
  * @since 6.1.0
  */
-fun <E> Array<E>.findThirdOrError(predicate: Predicate<E>): Either<NotInnerResultErrors, E> = either {
+fun <E> Array<E>.findThirdOrError(predicate: Predicate<E>): Either<NotInnerResultError, E> = either {
     catching({ findThird(predicate) }) { e: Exception -> when (e) {
         is NoResultsException -> NoResults
         is NoSuchElementException -> Empty
@@ -828,10 +827,10 @@ infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
  * - `TooManyElement` if the array contains more than one element.
  * @since 6.1.0
  */
-fun <E> Array<E>.onlyElementOrError(): Either<NotOnlyElementErrors, E> = either {
+fun <E> Array<E>.onlyElementOrError(): Either<NotOnlyElementError, E> = either {
     catching({ onlyElement() }) { e: Exception -> when (e) {
         is NoSuchElementException -> Empty
-        is TooManyElementsException -> TooManyElement
+        is TooManyElementsException -> TooManyElements
         else -> throw IllegalStateException()
     } }
 }
@@ -903,11 +902,11 @@ fun <E> Array<E>.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predic
  * Finds the only element in the array that matches the given predicate or returns an error if the conditions are not met.
  *
  * @param predicate A function that tests whether an element satisfies the desired condition.
- * @return Either an error encapsulated in a [NotOnlyResultErrors] object if the array has no matching element,
+ * @return Either an error encapsulated in a [NotOnlyResultError] object if the array has no matching element,
  *         too many matching elements, or another exception occurs, or the single matching element if exactly one exists.
  * @since 6.1.0
  */
-fun <E> Array<E>.findOnlyElementOrError(predicate: Predicate<E>): Either<NotOnlyResultErrors, E> = either {
+fun <E> Array<E>.findOnlyElementOrError(predicate: Predicate<E>): Either<NotOnlyResultError, E> = either {
     catching({ findOnlyElement(predicate) }) { e: Exception ->
         when (e) {
             is NoResultsException -> NoResults
@@ -1028,7 +1027,6 @@ fun <E> Array<E>.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate:
  * @param E The type of the elements in the array.
  * @param element The element to search for within the array.
  * @return The index of the given element in the array if it is found.
- * @throws NotFound If the element is not found in the array.
  * @since 6.1.0
  */
 fun <E> Array<E>.indexOfOrError(element: E) = either {
@@ -1044,7 +1042,6 @@ fun <E> Array<E>.indexOfOrError(element: E) = either {
  *
  * @param element The element to search for in the array.
  * @return The last index of the specified element in the array if it exists.
- * @throws NotFound Raised if the specified element is not found in the array.
  * @since 6.1.0
  */
 fun <E> Array<E>.lastIndexOfOrError(element: E) = either {
@@ -1063,7 +1060,6 @@ fun <E> Array<E>.lastIndexOfOrError(element: E) = either {
  * @param predicate A predicate function used to evaluate each element in the array.
  *                  The function should return `true` for the desired element.
  * @return The index of the first element that matches the [predicate].
- * @throws NoResults If no element matching the [predicate] is found.
  * @since 6.1.0
  */
 fun <E> Array<E>.indexOfFirstOrError(predicate: Predicate<E>) = either {
@@ -1082,7 +1078,6 @@ fun <E> Array<E>.indexOfFirstOrError(predicate: Predicate<E>) = either {
  * @param predicate A lambda function that takes an element of type [E] and returns `true`
  *                  if the element matches the condition, or `false` otherwise.
  * @return The index of the last element in the array that matches the given [predicate].
- * @throws NoResults If no element matches the [predicate].
  * @since 6.1.0
  */
 fun <E> Array<E>.indexOfLastOrError(predicate: Predicate<E>) = either {
@@ -1532,7 +1527,7 @@ infix fun <E> Array<E>.percent(p: Percentage): E {
  * @return Either an `IndexOutOfBoundsErrors` if the index is invalid or the element at the calculated position.
  * @since 6.1.0
  */
-infix fun <E> Array<E>.percentOrError(p: Percentage): Either<IndexOutOfBoundsErrors, E> = either {
+infix fun <E> Array<E>.percentOrError(p: Percentage): Either<IndexOutOfBoundsError, E> = either {
     ensure(isNotEmpty()) { Empty }
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()

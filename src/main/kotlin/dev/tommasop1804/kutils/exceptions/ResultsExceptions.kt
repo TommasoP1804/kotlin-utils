@@ -275,11 +275,11 @@ open class TooManyResultsException : RuntimeException {
 }
 
 /**
- * Represents an exception indicating that an iterable, collection, or property has fewer elements
+ * Represents an exception indicating that an iterables, collection, or property has fewer elements
  * than required or acceptable, based on defined size or range constraints.
  *
  * This exception extends the `RuntimeException` and is often used to signal violations of minimum
- * size or range requirements for collections, lists, or other iterable structures.
+ * size or range requirements for collections, lists, or other iterables structures.
  *
  * Various constructors allow specifying custom messages, causes, and context such as the current
  * size, required size, or range constraints, and the associated property causing the exception.
@@ -329,27 +329,27 @@ open class TooFewElementsException : RuntimeException {
 
     /**
      * Constructs a TooFewElementsException with a detailed message explaining
-     * the mismatch between the expected and minimum number of elements in an iterable.
+     * the mismatch between the expected and minimum number of elements in an iterables.
      *
-     * @param size the size of the iterable, or null if not specified
+     * @param size the size of the iterables, or null if not specified
      * @param minNumber the minimum number of elements required
-     * @param variableName an optional variable name associated with the iterable, or null if not specified
+     * @param variableName an optional variable name associated with the iterables, or null if not specified
      * @since 1.0.0
      */
-    constructor(size: Int? = null, minNumber: Int = 1, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minumum of $minNumber elements"}")
+    constructor(size: Int? = null, minNumber: Int = 1, variableName: String? = null) : super("The iterables ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the minimum number of elements is $minNumber" else "accept a minumum of $minNumber elements"}")
     /**
      * Initializes a new instance of the TooFewElementsException class.
      *
-     * This exception is thrown when an iterable object does not meet the constraints
+     * This exception is thrown when an iterables object does not meet the constraints
      * regarding the number of its elements. The error message is constructed dynamically
      * based on the provided parameters.
      *
-     * @param size the number of elements in the iterable, or null if unspecified
+     * @param size the number of elements in the iterables, or null if unspecified
      * @param range the acceptable range for the number of elements
-     * @param variableName the name of the iterable variable, or null if unspecified
+     * @param variableName the name of the iterables variable, or null if unspecified
      * @since 1.0.0
      */
-    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
+    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterables ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
     /**
      * Constructs a `TooFewElementsException` with a message derived from the specified property, size,
      * minimum number of elements required, and an optional underlying cause.
@@ -405,11 +405,11 @@ open class TooFewElementsException : RuntimeException {
 }
 
 /**
- * Represents an exception indicating that an iterable contains too many elements,
+ * Represents an exception indicating that an iterables contains too many elements,
  * violating the specified constraint on the maximum allowable number of elements or range.
  *
  * This exception provides various constructors to handle different contexts, such as
- * specifying the actual size of the iterable, the maximum allowed number of elements,
+ * specifying the actual size of the iterables, the maximum allowed number of elements,
  * acceptable ranges, or related properties.
  *
  * @since 1.0.0
@@ -450,25 +450,25 @@ open class TooManyElementsException : RuntimeException {
      * Constructs a `TooManyElementsException` with a detailed message based on the size and maximum number
      * of allowed elements for a specific variable.
      *
-     * @param size the number of elements currently in the iterable, or null if not specified
-     * @param maxNumber the maximum allowable number of elements in the iterable
-     * @param variableName the name of the variable associated with the iterable, or null if not applicable
+     * @param size the number of elements currently in the iterables, or null if not specified
+     * @param maxNumber the maximum allowable number of elements in the iterables
+     * @param variableName the name of the variable associated with the iterables, or null if not applicable
      * @since 1.0.0
      */
-    constructor(size: Int? = null, maxNumber: Int = 1, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
+    constructor(size: Int? = null, maxNumber: Int = 1, variableName: String? = null) : super("The iterables ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the max number of elements is $maxNumber" else "accept a maximum of $maxNumber elements"}")
     /**
      * Constructs a `TooManyElementsException` with a detailed error message based on the specified parameters.
      *
      * The error message indicates whether a variable name is provided, as well as the allowed range
-     * and the optional size of elements for the iterable. If the size is specified, it mentions the
+     * and the optional size of elements for the iterables. If the size is specified, it mentions the
      * exact number of elements and the range constraint. Otherwise, it states the acceptable range of elements.
      *
-     * @param size The number of elements in the iterable, or null if unspecified.
+     * @param size The number of elements in the iterables, or null if unspecified.
      * @param range The range of acceptable number of elements.
      * @param variableName The name of the variable related to the exception, or null if unspecified.
      * @since 1.0.0
      */
-    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterable ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
+    constructor(size: Int? = null, range: IntRange, variableName: String? = null) : super("The iterables ${if (variableName != null) "$variableName " else ""}${if (size != null) "has $size elements, but the elements number must be inside $range" else "accept a number of elements inside $range"}")
     /**
      * Constructs a `TooManyElementsException` with a message derived from the provided property details, collection size,
      * maximum allowed number, and an optional cause.

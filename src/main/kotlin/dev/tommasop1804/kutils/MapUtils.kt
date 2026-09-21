@@ -15,6 +15,10 @@ package dev.tommasop1804.kutils
 import Break
 import Continue
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.Either
+import dev.tommasop1804.kutils.classes.functional.catching
+import dev.tommasop1804.kutils.classes.functional.either
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.util.*
 import java.util.stream.Collector
@@ -165,10 +169,10 @@ fun <M : Map<K, V>, K, V> M.orNullIfEmpty() = ifEmpty { null }
  */
 operator fun <K, V> MMap<K, V>.plusAssign(entry: Map.Entry<K, V>) { put(entry.key, entry.value) }
 /**
- * Adds all the entries from the provided iterable to the current map. 
- * Each entry in the iterable is converted to a key-value pair and added to the map.
+ * Adds all the entries from the provided iterables to the current map.
+ * Each entry in the iterables is converted to a key-value pair and added to the map.
  *
- * @param entries An iterable collection of map entries to be added to the current map.
+ * @param entries An iterables collection of map entries to be added to the current map.
  * @since 1.0.0
  */
 operator fun <K, V> MMap<K, V>.plusAssign(entries: Iterable<Map.Entry<K, V>>) { putAll(entries.map(Map.Entry<K, V>::toPair)) }
@@ -182,7 +186,7 @@ operator fun <K, V> MMap<K, V>.minusAssign(entry: Map.Entry<K, V>) { remove(entr
 /**
  * Removes all specified entries from this map.
  *
- * @param entries The iterable collection of key-value pairs to be removed from the map.
+ * @param entries The iterables collection of key-value pairs to be removed from the map.
  * @since 1.0.0
  */
 fun <K, V> MMap<K, V>.removeAll(entries: Iterable<Map.Entry<K, V>>) { entries.forEach { remove(it.key, it.value) } }
@@ -703,65 +707,6 @@ inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMap(transformKeys: Transformer<Map.
 inline fun <K1, V1, K2, V2> Map<K1, V1>.mapToMapNotNull(transform: Transformer<Map.Entry<K1, V1>, Pair<K2, V2>?>) = entries.mapNotNull { transform(it) }.toMap()
 
 /**
- * Returns the first key-value pair of the map as a [Map.Entry] instance.
- *
- * This function retrieves the first entry from the map based on its iteration order.
- * If the map is empty, a [NoSuchElementException] is thrown.
- *
- * @throws NoSuchElementException if the map is empty.
- * @return the first key-value pair in the map.
- * @since 1.0.0
- */
-fun <K, V> Map<K, V>.first() = entries.first()
-/**
- * Finds the first key-value pair in the map that matches the specified predicate.
- *
- * This function evaluates the entries of the map in the order of iteration, returning
- * the first entry that satisfies the provided predicate. If no entry matches the predicate,
- * a [NoSuchElementException] is thrown.
- *
- * @param predicate the condition used to evaluate each map entry
- * @return the first map entry that matches the predicate
- * @throws NoSuchElementException if no entry matches the predicate
- * @since 1.0.0
- */
-infix fun <K, V> Map<K, V>.first(predicate: Predicate<Map.Entry<K, V>>) = entries.first(predicate)
-/**
- * Returns the first entry in the map that matches the given [predicate],
- * or the result of the [default] supplier if no such entry is found.
- *
- * @receiver the map to search for the matching entry.
- * @param default a supplier function that provides a fallback key-value pair if no entry matches the [predicate].
- * @param predicate a predicate to test each entry for a match.
- * @return the first matching entry if found, otherwise the result of the [default] function.
- * @since 1.0.0
- */
-fun <K, V> Map<K, V>.firstOr(default: Supplier<Pair<K, V>>, predicate: Predicate<Map.Entry<K, V>>) : Map.Entry<K, V> {
-    contract {
-        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
-    }
-    return entries.findFirstOr({ default().toMapEntry() }, predicate)
-}
-/**
- * Returns the first entry in the map that matches the given predicate, or throws an exception
- * created by the provided lambda function if no such entry exists.
- *
- * @receiver the map on which the operation is applied
- * @param lazyException a lambda function that provides the exception to be thrown
- * if no entry matching the predicate is found
- * @param predicate a function that defines the condition the entry must satisfy
- * @return the first entry in the map that matches the predicate
- * @throws Throwable the exception provided by the lambda function if no matching entry is found
- * @since 1.0.0
- */
-fun <K, V> Map<K, V>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Map.Entry<K, V>>): Map.Entry<K, V> {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return entries.firstOrThrow(lazyException)
-}
-
-/**
  * Returns the single entry present in the map or throws an exception if the map does not
  * meet the condition of having exactly one entry.
  *
@@ -814,24 +759,47 @@ infix fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier): M
     return entries.run { if (size == 1) first() else throw lazyException() }
 }
 /**
+ * Retrieves the only entry from the map as a [Map.Entry], or returns an error wrapped
+ * in an [Either] if the map does not contain exactly one entry.
+ *
+ * This function attempts to retrieve the single entry in the map using the [onlyEntry] method.
+ * If the map is empty, it returns an error of type [Empty].
+ * If the map contains more than one entry, it returns an error of type [TooManyElements].
+ * For any other unexpected exceptions, an [IllegalStateException] is thrown.
+ *
+ * @return An [Either] representing one of the following outcomes:
+ *         - [Either.Left] containing a [NotOnlyElementError] error if the map is empty or
+ *           contains more than one entry.
+ *         - [Either.Right] containing the single [Map.Entry] if the map has exactly one entry.
+ * @since 6.1.0
+ */
+fun <K, V> Map<K, V>.onlyEntryOrError(): Either<NotOnlyElementError, Map.Entry<K, V>> = either {
+    catching({ onlyEntry() }) { e: Exception -> when (e) {
+        is NoSuchElementException -> Empty
+        is TooManyElementsException -> TooManyElements
+        else -> throw IllegalStateException()
+    } }
+}
+/**
  * Filters the entries of the map that satisfy the given predicate and ensures that exactly one result exists.
  *
  * Throws a `NoSuchElementException` if the map is empty or if no entries satisfy the predicate.
  * Throws a `TooManyResultsException` if more than one entry satisfies the predicate.
- * Throws a `TooFewResultsException` if the result size is less than required.
+ * Throws a `NoResultsException` if the result size is less than required.
  *
  * @param predicate the predicate used to filter the entries of the map
  * @return the single entry that satisfies the predicate
  * @throws NoSuchElementException if the map is empty or no entries satisfy the predicate
  * @throws TooManyResultsException if more than one entry satisfies the predicate
- * @throws TooFewResultsException if less than one entry satisfies the predicate
- * @since 1.0.0
+ * @throws NoResultsException if less than one entry satisfies the predicate
+ * @since 6.1.0
  */
-infix fun <K, V> Map<K, V>.onlyEntry(predicate: Predicate<Map.Entry<K, V>>) = entries
+infix fun <K, V> Map<K, V>.findOnlyEntry(predicate: Predicate<Map.Entry<K, V>>) = entries
     .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter(predicate).run {
+        if (isEmpty()) throw NoResultsException()
         if (size == 1) first()
-        else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
+        else throw TooManyResultsException(size)
     }
 /**
  * Returns the single entry in the map that matches the given [predicate], or `null` if no entry
@@ -839,9 +807,9 @@ infix fun <K, V> Map<K, V>.onlyEntry(predicate: Predicate<Map.Entry<K, V>>) = en
  *
  * @param predicate a functional interface used to test each entry in the map for a match
  * @return the single matching entry or `null` if there is no match or multiple matches
- * @since 1.0.0
+ * @since 6.1.0
  */
-infix fun <K, V> Map<K, V>.onlyEntryOrNull(predicate: Predicate<Map.Entry<K, V>>) = filter(predicate).entries.run { if (size == 1) first() else null }
+infix fun <K, V> Map<K, V>.findOnlyEntryOrNull(predicate: Predicate<Map.Entry<K, V>>) = filter(predicate).entries.run { if (size == 1) first() else null }
 /**
  * Filters entries in a map based on a given predicate and returns the single matching entry.
  * If there is no matching entry or more than one entry matches, the provided default value is returned.
@@ -849,9 +817,9 @@ infix fun <K, V> Map<K, V>.onlyEntryOrNull(predicate: Predicate<Map.Entry<K, V>>
  * @param default a supplier providing a default map entry to return if the predicate does not match exactly one entry
  * @param predicate a condition to filter the entries of the map
  * @return the single map entry matching the predicate, or the default value if none or more than one entry matches
- * @since 1.0.0
+ * @since 6.1.0
  */
-fun <K, V> Map<K, V>.onlyEntryOr(default: Supplier<Pair<K, V>>, predicate: Predicate<Map.Entry<K, V>>): Map.Entry<K, V> {
+fun <K, V> Map<K, V>.findOnlyEntryOr(default: Supplier<Pair<K, V>>, predicate: Predicate<Map.Entry<K, V>>): Map.Entry<K, V> {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
@@ -864,13 +832,39 @@ fun <K, V> Map<K, V>.onlyEntryOr(default: Supplier<Pair<K, V>>, predicate: Predi
  *
  * @param lazyException A supplier function that provides the exception to be thrown when the number of matching entries is not exactly one.
  * @param predicate A predicate to filter the entries in the map.
- * @since 1.0.0
+ * @since 6.1.0
  */
-fun <K, V> Map<K, V>.onlyEntryOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Map.Entry<K, V>>): Map.Entry<K, V> {
+fun <K, V> Map<K, V>.findOnlyEntryOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<Map.Entry<K, V>>): Map.Entry<K, V> {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
     return filter(predicate).entries.run { if (size == 1) first() else throw lazyException() }
+}
+/**
+ * Finds the only entry in the map that matches the given predicate, or returns an error if zero
+ * or multiple matching entries are found.
+ *
+ * This function evaluates the entries of the map using the specified `predicate`. If exactly one
+ * entry matches the predicate, it is returned wrapped in a `Right` instance of the `Either` type.
+ * If zero entries match, a `NotOnlyResultErrors.NoResults` error is returned in a `Left` instance.
+ * If multiple entries match, a `NotOnlyResultErrors.TooManyResults` error is returned similarly.
+ *
+ * @param predicate A predicate to filter the entries of the map; only entries satisfying this
+ *                  predicate are considered as potential results.
+ * @return An `Either` containing:
+ *         - `Right<Map.Entry<K, V>>` if exactly one entry in the map matches the predicate.
+ *         - `Left<NotOnlyResultErrors>` if zero or multiple entries match the predicate.
+ * @since 6.1.0
+ */
+fun <K, V> Map<K, V>.findOnlyEntryOrError(predicate: Predicate<Map.Entry<K, V>>): Either<NotOnlyResultError, Map.Entry<K, V>> = either {
+    catching({ findOnlyEntry(predicate) }) { e: Exception ->
+        when (e) {
+            is NoResultsException -> NoResults
+            is NoSuchElementException -> Empty
+            is TooManyResultsException -> TooManyResults
+            else -> throw IllegalStateException()
+        }
+    }
 }
 
 /**
@@ -1080,6 +1074,107 @@ inline fun <M : Map<K, V>, K, V> M.ifSingleEntry(action: Consumer<M>): M {
         callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
     if (size == 1) action(this)
+    return this
+}
+/**
+ * Executes the specified [action] if the map contains the given key-value [entry].
+ * The action is called with the current map as its argument.
+ *
+ * @param entry The key-value pair to check for in the map.
+ * @param action A consumer function to be executed if the map contains the specified entry.
+ * @return The original map, allowing for method chaining.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifContains(entry: Pair<K, V>, action: Consumer<M>): M  {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (contains(entry)) action(this)
+    return this
+}
+/**
+ * Executes the specified [action] if the map does not contain the given key-value [entry].
+ *
+ * This function checks whether the map contains the specified key-value [entry].
+ * If the map does not contain the [entry], the provided [action] is invoked with the map as its argument.
+ * The map itself is returned regardless of whether the [action] was executed or not.
+ *
+ * @param entry The key-value pair to check for in the map.
+ * @param action A consumer function to be executed when the [entry] is not present in the map.
+ * @return The map itself, after optionally executing the [action].
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifNotContains(entry: Pair<K, V>, action: Consumer<M>): M  {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!contains(entry)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the map contains the specified key.
+ *
+ * @param key the key to check for in the map
+ * @param action the action to perform on the map if the key is found
+ * @return the original map instance
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifContainsKey(key: K, action: Consumer<M>): M  {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (containsKey(key)) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the map does not contain the given key.
+ *
+ * @param key the key to check for existence in the map.
+ * @param action a lambda or function to execute if the map does not contain the key.
+ * @return the original map after the action is executed, allowing for chaining.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifNotContainsKey(key: K, action: Consumer<M>): M  {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!containsKey(key)) action(this)
+    return this
+}
+/**
+ * Executes the specified action if the map contains the given value.
+ *
+ * @param value the value to check for in the map.
+ * @param action the action to perform on the map if the value is found.
+ * @return the original map.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifContainsValue(value: V, action: Consumer<M>): M  {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (containsValue(value)) action(this)
+    return this
+}
+/**
+ * Executes the given action if the map does not contain the specified value.
+ *
+ * @param value The value to check for existence in the map.
+ * @param action The action to execute if the value is not found in the map.
+ * @return The original map after performing the action, if applicable.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+inline fun <M : Map<K, V>, K, V> M.ifNotContainsValue(value: V, action: Consumer<M>): M  {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (!containsValue(value)) action(this)
     return this
 }
 

@@ -175,9 +175,9 @@ fun BodyPublisher(path: Path) =
 fun BodyPublisher(vararg arrays: ByteArray) =
     HttpRequest.BodyPublishers.ofByteArrays(arrays.toList())!!
 /**
- * Creates a `BodyPublisher` that publishes the provided iterable of byte arrays.
+ * Creates a `BodyPublisher` that publishes the provided iterables of byte arrays.
  *
- * @param arrays an iterable collection of byte arrays to be published as the request body
+ * @param arrays an iterables collection of byte arrays to be published as the request body
  * @return a `BodyPublisher` instance created from the given byte arrays
  * @since 4.7.0
  */

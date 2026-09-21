@@ -302,7 +302,7 @@ enum class Currency (
 		/**
 		 * Filters the entries to only retain those whose associated countries are entirely contained in the given list of countries.
 		 *
-		 * @param countries An iterable of `Country` objects against which the entries will be matched.
+		 * @param countries An iterables of `Country` objects against which the entries will be matched.
 		 * @since 1.0.0
 		 */
 		infix fun byCountries(countries: Iterable<Country>) = entries.filter { countries.toList().containsAll(it.countries) }

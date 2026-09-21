@@ -1843,7 +1843,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
         /**
          * Sorts a collection of colors by their luminosity in ascending order.
          *
-         * @param colors An iterable collection of `Color` objects to be sorted by luminosity.
+         * @param colors An iterables collection of `Color` objects to be sorted by luminosity.
          * @return A list of `Color` objects sorted by their luminosity.
          * @since 1.0.0
          */

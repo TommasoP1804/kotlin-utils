@@ -770,7 +770,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      */
     infix fun mergePatch(patch: Yaml) = runCatching {
         tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
-            toJson().mergePatch(patch.toJson())().toYaml()
+            toJson().mergePatch(patch.toJson()).toYaml()
         }
     }
     /**
@@ -785,7 +785,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      */
     infix fun mergePatch(patch: Json) = runCatching {
         tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
-            toJson().mergePatch(patch)().toYaml()
+            toJson().mergePatch(patch).toYaml()
         }
     }
     /**
@@ -1120,11 +1120,11 @@ class YamlNode(val rawValue: Any?) {
     fun asBoolean() = asString().toBoolean()
     /**
      * Converts the current raw value of the YAML node into a list of YAMLNode objects,
-     * if the raw value is iterable. 
-     * If the raw value is null or not iterable, returns an empty list.
+     * if the raw value is iterables.
+     * If the raw value is null or not iterables, returns an empty list.
      *
-     * @return a list containing YAMLNode objects constructed from elements of the underlying iterable raw value,
-     *         or an empty list if the raw value is not iterable.
+     * @return a list containing YAMLNode objects constructed from elements of the underlying iterables raw value,
+     *         or an empty list if the raw value is not iterables.
      * @since 3.0.0
      */
     fun <T> asList(): List<T>? = (rawValue as? Iterable<*>)?.map { it as T }
@@ -1132,7 +1132,7 @@ class YamlNode(val rawValue: Any?) {
      * Converts the current object to a [NonEmptyList] if possible.
      *
      * @return A [NonEmptyList] containing elements of type `T` if the object can be cast to an `Iterable` and is non-empty,
-     * or `null` if the conversion is not possible or the iterable is empty.
+     * or `null` if the conversion is not possible or the iterables is empty.
      * @since 5.2.1
      */
     fun <T> asNonEmptyList(): NonEmptyList<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toNonEmptyList()

@@ -24,6 +24,7 @@ import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonE
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
 import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
 import dev.tommasop1804.kutils.exceptions.*
@@ -394,13 +395,13 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      */
     fun <T> toMList() = runCatching { toList<T>()().toMList() }
     /**
-     * Converts the invoking collection or iterable to a `NonEmptyMList`.
+     * Converts the invoking collection or iterables to a `NonEmptyMList`.
      *
      * This function attempts to generate a `NonEmptyMList` from the current context
      * by first converting it to a regular list and wrapping it in a `NonEmptyMList` type.
      * The operation is encapsulated in a `Result` to handle cases where the conversion fails.
      *
-     * @param T The type of elements contained in the collection or iterable.
+     * @param T The type of elements contained in the collection or iterables.
      * @return A `Result` containing the `NonEmptyMList` if the conversion is successful,
      *         or an exception if the conversion cannot be completed.
      * @since 5.2.1
@@ -660,11 +661,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @return a Result containing the patched TOML object, or an exception if an error occurs
      * @since 3.11.0
      */
-    infix fun mergePatch(patch: Toml) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
-            toJson().mergePatch(patch.toJson())().toToml()
-        }
-    }
+    infix fun mergePatch(patch: Toml) = toJson().mergePatch(patch.toJson()).toToml()
     /**
      * Applies a merge patch to the current TOML object, transforming it based on the provided patch JSON.
      *
@@ -672,11 +669,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @return a Result containing the patched TOML object, or an exception if an error occurs
      * @since 3.11.0
      */
-    infix fun mergePatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
-            toJson().mergePatch(patch)().toToml()
-        }
-    }
+    infix fun mergePatch(patch: Json) = toJson().mergePatch(patch).toToml()
     /**
      * Applies a TOML patch (RFC 6902 style, executed via JSON Patch) to modify the current TOML content.
      *
@@ -684,11 +677,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @return a [Result] encapsulating the modified TOML or an exception if the operation fails.
      * @since 3.11.0
      */
-    infix fun tomlPatch(patch: Toml) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2), e.cause) }, includeCause = false, only = setOf(NoSuchJsonPathException::class)) {
-            toJson().jsonPatch(patch.toJson())().toToml()
-        }
-    }
+    infix fun tomlPatch(patch: Toml) = toJson().jsonPatch(patch.toJson()).map { it.toToml() }
     /**
      * Applies a TOML patch (executed via JSON Patch) to modify the current TOML content.
      *
@@ -696,11 +685,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @return a [Result] encapsulating the modified TOML or an exception if the operation fails.
      * @since 3.11.0
      */
-    infix fun tomlPatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, only = setOf(NoSuchJsonPathException::class)) {
-            toJson().jsonPatch(patch)().toToml()
-        }
-    }
+    infix fun tomlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toToml() }
 }
 
 /**
@@ -932,7 +917,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asBoolean() = asString().toBoolean()
     /**
-     * Converts the current raw value of the TOML node into a list, if iterable.
+     * Converts the current raw value of the TOML node into a list, if iterables.
      *
      * @since 3.11.0
      */
