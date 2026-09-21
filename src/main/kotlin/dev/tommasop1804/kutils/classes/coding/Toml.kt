@@ -27,6 +27,7 @@ import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEm
 import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import org.tomlj.TomlArray
@@ -38,6 +39,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.io.File
 import java.nio.file.Path
 import java.time.*
+import kotlin.reflect.typeOf
 import org.intellij.lang.annotations.Language as IJLanguage
 import org.tomlj.Toml as TomlJ
 
@@ -144,27 +146,42 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * @return `true` if the String is valid TOML; `false` otherwise.
          * @since 3.11.0
          */
-        fun String.isValidToml() = runCatching { Toml(this) }
+        fun String.isValidToml() = runCatching { Toml(this) }.isSuccess
 
         /**
-         * Converts the current file to a `Toml` instance encapsulated within a `Result`.
+         * Converts the current File instance to a Toml representation.
          *
-         * This method parses the content of the file on which it is called and attempts to create an instance
-         * of the `Toml` class with the file as input. The operation is performed within a `Result` context,
-         * meaning it captures any exception that occurs during the parsing process.
+         * This method attempts to parse the content of the file into a Toml object.
+         * If the conversion fails, it wraps the exception into an InvalidConversion error,
+         * specifying the source type File, the target type Toml, and the underlying throwable.
          *
-         * @return A `Result` wrapping the `Toml` instance if the parsing succeeds, or an exception if it fails.
-         * @since 3.13.0
+         * @return Either a successfully parsed Toml instance or an InvalidConversion error encapsulated in a catching block.
+         * @since 6.1.0
          */
-        fun File.toToml() = runCatching { Toml(this) }
+        fun File.toToml() = either {
+            catching({ Toml(this@toToml) }) { t: Throwable ->
+                InvalidConversion(this@toToml, typeOf<File>(), typeOf<Toml>(), t)
+            }
+        }
         /**
-         * Converts the current `String` into a TOML representation and wraps the operation in a `Result`.
+         * Parses the current string into a Toml object.
          *
-         * @receiver The `String` to be converted to TOML.
-         * @return A `Result` that either contains the parsed TOML object or an exception if parsing fails.
-         * @since 3.11.0
+         * The method attempts to parse the receiver string as TOML content.
+         * If parsing is successful, it returns a validated result either containing
+         * the parsed Toml object or a failure encapsulating an exception
+         * caused by invalid formatting.
+         *
+         * @receiver The string to be parsed as TOML.
+         * @return A validated result containing either the parsed Toml object if successful,
+         *         or an InvalidFormat error if the parsing fails.
+         *
+         * @since 6.1.0
          */
-        fun @receiver:IJLanguage("toml") String.toToml() = runCatching { Toml(this) }
+        fun @receiver:IJLanguage("toml") String.toToml() = either {
+            catching({ Toml(this@toToml) }) { t: Throwable ->
+                InvalidFormat(this@toToml, typeOf<Toml>(), t)
+            }
+        }
         /**
          * Converts the current `JSON` instance into its equivalent `TOML` representation.
          *
