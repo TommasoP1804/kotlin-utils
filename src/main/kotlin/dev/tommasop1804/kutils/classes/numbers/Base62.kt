@@ -2,7 +2,7 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
-package dev.tommasop1804.kutils.classes.base
+package dev.tommasop1804.kutils.classes.numbers
 
 import dev.tommasop1804.kutils.*
 import java.util.stream.IntStream

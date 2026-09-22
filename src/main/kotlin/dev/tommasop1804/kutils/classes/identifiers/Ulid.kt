@@ -13,8 +13,10 @@ import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.Supplier
 import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.Uuid
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.identifiers.Ulid.Companion.generateHashUlid
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.expect
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
@@ -56,13 +58,13 @@ import kotlin.IndexOutOfBoundsException
 import kotlin.Int
 import kotlin.Long
 import kotlin.MustUseReturnValues
-import kotlin.Result
 import kotlin.String
 import kotlin.Suppress
+import kotlin.Throwable
 import kotlin.code
 import kotlin.hashCode
 import kotlin.let
-import kotlin.runCatching
+import kotlin.reflect.typeOf
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
@@ -879,17 +881,22 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
         fun CharSequence.isValidUlid() = isValidCharArray(toString().toCharArray())
 
         /**
-         * Attempts to convert the current [CharSequence] into a [Ulid] instance by parsing its string representation.
+         * Converts the current `CharSequence` to a `Ulid` instance.
          *
-         * This function wraps the parsing operation in a `Result` object, allowing the caller to handle
-         * success and failure scenarios gracefully. The operation will succeed if the [CharSequence]
-         * contains a valid ULID string; otherwise, it will fail with an exception.
+         * This method attempts to interpret the `CharSequence` as a valid ULID and convert it.
+         * If the conversion succeeds, it returns the `Ulid` wrapped in an `Either.Right`.
+         * If the conversion fails, it captures the exception and returns an `Either.Left` containing
+         * an `InvalidFormatOfType` object describing the issue.
          *
-         * @receiver The [CharSequence] representing the potential ULID.
-         * @return A [Result] containing the parsed [Ulid] if successful, or a failure if the parsing fails.
-         * @since 3.0.0
+         * @return An `Either` instance where the left side contains an `InvalidFormatOfType`
+         * if the conversion fails, and the right side contains a `Ulid` if the conversion succeeds.
+         * @since 6.1.0
          */
-        fun CharSequence.toUlid() = runCatching { from(toString()) }
+        fun CharSequence.toUlid(): Either<InvalidFormatOfType, Ulid> = either {
+            catching({ Ulid(this@toUlid.toString()) }) { t: Throwable ->
+                InvalidFormatOfType(this@toUlid, typeOf<Ulid>(), t)
+            }
+        }
 
         class Serializer : ValueSerializer<Ulid>() {
             override fun serialize(value: Ulid, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

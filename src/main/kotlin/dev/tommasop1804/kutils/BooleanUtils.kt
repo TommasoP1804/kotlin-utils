@@ -17,6 +17,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.typeOf
 
 /**
  * A higher-order constant representing a lambda function that always evaluates to `true`.
@@ -231,18 +232,18 @@ val Boolean?.isNullOrFalse: Boolean get() {
 
 /**
  * Attempts to convert the string receiver to a Boolean using strict rules, and captures any
- * parsing error raised during conversion as a custom error of type [InvalidFormat].
+ * parsing error raised during conversion as a custom error of type [InvalidFormatOfType].
  *
  * This method utilizes a functional approach to error handling via the `either` scope, ensuring
  * errors are encapsulated without terminating execution. If the conversion is successful, the
- * resulting value is wrapped in a `Right`, otherwise, a `Left` containing a [InvalidFormat]
+ * resulting value is wrapped in a `Right`, otherwise, a `Left` containing a [InvalidFormatOfType]
  * is returned.
  *
  * Uses the following:
  * - `toBooleanStrict`: Parses the string to a Boolean or throws an exception if the string
  *   is not "true" or "false" (case sensitive).
  * - `catching`: Catches exceptions thrown by `toBooleanStrict` and transforms them into a
- *   [InvalidFormat] containing the invalid value.
+ *   [InvalidFormatOfType] containing the invalid value.
  *
  * @receiver The string to be parsed to a Boolean.
  * @return An `Either` where:
@@ -251,7 +252,7 @@ val Boolean?.isNullOrFalse: Boolean get() {
  * @since 6.1.0
  */
 fun String.toBooleanStrictOrError() = either {
-    catching({ toBooleanStrict() }) { _: Exception -> InvalidFormat(this@toBooleanStrictOrError, Boolean::class) }
+    catching({ toBooleanStrict() }) { _: Exception -> InvalidFormatOfType(this@toBooleanStrictOrError, typeOf<Boolean>()) }
 }
 
 /**

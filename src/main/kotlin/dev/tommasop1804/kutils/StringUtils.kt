@@ -14,7 +14,6 @@ package dev.tommasop1804.kutils
 
 import com.github.lalyos.jfiglet.FigletFont
 import dev.tommasop1804.kutils.annotations.*
-import dev.tommasop1804.kutils.classes.base.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.functional.*

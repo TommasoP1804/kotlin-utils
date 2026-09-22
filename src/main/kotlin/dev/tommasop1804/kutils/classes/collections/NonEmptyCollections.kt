@@ -18,7 +18,9 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.ValueDeserializer
@@ -575,6 +577,20 @@ open class NonEmptyList<out E>(@PublishedApi internal val elements: List<E>) : L
          */
         fun <E> Iterable<E>.toNonEmptyListOrNull() = tryOrNull { NonEmptyList(this.toList()) }
         /**
+         * Converts the current [Iterable] into a [NonEmptyList] if it contains at least one element,
+         * or returns an [Error] instance if the iterable is empty.
+         *
+         * This method ensures that the resulting value is a valid [NonEmptyList], guaranteeing
+         * that it always contains at least one element. If the conversion fails due to the iterable
+         * being empty, it returns an error type provided by the [tryOrError] function.
+         *
+         * @receiver The [Iterable] to be converted into a [NonEmptyList].
+         * @return A [NonEmptyList] wrapping the elements of the current iterable if it is non-empty,
+         *         or an error of type [Empty] otherwise.
+         * @since 6.1.0
+         */
+        fun <E> Iterable<E>.toNonEmptyListOrError() = tryOrError({ Empty }) { NonEmptyList(this.toList()) }
+        /**
          * Converts the iterables to a `NonEmptyList` if it contains at least one element, otherwise returns a default `NonEmptyList` provided by the given supplier.
          *
          * @param E The type of the elements in the iterables and the `NonEmptyList`.
@@ -884,6 +900,17 @@ class NonEmptyMList<E>(private val mElements: MList<E>) : MList<E> by mElements,
          * @since 5.2.0
          */
         fun <E> Iterable<E>.toNonEmptyMListOrNull() = tryOrNull { NonEmptyMList(this.toMList()) }
+        /**
+         * Converts an [Iterable] into a [NonEmptyMList] wrapped in a successful result, or returns an error if the iterable is empty.
+         *
+         * This extension function attempts to create a [NonEmptyMList] from the elements of the iterable.
+         * If the iterable is empty, it returns an error with the value [Empty].
+         * If the iterable is not empty, it wraps it into a [NonEmptyMList].
+         *
+         * @return A result type containing either a [NonEmptyMList] if successful, or an error if the iterable is empty.
+         * @since 6.1.0
+         */
+        fun <E> Iterable<E>.toNonEmptyMListOrError() = tryOrError({ Empty }) { NonEmptyMList(this.toMList()) }
         /**
          * Converts the current iterables into a NonEmptyMList. If the iterables is empty or if an exception occurs during the
          * conversion, it falls back to a provided default NonEmptyMList.
@@ -1275,6 +1302,20 @@ open class NonEmptySet<out E>(@PublishedApi internal val elements: Set<E>) : Set
          */
         fun <E> Iterable<E>.toNonEmptySetOrNull() = tryOrNull { NonEmptySet(this.toSet()) }
         /**
+         * Converts the current [Iterable] to a [NonEmptySet] if it contains at least one element.
+         * If the [Iterable] is empty, an error is returned instead, represented as the default `Empty` value.
+         *
+         * This function attempts to transform the elements of the [Iterable] into a [Set] and,
+         * in the case of successful transformation and non-empty content, wraps it into a [NonEmptySet].
+         * Any exception encountered during this process will be handled using the [tryOrError] method.
+         *
+         * @return An [Either] where the right value is a [NonEmptySet] containing the elements of the
+         * original [Iterable] (if non-empty), and the left value represents an error (e.g., `Empty`)
+         * if the [Iterable] was empty or an exception occurred.
+         * @since 6.1.0
+         */
+        fun <E> Iterable<E>.toNonEmptySetOrError() = tryOrError({ Empty }) { NonEmptySet(this.toSet()) }
+        /**
          * Converts the elements of the iterables into a [NonEmptySet]. If the iterables is empty or cannot be converted,
          * the provided default supplier is used to generate a fallback [NonEmptySet].
          *
@@ -1540,6 +1581,19 @@ class NonEmptyMSet<E>(private val mElements: MSet<E>) : MSet<E> by mElements, No
          * @since 5.2.0
          */
         fun <E> Iterable<E>.toNonEmptyMSetOrNull() = tryOrNull { NonEmptyMSet(this.toMSet()) }
+        /**
+         * Converts the current iterable into a `NonEmptyMSet` if it contains elements,
+         * or returns an error representation (`Empty`) if the iterable is empty.
+         *
+         * The conversion wraps the elements into an immutable multiset (`NonEmptyMSet`)
+         * that enforces non-empty semantics. If the iterable is empty, an alternative
+         * error value is returned instead.
+         *
+         * @receiver The iterable of elements to be converted.
+         * @return A `NonEmptyMSet` containing the elements of the iterable if it is non-empty; otherwise, an error value (`Empty`).
+         * @since 6.1.0
+         */
+        fun <E> Iterable<E>.toNonEmptyMSetOrError() = tryOrError({ Empty }) { NonEmptyMSet(this.toMSet()) }
         /**
          * Converts the iterables to a `NonEmptyMSet`. If the iterables is empty or an exception occurs during the process,
          * a default `NonEmptyMSet` provided by the supplier is returned.

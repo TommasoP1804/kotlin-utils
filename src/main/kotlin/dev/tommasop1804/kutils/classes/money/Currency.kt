@@ -8,7 +8,6 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
 import dev.tommasop1804.kutils.classes.geography.*
-import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import kotlin.reflect.KProperty
 
@@ -234,12 +233,10 @@ enum class Currency (
 		 * Retrieves a Currency instance corresponding to the provided numeric code.
 		 *
 		 * @param numericCode The three-digit numeric code of the currency, ranging from 000 to 999.
-		 * @throws ValidationFailedException if the number is out of range
 		 * @return The matching Currency instance if found, or null if no match exists.
 		 * @since 1.0.0
 		 */
 		infix fun ofNumeric(numericCode: Int): Currency? {
-			validate(numericCode in 0..999) { "Invalid numeric code: $numericCode" }
             return entries.firstOrNull { it.numericCode == String.format("%03d", numericCode) }
         }
 

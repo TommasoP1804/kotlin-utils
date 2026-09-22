@@ -1069,7 +1069,7 @@ sealed interface PaymentMethod {
 
             other as Cash
 
-            if (maxAmount?.let { other.maxAmount?.compareTo(it) != 0 } ?: other.maxAmount == null) return false
+            if ((maxAmount?.let { other.maxAmount?.compareTo(it) != 0 } ?: other.maxAmount) == null) return false
             if (currency != other.currency) return false
 
             return true

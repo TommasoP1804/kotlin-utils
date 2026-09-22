@@ -18,6 +18,8 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.slf4j.Logger
 import kotlin.contracts.ExperimentalContracts
@@ -1058,12 +1060,12 @@ inline fun <T> tryOrThrow(
 ): T {
     if (only intersects except) throw ParametersInConflictException(
         callableName = "tryOrThrow",
-        parametersName = listOf("overwriteOnly", "notOverwrite"),
+        parametersName = listOf("only", "except"),
         valuesInConflict = only intersect except
     )
     if (specificCases.keys intersects except) throw ParametersInConflictException(
         callableName = "tryOrThrow",
-        parametersName = listOf("specificCases", "notOverwrite"),
+        parametersName = listOf("only", "except"),
         valuesInConflict = specificCases.keys intersect except
     )
 
@@ -1123,6 +1125,60 @@ internal inline fun throwWithOrWithoutCause(laxyException: ExceptionTransformer,
 internal fun logWithOrWithoutException(logger: Logger, level: LogLevel, message: String?, includeException: Boolean, e: Exception) {
     if (includeException) log(logger, level, message ?: e.message.orEmpty(), e)
     else log(logger, level, message ?: e.message.orEmpty())
+}
+
+/**
+ * Executes the given block of code, returning the result if successful or an error of the specified type
+ * in case of an exception. Supports configurable behavior for handling specific exception cases.
+ *
+ * @param T The type of the result produced by the successful execution of the block.
+ * @param E The type of the error returned in case of an exception.
+ * @param error A transformer to map generic exceptions to a domain-specific error of type [E].
+ * @param specificCases A map of specific exception types to transformers that map them to
+ * corresponding errors of type [E]. These transformers take precedence over other configurations.
+ * @param only A set of exception types that are explicitly allowed to be mapped to errors.
+ * If this set is not empty, exceptions outside this set will be re-thrown instead of being transformed.
+ * @param except A set of exception types to be explicitly excluded from error transformation.
+ * Exceptions in this set will always be re-thrown and not transformed, even if present in [only] or [specificCases].
+ * @param block The code block to attempt executing.
+ * @return An [Either] instance where the left value represents an error of type [E] in case of an exception,
+ * or the right value represents the result of the successful execution of the block.
+ * @since 6.1.0
+ * */
+@IgnorableReturnValue
+inline fun <T, E : Error> tryOrError(
+    error: Transformer<Exception, E>,
+    specificCases: Map<KClass<out Exception>, Transformer<Exception, E>> = emptyMap(), // priority over only/except
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
+    block: Supplier<T>
+): Either<E, T> = either {
+    if (only intersects except) throw ParametersInConflictException(
+        callableName = "tryOrError",
+        parametersName = listOf("only", "except"),
+        valuesInConflict = only intersect except
+    )
+    if (specificCases.keys intersects except) throw ParametersInConflictException(
+        callableName = "tryOrError",
+        parametersName = listOf("only", "except"),
+        valuesInConflict = specificCases.keys intersect except
+    )
+
+    try {
+        block()
+    } catch (e: Exception) {
+        if (e is InterruptedException || e is CancellationException) throw e
+
+        val passes = (only.isEmpty() || only.any { it.isInstance(e) }) && except.none { it.isInstance(e) }
+        val specific = generateSequence<Class<*>>(e.javaClass) { it.superclass }
+            .firstNotNullOfOrNull { specificCases[it.kotlin] }
+
+        when {
+            specific != null -> raise(specific(e))
+            passes -> raise(error(e))
+            else -> throw e
+        }
+    }
 }
 
 /**

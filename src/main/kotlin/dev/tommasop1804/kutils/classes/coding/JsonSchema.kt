@@ -760,7 +760,7 @@ class JsonSchema(val json: Json) : Json(json) {
          */
         fun @receiver:Language("json") String.toJsonSchema() = either {
             catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
-                InvalidFormat(this@toJsonSchema, typeOf<JsonSchema>(), t)
+                InvalidFormatOfType(this@toJsonSchema, typeOf<JsonSchema>(), t)
             }
         }
         /**
@@ -783,25 +783,25 @@ class JsonSchema(val json: Json) : Json(json) {
          */
         fun JsonNode.toJsonSchema() = either {
             catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
-                InvalidConversion(this@toJsonSchema, typeOf<JsonNode>(), typeOf<JsonSchema>(), t)
+                InvalidConversionBetweenTypes(this@toJsonSchema, typeOf<JsonNode>(), typeOf<JsonSchema>(), t)
             }
         }
         /**
          * Converts a [com.fasterxml.jackson.databind.JsonNode] instance to a corresponding [JsonSchema].
          *
          * This function attempts to create a [JsonSchema] object from the current [JsonNode].
-         * If the conversion fails, an [InvalidConversion] error is returned encapsulating
+         * If the conversion fails, an [InvalidConversionBetweenTypes] error is returned encapsulating
          * the details of the failure, including the source node, the expected target type,
          * and the encountered exception.
          *
          * @receiver The [JsonNode] to be converted.
          * @return An [Either] containing the resulting [JsonSchema] if the conversion is successful,
-         *         or an [InvalidConversion] error if the conversion fails.
+         *         or an [InvalidConversionBetweenTypes] error if the conversion fails.
          * @since 6.1.0
          */
         fun com.fasterxml.jackson.databind.JsonNode.toJsonSchema() = either {
             catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
-                InvalidConversion(this@toJsonSchema, typeOf<com.fasterxml.jackson.databind.JsonNode>(), typeOf<JsonSchema>(), t)
+                InvalidConversionBetweenTypes(this@toJsonSchema, typeOf<com.fasterxml.jackson.databind.JsonNode>(), typeOf<JsonSchema>(), t)
             }
         }
         /**
@@ -818,7 +818,7 @@ class JsonSchema(val json: Json) : Json(json) {
          */
         fun Json.toJsonSchema() = either {
             catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
-                InvalidConversion(this@toJsonSchema, typeOf<Json>(), typeOf<JsonSchema>(), t)
+                InvalidConversionBetweenTypes(this@toJsonSchema, typeOf<Json>(), typeOf<JsonSchema>(), t)
             }
         }
 

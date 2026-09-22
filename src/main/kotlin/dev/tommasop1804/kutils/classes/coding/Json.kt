@@ -352,7 +352,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          */
         fun File.toJson() = either {
             catching({ Json(this@toJson) }) { t: Throwable ->
-                InvalidConversion(this@toJson, typeOf<File>(), typeOf<Json>(), t)
+                InvalidConversionBetweenTypes(this@toJson, typeOf<File>(), typeOf<Json>(), t)
             }
         }
         /**
@@ -367,7 +367,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          */
         fun Path.toJson() = either {
             catching({ Json(this@toJson) }) { t: Throwable ->
-                InvalidConversion(this@toJson, typeOf<Path>(), typeOf<Json>(), t)
+                InvalidConversionBetweenTypes(this@toJson, typeOf<Path>(), typeOf<Json>(), t)
             }
         }
         /**
@@ -385,7 +385,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          */
         fun @receiver:Language("json") String.toJson() = either {
             catching({ Json(this@toJson) }) { t: Throwable ->
-                InvalidFormat(this@toJson, typeOf<Json>(), t)
+                InvalidFormatOfType(this@toJson, typeOf<Json>(), t)
             }
         }
         /**
@@ -835,6 +835,23 @@ open class Json private constructor(@param:Language("json") override val value: 
             return true
         }
 
+        /**
+         * Reads and deserializes the given JSON content into an object of the specified type.
+         *
+         * @param T The type of the object to be deserialized.
+         * @param json The JSON content to be deserialized.
+         * @since 6.1.0
+         */
+        inline fun <reified  T> JsonMapper.readValue(json: Json) = readValue<T>(json.value)
+        /**
+         * Reads the given JSON content and deserializes it into an object of the specified type.
+         *
+         * @param json The JSON content to deserialize, provided as a `Json` wrapper.
+         * @return The deserialized object of type `T`.
+         * @since 6.1.0
+         */
+        inline fun <reified  T> ObjectMapper.readValue(json: Json): T = readValue(json.value, object : com.fasterxml.jackson.core.type.TypeReference<T>() {})
+
         class Serializer : ValueSerializer<Json>() {
             override fun serialize(value: Json, gen: JsonGenerator, ctxt: SerializationContext) {
                 val node = MAPPER.readTree(value.value)
@@ -938,22 +955,13 @@ open class Json private constructor(@param:Language("json") override val value: 
     }
 
     /**
-     * Converts a collection into a list of arrays of the specified type.
-     *
-     * This function processes the elements in the underlying collection
-     * and maps each item to a typed array of the specified generic type [T].
-     * It uses the `toList` function to gather elements and applies
-     * a transformation using `map` to create the result.
-     *
-     * The function requires the reified type parameter [T] to ensure
-     * type information is available at runtime.
+     * Converts the deserialized data into an array of the specified type.
      *
      * Possible errors:
      * - [DeserializationError.MappingError] - if conversion failed
      *
-     * @param T The type of the elements in the resulting arrays.
-     * @return A list of arrays, where each array is of type [T].
-     *
+     * @return An `Either` containing a `DeserializationError.MappingError` if deserialization fails,
+     *         or an array of type `T` if successful.
      * @since 6.1.0
      */
     inline fun <reified T> toArray() = toList<T>().map { it.toTypedArray() }
@@ -993,17 +1001,13 @@ open class Json private constructor(@param:Language("json") override val value: 
         toList<T>() as Either<Error, List<T>> thenEither { catching({ it.toNonEmptyList() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Transforms the elements of a list to a mutable list of the specified type.
-     *
-     * This function leverages reified type parameters to infer the type of the list's elements at runtime.
-     * It converts the elements of the source list to mutable lists using the provided mapping logic.
+     * Converts a generic list into an MList, wrapping the result in an Either type to handle potential mapping errors.
      *
      * Possible errors:
      * - [DeserializationError.MappingError] - if conversion failed
      *
-     * @param T The type of elements contained in the resulting mutable list.
-     * @return A new list where each element is a mutable list of type T.
-     *
+     * @return An [Either] containing either a [DeserializationError.MappingError] if the mapping fails,
+     *         or an [MList] of type [T] if the conversion is successful.
      * @since 6.1.0
      */
     inline fun <reified T> toMList() = toList<T>().map(List<T>::toMList)
@@ -1032,25 +1036,15 @@ open class Json private constructor(@param:Language("json") override val value: 
         toMList<T>() as Either<Error, MList<T>> thenEither { catching({ it.toNonEmptyMList() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts a collection of collections into a list of corresponding sets.
+     * Converts the receiver to a Set of type T if possible, returning either a MappingError
+     * in case of a deserialization issue or the resulting Set.
      *
-     * This function iterates through a collection of collections, converts each
-     * individual collection into a set, and returns the results as a list.
-     * The operation ensures that elements in each inner collection are unique
-     * within their respective sets.
-     *
-     * Inline and reified modifiers allow for type inference at compile time,
-     * ensuring the function works generically with the type parameter [T].
-     *
-     * @return A list of sets, where each set corresponds to a distinct collection
-     *         converted from the original data.
-     *
-     * @throws UnsupportedOperationException If the function is not called
-     *         on a collection or list-like structure.
-     *
+     * @return An [Either] containing a [DeserializationError.MappingError] on failure
+     * or the resulting [Set] of type [T] on success.
      * @since 6.1.0
      */
-    inline fun <reified T> toSet() = toList<T>().map { it.toSet() }
+    inline fun <reified T> toSet(): Either<DeserializationError.MappingError, Set<T>> =
+        toList<T>().map { it.toSet() }
     /**
      * Converts the receiving collection into a non-empty set.
      * Requires the collection to contain at least one element; otherwise, the operation will fail.
@@ -1073,24 +1067,16 @@ open class Json private constructor(@param:Language("json") override val value: 
         toSet<T>() as Either<Error, Set<T>> thenEither { catching({ it.toNonEmptySet() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts elements of type `T` into a mutable set (`MSet`).
-     *
-     * This function operates on a collection or sequence to transform its elements into
-     * a mutable set. The method utilizes the reified type parameter `T` to ensure type safety
-     * and implicitly infers the type, making it convenient for generic conversions.
-     *
-     * It starts by creating a standard set from the elements and then applies the `toMSet`
-     * conversion on the resulting set.
+     * Converts a deserialized set of type T into an MSet (mutable set) if deserialization is successful.
      *
      * Possible errors:
      * - [DeserializationError.MappingError] - if conversion failed
      *
-     * @return A new mutable set (`MSet`) containing the transformed elements.
-     * @param T The type of elements included in the set.
-     *
+     * @return Either a MappingError if deserialization fails, or an MSet<T> containing elements of type T.
      * @since 6.1.0
      */
-    inline fun <reified T> toMSet() = toSet<T>().map(Set<T>::toMSet)
+    inline fun <reified T> toMSet(): Either<DeserializationError.MappingError, MSet<T>> =
+        toSet<T>().map(Set<T>::toMSet)
     /**
      * Converts the invoking collection or sequence into a `NonEmptyMSet`.
      *
@@ -1166,6 +1152,10 @@ open class Json private constructor(@param:Language("json") override val value: 
      * This method attempts to transform the existing DataMap into a [NonEmptyDataMap].
      * If the conversion fails or the resulting map is empty, an [Error] is returned.
      *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
      * @return [Either] an [Error] if the conversion fails or the result is empty,
      *         or a successfully created [NonEmptyDataMap] instance.
      * @since 6.1.0
@@ -1196,6 +1186,10 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Converts the current object into a `NonEmptyDataMapNN` wrapped in an `Either` type.
      * The method ensures that the resulting map is non-empty, and returns an appropriate error if this condition is not met.
      *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
      * @return An instance of `Either` holding either an `Error` or a non-empty `NonEmptyDataMapNN`.
      * @since 6.1.0
      */
@@ -1217,6 +1211,10 @@ open class Json private constructor(@param:Language("json") override val value: 
      *
      * This method attempts to transform the current structure into a non-empty multimap.
      * If the structure is empty or an error occurs during transformation, it returns an `Error` encapsulated in the `Either` type.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
      *
      * @return An `Either` containing either an `Error` in case of failure or a successfully created `NonEmptyMMap<String, V>`.
      * @since 6.1.0
@@ -1246,6 +1244,10 @@ open class Json private constructor(@param:Language("json") override val value: 
      * This method attempts to transform the data structure, ensuring it is non-empty.
      * If the transformation is unsuccessful, an error is returned.
      *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
      * @return An `Either` containing an `Error` if the conversion fails, or a `NonEmptyDataMMap` if it succeeds.
      * @since 6.1.0
      */
@@ -1274,6 +1276,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Converts the current object into a `NonEmptyDataMMapNN` wrapped in an `Either` type.
      * This method attempts to transform the object into a `DataMMapNN`, then ensures
      * that the resulting map is non-empty.
+     *
      *
      * @return An `Either` containing an `Error` in case of failure, or a `NonEmptyDataMMapNN` upon successful transformation.
      * @since 6.1.0
@@ -1604,9 +1607,9 @@ open class Json private constructor(@param:Language("json") override val value: 
                 if (direction == SortDirection.Ascending) fields.sortBy { it.key }
                 else fields.sortByDescending { it.key }
 
-                for (entry in fields) {
-                    val sortedValue = sortKeysRecursively(entry.value, direction)
-                    sortedNode.set(entry.key, sortedValue)
+                for ([key, value1] in fields) {
+                    val sortedValue = sortKeysRecursively(value1, direction)
+                    sortedNode.set(key, sortedValue)
                 }
                 sortedNode
             }
@@ -1761,7 +1764,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * This implementation supports operations such as "add", "replace", and "remove".
      *
      * Possible erros:
-     * - [InvalidFormat] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1776,7 +1779,7 @@ open class Json private constructor(@param:Language("json") override val value: 
         val targetNode = toJsonNode().deepCopy()
         val patchNode = patch.toJsonNode()
 
-        ensure(patchNode.isArray) { InvalidFormat(patchNode, typeOf<List<*>>(), reason = "Patch must be an array of operations") }
+        ensure(patchNode.isArray) { InvalidFormatOfType(patchNode, typeOf<List<*>>(), reason = "Patch must be an array of operations") }
 
         for (operation in patchNode) {
             val op = operation.get("op")?.asString()
@@ -1847,7 +1850,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * This implementation supports operations such as "add", "replace", and "remove".
      *
      * Possible erros:
-     * - [InvalidFormat] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1860,7 +1863,8 @@ open class Json private constructor(@param:Language("json") override val value: 
      */
     infix fun jsonPatch(patch: Yaml) = jsonPatch(patch.toJson())
 
-    private fun Raise<Error>.applyAdd(root: JsonNode, pathStr: String, value: JsonNode) {
+    context(_: Raise<Error>)
+    private fun applyAdd(root: JsonNode, pathStr: String, value: JsonNode) {
         val [parent, leaf] = resolvePointer(root, pathStr)
         if (parent.isObject) {
             (parent as ObjectNode).set(leaf, value)
@@ -1871,7 +1875,8 @@ open class Json private constructor(@param:Language("json") override val value: 
         }
     }
 
-    private fun Raise<Error>.applyRemove(root: JsonNode, pathStr: String) {
+    context(_: Raise<Error>)
+    private fun applyRemove(root: JsonNode, pathStr: String) {
         val [parent, leaf] = resolvePointer(root, pathStr)
         if (parent.isObject) {
             (parent as ObjectNode).remove(leaf)
@@ -1880,7 +1885,8 @@ open class Json private constructor(@param:Language("json") override val value: 
         }
     }
 
-    private fun Raise<Error>.getPointerValue(root: JsonNode, pathStr: String): JsonNode? {
+    context(_: Raise<Error>)
+    private fun getPointerValue(root: JsonNode, pathStr: String): JsonNode? {
         val [parent, leaf] = resolvePointer(root, pathStr)
         return if (parent.isObject) {
             parent.get(leaf)
@@ -1889,9 +1895,10 @@ open class Json private constructor(@param:Language("json") override val value: 
         } else null
     }
 
-    private fun Raise<Error>.resolvePointer(root: JsonNode, pathStr: String): Pair<JsonNode, String> {
+    context(_: Raise<Error>)
+    private fun resolvePointer(root: JsonNode, pathStr: String): Pair<JsonNode, String> {
         if (pathStr.isEmpty() || !pathStr.startsWith("/")) {
-            raise(InvalidFormat(pathStr, typeOf<String>()))
+            raise(InvalidFormatOfType(pathStr, typeOf<String>()))
         }
 
         val tokens = pathStr.split(Char.SLASH).drop(1).map {
@@ -1912,7 +1919,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Validates the current JSON value against the given JSON schema and version.
      *
      * Possible errors:
-     * - [InvalidFormat] - if the input JSON schema is malformed.
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
      * - [JsonError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema instance used for validation.
@@ -1924,7 +1931,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Validates the current JSON value against the given JSON schema and version.
      *
      * Possible errors:
-     * - [InvalidFormat] - if the input JSON schema is malformed.
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
      * - [JsonError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema instance used for validation.
@@ -1950,7 +1957,7 @@ open class Json private constructor(@param:Language("json") override val value: 
             }
             raise(JsonError.SchemaValidationFailed(errors))
         } catch (e: Exception) {
-            InvalidFormat(jsonSchema, typeOf<JsonSchema>())
+            InvalidFormatOfType(jsonSchema, typeOf<JsonSchema>())
         }
     }
 }

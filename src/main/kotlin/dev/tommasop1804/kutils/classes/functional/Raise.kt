@@ -8,6 +8,8 @@
 package dev.tommasop1804.kutils.classes.functional
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.functional.Either.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
@@ -24,11 +26,15 @@ interface Raise<in Error> {
      */
     fun raise(error: Error): Nothing
 
-    /**
-     * Returns the `Right` value, or raises the `Left` value.
-     * @since 6.1.0
-     */
-    fun <A> Either<Error, A>.bind(): A = fold(::raise, ::identity)
+    fun <E, A> partitionEithers(
+        eithers: List<Either<E, A>>
+    ): Pair<List<E>, List<A>> =
+        eithers.fold(emptyList<E>() to emptyList()) { [errs, oks], either ->
+            when (either) {
+                is Left -> (errs + either.value) to oks
+                is Right -> errs to (oks + either.value)
+            }
+        }
 
     /**
      * Runs `block` on this receiver's [Either], raising its `Left`.
@@ -230,3 +236,80 @@ inline fun <E, EE, A> Raise<EE>.withError(
      */
     override fun raise(error: E): Nothing = this@withError.raise(transform(error))
 }.block()
+
+/**
+ * Provides a mechanism to short-circuit the execution flow by raising an error if the current value is null.
+ *
+ * @param E the type of the error that can be raised.
+ * @param T the type of the value being checked.
+ * @param left a supplier of the error to be raised if the current value is null.
+ * @since 6.1.0
+ */
+context(r: Raise<E>)
+infix fun <E, T> T.orRaise(left: Supplier<E>) = this ?: r.raise(left())
+
+/**
+ * Returns the `Right` value, or raises the `Left` value.
+ * @since 6.1.0
+ */
+context(r: Raise<E>)
+fun <E, A> Either<E, A>.bind(): A = fold({ r.raise(it) }, ::identity)
+/**
+ * Aborts the enclosing block, making it produce [error].
+ * @since 6.1.0
+ */
+context(r: Raise<E>)
+fun <E> raise(error: E): Nothing = r.raise(error)
+
+/**
+ * Combines two computations that may fail, either successfully producing a combined result
+ * or accumulating errors from both computations.
+ *
+ * @param a A function producing the first computation which may return a successful result or an error.
+ * @param b A function producing the second computation which may return a successful result or an error.
+ * @param combine A function that combines the successful results of both computations into a single result.
+ * @return An `Either` containing either a `NonEmptyList` of accumulated errors or a combined success result.
+ * @since 6.1.0
+ */
+fun <E, A, B, C> zipOrAccumulate(
+    a: Supplier<Either<E, A>>,
+    b: Supplier<Either<E, B>>,
+    combine: BiTransformer<A, B, C>
+): Either<NonEmptyList<E>, C> {
+    val resA = a()
+    val resB = b()
+
+    val errors = listOfNotNull(
+        (resA as? Left)?.value,
+        (resB as? Left)?.value
+    )
+
+    return if (errors.isNotEmpty()) {
+        @Suppress("UNCHECKED_CAST")
+        Left(NonEmptyList(errors.first(), errors.drop(1)) as NonEmptyList<E>)
+    } else Right(combine(
+        (resA as Right).value,
+        (resB as Right).value
+    ))
+}
+
+/**
+ * Transforms a list of `Either` values into a single `Either` containing a list of all `Right` values
+ * if all elements are `Right`, or a `Left` with a `NonEmptyList` of all `Left` values if one or more elements are `Left`.
+ *
+ * This method accumulates all errors (`Left` values) into a `NonEmptyList` when failures occur, rather than failing fast
+ * on the first error. If all elements in the list are `Right`, their values are collected into a result list.
+ *
+ * @return An `Either` where the `Right` value is a list of all `Right` values from the input list, or the `Left`
+ * value is a `NonEmptyList` of all `Left` values.
+ * @since 6.1.0
+ */
+context(r: Raise<*>)
+fun <E, A> List<Either<E, A>>.sequenceAccumulating(): Either<NonEmptyList<E>, List<A>> {
+    val [lefts, rights] = r.partitionEithers(this)
+
+    return if (lefts.isNotEmpty()) {
+        @Suppress("UNCHECKED_CAST")
+        Left(NonEmptyList(lefts.first(), lefts.drop(1)) as NonEmptyList<E>)
+    } else Right(rights)
+}

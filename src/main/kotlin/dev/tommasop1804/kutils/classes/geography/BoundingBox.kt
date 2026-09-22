@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geometry.*
+import dev.tommasop1804.kutils.errors.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
@@ -203,18 +205,18 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
          * @return A new BoundingBox instance, wrapped in a [Result]
          * @since 3.0.0
          */
-        infix fun fromWkt(wkt: String) = runCatching {
+        infix fun fromWkt(wkt: String): Either<ParsingError, BoundingBox> = either {
             val coordinates = wkt.after("((").before("))").split(",")
-                .map { it.trim().split(" ").map { coord -> coord.toDouble() } }
+                .map { it.trim().split(" ").map { coord -> coord.toDoubleOrError().bind() } }
 
-            val minLon = coordinates.minOf { it[0] }
-            val maxLon = coordinates.maxOf { it[0] }
-            val minLat = coordinates.minOf { it[1] }
-            val maxLat = coordinates.maxOf { it[1] }
+            ensure(coordinates.isNotEmpty()) { InvalidFormat(wkt, "WKT", "empty coordinate list") }
+
+            val lons = coordinates.map { it[0] }
+            val lats = coordinates.map { it[1] }
 
             BoundingBox(
-                GeoCoordinate(minLat, minLon),
-                GeoCoordinate(maxLat, maxLon)
+                GeoCoordinate(lats.min(), lons.min()),
+                GeoCoordinate(lats.max(), lons.max())
             )
         }
 
@@ -226,7 +228,7 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
          * @throws IllegalArgumentException if the PostGIS string is not valid
          * @since 3.0.0
          */
-        infix fun fromPostGis(postgis: String) = runCatching { fromWkt(postgis after ";") }
+        infix fun fromPostGis(postgis: String): Either<ParsingError, BoundingBox> = fromWkt(postgis after ";")
 
         /**
          * Creates a BoundingBox from a GeoJSON polygon string.
@@ -236,19 +238,19 @@ class BoundingBox(var min: GeoCoordinate, var max: GeoCoordinate): Serializable,
          * @throws IllegalArgumentException if the GeoJSON string is not valid
          * @since 3.0.0
          */
-        infix fun fromGeoJson(geojson: String) = runCatching {
-            val coords = geojson.after("[[").before("]]")
+        infix fun fromGeoJson(geojson: String): Either<ParsingError, BoundingBox> = either {
+            val coordinates = geojson.after("[[").before("]]")
                 .split("],[")
-                .map { it.trim('[', ']').split(",").map { coord -> coord.toDouble() } }
+                .map { it.trim('[', ']').split(",").map { coord -> coord.toDoubleOrError().bind() } }
 
-            val minLon = coords.minOf { it[0] }
-            val maxLon = coords.maxOf { it[0] }
-            val minLat = coords.minOf { it[1] }
-            val maxLat = coords.maxOf { it[1] }
+            ensure(coordinates.isNotEmpty()) { InvalidFormat(geojson, "GeoJSON", "empty coordinate list") }
+
+            val lons = coordinates.map { it[0] }
+            val lats = coordinates.map { it[1] }
 
             BoundingBox(
-                GeoCoordinate(minLat, minLon),
-                GeoCoordinate(maxLat, maxLon)
+                GeoCoordinate(lats.min(), lons.min()),
+                GeoCoordinate(lats.max(), lons.max())
             )
         }
     }

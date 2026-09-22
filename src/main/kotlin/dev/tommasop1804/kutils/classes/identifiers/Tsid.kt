@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
@@ -37,6 +39,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.ln
+import kotlin.reflect.typeOf
 
 /**
  * Represents a Time-Sorted Identifiers (TSID) implementation.
@@ -441,17 +444,23 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
         }
         
         /**
-         * Converts the given string into a TSID instance.
+         * Converts the current `CharSequence` to a `Tsid` object.
          *
-         * @param base32 Indicates whether the string should be interpreted as a Base32-encoded 
-         * value. If true, the string is expected to follow Base32 encoding. Defaults to true.
-         * 
-         * @return A Result encapsulating the successful conversion to a TSID instance, or any 
-         * exception that occurred during the process.
+         * This method interprets the string representation of the `CharSequence` and attempts to create
+         * a `Tsid` instance. It provides optional support for Base32 encoding, which is enabled by default.
+         * If the conversion fails due to an invalid format, an `InvalidFormatOfType` error is returned.
          *
-         * @since 3.0.0
+         * @param base32 A boolean flag indicating whether the `CharSequence` should be interpreted
+         *               as Base32-encoded. Default value is `true`.
+         * @return An `Either` encapsulating either a successful `Tsid` object or an `InvalidFormatOfType`
+         *         error in case of a conversion failure.
+         * @since 6.1.0
          */
-        fun CharSequence.toTsid(base32: Boolean = true) = runCatching { Tsid(toString(), base32) }
+        fun CharSequence.toTsid(base32: Boolean = true): Either<InvalidFormatOfType, Tsid> = either {
+            catching({ Tsid(this@toTsid.toString(), base32) }) { t: Throwable ->
+                InvalidFormatOfType(this@toTsid, typeOf<Tsid>(), t)
+            }
+        }
         /**
          * Converts a `Long` value to a `TSID` instance.
          *
@@ -477,9 +486,9 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
          * does not conform to the expected format for the specified base.
          * @since 3.0.0
          */
-        fun CharSequence.decodeToTsid(base: Int): Tsid {
-            validate(base in 2..62) { "Invalid base: $base" }
-            return BaseN.decode(toString(), base)
+        fun CharSequence.decodeToTsid(base: Int) = either {
+            ensure(base in 2..62) { NumberError.InvalidRadix(base, 2..62) }
+            BaseN.decode(this@decodeToTsid.toString(), base)
         }
 
         class Serializer : ValueSerializer<Tsid>() {
@@ -720,13 +729,16 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
     /**
      * Encodes the current object into a string representation using the specified base.
      *
-     * @param base The base to use for encoding. Must be between 2 and 62, inclusive.
-     * @return A string representation of the object encoded in the specified base.
-     * @since 3.0.0
+     * The base must lie within the range of supported values (2 to 62). If the base is outside
+     * this range, an error of type `NumberError.InvalidRadix` will be returned.
+     *
+     * @param base The numeric base to use for encoding. Must be an integer between 2 and 62 inclusive.
+     * @return Either an error of type `NumberError.InvalidRadix` if the base is invalid, or the encoded string representation.
+     * @since 6.1.0
      */
-    fun encode(base: Int): String {
-        validate(base in 2..62) { "Invalid base: $base" }
-        return BaseN.encode(this, base)
+    fun encode(base: Int): Either<NumberError.InvalidRadix, String> = either {
+        ensure(base in 2..62) { NumberError.InvalidRadix(base, 2..62) }
+        BaseN.encode(this, base)
     }
 
     /**

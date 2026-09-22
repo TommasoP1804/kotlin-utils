@@ -345,7 +345,7 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
      * @param vertices The collection of vertices to be removed.
      * @since 1.0.0
      */
-    fun removeVertices(vertices: Iterable<Point>) = this.vertices.removeAll(vertices)
+    fun removeVertices(vertices: Iterable<Point>) = this.vertices.removeAll(vertices.toSet())
 
     /**
      * Removes a specified number of vertices from the polygon starting at the given index.

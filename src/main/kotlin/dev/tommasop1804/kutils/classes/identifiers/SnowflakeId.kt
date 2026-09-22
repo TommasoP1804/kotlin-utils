@@ -10,8 +10,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.asMillisOfDuration
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.SqlTypes
@@ -32,6 +34,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.reflect.typeOf
 
 /**
  * Represents a Snowflake ID, a unique identifier typically used for distributed systems.
@@ -193,28 +196,37 @@ class SnowflakeId(val value: Long) : Number(), Comparable<SnowflakeId>, Serializ
         fun CharSequence.isValidSnowflakeId() = runCatching { SnowflakeId(this) }.isSuccess
 
         /**
-         * Converts the current [Long] value to an instance of [SnowflakeId].
+         * Converts the invoking [Long] value into a [SnowflakeId], encapsulated in an [Either].
          *
-         * The conversion is wrapped in a [Result] object to safely handle potential exceptions
-         * during the creation of the [SnowflakeId] instance.
+         * The method attempts to create a [SnowflakeId] instance using the current [Long] value. If the
+         * operation succeeds, the resulting [SnowflakeId] is wrapped in a `Right`. Otherwise, if the
+         * conversion fails, an [InvalidFormatOfType] is generated and returned in a `Left`.
          *
-         * @return A [Result] containing the created [SnowflakeId] instance if successful, or an exception if the creation fails.
-         * @since 3.0.0
+         * @return Either an [InvalidFormatOfType] representing the failure details or a successfully created [SnowflakeId].
+         * @since 6.1.0
          */
-        fun Long.toSnowflakeId() = runCatching { SnowflakeId(this) }
+        fun Long.toSnowflakeId(): Either<InvalidFormatOfType, SnowflakeId> = either {
+            catching({ SnowflakeId(this@toSnowflakeId) }) { t: Throwable ->
+                InvalidFormatOfType(this@toSnowflakeId, typeOf<SnowflakeId>(), t)
+            }
+        }
         /**
-         * Converts the current character sequence into a `SnowflakeID` instance.
+         * Converts the `CharSequence` receiver into a `SnowflakeId`.
          *
-         * This extension function attempts to create a `SnowflakeID` object by parsing
-         * the character sequence as a long value. The operation is wrapped in a `Result`
-         * object to gracefully handle potential parsing exceptions.
+         * This method attempts to construct a `SnowflakeId` from the supplied `CharSequence`.
+         * If the input cannot properly be converted, an `InvalidFormatOfType` instance
+         * will be returned to indicate the failure, encapsulating the invalid input and the target type.
          *
-         * @receiver The character sequence to be converted into a `SnowflakeID`.
-         * @return A `Result` containing the successfully created `SnowflakeID` instance,
-         *         or a failure if the character sequence could not be parsed into a valid long value.
-         * @since 3.0.0
+         * @return An `Either` representing the result of the conversion.
+         * If the conversion is successful, the right-hand side will contain a `SnowflakeId`.
+         * If there is a failure, the left-hand side will contain an `InvalidFormatOfType` object detailing the issue.
+         * @since 6.1.0
          */
-        fun CharSequence.toSnowflakeId() = runCatching { SnowflakeId(this) }
+        fun CharSequence.toSnowflakeId(): Either<InvalidFormatOfType, SnowflakeId> = either {
+            catching({ SnowflakeId(this@toSnowflakeId) }) { t: Throwable ->
+                InvalidFormatOfType(this@toSnowflakeId, typeOf<SnowflakeId>(), t)
+            }
+        }
 
         private fun resolveDefaultNodeId() = try {
             val hostname = java.net.InetAddress.getLocalHost().hostName

@@ -170,12 +170,12 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          *
          * @param separator The character used to separate values in the CSV file. Defaults to ','.
          * @param hasHeaders A boolean indicating whether the CSV file contains headers. Defaults to true.
-         * @return An `Either` wrapping a [Csv] object on success, or an [InvalidConversion] error if the conversion fails.
+         * @return An `Either` wrapping a [Csv] object on success, or an [InvalidConversionBetweenTypes] error if the conversion fails.
          * @since 6.1.0
          */
         fun File.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
             catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
-                InvalidConversion(this@toCsv, typeOf<File>(), typeOf<Csv>(), t)
+                InvalidConversionBetweenTypes(this@toCsv, typeOf<File>(), typeOf<Csv>(), t)
             }
         }
         /**
@@ -192,7 +192,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          */
         fun Path.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
             catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
-                InvalidConversion(this@toCsv, typeOf<Path>(), typeOf<Csv>(), t)
+                InvalidConversionBetweenTypes(this@toCsv, typeOf<Path>(), typeOf<Csv>(), t)
             }
         }
 
@@ -208,7 +208,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          */
         fun String.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
             catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
-                InvalidFormat(this@toCsv, typeOf<Csv>(), t)
+                InvalidFormatOfType(this@toCsv, typeOf<Csv>(), t)
             }
         }
 

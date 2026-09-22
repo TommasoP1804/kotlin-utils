@@ -281,9 +281,9 @@ data class Chunked<T>(
                 var comparator = if (sorting.first().direction == SortDirection.Descending)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
-                for (sortOption in sorting.drop(1)) {
-                    val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.property }] ?: throw NoSuchPropertyException()
-                    comparator = if (sortOption.direction == SortDirection.Descending)
+                for ([property1, direction] in sorting.drop(1)) {
+                    val property = baseCollection.first()::class.memberProperties[{ it.name == property1 }] ?: throw NoSuchPropertyException()
+                    comparator = if (direction == SortDirection.Descending)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
                     else comparator.thenBy { property.call(it) as Comparable<*>? }
                 }

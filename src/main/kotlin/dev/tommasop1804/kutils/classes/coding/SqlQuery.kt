@@ -415,7 +415,7 @@ class SqlQuery(@param:Language("sql") override val value: String): CharSequence,
          */
         fun @receiver:Language("sql") String.toSqlQuery() = either {
             catching({ SqlQuery(this@toSqlQuery) }) { t: Throwable ->
-                InvalidFormat(this@toSqlQuery, typeOf<SqlQuery>(), t)
+                InvalidFormatOfType(this@toSqlQuery, typeOf<SqlQuery>(), t)
             }
         }
         /**

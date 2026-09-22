@@ -14,10 +14,12 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BIT_BINARY
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BIT_DECIMAL
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTE_BINARY
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTE_DECIMAL
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -65,6 +67,37 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
         get() = unit.measure
 
     /**
+     * Rounds the numerical value of the measurement to the nearest integer
+     * while retaining the original unit.
+     *
+     * This function uses the standard mathematical rounding rules.
+     *
+     *
+     * @return A new `Measurement` object with the rounded value and the same unit as the original.
+     * @since 6.1.0
+     */
+    val rounded get() = Measurement(kotlin.math.round(value), unit)
+
+    /**
+     * Rounds up the value of the current measurement to the nearest integer, preserving the original unit.
+     *
+     *
+     * @return A new measurement instance with its value rounded up to the nearest integer.
+     * @since 6.1.0
+     */
+    val ceil get() = Measurement(kotlin.math.ceil(value), unit)
+
+    /**
+     * Calculates the largest integer value less than or equal to the current measurement's value
+     * and returns a new `Measurement` instance with the floored value and the original unit.
+     *
+     *
+     * @return A new `Measurement` instance with the floored value.
+     * @since 6.1.0
+     */
+    val floor get() = Measurement(kotlin.math.floor(value), unit)
+
+    /**
      * Constructor for creating a `Measurement` instance using a numeric value and a specified measure.
      * Automatically initializes the measurement using the associated `SIUnit` of the provided `Measure`.
      *
@@ -101,37 +134,62 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
         infix fun <T : ScalarUnit> Number.ofUnitUnrestricted(unit: T) = RMeasurement(toDouble(), unit)
 
         /**
-         * Parses an unrestricted measurement string into a Measurement object.
+         * Parses a given string into a Measurement object without constraints.
+         * The input string should contain a numeric value followed by a unit symbol,
+         * separated by a single whitespace character.
          *
-         * The input string is expected to contain a numeric value followed by a unit symbol,
-         * separated by one or more spaces.
+         * Possible errors:
+         * - [IterableError.NoResults] - if no known unit symbol is found.
+         * - [InvalidFormatOfType] - if the numeric value is not a valid double.
          *
-         * @param string the measurement string to be parsed, containing a number and a unit symbol.
-         * @return a Result wrapping the parsed Measurement object or an exception if parsing fails.
-         * @throws NoSuchEntryException if the unit symbol in the input string does not match any known units.
-         * @since 3.1.1
+         * @param string the input string containing the numeric value and unit symbol.
+         * @return an Either object containing a Measurement instance on success,
+         *         or an Error if parsing fails.
+         * @since 6.1.0
          */
         @Suppress("UNCHECKED_CAST")
-        infix fun parseUnrestricted(string: String) = runCatching {
+        infix fun parseUnrestricted(string: String): Either<Error, Measurement> = either {
             val [number, unit] = string / (Char.SPACE to 2)
             Measurement(
-                number.toDouble(),
-                MeasureUnit.knownUnitsScalar.find { it.knownSymbol && it.symbol == unit } ?: throw NoSuchEntryException("Unknown symbol unit: $unit")
+                number.toDoubleOrError().bind(),
+                MeasureUnit.knownUnitsScalar.find { it.knownSymbol && it.symbol == unit } ?: raise(IterableError.NoResults)
             )
         }
 
         /**
-         * Converts the current string to a measurement by parsing it using the `parseUnrestricted` function.
+         * Parses a given string into a Measurement object without constraints.
+         * The input string should contain a numeric value followed by a unit symbol,
+         * separated by a single whitespace character.
          *
-         * The input string should represent a valid measurement format that is compatible with parsing.
-         * The function provides a way to interpret such strings into a measurement object.
+         * Possible errors:
+         * - [IterableError.NoResults] - if no known unit symbol is found.
+         * - [InvalidFormatOfType] - if the numeric value is not a valid double.
          *
-         * @receiver The string to be converted into a measurement.
-         * @return A parsed measurement based on the input string wrapped in a Result.
-         *
-         * @since 3.1.1
+         * @return an Either object containing a Measurement instance on success,
+         *         or an Error if parsing fails.
+         * @since 6.1.0
          */
         fun String.toMeasurement() = parseUnrestricted(this)
+
+        /**
+         * Calculates the average of the given measurements. All measurements are first converted to the
+         * unit of the first measurement to ensure consistency before computing the average.
+         *
+         * @param measurements a variable number of `Measurement` objects to be averaged. All measurements
+         * must be convertible to the same unit.
+         * @return an `Either` containing either the resulting average `Measurement` or an
+         * `IllegalConversionBetweenUnits` error if any of the measurements cannot be converted to the unit
+         * of the first measurement.
+         * @since 6.1.0
+         */
+        @OptIn(Beta::class)
+        fun average(vararg measurements: Measurement): Either<IllegalConversionBetweenUnits, Measurement> = either {
+            var sum = 0.0
+            for (measurement in measurements) {
+                sum += ScalarUnit.convert(measurement, measurements[0].unit).bind().value
+            }
+            Measurement(sum / measurements.size, measurements[0].unit)
+        }
 
         class Serializer : ValueSerializer<Measurement>() {
             override fun serialize(
@@ -351,18 +409,15 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
     fun toString(symbol: Boolean) = value.toString() + " " + if (symbol) unit.measureUnit.symbol else unit.measureUnit.unitName
 
     /**
-     * Converts the current measurement to a different scalar unit.
+     * Converts the current scalar unit measurement to a specified target scalar unit.
      *
-     * Uses the static conversion method available in the `ScalarUnit` interface
-     * to convert the current measurement's unit to the specified target unit.
-     *
-     * @param to the target `ScalarUnit` to which the current measurement unit should be converted.
-     * @return A new `Measurement` instance representing the current measurement in the specified unit, wrapped in a [Result]
-     * @throws dev.tommasop1804.kutils.exceptions.UnitConversionException if conversion failed.
-     * @since 1.0.0
+     * @param to The target scalar unit to which the current measurement will be converted.
+     * @return Either an IllegalConversionBetweenUnits error if the conversion is invalid, or a Measurement representing the converted value.
+     * @since 6.1.0
      */
     @Beta
-    infix fun convertTo(to: ScalarUnit) = ScalarUnit.convert(this, to)
+    infix fun convertTo(to: ScalarUnit): Either<IllegalConversionBetweenUnits, Measurement> =
+        ScalarUnit.convert(this, to)
 
     /**
      * Adds the value of another `Measurement` to this `Measurement`.
@@ -522,37 +577,6 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
     operator fun unaryPlus() = abs()
 
     /**
-     * Rounds the numerical value of the measurement to the nearest integer
-     * while retaining the original unit.
-     *
-     * This function uses the standard mathematical rounding rules.
-     *
-     * 
-     * @return A new `Measurement` object with the rounded value and the same unit as the original.
-     * @since 1.0.0
-     */
-    fun round() = Measurement(kotlin.math.round(value), unit)
-
-    /**
-     * Rounds up the value of the current measurement to the nearest integer, preserving the original unit.
-     *
-     * 
-     * @return A new measurement instance with its value rounded up to the nearest integer.
-     * @since 1.0.0
-     */
-    fun ceil() = Measurement(kotlin.math.ceil(value), unit)
-
-    /**
-     * Calculates the largest integer value less than or equal to the current measurement's value
-     * and returns a new `Measurement` instance with the floored value and the original unit.
-     *
-     * 
-     * @return A new `Measurement` instance with the floored value.
-     * @since 1.0.0
-     */
-    fun floor() = Measurement(kotlin.math.floor(value), unit)
-
-    /**
      * Compares this measurement with the specified measurement for order.
      * An exception is thrown if the two measurements are of different units.
      *
@@ -567,26 +591,6 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
     override operator fun compareTo(other: Measurement): Int {
         if (other.unit != unit) throw IllegalOperationException("Can't compare measurement of different type.")
         return value.compareTo(ScalarUnit.convert(other, unit)().value)
-    }
-
-    /**
-     * Calculates the average of the provided measurements. All measurements must have the same unit of measure.
-     *
-     * 
-     * @param measurements A variable number of measurements to be averaged. All measurements must share the same unit of measure.
-     * @return A new Measurement representing the average of the input measurements.
-     * @throws IllegalOperationException If the units of the provided measurements are not the same.
-     * @since 1.0.0
-     */
-    @OptIn(Beta::class)
-    fun average(vararg measurements: Measurement): Measurement {
-        var sum = 0.0
-        for (measurement in measurements) {
-            if (measurements[0].unit.measure == measurement.unit.measure)
-                throw IllegalOperationException("Cannot average measurements of different units")
-            sum += ScalarUnit.convert(measurement, measurements[0].unit)().value
-        }
-        return Measurement(sum / measurements.size, measurements[0].unit)
     }
 
     /**
@@ -735,35 +739,34 @@ class RMeasurement<T : ScalarUnit>(override val value: Double, override val unit
          */
         infix fun Number.ofUnit(unit: MeasureUnit.MassUnit): Mass = RMeasurement(toDouble(), unit)
 
-
         /**
-         * Parses the given string into a measurement object with a numeric value and a unit.
+         * Parses a string representation of a measurement into either a success result containing
+         * an instance of [RMeasurement] or an error result.
          *
-         * @param string The input string in the format "number unit", where number is a numeric value
-         * and unit is a valid unit symbol. The unit symbol must correspond to a known measurement unit.
-         * @return A [Result] wrapping the measurement object with the parsed value and associated unit.
-         *         If the parsing fails or an unknown unit is provided, an exception is thrown and captured in the [Result].
-         * @since 3.1.1
+         * @param string The input string to parse, which must conform to the format of a numeric value
+         *        followed by a unit symbol, separated by space(s).
+         * @return An [Either] containing [RMeasurement] of type [T] if the parsing succeeds, or an [Error]
+         *         if the parsing fails due to invalid input or unknown unit.
+         * @since 6.1.0
          */
         @Suppress("UNCHECKED_CAST")
-        infix fun <T : ScalarUnit> parse(string: String) = runCatching {
+        infix fun <T : ScalarUnit> parse(string: String): Either<Error, RMeasurement<T>> = either {
             val [number, unit] = string / (Char.SPACE to 2)
             RMeasurement(
-                number.toDouble(),
-                MeasureUnit.knownUnitsScalar.find { it.knownSymbol && it.symbol == unit } as T? ?: throw NoSuchEntryException("Unknown symbol unit: $unit")
+                number.toDoubleOrError().bind(),
+                MeasureUnit.knownUnitsScalar.find { it.knownSymbol && it.symbol == unit } as? T ?: raise(IterableError.NoResults)
             )
         }
 
         /**
-         * Converts the current string to a measurement by parsing it using the `parse` function.
+         * Parses a string representation of a measurement into either a success result containing
+         * an instance of [RMeasurement] or an error result.
          *
-         * The input string should represent a valid measurement format that is compatible with parsing.
-         * The function provides a way to interpret such strings into a measurement object.
-         *
-         * @receiver The string to be converted into a measurement.
-         * @return A parsed measurement based on the input string wrapped in a Result.
-         *
-         * @since 3.1.1
+         * @receiver The input string to parse, which must conform to the format of a numeric value
+         *        followed by a unit symbol, separated by space(s).
+         * @return An [Either] containing [RMeasurement] of type [T] if the parsing succeeds, or an [Error]
+         *         if the parsing fails due to invalid input or unknown unit.
+         * @since 6.1.0
          */
         fun <T : ScalarUnit> String.toMeasurement() = parse<T>(this)
 

@@ -73,7 +73,6 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      *
      * @since 6.1.0
      */
-    @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val eanPrefix
         get() = either {
             ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
@@ -100,7 +99,6 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      *
      * @since 6.1.0
      */
-    @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val linguisticGroup
         get() = either {
             ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
@@ -127,7 +125,6 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      * @return The publisher segment of the ISBN-13 value or `null` if the format is invalid.
      * @since 6.1.0
      */
-    @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val publisher
         get() = either {
             ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
@@ -143,14 +140,9 @@ value class Isbn private constructor(override val value: String) : CharSequence,
      * The title component is determined by splitting the `value` string using dashes as delimiters and
      * accessing the fourth segment (zero-based index 3) of the resulting collection.
      *
-     * Usage of this property is marked as requiring caution and is annotated with [OnlyForSpecificType]
-     * because incorrect formatting of the ISBN-13 code (e.g., missing or additional dashes)
-     * may lead to unexpected results or a [Uncomputable] value.
-     *
      * @return the title segment from the ISBN-13 code, or [Uncomputable] if the format is invalid.
      * @since 6.1.0
      */
-    @OnlyForSpecificType("Only works for ISBN-13 codes with 4 dashes")
     val title
         get() = either {
             ensure(count { it == Char.HYPEN } == 4) { Uncomputable("Only works for ISBN-13 codes with 4 dashes") }
@@ -211,7 +203,7 @@ value class Isbn private constructor(override val value: String) : CharSequence,
          */
         fun CharSequence.toIsbn() = filter { it.isDigit() || it == Char.HYPEN }.run { either {
             catching({ Isbn(this@toIsbn) }) { t: Throwable ->
-                InvalidFormat(this@toIsbn, typeOf<Isbn>(), t)
+                InvalidFormatOfType(this@toIsbn, typeOf<Isbn>(), t)
             }
         } }
 

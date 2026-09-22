@@ -105,7 +105,7 @@ value class UpcA private constructor(override val value: String) : CharSequence,
          */
         fun CharSequence.toUpcA() = filter { it.isDigit() }.run { either {
             catching({ UpcA(this@toUpcA) }) { t: Throwable ->
-                InvalidFormat(this@toUpcA, typeOf<UpcA>(), t)
+                InvalidFormatOfType(this@toUpcA, typeOf<UpcA>(), t)
             }
         } }
 

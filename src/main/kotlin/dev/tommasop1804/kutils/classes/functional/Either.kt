@@ -313,6 +313,21 @@ inline fun <L, R> Either<L, R>.onRight(block: Consumer<R>): Either<L, R> {
 }
 
 /**
+ * Converts the current value into an `Either` by evaluating if the value is `null`.
+ * If the value is not `null`, it is returned as `Right` in the resulting `Either`.
+ * If the value is `null`, the provided supplier function is invoked to produce a `Left` value.
+ *
+ * @param T The type of the value being evaluated.
+ * @param L The type of the `Left` value to be produced when the original value is `null`.
+ * @param left A supplier function that provides the `Left` value when the original value is `null`.
+ * @return An `Either` instance where:
+ *         - `Right<T>` represents the original value if it is non-`null`.
+ *         - `Left<L>` is produced by the `left` supplier if the original value is `null`.
+ * @since 6.1.0
+ */
+infix fun <T, L> T.orEither(left: Transformer<T, L>) = either { this ?: raise(left(this)) }
+
+/**
  * Executes a block of code in the context of a `Raise` scope, capturing any raised error
  * as a `Left` in the resulting `Either`, or returning the result of the block as a `Right`.
  *
@@ -330,11 +345,11 @@ inline fun <L, R> Either<L, R>.onRight(block: Consumer<R>): Either<L, R> {
  */
 @OptIn(ExperimentalContracts::class)
 @Suppress("UNCHECKED_CAST")
-inline fun <E, A> either(block: Raise<E>.() -> A): Either<E, A> {
+inline fun <E, A> either(block: context(Raise<E>) () -> A): Either<E, A> {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     val scope = DefaultRaise<E>()
     return try {
-        Right(scope.block())
+        Right(context(scope) { block() })
     } catch (s: RaiseSignal) {
         if (s.scope === scope) Left(s.error as E) else throw s
     }
@@ -346,10 +361,82 @@ inline fun <E, A> either(block: Raise<E>.() -> A): Either<E, A> {
  * as is (widened to [E2]) and [block] is not executed.
  * @since 6.1.0
  */
-inline infix fun <E1 : E2, E2, A, B> Either<E1, A>.thenEither(block: ReceiverBiTransformer<Raise<E2>, A, B>): Either<E2, B> =
+inline infix fun <E1 : E2, E2, A, B> Either<E1, A>.thenEither(block: ContextTransformer<Raise<E2>, A, B>): Either<E2, B> =
     when (this) {
         is Left -> this
         is Right -> either { block(value) }
+    }
+
+/**
+ * Executes a transformation block on the right value of the `Either` instance and returns the result,
+ * merging the result into a new `Either` while maintaining the compatibility between error types.
+ * The transformation allows composition with a potential raise for the error type.
+ *
+ * @param block A transformation function that accepts a receiver of type `Raise<E2>` and the right value of the current `Either`,
+ *              and returns a new value of type `B`. This block is used for mapping the success value while allowing error handling.
+ * @return A new `Either` instance resulting from the applied transformation using the specified block.
+ * @since 6.1.0
+ */
+inline infix fun <E1 : E2, E2 : BE, A, BE, BR> Either<E1, A>.thenMergeWith(block: ContextTransformer<Raise<E2>, A, Either<BE, BR>>) =
+    thenEither(block).flatten()
+
+/**
+ * Combines the current `Either` instance with another `Either` instance, producing a new `Either`
+ * containing a pair of values if both are successful (`Right`).
+ *
+ * If either `Either` instance is a failure (`Left`), the result will also be a failure
+ * containing the error from the first encountered `Left`.
+ *
+ * @param other The `Either` instance to combine with the current instance.
+ * @return An `Either` of type `Either<E, Pair<A, B>>`, where:
+ *         - `Right<Pair<A, B>>` contains a pair of the two successful values if both instances are `Right`.
+ *         - `Left<E>` contains the error if either instance is `Left`.
+ * @since 6.1.0
+ */
+infix fun <E, A, B> Either<E, A>.mergeWith(other: Either<E, B>): Either<E, Pair<A, B>> =
+    either {
+        val a = bind()
+        val b = other.bind()
+        a to b
+    }
+/**
+ * Combines the values of two `Either` instances, if both are `Right`, using a provided combining function.
+ *
+ * If either of the `Either` instances is `Left`, the result will be `Left` with the error value from one
+ * of the `Left` instances.
+ *
+ * @param other The second `Either` instance to combine with this one.
+ * @param combine A function that takes the values of type `A` and `B` from the two `Right` instances
+ *                and combines them into a value of type `C`.
+ * @return An `Either` containing the combination of the values:
+ *         - `Right<C>` if both instances are `Right`.
+ *         - `Left<E>` if either instance is `Left`.
+ * @since 6.1.0
+ */
+inline fun <E, A, B, C> Either<E, A>.mergeWith(
+    other: Either<E, B>,
+    combine: (A, B) -> C
+): Either<E, C> =
+    either {
+        combine(bind(), other.bind())
+    }
+
+/**
+ * Flattens a nested `Either` structure into a single `Either` instance.
+ *
+ * This method is useful when dealing with an `Either` containing another `Either` as its right-side
+ * value. If the outer instance is a `Left`, it is returned as-is. If it is a `Right`, the
+ * encapsulated `Either` value is returned directly.
+ *
+ * @return A single-layered `Either` instance, preserving the left value if the outer instance
+ *         is `Left`, or flattening the inner `Either` if the outer instance is `Right`.
+ * @since 6.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+fun <E1 : E2, E2 : E, E, A> Either<E1, Either<E2, A>>.flatten(): Either<E, A> =
+    when (this) {
+        is Left -> this as Left<E>
+        is Right -> value
     }
 
 /**

@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -21,6 +24,7 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+import kotlin.reflect.typeOf
 
 /**
  * Represents a percentage value with utility functions to operate within percentage-related constraints.
@@ -196,6 +200,47 @@ value class Percentage private constructor(internal val value: Double) : Compara
     val isNotDecimal: Boolean get() = !isDecimal
 
     /**
+     * Represents a computed percentage value obtained by applying the ceiling
+     * function to an existing percentage value.
+     *
+     * This property ensures the percentage value is rounded up to the nearest
+     * integer, maintaining its integrity as a percentage representation.
+     *
+     * @return A new `Percentage` instance with the ceiling of the original value.
+     * @since 6.1*/
+    val ceil get() = Percentage(kotlin.math.ceil(value))
+    /**
+     * A computed property that returns the value of the current percentage rounded down
+     * to the nearest whole number using the mathematical floor function.
+     *
+     * This property ensures that the percentage value is adjusted to eliminate any
+     * fractional part, always rounding towards the lesser integer.
+     *
+     * @return A new Percentage instance with the floored value of the original percentage.
+     *
+     * @since 6.1.0
+     */
+    val floor get() = Percentage(kotlin.math.floor(value))
+    /**
+     * Represents a percentage value that is rounded to the nearest whole number.
+     * This property calculates the rounded percentage based on the current `value`.
+     * It uses `kotlin.math.round` to perform the rounding operation.
+     *
+     * @return A `Percentage` instance containing the rounded percentage.
+     * @since 6.1.0
+     */
+    val rounded get() = Percentage(kotlin.math.round(value))
+    /**
+     * A computed property that returns the absolute value of the current `Percentage` instance.
+     * This removes the sign of the `value` while retaining the percentage representation.
+     * The value is derived using the standard absolute value function from Kotlin's math library.
+     *
+     * @return A new `Percentage` instance with the absolute value of the original `value`.
+     * @since 6.1.0
+     */
+    val abs get() = Percentage(kotlin.math.abs(value))
+
+    /**
      * Constructs a new instance of the `Percentage` class based on the given parameters.
      *
      * This constructor creates a percentage value using the provided number. The number can be interpreted 
@@ -209,6 +254,7 @@ value class Percentage private constructor(internal val value: Double) : Compara
      * @param allowNegativeOverflow Allows values less than 0% if set to `true`. Defaults to `false`.
      * @throws MalformedInputException If `from0to1` is `false` and `number` exceeds 100 or falls below 0, 
      * unless the respective overflow allowance parameters are enabled.
+     * @throws NumberSignException If `number` is NaN.
      * @since 1.0.0
      */
     constructor(
@@ -219,6 +265,7 @@ value class Percentage private constructor(internal val value: Double) : Compara
     ) : this(Unit.run {
         val value = if (from0to1) number.toDouble() * 100.0 else number.toDouble()
 
+        if (number is Double && number.isNaN()) throw NumberSignException("NaN is not allowed")
         if (!allowPositiveOverflow) validateInputFormat(value <= 100.0, lazyMessage = { "The percentage must be less than or equal to 100" })
         if (!allowNegativeOverflow) validateInputFormat(value >= 0.0, lazyMessage = { "The percentage must be greater than or equal to 0" })
         value
@@ -345,6 +392,7 @@ value class Percentage private constructor(internal val value: Double) : Compara
                 ?: throw MalformedInputException("The string is not a valid percentage number")
             if (from0to1) value / 100.0 else value
         },
+        false,
         allowPositiveOverflow,
         allowNegativeOverflow
     )
@@ -523,45 +571,63 @@ value class Percentage private constructor(internal val value: Double) : Compara
         val FULL = Percentage(100.0)
 
         /**
-         * Converts a numeric value into a `Percentage` instance.
+         * Converts the current [Number] instance to a percentage value.
          *
-         * This method interprets the numeric value and generates a `Percentage` object based on the specified flags.
-         * The input can be treated as a normalized value within the range [0, 1] or as a direct percentage value.
-         * It also performs input validation to enforce bounds unless positive or negative overflow is explicitly allowed. 
-         * The conversion is wrapped in a `Result` to handle potential exceptions safely.
+         * Possible errors:
+         * - [NumberError.PositivePercentageOverflow] - The percentage value exceeds 100% an
+         * - [NumberError.NegativePercentageOverflow] - The percentage value is negative and
+         * - [NumberError.InvalidSign] - The percentage value is NaN and is not allowed.
          *
-         * @param from0to1 If `true`, the input value is treated as a normalized value in the range [0, 1]. Defaults to `false`.
-         * @param allowPositiveOverflow If `true`, values exceeding 100% are allowed. Defaults to `false`.
-         * @param allowNegativeOverflow If `true`, values below 0% are allowed. Defaults to `false`.
-         * @return A `Result` containing the constructed `Percentage` instance or an exception if the input is invalid.
-         * @since 1.0.0
+         * @param from0to1 If set to true, the input value is assumed to be between 0 and 1
+         *                 (e.g., 0.5 will be converted to 50%). Defaults to false.
+         * @param allowPositiveOverflow If set to true, allows the percentage value to exceed 100. Defaults to false.
+         * @param allowNegativeOverflow If set to true, allows the percentage value to be negative. Defaults to false.
+         * @return An [Either] containing a [NumberError] if the conversion fails due to constraints (e.g., overflow or invalid sign),
+         *         or a [Percentage] if the conversion is successful.
+         * @since 6.1.0
          */
         fun Number.toPercentage(
             from0to1: Boolean = false,
             allowPositiveOverflow: Boolean = false,
             allowNegativeOverflow: Boolean = false
-        ) = runCatching { Percentage(this, from0to1, allowPositiveOverflow, allowNegativeOverflow) }
+        ): Either<ValidationError, Percentage> = either {
+            val value = if (from0to1) toDouble() * 100.0 else toDouble()
+
+            if (this is Double && isNaN()) raise(NumberError.InvalidSign(NumberSign.NaN, setOf(NumberSign.Zero, NumberSign.Positive, NumberSign.Negative)))
+            if (!allowPositiveOverflow) ensure(value <= 100.0) { NumberError.PositivePercentageOverflow(value) }
+            if (!allowNegativeOverflow) ensure(value >= 0.0) { NumberError.NegativePercentageOverflow(value) }
+            Percentage(value)
+        }
         /**
-         * Converts the string representation of a percentage into a `Percentage` instance.
+         * Converts the string representation of a percentage to a `Percentage` object.
+         * This method parses the string, validates its format, and converts it into a percentage value.
+         * It also supports options to interpret values in the range 0.0 to 1.0 and control overflow behavior.
          *
-         * The method attempts to parse the string and initializes a `Percentage` object using the provided
-         * flags to define the interpretation of the value and its overflow handling. The input is processed
-         * based on the `from0to1` flag, and overflow permissions can be controlled through additional parameters.
+         * Possible errors:
+         * - [InvalidFormatOfType] - The string does not represent a valid percentage format.
+         * - [NumberError.PositivePercentageOverflow] - The percentage value exceeds 100% and overflow is not allowed.
+         * - [NumberError.NegativePercentageOverflow] - The percentage value is negative and overflow is not allowed.
+         * - [NumberError.InvalidSign] - The percentage value is NaN and is not allowed.
          *
-         * @param from0to1 indicates if the input string represents a value in the range `[0, 1]` that should
-         *        be converted to a percentage value by scaling it by 100.
-         * @param allowPositiveOverflow determines whether values exceeding 100% are considered valid percentages.
-         * @param allowNegativeOverflow determines whether values below 0% are considered valid percentages.
-         *
-         * @return a `Result` encapsulating the creation of a `Percentage` instance or an error if parsing fails.
-         *
-         * @since 1.0.0
+         * @param from0to1 If true, the string is interpreted as a value between 0.0 and 1.0,
+         *                 and it will be converted to an equivalent percentage (0-100).
+         * @param allowPositiveOverflow If true, allows the percentage value to exceed 100%.
+         * @param allowNegativeOverflow If true, allows the percentage value to be negative.
+         * @return Either a `ValidationError` if the string format is invalid,
+         *         or a valid `Percentage` object.
+         * @since 6.1.0
          */
+        @Suppress("UNCHECKED_CAST")
         fun String.toPercentage(
             from0to1: Boolean = false,
             allowPositiveOverflow: Boolean = false,
             allowNegativeOverflow: Boolean = false
-        ) = runCatching { Percentage(this, from0to1, allowPositiveOverflow, allowNegativeOverflow) }
+        ): Either<ValidationError, Percentage> = either {
+            val string = this.trim() - Char.PERCENT
+            if (string.isEmpty()) raise(InvalidFormatOfType(this, typeOf<Percentage>(), "String is empty."))
+            val value = string.toDoubleOrError().bind()
+            if (from0to1) value / 100.0 else value
+        } as Either<ValidationError, Double> thenMergeWith { it.toPercentage(false, allowPositiveOverflow, allowNegativeOverflow) }
 
         /**
          * Calculates the specified percentage of a number.
@@ -1032,36 +1098,4 @@ value class Percentage private constructor(internal val value: Double) : Compara
      * @since 1.0.0
      */
     fun roundToLong() = value.roundToLong()
-
-    /**
-     * Rounds the value of the current percentage up to the nearest whole number.
-     *
-     * This function uses the `kotlin.math.ceil` function to compute the smallest 
-     * integer value that is greater than or equal to the current percentage value.
-     *
-     * @return A new `Percentage` instance with the rounded-up value.
-     * @since 1.0.0
-     */
-    fun ceil() = Percentage(kotlin.math.ceil(value))
-    /**
-     * Returns a new `Percentage` instance whose value is the largest whole number 
-     * less than or equal to the current percentage value.
-     *
-     * This function uses the `kotlin.math.floor` function internally to achieve the 
-     * flooring operation on the percentage value.
-     *
-     * @return A `Percentage` object with the floored value.
-     * @since 1.0.0
-     */
-    fun floor() = Percentage(kotlin.math.floor(value))
-    /**
-     * Rounds the percentage value to the nearest whole number and returns a new `Percentage` object
-     * representing the rounded value.
-     *
-     * This method internally uses `kotlin.math.round` to perform rounding on the numerical value.
-     *
-     * @return A new `Percentage` instance with the rounded value.
-     * @since 1.0.0
-     */
-    fun round() = Percentage(kotlin.math.round(value))
 }

@@ -17,13 +17,16 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
 import dev.tommasop1804.kutils.classes.coding.Yaml.Companion.toYaml
+import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
 import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import org.w3c.dom.Document
@@ -31,6 +34,9 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
+import org.xml.sax.SAXException
+import tools.jackson.core.JacksonException
+import tools.jackson.core.exc.StreamReadException
 import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
@@ -53,6 +59,7 @@ import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.SchemaFactory
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
+import kotlin.reflect.typeOf
 import com.fasterxml.jackson.dataformat.xml.XmlMapper as OldXmlMapper
 import org.intellij.lang.annotations.Language as IJLanguage
 
@@ -153,6 +160,29 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      */
     val fieldsNames: Set<String>
         get() = toDocument().documentElement.childrenAsList().map { it.nodeName }.toSet()
+
+    /**
+     * Indicates whether the underlying document structure is considered empty.
+     *
+     * This property returns `true` if the document's root element has no child elements
+     * and its textual content is either null or entirely blank. Otherwise, it returns `false`.
+     *
+     * @since 6.1.0
+     */
+    @get:JvmName("isEmptyXml")
+    val isEmpty: Boolean get() {
+        val root = toDocument().documentElement
+        return root.childrenAsList().isEmpty() && root.textContent.isNullOrBlank()
+    }
+    @get:JvmName("isNotEmptyXml")
+    /**
+     * Represents whether a collection or sequence is not empty.
+     * Returns `true` if the collection or sequence contains at least one element.
+     * Returns `false` if the collection or sequence is empty.
+     * This property is the negation of `isEmpty`.
+     * @since 6.1.0
+     */
+    val isNotEmpty: Boolean get() = !isEmpty
 
     /**
      * Secondary constructor that initializes an instance using a `Code` object.
@@ -328,32 +358,51 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
         fun prettify(@IJLanguage("XML") xml: String): String = documentToString(parseDocument(xml), pretty = true)
 
         /**
-         * Converts the current file into an instance of `Xml`.
-         * The operation is wrapped in a `Result` to handle any potential exceptions that
-         * may occur during the conversion process.
+         * Converts the current `File` instance to an XML representation.
+         * This function uses a type-safe operation to parse the file as TOML and transform it into XML format.
          *
-         * @return A `Result` containing the `Xml` representation of the file if successful,
-         * or an exception if an error occurs during processing.
-         * @since 3.13.0
+         * @receiver the file to be converted
+         * @return a result wrapped in an `Either` type, representing either a successful conversion
+         *         or an `InvalidConversion` error if the operation fails
+         * @since 6.1.0
          */
-        fun File.toXml() = runCatching { Xml(this) }
+        fun File.toXml() = either {
+            catching({ Xml(this@toXml) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toXml, typeOf<File>(), typeOf<Xml>(), t)
+            }
+        }
         /**
-         * Converts the current Path object to an XML representation.
+         * Converts the current Path instance to its XML representation.
          *
-         * Returns a Result object that contains the XML representation of
-         * the Path if the operation is successful, or an exception if an
-         * error occurs during the conversion.
-         * @since 3.13.0
+         * This function attempts to parse the Path as TOML format and then transforms
+         * it into an XML representation. If the conversion fails, an `InvalidConversion`
+         * error is returned containing details about the failure.
+         *
+         * @return An `Either` instance representing the successful conversion to XML
+         *         or an `InvalidConversion` error if the operation fails.
+         * @since 6.1.0
          */
-        fun Path.toXml() = runCatching { Xml(this) }
+        fun Path.toXml() = either {
+            catching({ Xml(this@toXml) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toXml, typeOf<Path>(), typeOf<Xml>(), t)
+            }
+        }
         /**
-         * Converts a String into an [Xml] object, wrapping the operation in a [Result].
+         * Converts the current TOML string to its XML representation.
          *
-         * @receiver The string to be converted into XML.
-         * @return A [Result] containing the parsed [Xml] or an exception if parsing fails.
-         * @since 3.9.0
+         * This extension function parses the receiver string, which is expected to be in TOML format,
+         * and converts it to an XML object. If the input is invalid or the conversion fails,
+         * an error encapsulating the issue will be returned.
+         *
+         * @receiver The TOML string to be converted.
+         * @return Either the parsed XML object or an error indicating the failure reason.
+         * @since 6.1.0
          */
-        fun @receiver:IJLanguage("XML") String.toXml() = runCatching { Xml(this) }
+        fun @receiver:IJLanguage("XML") String.toXml() = either {
+            catching({ Xml(this@toXml) }) { t: Throwable ->
+                InvalidFormatOfType(this@toXml, typeOf<Xml>(), t)
+            }
+        }
         /**
          * Converts a JSON object to its XML representation.
          *
@@ -441,32 +490,35 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             Xml(MAPPER.writer().withRootName(rootName).writeValueAsString(this))
 
         /**
-         * Converts the current file into an instance of `Xml`.
-         * The operation is wrapped in a `Result` to handle any potential exceptions that
-         * may occur during the conversion process.
+         * Converts the current file into a pretty-printed XML representation.
          *
-         * @return A `Result` containing the `Xml` representation of the file if successful,
-         * or an exception if an error occurs during processing.
-         * @since 3.13.0
+         * The method first converts the file content to XML and then applies
+         * formatting to enhance readability.
+         *
+         * @return Either an error of type InvalidConversion if the file cannot
+         *         be converted to XML, or a formatted Xml instance.
+         * @since 6.1.0
          */
-        fun File.toPrettyXml() = runCatching { Xml(this).pretty }
+        fun File.toPrettyXml(): Either<InvalidConversionBetweenTypes, Xml> = toXml().map(Xml::pretty)
         /**
-         * Converts the current Path object to an XML representation.
+         * Converts the content of the given Path to a prettified XML representation if valid.
          *
-         * Returns a Result object that contains the XML representation of
-         * the Path if the operation is successful, or an exception if an
-         * error occurs during the conversion.
-         * @since 3.13.0
+         * @return Either an InvalidConversion error if the content cannot be parsed as XML, or a prettified Xml object.
+         * @since 6.1.0
          */
-        fun Path.toPrettyXml() = runCatching { Xml(this).pretty }
+        fun Path.toPrettyXml(): Either<InvalidConversionBetweenTypes, Xml> = toXml().map(Xml::pretty)
         /**
-         * Converts a String into an [Xml] object, wrapping the operation in a [Result].
+         * Converts the current XML string into a pretty-printed XML format.
          *
-         * @receiver The string to be converted into XML.
-         * @return A [Result] containing the parsed [Xml] or an exception if parsing fails.
-         * @since 3.13.0
+         * This method parses the receiver string as XML and, if successful, returns
+         * a properly indented and human-readable version of the XML content.
+         *
+         * @receiver The XML string to be converted to a pretty-printed format.
+         * @return Either an instance of InvalidFormat if the receiver string is not valid XML,
+         *         or a pretty-printed Xml object on successful conversion.
+         * @since 6.1.0
          */
-        fun @receiver:IJLanguage("XML") String.toPrettyXml() = runCatching { Xml(this).pretty }
+        fun @receiver:IJLanguage("XML") String.toPrettyXml(): Either<InvalidFormatOfType, Xml> = toXml().map(Xml::pretty)
         /**
          * Converts a JSON object to its XML representation.
          *
@@ -554,46 +606,84 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
             Xml(MAPPER.writer().withRootName(rootName).writeValueAsString(this)).pretty
 
         /**
-         * Reads an XML file and deserializes its content into an object of the specified type.
+         * Reads and deserializes the content of a specified file into an instance of the specified type.
          *
-         * @param file The file containing the XML data.
-         * @return A [Result] wrapping the deserialized object of type [T].
-         * @since 3.9.0
-         */
-        inline fun <reified T> readFromFile(file: File): Result<T> =
-            runCatching { MAPPER.readValue(file, T::class.java) }
-
-        /**
-         * Reads an XML file and deserializes its content into a list of objects of the specified type.
+         * This method uses a JSON deserializer to parse the file content and map it to the desired type.
+         * Errors during the deserialization process are wrapped in a `DeserializationError`.
          *
-         * @param file The XML file to be read.
-         * @return A [Result] wrapping the deserialized list of type [T].
-         * @since 3.9.0
+         * Possible errors:
+         * - [DeserializationError.ReadError] - if an error occurs during file reading
+         * - [DeserializationError.MappingError] - if conversion failed
+         * - [DeserializationError] - if any other error occurs during jackson deserialization
+         *
+         * @param file The file to be read and deserialized.
+         * @return An instance of `Either` containing the deserialized object of type `T` if successful,
+         *         or a `DeserializationError` if an error occurs during the reading or mapping process.
+         * @since 6.1.0
          */
-        inline fun <reified T> readListFromFile(file: File): Result<List<T>> = runCatching {
-            MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java))
+        inline fun <reified T> readFromFile(file: File): Either<DeserializationError, T> = either {
+            catching({ MAPPER.readValue(file, T::class.java) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<T>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<T>(), e)
+                is JacksonException -> DeserializationError(typeOf<T>(), e)
+                else -> throw e
+            } }
         }
 
         /**
-         * Reads an XML file and deserializes its content into a set of objects of the specified type.
+         * Reads a list of objects of type [T] from the specified file and deserializes it using the configured object mapper.
          *
-         * @param file The XML file to be read.
-         * @return A [Result] wrapping the deserialized set of type [T].
-         * @since 3.9.0
+         * @param file The file from which the list is to be read.
+         * @return An [Either] that contains the successfully deserialized list of type [T] if the operation succeeds,
+         * or a [DeserializationError] if an error occurs during the deserialization process.
+         * @since 6.1.0
          */
-        inline fun <reified T> readSetFromFile(file: File): Result<Set<T>> = runCatching {
-            MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java))
+        inline fun <reified T> readListFromFile(file: File): Either<DeserializationError, T> = either {
+            catching({ MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java)) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<List<T>>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<List<T>>(), e)
+                is JacksonException -> DeserializationError(typeOf<List<T>>(), e)
+                else -> throw e
+            } }
         }
 
         /**
-         * Reads an XML file and deserializes its content into a map with string keys and values of a generic type.
+         * Reads a set of objects of type [T] from the specified file.
          *
-         * @param file The XML file to be read.
-         * @return A [Result] wrapping the deserialized map.
-         * @since 3.9.0
+         * This method deserializes the file content into a `Set` of type [T]
+         * using a Jackson object mapper. In case of deserialization errors,
+         * the error is wrapped in an `Either` as a `DeserializationError`.
+         *
+         * @param file The file to read and deserialize the content from.
+         * @return An `Either` containing a `Set` of type [T] on success, or
+         *         a `DeserializationError` in case of a failure.
+         * @since 6.1.0
          */
-        fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching {
-            MAPPER.readValue(file, object : TypeReference<Map<String, T>>() {})
+        inline fun <reified T> readSetFromFile(file: File): Either<DeserializationError, Set<T>> = either {
+            catching({ MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java)) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<Set<T>>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<Set<T>>(), e)
+                is JacksonException -> DeserializationError(typeOf<Set<T>>(), e)
+                else -> throw e
+            } }
+        }
+
+        /**
+         * Reads a map from the specified file and deserializes its content into a map with `String` keys
+         * and values of the specified generic type `T`.
+         *
+         * @param file The file to be read and deserialized into a map.
+         * @return An `Either` containing a `DeserializationError` if deserialization fails,
+         *         or a `Map<String, T>` if the operation is successful.
+         * @since 6.1.0
+         */
+        fun <T> readMapFromFile(file: File): Either<DeserializationError, Map<String, T>> = either {
+            catching({ MAPPER.readValue(file, object : TypeReference<Map<String, T>>() {}) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<Map<String, T>>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<Map<String, T>>(), e)
+                is JacksonException -> DeserializationError(typeOf<Map<String, T>>(), e)
+                else -> throw e
+            } }
         }
 
         class Serializer : ValueSerializer<Xml>() {
@@ -661,37 +751,56 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     // CONVERSIONS ---------------------------------------------------------------------------------
 
     /**
-     * Converts the stored XML string into an object of the specified type [T].
+     * Attempts to map the provided value to an object of the specified type T using the MAPPER.
+     * If the mapping process fails due to a DatabindException, wraps the failure information into a MappingError.
      *
-     * @return a [Result] containing the deserialized object or an exception.
-     * @since 3.9.0
+     * @return Either a successful result of type T or a DeserializationError.MappingError containing details of the failure.
+     * @since 6.1.0
      */
-    inline fun <reified T> toObject() = runCatching { MAPPER.readValue<T>(value) as T }
-
-    /**
-     * Converts the XML content into a typed array of the specified type [T].
-     *
-     * @return a [Result] containing the typed array of type [T].
-     * @since 3.9.0
-     */
-    inline fun <reified T> toArray() = runCatching { toList<T>().getOrThrow().toTypedArray() }
-
-    /**
-     * Converts the XML content into a list of objects of type [T].
-     *
-     * This interprets the XML as an array-like structure: the root element's children are
-     * each deserialized into an instance of [T].
-     *
-     * @return a [Result] containing the deserialized list.
-     * @since 3.9.0
-     */
-    inline fun <reified T> toList(): Result<List<T>> = runCatching {
-        val children = parseDocument(value).documentElement.childrenAsList()
-        if (children.isEmpty()) emptyList()
-        else {
-            val firstName = children.first().nodeName
-            children.filter { it.nodeName == firstName }.map { elementToObject<T>(it) }
+    inline fun <reified T> toObject(): Either<DeserializationError.MappingError, T> = either {
+        catching({ MAPPER.readValue<T>(value) as T }) { e: DatabindException ->
+            DeserializationError.MappingError(typeOf<T>(), e.message)
         }
+    }
+
+    /**
+     * Converts the data to an array of the specified type.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     *
+     * @return Either a deserialization error or an array of type T.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toArray(): Either<DeserializationError, Array<T>> = toList<T>().map { it.toTypedArray() }
+
+    /**
+     * Transforms the current object into an `Either` containing a list of deserialized objects of type `T`
+     * or a `DeserializationError`. This function processes the document, matches children nodes with the
+     * same name, and maps them to objects of the specified type.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     *
+     * @return An `Either<DeserializationError, List<T>>` where the right side contains a list of successfully
+     * deserialized objects of type `T`, and the left side contains a `DeserializationError` in case of failure.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toList(): Either<DeserializationError, List<T>> = either {
+        catching({
+            val children = parseDocument(value).documentElement.childrenAsList()
+            if (children.isEmpty()) emptyList()
+            else {
+                val firstName = children.first().nodeName
+                children.filter { it.nodeName == firstName }.map { elementToObject<T>(it) }
+            }
+        }) { e: Exception -> when (e) {
+            is DatabindException -> DeserializationError.MappingError(typeOf<T>(), e)
+            is JacksonException -> DeserializationError(typeOf<T>(), e)
+            else -> throw e
+        } }
     }
     /**
      * Converts a collection or sequence of elements into a non-empty list of elements of the specified type [T].
@@ -700,189 +809,305 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * any element, this function will capture the exception and return the result of the operation wrapped
      * in a Result type.
      *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     * - [IterableError.Empty] - if the resulting list is empty
+     *
      * @param T The type of elements expected in the non-empty list.
      * @return A [Result] containing the successfully transformed list if all the elements are valid; otherwise,
      *         a failure if an exception is encountered during the transformation process.
      * @since 5.2.1
      */
-    inline fun <reified T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
+    inline fun <reified T> toNonEmptyList(): Either<Error, NonEmptyList<T>> =
+        toList<T>() as Either<Error, List<T>> thenEither { catching({ it.toNonEmptyList() }) { _: Throwable -> IterableError.Empty } }
+
 
     /**
-     * Converts the XML content into a mutable list of objects of type [T].
+     * Converts a list of type `T` into an `MList<T>` by attempting deserialization.
+     * The result is wrapped in an `Either` type that represents either
+     * the successful conversion with an `MList<T>` or a `DeserializationError`.
      *
-     * @return a [Result] containing the mutable list.
-     * @since 3.9.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     *
+     * @return an `Either` containing a `DeserializationError` if deserialization
+     *         fails, or an `MList<T>` if the conversion is successful.
+     * @since 6.1.0
      */
-    inline fun <reified T> toMList(): Result<MList<T>> = runCatching { toList<T>().getOrThrow().toMList() }
+    inline fun <reified T> toMList(): Either<DeserializationError, MList<T>> = toList<T>().map { it.toMList() }
     /**
-     * Converts the current context to a mutable list of type `T` and attempts to transform it
-     * into a `NonEmptyMList<T>`. This operation is wrapped in a `Result` to handle success
-     * or failure of the transformation.
+     * Converts an instance into a non-empty mutable list of the specified type [T].
      *
-     * @param T The type of elements in the list.
-     * @return A `Result` containing a `NonEmptyMList<T>` if the transformation succeeds, or an
-     *         error if the list is empty.
-     * @since 5.2.1
+     * This method wraps the conversion process in an `Either`, allowing safe handling of errors
+     * during the transformation. The function first attempts to cast the object to an `MList` of type [T]
+     * and then further validates its non-emptiness. If the list is empty or an exception occurs,
+     * it returns an error encapsulated in an `Either`.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     * - [IterableError.Empty] - if the resulting list is empty
+     *
+     * @param T The type of elements in the resulting non-empty mutable list.
+     * @return An `Either` that contains an `MList` of type [T] if successful, or an appropriate `Error` otherwise.
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyMList() = toMList<T>().mapCatching { it.toNonEmptyMList() }
+    inline fun <reified T> toNonEmptyMList() =
+        toMList<T>() as Either<Error, MList<T>> thenEither { catching({ it.toNonEmptyMList() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the XML content into a set of objects of type [T].
+     * Converts a collection of collections into a list of sets, where each inner collection
+     * is transformed into a set. The operation guarantees that duplicate elements
+     * within each inner collection are removed, resulting in distinct elements for each set.
      *
-     * @return a [Result] containing the deserialized set.
-     * @since 3.9.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     *
+     * @return A new list where each element is a set containing the distinct elements
+     *         of the corresponding original collection.
+     * @since 6.1.0
      */
-    inline fun <reified T> toSet(): Result<Set<T>> = runCatching { toList<T>().getOrThrow().toSet() }
+    inline fun <reified T> toSet() = toList<T>().map { it.toSet() }
     /**
-     * Converts a collection to a non-empty set, wrapping the result in a Result instance.
-     * If the conversion fails or results in an empty set, the operation is handled as a failure.
+     * Converts the current collection into a `NonEmptySet` wrapped in an `Either`.
+     * If the collection is empty, returns an `Either` containing an error.
      *
-     * @receiver The collection to be converted to a non-empty set.
-     * @return A Result containing a non-empty set if the conversion is successful, or an error if the operation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     * - [IterableError.Empty] - if the resulting list is empty
+     *
+     * @return An `Either` containing a `NonEmptySet` if the collection is non-empty,
+     * or an error if the collection is empty.
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptySet() = toSet<T>().mapCatching { it.toNonEmptySet() }
+    inline fun <reified T> toNonEmptySet(): Either<Error, NonEmptySet<T>> =
+        toSet<T>() as Either<Error, Set<T>> thenEither { catching({ it.toNonEmptySet() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the XML content into a mutable set of objects of type [T].
+     * Converts a deserialized list of type [T] into an [MSet] while encapsulating the result in an [Either].
+     * This method applies the `toMSet` transformation on the resulting list.
      *
-     * @return a [Result] containing the mutable set.
-     * @since 3.9.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     *
+     * @return An [Either] containing a [DeserializationError] if deserialization fails, or an [MSet] of type [T] if successful.
+     * @since 6.1.0
      */
-    inline fun <reified T> toMSet(): Result<MSet<T>> = runCatching { toSet<T>().getOrThrow().toMSet() }
+    inline fun <reified T> toMSet(): Either<DeserializationError, MSet<T>> = toList<T>().map { it.toMSet() }
     /**
-     * Converts a collection into a non-empty mutable set, if possible.
+     * Converts a collection into a `NonEmptyMSet` wrapped in an `Either` type.
+     * The conversion ensures that the resulting multiset is non-empty. If the operation fails
+     * (e.g., when the original collection is empty), it returns an `Error`.
      *
-     * This function first transforms the collection into a mutable set.
-     * Then, it attempts to wrap the resulting set in a non-empty mutable
-     * set representation. If this conversion fails, the result will
-     * indicate the failure.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [DeserializationError] - if any other error occurs during jackson deserialization
+     * - [IterableError.Empty] - if the resulting list is empty
      *
-     * @param T The type of elements in the collection.
-     * @return A `Result` containing the non-empty mutable set if the
-     *         transformation succeeds, or a failure otherwise.
-     * @since 5.2.1
+     * @return `Either<Error, NonEmptyMSet<T>>` where the left side contains an `Error` if the
+     *         conversion fails, and the right side contains a `NonEmptyMSet<T>` if the conversion succeeds.
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyMSet() = toMSet<T>().mapCatching { it.toNonEmptyMSet() }
+    inline fun <reified T> toNonEmptyMSet(): Either<Error, NonEmptyMSet<T>> =
+        toMSet<T>() as Either<Error, MSet<T>> thenEither { catching({ it.toNonEmptyMSet() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the XML content into a map with string keys and values of type [V].
+     * Converts the current value to a `Map<String, V>` type using Jackson ObjectMapper.
      *
-     * @return a [Result] containing the deserialized map.
-     * @since 3.9.0
+     * This function attempts to deserialize the provided value into a map where the keys are strings
+     * and the values are of type `V`. It uses Jackson's `ObjectMapper` for the deserialization process
+     * and captures any exceptions that may occur during this operation.
+     *
+     * @param V The type of the values in the resulting map.
+     * @return A result type indicating either a successful `Map<String, V>` conversion
+     *         or a deserialization error. The possible errors include:
+     *         - [DeserializationError.ReadError] for issues during stream reading.
+     *         - [DeserializationError.MappingError] for issues during data mapping.
+     *         - [DeserializationError] for general Jackson-related exceptions.
+     * @since 6.1.0
      */
-    inline fun <reified V> toMap(): Result<Map<String, V>> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V>
+    inline fun <reified V> toMap() = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V> }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<Map<String, V>>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<Map<String, V>>(), e)
+            is JacksonException -> DeserializationError(typeOf<Map<String, V>>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Converts the current collection to a non-empty map, ensuring that the resulting map is not empty.
+     * Converts the current structure into a non-empty map of type [Map<String, V>].
+     * If the conversion is successful, it returns a `Right` containing the map.
+     * If any exception is thrown during conversion or the resulting map is empty, it returns a `Left` with an appropriate error.
      *
-     * This method attempts to transform the elements of the collection into a map of the specified type [V],
-     * and wraps the result in a `Result` object to handle potential errors during the mapping process.
+     * Uses `toMap<V>()` for the conversion and ensures the resulting map is non-empty by wrapping it in an `Either` structure
+     * with error handling for possible exceptions or empty results.
      *
-     * @return A `Result` containing the resulting non-empty map if the transformation succeeds, or an error if the operation fails.
-     * @since 5.2.1
+     * @return An `Either` where the right value is a non-empty map and the left value represents an error.
+     * @since 6.1.0
      */
-    inline fun <reified V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
+    inline fun <reified V> toNonEmptyMap() =
+        toMap<V>() as Either<Error, Map<String, V>> thenEither { catching({ it.toNonEmptyMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
-     * Converts the XML content into a mutable map with string keys and values of type [V].
+     * Converts the current value into a DataMap representation. This method utilizes the Jackson ObjectMapper
+     * for deserialization and wraps the result in an Either type to handle potential errors.
      *
-     * @return a [Result] containing the mutable map.
-     * @since 3.9.0
+     * @return Either a successfully deserialized [DataMap] or a [DeserializationError] in case of a failure.
+     * @since 6.1.0
      */
-    inline fun <reified V> toMMap(): Result<MMap<String, V>> = runCatching { toMap<V>().getOrThrow().toMMap() }
-    /**
-     * Converts the current instance to a `Result` containing a `NonEmptyMMap` with `String` keys and values of type `V`.
-     * This method ensures that the resulting map is non-empty.
-     *
-     * @return A `Result` wrapping a `NonEmptyMMap` if the conversion is successful, or an error if the conversion fails.
-     * @since 5.2.1
-     */
-    inline fun <reified V> toNonEmptyMMap(): Result<NonEmptyMMap<String, V>> = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
-
-    /**
-     * Converts the XML content into a [DataMap].
-     *
-     * @return a [Result] containing the [DataMap].
-     * @since 3.9.0
-     */
-    fun toDataMap(): Result<DataMap> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap
+    fun toDataMap(): Either<DeserializationError, DataMap> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMap>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMap>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMap>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Transforms the current object into a [Result] containing a [NonEmptyDataMap].
-     * This is achieved by first converting the object to a data map and then attempting
-     * to convert that data map into a non-empty variant.
+     * Converts the current instance to a [NonEmptyDataMap] wrapped in an [Either].
      *
-     * @return A [Result] wrapping a [NonEmptyDataMap] if the transformation is successful,
-     * or an error result if the operation fails.
-     * @since 5.2.1
+     * This method attempts to transform the existing DataMap into a [NonEmptyDataMap].
+     * If the conversion fails or the resulting map is empty, an [Error] is returned.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return [Either] an [Error] if the conversion fails or the result is empty,
+     *         or a successfully created [NonEmptyDataMap] instance.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
-
+    fun toNonEmptyDataMap(): Either<Error, NonEmptyDataMap> =
+        toDataMap() as Either<Error, DataMap> thenEither { catching({ it.toNonEmptyMap() }) { _: Exception -> IterableError.Empty } }
     /**
-     * Converts the XML content into a [DataMMap].
+     * Converts the current value into a `DataMapNN` instance, handling potential deserialization errors.
      *
-     * @return a [Result] containing the [DataMMap].
-     * @since 3.9.0
+     * This method attempts to deserialize the value into a `DataMapNN` object using a pre-configured
+     * Jackson object mapper. If the deserialization succeeds, it returns the resulting `DataMapNN`
+     * instance wrapped in an `Either.Right`. If deserialization fails, an appropriate `DeserializationError`
+     * is returned wrapped in an `Either.Left`.
+     *
+     * @return `Either.Left` containing a `DeserializationError` if deserialization fails, or
+     *         `Either.Right` containing a `DataMapNN` instance if deserialization is successful.
+     * @since 6.1.0
      */
-    fun toDataMMap(): Result<DataMMap> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap
+    fun toDataMapNN(): Either<DeserializationError, DataMapNN> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMapNN>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMapNN>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMapNN>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Converts the current object to a `Result` containing a `DataMMap` instance
-     * with a non-empty state by transforming the result of `toDataMMap` and applying
-     * `toNonEmptyMMap` on its mapped content.
+     * Converts the current object into a `NonEmptyDataMapNN` wrapped in an `Either` type.
+     * The method ensures that the resulting map is non-empty, and returns an appropriate error if this condition is not met.
      *
-     * @return A `Result` wrapping the non-empty `DataMMap` if the transformation is successful,
-     *         or a failure result if an error occurs during the process.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return An instance of `Either` holding either an `Error` or a non-empty `NonEmptyDataMapNN`.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMMap(): Result<DataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMapNN(): Either<Error, NonEmptyDataMapNN> =
+        toDataMapNN() as Either<Error, DataMapNN> thenEither { catching({ it.toNonEmptyMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
-     * Converts the XML content into a [DataMapNN].
+     * Converts the current map structure into a mutable map of type `Map<String, V>`.
+     * The function is inline and reified, preserving the type `V` at runtime.
+     * This transformation allows for further operations on the map in a mutable context.
      *
-     * @return a [Result] containing the [DataMapNN].
-     * @since 3.9.0
+     * @param V The type of the values in the resulting map.
+     * @return A mutable map transformed into the desired structure.
+     * @since 6.1.0
      */
-    fun toDataMapNN(): Result<DataMapNN> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN
-    }
+    inline fun <reified V> toMMap() = toMap<V>().map(Map<String, V>::toMMap)
     /**
-     * Converts the current object to a Result containing a non-empty DataMapNN.
+     * Converts the current structure into a `NonEmptyMMap<String, V>`, wrapped in an `Either` type for error handling.
      *
-     * The method invokes the `toDataMapNN` function and attempts to transform the resulting
-     * DataMapNN into a non-empty map using `toNonEmptyMap`. If the transformation succeeds,
-     * the resulting non-empty DataMapNN is encapsulated within a Result. Otherwise, the failure
-     * is propagated through the Result.
+     * This method attempts to transform the current structure into a non-empty multimap.
+     * If the structure is empty or an error occurs during transformation, it returns an `Error` encapsulated in the `Either` type.
      *
-     * @return A Result wrapping a non-empty DataMapNN if the transformation succeeds, or a failure if the operation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return An `Either` containing either an `Error` in case of failure or a successfully created `NonEmptyMMap<String, V>`.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMapNN(): Result<DataMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMap() }
+    inline fun <reified V> toNonEmptyMMap(): Either<Error, NonEmptyMMap<String, V>> =
+        toMMap<V>() as Either<Error, MMap<String, V>> thenEither { catching({ it.toNonEmptyMMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
-     * Converts the XML content into a [DataMMapNN].
+     * Converts a given value to a `DataMMap` instance by attempting to deserialize it
+     * using the predefined object mapper. In case of a failure during deserialization,
+     * an appropriate `DeserializationError` is returned.
      *
-     * @return a [Result] containing the [DataMMapNN].
-     * @since 3.9.0
+     * @return An `Either` instance containing `DataMMap` on successful deserialization
+     * or `DeserializationError` on failure.
+     * @since 6.1.0
      */
-    fun toDataMMapNN(): Result<DataMMapNN> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN
+    fun toDataMMap(): Either<DeserializationError, DataMMap> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMMap>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMMap>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMMap>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Transforms the current object into a `NonEmptyDataMMapNN` wrapped in a `Result`.
+     * Converts the current instance into a `NonEmptyDataMMap`.
+     * This method attempts to transform the data structure, ensuring it is non-empty.
+     * If the transformation is unsuccessful, an error is returned.
      *
-     * This method attempts to convert the current data structure into a `DataMMapNN`,
-     * then further ensures that the resulting map is non-empty.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
      *
-     * @return A `Result` containing a `NonEmptyDataMMapNN` if the transformation succeeds,
-     *         or an exception if any step of the transformation fails.
-     * @since 5.2.1
+     * @return An `Either` containing an `Error` if the conversion fails, or a `NonEmptyDataMMap` if it succeeds.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMMap(): Either<Error, NonEmptyDataMMap> =
+        toDataMMap() as Either<Error, DataMMap> thenEither { catching({ it.toNonEmptyMMap() }) { _: Exception -> IterableError.Empty } }
+    /**
+     * Converts the current object into a `DataMMapNN` instance.
+     *
+     * This method attempts to deserialize the current object into a `DataMMapNN` type
+     * using the Jackson library. If the deserialization process encounters an error,
+     * the method will return a `DeserializationError` indicating the specific issue.
+     *
+     * @return An `Either` containing either a successfully deserialized `DataMMapNN` instance
+     * or a `DeserializationError` describing the failure encountered during the deserialization process.
+     * @since 6.1.0
+     */
+    fun toDataMMapNN(): Either<DeserializationError, DataMMapNN> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMMapNN>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMMapNN>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMMapNN>(), e)
+            else -> throw e
+        } }
+    }
+    /**
+     * Converts the current object into a `NonEmptyDataMMapNN` wrapped in an `Either` type.
+     * This method attempts to transform the object into a `DataMMapNN`, then ensures
+     * that the resulting map is non-empty.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return An `Either` containing an `Error` in case of failure, or a `NonEmptyDataMMapNN` upon successful transformation.
+     * @since 6.1.0
+     */
+    fun toNonEmptyDataMMapNN(): Either<Error, NonEmptyDataMMapNN> =
+        toDataMMapNN() as Either<Error, DataMMapNN> thenEither { catching({ it.toNonEmptyMMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
      * Converts the provided value into a JSON object, optionally replacing specific placeholders in the output.
@@ -1059,28 +1284,11 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
     }
 
     /**
-     * Checks if the XML root has no child elements and no text content.
+     * Operator form of [isEmpty].
      *
      * @since 3.9.0
      */
-    fun isEmptyXml(): Boolean {
-        val root = toDocument().documentElement
-        return root.childrenAsList().isEmpty() && root.textContent.isNullOrBlank()
-    }
-
-    /**
-     * Negates [isEmptyXml].
-     *
-     * @since 3.9.0
-     */
-    fun isNotEmpty(): Boolean = !isEmptyXml()
-
-    /**
-     * Operator form of [isEmptyXml].
-     *
-     * @since 3.9.0
-     */
-    operator fun not(): Boolean = isEmptyXml()
+    operator fun not(): Boolean = isEmpty
 
     // --- PATCH OPERATIONS ---
 
@@ -1089,92 +1297,130 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * The patch is expressed as [Json] since there is no standard XML merge-patch spec.
      *
      * @param patch the JSON merge patch to apply.
-     * @return a [Result] containing the patched [Xml].
-     * @since 3.9.0
+     * @return the patched [Xml].
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Json): Result<Xml> = runCatching {
-        val root = rootName
-        toJson().mergePatch(patch).toXml(root)
-    }
+    infix fun mergePatch(patch: Json): Xml = toJson().mergePatch(patch).toXml(rootName)
 
     /**
      * Applies a JSON Merge Patch to this XML, using another [Xml] as patch.
      *
-     * @since 3.9.0
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Xml): Result<Xml> = mergePatch(patch.toJson())
+    infix fun mergePatch(patch: Xml): Xml = mergePatch(patch.toJson())
 
     /**
      * Applies a JSON Merge Patch to this XML, using a [Yaml] as patch.
      *
-     * @since 3.9.0
+     * @since 6.1.0
      */
     @OptIn(Beta::class)
-    infix fun mergePatch(patch: Yaml): Result<Xml> = mergePatch(patch.toJson())
+    infix fun mergePatch(patch: Yaml): Xml = mergePatch(patch.toJson())
 
     /**
      * Applies a JSON Patch (RFC 6902) to this XML and returns the result.
      *
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
      * @param patch the JSON patch to apply.
-     * @return a [Result] containing the patched [Xml].
-     * @since 3.9.0
+     * @since 6.1.0
      */
-    infix fun xmlPatch(patch: Json): Result<Xml> = runCatching {
-        val root = rootName
-        toJson().jsonPatch(patch).getOrThrow().toXml(root)
-    }
+    infix fun xmlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toXml(rootName) }
 
     /**
      * Applies a JSON Patch (RFC 6902) using another [Xml] as patch.
      *
-     * @since 3.9.0
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
+     * @since 6.1.0
      */
-    infix fun xmlPatch(patch: Xml): Result<Xml> = xmlPatch(patch.toJson())
+    infix fun xmlPatch(patch: Xml) = xmlPatch(patch.toJson())
 
     /**
      * Applies a JSON Patch (RFC 6902) using a [Yaml] as patch.
      *
-     * @since 3.9.0
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
+     * @since 6.1.0
      */
     @OptIn(Beta::class)
-    infix fun xmlPatch(patch: Yaml): Result<Xml> = xmlPatch(patch.toJson())
+    infix fun xmlPatch(patch: Yaml) = xmlPatch(patch.toJson())
 
     // --- XSLT ---
 
     /**
-     * Applies an XSLT transformation to this XML, returning the transformed document as a string.
+     * Transforms the given XML using the specified XSLT configuration.
      *
-     * @param xslt The XSLT stylesheet as an [Xml] document.
-     * @return a [Result] containing the transformed output as a string.
-     * @since 3.9.0
+     * Possible erros:
+     * - [XmlError.InvalidXsltConfig] - if the XSLT configuration is invalid.
+     * - [XmlError.XsltTransfomationFailed] - if the transformation fails.
+     *
+     * @param xslt The XSLT configuration used for transformation.
+     * @return Either an XmlError representing a failure during transformation, or the transformed XML string.
+     * @since 6.1.0
      */
-    infix fun transform(xslt: Xml): Result<String> = runCatching {
-        val transformer = TRANSFORMER_FACTORY.newTransformer(StreamSource(StringReader(xslt.value)))
+    infix fun transform(xslt: Xml): Either<XmlError, String> = either {
+        val transformer = catching({
+            TRANSFORMER_FACTORY.newTransformer(StreamSource(StringReader(xslt.value)))
+        }) { e: Exception -> XmlError.InvalidXsltConfig(e) }
         val writer = StringWriter()
-        transformer.transform(StreamSource(StringReader(value)), StreamResult(writer))
+        catching({
+            transformer.transform(StreamSource(StringReader(value)), StreamResult(writer))
+        }) { e: Exception -> XmlError.XsltTransfomationFailed(e) }
         writer.toString()
     }
 
     /**
-     * Applies an XSLT transformation to this XML, expecting XML output.
+     * Transforms the given XML using the specified XSLT configuration.
      *
-     * @param xslt The XSLT stylesheet as an [Xml] document.
-     * @return a [Result] containing the transformed [Xml].
-     * @since 3.9.0
+     * Possible erros:
+     * - [XmlError.InvalidXsltConfig] - if the XSLT configuration is invalid.
+     * - [XmlError.XsltTransfomationFailed] - if the transformation fails.
+     * - [InvalidFormatOfType] - if produced an invalid XML.
+     *
+     * @param xslt The XSLT configuration used for transformation.
+     * @return Either an XmlError representing a failure during transformation, or the transformed XML string.
+     * @since 6.1.0
      */
-    infix fun transformToXml(xslt: Xml): Result<Xml> = runCatching { Xml(transform(xslt).getOrThrow()) }
+    @Suppress("UNCHECKED_CAST")
+    infix fun transformToXml(xslt: Xml) = transform(xslt) as Either<Error, String> thenMergeWith { it.toXml() }
 
     // --- XSD VALIDATION ---
 
     /**
-     * Validates this XML against the provided XSD schema.
+     * Validates the XML instance using the provided XML Schema Definition (XSD).
      *
-     * @param xsd The XSD schema as an [Xml] document.
-     * @return a [Result] containing this [Xml] if validation succeeds, or a failure with the
-     *         validation errors otherwise.
-     * @since 3.9.0
+     * This method uses the W3C XML Schema (XSD) to validate the structure and content
+     * of the current XML object. If validation fails, it returns an appropriate error
+     * wrapped in an Either type.
+     *
+     * Possible errors:
+     * - [XmlError.SchemaValidationFailed] - if the validation fails.
+     * - [InvalidFormatOfType] - if produced an invalid XML.
+     * - [GenericError] - if an unexpected error occurs.
+     *
+     * @param xsd The XSD used to validate the current XML object.
+     * @since 6.1.0
      */
-    infix fun validateWithSchema(xsd: Xml): Result<Xml> = runCatching {
+    infix fun validateWithSchema(xsd: Xml) = either {
         val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).apply {
             try {
                 setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, String.EMPTY)
@@ -1183,12 +1429,12 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
         }
         val schema = factory.newSchema(StreamSource(StringReader(xsd.value)))
         val validator = schema.newValidator()
-        try {
-            validator.validate(StreamSource(StringReader(value)))
-            this
-        } catch (e: Exception) {
-            throw XmlSchemaValidationException(e.message.orEmpty(), e)
-        }
+        catching({ validator.validate(StreamSource(StringReader(value))) }) { e: Exception -> when (e) {
+            is IllegalArgumentException -> XmlError.SchemaValidationFailed(e.message)
+            is SAXException -> InvalidFormatOfType(xsd, typeOf<Xml>(), e.message)
+            else -> GenericError
+        } }
+        this@Xml
     }
 }
 

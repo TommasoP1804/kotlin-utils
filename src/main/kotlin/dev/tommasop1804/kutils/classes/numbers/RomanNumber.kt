@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -22,6 +25,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.io.Serial
 import java.io.Serializable
 import java.util.*
+import kotlin.reflect.typeOf
 
 /**
  * Represents a Roman numeral with its corresponding numeric components.
@@ -224,11 +228,14 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
      * @param number The number to initialize the class with. Must be greater than zero.
      *
      * @throws ValidationFailedException if the provided number is not greater than zero.
+     * @throws NumberSignException if the provided number is NaN.
      *
      * @since 1.0.0
      */
     constructor(number: Number) : this(one = number.toLong(), 0, 0, 0, 0, 0, 0) {
         validate(number.toInt() > 0) { "Roman number cannot be negative or zero: $number" }
+        if (number is Double && number.isNaN())
+            throw NumberSignException("Roman number cannot be NaN: $number")
     }
     /**
      * Constructs a Roman number representation by taking an unsigned byte as input.
@@ -717,48 +724,53 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
         fun CharSequence.isValidRomanNumber(value: String) = runCatching(::RomanNumber).isSuccess
 
         /**
-         * Converts a number to its Roman numeral representation.
-         * The number is converted to [Long], so in case of decimal digits, the fractional part is truncated.
+         * Converts the given number to its Roman numeral representation.
          *
-         * @since 1.0.0
+         * @return Either an instance of [NumberError.InvalidSign] if the number has an invalid sign,
+         *         or a [RomanNumber] representing the value in Roman numeral format.
+         * @since 6.1.0
          */
-        fun Number.toRomanNumber() = RomanNumber(toLong())
-
-        /**
-         * Converts the given [CharSequence] to its equivalent Roman numeral representation.
+        fun Number.toRomanNumber(): Either<NumberError.InvalidSign, RomanNumber> = either {
+            catching({ RomanNumber(this@toRomanNumber) }) { t: Throwable ->
+                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+            }
+        }
+        /***
+         * Parses the given string value and interprets it as a Roman numeral.
+         * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidFormatOfType]
+         * if an error occurs, such as an invalid input format.
          *
-         * The method processes the [CharSequence] to parse and return its Roman numeral format.
-         * It assumes the input [CharSequence] represents a valid numeric value suitable
-         * for conversion.
-         *
-         * @receiver CharSequence A sequence of characters representing the input value to be converted.
-         * @return String The Roman numeral representation of the input.
-         *
-         * @throws IllegalArgumentException If the input is not a valid numeric value or cannot
-         *         be converted to a Roman numeral.
-         * @since 1.0.0
+         * @receiver the string representing the value to be parsed. It can be either
+         * a numeric string or a valid Roman numeral.
+         * @return an [Either] instance containing [RomanNumber] on success or [InvalidFormatOfType]
+         * on failure.
+         * @since 6.1.0
          */
         fun CharSequence.toRomanNumber() = parse(toString())
 
         /**
-         * Converts a Roman numeral string to its integer equivalent.
-         * Handles validation and supports both uppercase and trimmed input.
-         * If the parsing operation fails, an exception will be wrapped in a [Result].
+         * Parses the given string value and interprets it as a Roman numeral.
+         * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidFormatOfType]
+         * if an error occurs, such as an invalid input format.
          *
-         * @param value The Roman numeral string to be parsed. It is expected to be in a valid Roman numeral format.
-         * @return [Result] which contains an integer equivalent of the Roman numeral if successful, or an exception if the parsing fails.
-         * @since 1.0.0
+         * @param value the string representing the value to be parsed. It can be either
+         * a numeric string or a valid Roman numeral.
+         * @return an [Either] instance containing [RomanNumber] on success or [InvalidFormatOfType]
+         * on failure.
+         * @since 6.1.0
          */
-        private infix fun parse(value: String) = runCatching {
+        private infix fun parse(value: String): Either<InvalidFormatOfType, RomanNumber> = either {
             val number = tryOrNull { RomanNumber(value.toLong()) }
-            if (number != null) return@runCatching number
+            if (number != null) return@either number
 
             val roman: String = +value.trim()
             var result = 0
             var prevValue = 0
 
             for (i in roman.length - 1 downTo 0) {
-                val value = romanCharToValue(roman[i])
+                val value = romanCharToValue(roman[i]).orRaise {
+                    InvalidFormatOfType(value, typeOf<RomanNumber>(), "Invalid roman char: ${roman[i]}")
+                }
                 if (value < prevValue) result -= value
                 else result += value
                 prevValue = value
@@ -767,15 +779,15 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
         }
 
         /**
-         * Converts a Roman numeral character into its corresponding integer value.
+         * Converts a Roman numeral character to its integer value.
          *
-         * @param char The Roman numeral character to be converted.
-         * It can be either modern Roman numerals (e.g., 'I', 'V', 'X') or Unicode Roman numeral representations.
-         * @return The integer value corresponding to the provided Roman numeral character.
-         * @throws IllegalArgumentException If the provided character is not a valid Roman numeral.
-         * @since 1.0.0
+         * @param char The Roman numeral character to be converted. Accepted characters include standard
+         * Roman numerals (I, V, X, L, C, D, M) and their uncommon or alternative representations.
+         * @return The integer value corresponding to the Roman numeral character, or null if the character
+         * is not a valid Roman numeral.
+         * @since 6.1.0
          */
-        infix fun romanCharToValue(char: Char): Int {
+        infix fun romanCharToValue(char: Char): Int? {
             return when (char) {
                 'I', 'Ⅰ', 'ⅰ', 'i' -> 1
                 'V', 'Ⅴ', 'ⅴ', 'v' -> 5
@@ -788,7 +800,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
                 'ↂ' -> 10000
                 'ↇ' -> 50000
                 'ↈ' -> 100000
-                else -> throw IllegalArgumentException("Invalid Roman character: $char")
+                else -> null
             }
         }
 

@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geography.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -20,6 +22,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * A value class representing a BIC (Bank Identifier Code), also known as SWIFT code.
@@ -157,16 +160,20 @@ value class Bic private constructor(val value: String) : CharSequence {
         fun CharSequence.isValidBic() = runCatching { Bic(this) }.isSuccess
 
         /**
-         * Attempts to convert the current `CharSequence` into a `BIC` instance.
-         * If the conversion succeeds, the resulting `BIC` object is wrapped in a `Result`.
-         * If the conversion fails (e.g., the input does not conform to the expected BIC format),
-         * the resulting `Result` will contain the exception that was thrown.
+         * Converts a [CharSequence] to a [Bic] instance if the input is properly formatted.
          *
-         * @receiver The `CharSequence` to be converted into a `BIC`.
-         * @return A `Result` containing the successfully created `BIC` instance or a failure wrapping the exception.
-         * @since 3.0.0
+         * If the input does not conform to the expected format for a BIC (Bank Identifier Code),
+         * an [InvalidFormatOfType] error is returned encapsulating the invalid input, the expected type, and the exception.
+         *
+         * @return An [Either] instance that contains a [Bic] object if the conversion is successful,
+         * or an [InvalidFormatOfType] object if the conversion fails.
+         * @since 6.1.0
          */
-        fun CharSequence.toBic() = runCatching { Bic(this) }
+        fun CharSequence.toBic(): Either<InvalidFormatOfType, Bic> = either {
+            catching({ Bic(this@toBic) }) { t: Throwable ->
+                InvalidFormatOfType(this@toBic, typeOf<Bic>(), t)
+            }
+        }
 
         class Serializer : ValueSerializer<Bic>() {
             override fun serialize(value: Bic, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

@@ -10,8 +10,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.money.Pan.Companion.normalize
 import dev.tommasop1804.kutils.classes.money.PaymentMethod.Card.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -21,6 +23,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents a Payment Account Number (PAN) value class.
@@ -53,7 +56,7 @@ value class Pan private constructor(val value: String) : CharSequence {
      * @return A string consisting exclusively of digits extracted from the original `value`.
      * @since 3.1.0
      */
-    val normalized: String get() = normalize(value)
+    val normalized: String get() = normalize(value)()
     /**
      * The control digit derived from the normalized representation of the PAN (Primary Account Number).
      *
@@ -66,7 +69,7 @@ value class Pan private constructor(val value: String) : CharSequence {
      * @throws IllegalArgumentException if the normalized PAN is invalid or empty.
      * @since 3.1.0
      */
-    val controlDigit: Int get() = computeControlDigit(normalized)
+    val controlDigit: Int get() = computeControlDigit(normalized - 1)()
     /**
      * Represents the issuer entity associated with the current context.
      * This value is derived dynamically using the `Issuer.from(this)` method.
@@ -84,7 +87,7 @@ value class Pan private constructor(val value: String) : CharSequence {
      * @return The number of numeric digits present in the normalized PAN value.
      * @since 3.1.0
      */
-    override val length: Int get() = normalize(value).length
+    override val length: Int get() = normalize(value)().length
 
     /**
      * Secondary constructor for the `Pan` class that initializes the value
@@ -102,7 +105,7 @@ value class Pan private constructor(val value: String) : CharSequence {
      * @since 3.1.0
      */
     constructor(value: CharSequence) : this(compute {
-        val normalized = normalize(value.toString())
+        val normalized = normalize(value.toString())()
         (normalized % 4).joinToString(Char.SPACE)
     })
 
@@ -112,20 +115,18 @@ value class Pan private constructor(val value: String) : CharSequence {
 
     companion object {
         /**
-         * Attempts to convert the current `CharSequence` into a `Pan` instance.
+         * Converts the current [CharSequence] to a [Pan] object.
+         * This method attempts to parse the character sequence as a [Pan], handling any exceptions
+         * that may arise during the conversion process and returning an appropriate [InvalidFormatOfType] in case of failure.
          *
-         * This method wraps the creation of a `Pan` object in a `runCatching` block,
-         * allowing for safe handling of potential exceptions that may occur during
-         * the normalization or validation of the input sequence. If the input is
-         * successfully converted into a valid `Pan`, the resulting object is
-         * encapsulated in a `Result`. Otherwise, an exception is captured in the
-         * `Result`.
-         *
-         * @receiver The `CharSequence` to be normalized and converted into a `Pan`.
-         * @return A `Result` containing either the successfully created `Pan` instance or an exception in case of failure.
-         * @since 3.1.0
+         * @return an [Either] containing a [Pan] if parsing is successful, or an [InvalidFormatOfType] if the format is invalid.
+         * @since 6.1.0
          */
-        fun CharSequence.toPan() = runCatching { Pan(this) }
+        fun CharSequence.toPan(): Either<InvalidFormatOfType, Pan> = either {
+            catching({ Pan(this@toPan) }) { t: Throwable ->
+                InvalidFormatOfType(this@toPan, typeOf<Pan>(), t)
+            }
+        }
 
         /**
          * Validates if the given character sequence is a valid PAN (Primary Account Number) 
@@ -140,45 +141,46 @@ value class Pan private constructor(val value: String) : CharSequence {
          * @since 3.1.0
          */
         fun CharSequence.isValidPan(): Boolean {
-            val digits = normalize(toString())
-            if (digits.length < 2) return false
-            return luhnSum(digits) % 10 == 0
+            val digits = normalize(toString()).onLeft { return false }()
+            return digits.length >= 2 && luhnSum(digits) % 10 == 0
         }
 
         /**
-         * Normalizes the given input string by removing all whitespace and dash characters.
-         * Ensures that the resulting string contains only numeric digits. Throws a 
-         * `MalformedInputException` if the validation fails.
+         * Normalizes the input string by removing spaces and dashes and ensuring that the resulting string
+         * contains only digits. If the input violates the format requirements, an error is returned.
          *
-         * @param input The input string to be normalized. It may contain numeric digits, spaces, and dashes.
-         * @return A string containing only numeric digits derived from the given input.
-         * @throws MalformedInputException If the input contains any non-numeric characters other than spaces or dashes.
-         * @since 3.1.0
+         * @param input the raw input string to be normalized.
+         * @return either a valid normalized string if the input conforms to the specified format,
+         *         or an error of type [InvalidFormatOfType] if the input contains invalid characters.
+         * @since 6.1.0
          */
-        private fun normalize(input: String): String {
+        private fun normalize(input: String): Either<InvalidFormatOfType, String> = either {
             val cleaned = input.replace("[\\s-]".toRegex(), "")
-            return if (cleaned.all { it.isDigit() }) cleaned else throw MalformedInputException("Input must contain only digits, spaces, or dashes")
+            if (cleaned.all { it.isDigit() }) cleaned else raise(
+                InvalidFormatOfType(input, typeOf<Pan>(), "Input must contain only digits, spaces, or dashes")
+            )
         }
 
         /**
-         * Computes the control digit for a given numeric string using the Luhn algorithm.
+         * Computes the control digit for a given number using the Luhn algorithm.
          *
-         * This function takes a numeric string without a check digit, normalizes it, and calculates the 
-         * control digit required to make the entire number valid according to the Luhn algorithm. 
-         * The control digit is appended at the end of the number to validate its integrity.
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the input contains invalid characters.
+         * - [InvalidFormat] - if the digits are empty.
          *
-         * @param numberWithoutCheck A numeric string without the check digit. It must contain only digits, 
-         * spaces, or dashes, which will be normalized before processing.
-         * @return The calculated control digit as an integer. This digit ensures the provided number 
-         * conforms to the Luhn checksum formula.
-         * @throws IllegalArgumentException If the input string is empty or invalid after normalization.
-         * @since 3.1.0
+         * @param numberWithoutCheck the input number as a string, which does not include the control digit.
+         *                           Must be a valid sequence of numeric characters.
+         * @return either the computed control digit as an integer or an [InvalidFormat] instance if the
+         *         input is invalid or improperly formatted.
+         * @since 6.1.0
          */
-        fun computeControlDigit(numberWithoutCheck: String): Int {
-            val digits = normalize(numberWithoutCheck)
-            require(digits.isNotEmpty()) { "Input must not be empty" }
+        fun computeControlDigit(numberWithoutCheck: String): Either<InvalidFormat, Int> = either {
+            val digits = normalize(numberWithoutCheck).bind()
+            ensure(digits.isNotEmpty()) {
+                InvalidFormat(digits, "Truncated Pan", "Input must not be empty")
+            }
             val sum = luhnSum("${digits}0")
-            return (10 - (sum % 10)) % 10
+            (10 - (sum % 10)) % 10
         }
 
         /**

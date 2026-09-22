@@ -11,7 +11,7 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
-import dev.tommasop1804.kutils.classes.base.*
+import dev.tommasop1804.kutils.classes.constants.NumberSign
 import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.range.*
@@ -27,7 +27,8 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.math.*
 import kotlin.math.pow
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * A lambda function that when invoked returns the integer value `0`.
@@ -156,6 +157,19 @@ val MINUS_ONE_B: Supplier<Byte> = { -1 }
  * @since 5.4.0
  */
 const val INDEX_NOT_FOUND = -1
+
+/**
+ * Retrieves the `NumberSign` representation of the current number.
+ *
+ * This property provides a convenient way to determine whether the number
+ * is positive, negative, or zero by mapping it to its corresponding `NumberSign` value.
+ *
+ * @return `NumberSign.Positive` if the number is positive,
+ *         `NumberSign.Negative` if it is negative,
+ *         or `NumberSign.Zero` if it is neither.
+ * @since 6.1.0
+ */
+val Number.sign get() = NumberSign from this
 
 /**
  * Indicates whether the current number is not a decimal (i.e., it represents a whole number),
@@ -1209,17 +1223,17 @@ private const val TWO_POW_63 = Long.MAX_VALUE.toDouble()
 @PublishedApi
 internal inline fun <reified N : Number, T : Any> N.narrow(
     range: LongRange,
-    target: KClass<*>,
+    target: KType,
     build: (Long) -> T,
-): Either<InvalidConversion, T> =
+): Either<InvalidConversionBetweenTypes, T> =
     exactLongOrNull()
         ?.takeIf { it in range }
         ?.let(build)
-        .rightIfNotNull { InvalidConversion(this, N::class, target) }
+        .rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), target, reason = "Number out of valid range for type ${target.simpleName}") }
 
 @PublishedApi
-internal fun <T : Any> String.parseOrError(target: KClass<*>, parse: (String) -> T): Either<InvalidFormat, T> =
-    either { catching({ parse(this@parseOrError) }) { _: NumberFormatException -> raise(InvalidFormat(this@parseOrError, target)) } }
+internal fun <T : Any> String.parseOrError(target: KType, parse: (String) -> T): Either<InvalidFormatOfType, T> =
+    either { catching({ parse(this@parseOrError) }) { _: NumberFormatException -> raise(InvalidFormatOfType(this@parseOrError, target)) } }
 
 /**
  * Converts the current number to a `Byte` if it falls within the valid range for a `Byte`
@@ -1235,7 +1249,7 @@ internal fun <T : Any> String.parseOrError(target: KClass<*>, parse: (String) ->
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toByteOrError() =
-    narrow(Byte.MIN_VALUE.toLong()..Byte.MAX_VALUE.toLong(), Byte::class, Long::toByte)
+    narrow(Byte.MIN_VALUE.toLong()..Byte.MAX_VALUE.toLong(), typeOf<Byte>(), Long::toByte)
 
 /**
  * Converts a number of type [N] to a [Short], verifying if the number falls within
@@ -1254,7 +1268,7 @@ inline fun <reified N : Number> N.toByteOrError() =
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toShortOrError() =
-    narrow(Short.MIN_VALUE.toLong()..Short.MAX_VALUE.toLong(), Short::class, Long::toShort)
+    narrow(Short.MIN_VALUE.toLong()..Short.MAX_VALUE.toLong(), typeOf<Short>(), Long::toShort)
 
 /**
  * Attempts to convert the current number to an `Int`.
@@ -1275,7 +1289,7 @@ inline fun <reified N : Number> N.toShortOrError() =
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toIntOrError() =
-    narrow(Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong(), Int::class, Long::toInt)
+    narrow(Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong(), typeOf<Int>(), Long::toInt)
 
 /**
  * Attempts to convert the current number instance of type `N` into a `Long`.
@@ -1288,12 +1302,12 @@ inline fun <reified N : Number> N.toIntOrError() =
  *         a `NumberConversionError` on failure.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toLongOrError(): Either<InvalidConversion, Long> =
-    exactLongOrNull().rightIfNotNull { InvalidConversion(this, N::class, Long::class) }
+inline fun <reified N : Number> N.toLongOrError(): Either<InvalidConversionBetweenTypes, Long> =
+    exactLongOrNull().rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<Long>()) }
 
 /**
  * Converts the current [Number] to a [UByte] if it falls within the valid range for [UByte],
- * otherwise returns an error of type [InvalidConversion].
+ * otherwise returns an error of type [InvalidConversionBetweenTypes].
  *
  * This method utilizes the `narrow` utility function to perform the conversion. The conversion
  * process includes verifying that the numeric value can be safely represented as a [UByte],
@@ -1301,15 +1315,15 @@ inline fun <reified N : Number> N.toLongOrError(): Either<InvalidConversion, Lon
  *
  * @receiver The [Number] to be converted.
  * @return An instance of [Either], which will hold a [UByte] if the conversion is successful,
- * or a [InvalidConversion] if the value is out of range or cannot be converted.
+ * or a [InvalidConversionBetweenTypes] if the value is out of range or cannot be converted.
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toUByteOrError() =
-    narrow(0L..UByte.MAX_VALUE.toLong(), UByte::class, Long::toUByte)
+    narrow(0L..UByte.MAX_VALUE.toLong(), typeOf<UByte>(), Long::toUByte)
 
 /**
  * Converts this [Number] instance to an [UShort] if the value falls within the valid [UShort] range.
- * Throws a [InvalidConversion] if the conversion is not possible due to the number being out of range
+ * Throws a [InvalidConversionBetweenTypes] if the conversion is not possible due to the number being out of range
  * or any other incompatibility.
  *
  * This function leverages the `narrow` method to ensure the value is first cast to a `Long`, validated
@@ -1320,7 +1334,7 @@ inline fun <reified N : Number> N.toUByteOrError() =
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toUShortOrError() =
-    narrow(0L..UShort.MAX_VALUE.toLong(), UShort::class, Long::toUShort)
+    narrow(0L..UShort.MAX_VALUE.toLong(), typeOf<UShort>(), Long::toUShort)
 
 /**
  * Converts the current number of type [N] to an unsigned integer ([UInt]) if it falls within
@@ -1328,12 +1342,12 @@ inline fun <reified N : Number> N.toUShortOrError() =
  *
  * This method relies on the internal `narrow` function to handle the conversion process.
  * The conversion validates whether the number can be represented as a [UInt] and, if valid,
- * performs the transformation. Otherwise, an instance of [InvalidConversion] is returned
+ * performs the transformation. Otherwise, an instance of [InvalidConversionBetweenTypes] is returned
  * to indicate the failure.
  *
  * @receiver The number to be converted.
  * @return An [Either] containing the successfully converted [UInt] if the operation succeeds,
- *         or a [InvalidConversion] if the number is out of the valid [UInt] range
+ *         or a [InvalidConversionBetweenTypes] if the number is out of the valid [UInt] range
  *         or cannot be converted.
  *
  * @throws IllegalArgumentException if the input number falls outside the acceptable range
@@ -1342,10 +1356,10 @@ inline fun <reified N : Number> N.toUShortOrError() =
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toUIntOrError() =
-    narrow(0L..UInt.MAX_VALUE.toLong(), UInt::class, Long::toUInt)
+    narrow(0L..UInt.MAX_VALUE.toLong(), typeOf<UInt>(), Long::toUInt)
 
 /**
- * Converts a number of type [N] to a [ULong], or returns a [InvalidConversion] if the conversion is invalid.
+ * Converts a number of type [N] to a [ULong], or returns a [InvalidConversionBetweenTypes] if the conversion is invalid.
  * The conversion ensures the number is non-negative and within the range of an unsigned long integer.
  *
  * Supported input types include:
@@ -1353,16 +1367,16 @@ inline fun <reified N : Number> N.toUIntOrError() =
  * - [BigDecimal]: Conversion succeeds if it can be represented as an exact integer, is non-negative, and fits within [ULong.SIZE_BITS].
  * - Other [Number] types: Conversion succeeds if it can be exactly converted to a non-negative long integer.
  *
- * @return An [Either] containing either the successfully converted [ULong] value or a [InvalidConversion] if the conversion fails.
+ * @return An [Either] containing either the successfully converted [ULong] value or a [InvalidConversionBetweenTypes] if the conversion fails.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toULongOrError(): Either<InvalidConversion, ULong> =
+inline fun <reified N : Number> N.toULongOrError(): Either<InvalidConversionBetweenTypes, ULong> =
     when (this) {
         is BigInteger -> takeIf { signum() >= 0 && bitLength() <= ULong.SIZE_BITS }?.toLong()?.toULong() // wrap intenzionale
         is BigDecimal -> try { toBigIntegerExact() } catch (e: ArithmeticException) { null }
             ?.takeIf { it.signum() >= 0 && it.bitLength() <= ULong.SIZE_BITS }?.toLong()?.toULong()
         else -> exactLongOrNull()?.takeIf { it >= 0 }?.toULong()
-    }.rightIfNotNull { InvalidConversion(this, N::class, ULong::class) }
+    }.rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<ULong>()) }
 
 /**
  * Attempts to convert a number of type `N` to a `Float`. If the conversion is successful
@@ -1374,10 +1388,10 @@ inline fun <reified N : Number> N.toULongOrError(): Either<InvalidConversion, UL
  * a non-finite value.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toFloatOrError(): Either<InvalidConversion, Float> =
+inline fun <reified N : Number> N.toFloatOrError(): Either<InvalidConversionBetweenTypes, Float> =
     toFloat()
         .takeIf { it.isFinite() }
-        .rightIfNotNull { InvalidConversion(this, N::class, Float::class) }
+        .rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<Float>()) }
 
 /**
  * Converts the current number instance to a `Double` or returns an error if the conversion fails.
@@ -1391,16 +1405,16 @@ inline fun <reified N : Number> N.toFloatOrError(): Either<InvalidConversion, Fl
  * or `Left` with a `NumberConversionError` if the conversion fails.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toDoubleOrError(): Either<InvalidConversion, Double> =
+inline fun <reified N : Number> N.toDoubleOrError(): Either<InvalidConversionBetweenTypes, Double> =
     toDouble()
         .takeIf { it.isFinite() }
-        .rightIfNotNull { InvalidConversion(this, N::class, Double::class) }
+        .rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<Double>()) }
 
 /**
  * Attempts to convert a number of type [N] to a [BigInteger].
  *
  * If the conversion is successful, the resulting [BigInteger] is returned wrapped in an [Either.Right].
- * Otherwise, a [InvalidConversion] is returned wrapped in an [Either.Left].
+ * Otherwise, a [InvalidConversionBetweenTypes] is returned wrapped in an [Either.Left].
  *
  * The method performs the following type checks and transformations:
  * - If the number is already a [BigInteger], it is returned directly.
@@ -1409,21 +1423,21 @@ inline fun <reified N : Number> N.toDoubleOrError(): Either<InvalidConversion, D
  *   converting it to a [BigInteger] if it satisfies these conditions.
  * - For other numeric types, it tries to convert the number to a `Long` exactly and then to a [BigInteger].
  *
- * If none of the above conversions are possible, a [InvalidConversion] is created to indicate
+ * If none of the above conversions are possible, a [InvalidConversionBetweenTypes] is created to indicate
  * the failure, specifying the original number, its class type, and the target type ([BigInteger]).
  *
  * @return An [Either] containing the resulting [BigInteger] wrapped in [Either.Right]
- * if the conversion succeeds, or a [InvalidConversion] wrapped in [Either.Left] if it fails.
+ * if the conversion succeeds, or a [InvalidConversionBetweenTypes] wrapped in [Either.Left] if it fails.
  *
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toBigIntOrError(): Either<InvalidConversion, BigInteger> =
+inline fun <reified N : Number> N.toBigIntOrError(): Either<InvalidConversionBetweenTypes, BigInteger> =
     when (this) {
         is BigInteger -> this
         is BigDecimal -> try { toBigIntegerExact() } catch (e: ArithmeticException) { null }
         is Double, is Float -> toDouble().takeIf { it.isFinite() && it == truncate(it) }?.let { BigDecimal(it).toBigInteger() }
         else -> exactLongOrNull()?.let(BigInteger::valueOf)
-    }.rightIfNotNull { InvalidConversion(this, N::class, BigInteger::class) }
+    }.rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<BigInteger>()) }
 
 /**
  * Converts the current number instance into a `BigDecimal`, returning the result as an `Either`.
@@ -1443,37 +1457,37 @@ inline fun <reified N : Number> N.toBigIntOrError(): Either<InvalidConversion, B
  * - `Left` contains a `NumberConversionError` if the conversion fails.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toBigDecimalOrError(): Either<InvalidConversion, BigDecimal> =
+inline fun <reified N : Number> N.toBigDecimalOrError(): Either<InvalidConversionBetweenTypes, BigDecimal> =
     when (this) {
         is BigDecimal -> this
         is BigInteger -> BigDecimal(this)
         is Byte, is Short, is Int, is Long -> BigDecimal.valueOf(toLong())
         is Double, is Float -> toDouble().takeIf { it.isFinite() }?.let(BigDecimal::valueOf)
         else -> null
-    }.rightIfNotNull { InvalidConversion(this, N::class, BigDecimal::class) }
+    }.rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<BigDecimal>()) }
 
 /**
  * Attempts to parse the string as a [Byte] and returns the result wrapped in an [Either].
  *
  * If the string cannot be parsed into a [Byte] due to a [NumberFormatException],
- * an instance of [InvalidFormat] containing the original string and target type
+ * an instance of [InvalidFormatOfType] containing the original string and target type
  * will be returned in the [Either] as an error.
  *
- * @return [Either] containing the successfully parsed [Byte] or a [InvalidFormat].
+ * @return [Either] containing the successfully parsed [Byte] or a [InvalidFormatOfType].
  * @since 6.1.0
  */
-fun String.toByteOrError() = parseOrError(Byte::class, String::toByte)
+fun String.toByteOrError() = parseOrError(typeOf<Byte>(), String::toByte)
 /**
  * Parses the string as a [Short] or returns an error if the parsing fails.
  *
  * This function attempts to convert the string to a [Short].
- * If the string cannot be successfully parsed, a [InvalidFormat] is returned
+ * If the string cannot be successfully parsed, a [InvalidFormatOfType] is returned
  * encapsulating details of the failure.
  *
- * @return An [Either] containing a successfully parsed [Short] or a [InvalidFormat].
+ * @return An [Either] containing a successfully parsed [Short] or a [InvalidFormatOfType].
  * @since 6.1.0
  */
-fun String.toShortOrError() = parseOrError(Short::class, String::toShort)
+fun String.toShortOrError() = parseOrError(typeOf<Short>(), String::toShort)
 /**
  * Attempts to parse the string into an integer. Returns an `Either` result where the success case
  * contains the parsed integer value, and the failure case represents an instance of `NumberParsingError`.
@@ -1487,7 +1501,7 @@ fun String.toShortOrError() = parseOrError(Short::class, String::toShort)
  * in case of failure.
  * @since 6.1.0
  */
-fun String.toIntOrError() = parseOrError(Int::class, String::toInt)
+fun String.toIntOrError() = parseOrError(typeOf<Int>(), String::toInt)
 /**
  * Parses the current string into a Long or returns a `NumberParsingError` if the conversion fails.
  *
@@ -1499,7 +1513,7 @@ fun String.toIntOrError() = parseOrError(Int::class, String::toInt)
  * @return An `Either` containing the successfully parsed Long or a `NumberParsingError` if parsing fails.
  * @since 6.1.0
  */
-fun String.toLongOrError() = parseOrError(Long::class, String::toLong)
+fun String.toLongOrError() = parseOrError(typeOf<Long>(), String::toLong)
 
 /**
  * Converts the current string to a [UByte], or throws an exception if the conversion fails.
@@ -1510,7 +1524,7 @@ fun String.toLongOrError() = parseOrError(Long::class, String::toLong)
  * @return the [UByte] value represented by this string.
  * @since 6.1.0
  */
-fun String.toUByteOrError() = parseOrError(UByte::class, String::toUByte)
+fun String.toUByteOrError() = parseOrError(typeOf<UByte>(), String::toUByte)
 /**
  * Converts the string to an unsigned 16-bit integer (`UShort`) or throws an error if the conversion fails.
  *
@@ -1521,7 +1535,7 @@ fun String.toUByteOrError() = parseOrError(UByte::class, String::toUByte)
  * @return The `UShort` value represented by the string.
  * @since 6.1.0
  */
-fun String.toUShortOrError() = parseOrError(UShort::class, String::toUShort)
+fun String.toUShortOrError() = parseOrError(typeOf<UShort>(), String::toUShort)
 /**
  * Converts the string to an unsigned integer (`UInt`) or throws an error if the conversion fails.
  *
@@ -1533,42 +1547,42 @@ fun String.toUShortOrError() = parseOrError(UShort::class, String::toUShort)
  * @return The parsed unsigned integer representation of the string.
  * @since 6.1.0
  */
-fun String.toUIntOrError() = parseOrError(UInt::class, String::toUInt)
+fun String.toUIntOrError() = parseOrError(typeOf<UInt>(), String::toUInt)
 /**
- * Parses the string as an unsigned [ULong] number or returns a [InvalidFormat] if the string is not a valid representation of an unsigned long.
+ * Parses the string as an unsigned [ULong] number or returns a [InvalidFormatOfType] if the string is not a valid representation of an unsigned long.
  *
  * This method attempts to convert the string into an unsigned [ULong] using the [String.toULong] function. If the parsing fails
- * due to an invalid format or overflow, a [InvalidFormat] encapsulating the erroneous input and target type is returned.
+ * due to an invalid format or overflow, a [InvalidFormatOfType] encapsulating the erroneous input and target type is returned.
  *
  * @receiver The string to be parsed as an unsigned long.
- * @return An [Either] instance containing a successful [ULong] parsing result or a [InvalidFormat] in case of failure.
+ * @return An [Either] instance containing a successful [ULong] parsing result or a [InvalidFormatOfType] in case of failure.
  *
  * @since 6.1.0
  */
-fun String.toULongOrError() = parseOrError(ULong::class, String::toULong)
+fun String.toULongOrError() = parseOrError(typeOf<ULong>(), String::toULong)
 
 /**
  * Converts the string to a [Float] or returns an error encapsulated in an [Either] if the string cannot be parsed.
  *
  * This method attempts to parse the current string as a floating-point number. If the parsing fails due to an
- * invalid format, a [InvalidFormat] is returned, which includes details about the failure and the target type.
+ * invalid format, a [InvalidFormatOfType] is returned, which includes details about the failure and the target type.
  *
- * @return An [Either] containing the parsed [Float] if successful, or a [InvalidFormat] if parsing fails.
+ * @return An [Either] containing the parsed [Float] if successful, or a [InvalidFormatOfType] if parsing fails.
  *
  * @since 6.1.0
  */
-fun String.toFloatOrError() = parseOrError(Float::class, String::toFloat)
+fun String.toFloatOrError() = parseOrError(typeOf<Float>(), String::toFloat)
 /**
  * Attempts to parse the string as a [Double]. If parsing is successful, the result is returned
- * as a successful value. Otherwise, a [InvalidFormat] is returned indicating the failure.
+ * as a successful value. Otherwise, a [InvalidFormatOfType] is returned indicating the failure.
  *
  * This method makes use of `parseOrError` to handle the conversion and error wrapping.
  *
  * @receiver The string to be parsed into a [Double].
- * @return An [Either] containing either a successful parsed [Double] or an instance of [InvalidFormat].
+ * @return An [Either] containing either a successful parsed [Double] or an instance of [InvalidFormatOfType].
  * @since 6.1.0
  */
-fun String.toDoubleOrError() = parseOrError(Double::class, String::toDouble)
+fun String.toDoubleOrError() = parseOrError(typeOf<Double>(), String::toDouble)
 
 /**
  * Converts the current string to a [BigInt] or throws an error if the conversion fails.
@@ -1581,18 +1595,18 @@ fun String.toDoubleOrError() = parseOrError(Double::class, String::toDouble)
  * @return The parsed [BigInt] value.
  * @since 6.1.0
  */
-fun String.toBigIntOrError() = parseOrError(BigInt::class, String::toBigInteger)
+fun String.toBigIntOrError() = parseOrError(typeOf<BigInt>(), String::toBigInteger)
 /**
  * Parses the string as a [BigDecimal] or returns an error if parsing fails.
  *
  * This method leverages a utility function to attempt parsing the string. If the string
- * cannot be parsed into a valid [BigDecimal], an instance of [InvalidFormat] is returned.
+ * cannot be parsed into a valid [BigDecimal], an instance of [InvalidFormatOfType] is returned.
  *
  * @receiver The string to be parsed.
- * @return An [Either] containing the successfully parsed [BigDecimal] or a [InvalidFormat].
+ * @return An [Either] containing the successfully parsed [BigDecimal] or a [InvalidFormatOfType].
  * @since 6.1.0
  */
-fun String.toBigDecimalOrError() = parseOrError(BigDecimal::class, ::BigDecimal)
+fun String.toBigDecimalOrError() = parseOrError(typeOf<BigDecimal>(), ::BigDecimal)
 
 /**
  * Converts the string to a [BigInteger] using the specified [radix]. If the conversion fails or the radix is invalid, an error is returned.
@@ -1602,8 +1616,8 @@ fun String.toBigDecimalOrError() = parseOrError(BigDecimal::class, ::BigDecimal)
  * @since 6.1.0
  */
 fun String.toBigIntOrError(radix: Int): Either<Error, BigInteger> = either {
-    ensure(radix in Character.MIN_RADIX..Character.MAX_RADIX) { NumberError.InvalidRadix(radix) }
-    catching({ toBigInteger(radix) }) { _: NumberFormatException -> raise(InvalidFormat(this@toBigIntOrError, BigInt::class)) }
+    ensure(radix in Character.MIN_RADIX..Character.MAX_RADIX) { NumberError.InvalidRadix(radix, Character.MIN_RADIX..Character.MAX_RADIX) }
+    catching({ toBigInteger(radix) }) { _: NumberFormatException -> raise(InvalidFormatOfType(this@toBigIntOrError, typeOf<BigInt>())) }
 }
 /**
  * Converts the string representation of a number to a `BigInt` instance.
@@ -1685,14 +1699,14 @@ fun Double.toBigDecimal(): BigDecimal = BigDecimal(this)
 
 private fun <T : Any> Long.narrowU(
     source: Any,
-    from: KClass<*>,
-    target: KClass<*>,
+    from: KType,
+    target: KType,
     max: Long,
     build: (Long) -> T,
-): Either<InvalidConversion, T> =
+): Either<InvalidConversionBetweenTypes, T> =
     takeIf { it in 0..max }
         ?.let(build)
-        .rightIfNotNull { InvalidConversion(source, from, target) }
+        .rightIfNotNull { InvalidConversionBetweenTypes(source, from, target) }
 
 /** ULong → Long esatto, `null` se > Long.MAX_VALUE (il bit di segno indica il wrap). */
 private fun ULong.exactLongOrNull(): Long? = toLong().takeIf { it >= 0 }
@@ -1701,11 +1715,11 @@ private fun ULong.exactLongOrNull(): Long? = toLong().takeIf { it >= 0 }
  * Converts this [UByte] to a [Byte], ensuring the value is within the valid range for the target type.
  *
  * @receiver The [UByte] value to be converted.
- * @return An [Either] containing a [Byte] if the conversion is successful, or a [InvalidConversion]
+ * @return An [Either] containing a [Byte] if the conversion is successful, or a [InvalidConversionBetweenTypes]
  *         if the [UByte] value cannot be represented as a [Byte].
  * @since 6.1.0
  */
-fun UByte.toByteOrError() = toLong().narrowU(this, UByte::class, Byte::class, Byte.MAX_VALUE.toLong(), Long::toByte)
+fun UByte.toByteOrError() = toLong().narrowU(this, typeOf<UByte>(), typeOf<Byte>(), Byte.MAX_VALUE.toLong(), Long::toByte)
 
 /**
  * Converts the current [UShort] value to a [Byte], or returns an error if the value cannot be represented
@@ -1713,50 +1727,50 @@ fun UByte.toByteOrError() = toLong().narrowU(this, UByte::class, Byte::class, By
  *
  * The method ensures a safe and precise conversion by checking if the [UShort] value lies within the
  * valid range for a [Byte] ([0] to [127]). If the value is out of range, the conversion fails and
- * provides a [InvalidConversion].
+ * provides a [InvalidConversionBetweenTypes].
  *
  * @receiver The [UShort] value to be converted to a [Byte].
- * @return An [Either] containing the successfully converted [Byte] value or a [InvalidConversion]
+ * @return An [Either] containing the successfully converted [Byte] value or a [InvalidConversionBetweenTypes]
  * if the value is out of the valid range.
  * @since 6.1.0
  */
-fun UShort.toByteOrError() = toLong().narrowU(this, UShort::class, Byte::class, Byte.MAX_VALUE.toLong(), Long::toByte)
+fun UShort.toByteOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<Byte>(), Byte.MAX_VALUE.toLong(), Long::toByte)
 /**
  * Converts an [UShort] to a [Short], returning an error if the value cannot be represented
  * within the bounds of a [Short].
  *
  * This function performs a narrowing conversion from [UShort] to [Short]. If the value
  * of the [UShort] exceeds the maximum value representable by a [Short], an error of type
- * [InvalidConversion] will be generated.
+ * [InvalidConversionBetweenTypes] will be generated.
  *
  * @receiver The [UShort] value to be converted.
  * @return An [Either] instance containing the successfully converted [Short] or a
- *         [InvalidConversion] in case of failure.
+ *         [InvalidConversionBetweenTypes] in case of failure.
  * @since 6.1.0
  */
-fun UShort.toShortOrError() = toLong().narrowU(this, UShort::class, Short::class, Short.MAX_VALUE.toLong(), Long::toShort)
+fun UShort.toShortOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<Short>(), Short.MAX_VALUE.toLong(), Long::toShort)
 /**
  * Converts the receiver [UShort] value to a [UByte], or returns an error if the value exceeds [UByte.MAX_VALUE].
  *
  * This method ensures safe narrowing of a [UShort] to a [UByte] by validating
  * that the value lies within the range of [UByte]. If the value is outside the permissible
- * range, an error of type [InvalidConversion] is returned.
+ * range, an error of type [InvalidConversionBetweenTypes] is returned.
  *
  * @return An instance of `Either<NumberConversionError, UByte>` representing the result of the conversion process.
  *         The success case contains the converted [UByte] value, while the failure case contains the corresponding error.
  * @since 6.1.0
  */
-fun UShort.toUByteOrError() = toLong().narrowU(this, UShort::class, UByte::class, UByte.MAX_VALUE.toLong(), Long::toUByte)
+fun UShort.toUByteOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<UByte>(), UByte.MAX_VALUE.toLong(), Long::toUByte)
 
 /**
  * Converts the current [UInt] value to a [Byte], or returns an error if the value exceeds the range of [Byte].
  *
  * @receiver The source [UInt] value to be converted.
  * @return [Byte] representation of this [UInt] if it is within the valid range of [Byte],
- * or a [InvalidConversion] wrapped in an `Either` if the conversion cannot be performed.
+ * or a [InvalidConversionBetweenTypes] wrapped in an `Either` if the conversion cannot be performed.
  * @since 6.1.0
  */
-fun UInt.toByteOrError() = toLong().narrowU(this, UInt::class, Byte::class, Byte.MAX_VALUE.toLong(), Long::toByte)
+fun UInt.toByteOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<Byte>(), Byte.MAX_VALUE.toLong(), Long::toByte)
 /**
  * Converts this [UInt] to a [Short] if possible, or returns an error if the value cannot be represented
  * as a [Short] without loss of information.
@@ -1768,7 +1782,7 @@ fun UInt.toByteOrError() = toLong().narrowU(this, UInt::class, Byte::class, Byte
  * @return The result of the conversion as a [Short] or an error wrapped in an `Either` type.
  * @since 6.1.0
  */
-fun UInt.toShortOrError() = toLong().narrowU(this, UInt::class, Short::class, Short.MAX_VALUE.toLong(), Long::toShort)
+fun UInt.toShortOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<Short>(), Short.MAX_VALUE.toLong(), Long::toShort)
 /**
  * Converts the current `UInt` value to an `Int`.
  *
@@ -1785,7 +1799,7 @@ fun UInt.toShortOrError() = toLong().narrowU(this, UInt::class, Short::class, Sh
  *
  * @since 6.1.0
  */
-fun UInt.toIntOrError() = toLong().narrowU(this, UInt::class, Int::class, Int.MAX_VALUE.toLong(), Long::toInt)
+fun UInt.toIntOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<Int>(), Int.MAX_VALUE.toLong(), Long::toInt)
 /**
  * Converts this [UInt] to a [UByte] if the conversion can be performed without
  * data loss or overflow. If the [UInt] value exceeds the maximum value that can
@@ -1794,26 +1808,26 @@ fun UInt.toIntOrError() = toLong().narrowU(this, UInt::class, Int::class, Int.MA
  *
  * @receiver The [UInt] value to be converted.
  * @return An [Either] type that contains the resulting [UByte] if the conversion
- *         is successful, or a [InvalidConversion] if the conversion fails.
+ *         is successful, or a [InvalidConversionBetweenTypes] if the conversion fails.
  * @since 6.1.0
  */
-fun UInt.toUByteOrError() = toLong().narrowU(this, UInt::class, UByte::class, UByte.MAX_VALUE.toLong(), Long::toUByte)
+fun UInt.toUByteOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<UByte>(), UByte.MAX_VALUE.toLong(), Long::toUByte)
 /**
  * Attempts to convert the current [UInt] value to a [UShort].
  *
  * If the current value can be represented as a [UShort] (i.e., it falls within the valid
  * [UShort] range), the conversion is performed successfully. Otherwise, an error
- * of type [InvalidConversion] is returned encapsulating the source value and type.
+ * of type [InvalidConversionBetweenTypes] is returned encapsulating the source value and type.
  *
  * This method internally uses the `narrowU` utility function to perform the range validation
  * and conversion safely.
  *
  * @receiver The [UInt] value being converted.
  * @return Either a [UShort] representation of the receiver if the value is within range,
- * or a [InvalidConversion] if the value exceeds the valid range.
+ * or a [InvalidConversionBetweenTypes] if the value exceeds the valid range.
  * @since 6.1.0
  */
-fun UInt.toUShortOrError() = toLong().narrowU(this, UInt::class, UShort::class, UShort.MAX_VALUE.toLong(), Long::toUShort)
+fun UInt.toUShortOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<UShort>(), UShort.MAX_VALUE.toLong(), Long::toUShort)
 
 /**
  * Attempts to narrow the current `ULong` value to a specific type `T` based on the provided constraints.
@@ -1828,15 +1842,15 @@ fun UInt.toUShortOrError() = toLong().narrowU(this, UInt::class, UShort::class, 
  * @since 6.1.0
  */
 private fun <T : Any> ULong.narrowU(
-    from: KClass<*>,
-    target: KClass<*>,
+    from: KType,
+    target: KType,
     max: Long,
     build: (Long) -> T,
-): Either<InvalidConversion, T> =
+): Either<InvalidConversionBetweenTypes, T> =
     exactLongOrNull()
         ?.takeIf { it <= max }
         ?.let(build)
-        .rightIfNotNull { InvalidConversion(this, from, target) }
+        .rightIfNotNull { InvalidConversionBetweenTypes(this, from, target) }
 
 /**
  * Attempts to convert this `ULong` to a `Byte`. Returns a `Right` containing the resulting value
@@ -1847,7 +1861,7 @@ private fun <T : Any> ULong.narrowU(
  * A `Right` contains the converted `Byte` value, while a `Left` contains a `NumberConversionError`.
  * @since 6.1.0
  */
-fun ULong.toByteOrError() = narrowU(ULong::class, Byte::class, Byte.MAX_VALUE.toLong(), Long::toByte)
+fun ULong.toByteOrError() = narrowU(typeOf<ULong>(), typeOf<Byte>(), Byte.MAX_VALUE.toLong(), Long::toByte)
 /**
  * Converts the current [ULong] value to a [Short].
  *
@@ -1855,11 +1869,11 @@ fun ULong.toByteOrError() = narrowU(ULong::class, Byte::class, Byte.MAX_VALUE.to
  * The conversion uses a boundary check to ensure the [ULong] value is within
  * the range of a [Short], which is from `0` to `Short.MAX_VALUE` inclusive.
  *
- * @return Either a [Short] representation of the current [ULong] value or a [InvalidConversion]
+ * @return Either a [Short] representation of the current [ULong] value or a [InvalidConversionBetweenTypes]
  * indicating the value is out of range for the target type.
  * @since 6.1.0
  */
-fun ULong.toShortOrError() = narrowU(ULong::class, Short::class, Short.MAX_VALUE.toLong(), Long::toShort)
+fun ULong.toShortOrError() = narrowU(typeOf<ULong>(), typeOf<Short>(), Short.MAX_VALUE.toLong(), Long::toShort)
 /**
  * Attempts to convert the current `ULong` value to an `Int`. If the conversion
  * cannot be performed due to the value exceeding the maximum size allowed for an `Int`,
@@ -1869,31 +1883,31 @@ fun ULong.toShortOrError() = narrowU(ULong::class, Short::class, Short.MAX_VALUE
  *         `NumberConversionError` if the conversion fails.
  * @since 6.1.0
  */
-fun ULong.toIntOrError() = narrowU(ULong::class, Int::class, Int.MAX_VALUE.toLong(), Long::toInt)
+fun ULong.toIntOrError() = narrowU(typeOf<ULong>(), typeOf<Int>(), Int.MAX_VALUE.toLong(), Long::toInt)
 /**
  * Converts the current [ULong] value to a [Long], or returns an error if the conversion is not possible.
  *
  * This method leverages `narrowU` to check the validity of the conversion
  * and ensures the [Long.MAX_VALUE] boundary is respected. If the value
  * exceeds the maximum allowable value for [Long], an appropriate
- * [InvalidConversion] is returned encapsulated in an `Either`.
+ * [InvalidConversionBetweenTypes] is returned encapsulated in an `Either`.
  *
  * @receiver The [ULong] value to be converted to [Long].
  * @return An `Either` containing the converted [Long] value if successful,
- *         or a [InvalidConversion] if the conversion fails.
+ *         or a [InvalidConversionBetweenTypes] if the conversion fails.
  * @since 6.1.0
  */
-fun ULong.toLongOrError() = narrowU(ULong::class, Long::class, Long.MAX_VALUE) { it }
+fun ULong.toLongOrError() = narrowU(typeOf<ULong>(), typeOf<Long>(), Long.MAX_VALUE) { it }
 /**
  * Attempts to convert the current [ULong] value to a [UByte].
  *
  * If the conversion succeeds, the result is returned as a [UByte].
- * If the current value exceeds the maximum value of [UByte], a [InvalidConversion] is returned.
+ * If the current value exceeds the maximum value of [UByte], a [InvalidConversionBetweenTypes] is returned.
  *
- * @return Either a converted [UByte] or a [InvalidConversion] if the conversion fails.
+ * @return Either a converted [UByte] or a [InvalidConversionBetweenTypes] if the conversion fails.
  * @since 6.1.0
  */
-fun ULong.toUByteOrError() = narrowU(ULong::class, UByte::class, UByte.MAX_VALUE.toLong(), Long::toUByte)
+fun ULong.toUByteOrError() = narrowU(typeOf<ULong>(), typeOf<UByte>(), UByte.MAX_VALUE.toLong(), Long::toUByte)
 /**
  * Attempts to convert the current [ULong] value to a [UShort] value.
  *
@@ -1904,10 +1918,10 @@ fun ULong.toUByteOrError() = narrowU(ULong::class, UByte::class, UByte.MAX_VALUE
  * This method ensures that the conversion is safe and avoids silent overflows.
  *
  * @return An [Either] containing the successfully converted [UShort] value or a
- * [InvalidConversion] if the conversion fails.
+ * [InvalidConversionBetweenTypes] if the conversion fails.
  * @since 6.1.0
  */
-fun ULong.toUShortOrError() = narrowU(ULong::class, UShort::class, UShort.MAX_VALUE.toLong(), Long::toUShort)
+fun ULong.toUShortOrError() = narrowU(typeOf<ULong>(), typeOf<UShort>(), UShort.MAX_VALUE.toLong(), Long::toUShort)
 /**
  * Converts the current [ULong] value to a [UInt].
  *
@@ -1919,7 +1933,7 @@ fun ULong.toUShortOrError() = narrowU(ULong::class, UShort::class, UShort.MAX_VA
  * @throws IllegalArgumentException if the value exceeds [UInt.MAX_VALUE].
  * @since 6.1.0
  */
-fun ULong.toUIntOrError() = narrowU(ULong::class, UInt::class, UInt.MAX_VALUE.toLong(), Long::toUInt)
+fun ULong.toUIntOrError() = narrowU(typeOf<ULong>(), typeOf<UInt>(), UInt.MAX_VALUE.toLong(), Long::toUInt)
 
 /**
  * Parses the content of the CharSequence as a numeric value represented in words and returns the result as a [Result].
@@ -1934,8 +1948,8 @@ fun ULong.toUIntOrError() = narrowU(ULong::class, UInt::class, UInt.MAX_VALUE.to
  * @since 4.0.0
  */
 fun CharSequence.parseNumberWords() = either {
-    catching({ NumberWords.parse(toString()) }) { _: Exception ->
-        InvalidFormat(this@parseNumberWords, BigDecimal::class)
+    catching({ NumberWords.parse(this@parseNumberWords.toString()) }) { _: Exception ->
+        InvalidFormatOfType(this@parseNumberWords, typeOf<BigDecimal>())
     }
 }
 

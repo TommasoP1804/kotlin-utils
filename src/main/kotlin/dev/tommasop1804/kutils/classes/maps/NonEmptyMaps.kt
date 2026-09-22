@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.ValueDeserializer
@@ -117,6 +118,26 @@ open class NonEmptyMap<K, out V>(@PublishedApi internal val elements: Map<K, V>)
          * @since 5.2.0
          */
         fun <K, V> Map<K, V>.toNonEmptyMapOrNull() = tryOrNull { NonEmptyMap(this) }
+        /**
+         * Converts this [Map] to a [NonEmptyMap] instance or returns an error result
+         * if the map is empty.
+         *
+         * This function attempts to create a [NonEmptyMap] from the current map. If
+         * the map contains at least one element, it successfully returns a
+         * [NonEmptyMap] that wraps this map. If the map is empty, it produces an
+         * error result of type [Empty].
+         *
+         * The conversion process utilizes the `tryOrError` mechanism to manage the
+         * control flow, ensuring that the appropriate result (either a [NonEmptyMap]
+         * or an [Empty] error) is returned based on the map's state.
+         *
+         * @return A result wrapped in `Either` where:
+         * - The right value is a [NonEmptyMap] created from the current map if it
+         *   contains at least one entry.
+         * - The left value is an error of type [Empty] if the map is empty.
+         * @since 6.1.0
+         */
+        fun <K, V> Map<K, V>.toNonEmptyMapOrError() = tryOrError({ Empty }) { NonEmptyMap(this) }
         /**
          * Converts the current map into a `NonEmptyMap`. If the map is empty or an exception occurs during the
          * conversion, the provided default value supplier is invoked to return a fallback `NonEmptyMap`.
@@ -381,6 +402,21 @@ class NonEmptyMMap<K, V>(private val mElements: MMap<K, V>) : MMap<K, V> by mEle
          * @since 5.2.0
          */
         fun <K, V> Map<K, V>.toNonEmptyMMapOrNull() = tryOrNull { NonEmptyMMap(toMMap()) }
+        /**
+         * Converts the current [Map] instance into a `NonEmptyMMap` wrapped within an error-handling mechanism.
+         *
+         * If the map is empty, this function returns an `Empty` error. Otherwise, it attempts to
+         * convert the map to a `NonEmptyMMap` by transforming it into an intermediate `MMap`
+         * using the `toMMap` function.
+         *
+         * This operation is performed using the `tryOrError` function, which ensures safe execution
+         * and captures any exceptions that may occur during the transformation process. The error
+         * returned in case of failure is of type `Empty`.
+         *
+         * @return An instance of `NonEmptyMMap` if the map is non-empty, or an `Empty` error if the map is empty.
+         * @since 6.1.0
+         */
+        fun <K, V> Map<K, V>.toNonEmptyMMapOrError() = tryOrError({ Empty }) { NonEmptyMMap(toMMap()) }
         /**
          * Converts the current map to a `NonEmptyMMap`. If the map is empty, the specified default supplier is used
          * to provide a fallback `NonEmptyMMap`.

@@ -10,9 +10,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.base.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.numbers.Hex.Companion.toHex
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.EnhancedUserType
@@ -35,6 +36,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.Instant
 import java.util.*
+import kotlin.reflect.typeOf
 import kotlin.time.toJavaInstant
 
 /**
@@ -286,16 +288,21 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
         fun CharSequence.isValidKsuid() = runCatching { Ksuid(toString()) }.isSuccess
 
         /**
-         * Converts the given [CharSequence] into a [Ksuid] instance.
+         * Converts the current [CharSequence] into a [Ksuid] instance.
          *
-         * This method attempts to create a [Ksuid] object using the string representation of the
-         * [CharSequence]. The result is wrapped in a [Result] to handle potential exceptions
-         * that may occur during the creation process, such as invalid format or other constraints.
+         * This function attempts to parse the [CharSequence] as a valid KSUID format. In case the input
+         * does not conform to the expected KSUID structure or an error occurs during construction,
+         * it returns an instance of [InvalidFormatOfType] encapsulating the error details and the input.
          *
-         * @return A [Result] containing the [Ksuid] instance if successful, or an exception if an error occurs.
-         * @since 3.0.0
+         * @return An [Either] containing a successfully parsed [Ksuid], or an [InvalidFormatOfType]
+         * representing a failure with the associated error and input data.
+         * @since 6.1.0
          */
-        fun CharSequence.toKsuid() = runCatching { Ksuid(toString()) }
+        fun CharSequence.toKsuid(): Either<InvalidFormatOfType, Ksuid> = either {
+            catching({ Ksuid(this@toKsuid) }) { t: Throwable ->
+                InvalidFormatOfType(this@toKsuid, typeOf<Ksuid>(), t)
+            }
+        }
 
         class Serializer : ValueSerializer<Ksuid>() {
             override fun serialize(value: Ksuid, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
