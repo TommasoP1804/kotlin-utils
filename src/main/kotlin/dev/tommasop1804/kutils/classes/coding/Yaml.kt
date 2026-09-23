@@ -19,7 +19,6 @@ import dev.tommasop1804.kutils.OffsetDateTime
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
-import dev.tommasop1804.kutils.classes.coding.Toml.Companion.toToml
 import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
@@ -835,32 +834,66 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [YamlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
      *
      * @param patch The YAML content representing the patch to be applied.
-     * @return Either an `Error` if the operation fails, or a `Toml` object if successful.
+     * @return Either an `Error` if the operation fails, or a `Yaml` object if successful.
      * @since 6.1.0
      */
-    infix fun yamlPatch(patch: Yaml): Either<Error, Toml> = toJson().jsonPatch(patch.toJson()).map { it.toToml() }
+    infix fun yamlPatch(patch: Yaml): Either<Error, Yaml> = toJson().jsonPatch(patch.toJson()).map { it.toYaml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { YamlError.PathNotFound(e.path) }
+    }
     /**
-     * Applies a JSON patch to the current YAML structure, transforming it into a TOML structure.
+     * Applies a JSON patch to the current YAML structure, transforming it into a YAML structure.
      *
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [YamlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
      *
      * @param patch the JSON patch to apply to the current YAML structure.
-     * @return either an error if the operation fails, or a TOML structure resulting from the patch operation.
+     * @return either an error if the operation fails, or a YAML structure resulting from the patch operation.
      * @since 6.1.0
      */
-    infix fun yamlPatch(patch: Json): Either<Error, Toml> = toJson().jsonPatch(patch.toJson()).map { it.toToml() }
+    infix fun yamlPatch(patch: Json): Either<Error, Yaml> = toJson().jsonPatch(patch.toJson()).map { it.toYaml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { YamlError.PathNotFound(e.path) }
+    }
+
+    /**
+     * Validates the current object against a provided JSON schema using a JSON serialization of the object.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [YamlError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema to validate the object against.
+     * @return A result indicating whether validation was successful or a failure containing schema validation errors.
+     * @since 6.1.0
+     */
+    infix fun validateWithSchema(jsonSchema: JsonSchema) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        YamlError.SchemaValidationFailed(e.errors)
+    }
+    /**
+     * Validates the current object against the provided JSON schema.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [YamlError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema to validate against.
+     * @param version The version of the JSON schema to be used during validation.
+     * @return A result mapping any validation errors, if present.
+     * @since 6.1.0
+     */
+    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        YamlError.SchemaValidationFailed(e.errors)
+    }
 }
 
 /**
@@ -1347,7 +1380,7 @@ class YamlNode(val rawValue: Any?) {
      * @return the LocalDate representation of the node's value.
      * @since 3.0.0
      */
-    fun asDate() = asString()?.let(::LocalDate)?.getOrThrow()
+    fun asDate() = asString()?.let(::LocalDate)
     /**
      * Converts the current YAMLNode to an OffsetDateTime representation.
      *
@@ -1358,7 +1391,7 @@ class YamlNode(val rawValue: Any?) {
      * @return an OffsetDateTime object parsed from the node's value.
      * @since 3.0.0
      */
-    fun asDateTime(): OffsetDateTime? = asString()?.let(::OffsetDateTime)?.getOrThrow()
+    fun asDateTime(): OffsetDateTime? = asString()?.let(::OffsetDateTime)
     /**
      * Converts the current node to an [Instant] if possible.
      *
@@ -1369,7 +1402,7 @@ class YamlNode(val rawValue: Any?) {
      * @return The parsed [Instant] instance representing the node's value.
      * @since 3.0.0
      */
-    fun asInstant(): Instant? = asString()?.let(::Instant)?.getOrThrow()
+    fun asInstant(): Instant? = asString()?.let(::Instant)
 
     /**
      * Returns a string representation of the YAMLNode object.

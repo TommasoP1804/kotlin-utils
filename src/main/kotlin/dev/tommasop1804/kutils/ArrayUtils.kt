@@ -155,6 +155,19 @@ val <E : Comparable<E>> Array<E>.isNotSortedDescending get() = !isSortedDescendi
  * @since 5.4.0
  */
 fun <E> Array<E>.orNullIfEmpty() = ifEmpty { null }
+/**
+ * Returns an `Either` instance based on whether is empty or not.
+ *
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
+ *
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.orErrorIfEmpty(): Either<Empty, Array<E>> =
+    either { if (isEmpty()) raise(Empty) else this }
 
 /**
  * Negates the state of the array by returning `true` if the array is either `null` or empty.

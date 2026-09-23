@@ -6,10 +6,13 @@ package dev.tommasop1804.kutils.classes.translators
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.io.File
 import java.nio.file.Path
 import kotlin.enums.EnumEntries
+import kotlin.reflect.typeOf
 
 /**
  * A class that provides translation capabilities by reading and extracting data from configuration files
@@ -47,119 +50,151 @@ open class Translator(
 
     companion object {
         /**
-         * Translates the specified key to its corresponding value by reading the content of a configuration
-         * file in YAML or JSON format. The translation operation retrieves the value associated with the
-         * provided key from the file.
+         * Translates the invoking string by leveraging the provided translator instance, which reads
+         * configuration data from a YAML or JSON file. The translation process attempts to map the
+         * string to its corresponding value within the file's structure.
          *
-         * @return The value associated with the specified key in the configuration file.
-         * @throws ConfigurationException if the file extension is unsupported or if the file content
-         * is not valid YAML or JSON.
-         * @throws TranslationException if the key is not found in the configuration file.
-         * @since 1.0.0
+         * Possible errors:
+         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+         * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
+         *
+         * @param translator The `Translator` instance that defines the configuration file and
+         * handles the logic for translating the string using either YAML or JSON file formats.
+         * @return An `Either` containing either the successfully translated string or an error,
+         * depending on the outcome of the translation process.
+         * @since 6.1.0
          */
-        infix fun String.translatedWith(translator: Translator): String {
-            if (translator.file.extension == "yaml" || translator.file.extension == "yml") {
-                val yaml = tryOrThrow({ ConfigurationException("Not a valid YAML") }) { Yaml(translator.file) }
-                return yaml.getAsNode(this).asString() ?: throw TranslationException("Key '$this' not found in YAML file")
+        infix fun String.translatedWith(translator: Translator): Either<Error, String> = either {
+            when (translator.file.extension) {
+                "yaml", "yml" -> {
+                    val yaml = tryOrRaise({ InvalidFormatOfType(translator.file, typeOf<Yaml>(), it.message) }) {
+                        Yaml(translator.file)
+                    }
+                    yaml.getAsNode(this).asString().orRaise { YamlError.PathNotFound(this) }
+                }
+                "json" -> {
+                    val json = tryOrRaise({ InvalidFormatOfType(translator.file, typeOf<Json>(), it.message) }) {
+                        Json(translator.file)
+                    }
+                    json.getAsNode(this)?.asString().orRaise { JsonError.PathNotFound(this) }
+                }
+                else -> raise(FileError.InvalidExtension(translator.file))
             }
-            else if (translator.file.extension == "json") {
-                val json = tryOrThrow({ ConfigurationException("Not a valid JSON") }) { Json(translator.file) }
-                return json.getAsNode(this)?.asString() ?: throw TranslationException("Key '$this' not found in JSON file")
-            }
-            throw ConfigurationException("Unsupported file extension: ${translator.file.extension}")
         }
         /**
-         * Translates the specified key to its corresponding value by reading the content of a configuration
-         * file in YAML or JSON format. The translation operation retrieves the value associated with the
-         * provided key from the file.
+         * Translates the invoking string by leveraging the provided translator instance, which reads
+         * configuration data from a YAML or JSON file. The translation process attempts to map the
+         * string to its corresponding value within the file's structure.
          *
-         * @return The value associated with the specified key in the configuration file.
-         * @throws ConfigurationException if the file extension is unsupported or if the file content
-         * is not valid YAML or JSON.
-         * @throws TranslationException if the key is not found in the configuration file.
-         * @since 1.0.0
+         * Possible errors:
+         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+         * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
+         *
+         * @param translator The `Translator` instance that defines the configuration file and
+         * handles the logic for translating the string using either YAML or JSON file formats.
+         * @return An `Either` containing either the successfully translated string or an error,
+         * depending on the outcome of the translation process.
+         * @since 6.1.0
          */
         infix fun Enum<*>.translatedWith(translator: Translator) = name.translatedWith(translator)
         /**
-         * Translates a collection of keys into their corresponding values from a configuration file.
+         * Translates a collection of string keys into their corresponding values using a specified translator.
+         * The translation process returns a list where each element is either a successfully translated value
+         * or an error indicating why a key could not be translated.
          *
-         * This method processes each key in the provided iterables and retrieves the mapped value
-         * from the file associated with the provided `Translator` instance. Supported configuration file
-         * formats include YAML and JSON. If a key is not found, a `TranslationException` is thrown.
+         * Possible errors for each:
+         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+         * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
          *
-         * @return A list of strings containing the translated values for the provided keys.
-         * @throws ConfigurationException If the file format is unsupported or the configuration file is invalid.
-         * @throws TranslationException If any of the keys are not found in the configuration file.
-         * @since 1.0.0
+         * @param translator The translator instance used to resolve the translation for each string key in the collection.
+         * @return A list of `Either` objects where each element represents either a successful translation (`String`)
+         * or an error (`Error`) for the corresponding key in the original collection.
+         * @since 6.1.0
          */
-        infix fun Iterable<String>.translatedWith(translator: Translator): List<String> = map { it.translatedWith(translator) }
+        infix fun Iterable<String>.translatedWith(translator: Translator): List<Either<Error, String>> = map { it.translatedWith(translator) }
         /**
-         * Translates the specified enumeration entries to their corresponding values
-         * by reading the content of a configuration file in YAML or JSON format.
+         * Translates a collection of string keys into their corresponding values using a specified translator.
+         * The translation process returns a list where each element is either a successfully translated value
+         * or an error indicating why a key could not be translated.
          *
-         * The translation operation maps each enumeration name from the provided entries
-         * to its associated value retrieved from the configuration file.
+         * Possible errors for each:
+         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+         * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
          *
-         * @return A list of strings containing the translated values for the provided enumeration entries.
-         * @throws ConfigurationException If the file format is unsupported or the configuration file is invalid.
-         * @throws TranslationException If any of the keys derived from enumeration entries are not found in the configuration file.
-         * @since 1.0.0
+         * @param translator The translator instance used to resolve the translation for each string key in the collection.
+         * @return A list of `Either` objects where each element represents either a successful translation (`String`)
+         * or an error (`Error`) for the corresponding key in the original collection.
+         * @since 6.1.0
          */
-        infix fun EnumEntries<*>.translatedWith(translator: Translator): List<String> = map { it.translatedWith(translator) }
+        infix fun EnumEntries<*>.translatedWith(translator: Translator): List<Either<Error, String>> = map { it.translatedWith(translator) }
     }
 
     /**
-     * Translates the specified key to its corresponding value by reading the content of a configuration
-     * file in YAML or JSON format. The translation operation retrieves the value associated with the
-     * provided key from the file.
+     * Translates the invoking string by leveraging the provided translator instance, which reads
+     * configuration data from a YAML or JSON file. The translation process attempts to map the
+     * string to its corresponding value within the file's structure.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+     * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
      * @param key The key whose corresponding value is to be retrieved from the configuration file.
-     * @return The value associated with the specified key in the configuration file.
-     * @throws ConfigurationException if the file extension is unsupported or if the file content
-     * is not valid YAML or JSON.
-     * @throws TranslationException if the key is not found in the configuration file.
-     * @since 1.0.0
+     * @return An `Either` containing either the successfully translated string or an error,
+     * depending on the outcome of the translation process.
+     * @since 6.1.0
      */
     infix fun translate(key: String) = key.translatedWith(this)
     /**
-     * Translates the specified key to its corresponding value by reading the content of a configuration
-     * file in YAML or JSON format. The translation operation retrieves the value associated with the
-     * provided key from the file.
+     * Translates the invoking string by leveraging the provided translator instance, which reads
+     * configuration data from a YAML or JSON file. The translation process attempts to map the
+     * string to its corresponding value within the file's structure.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+     * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
      * @param key The key whose corresponding value is to be retrieved from the configuration file.
-     * @return The value associated with the specified key in the configuration file.
-     * @throws ConfigurationException if the file extension is unsupported or if the file content
-     * is not valid YAML or JSON.
-     * @throws TranslationException if the key is not found in the configuration file.
-     * @since 1.0.0
+     * @return An `Either` containing either the successfully translated string or an error,
+     * depending on the outcome of the translation process.
+     * @since 6.1.0
      */
     infix fun translate(key: Enum<*>) = key.translatedWith(this)
     /**
-     * Translates a collection of keys into their corresponding values from a configuration file.
+     * Translates a collection of string keys into their corresponding values using a specified translator.
+     * The translation process returns a list where each element is either a successfully translated value
+     * or an error indicating why a key could not be translated.
      *
-     * This method processes each key in the provided iterables and retrieves the mapped value
-     * from the file associated with this `Translator` instance. Supported configuration file
-     * formats include YAML and JSON. If a key is not found, a `NoSuchElementException` is thrown.
+     * Possible errors for each:
+     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+     * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
-     * @param keys An iterables collection of keys to be translated.
-     * @return A list of strings containing the translated values for the provided keys.
-     * @throws ConfigurationException If the file format is unsupported or the configuration file is invalid.
-     * @throws TranslationException If any of the keys are not found in the configuration file.
-     * @since 1.0.0
+     * @param keys The collection of string keys to be translated.
+     * @return A list of `Either` objects where each element represents either a successful translation (`String`)
+     * or an error (`Error`) for the corresponding key in the original collection.
+     * @since 6.1.0
      */
-    infix fun translate(keys: Iterable<String>): List<String> = keys.map { translate(it) }
+    infix fun translate(keys: Iterable<String>): List<Either<Error, String>> = keys.map { translate(it) }
     /**
-     * Translates the specified enumeration entries to their corresponding values
-     * by reading the content of a configuration file in YAML or JSON format.
+     * Translates a collection of string keys into their corresponding values using a specified translator.
+     * The translation process returns a list where each element is either a successfully translated value
+     * or an error indicating why a key could not be translated.
      *
-     * The translation operation maps each enumeration name from the provided entries
-     * to its associated value retrieved from the configuration file.
+     * Possible errors for each:
+     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
+     * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
-     * @param keys The enumeration entries whose corresponding values are to be retrieved from the configuration file.
-     * @return A list of strings containing the translated values for the provided enumeration entries.
-     * @throws ConfigurationException If the file format is unsupported or the configuration file is invalid.
-     * @throws TranslationException If any of the keys derived from enumeration entries are not found in the configuration file.
-     * @since 1.0.0
+     * @param keys The collection of string keys to be translated.
+     * @return A list of `Either` objects where each element represents either a successful translation (`String`)
+     * or an error (`Error`) for the corresponding key in the original collection.
+     * @since 6.1.0
      */
-    infix fun translate(keys: EnumEntries<*>): List<String> = keys.map { translate(it.name) }
+    infix fun translate(keys: EnumEntries<*>): List<Either<Error, String>> = keys.map { translate(it.name) }
 }

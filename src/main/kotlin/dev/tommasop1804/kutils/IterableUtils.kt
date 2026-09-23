@@ -217,6 +217,19 @@ val Collection<*>.isNotSingleElement get() = size != 1
  * @since 5.4.0
  */
 fun <C : Collection<E>, E> C.orNullIfEmpty() = ifEmpty { null }
+/**
+ * Returns an `Either` instance based on whether is empty or not.
+ *
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
+ *
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
+ */
+fun <C : Collection<E>, E> C.orErrorIfEmpty(): Either<Empty, C> =
+    either { ifEmpty { raise(Empty) } }
 
 /**
  * Merges the current collection with one or more additional collections.

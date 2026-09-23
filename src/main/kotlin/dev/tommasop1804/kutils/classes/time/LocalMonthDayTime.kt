@@ -9,11 +9,12 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.MICROS_PER_SECOND
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.NANOS_PER_SECOND
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.SECONDS_PER_DAY
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.SECONDS_PER_MINUTE
-import dev.tommasop1804.kutils.invoke
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -31,14 +32,7 @@ import java.util.*
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.Long.Companion.MIN_VALUE
 import kotlin.reflect.KProperty
-import kotlin.text.contains
-import kotlin.text.endsWith
-import kotlin.text.indexOf
-import kotlin.text.isBlank
-import kotlin.text.startsWith
-import kotlin.text.substring
-import kotlin.text.take
-import kotlin.time.ExperimentalTime
+import kotlin.reflect.typeOf
 import kotlin.time.toJavaInstant
 
 /**
@@ -144,7 +138,6 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
      * @param zoneId The time zone associated with the LocalDateTime to be created.
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zoneId: ZoneId) : this(from(LocalDateTime.ofInstant(instant.toJavaInstant(), zoneId)))
     /**
      * Constructs an instance based on a Kotlin Time Instant and a specified time zone.
@@ -153,7 +146,6 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
      * @param zoneId The `ZoneIdent` representing the time zone to associate with the instant.
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zoneId: ZoneIdent) : this(from(LocalDateTime.ofInstant(instant.toJavaInstant(), zoneId.zoneId)))
 
     /**
@@ -462,19 +454,20 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
         fun now() = LocalMonthDayTime(MonthDay.now(), LocalTime.now())
 
         /**
-         * Parses the given string into a `LocalMonthDayTime` instance or generates the current date and time if the string is blank.
-         * The string can represent partial date-time formats, including optional time zone or offset information.
+         * Parses the given [CharSequence] into an instance of [LocalMonthDayTime].
+         * The input format is expected to follow specific patterns based on whether
+         * the input starts with "-", "--", or neither. Invalid formats will be captured
+         * and returned as an [InvalidFormatOfType] error.
          *
-         * @param s The string to be parsed. It supports various formats:
-         *          - `MM-dd` or `MM-ddTHH:mm` for plain month-day and optional time.
-         *          - `-MM-dd` or `-MM-ddTHH:mm` for month-day with a leading dash and optional time.
-         *          - `--MM-dd` or `--MM-ddTHH:mm` for month-day in ISO representation and optional time.
-         *          - An empty or blank string will default to the current date and time.
-         * @return A result encapsulating a `LocalMonthDayTime` object if parsed successfully or an exception if parsing fails.
-         * @since 1.0.0
+         * @param s the input character sequence to parse. It may represent a date
+         *        in various formats such as "MM-dd", "-MM-dd", and "--MM-dd", optionally
+         *        followed by a time component.
+         * @return an [Either] containing [LocalMonthDayTime] if the parsing is successful,
+         *         or an [InvalidFormatOfType] if the format is invalid or an error occurs.
+         * @since 6.1.0
          */
         @JvmStatic
-        fun parse(s: CharSequence) = runCatching {
+        fun parse(s: CharSequence): Either<InvalidFormatOfType, LocalMonthDayTime> = either { catching({
             if (s.isBlank()) LocalMonthDayTime()
             else {
                 val finalIndex = if (s.endsWith("Z")) s.length - 1
@@ -496,7 +489,7 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
                     LocalTime.parse(s.substring(6, finalIndex))
                 )
             }
-        }
+        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<LocalMonthDayTime>(), t) } }
 
         /**
          * Converts a [Temporal] object to a local month, day, and time representation.

@@ -7,6 +7,7 @@
 package dev.tommasop1804.kutils.classes.functional
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.classes.functional.Either.*
 import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
@@ -440,6 +441,85 @@ fun <E1 : E2, E2 : E, E, A> Either<E1, Either<E2, A>>.flatten(): Either<E, A> =
     }
 
 /**
+ * Returns the list contained within the `Right` instance of this `Either`, or an empty list if the instance is `Left`.
+ *
+ * This method is a convenience function to handle scenarios where the `Either` type
+ * contains a `List<T>` in the `Right` side and ensures a consistent return type of `List<T>`,
+ * eliminating the need to manually handle the `Left` case.
+ *
+ * @return The list of type `T` if this instance is `Right`, or an empty list if it is `Left`.
+ * @since 6.1.0
+ */
+fun <E, T> Either<E, List<T>>.orEmpty(): List<T> =
+    when (this) {
+        is Left -> emptyList()
+        is Right -> value
+    }
+/**
+ * Returns the set contained in the `Right` instance if this `Either` is of type `Right`,
+ * or an empty set if this `Either` is of type `Left`.
+ *
+ * This function provides a convenient way to retrieve the encapsulated set from an `Either`
+ * without explicitly handling the `Left` and `Right` cases. It ensures that a `Set` is always returned,
+ * defaulting to an empty set in case of failure (`Left`).
+ *
+ * @return The set contained in the `Right` instance, or an empty set if this `Either` is a `Left`.
+ * @since 6.1.0
+ */
+fun <E, T> Either<E, Set<T>>.orEmpty(): Set<T> =
+    when (this) {
+        is Left -> emptySet()
+        is Right -> value
+    }
+/**
+ * Returns the map value contained in this `Either` instance if it is of type `Right`,
+ * or an empty map if it is of type `Left`.
+ *
+ * This extension function provides a convenient way to safely retrieve the
+ * value of type `Map<K, V>` from an `Either` instance without needing to
+ * explicitly check its type. When the instance is `Left`, an empty map
+ * is returned as a fallback.
+ *
+ * @return The map value if the instance is `Right`, or an empty map if the instance is `Left`.
+ * @since 6.1.0
+ */
+fun <E, K, V> Either<E, Map<K, V>>.orEmpty(): Map<K, V> =
+    when (this) {
+        is Left -> emptyMap()
+        is Right -> value
+    }
+/**
+ * Returns the contained table value if this instance is a `Right`, or an empty table if this instance is a `Left`.
+ *
+ * This function provides a convenient way to handle the `Either` type, ensuring that a valid table is always returned,
+ * either based on the encapsulated `Right` value or as an empty table in case of `Left`.
+ *
+ * @return A `Table<R, C, V?>` containing the value wrapped by the `Right` instance, or an empty table if the instance is a `Left`.
+ * @since 6.1.0
+ */
+fun <E, R, C, V> Either<E, Table<R, C, V?>>.orEmpty(): Table<R, C, V?> =
+    when (this) {
+        is Left -> emptyTable()
+        is Right -> value
+    }
+/**
+ * Returns the `TypedTable` instance encapsulated within the `Either`, or an empty `TypedTable`
+ * if the current instance is `Left`.
+ *
+ * This function ensures that a non-null `TypedTable` is returned regardless of whether the `Either`
+ * is `Left` or `Right`. If the instance is `Left`, the function calls `emptyTypedTable()` to
+ * provide a default empty result. Otherwise, the `TypedTable` in the `Right` instance is returned.
+ *
+ * @return A `TypedTable` instance, either the value encapsulated by `Right`, or an empty one if `Left`.
+ * @since 6.1.0
+ */
+fun <E, R> Either<E, TypedTable<R>>.orEmpty(): TypedTable<R> =
+    when (this) {
+        is Left -> emptyTypedTable()
+        is Right -> value
+    }
+
+/**
  * Transforms a [Result] into an `Either` type, using the provided transformers for successful
  * and failed outcomes. If the [Result] is successful, the [right] transformer is applied
  * to the value. If the [Result] contains an exception, the [left] transformer is applied
@@ -458,6 +538,20 @@ fun <E1 : E2, E2 : E, E, A> Either<E1, Either<E2, A>>.flatten(): Either<E, A> =
 fun <T, L> Result<T>.toEither(right: MonoTransformer<T> = identity(), left: Transformer<Throwable, L>) = either {
     catching({ right(this@toEither.getOrThrow()) }) { t: Throwable -> left(t) }
 }
+/**
+ * Converts a `Result` instance into an `Either` type.
+ *
+ * This method maps a successful result of type `T` contained in the `Result` object to the `Right` type
+ * of the `Either`, while mapping a failed result (an exception) to the `Left` type of the `Either`
+ * based on the provided mapping of exception types to transformation functions.
+ *
+ * @param cases A map where the keys are the `KClass` of throwable types that should be handled,
+ * and the values are transformation functions (`Transformer`) that convert the throwable into
+ * a value of type `L`. The first matching throwable based on type hierarchy is applied.
+ * @return An `Either` instance where the success value of the `Result` is wrapped in `Right`,
+ * or the transformed value of the throwable is wrapped in `Left` if an exception occurs.
+ * @since 6.1.0
+ */
 @Suppress("UNCHECKED_CAST")
 fun <T, L> Result<T>.toEither(cases: Map<KClass<out Throwable>, Transformer<Throwable, L>>): Either<L, T> = either { catching({ this@toEither.getOrThrow() }) { t: Throwable ->
     (cases.entries
@@ -470,3 +564,29 @@ fun <T, L> Result<T>.toEither(cases: Map<KClass<out Throwable>, Transformer<Thro
             }
         }?.value ?: { GenericError as L })(t)
 } }
+
+/**
+ * Applies a transformation function to each element in the iterable and accumulates the results
+ * if all transformations succeed, or returns the first encountered failure.
+ *
+ * The `traverse` function iterates over each element in the collection, applies the provided
+ * transformation function, and collects the successful results into a list. If any transformation
+ * produces a `Left` instance, the function immediately returns that `Left`, short-circuiting further
+ * processing.
+ *
+ * @param f A transformation function that maps each element of type `A` in the iterable to an `Either<E, B>`,
+ *          where `E` represents a failure type and `B` represents a success type.
+ * @return An `Either` instance containing a `List<B>` if all transformations succeed, or the first
+ *         `Left<E>` encountered if any transformation fails.
+ * @since 6.1.0
+ */
+inline fun <E, A, B> Iterable<A>.traverse(f: Transformer<A, Either<E, B>>): Either<E, List<B>> {
+    val results = mutableListOf<B>()
+    for (item in this) {
+        when (val result = f(item)) {
+            is Left -> return result
+            is Right -> results.add(result.value)
+        }
+    }
+    return Right(results)
+}

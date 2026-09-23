@@ -97,7 +97,7 @@ sealed interface PaymentMethod {
             jsonNode.get("panHash") != null -> Card(
                 panHash = jsonNode.get("panHash").asString(),
                 last4Digits = jsonNode.get("last4Digits").asString(),
-                expiry = YearMonth(jsonNode.get("expiry").asString())(),
+                expiry = YearMonth(jsonNode.get("expiry").asString()),
                 cvvHash = jsonNode.get("cvvHash").asString(),
                 holderName = jsonNode.get("holderName").asString(),
                 issuer = jsonNode.get("issuer")?.let { Card.Issuer.ofName(it.asString()) }
@@ -123,7 +123,7 @@ sealed interface PaymentMethod {
             jsonNode.get("panHash") != null -> Card(
                 panHash = jsonNode.get("panHash").asText(),
                 last4Digits = jsonNode.get("last4Digits").asText(),
-                expiry = YearMonth(jsonNode.get("expiry").asText())(),
+                expiry = YearMonth(jsonNode.get("expiry").asText()),
                 cvvHash = jsonNode.get("cvvHash").asText(),
                 holderName = jsonNode.get("holderName").asText(),
                 issuer = jsonNode.get("issuer")?.let { Card.Issuer.ofName(it.asText()) }
@@ -284,7 +284,7 @@ sealed interface PaymentMethod {
                     return Card(
                         panHash = node.get("panHash").asString(),
                         last4Digits = node.get("last4Digits").asString(),
-                        expiry = YearMonth(node.get("expiry").asString())(),
+                        expiry = YearMonth(node.get("expiry").asString()),
                         cvvHash = node.get("cvvHash").asString(),
                         holderName = node.get("holderName").asString(),
                         issuer = node.get("issuer")?.let { Issuer.ofName(it.asString()) }
@@ -311,7 +311,7 @@ sealed interface PaymentMethod {
                     return Card(
                         panHash = node.get("panHash").asText(),
                         last4Digits = node.get("last4Digits").asText(),
-                        expiry = YearMonth(node.get("expiry").asText())(),
+                        expiry = YearMonth(node.get("expiry").asText()),
                         cvvHash = node.get("cvvHash").asText(),
                         holderName = node.get("holderName").asText(),
                         issuer = node.get("issuer")?.let { Issuer.ofName(it.asText()) }

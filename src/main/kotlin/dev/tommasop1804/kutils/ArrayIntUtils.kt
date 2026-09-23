@@ -144,6 +144,19 @@ val IntArray.isNotDescendingSorted get() = !isSortedDescending()
  * @since 6.1.0
  */
 fun IntArray.orNullIfEmpty() = if (isEmpty()) null else this
+/**
+ * Returns an `Either` instance based on whether is empty or not.
+ *
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
+ *
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
+ */
+fun IntArray.orErrorIfEmpty(): Either<Empty, IntArray> =
+    either { if (isEmpty()) raise(Empty) else this }
 
 /**
  * Returns the current IntArray if it is not null, or an empty IntArray if it is null.

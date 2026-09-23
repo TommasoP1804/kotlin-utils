@@ -13,9 +13,10 @@ import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.LocalDateTime
 import dev.tommasop1804.kutils.RiskyApproximationOfTemporal
 import dev.tommasop1804.kutils.before
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.emptyMList
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isDecimal
 import dev.tommasop1804.kutils.tryOrThrow
 import dev.tommasop1804.kutils.validate
@@ -40,6 +41,7 @@ import java.time.chrono.Chronology
 import java.time.chrono.IsoChronology
 import java.time.temporal.*
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 import kotlin.text.startsWith
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
@@ -315,23 +317,18 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
         }
         
         /**
-         * Parses the input string to calculate a time-based duration.
+         * Parses the given [CharSequence] input and attempts to convert it into a [Duration] representation.
+         * The input must comply with the ISO-8601 duration format and start with a 'P' character.
+         * If parsing fails due to an invalid format, it returns an [InvalidFormatOfType] error.
          *
-         * The input string should adhere to the ISO-8601 duration format, starting with 'P'.
-         * It may include designators for years, months, days, hours, minutes, seconds, and fractions of seconds.
-         * Negative durations are supported by using a '-' prefix before 'P'.
-         *
-         * @param a the input string representing the duration in ISO-8601 format.
-         *          For example, "P1Y2M3DT4H5M6.789S" would represent a duration of
-         *          1 year, 2 months, 3 days, 4 hours, 5 minutes, and 6.789 seconds.
-         * @return a [Result] containing the calculated [Duration] if parsing is successful,
-         *         or an error if the input string is invalid.
-         * @throws MalformedInputException if the input string does not conform to the ISO-8601 duration format.
-         * @since 1.0.0
+         * @param a The input [CharSequence] in the ISO-8601 duration format, prefixed by 'P'.
+         *          It can optionally include time components separated by 'T'.
+         * @return Either a successfully parsed [Duration] object or an [InvalidFormatOfType] error describing the issue.
+         * @since 6.1.0
          */
-        infix fun parse(a: CharSequence) = runCatching {
+        infix fun parse(a: CharSequence): Either<InvalidFormatOfType, Duration> = either { catching({
             var duration = Duration()
-            var text = a
+            var text = a.toString()
             if (text.isBlank()) duration
             else {
                 val negative = text.startsWith("-")
@@ -399,7 +396,7 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
                 } else throw MalformedInputException("Text must start with 'P'")
                 duration
             }
-        }
+        }) { t: Throwable -> InvalidFormatOfType(a, typeOf<Duration>(), t) } }
 
         /**
          * Calculates the duration between this temporal object and the specified end temporal object.

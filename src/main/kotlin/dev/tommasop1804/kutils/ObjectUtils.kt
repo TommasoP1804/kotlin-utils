@@ -1180,6 +1180,61 @@ inline fun <T, E : Error> tryOrError(
         }
     }
 }
+/**
+ * Executes the provided [block] and handles exceptions by either raising an error or re-throwing.
+ * This method allows fine-grained control over exception handling by specifying specific cases,
+ * inclusion filters ([only]), and exclusion filters ([except]).
+ *
+ * The [block] is executed in the current context, and exceptions are handled based on the following rules:
+ * - If the exception is of type [InterruptedException] or [CancellationException], it is re-thrown immediately.
+ * - If specific cases are provided in [specificCases], they take precedence over other filters.
+ * - If an exception matches the [only] set, it is processed unless it is excluded by the [except] set.
+ * - If no specific handling or inclusion logic matches, the exception is passed through unhandled.
+ *
+ * @param error A transformer function mapping generic exceptions to a specific error type [E].
+ * @param specificCases A map of specific exception classes to transformer functions. These take precedence over other filters.
+ * @param only A set of exception classes to be processed. If empty, all exceptions will be considered.
+ * @param except A set of exception classes to be excluded from processing. Takes precedence over [only].
+ * @param block The code block to execute, potentially throwing exceptions to handle.
+ * @return The result of the execution of [block], if no exception causes it to raise or fail.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+context(raise: Raise<E>)
+inline fun <T, E> tryOrRaise(
+    error: Transformer<Exception, E>,
+    specificCases: Map<KClass<out Exception>, Transformer<Exception, E>> = emptyMap(), // priority over only/except
+    only: Set<KClass<out Exception>> = emptySet(),
+    except: Set<KClass<out Exception>> = emptySet(),
+    block: Supplier<T>
+): T {
+    if (only intersects except) throw ParametersInConflictException(
+        callableName = "tryOrError",
+        parametersName = listOf("only", "except"),
+        valuesInConflict = only intersect except
+    )
+    if (specificCases.keys intersects except) throw ParametersInConflictException(
+        callableName = "tryOrError",
+        parametersName = listOf("only", "except"),
+        valuesInConflict = specificCases.keys intersect except
+    )
+
+    return try {
+        block()
+    } catch (e: Exception) {
+        if (e is InterruptedException || e is CancellationException) throw e
+
+        val passes = (only.isEmpty() || only.any { it.isInstance(e) }) && except.none { it.isInstance(e) }
+        val specific = generateSequence<Class<*>>(e.javaClass) { it.superclass }
+            .firstNotNullOfOrNull { specificCases[it.kotlin] }
+
+        when {
+            specific != null -> raise.raise(specific(e))
+            passes -> raise.raise(error(e))
+            else -> throw e
+        }
+    }
+}
 
 /**
  * Converts the receiver object to a string representation in a safe manner.

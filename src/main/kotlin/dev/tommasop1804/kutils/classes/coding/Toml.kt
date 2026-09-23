@@ -842,7 +842,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [TomlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
@@ -850,7 +850,9 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @param patch the TOML object representing the patch to apply.
      * @since 6.1.0
      */
-    infix fun tomlPatch(patch: Toml) = toJson().jsonPatch(patch.toJson()).map { it.toToml() }
+    infix fun tomlPatch(patch: Toml) = toJson().jsonPatch(patch.toJson()).map { it.toToml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { TomlError.PathNotFound(e.path) }
+    }
     /**
      * Applies a JSON patch to the current object converted to JSON and converts the result back to TOML.
      *
@@ -861,7 +863,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [TomlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
@@ -869,7 +871,39 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * @param patch the JSON patch to apply to the current object
      * @since 6.1.0
      */
-    infix fun tomlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toToml() }
+    infix fun tomlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toToml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { TomlError.PathNotFound(e.path) }
+    }
+
+    /**
+     * Validates the current object against a provided JSON schema using a JSON serialization of the object.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [TomlError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema to validate the object against.
+     * @return A result indicating whether validation was successful or a failure containing schema validation errors.
+     * @since 6.1.0
+     */
+    infix fun validateWithSchema(jsonSchema: JsonSchema) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        TomlError.SchemaValidationFailed(e.errors)
+    }
+    /**
+     * Validates the current object against the provided JSON schema.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [TomlError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema to validate against.
+     * @param version The version of the JSON schema to be used during validation.
+     * @return A result mapping any validation errors, if present.
+     * @since 6.1.0
+     */
+    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        TomlError.SchemaValidationFailed(e.errors)
+    }
 }
 
 /**
@@ -1119,7 +1153,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asDate(): LocalDate? = when (rawValue) {
         is LocalDate -> rawValue
-        else -> asString()?.let(::LocalDate)?.getOrThrow()
+        else -> asString()?.let(::LocalDate)
     }
     /**
      * Converts the current TomlNode to an OffsetDateTime representation.
@@ -1128,7 +1162,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asDateTime(): OffsetDateTime? = when (rawValue) {
         is OffsetDateTime -> rawValue
-        else -> asString()?.let(::OffsetDateTime)?.getOrThrow()
+        else -> asString()?.let(::OffsetDateTime)
     }
     /**
      * Converts the current node to an [Instant] if possible.
@@ -1137,7 +1171,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asInstant(): Instant? = when (rawValue) {
         is Instant -> rawValue
-        else -> asString()?.let(::Instant)?.getOrThrow()
+        else -> asString()?.let(::Instant)
     }
 
     /**

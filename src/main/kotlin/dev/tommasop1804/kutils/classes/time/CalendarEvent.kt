@@ -16,7 +16,6 @@ import dev.tommasop1804.kutils.classes.colors.*
 import dev.tommasop1804.kutils.classes.registry.*
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalToUnrestricted
 import dev.tommasop1804.kutils.expectClass
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNotDecimal
 import dev.tommasop1804.kutils.jsonb
 import dev.tommasop1804.kutils.memberPropertiesMap
@@ -514,7 +513,7 @@ data class CalendarEvent(
 
                     class Deserializer : ValueDeserializer<ByDate>() {
                         override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): ByDate =
-                            ByDate(dev.tommasop1804.kutils.LocalDate(p.objectReadContext().readValue(p, String::class.java))())
+                            ByDate(dev.tommasop1804.kutils.LocalDate(p.objectReadContext().readValue(p, String::class.java)))
                     }
 
                     class OldSerializer : JsonSerializer<ByDate>() {

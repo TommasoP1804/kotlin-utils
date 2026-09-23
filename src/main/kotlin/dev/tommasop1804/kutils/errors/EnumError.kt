@@ -17,14 +17,16 @@ package dev.tommasop1804.kutils.errors
 @Suppress("unused")
 open class EnumError(open val enum: Enum<*>) {
     /**
-     * Represents an error occurring when a specified entry is not found within an enumeration.
+     * Represents an error that occurs when a specific entry is not found within an enumeration.
      *
-     * This data class is a specialized type of [EnumError] designed to provide additional context
-     * about a missing entry in an enum-based operation. It includes the enumeration type and the
-     * specific entry that could not be located.
+     * This data class provides detailed information about the missing entry, associating it with
+     * the corresponding enumeration (`enum`) from which the entry was expected. It extends the
+     * [EnumError] class to categorize this as an error related to enumeration handling. Additionally,
+     * it implements the [ParsingError] interface, indicating that this error qualifies as a specific
+     * parsing issue.
      *
-     * @property enum The enumeration type in which the entry lookup was attempted.
-     * @property entry The name of the entry that was not found.
+     * @property enum The enumeration associated with the missing entry.
+     * @property entry The name of the entry within the enumeration that was not found.
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */

@@ -19,11 +19,15 @@ import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.EMAIL_REGEX
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.apache.commons.codec.binary.Base32
 import org.bouncycastle.jcajce.provider.digest.*
 import org.bouncycastle.util.encoders.Hex
+import tools.jackson.core.JacksonException
+import tools.jackson.core.exc.StreamReadException
+import tools.jackson.databind.DatabindException
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -35,6 +39,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.typeOf
 
 /**
  * Provides an empty string as a constant property of the String companion object.
@@ -1344,22 +1349,30 @@ fun String.camelCase(): String {
 }
 
 /**
- * Deserializes the JSON string into an object of the specified type [T].
+ * Deserializes a JSON string into an object of the specified type.
  *
- * This method uses a generic type parameter [T] to determine the target type
- * during deserialization. It leverages the `MAPPER` object configured for
- * JSON processing to read and convert the JSON string into the desired type.
+ * This method uses the Jackson library to convert the string into an object of type [T].
+ * It handles deserialization errors gracefully, wrapping them into `DeserializationError` subclasses
+ * such as `DeserializationError.ReadError` or `DeserializationError.MappingError`.
  *
- * If the deserialization process encounters any errors, such as invalid JSON
- * structure or type mismatches, the operation will return a failed `Result`
- * wrapping the exception.
+ * Possible errors:
+ * - [DeserializationError.ReadError] - Indicates an error occurred while reading the JSON string.
+ * - [DeserializationError.MappingError] - Indicates an error occurred during the mapping process.
+ * - [DeserializationError] - Indicates an unexpected error occurred during deserialization.
  *
  * @receiver The JSON string to be deserialized.
- * @return A [Result] containing the deserialized object of type [T] if successful,
- * or an exception if deserialization fails.
- * @since 1.0.0
+ * @return An `Either` instance containing either a deserialization error (`Left`) or the successfully
+ *         deserialized object (`Right`).
+ * @since 6.1.0
  */
-inline fun <reified T> String.deserialize() = runCatching { MAPPER.readValue(this, T::class.java) as T }
+inline fun <reified T> String.deserialize() = either {  catching({
+    MAPPER.readValue(this, T::class.java) as T
+}) { e: Exception -> when (e) {
+    is StreamReadException -> DeserializationError.ReadError(typeOf<T>(), e)
+    is DatabindException -> DeserializationError.MappingError(typeOf<T>(), e)
+    is JacksonException -> DeserializationError(typeOf<T>(), e)
+    else -> throw e
+} } }
 
 /**
  * Creates a Map by associating each character in the CharSequence with a value

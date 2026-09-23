@@ -157,12 +157,12 @@ data class Chunked<T>(
                             when (it.operator.category)  {
                                 Category.String, Equality -> "'${it.value?.toString()?.lowercase()}'"
                                 Comparison if it.property in dateFields -> {
-                                    if (YearMonth(it.value!!.toString()).isSuccess)
+                                    if (tryTrueOrFalse { val _ = YearMonth(it.value!!.toString()) })
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()}' AS DATE)"
                                 }
                                 Comparison if it.property in dateTimeFields -> {
-                                    if (YearMonth(it.value!!.toString()).isSuccess)
+                                    if (tryTrueOrFalse { val _ = YearMonth(it.value!!.toString()) })
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()} ${if (it.operator in setOf(GreaterThan, GreaterThanOrEquals)) "00:00:00" else "23:59:59"}' AS TIMESTAMP)"
                                 }

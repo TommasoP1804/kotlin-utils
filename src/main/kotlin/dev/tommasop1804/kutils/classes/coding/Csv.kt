@@ -287,34 +287,71 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
         }
 
         /**
-         * Reads an array of the specified type from the given CSV file.
+         * Reads an array of type [T] from the specified file. The file should contain
+         * elements separated by a given character and may optionally include headers.
          *
-         * @param T The type of elements to be read and stored in the resulting array.
-         * @param file The file from which the array is read.
-         * @return A [Result] containing the array of type [T].
-         * @since 3.13.0
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file to read data from.
+         * @param separator The character used to separate elements in the file. Defaults to ','.
+         * @param hasHeaders Indicates whether the file includes headers. Defaults to true.
+         * @return An [Either] containing an [Array] of type [T] if reading succeeds, or an [Error] if it fails.
+         * @since 6.1.0
          */
-        inline fun <reified T> readArrayFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<Array<T>> =
-            runCatching { readListFromFile<T>(file, separator, hasHeaders)().toTypedArray() }
+        inline fun <reified T> readArrayFromFile(
+            file: File,
+            separator: Char = Char.COMMA,
+            hasHeaders: Boolean = true
+        ): Either<Error, Array<T>> = readListFromFile<T>(file).map { it.toTypedArray() }
 
         /**
-         * Reads and parses a list of objects from the specified CSV file.
+         * Reads a list of objects of type T from a specified file.
          *
-         * @param file The file to read from. It should contain CSV-formatted data.
-         * @return A [Result] containing the parsed list of objects of type [T].
-         * @since 3.13.0
+         * This method parses the contents of a given file containing data in CSV format
+         * and converts it into a list of the specified type [T]. The file content is expected
+         * to be delimited by the provided separator and may optionally include headers.
+         *
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file to be read, containing delimited data in CSV format.
+         * @param separator A character used to separate values in the data. Defaults to a comma (',').
+         * @param hasHeaders Indicates whether the CSV file includes headers. Defaults to true.
+         * @return An [Either] object containing either an [Error] if the operation fails,
+         *         or a [List] of objects of type [T] if the operation succeeds.
+         * @since 6.1.0
          */
-        inline fun <reified T> readListFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<List<T>> =
-            runCatching { Csv(file.readText(), separator, hasHeaders).toList<T>()() }
+        inline fun <reified T> readListFromFile(
+            file: File,
+            separator: Char = Char.COMMA,
+            hasHeaders: Boolean = true
+        ): Either<Error, List<T>> = (either {
+            catching({ Csv(file.readText(), separator, hasHeaders) }) { e: MalformedInputException ->
+                InvalidFormatOfType(file, typeOf<Csv>(), e)
+            }
+        } thenEither { it.toList<T>() }).flatten()
 
         /**
-         * Reads the content of a given file, parses it as CSV, and converts it to a set of type [T].
+         * Reads a file and transforms its contents into a Set of elements of the specified type.
          *
-         * @param file The file to be read, whose content is expected to be in CSV format.
-         * @return A [Result] containing a [Set] of elements of type [T].
-         * @since 3.13.0
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file to read data from.
+         * @param separator The character used to separate values in the file. Defaults to a comma.
+         * @param hasHeaders Indicates whether the file contains header rows. Defaults to true.
+         * @return An Either containing an Error if an issue occurs, or a Set of elements of the specified type.
+         * @since 6.1.0
          */
-        inline fun <reified T> readSetFromFile(file: File, separator: Char = Char.COMMA, hasHeaders: Boolean = true): Result<Set<T>> = runCatching { Csv(file.readText(), separator, hasHeaders).toSet<T>()() }
+        inline fun <reified T> readSetFromFile(
+            file: File,
+            separator: Char = Char.COMMA,
+            hasHeaders: Boolean = true
+        ): Either<Error, Set<T>> = readListFromFile<T>(file).map { it.toSet() }
 
         class Serializer : ValueSerializer<Csv>() {
             override fun serialize(value: Csv, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

@@ -153,6 +153,20 @@ val <E> Sequence<E>.isNotSingleElement: Boolean get() = !isSingleElement
 fun <S : Sequence<E>, E> S.orNullIfEmpty() = if (isEmpty) null else this
 
 /**
+ * Returns an `Either` instance based on whether is empty or not.
+ *
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
+ *
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
+ */
+fun <E> Sequence<E>.orErrorIfEmpty(): Either<Empty, Sequence<E>> =
+    either { ifEmpty { raise(Empty) } }
+
+/**
  * Merges the current sequence with additional sequences and returns the resulting sequence.
  * 
  * If the current sequence is null or empty and no additional sequences are provided, 

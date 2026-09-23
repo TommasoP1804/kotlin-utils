@@ -387,8 +387,8 @@ class Stopwatch (var startTime: Long? = null, var endTime: Long? = null) : Seria
      * @since 1.0.0
      */
     override fun hashCode(): Int {
-        var result = startTime?.hashCode() ?: 0
-        result = 31 * result + (endTime?.hashCode() ?: 0)
+        var result = startTime.hashCode()
+        result = 31 * result + endTime.hashCode()
         result = 31 * result + isRunning.hashCode()
         return result
     }

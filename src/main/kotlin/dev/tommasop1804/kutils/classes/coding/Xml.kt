@@ -1323,7 +1323,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [XmlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
@@ -1331,7 +1331,9 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @param patch the JSON patch to apply.
      * @since 6.1.0
      */
-    infix fun xmlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toXml(rootName) }
+    infix fun xmlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toXml(rootName) }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { XmlError.PathNotFound(e.path) }
+    }
 
     /**
      * Applies a JSON Patch (RFC 6902) using another [Xml] as patch.
@@ -1339,14 +1341,16 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [XmlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
      *
      * @since 6.1.0
      */
-    infix fun xmlPatch(patch: Xml) = xmlPatch(patch.toJson())
+    infix fun xmlPatch(patch: Xml) = xmlPatch(patch.toJson()).mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { XmlError.PathNotFound(e.path) }
+    }
 
     /**
      * Applies a JSON Patch (RFC 6902) using a [Yaml] as patch.
@@ -1354,7 +1358,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Possible erros:
      * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
-     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [XmlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
      * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
      * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
@@ -1362,7 +1366,9 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * @since 6.1.0
      */
     @OptIn(Beta::class)
-    infix fun xmlPatch(patch: Yaml) = xmlPatch(patch.toJson())
+    infix fun xmlPatch(patch: Yaml) = xmlPatch(patch.toJson()).mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { XmlError.PathNotFound(e.path) }
+    }
 
     // --- XSLT ---
 

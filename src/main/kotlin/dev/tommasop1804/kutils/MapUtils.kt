@@ -18,6 +18,7 @@ import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.functional.Either
 import dev.tommasop1804.kutils.classes.functional.catching
 import dev.tommasop1804.kutils.classes.functional.either
+import dev.tommasop1804.kutils.classes.functional.raise
 import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.util.*
@@ -159,6 +160,19 @@ val <V> Map<*, V>.valuesMode get() = values.groupingBy { it }.eachCount().maxByO
  * @since 5.4.0
  */
 fun <M : Map<K, V>, K, V> M.orNullIfEmpty() = ifEmpty { null }
+/**
+ * Returns an `Either` instance based on whether is empty or not.
+ *
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
+ *
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
+ */
+fun <M: Map<K, V>, K, V> M.orErrorIfEmpty(): Either<Empty, M> =
+    either { ifEmpty { raise(Empty) } }
 
 /**
  * Adds the specified entry to this map. If the key already exists in the map, 

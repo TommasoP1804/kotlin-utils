@@ -11,9 +11,11 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.web.*
 import dev.tommasop1804.kutils.classes.web.HttpStatus.Companion.toHttpStatus
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.io.File
 import java.io.InputStream
@@ -29,6 +31,7 @@ import java.util.concurrent.Flow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.typeOf
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -523,26 +526,34 @@ fun <T> HttpRequest.sendAsync(bodyHandler: HttpResponse.BodyHandler<T>, pushProm
     client.sendAsync(this, bodyHandler)!!
 
 /**
- * Converts the current string to a [URI] instance. If the string is not a valid URI,
- * the operation will return a [Result] encapsulating the failure.
+ * Converts the current `String` instance to a `Uri` representation.
  *
- * This method attempts to parse the string as a URI and wraps the result in a [Result] object.
- * If the string is malformed or violates URI syntax rules, the exception will be captured
- * within the [Result] failure.
+ * This method attempts to transform the string into a valid `Uri` object. If the conversion
+ * is successful, a `Right` instance containing the resulting `Uri` is returned. If the conversion
+ * fails due to an invalid format, a `Left` instance containing an `InvalidFormatOfType` error is returned.
  *
- * @receiver The string to be converted to a [URI].
- * @return A [Result] object containing either a successfully parsed [URI] or an exception if parsing fails.
- * @since 3.0.0
+ * @return An `Either` object containing a `Uri` in a `Right` instance if successful, or an
+ *         `InvalidFormatOfType` error in a `Left` instance if the conversion fails.
+ * @since 6.1.0
  */
-fun String.toUri() = runCatching { Uri(this) }
+fun String.toUri(): Either<InvalidFormatOfType, Uri> = tryOrError({
+    InvalidFormatOfType(this, typeOf<Uri>(), it)
+}) { Uri(this) }
 /**
- * Converts the string to a URL wrapped in a Result.
- * The method first attempts to convert the string to a URI and, if successful, converts the URI to a URL.
+ * Converts the string to a `Url` object if the string is a valid URL representation,
+ * otherwise returns an `InvalidFormatOfType` error encapsulated in an `Either`.
  *
- * @return A [Result] containing the [URL] if the conversion was successful, or an exception if it failed.
- * @since 3.0.0
+ * This function attempts to parse the string as a `Uri` and convert it to a `URL`.
+ * If the parsing or conversion fails, an `InvalidFormatOfType` error is returned,
+ * providing information about the failure.
+ *
+ * @return An `Either` containing `Right<Url>` if the string is successfully converted to `Url`,
+ *         or `Left<InvalidFormatOfType>` if the conversion fails.
+ * @since 6.1.0
  */
-fun String.toUrl(): Result<Url> = runCatching { toUri()().toURL() }
+fun String.toUrl(): Either<InvalidFormatOfType, Url> = tryOrError({
+    InvalidFormatOfType(this, typeOf<Url>(), it)
+}) { Uri(this).toURL() }
 
 /**
  * Converts this URL to a Uri.

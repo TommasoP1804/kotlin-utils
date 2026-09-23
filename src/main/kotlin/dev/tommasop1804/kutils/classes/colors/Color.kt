@@ -1099,7 +1099,7 @@ class Color internal constructor(var red: Int, var green: Int, var blue: Int, va
         fun ofRGBA(red: Int, green: Int, blue: Int, alpha: Percentage): Color {
             if (red !in 0..255 || green !in 0..255 || blue !in 0..255 || alpha.isOverflowing)
                 throw ValidationFailedException("Color RGBA components must be between 0 and 255 for colors and between 0 and 1 for alpha.")
-            return Color(red, green, blue, alpha.round())
+            return Color(red, green, blue, alpha.rounded)
         }
         /**
          * Combines the RGBA color components into a single color representation using a quadruple input.

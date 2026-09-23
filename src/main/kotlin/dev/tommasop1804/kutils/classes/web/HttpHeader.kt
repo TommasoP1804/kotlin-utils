@@ -14,7 +14,9 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.measure.*
+import dev.tommasop1804.kutils.classes.measure.MeasureUnit.DataSizeUnit.Companion.BYTES
 import dev.tommasop1804.kutils.classes.measure.RMeasurement.Companion.ofUnit
 import dev.tommasop1804.kutils.classes.security.*
 import dev.tommasop1804.kutils.classes.security.Jwt.Companion.toJwt
@@ -41,6 +43,8 @@ import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.IF_MODIFIED_SINC
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.IF_UNMODIFIED_SINCE
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LAST_MODIFIED
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LOCATION
+import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.headerDateToInstant
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -51,7 +55,6 @@ import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.net.InetSocketAddress
-import java.net.URI
 import java.nio.charset.Charset
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -60,6 +63,7 @@ import java.time.ZoneOffset.UTC
 import java.time.temporal.TemporalAccessor
 import java.util.*
 import java.util.Locale.LanguageRange
+import kotlin.reflect.typeOf
 import kotlin.text.Charsets.ISO_8859_1
 
 /**
@@ -346,19 +350,19 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
         }
 
         /**
-         * Converts a string representation of a date, commonly found in HTTP headers, into an [Instant].
+         * Converts a string representation of a date in HTTP header format to an [Instant].
+         * The method attempts to parse the string using a standard ISO date-time validator,
+         * or falls back to parsing the string as per common HTTP header date formats,
+         * such as RFC 7231 and other conventional formats.
          *
-         * The input string is expected to follow the format "WeekDay, Day Month Year Time TZ" (e.g., "Tue, 15 Nov 1994 08:12:31 GMT").
-         *
-         * @receiver The date string to be converted.
-         * @return The corresponding [Instant] representation of the date.
-         * @throws MalformedInputException If the month in the input string is invalid or if the format does not match expectations.
-         * @since 2.1.0
+         * @return Either an [InvalidFormatOfType] error indicating the string could not
+         *         be parsed into an [Instant], or the resulting [Instant] representation of the date.
+         * @since 6.1.0
          */
-        fun String.headerDateToInstant(): Instant =
+        fun String.headerDateToInstant(): Either<InvalidFormatOfType, Instant> = either {
             tryOr({
-                tryOrThrow({ MalformedInputException(Instant::class) }) {
-                    if (ISO_DATE_TIME_STANDARD_VALIDATOR(this)) return@tryOrThrow Instant(this)()
+                tryOrRaise({ InvalidFormatOfType(this, typeOf<Instant>(), it) }) {
+                    if (ISO_DATE_TIME_STANDARD_VALIDATOR(this)) return@tryOrRaise Instant(this)
                     val splitted = this / Char.SPACE
                     val day = splitted[1].toInt()
                     val month = when (splitted[2]) {
@@ -380,7 +384,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
                     val time = LocalTime(splitted[4])()
                     LocalDateTime(LocalDate(year, month, day), time).toInstant((TimeZone of splitted[5]).firstOrNull()?.offset ?: UTC)
                 }
-            }) { Instant.from(RFC_7231_DATE_TIME_FORMATTER.parse(this)) }
+            }) { Instant.from(RFC_7231_DATE_TIME_FORMATTER.parse(this)) } }
 
         /**
          * Converts the invoking [TemporalAccessor] instance, such as a date-time object, into a string
@@ -494,19 +498,20 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
      */
     fun toPair(): Pair<String, List<String>> = name to values
     /**
-     * Converts the current `HttpHeader` instance into a `Pair` representation, where the key
-     * is the header name and the value is deserialized to the specified type [T].
+     * Converts the current `HttpHeader` instance into a typed representation that deserializes
+     * all the values into the specified type [T], wrapped in an `Either` type.
      *
-     * This function uses the first value from the header's value list, attempts to
-     * deserialize it into the specified type [T], and then combines it with the header name
-     * to form the resulting `Pair`.
+     * This function attempts to deserialize each value in the `values` collection to the type [T].
+     * If all elements are successfully deserialized, it returns a `Pair` where the first element
+     * is the header name and the second element is the list of deserialized values. In case of a
+     * deserialization error, it returns a `DeserializationError`.
      *
-     * @return A `Pair` consisting of the header name as the key and the deserialized value
-     * of type [T] as the value.
-     * @throws Throwable If deserialization of the header value fails.
-     * @since 2.1.0
+     * @return An `Either` object containing either a `DeserializationError` if deserialization fails,
+     *         or a `Pair` of the header name and a list of deserialized values as the success result.
+     * @since 6.1.0
      */
-    inline fun <reified T> toTypedPair(): Pair<String, T> = name to values.first().deserialize<T>()()
+    inline fun <reified T> toTypedPair(): Either<DeserializationError, Pair<String, List<T>>> =
+        values.traverse { it.deserialize<T>() }.map { name to it }
     /**
      * Converts the current HttpHeader instance into a Map.Entry representation,
      * where the key is the header name and the value is the associated List<String>.
@@ -516,16 +521,18 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
      */
     fun toMapEntry(): Map.Entry<String, List<String>> = toPair().toMapEntry()
     /**
-     * Converts the current `HttpHeader` instance into a `Map.Entry` representation,
-     * where the key is the header name and the value is deserialized to the specified type [T].
+     * Converts a deserialization result into a typed map entry.
      *
-     * This function reuses the `toPair` method to obtain a `Pair` representation and then converts
-     * it into a `Map.Entry`.
+     * This function attempts to deserialize data into a `Map.Entry` with a key of type `String`
+     * and a value of type `List<T>`. If the deserialization succeeds, the result is wrapped in
+     * an `Either.Right`. If the deserialization fails, the error is wrapped in an `Either.Left`.
      *
-     * @return A `Map.Entry` consisting of the header name as the key and its deserialized value of type [T].
-     * @since 2.1.0
+     * @return An `Either` containing either a `DeserializationError` in case of failure
+     *         or a typed `Map.Entry<String, List<T>>` on success.
+     * @since 6.1.0
      */
-    inline fun <reified T> toTypedMapEntry(): Map.Entry<String, T> = toTypedPair<T>().toMapEntry()
+    inline fun <reified T> toTypedMapEntry(): Either<DeserializationError, Map.Entry<String, List<T>>> =
+        toTypedPair<T>().map { it.toMapEntry() }
 
     /**
      * Converts the current `HttpHeader` instance into an `HttpHeaders` object.
@@ -540,45 +547,19 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
     fun toHttpHeaders() = HttpHeaders(this)
 
     /**
-     * Deserializes the first value in the `values` list of the containing `HttpHeader` class
-     * to the specified type [T].
+     * Retrieves the deserialized list of values from the current `HttpHeader` instance
+     * as the specified type [T], wrapped in an `Either` type.
      *
-     * This function leverages the `deserialize` extension function and attempts to convert
-     * the first string in the `values` list into an object of type [T]. If deserialization fails,
-     * an exception is thrown.
+     * This function utilizes `toTypedPair` to perform the deserialization process
+     * and extracts only the second element of the resulting `Pair`, which is the
+     * list of successfully deserialized values.
      *
-     * @return The deserialized value of type [T].
-     * @since 2.1.0
+     * @return An `Either` object containing either a `DeserializationError` if
+     *         deserialization fails, or a `List<T>` of deserialized values
+     *         as the success result.
+     * @since 6.1.0
      */
-    inline fun <reified T> typedValue() = values.first().deserialize<T>()
-    /**
-     * Deserializes all values in the `values` collection to a specified type [T].
-     *
-     * This function uses the `deserialize` extension function to transform each
-     * element in the `values` collection into an instance of the specified type [T].
-     * The deserialization process may throw exceptions if any element cannot be
-     * converted into the desired type.
-     *
-     * @return A list of objects of type [T], obtained by deserializing the elements
-     * in the `values` collection.
-     * @since 2.1.0
-     */
-    inline fun <reified T> typedValues() = values.map { it.serialize().deserialize<T>() }
-    /**
-     * Deserializes all values in the `values` collection to a specified type [T].
-     *
-     * This function uses the `deserialize` extension function to transform each
-     * element in the `values` collection into an instance of the specified type [T].
-     * The deserialization process may throw exceptions if any element cannot be
-     * converted into the desired type.
-     *
-     * @return A list of objects of type [T], obtained by deserializing the elements
-     * in the `values` collection.
-     * @throws Throwable If the deserialization process for any element in the
-     * `values` collection fails, the exception will be propagated.
-     * @since 2.1.0
-     */
-    inline fun <reified T> unsafeTypedValues() = values.map { it.serialize().deserialize<T>()() }
+    inline fun <reified T> typedValues(): Either<DeserializationError, List<T>> = toTypedPair<T>().map { it.second }
 
     /**
      * Creates a new `HttpHeader` instance with the specified name while retaining the current values.
@@ -980,7 +961,6 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @since 2.1.0
      */
     override fun get(key: String): List<String>? = headers.find { it.nameEquals(key) }?.values
-
     /**
      * Retrieves the value associated with the specified key or throws an exception if the key is not present.
      *
@@ -993,584 +973,16 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      */
     fun getOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) =
         get(key) ?: throw lazyException()
-
     /**
-     * Retrieves the first value associated with the specified key from the headers.
-     * Searches through the headers, finds the header that matches the given key,
-     * and returns the first value from the matched header.
+     * Attempts to retrieve a value associated with the given key. If the key does not exist,
+     * an error of type IterableError.NotFound is returned.
      *
-     * @param key The key used to locate the matching header.
-     * @return The first value corresponding to the specified key.
-     * @throws NoSuchElementException If no header matches the given key.
-     * @since 2.1.0
+     * @param key The key to retrieve the associated value for.
+     * @return Either a List of Strings associated with the key or an IterableError.NotFound error.
+     * @since 6.1.0
      */
-    fun getFirst(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first()
-    /**
-     * Retrieves the first value of a specific type associated with the given key from the headers.
-     *
-     * This function searches for a header with the specified key, extracts its values,
-     * serializes the first value, and deserializes it into the desired type.
-     *
-     * @param T The type to which the first value should be deserialized.
-     * @param key The key used to locate the header.
-     * @return The first value deserialized into the specified type.
-     * @throws Exception If the header cannot be found or if deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()
-    /**
-     * Retrieves and deserializes the first value associated with the specified header key,
-     * casting it to the desired type. This method is considered unsafe as it does not perform
-     * explicit validation of the type during runtime.
-     *
-     * @param T The reified type to which the value will be cast.
-     * @param key The header key to search for in the headers.
-     * @return The first value associated with the header key, deserialized and cast to type T.
-     * @throws NoSuchElementException If no header with the specified key exists.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.first().serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the first value associated with the given key from the headers or returns null if no match is found.
-     *
-     * @param key The key to search for in the headers.
-     * @return The first value associated with the key, or null if no such key exists.
-     * @since 2.1.0
-     */
-    fun getFirstOrNull(key: String): String? = headers.find { it.nameEquals(key) }?.values?.firstOrNull()
-    /**
-     * Retrieves the first value associated with the given key, deserializing it into the specified type if possible.
-     *
-     * This function searches for a header entry matching the provided key, attempts to serialize the first value,
-     * and then deserializes it into the specified type defined by the reified generic type parameter.
-     *
-     * @param T The type to which the value should be deserialized.
-     * @param key The key identifying the header entry to search for.
-     * @return The first value deserialized into the specified type, or null if the key is not found or deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.firstOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-    /**
-     * Retrieves the first value associated with the given key from the headers, deserializes it into the specified type,
-     * and returns it if available. This method uses an unsafe approach to type casting and may throw runtime exceptions
-     * if the deserialization fails. Use with caution.
-     *
-     * @param T The expected type of the deserialized value.
-     * @param key The key used to find the corresponding header value.
-     * @return The deserialized value of type T if found, or null if no value is available.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.firstOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-
-    /**
-     * Retrieves the first value associated with the given key from the headers or throws an exception
-     * provided by the lazyException supplier if no matching value is found.
-     *
-     * @param key The key to search for in the headers.
-     * @param lazyException A supplier that provides the exception to throw if no matching value is found.
-     * @return The first value associated with the given key.
-     * @throws Throwable An exception provided by the lazyException supplier if no matching key or value is found.
-     * @since 2.1.0
-     */
-    fun getFirstOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException)
-    /**
-     * Retrieves and deserializes the first value associated with the specified key from the headers
-     * into the expected type [T]. Throws a lazily-supplied exception if the key or value is not found.
-     *
-     * @param key The key to search for in the headers.
-     * @param lazyException A supplier function that provides the exception to be thrown 
-     *                      if the key or value is not found.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()
-    /**
-     * Retrieves the first value associated with the specified key from the headers and deserializes it into the specified type.
-     * Throws a lazily-supplied exception if the value is not found or cannot be deserialized.
-     *
-     * @param key The key to search for in the headers.
-     * @param lazyException A supplier function that provides the exception to be thrown if the value is not found
-     *        or cannot be deserialized.
-     * @return The deserialized first value associated with the provided key, cast to the specified type [T].
-     * @throws Throwable The lazily-supplied exception if the key is not found or if deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.firstOrThrow(lazyException).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the first value associated with the specified key from the headers. 
-     * If no matching key-value pair is found, the supplied default value is returned.
-     *
-     * @param key The key to search for in the headers.
-     * @param default A supplier function that provides a default value when the key is not found.
-     * @return The first value associated with the specified key, or the value from the default supplier if the key is not present.
-     * @since 2.1.0
-     */
-    fun getFirstOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default)
-    /**
-     * Retrieves the first value associated with the specified key or a typed default value if the key is not found.
-     * The value is serialized and deserialized into the specified type `T`.
-     *
-     * @param key The key to search for in the headers.
-     * @param default A supplier providing a default value of type `T` if the key is not found.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()
-    /**
-     * Retrieves the first value associated with the specified key from the headers, attempting to cast it
-     * to the provided type `T`. If no value is found, it uses the provided default supplier.
-     * This function performs an unsafe cast, so use it with caution.
-     *
-     * @param T The type to which the value should be cast.
-     * @param key The key to search for in the headers.
-     * @param default A supplier function that provides a default value of type `T` if no valid value is found.
-     * @return The first value associated with the key, cast to the specified type `T`, or the default value if not found.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getFirstTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the second value associated with the specified key from the headers.
-     *
-     * This method searches for a header with a name matching the given key, and then it retrieves
-     * the second value from the values of that header. If no matching header is found or if there
-     * is no second value, the operation will throw an exception.
-     *
-     * @param key The name of the header to search for.
-     * @return The second value associated with the specified header key.
-     * @throws NoSuchElementException If no header with the specified key is found.
-     * @throws IndexOutOfBoundsException If the header does not contain at least two values.
-     * @since 2.1.0
-     */
-    fun getSecond(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second()
-    /**
-     * Retrieves the second value associated with the given key from headers, serializes 
-     * it, and deserializes it into the specified type.
-     *
-     * @param key The key whose second associated value is to be retrieved.
-     * @return The second value associated with the key, deserialized into the specified type.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()
-    /**
-     * Retrieves the second value associated with the given key from the `headers`,
-     * performs serialization and deserialization, and returns the result as the specified type [T].
-     * This operation assumes the existence of the key and at least two values, and performs
-     * unchecked type casting, which may lead to runtime exceptions if the type does not match.
-     *
-     * @param T The type to which the second value in the header will be deserialized.
-     * @param key The key used to locate the corresponding header in the `headers`.
-     * @return The second value associated with the specified key, deserialized into the specified type [T].
-     * @throws NoSuchElementException If the key is not found or there is no second value.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.second().serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the second value associated with the specified key from the headers.
-     *
-     * Searches through the headers for an entry that matches the given key and
-     * returns the second value associated with that key, if it exists. If no
-     * matching entry or second value is found, `null` is returned.
-     *
-     * @param key the key used to identify the entry in the headers.
-     * @return the second value associated with the specified key, or `null` if not found.
-     * @since 2.1.0
-     */
-    fun getSecondOrNull(key: String): String? = headers.find { it.nameEquals(key) }?.values?.secondOrNull()
-    /**
-     * Retrieves the second value associated with the specified key from the headers,
-     * attempts to deserialize it into the specified type [T], and returns the result.
-     * If the value is not found or the deserialization fails, returns null.
-     *
-     * @param T The type to which the value should be deserialized.
-     * @param key The key whose associated second value is to be retrieved.
-     * @return The second value associated with the key, deserialized to type [T], or null if not found or deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.secondOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-    /**
-     * Retrieves the second value associated with the given key from the headers,
-     * attempts to deserialize it into the specified type, and returns it.
-     * If no value exists or deserialization fails, `null` is returned.
-     *
-     * This function is considered unsafe as it relies on unchecked type casts and reified generics,
-     * which may result in runtime type errors if the expected type does not match the actual data type.
-     *
-     * @param T The type to which the value will be deserialized.
-     * @param key The key associated with the header whose value is to be retrieved.
-     * @return The second value associated with the specified key, deserialized to the type `T`,
-     *         or `null` if no such value exists or deserialization fails.
-     **/
-    inline fun <reified T> getSecondTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.secondOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-
-    /**
-     * Retrieves the second value associated with the specified key or throws an exception if not found.
-     *
-     * This method searches through the headers to find a match based on the provided key.
-     * If found, it retrieves the associated values and ensures the second value exists.
-     * If the second value is not present, the provided lazy exception is thrown.
-     *
-     * @param key The key used to search for the header entry.
-     * @param lazyException A supplier*/
-    fun getSecondOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException)
-    /**
-     * Retrieves and deserializes the second value associated with the given key from the headers,
-     * ensuring that the value is of the specified type. If the key or second value is not found,
-     * the provided exception supplier is invoked to throw an exception.
-     *
-     * @param T The type to which the second value should be deserialized.
-     * @param key The key to search for in the headers.
-     * @param lazyException A supplier that provides the exception to be thrown if the key or second value is not found.
-     * @return The deserialized second value of the specified type.
-     * @throws Throwable The exception provided by the supplier if the key or second value is not found.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()
-    /**
-     * Retrieves the second value associated with a specific header key, performs serialization and 
-     * deserialization, and returns it as a typed object. If the second value is not found, an exception is thrown.
-     *
-     * This method is considered "unsafe" as it performs unchecked casting after deserialization,
-     * and assumptions about the type must be correct to avoid runtime errors.
-     *
-     * @param T The expected type of the deserialized object.
-     * @param key The header key whose second value is to be retrieved.
-     * @param lazyException A supplier for the exception to be thrown if the required value is not found.
-     * @return The deserialized object of the expected type T.
-     * @throws Throwable If the second value is not found or if deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.secondOrThrow(lazyException).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the second value associated with the specified header key, or falls back to the default value if no such value exists.
-     *
-     * @param key The header key used to search for the desired entry.
-     * @param default A supplier that provides a fallback value if the second value is not found.
-     * @return The second value corresponding to the header key, or the provided default value.
-     * @throws NoSuchElementException If the key is not found in the headers.
-     * @since 2.1.0
-     */
-    fun getSecondOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default)
-    /**
-     * Retrieves the second value associated with the given key from the headers, converting it to the specified type.
-     * If the second value is not present, the provided default value is used instead.
-     *
-     * @param key The key whose associated value is to be fetched.
-     * @param default A supplier that provides a default value to be used if the second value does not exist.
-     * @return The second value associated with the key, converted to the type `T`, or the provided default value.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()
-    /**
-     * Retrieves the second value associated with a specified key from a headers collection, or a default value
-     * of the specified type if the second value does not exist. The type is determined at runtime and deserialized
-     * from the stored representation.
-     *
-     * @param key The key used to locate the header entry in the collection.
-     * @param default A supplier that provides a default value of type `T` to be used if a second value is not found.
-     * @return The second value associated with the key, deserialized to the specified type `T`, or the default value if unavailable.
-     * @throws NoSuchElementException if the key is not found in the headers collection.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getSecondTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.secondOr(default).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the third value corresponding to a specified key from the headers.
-     * If the key does not exist or there is no third value, an exception is thrown.
-     *
-     * @param key The key used to locate the header in the collection.
-     * @return The third value associated with the specified key.
-     * @throws NoSuchElementException If the key is not found in the headers or if
-     * there is no third value for the key.
-     * @since 2.1.0
-     */
-    fun getThird(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third()
-    /**
-     * Retrieves the third item from the list of values associated with the provided key,
-     * deserializes it into the specified type [T], and returns the result.
-     *
-     * @param T The type to which the third item will be deserialized.
-     * @param key The key used to locate the header with the list of values.
-     * @return The third value from the list, deserialized into the specified type [T].
-     * @throws NoSuchElementException If the header with the provided key is not found.
-     * @since 3.0.0
-     */
-    inline fun <reified T> getThirdTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()
-    /**
-     * Retrieves the third value associated with the specified key, attempts to serialize and 
-     * deserialize it into the provided type [T], and returns it. This method is considered unsafe 
-     * as it assumes the existence of the key, a third value, and successful deserialization to [T].
-     *
-     * @param key The key to locate in the headers.
-     * @return The deserialized third value of type [T] associated with the given key.
-     * @throws IllegalStateException If the key is not found in the headers or if a third value does not exist.
-     *
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.third().serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the third value associated with the specified key from the headers, or null if either the key is not found
-     * or there are fewer than three values for the key.
-     *
-     * @param key The key whose associated third value is to be returned.
-     * @return The third value associated with the key, or null if the key is not found or does not have at least three values.
-     * @since 2.1.0
-     */
-    fun getThirdOrNull(key: String): String? = headers.find { it.nameEquals(key) }?.values?.thirdOrNull()
-    /**
-     * Retrieves the third element corresponding to the given key from a collection, deserializes it, and returns it as the specified type, or null if not found.
-     *
-     * @param T The reified type to which the third element should be deserialized.
-     * @param key The key used to locate the collection of data.
-     * @return The third element deserialized to the specified type, or null if the element is not found or deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.thirdOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-    /**
-     * Retrieves the third item from the values associated with the specified key, deserialized into the requested type `T`.
-     * If the third item does not exist or deserialization fails, it returns null.
-     *
-     * @param T The type to which the third value is deserialized. This type must be reified.
-     * @param key The key used to search for the associated values from which the third item is retrieved.
-     * @return The third value deserialized into type `T`, or null if the third value is not present or deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.thirdOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-
-    /**
-     * Retrieves the third element associated with the specified key from the headers.
-     * If the key is not found or the third element does not exist, the provided exception is thrown.
-     *
-     * @param key the key to look up in the headers.
-     * @param lazyException a supplier for the exception to be thrown if the key is not found
-     * or the third value does not exist.
-     * @return the third value associated with the specified key.
-     * @throws Throwable the exception produced by the provided supplier if the key
-     * or third value does not exist.
-     * @since 2.1.0
-     */
-    fun getThirdOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException)
-    /**
-     * Retrieves the third value from the headers corresponding to the specified key, deserializes it
-     * into the specified type [T], or throws an exception if the value cannot be found or deserialized.
-     *
-     * @param T The type to which the value is deserialized.
-     * @param key The key used to locate the required header in the headers collection.
-     * @param lazyException A supplier that provides the exception to be thrown if the required value
-     *                       cannot be found or deserialized.
-     * @return The third value corresponding to the specified key, deserialized into type [T].
-     * @throws Throwable The exception provided by the [lazyException] supplier if the value
-     *                   cannot be found or deserialized.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()
-    /**
-     * Retrieves the third value associated with the given key from the headers, performs type deserialization, 
-     * and throws a lazily supplied exception if the key or value cannot be resolved.
-     *
-     * This method is considered unsafe because type deserialization is performed without additional checks, 
-     * and runtime exceptions may occur if the type does not match or if the third value is absent.
-     *
-     * @param T The expected type of the deserialized third value.
-     * @param key The key used to find the corresponding header in the collection.
-     * @param lazyException A supplier that lazily provides the exception to be thrown if the key or value is 
-     * not resolvable or valid.
-     * @return The deserialized third value of the specified type associated with the provided key.
-     * @throws Throwable The lazily supplied exception if the key or third value does not exist or deserialization fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.thirdOrThrow(lazyException).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the third value associated with the given key from the headers.
-     * If the third value is not available, the provided default supplier is used to supply the fallback value.
-     *
-     * @param key The key used to locate the header values.
-     * @param default A supplier function that provides a default value if the third value is unavailable.
-     * @since 2.1.0
-     */
-    fun getThirdOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default)
-    /**
-     * Retrieves the third value associated with the specified key from the headers, or provides a default value.
-     * If a third value exists in the header's values list, it is returned after being serialized and deserialized
-     * to the appropriate type. If the third value does not exist, the default value provided by the supplier
-     * is used instead.
-     *
-     * @param T The expected type of the retrieved value.
-     * @param key The key used to find the target header in the collection.
-     * @param default A supplier function that provides the default value if the third value is not found.
-     * @return The third value associated with the key, deserialized to type T.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()
-    /**
-     * Retrieves the third value associated with the specified key from the headers, or a default value if the key does not exist,
-     * and attempts to deserialize it into the specified type. The operation is performed unsafely, and type mismatches may result in runtime exceptions.
-     *
-     * @param T The target type to deserialize the value into.
-     * @param key The key to search for in the headers.
-     * @param default A supplier that provides the default value if the key does not exist or if the list does not contain a third value.
-     * @return The deserialized value of type T, which may be the third value from the specified key's associated list or the supplied default.
-     * @throws RuntimeException If the deserialization process fails due to a type mismatch or other errors.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getThirdTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.thirdOr(default).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the only element associated with the specified key from the headers.
-     * The method performs a search for the header with the given key, ensuring that 
-     * exactly one element exists in its associated values. An exception is thrown 
-     * if no matching key is found or if there are multiple elements in the values.
-     *
-     * @param key The key of the header whose single associated value is to be retrieved.
-     * @return The single element associated with the specified key.
-     * @throws NoSuchHeaderException If no matching key is found.
-     * @throws NoSuchElementException If no matching key is found.
-     * @throws IllegalStateException If multiple values are associated with the key.
-     * @since 2.1.0
-     */
-    fun getOnlyElement(key: String) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement()
-    /**
-     * Retrieves and processes a single element of a specified type from a collection identified by the given key.
-     *
-     * This method filters the headers by the specified key, extracts a single element from the matching entries,
-     * and deserializes it to the requested type.
-     *
-     * @param T The reified type to which the extracted element should be deserialized.
-     * @param key The key used to locate the desired element in the headers.
-     * @return An instance of type T obtained by processing the single element associated with the given key.
-     * @throws IllegalStateException If the key does not match any elements or if more than one element is found.
-     * 
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTyped(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()
-    /**
-     * Retrieves the only element of type [T] from the specified header key. This method assumes
-     * that the provided key exists, the header contains exactly one value, and it can be safely
-     * deserialized to the specified type [T]. Unsafe behavior can occur if these assumptions are 
-     * violated, such as deserialization errors or unexpected multiple values.
-     *
-     * @param key The key used to locate the header from which the single element will be retrieved.
-     * @return The single deserialized value of type [T] associated with the specified header key.
-     * @throws IllegalArgumentException If the header matching the key is not found or contains multiple 
-     * elements.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedUnsafe(key: String) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElement().serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the only element associated with the specified key if it exists, or returns null
-     * if there are no elements or more than one element.
-     *
-     * @param key The key to search for in the headers.
-     * @return The only element associated with the key, or null if none exists or if there are multiple elements.
-     * @since 2.1.0
-     */
-    fun getOnlyElementOrNull(key: String): String? = headers.find { it.nameEquals(key) }?.values?.onlyElementOrNull()
-    /**
-     * Retrieves a single element of the specified type [T] by the given key from a collection, 
-     * or returns null if no such element exists or multiple elements are found.
-     *
-     * @param T The type of the element to retrieve.
-     * @param key The key used to locate the element in the collection.
-     * @return The single element of type [T] if found, or null if not found or multiple elements are present.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.onlyElementOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-    /**
-     * Retrieves the only element matching the specified key from headers as a deserialized object of the specified type,
-     * or returns null if no matching element is found, there are multiple elements, or deserialization fails.
-     *
-     * This function uses inline reification and performs unsafe casting. It is intended for scenarios where type consistency
-     * is guaranteed externally.
-     *
-     * @param key The key used to search for the matching element in headers.
-     * @return The deserialized object of type [T] if a single matching element is found and deserialization succeeds, 
-     * or null otherwise.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedUnsafeOrNull(key: String): T? = toList().find { it.nameEquals(key) }?.values?.onlyElementOrNull()?.serialize()?.deserialize<T>()?.getOrThrow()
-
-    /**
-     * Retrieves the only element matching the provided key from a collection. 
-     * Throws an exception supplied by the `lazyException` if no matching element is found
-     * or if there are multiple matching elements.
-     *
-     * @param key The key used to identify the element to be retrieved.
-     * @param lazyException A supplier that provides the exception to be thrown if the conditions are not met.
-     * @since 2.1.0
-     */
-    fun getOnlyElementOrThrow(key: String, lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException)
-    /**
-     * Retrieves and deserializes the only element from the headers' values associated with the specified key.
-     * If there are no elements or more than one element, the provided exception supplier is invoked to throw an exception.
-     *
-     * @param T The type to which the single value will be deserialized.
-     * @param key The key to identify the header whose values are to be processed.
-     * @param lazyException A supplier that provides the exception to be thrown if finding the single element fails.
-     * @return The deserialized element with the specified type.
-     * @throws Exception Thrown with the exception supplied by lazyException if the single element retrieval fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()
-    /**
-     * Retrieves the only element of a given type from the headers associated with the specified key, or throws 
-     * an exception if the conditions are not met.
-     *
-     * This method searches for a header matching the provided key, ensures it contains exactly one value, 
-     * and then deserializes the value to the specified type. If the search fails, or if multiple elements are 
-     * found, it throws an exception provided by the supplied [lazyException].
-     *
-     * The method is considered "typed unsafe" since it uses inline reified type arguments for deserialization.
-     *
-     * @param T The reified type to which the retrieved element will be deserialized.
-     * @param key The key used to search for the corresponding header.
-     * @param lazyException A supplier of a throwable exception, used in case of errors during searching or deserialization.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedUnsafeOrThrow(key: String, noinline lazyException: ThrowableSupplier = { NoSuchHeaderException(key) }) = toList().findFirstOrThrow(lazyException) { it.nameEquals(key) }.values.onlyElementOrThrow(lazyException).serialize().deserialize<T>()()
-
-    /**
-     * Retrieves the only occurrence of a value associated with the specified key. If no such element
-     * exists, the default value provided by the supplied function is returned.
-     *
-     * @param key The key whose associated single element value is to be retrieved.
-     * @param default A supplier function that provides a default value if no element is found.
-     * @return The value associated with the key if found, otherwise the supplied default value.
-     * @since 2.1.0
-     */
-    fun getOnlyElementOr(key: String, default: Supplier<String>) = headers.findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.firstOr(default)
-    /**
-     * Retrieves the only element associated with the specified key from the headers and deserializes it into the specified type.
-     * If no element is found, the provided default value is used.
-     *
-     * @param T The expected type of the deserialized object.
-     * @param key The key used to search for the element in the headers.
-     * @param default A supplier function providing the default value if no element is found.
-     * @return The deserialized object of type T.
-     * @throws IllegalStateException If there are multiple elements associated with the key.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()
-    /**
-     * Retrieves the only element associated with the provided key as a deserialized type-safe object.
-     * 
-     * If the key exists in the `headers` collection and has a single value, that value is serialized,
-     * deserialized to ensure type safety, and returned. If no value is associated with the key, the
-     * supplied default value is serialized, deserialized, and returned instead.
-     * 
-     * This method can potentially throw runtime exceptions if the deserialization process or 
-     * type conversion fails at runtime.
-     * 
-     * @param T The reified type of the object to deserialize.
-     * @param key The key to search within the `headers` collection.
-     * @param default A supplier function to provide a default value if the key is not present or no value exists.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getOnlyElementTypedUnsafeOr(key: String, noinline default: Supplier<T>) = toList().findFirstOrThrow({ NoSuchHeaderException(key) }) { it.nameEquals(key) }.values.onlyElementOr(default).serialize().deserialize<T>()()
+    fun getOrError(key: String): Either<IterableError.NotFound, List<String>> =
+        either { get(key).orRaise { IterableError.NotFound(key) } }
 
     /**
      * Retrieves the value associated with the specified key from the headers
@@ -1590,32 +1002,59 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @since 2.1.0
      */
     fun getHeader(key: String): HttpHeader? = headers.find { it.nameEquals(key) }
+    /**
+     * Retrieves an HTTP header that matches the specified key. If no matching header is found,
+     * the provided exception will be thrown.
+     *
+     * @param key the key of the header to retrieve
+     * @param lazyException a supplier that provides the exception to be thrown if the header is not found
+     * @return the HTTP header that matches the specified key
+     * @since 6.1.0
+     */
+    fun getHeaderOrThrow(key: String, lazyException: ThrowableSupplier): HttpHeader =
+        headers.findFirstOrThrow(lazyException) { it.nameEquals(key) }
+    /**
+     * Retrieves the HTTP header corresponding to the provided key. If the header is not found,
+     * returns an error indicating the missing key.
+     *
+     * @param key The name of the header to look for.
+     * @return Either an error of type [IterableError.NotFound] if the header is not found,
+     *         or the matching [HttpHeader] if it exists.
+     * @since 6.1.0
+     */
+    fun getHeaderOrError(key: String): Either<IterableError.NotFound, HttpHeader> =
+        headers.findFirstOrError { it.nameEquals(key) }.mapLeft { IterableError.NotFound(key) }
+    /**
+     * Retrieves the HTTP header that matches the specified key. If no header is found,
+     * the provided default supplier is used to supply a default header.
+     *
+     * @param key the name of the header to retrieve
+     * @param default a supplier providing a default header to return if the specified key is not found
+     * @return the HTTP header that matches the key or the default header supplied by the supplier
+     * @since 6.1.0
+     */
+    fun getHeaderOr(key: String, default: Supplier<HttpHeader>): HttpHeader =
+        headers.findFirstOr(default) { it.nameEquals(key) }
 
     /**
-     * Retrieves and deserializes the values of an HTTP header with the specified key into a list of objects of type [T].
+     * Retrieves a list of typed values associated with the given key. If no values are found or the values
+     * cannot be cast to the specified type, an error is returned.
      *
-     * This function searches for a header in the collection whose name matches the provided `key`.
-     * If a matching header is found, its values are deserialized into instances of type [T].
-     * Returns null if no matching header is found or if deserialization fails.
+     * Possible errors:
+     * - [IterableError.NotFound] - Indicates that the specified key was not found in the header.
+     * - [DeserializationError.ReadError] - Indicates an error occurred while reading the JSON string.
+     * - [DeserializationError.MappingError] - Indicates an error occurred during the mapping process.
+     * - [DeserializationError] - Indicates an unexpected error occurred during deserialization.
      *
-     * @param key The name of the header whose values should be deserialized.
-     * @return A list of deserialized objects of type [T], or null if no matching header is found.
-     * @since 2.1.0
+     * @param key The key to look up the values for.
+     * @return Either an error if the retrieval or type conversion fails, or a list of values of the specified type.
+     * @since 6.1.0
      */
-    inline fun <reified T> getTyped(key: String) = toList().find { it.nameEquals(key) }?.typedValues<T>()
-    /**
-     * Retrieves the values of an HTTP header with the specified name and deserializes
-     * them to the specified type [T]. This method performs an unsafe operation where
-     * deserialization errors will propagate as exceptions.
-     *
-     * @param T The target type to which the header values should be deserialized.
-     * @param key The name of the HTTP header to search for.
-     * @return A list of deserialized objects of type [T], or `null` if the header
-     *         with the specified name does not exist.
-     * @throws Throwable If the deserialization of any header value fails.
-     * @since 2.1.0
-     */
-    inline fun <reified T> getTypedUnsafe(key: String) = toList().find { it.nameEquals(key) }?.unsafeTypedValues<T>()
+    inline fun <reified T> getTypedOrError(key: String): Either<Error, List<T>> =
+        toList()
+            .findFirstOrError { it.nameEquals(key) }
+            .mapLeft { IterableError.NotFound(key) }
+            .thenMergeWith { it.typedValues<T>() }
 
     /**
      * Sets a header with the given key and values. If a header with the same key already exists, it is removed before adding the new header.
@@ -2006,20 +1445,19 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      */
     override fun hashCode() = headers.hashCode()
 
-    // 3.0.03.0.03.0.03.0.03.0.03.0.03.0.03.0.0-
-
     /**
-     * Retrieves and parses the "ACCEPT" header values into a list of `MediaType` objects.
+     * Retrieves and parses the "Accept" header from a request.
      *
-     * This method first retrieves the ACCEPT header using `getOrThrow` and subsequently maps
-     * each value to its corresponding `MediaType` representation.
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
      *
-     * @return A list of `MediaType` objects parsed from the "ACCEPT" header values.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @throws MalformedInputException if the header value is malformed.
-     * @since 3.0.0
+     * @return Either an error indicating failure to retrieve or parse the "Accept" header,
+     *         or a list of MediaType objects representing the parsed values of the header.
+     * @since 6.1.0
      */
-    fun getAccept() = getOrThrow(ACCEPT).map { MediaType.parse(it)() }
+    fun getAccept(): Either<Error, List<MediaType>> =
+        getOrError(ACCEPT) thenMergeWith { list -> list.traverse { MediaType.parse(it) } }
     /**
      * Sets the "Accept" header with the provided media types.
      *
@@ -2031,23 +1469,28 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setAccept(vararg values: MediaType) = set(ACCEPT, values.toList())
 
     /**
-     * Parses and retrieves the `Accept-Language` header value as a list of language ranges.
+     * Returns a value representing the parsed "Accept-Language" header.
      *
-     * The method attempts to fetch the `Accept-Language` value and parse it into a list of
-     * `LanguageRange` objects. If the header value is null, blank, or parsing fails, an
-     * empty list is returned.
+     * This method attempts to retrieve and parse the "Accept-Language" header
+     * into a list of language ranges. It handles errors that may occur during
+     * retrieval or parsing of the header and provides them as part of the result.
      *
-     * @return A list of `LanguageRange` objects based on the `Accept-Language` header value,
-     * or an empty list if the value is invalid or not present.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return Either an `Error` object in case of failure, or a list of `LanguageRange`
+     *         objects parsed from the "Accept-Language" header.
+     * @since 6.1.0
      */
-    fun getAcceptLanguage(): List<LanguageRange> {
-        val value = getFirstOrThrow(ACCEPT_LANGUAGE)
-        return if (value.isNotNullOrBlank)
-            tryOr({ emptyList() }) { LanguageRange.parse(value) }
-        else emptyList()
-    }
+    fun getAcceptLanguage(): Either<Error, List<LanguageRange>> = getOrError(ACCEPT_LANGUAGE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(ACCEPT_LANGUAGE) }
+        .thenMergeWith {
+            tryOrError({ t -> InvalidFormatOfType(it, typeOf<LanguageRange>(), t) }) {
+                LanguageRange.parse(it).toList()
+            }
+        }
     /**
      * Sets the `Accept-Language` header with the specified language ranges and their weights.
      * This header is used to specify the preferred languages for response content.
@@ -2070,23 +1513,20 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     }
 
     /**
-     * Converts the Accept-Language header information into a list of Locale objects.
+     * Retrieves the "Accept-Language" header values as a list of `Locale` objects.
+     * Converts the language ranges into `Locale` instances, filtering out invalid entries.
      *
-     * This method processes language ranges obtained from the Accept-Language
-     * header, filters out entries with a wildcard ('*'), and converts the remaining
-     * entries into Locale objects.
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
      *
-     * @return a list of Locale objects derived from the Accept-Language header.
-     *         Returns an empty list if the header contains no valid entries.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * @return Either an `Error` or a list of `Locale` objects based on the parsed "Accept-Language" header.
+     * @since 6.1.0
      */
-    fun getAcceptLanguageAsLocales(): List<Locale> {
-        val ranges = getAcceptLanguage()
-        if (ranges.isEmpty()) return emptyList()
+    fun getAcceptLanguageAsLocales(): Either<Error, List<Locale>> = getAcceptLanguage().map { list ->
         val locales = emptyMList<Locale>()
-        ranges.forEach { if (it.range notStartsWith Char.STAR) locales.add(Locale.forLanguageTag(it.range)) }
-        return locales.toList()
+        list.forEach { if (it.range notStartsWith Char.STAR) locales.add(Locale.forLanguageTag(it.range)) }
+        locales.toList()
     }
     /**
      * Updates the accept-language settings using the provided locales.
@@ -2099,17 +1539,23 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         setAcceptLangauge(*values.map { LanguageRange(it.toLanguageTag()) }.toTypedArray())
 
     /**
-     * Retrieves the "Accept-Patch" HTTP header value from the response and parses it into a list of MediaType objects.
+     * Retrieves and parses the "Accept-Patch" HTTP header value.
      *
-     * This method fetches the value associated with the "Accept-Patch" header by using `getOrThrow`
-     * and then maps each value string into a `MediaType` object by applying the `MediaType.parse` parser.
+     * This method returns a list of parsed media types indicating
+     * the acceptable patch document formats for the resource.
      *
-     * @return A list of parsed `MediaType` objects representing the values of the "Accept-Patch" header.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @throws MalformedInputException if the header value is malformed.
-     * @since 3.0.0
+     * The parsing is performed on the header value using the MediaType.parse method.
+     * If an error occurs during retrieval or parsing, it propagates as an error.
+     *
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return A list of MediaType objects parsed from the "Accept-Patch" header value.
+     * @since 6.1.0
      */
-    fun getAcceptPatch() = getOrThrow(ACCEPT_PATCH).map { MediaType.parse(it)() }
+    fun getAcceptPatch() =
+        getOrError(ACCEPT_PATCH) thenMergeWith { list -> list.traverse { MediaType.parse(it) } }
     /**
      * Sets the "Accept-Patch" header with the provided media types.
      *
@@ -2124,16 +1570,23 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setAcceptPatch(vararg values: MediaType) = set(ACCEPT_PATCH, values.toList())
 
     /**
-     * Retrieves the value of the "Access-Control-Allow-Credentials" header and converts it to a boolean.
-     * This function ensures the presence of the header before attempting to convert its value.
-     * Throws an exception if the header is missing.
+     * Retrieves and processes the `ACCESS_CONTROL_ALLOW_CREDENTIALS` value.
      *
-     * @return `true` if the "Access-Control-Allow-Credentials" header is present and its value is truthy, `false` otherwise.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * This method fetches the value associated with `ACCESS_CONTROL_ALLOW_CREDENTIALS`, validates its existence,
+     * and attempts to convert it to a boolean. If the required value is not present or cannot be parsed as a valid boolean,
+     * it raises an appropriate error. The method handles intermediate errors and provides a streamlined processing flow.
+     *
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return A result indicating the processed boolean value of `ACCESS_CONTROL_ALLOW_CREDENTIALS`, or an error representation.
+     * @since 6.1.0
      */
-    fun getAccessControlAllowCredentials() = getFirstOrThrow(ACCESS_CONTROL_ALLOW_CREDENTIALS)
-        .toBoolean()
+    fun getAccessControlAllowCredentials() = getOrError(ACCESS_CONTROL_ALLOW_CREDENTIALS)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(ACCESS_CONTROL_ALLOW_CREDENTIALS) }
+        .thenMergeWith { (-it).toBooleanStrictOrError() }
     /**
      * Sets the Access-Control-Allow-Credentials header to indicate whether the response to
      * the request can be exposed when the credentials flag is true.
@@ -2145,19 +1598,24 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setAccessControlAllowCredentials(allowCredentials: Boolean) = set(ACCESS_CONTROL_ALLOW_CREDENTIALS, allowCredentials.toString())
 
     /**
-     * Retrieves the allowed HTTP methods from the "Access-Control-Allow-Methods" header.
+     * Retrieves the list of allowed HTTP methods for Cross-Origin Resource Sharing (CORS).
      *
-     * This method extracts the value of the `ACCESS_CONTROL_ALLOW_METHODS` header,
-     * splits the value by commas, and maps each element to the corresponding
-     * `HttpMethod` enum constant.
+     * The method fetches the access control allow methods from a predefined source and returns a list of HTTP methods.
+     * If the methods cannot be located, an error of type `IterableError.NotFound` is returned.
      *
-     * @return A list of `HttpMethod` enum constants representing the allowed HTTP methods.
-     * @throws dev.tommasop1804.kutils.exceptions.NoSuchEntryException if the header value cannot be parsed correctly.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return Either an error of type `IterableError.NotFound` if the methods are not found,
+     *         or a list of allowed HTTP methods as strings.
+     * @since 6.1.0
      */
-    fun getAccessControlAllowMethods() = getFirstOrThrow(ACCESS_CONTROL_ALLOW_METHODS)
-        .split(Char.COMMA).map { it.toEnumConst<HttpMethod>() }
+    fun getAccessControlAllowMethods(): Either<IterableError.NotFound, List<String>> = getOrError(ACCESS_CONTROL_ALLOW_METHODS)
+        .thenMergeWith { it.orErrorIfEmpty() }
+        .map { it.joinToString(Char.COMMA) }
+        .mapLeft { IterableError.NotFound(ACCESS_CONTROL_ALLOW_METHODS) }
+        .map { it / Char.COMMA }
     /**
      * Sets the "Access-Control-Allow-Methods" header with the specified HTTP methods.
      *
@@ -2166,21 +1624,38 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param values The HTTP methods to be allowed, provided as vararg parameters. Each method is represented by an instance of [HttpMethod].
      * @since 3.0.0
      */
-    fun setAccessControlAllowMethods(vararg values: HttpMethod) = set(ACCESS_CONTROL_ALLOW_METHODS, values.joinToString(String.COMMA, transform = HttpMethod::name))
+    fun setAccessControlAllowMethods(vararg values: HttpMethod) = set(ACCESS_CONTROL_ALLOW_METHODS, values.joinToString(String.COMMA, transform = HttpMethod::value))
+    /**
+     * Sets the "Access-Control-Allow-Methods" header for the response with the specified HTTP methods.
+     * This header indicates the methods allowed when accessing the resource in a cross-origin request.
+     *
+     * @param values The HTTP methods to be allowed, such as "GET", "POST", "PUT", etc.
+     * @since 6.1.0
+     */
+    fun setAccessControlAllowMethods(vararg values: String) = set(ACCESS_CONTROL_ALLOW_METHODS, values.joinToString(String.COMMA))
 
     /**
-     * Retrieves the maximum age for access control from a predefined configuration key.
+     * Retrieves the maximum age for the access control setting from a configuration or source.
      *
-     * This method works by fetching the value associated with the `ACCESS_CONTROL_MAX_AGE` key,
-     * converting it to a Long, and then interpreting it as a duration in seconds.
+     * This method attempts to fetch the value associated with the key ACCESS_CONTROL_MAX_AGE.
+     * If the value is not found, an IterableError.NotFound is returned.
+     * The retrieved value is then processed to ensure it is converted to a valid long value
+     * and subsequently transformed into a duration in seconds.
      *
-     * @return The maximum age for access control as a duration in seconds.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return Either the maximum age as a duration in seconds or an error if the value is not found
+     *         or cannot be processed as a valid duration.
+     * @since 6.1.0
      */
-    fun getAccessControlMaxAge() = getFirstOrThrow(ACCESS_CONTROL_MAX_AGE)
-        .toLong()
-        .asSecondsOfDuration()
+    fun getAccessControlMaxAge() = getOrError(ACCESS_CONTROL_MAX_AGE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(ACCESS_CONTROL_MAX_AGE) }
+        .thenMergeWith { it.toLongOrError() }
+        .map { it.asSecondsOfDuration() }
+
     /**
      * Sets the maximum age for the access control in seconds. This determines how long
      * the access control settings should be cached by the client.
@@ -2193,19 +1668,18 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setAccessControlMaxAge(maxAge: Duration) = set(ACCESS_CONTROL_MAX_AGE, maxAge.toSeconds())
 
     /**
-     * Retrieves the HTTP access control request method from the request headers.
+     * Retrieves the HTTP access control request method header value.
      *
-     * This method queries the header defined by `ACCESS_CONTROL_REQUEST_METHOD` and attempts to
-     * convert its value to an enum constant of type [HttpMethod].
+     * This method attempts to fetch and process the value of the access control request
+     * method header. If the value is found and successfully resolved, it returns the method
+     * as a string. Otherwise, it returns an error indicating that the value was not found.
      *
-     * @param value An instance of [HttpMethod] representing the required HTTP method type for mapping.
-     * @return The corresponding [HttpMethod] enum constant determined from the header value.
-     * @throws dev.tommasop1804.kutils.exceptions.NoSuchEntryException If the header value cannot be matched to a valid enum constant.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * @return Either an error representing a missing access control request method or the resolved request method as a string.
+     * @since 6.1.0
      */
-    fun getAccessControlRequestMethod(value: HttpMethod) = getFirstOrThrow(ACCESS_CONTROL_REQUEST_METHOD)
-        .toEnumConst<HttpMethod>()
+    fun getAccessControlRequestMethod(): Either<IterableError.NotFound, String> = getOrError(ACCESS_CONTROL_REQUEST_METHOD)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(ACCESS_CONTROL_REQUEST_METHOD) }
     /**
      * Sets the `Access-Control-Request-Method` header for a preflight request in a CORS (Cross-Origin Resource Sharing) scenario.
      * This header indicates which HTTP method will be used during the actual request.
@@ -2213,30 +1687,47 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @param value The HTTP method to set for the `Access-Control-Request-Method` header.
      * @since 3.0.0
      */
-    fun setAccessControlRequestMethod(value: HttpMethod) = set(ACCESS_CONTROL_REQUEST_METHOD, value.name)
+    fun setAccessControlRequestMethod(value: HttpMethod) = set(ACCESS_CONTROL_REQUEST_METHOD, value.value)
+    /**
+     * Sets the HTTP method to be used for the Access-Control-Request-Method header.
+     *
+     * The Access-Control-Request-Method header is used in CORS requests to indicate
+     * which HTTP method will be used when the actual request is made.
+     *
+     * @param value The HTTP method to be set for the Access-Control-Request-Method header.
+     * @since 6.1.0
+     */
+    fun setAccessControlRequestMethod(value: String) = set(ACCESS_CONTROL_REQUEST_METHOD, value)
 
     /**
-     * Retrieves a list of character sets from the "Accept-Charset" header value.
+     * Retrieves the acceptable charsets from the provided input, parsing and validating
+     * the values to return a list of `Charset` instances.
      *
-     * This method parses the "Accept-Charset" header and returns a list of character sets
-     * specified in the header. If the header contains the wildcard '*', it is ignored in the result.
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
      *
-     * @return a list of character sets specified in the "Accept-Charset" header.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * @return Either an `Error` if the acceptable charsets could not be retrieved or parsed
+     *         successfully, or a `List<Charset>` containing the parsed charsets.
+     * @since 6.1.0
      */
-    fun getAcceptCharset(): List<Charset> {
-        val value = getFirstOrThrow(ACCEPT_CHARSET)
-        val tokens = value / Char.COMMA
-        val result = emptyMList<Charset>()
-        for (token in tokens) {
-            val paramIdx = token.indexOf(';')
-            val charsetName = if (paramIdx == -1) token
-            else token.take(paramIdx)
-            if (charsetName != String.STAR) result.add(Charset.forName(charsetName))
+    fun getAcceptCharset(): Either<Error, List<Charset>> = getOrError(ACCEPT_CHARSET)
+        .thenMergeWith { it.orErrorIfEmpty() }
+        .map { it.joinToString(Char.COMMA) }
+        .mapLeft { IterableError.NotFound(ACCEPT_CHARSET) }
+        .thenMergeWith {
+            tryOrError({ t -> InvalidFormatOfType(it, typeOf<Charset>(), t) }) {
+                val tokens = it / Char.COMMA
+                val result = emptyMList<Charset>()
+                for (token in tokens) {
+                    val paramIdx = token.indexOf(';')
+                    val charsetName = if (paramIdx == -1) token
+                    else token.take(paramIdx)
+                    if (charsetName != String.STAR) result.add(Charset.forName(charsetName))
+                }
+                result.toList()
+            }
         }
-        return result.toList()
-    }
     /**
      * Sets the Accept-Charset header with the specified character sets.
      *
@@ -2246,36 +1737,53 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setAcceptCharset(vararg values: Charset) = set(ACCEPT_CHARSET, values.joinToString(String.COMMA) { it.name().lowercase(Locale.ROOT) })
 
     /**
-     * Retrieves and processes the "Allow" HTTP header field to produce a list of HTTP methods.
+     * Retrieves the allowed values as a comma-separated string or an error if not found.
      *
-     * The method obtains the value associated with the "Allow" header, splits it into a collection of 
-     * comma-separated string tokens, trims any leading or trailing whitespace from each token, and
-     * maps them to corresponding `HttpMethod` enum constants.
+     * This method attempts to obtain the value associated with the 'ALLOW' key.
+     * If the key does not exist or if the value is empty, a corresponding error
+     * of type `IterableError.NotFound` is returned.
      *
-     * @return A list of `HttpMethod` enum constants derived from the "Allow" header field.
-     * @throws NoSuchHeaderException If the "Allow" header is not present in the data source.
-     * @throws dev.tommasop1804.kutils.exceptions.NoSuchEntryException If any of the tokens cannot be mapped to a valid `HttpMethod` enum constant.
-     * @since 3.0.0
+     * @return Either an instance of `IterableError.NotFound` indicating the absence
+     * of the 'ALLOW' key or a `String` representing the allowed values joined
+     * by a comma.
+     * @since 6.1.0
      */
-    fun getAllow() = getFirstOrThrow(ALLOW).splitAndTrim(Char.COMMA).map { it.toEnumConst<HttpMethod>() }
+    fun getAllow(): Either<IterableError.NotFound, String> = getOrError(ALLOW)
+        .thenMergeWith { it.orErrorIfEmpty() }
+        .map { it.joinToString(Char.COMMA) }
+        .mapLeft { IterableError.NotFound(ALLOW) }
     /**
      * Configures the allowed HTTP methods for a specific resource or endpoint.
      *
      * @param values A variable number of HTTP methods to allow, specified as instances of [HttpMethod].
      * @since 3.0.0
      */
-    fun setAllow(vararg values: HttpMethod) = set(ALLOW, values.joinToString(String.COMMA, transform = HttpMethod::name))
+    fun setAllow(vararg values: HttpMethod) = set(ALLOW, values.joinToString(String.COMMA, transform = HttpMethod::value))
+    /**
+     * Configures the given values for the "ALLOW" functionality by joining them with a comma separator.
+     *
+     * @param values A variable number of string arguments to be set for "ALLOW".
+     * @since 6.1.0
+     */
+    fun setAllow(vararg values: String) = set(ALLOW, values.joinToString(String.COMMA))
 
     /**
-     * Retrieves the Bearer authentication token from the authorization header.
-     * This method extracts the first value found in the AUTHORIZATION header and converts it
-     * to a JWT (JSON Web Token) representation.
+     * Retrieves a Bearer authentication token. The function attempts to extract the authorization token
+     * and process it into a JWT (JSON Web Token) representation. It handles potential errors during the
+     * extraction and transformation steps and returns either the successfully processed JWT or an error.
      *
-     * @return The JWT token extracted from the AUTHORIZATION header.
-     * @throws NoSuchHeaderException if the AUTHORIZATION header is missing or invalid.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return An `Either` instance where the left side represents an `Error` in case of failure, and
+     *         the right side represents a `Jwt` object if the operation is successful.
+     * @since 6.1.0
      */
-    fun getBearerAuth() = getFirstOrThrow(AUTHORIZATION).toJwt()()
+    fun getBearerAuth(): Either<Error, Jwt> = getOrError(AUTHORIZATION)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(AUTHORIZATION) }
+        .thenMergeWith { it.toJwt() }
     /**
      * Sets the Bearer Authorization header with the provided JWT token.
      *
@@ -2283,7 +1791,6 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @since 3.0.0
      */
     fun setBearerAuth(token: Jwt) = set(AUTHORIZATION, token.toString(true))
-
     /**
      * Sets the Authorization header to use Basic Authentication with the provided encoded credentials.
      *
@@ -2318,13 +1825,20 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     }
     
     /**
-     * Retrieves the content language as a Locale object based on the CONTENT_LANGUAGE value.
+     * Retrieves the content language associated with the current context.
      *
-     * @return the Locale corresponding to the content language tag.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * The method attempts to fetch the content language information and returns either
+     * a `Locale` object representing the language tag or an `IterableError.NotFound` error
+     * if the specified content language is not present.
+     *
+     * @return an `Either` that contains a `Locale` if the content language is found,
+     *         or an `IterableError.NotFound` instance if the content language is not available.
+     * @since 6.1.0
      */
-    fun getContentLanguage(): Locale = getFirstOrThrow(CONTENT_LANGUAGE).let(Locale::forLanguageTag)
+    fun getContentLanguage(): Either<IterableError.NotFound, Locale> = getOrError(CONTENT_LANGUAGE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(CONTENT_LANGUAGE) }
+        .map { Locale.forLanguageTag(it) }
     /**
      * Sets the content language for the current operation or request. 
      * The language is specified using a Locale object and will be 
@@ -2336,19 +1850,24 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setContentLanguage(value: Locale) = set(CONTENT_LANGUAGE, value.toLanguageTag())
 
     /**
-     * Retrieves the content length from a predefined source and converts it 
-     * to a numerical value represented in bytes.
+     * Retrieves the content length as a `DataSize` object, wrapped in an `Either` type indicating success or failure.
      *
-     * This function fetches the value associated with the `CONTENT_LENGTH` key 
-     * using the `getFirstOrThrow` method. The returned value is then converted 
-     * to a `Long` representing the size in bytes. The unit of the result is 
-     * `MeasureUnit.DataSizeUnit.BYTE`.
+     * The method attempts to extract and normalize the content length information. If successful, it returns
+     * a `DataSize` representing the content length in bytes. If the content length cannot be determined, an
+     * `Error` is returned describing the issue.
      *
-     * @return The content length in bytes as a `Long`.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return An `Either` object containing a normalized `DataSize` on success or an `Error` on failure.
+     * @since 6.1.0
      */
-    fun getContentLength() = getFirstOrThrow(CONTENT_LENGTH).toLong() ofUnit MeasureUnit.DataSizeUnit.BYTES
+    fun getContentLength(): Either<Error, DataSize> = getOrError(CONTENT_LENGTH)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(CONTENT_LENGTH) }
+        .thenMergeWith { it.toLongOrError() }
+        .map { (it ofUnit BYTES).normalize() }
     /**
      * Sets the content length of a data transfer operation.
      *
@@ -2357,7 +1876,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @since 3.0.0
      */
     @OptIn(Beta::class)
-    fun setContentLength(value: DataSize) = set(CONTENT_LENGTH, value.convertTo(MeasureUnit.DataSizeUnit.BYTES)().value)
+    fun setContentLength(value: DataSize) = set(CONTENT_LENGTH, value.convertTo(BYTES)().value)
     /**
      * Sets the value of the Content-Length header for a request.
      *
@@ -2367,15 +1886,19 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setContentLength(bytes: Long) = set(CONTENT_LENGTH, bytes)
 
     /**
-     * Retrieves the content type from a predefined constant or configuration. This method extracts 
-     * the first occurrence of the content type value and parses it into a `MediaType` object.
+     * Retrieves the content type information as a MediaType object, or an error if the process fails.
      *
-     * @return A `MediaType` object representing the parsed content type.
-     * @throws MalformedInputException if the content type cannot be parsed.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return Either an Error instance if there was a failure, or a MediaType object representing the content type.
+     * @since 6.1.0
      */
-    fun getContentType() = getFirstOrThrow(CONTENT_TYPE).let { MediaType.parse(it)() }
+    fun getContentType(): Either<Error, MediaType> = getOrError(CONTENT_TYPE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(CONTENT_TYPE) }
+        .thenMergeWith { MediaType.parse(it) }
     /**
      * Sets the content type for the request or response by assigning a specified MediaType value.
      *
@@ -2385,15 +1908,23 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setContentType(value: MediaType) = set(CONTENT_TYPE, value.toString())
 
     /**
-     * Retrieves a date in the form of an Instant by parsing the first occurrence
-     * of a date string that matches the RFC 7231 date-time format.
+     * Retrieves the date information associated with the DATE key.
      *
-     * @return an Instant representing the parsed date and time.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 3.0.0
+     * The method processes the value corresponding to the DATE key, performs various operations
+     * to ensure its validity, and converts it to an Instant if the data is found and valid.
+     *
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return Either an Error object if the operation fails, or an Instant representing the date.
+     * @since 6.1.0
      */
-    fun getDate(): Instant = getFirstOrThrow(DATE).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
+    fun getDate(): Either<Error, Instant> = getOrError(DATE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(DATE) }
+        .thenMergeWith { it.headerDateToInstant() }
+
     /**
      * Sets the date to the specified value using the provided TemporalAccessor and formats it 
      * using the RFC_7231_DATE_TIME_FORMATTER.
@@ -2405,15 +1936,17 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setDate(value: TemporalAccessor = Instant()) = set(DATE, RFC_7231_DATE_TIME_FORMATTER(value))
 
     /**
-     * Retrieves the expiry date and time as an Instant.
-     * Parses the content of the "EXPIRES" field according to the RFC 7231 date-time format.
+     * Retrieves the expiration date as an Instant, wrapped in an Either type.
+     * The method handles possible errors during processing and maps them into appropriate error types.
      *
-     * @return the expiration date and time as an Instant
-     * @throws NoSuchHeaderException if the header is missing.
-     * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 3.0.0
+     * @return Either containing an expiration date as an Instant on success,
+     *         or an Error if retrieval or conversion fails.
+     * @since 6.1.0
      */
-    fun getExpires(): Instant = getFirstOrThrow(EXPIRES).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
+    fun getExpires(): Either<Error, Instant> = getOrError(EXPIRES)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(EXPIRES) }
+        .thenMergeWith { it.headerDateToInstant() }
     /**
      * Sets the expiration date for this object using the provided temporal accessor.
      * The expiration date is formatted according to the RFC 7231 date-time standard.
@@ -2425,30 +1958,34 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setExpires(value: TemporalAccessor) = set(EXPIRES, RFC_7231_DATE_TIME_FORMATTER(value))
 
     /**
-     * Retrieves the host information in the form of an unresolved `InetSocketAddress`.
+     * Retrieves the host information as an `Either` type, representing either a successful result or an error.
      *
-     * The method parses a host string and identifies both the host name and port, when available.
-     * If the host string is enclosed in square brackets (e.g., for IPv6 addresses), 
-     * it handles the enclosed formatting appropriately to extract the host and port.
-     * In case the host string does not specify a port, the port defaults to `0`.
+     * The method attempts to resolve the host and port information from a given data source. If successful, it returns
+     * an `InetSocketAddress` containing the host and port. Otherwise, it returns an `IterableError.NotFound` instance
+     * indicating that the host could not be found.
      *
-     * @return an `InetSocketAddress` instance with the extracted host and port, or a host with port `0` if no port is specified.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return An `Either` containing the resolved `InetSocketAddress` on success or `IterableError.NotFound` on failure.
+     * @since 6.1.0
      */
-    @Suppress("kutils_substring_as_int_invoke")
-    fun getHost(): InetSocketAddress = getFirstOrThrow(HOST).let {
-        var host: String? = null
-        var port = 0
-        val separator = if (it startsWith '[') it.indexOf(Char.COLON, it.indexOf(']')) else it.lastIndexOf(Char.COLON)
-        if (separator != -1) {
-            host = it.take(separator)
-            val portString = it.substring(separator + 1)
-            tryOrNull { port = portString.toInt() }
-        }
-        if (host == null) host = it
-        InetSocketAddress.createUnresolved(host, port)
-    }
+    fun getHost(): Either<Error, InetSocketAddress> = getOrError(HOST)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(HOST) }
+        .thenMergeWith { tryOrError({ t -> InvalidFormatOfType(it, typeOf<InetSocketAddress>(), t) }) {
+            var host: String? = null
+            var port = 0
+            val separator = if (it startsWith '[') it.indexOf(Char.COLON, it.indexOf(']')) else it.lastIndexOf(Char.COLON)
+            if (separator != -1) {
+                host = it.take(separator)
+                val portString = it.substring(separator + 1)
+                tryOrNull { port = portString.toInt() }
+            }
+            if (host == null) host = it
+            InetSocketAddress.createUnresolved(host, port)
+        } }
     /**
      * Sets the host value in the configuration.
      *
@@ -2464,16 +2001,21 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     }
 
     /**
-     * Retrieves the value of the `If-Modified-Since` HTTP header as an `Instant`.
-     * If the header value is present, it is parsed using the RFC 7231 date-time format.
-     * Throws an exception if the header is missing or cannot be parsed.
+     * Retrieves the `If-Modified-Since` header value as an `Instant`.
+     * Attempts to parse the value from the header, returning it wrapped in an `Either` instance.
      *
-     * @return The `Instant` representation of the `If-Modified-Since` header value.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 3.0.0
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return An `Either` containing the parsed `Instant` if successful,
+     *         or an `Error` if the header is missing or cannot be parsed.
+     * @since 6.1.0
      */
-    fun getIfModifiedSince(): Instant = getFirstOrThrow(IF_MODIFIED_SINCE).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
+    fun getIfModifiedSince(): Either<Error, Instant> = getOrError(IF_MODIFIED_SINCE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(IF_MODIFIED_SINCE) }
+        .thenMergeWith { it.headerDateToInstant() }
     /**
      * Sets the "If-Modified-Since" header value with the provided temporal accessor.
      *
@@ -2489,16 +2031,20 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setIfModifiedSince(value: TemporalAccessor) = set(IF_MODIFIED_SINCE, RFC_7231_DATE_TIME_FORMATTER(value))
 
     /**
-     * Parses the value associated with the "If-Unmodified-Since" header and returns it as an Instant.
+     * Retrieves the value associated with the `IF_UNMODIFIED_SINCE` key, converting it into an `Instant` if present and valid.
+     * Handles potential errors during the retrieval and conversion process, returning an `Either` that wraps the result.
      *
-     * This method retrieves the "If-Unmodified-Since" header value, processes it using the 
-     * RFC 7231 Date-Time formatter, and converts it to an Instant object.
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
      *
-     * @return an Instant representing the parsed "If-Unmodified-Since" header value
-     * @throws NoSuchHeaderException if the header is missing.
-     * @since 3.0.0
+     * @return An `Either` containing an `Error` on failure or an `Instant` representing the parsed date if successful.
+     * @since 6.1.0
      */
-    fun getIfUnmodifiedSince(): Instant = getFirstOrThrow(IF_UNMODIFIED_SINCE).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
+    fun getIfUnmodifiedSince(): Either<Error, Instant> = getOrError(IF_UNMODIFIED_SINCE)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(IF_UNMODIFIED_SINCE) }
+        .thenMergeWith { it.headerDateToInstant() }
     /**
      * Sets the "If-Unmodified-Since" condition for a request. This determines the validity of the operation 
      * based on a specific timestamp. The server processes the request only if the resource has not been 
@@ -2512,17 +2058,19 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setIfUnmodifiedSince(value: TemporalAccessor) = set(IF_UNMODIFIED_SINCE, RFC_7231_DATE_TIME_FORMATTER(value))
 
     /**
-     * Retrieves the timestamp of the last modification.
+     * Retrieves the last modified timestamp from the specified data source.
+     * This method processes the data to obtain an `Instant` representing the
+     * last modification time. If an error occurs during retrieval or processing,
+     * it returns an `Either` containing the corresponding error.
      *
-     * This method parses the value associated with the LAST_MODIFIED field and converts it 
-     * into an Instant object following the RFC 7231 date-time format.
-     *
-     * @return an Instant representing the last modified timestamp.
-     * @throws NoSuchHeaderException if the header is missing.
-     * @throws java.time.format.DateTimeParseException if the date string cannot be parsed.
-     * @since 3.0.0
+     * @return An instance of `Either` containing either an `Error` or the `Instant`
+     *         representing the last modification time.
+     * @since 6.1.0
      */
-    fun getLastModified(): Instant = getFirstOrThrow(LAST_MODIFIED).let { RFC_7231_DATE_TIME_FORMATTER.parse(it, Instant::from) }
+    fun getLastModified(): Either<Error, Instant> = getOrError(LAST_MODIFIED)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(LAST_MODIFIED) }
+        .thenMergeWith { it.headerDateToInstant() }
     /**
      * Sets the value of the `LAST_MODIFIED` field using the specified temporal accessor.
      *
@@ -2536,23 +2084,26 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun setLastModified(value: TemporalAccessor = Instant()) = set(LAST_MODIFIED, RFC_7231_DATE_TIME_FORMATTER(value))
 
     /**
-     * Retrieves the location as a URI object.
-     * 
-     * This method fetches the first occurrence of the `LOCATION` key and attempts 
-     * to convert it into a URI. If the key is missing or the value cannot 
-     * be processed, an exception may be thrown.
-     * 
-     * @return the location as a URI
-     * @throws NoSuchElementException if the `LOCATION` key is not found
-     * @throws IllegalArgumentException if the value cannot be converted to a valid URI
-     * @since 3.0.0
+     * Retrieves the location as a URI, wrapped in an Either type.
+     * This method performs a series of operations to fetch and transform the location
+     * data, handling errors and conversions along the way.
+     *
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return Either an error indicating the failure reason or a URI representing the location.
+     * @since 6.1.0
      */
-    fun getLocation() = getFirstOrThrow(LOCATION).toUri()()
+    fun getLocation(): Either<Error, Uri> = getOrError(LOCATION)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(LOCATION) }
+        .thenMergeWith { it.toUri() }
     /**
      * Sets the location URI for the given key.
      * 
      * @param value The URI to be set as the location.
      * @since 3.0.0
      */
-    fun setLocation(value: URI) = set(LOCATION, value.toString())
+    fun setLocation(value: Uri) = set(LOCATION, value.toString())
 }

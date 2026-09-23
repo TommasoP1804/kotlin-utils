@@ -144,6 +144,19 @@ val ByteArray.isNotDescendingSorted get() = !isSortedDescending()
  * @since 6.1.0
  */
 fun ByteArray.orNullIfEmpty() = if (isEmpty()) null else this
+/**
+ * Returns an `Either` instance based on whether is empty or not.
+ *
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
+ *
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
+ */
+fun ByteArray.orErrorIfEmpty(): Either<Empty, ByteArray> =
+    either { if (isEmpty()) raise(Empty) else this }
 
 /**
  * Returns the current ByteArray if it is not null, or an empty ByteArray if it is null.
