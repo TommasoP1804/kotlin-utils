@@ -498,6 +498,83 @@ inline fun <T1, reified T2> T1?.safeCastOr(transform: Transformer<T1?, T2>): T2 
 inline fun <reified T> Any?.safeCastOrThrow(lazyException: ThrowableSupplier) = runCatching { this as T }.getOrThrow(lazyException = lazyException)
 
 /**
+ * Returns the receiver object if it is non-null; otherwise, throws the exception provided by the given supplier.
+ *
+ * @param lazyException A supplier function that provides the exception to be thrown if the receiver is null.
+ * @since 6.1.0
+ */
+inline infix fun <reified T> T.orThrow(lazyException: ThrowableSupplier) =
+    this ?: throw lazyException()
+/**
+ * Combines a value with an error handler to produce an `Either` type.
+ *
+ * This function evaluates the given value and either returns it wrapped
+ * as `Right` if it is non-null, or invokes the provided error supplier
+ * to produce an error, which is then raised and captured as `Left`.
+ *
+ * @param T The type of the value to be evaluated.
+ * @param E The specific subtype of `Error` to be used in case of a null value.
+ * @param lazyError A lambda function supplying the error to be raised
+ *                  if the value is null.
+ * @return An `Either` where:
+ *         - `Right<T>` contains the evaluated non-null value.
+ *         - `Left<E>` contains the error produced by the `lazyError` supplier.
+ * @since 6.1.0
+ */
+inline infix fun <reified T, reified E : Error> T.orError(lazyError: Supplier<E>) =
+    either { this ?: raise(lazyError()) }
+
+/**
+ * Throws a lazily created exception of type [Throwable] if the specified condition is met.
+ *
+ * @param condition The condition to be evaluated. If true, the exception will be thrown.
+ * @param lazyException A function or lambda that takes the current instance of [T] and returns a [Throwable] to be thrown if the condition is true.
+ * @since 6.1.0
+ */
+inline fun <reified T> T.throwIf(condition: Boolean, lazyException: Transformer<T, Throwable>) =
+    if (condition) throw lazyException(this) else this
+/**
+ * Evaluates the given predicate with the current object. If the predicate
+ * returns true, the function throws an exception created by invoking the lazyException
+ * transformer with the current object. Otherwise, it returns the object itself.
+ *
+ * @param predicate A predicate function that represents the condition to evaluate.
+ * @param lazyException A transformer function that generates a throwable to be thrown
+ *                      if the predicate evaluates to true.
+ * @since 6.1.0
+ */
+inline fun <reified T> T.throwIf(predicate: Predicate<T>, lazyException: Transformer<T, Throwable>) =
+    if (predicate(this)) throw lazyException(this) else this
+/**
+ * Evaluates a condition and raises an error using the provided `lazyError` if the condition is `true`.
+ * This method operates within a functional context, leveraging the `either` construct for error handling.
+ *
+ * @param T The type of the receiver object being evaluated.
+ * @param E The type of the error to be raised.
+ * @param condition A boolean condition which determines if the error should be raised.
+ * @param lazyError A transformer function that takes the receiver object of type `T` and produces an error of type `E` when the condition is `true`.
+ *                  This function is invoked lazily to construct the error.
+ * @since 6.1.0
+ */
+inline fun <reified T, reified E> T.errorIf(condition: Boolean, lazyError: Transformer<T, E>) =
+    either { if (condition) raise(lazyError(this)) else this }
+/**
+ * Evaluates a predicate for the current object and raises an error if the predicate is satisfied.
+ * This method enables functional-style error handling by short-circuiting computations when
+ * a condition is met.
+ *
+ * @param T The type of the object this method is invoked on.
+ * @param E The type of the error that can be raised.
+ * @param predicate A `Predicate` used to test the condition on the object. If the predicate
+ *        returns `true`, an error is raised.
+ * @param lazyError A `Transformer` that takes the current object and produces an error of type `E`.
+ *        The error is used when the predicate condition evaluates to `true`.
+ * @since 6.1.0
+ */
+inline fun <reified T, reified E> T.errorIf(predicate: Predicate<T>, lazyError: Transformer<T, E>) =
+    either { if (predicate(this)) raise(lazyError(this)) else this }
+
+/**
  * Returns the receiver object if the specified condition is true, otherwise returns null.
  *
  * @param condition The condition to evaluate. If true, the receiver object is returned; if false, null is returned.

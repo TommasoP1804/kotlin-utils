@@ -20,7 +20,6 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.net.URLConnection
-import java.util.*
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KMutableProperty1
@@ -1163,6 +1162,39 @@ typealias ThrowableTransformer = (Throwable) -> Throwable
  * @since 1.0.0
  */
 typealias NullableThrowableSupplier = () -> Throwable?
+
+/**
+ * A type alias representing a supplier function that produces an instance of the `Error` interface.
+ * This supplier can be used for deferred or lazy error construction,
+ * facilitating dynamic error generation scenarios.
+ *
+ * @since 6.1.0
+ */
+typealias ErrorSupplier = () -> dev.tommasop1804.kutils.errors.Error
+/**
+ * A typealias representing a function that transforms one `Error` into another.
+ *
+ * This alias simplifies the declaration of functions or properties where
+ * error transformation logic needs to be encapsulated. The transformation
+ * can be used to map, modify, or adapt errors within the system to fit
+ * different contexts or requirements.
+ *
+ * @since 6.1.0
+ */
+typealias ErrorTransformer = (dev.tommasop1804.kutils.errors.Error) -> dev.tommasop1804.kutils.errors.Error
+
+/**
+ * A type alias representing a supplier that returns an optional instance of `Error`.
+ *
+ * This lambda-based supplier can be used in scenarios where an `Error` instance
+ * needs to be generated or fetched dynamically, with the possibility of being null.
+ *
+ * It provides a flexible mechanism for handling optional error objects, allowing
+ * for deferred execution and lazy evaluation.
+ *
+ * @since 6.1.0
+ */
+typealias NullableErrorSupplier = () -> dev.tommasop1804.kutils.errors.Error?
 
 /**
  * A typealias representing an action that is a function with no parameters and no return value.
