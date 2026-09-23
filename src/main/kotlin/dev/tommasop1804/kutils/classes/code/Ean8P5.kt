@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -18,6 +20,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents a specific variation of an EAN-8 barcode with an additional 5-digit extension (EAN-8+5).
@@ -85,19 +88,24 @@ value class Ean8P5 private constructor(override val value: String) : CharSequenc
         fun CharSequence.isValidEan8P5() = matches(Regex("[0-9]{8}[ -]?[0-9]{5}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 6) == this[7] }
 
         /**
-         * Converts the string to an instance of the EAN8P5 class.
+         * Attempts to convert the current `CharSequence` instance into an `Ean8P5` object.
          *
-         * This method attempts to parse the current string as an EAN8P5 object,
-         * encapsulating an EAN-8 barcode with a 5-digit add-on.
-         * The method returns a [Result] containing the successfully created
-         * EAN8P5 instance or an exception if the conversion fails.
+         * The method filters the character sequence, retaining only digits, spaces, and hyphens.
+         * It then uses the `Ean8P5` constructor to create the object. If the conversion fails,
+         * a `ParsingError` is raised, encapsulating the original input and the target class type.
          *
-         * @receiver The string to be converted.
-         * @return A [Result] containing the EAN8P5 instance if successful,
-         * or an exception otherwise.
-         * @since 3.0.0
+         * Error handling is done using a functional approach by leveraging `either` and `catching`.
+         *
+         * @return An `Either` instance where:
+         *         - `Right<Ean8P5>` indicates a successful conversion, containing the resulting `Ean8P5` object.
+         *         - `Left<ParsingError>` indicates a failure, providing details about the invalid input.
+         * @since 6.1.0
          */
-        fun CharSequence.toEan8P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean8P5(this) } }
+        fun CharSequence.toEan8P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { either {
+            catching({ Ean8P5(this@toEan8P5) }) { t: Throwable ->
+                InvalidFormatOfType(this@toEan8P5, typeOf<Ean8P5>(), t)
+            }
+        } }
 
         class Serializer : ValueSerializer<Ean8P5>() {
             override fun serialize(value: Ean8P5, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

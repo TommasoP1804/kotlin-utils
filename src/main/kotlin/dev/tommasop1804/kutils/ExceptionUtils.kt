@@ -15,6 +15,25 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+/**
+ * Represents a code path that should never be reachable under normal circumstances.
+ *
+ * This value generates a runtime error when accessed, explicitly signaling that execution
+ * has reached a location in the program that was assumed to be logically impossible.
+ * Its primary use is for ensuring exhaustiveness in certain control structures, such as `when` expressions.
+ *
+ * @since 6.1.0
+ */
+val UNREACHABLE: Nothing = error("Unreachable")
+
+/**
+ * Extension property that retrieves the root cause of a [Throwable].
+ *
+ * This property traverses the chain of throwable causes and returns
+ * the deepest nested cause. If there are no nested causes, it returns
+ * the throwable itself.
+ * @since 6.1.0
+ */
 val Throwable.rootCause: Throwable
     get() {
         var current = this
@@ -37,7 +56,7 @@ val Throwable.rootCause: Throwable
 val Throwable.causes: List<Throwable>
     get() {
         val list = emptyMList<Throwable>()
-        var current: Throwable? = this
+        var current: Throwable? = cause
         while (current != null) {
             list += current
             current = current.cause
@@ -141,3 +160,74 @@ infix fun ThrowableSupplier.causeOf(main: Throwable): ThrowableSupplier = { main
  * @since 1.0.0
  */
 infix fun ThrowableSupplier.causeOf(main: ThrowableSupplier): ThrowableSupplier = { main().initCause(invoke())!! }
+
+/**
+ * Associates the current throwable chain with a specified root cause.
+ *
+ * This function ensures the given throwable is set as the root cause of the throwable chain,
+ * and takes necessary precautions to avoid circular references or redundant associations.
+ *
+ * @param cause The throwable to be set as the root cause.
+ * @return The original throwable (receiver), after associating with the given root cause.
+ * @since 6.1.0
+ */
+infix fun Throwable.withRootCause(cause: Throwable): Throwable = also { outer ->
+    if (outer === cause) return@also
+    val root = generateSequence(outer) { it.cause?.takeIf { next -> next !== it } }
+        .last()
+    if (root === cause) return@also
+    runCatching { root.initCause(cause) }
+        .onFailure { root.addSuppressed(cause) }
+}
+/**
+ * Associates the given root cause with the current throwable. If the current throwable already has
+ * the given cause in its causal chain, no action is taken. Otherwise, the root cause will be added
+ * to the deepest node in the causal chain, either as its cause or by suppressing it if an exception
+ * occurs during initialization.
+ *
+ * @param cause A supplier function that provides the root cause to be added.
+ * @return The current throwable instance, potentially augmented with the root cause in its causal chain.
+ * @since 6.1.0
+ */
+infix fun Throwable.withRootCause(cause: ThrowableSupplier): Throwable = also { outer ->
+    if (outer === cause) return@also
+    val root = generateSequence(outer) { it.cause?.takeIf { next -> next !== it } }
+        .last()
+    if (root === cause) return@also
+    runCatching { root.initCause(cause()) }
+        .onFailure { root.addSuppressed(cause()) }
+}
+/**
+ * Associates the given cause with the current throwable chain, ensuring the specified cause
+ * is linked to the deepest root cause of the throwable chain. If the given cause already
+ * exists in the throwable chain, this method has no effect.
+ *
+ * @param cause The throwable to be associated as the root cause.
+ * @return The receiver throwable supplier with the updated root cause.
+ * @since 6.1.0
+ */
+infix fun ThrowableSupplier.withRootCause(cause: Throwable): ThrowableSupplier = also { outer ->
+    if (outer === cause) return@also
+    val root = generateSequence(outer) { it.cause?.takeIf { next -> next !== it } }
+        .last()
+    if (root === cause) return@also
+    runCatching { root.initCause(cause) }
+        .onFailure { root.addSuppressed(cause) }
+}
+/**
+ * Associates a root cause with the current `ThrowableSupplier` instance. If a root cause is not already
+ * present, it initializes the root cause. Otherwise, it adds the supplied cause as a suppressed exception
+ * to the deepest cause in the chain.
+ *
+ * @param cause a supplier for the throwable instance to be associated or added as a suppressed exception
+ * @return the original `ThrowableSupplier` instance with the updated root cause or suppressed exception
+ * @since 6.1.0
+ */
+infix fun ThrowableSupplier.withRootCause(cause: ThrowableSupplier): ThrowableSupplier = also { outer ->
+    if (outer === cause) return@also
+    val root = generateSequence(outer) { it.cause?.takeIf { next -> next !== it } }
+        .last()
+    if (root === cause) return@also
+    runCatching { root.initCause(cause()) }
+        .onFailure { root.addSuppressed(cause()) }
+}

@@ -12,8 +12,9 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.measure.MeasureUnit.*
-import dev.tommasop1804.kutils.exceptions.*
+import dev.tommasop1804.kutils.errors.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.SerializationContext
@@ -133,23 +134,21 @@ interface ScalarUnit : Serializable {
         @JsonIgnore @Serial private const val serialVersionUID = 1L
 
         /**
-         * Converts a given measurement to a specified scalar unit.
+         * Converts a given measurement from its current unit to the specified target unit.
+         * This function validates that the conversion is possible between the units, raising an error
+         * if the `measurement`'s unit is incompatible with the target unit.
          *
-         * This function performs a unit conversion for measurements of various types such as length, time, mass, temperature, and more.
-         * The conversion is done only if the measure type of the input measurement matches the measure type of the target scalar unit.
-         *
-         * @receiver Scalar unit representing the target unit for the conversion.
-         * @param measurement The input measurement to be converted, consisting of a value and its associated unit.
-         * @param to The scalar unit to which the measurement should be converted. This must have the same measure as the input measurement.
-         * @return A `Measurement` object that holds the converted value along with the target unit.
-         * @throws UnitConversionException If the measure of the input measurement does not match the measure of the target scalar unit.
-         * @since 1.0.0
+         * @param measurement The measurement value along with its current unit to be converted.
+         * @param to The target unit to which the measurement should be converted.
+         * @return Either a successful [Measurement] converted to the target unit, or an error
+         *         [IllegalConversionBetweenUnits] if the conversion is not possible.
+         * @since 6.1.0
          */
         @Beta
-        fun convert(measurement: Measurement, to: ScalarUnit) = runCatching {
-            val message = "Cannot convert " + measurement.measure + " to " + to.measure
+        fun convert(measurement: Measurement, to: ScalarUnit): Either<IllegalConversionBetweenUnits, Measurement> = either {
+            val error = IllegalConversionBetweenUnits(measurement, measurement.unit, to)
             if (measurement.measure != to.measure) {
-                throw UnitConversionException(message)
+                raise(error)
             }
 
             Measurement(when (val unit = measurement.unit) {
@@ -167,7 +166,7 @@ interface ScalarUnit : Serializable {
                 is AccelerationUnit -> unit.convertTo(measurement.value, to as AccelerationUnit)
                 is DensityUnit -> unit.convertTo(measurement.value, to as DensityUnit)
                 is DataSizeUnit -> unit.convertTo(measurement.value, to as DataSizeUnit)
-                else -> throw UnitConversionException(message)
+                else -> raise(error)
             }, to)
         }
     }

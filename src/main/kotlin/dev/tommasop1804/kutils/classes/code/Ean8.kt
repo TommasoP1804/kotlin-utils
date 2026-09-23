@@ -14,6 +14,8 @@ import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.core.JsonGenerator
@@ -27,6 +29,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents a value class for EAN-8 product codes, a standardized 8-digit barcode format primarily used in retail.
@@ -94,17 +97,25 @@ value class Ean8 private constructor(override val value: String) : CharSequence,
         fun CharSequence.isValidEan8() = matches(Regex("[0-9]{8}")) && computeCheckDigit(toString() - 1) == this[7]
 
         /**
-         * Converts the current string to an EAN-8 object, encapsulating the representation of an EAN-8 barcode.
+         * Converts the current `CharSequence` to an `EAN8` by filtering out non-digit characters and attempting
+         * to construct an `EAN8` instance. If the conversion fails, a `ParsingError` is returned.
          *
-         * This function performs the conversion by trying to initialize an `EAN8` instance using the string.
-         * It uses a `runCatching` block to catch potential exceptions that may arise during the conversion.
+         * This method ensures that only valid numerical characters contribute to the creation of the `EAN8` value.
+         * The conversion process leverages functional error handling using `either` and `catching`, where any
+         * exception thrown during the construction of the `EAN8` value is handled gracefully.
          *
-         * @receiver The string being converted to the EAN-8 format.
-         * @return A `Result` wrapping the constructed `EAN8` instance. If an error occurs during conversion,
-         * the `Result` will contain the exception.
-         * @since 3.0.0
+         * @receiver The `CharSequence` to be converted to an `EAN8`.
+         * @return An `Either` where:
+         *         - `Right` contains the successfully created `EAN8` instance.
+         *         - `Left` contains a `ParsingError` if the conversion fails.
+         * @throws Throwable if an exception unrelated to `ParsingError` occurs during the conversion.
+         * @since 6.1.0
          */
-        fun CharSequence.toEan8() = filter { it.isDigit() }.run { runCatching { Ean8(this) } }
+        fun CharSequence.toEan8() = filter { it.isDigit() }.run { either {
+            catching({ Ean8(this@toEan8) }) { t: Throwable ->
+                InvalidFormatOfType(this@toEan8, typeOf<Ean8>(), t)
+            }
+        } }
 
         /**
          * Computes the check digit for a given string code based on the EAN checksum algorithm.

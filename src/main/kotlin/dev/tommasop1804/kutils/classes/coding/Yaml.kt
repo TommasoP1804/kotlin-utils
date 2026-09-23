@@ -24,9 +24,11 @@ import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonE
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
 import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import org.yaml.snakeyaml.DumperOptions
@@ -44,6 +46,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.io.File
 import java.nio.file.Path
 import java.time.*
+import kotlin.reflect.typeOf
 import org.intellij.lang.annotations.Language as IJLanguage
 import org.yaml.snakeyaml.Yaml as SnakeYaml
 
@@ -82,7 +85,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @since 3.0.0
      */
-    val isObject = toDataMap().isSuccess
+    val isObject = toDataMap().isLeft
     /**
      * Indicates whether the value of the current instance represents an array-like structure.
      *
@@ -95,7 +98,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      *
      * @since 3.0.0
      */
-    val isArray = toList<Any>().isSuccess && value.trim() startsWith Char.HYPEN
+    val isArray = toList<Any>().isLeft && value.trim() startsWith Char.HYPEN
     /**
      * Indicates whether the current YAML node represents a scalar value.
      * This property evaluates to `true` if the node is neither an array nor an object.
@@ -208,44 +211,54 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @return `true` if the String is valid YAML; `false` otherwise.
          * @since 3.0.0
          */
-        fun String.isValidYaml() = runCatching { Yaml(this) }
+        fun String.isValidYaml() = runCatching { Yaml(this) }.isSuccess
 
         /**
-         * Converts the contents of the current file into a YAML representation.
+         * Converts the current File instance to a Yaml object.
          *
-         * This method attempts to parse the file contents and represents it as a YAML object.
-         * Any errors encountered during the parsing process are captured within the `Result` object
-         * returned by this function.
-         *
-         * @receiver File object whose contents are to be converted.
-         * @return A `Result` wrapping the parsed YAML object if successful, or an exception if an error occurs.
-         * @since 3.13.0
+         * @return An Either containing the resulting Yaml object if the conversion is successful,
+         *         or an InvalidConversion object in case of failure.
+         * @since 6.1.0
          */
-        fun File.toYaml() = runCatching { Yaml(this) }
+        fun File.toYaml(): Either<InvalidConversionBetweenTypes, Yaml> = either {
+            catching({ Yaml(this@toYaml) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toYaml, typeOf<File>(), typeOf<Yaml>(), t)
+            }
+        }
         /**
-         * Converts the content of the given file path to its YAML representation.
+         * Converts the current [Path] instance to a [Yaml] representation.
          *
-         * This function reads the file located at the invoked Path and attempts to parse it into a YAML format.
-         * The operation is wrapped in a `Result` to handle any potential errors gracefully during parsing or
-         * file access.
+         * This method attempts to interpret the [Path] as a YAML type. If the conversion
+         * is successful, the resulting [Yaml] object is returned wrapped in an [Either].
+         * If the conversion fails, an [InvalidConversionBetweenTypes] error is returned containing
+         * details about the failed conversion.
          *
-         * @receiver The file path to be read and converted into YAML format.
-         * @return A `Result` containing the YAML representation of the file content, or an error if the
-         *         operation fails.
-         * @since 3.13.0
+         * @return An [Either] containing either the successfully converted [Yaml] object
+         * or an [InvalidConversionBetweenTypes] error encapsulating the failure details.
+         * @since 6.1.0
          */
-        fun Path.toYaml() = runCatching { Yaml(this) }
+        fun Path.toYaml(): Either<InvalidConversionBetweenTypes, Yaml> = either {
+            catching({ Yaml(this@toYaml) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toYaml, typeOf<Path>(), typeOf<Yaml>(), t)
+            }
+        }
         /**
-         * Converts the current `String` into a YAML representation and wraps the operation in a `Result`.
-         * 
-         * This method attempts to parse the content of the `String` as YAML, creating an instance of the `YAML` class.
-         * If the operation is successful, the `Result` will contain the parsed `YAML` object; otherwise, it will contain the exception.
+         * Converts the annotated YAML string to a `Yaml` object.
          *
-         * @receiver The `String` to be converted to YAML.
-         * @return A `Result` that either contains the parsed YAML object or an exception if parsing fails.
-         * @since 3.0.0
+         * This extension function attempts to parse the current receiver string (annotated as YAML)
+         * into a `Yaml` object. If the parsing fails due to an invalid format or any other error,
+         * it wraps the exception in an `InvalidFormat` error result.
+         *
+         * @receiver A YAML-formatted string that will be parsed.
+         * @return An `Either` instance containing the parsed `Yaml` object on success
+         *         or an `InvalidFormat` error on failure.
+         * @since 6.1.0
          */
-        fun @receiver:IJLanguage("yaml") String.toYaml() = runCatching { Yaml(this) }
+        fun @receiver:IJLanguage("yaml") String.toYaml() = either {
+            catching({ Yaml(this@toYaml) }) { t: Throwable ->
+                InvalidFormatOfType(this@toYaml, typeOf<Yaml>(), t)
+            }
+        }
         /**
          * Converts the current `JSON` instance into its equivalent `YAML` representation.
          *
@@ -300,67 +313,72 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
         }
 
         /**
-         * Reads the content of the specified file and parses it into a YAML object.
+         * Reads and parses the content of the specified file into an instance of the specified type.
          *
-         * @param file the file to be read and parsed as YAML
-         * @return a Result containing the parsed YAML object if the operation is successful, 
-         * or an exception if an error occurs
-         * @since 3.0.0
+         * @param file The file to be read and parsed.
+         * @return An `Either` containing the parsed object of type `T` if successful, or an `InvalidFormat` error if parsing fails.
+         * @since 6.1.0
          */
-        fun <T> readFromFile(file: File): Result<T> = runCatching { SNAKE_YAML.load(file.readText()) }
+        inline fun <reified T> readFromFile(file: File): Either<InvalidFormatOfType, T> = either {
+            catching({ SNAKE_YAML.load<T>(file.readText()) }) { t: Throwable ->
+                InvalidFormatOfType(file, typeOf<T>(), t)
+            }
+        }
         /**
-         * Reads an array of the specified type from the given file.
+         * Reads a file and converts its content into an array of the specified type.
          *
-         * This method attempts to read the contents of the file and convert it into an array
-         * of the specified type `T`. The operation is wrapped in a `Result` object to capture
-         * success or failure without throwing exceptions directly.
-         *
-         * @param T The type of elements to be read and stored in the resulting array.
-         * @param file The file from which the array is read.
-         * @return A `Result` containing the array of type `T` if the operation succeeds, 
-         * or the encapsulated exception if the operation fails.
-         * @since 3.0.0
+         * @param file The file to be read and converted into an array.
+         * @return An `Either` containing either an `Error` if the reading or conversion fails,
+         *         or an array of type `T` if the operation is successful.
+         * @since 6.1.0
          */
-        inline fun <reified T> readArrayFromFile(file: File): Result<Array<T>> = runCatching { readListFromFile<T>(file)().toTypedArray() }
+        inline fun <reified T> readArrayFromFile(file: File): Either<Error, Array<T>> = readListFromFile<T>(file).map { it.toTypedArray() }
         /**
-         * Reads and parses a list of objects from the specified file.
+         * Reads a list of elements of type [T] from the specified file.
          *
-         * The file is expected to be in a YAML format, and the contents
-         * will be deserialized into a list of objects of type [T].
+         * This method attempts to parse the file content as YAML and converts the data into a list of the specified type [T].
+         * If the file content format is invalid, an error is returned.
          *
-         * @param file The file to read from. It should contain YAML-formatted data.
-         * @return A [Result] containing the parsed list of objects of type [T], 
-         * or an exception if the operation fails.
-         * @since 3.0.0
+         * @param file The file to be read and parsed into a list of elements of type [T].
+         * @return Either an [Error] if the parsing fails, or a [List] of elements of type [T] if the parsing is successful.
+         * @since 6.1.0
          */
-        fun <T> readListFromFile(file: File): Result<List<T>> = runCatching { Yaml(file.readText()).toList<T>()() }
+        inline fun <reified T> readListFromFile(file: File): Either<Error, List<T>> = (either {
+            catching({ Yaml(file.readText()) }) { e: MalformedInputException ->
+                InvalidFormatOfType(file, typeOf<Yaml>(), e)
+            }
+        } thenEither { it.toList<T>() }).flatten()
         /**
-         * Reads the content of a given file, parses it as YAML, and converts it to a set of type `T`.
+         * Reads a set of elements of type [T] from the specified file. The method attempts to deserialize
+         * the contents of the file into a list and then converts that list into a set.
          *
-         * This method attempts to interpret the content of the specified file as YAML
-         * and extract a set of elements of type `T`. The operation is performed within
-         * a `Result` context to handle possible exceptions that might occur during file
-         * reading or data parsing.
-         *
-         * @param file The file to be read, whose content is expected to be in YAML format.
-         * @return A [Result] containing a [Set] of elements of type `T` if the operation is successful. 
-         * In case of failure, the [Result] will encapsulate the exception.
-         * @since 3.0.0
+         * @param file The file from which the elements should be read.
+         * @return An [Either] containing a set of elements of type [T] if successful, or an [Error] if
+         *         the operation fails.
+         * @since 6.1.0
          */
-        fun <T> readSetFromFile(file: File): Result<Set<T>> = runCatching { Yaml(file.readText()).toSet<T>()() }
+        inline fun <reified T> readSetFromFile(file: File): Either<Error, Set<T>> = readListFromFile<T>(file).map { it.toSet() }
         /**
-         * Reads the contents of a specified file and parses it into a map structure from YAML format.
+         * Reads and parses a YAML file into a map with string keys and values of the specified type.
          *
-         * The method expects the file to contain valid YAML data. It then converts the YAML content
-         * into a `Map` where the keys are `String` and the values are of the generic type `T`.
-         * Any errors during reading or parsing the file are encapsulated in a `Result` object.
+         * This function uses a YAML parser to deserialize the contents of the given file into a map.
+         * If the file cannot be read or the contents cannot be properly deserialized into the expected
+         * type, an error will be returned.
          *
-         * @param file The file containing the YAML data to be parsed.
-         * @return A [Result] containing the parsed map with keys as `String` and values of type `T`
-         *         on success, or an exception on failure.
-         * @since 3.0.0
+         * @param T The type of the values in the map.
+         * @param file The YAML file to read and parse.
+         * @return Either a successfully parsed map or an error encapsulating the failure.
+         * @since 6.1.0
          */
-        fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching { Yaml(file.readText()).toMap<T>()() }
+        inline fun <reified T> readMapFromFile(file: File) = either {
+            @Suppress("USELESS_CAST")
+            catching({
+                val map = SNAKE_YAML.load<Map<String, T>>(file.readText())
+                map.mapValues { it.value as T }
+            }) { t: Throwable ->
+                InvalidFormatOfType(file, typeOf<Map<String, T>>(), t)
+            }
+        }
 
         class Serializer : ValueSerializer<Yaml>() {
             override fun serialize(value: Yaml, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
@@ -414,264 +432,296 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
     }
 
     /**
-     * Converts the YAML content represented by this instance into an object of type [T].
+     * Converts the current object to an instance of the specified type.
      *
-     * @param T The target type to which the YAML content will be converted.
-     * @return A [Result] containing an instance of type [T] if the conversion succeeds,
-     *         or an exception if the conversion fails.
-     * @throws IllegalArgumentException if the value cannot be converted to the specified type.
-     * @since 3.0.0
+     * This method attempts to deserialize the current object into an instance of the type `T`.
+     * If the deserialization fails, a `DeserializationError.MappingError` is returned.
+     *
+     * @return An `Either` containing the deserialization result. The left value indicates a `MappingError`,
+     *         while the right value contains the successfully deserialized object of type `T`.
+     * @since 6.1.0
      */
-    inline fun <reified T> toObject() = runCatching {
-        tryOr({ toJson().toObject<T>()() }) {
-            SNAKE_YAML.loadAs(value, T::class.java)!!
-        }
+    inline fun <reified T> toObject(): Either<DeserializationError.MappingError, T> = tryOr({ toJson().toObject<T>() }) {
+        SNAKE_YAML.loadAs(value, T::class.java)!!
     }
 
     /**
-     * Converts the YAML content into an array of type `T`.
+     * Converts a deserialized list into an array of the specified type.
+     * Uses reified type parameters to create the array at runtime.
      *
-     * This function uses SnakeYAML's `loadAll` method to parse the YAML string stored in the `value` field
-     * of the containing class, then maps the resulting objects to the specified type `T` and produces
-     * an array of `T`. The operation is wrapped in a `Result` using `runCatching` to handle any parsing
-     * or type casting errors.
-     *
-     * @param T The type to which the YAML objects should be cast.
-     * @return A `Result` containing an array of type `T` if the conversion is successful, or the exception if it fails.
-     * @throws ClassCastException If the YAML content cannot be cast to `T` at runtime.
-     * @throws YAMLException If the YAML content is malformed.
-     *
-     * @since 3.0.0
+     * @return Either a mapping error if deserialization fails, or an array of the specified type.
+     * @since 6.1.0
      */
-    inline fun <reified T> toArray() = runCatching { SNAKE_YAML.loadAll(value).map { it as T }.toTypedArray() }
+    inline fun <reified T> toArray(): Either<DeserializationError.MappingError, Array<T>> =
+        toList<T>().map { it.toTypedArray() }
 
     /**
-     * Converts the YAML content stored in the `value` property into a list of objects of type `T`.
-     * The method uses the SnakeYAML library to parse the YAML content and map it to a collection.
-     * Any parsing errors will be captured and returned as a `Result` object.
+     * Converts the serialized YAML content into a strongly-typed list of the specified type.
      *
-     * @param T The type to which each element in the resulting list will be cast.
-     * @return A `Result` wrapping either the successfully parsed list of objects or any exception encountered during parsing.
-     * @throws ClassCastException If an element in the YAML content cannot be cast to the specified type `T`.
-     * @since 3.0.0
+     * This method attempts to deserialize the YAML input into a `List` of type `T`.
+     * If the conversion fails due to a mapping error, the result will contain a `DeserializationError.MappingError`.
+     *
+     * @return Either a `DeserializationError.MappingError` if the conversion fails, or a `List<T>` with the deserialized objects.
+     * @since 6.1.0
      */
-    fun <T> toList(): Result<List<T>> = runCatching { SNAKE_YAML.load<List<T>>(value) }
+    inline fun <reified T> toList(): Either<DeserializationError.MappingError, List<T>> = either {
+        catching({
+            val raw = SNAKE_YAML.load<List<*>>(value)
+            raw.map { it as T }
+        }) { t: Throwable -> DeserializationError.MappingError(typeOf<List<T>>(), t) }
+    }
     /**
-     * Converts a collection or sequence of elements into a non-empty list wrapped in a Result.
+     * Transforms a collection into a `NonEmptyList` wrapped in an `Either` type.
      *
-     * The method first converts the collection or sequence into a list.
-     * It then attempts to transform the resulting list into a non-empty list,
-     * ensuring that the result contains meaningful data.
+     * This method attempts to convert the current collection to a `NonEmptyList`.
+     * If the collection is empty, it returns a failure represented as an `Error`.
+     * The success case contains the resulting `NonEmptyList` wrapped in an `Either.Right`.
      *
-     * @return A [Result] wrapping the non-empty list if the transformation is successful,
-     *         or a failure if the conversion cannot produce a non-empty list.
-     * @since 5.2.1
+     * The operation ensures type-safety by leveraging reified type parameters
+     * and catching potential exceptions during the conversion process.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @param T The type of elements within the collection.
+     * @return An `Either<Error, List<T>>`, where a successful result contains
+     *         the `NonEmptyList` and a failure contains an `IterableError.Empty`.
+     * @since 6.1.0
      */
-    fun <T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
+    inline fun <reified T> toNonEmptyList() =
+        toList<T>() as Either<Error, List<T>> thenEither { catching({ it.toNonEmptyList() }) { _: Throwable -> IterableError.Empty } }
     /**
-     * Parses the YAML content stored in the current object and converts it into a mutable list of type [T].
+     * Converts a serialized input into an `MList` of type `T`, wrapped in an `Either` to handle possible errors.
      *
-     * Uses SnakeYAML to process the content and attempts to cast each deserialized element to the specified type.
+     * The method attempts to deserialize the input into a list of type `T` and then maps it into an `MList<T>`.
+     * If the deserialization fails, a `DeserializationError.MappingError` is returned inside the `Either`.
      *
-     * @param T The type of elements in the resulting mutable list.
-     * @return A [Result] containing the mutable list of type [T], or an exception if the operation fails.
-     * @throws ClassCastException If any element in the YAML content cannot be cast to the specified type [T].
-     * @since 3.0.0
+     * @return An `Either` containing a deserialization error of type `DeserializationError.MappingError`
+     *         or a successfully mapped `MList<T>`.
+     * @since 6.1.0
      */
-    fun <T> toMList() = runCatching { SNAKE_YAML.load<List<T>>(value).toMList() }
+    inline fun <reified T> toMList(): Either<DeserializationError.MappingError, MList<T>> =
+        toList<T>().map { it.toMList() }
     /**
-     * Converts the current instance to a non-empty mutable list wrapped in a Result.
+     * Converts the current context into a `NonEmptyMList<T>` if possible, wrapped in an `Either` type.
+     * If conversion is successful, the resulting `NonEmptyMList<T>` is returned as `Right`.
+     * If the conversion fails, an error of type `Error` is returned as `Left`.
      *
-     * This function attempts to map the result of `toMList<T>()` to a non-empty mutable list.
-     * If the list is empty or the conversion fails, the resulting `Result` will contain a failure.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
      *
-     * @param T The type of elements in the list.
-     * @return A [Result] containing a non-empty mutable list if the conversion is successful,
-     *         or a failure if the list is empty or another error occurs.
-     * @since 5.2.1
+     * @return An `Either` containing either a `NonEmptyMList<T>` on success (`Right`)
+     *         or an error (`Left`) if the conversion could not be performed.
+     * @since 6.1.0
      */
-    fun <T> toNonEmptyMList() = toMList<T>().mapCatching { it.toNonEmptyMList() }
+    inline fun <reified T> toNonEmptyMList(): Either<Error, NonEmptyMList<T>> =
+        toMList<T>() as Either<Error, MList<T>> thenEither { catching({ it.toNonEmptyMList() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the YAML content represented by `value` into a set of objects of type `T`.
-     * This method uses SnakeYAML to parse the content and extract all objects, casting
-     * each to the specified type `T` and collecting them into an immutable set.
+     * Transforms a deserialized list of elements into a set.
      *
-     * Any exception encountered during parsing or casting will be encapsulated
-     * within a `Result` using the `runCatching` construct.
+     * This method attempts to deserialize a list of elements of type [T]
+     * and converts it into a set, ensuring all elements are unique.
      *
-     * @param T The type of the elements in the resulting set.
-     * @return A `Result` containing the set of objects of type `T` or an exception
-     *         if an error occurs.
-     * @since 3.0.0
+     * @return Either a mapping error in case of deserialization failure
+     *         or a set containing unique elements of type [T].
+     * @since 6.1.0
      */
-    fun <T> toSet() = runCatching { SNAKE_YAML.load<List<T>>(value).toSet() }
+    inline fun <reified T> toSet(): Either<DeserializationError.MappingError, Set<T>> =
+        toList<T>().map { it.toSet() }
     /**
-     * Converts the elements in the collection into a `NonEmptySet`.
+     * Converts a collection to a `NonEmptySet` wrapped in an `Either`.
+     * If the collection is empty, an error is returned instead.
      *
-     * This method attempts to create a `NonEmptySet` from the elements of the collection
-     * by calling `toSet` to eliminate duplicates, and then safely maps the result to
-     * ensure it becomes a valid `NonEmptySet`. If the mapping is unsuccessful (e.g., the
-     * resulting set is empty), it returns the failure encapsulated in a `Result`.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
      *
-     * @return A `Result` containing the `NonEmptySet` if the conversion is successful,
-     * or a failure if the resulting set is empty.
-     * @since 5.2.1
+     * @return An `Either` containing a `NonEmptySet` if the conversion is successful, or an `Error` if the collection is empty.
+     * @since 6.1.0
      */
-    fun <T> toNonEmptySet() = toSet<T>().mapCatching { it.toNonEmptySet() }
+    inline fun <reified T> toNonEmptySet(): Either<Error, NonEmptySet<T>> =
+        toSet<T>() as Either<Error, Set<T>> thenEither { catching({ it.toNonEmptySet() }) { _: Throwable -> IterableError.Empty } }
     /**
-     * Parses the YAML content stored in the `value` field and converts it into a mutable set of elements of type T.
+     * Converts the serialized data into a mutable set of type [T].
      *
-     * The method uses the SnakeYAML library to process the YAML content, loading all elements and casting them to the
-     * specified type T. These elements are then collected and transformed into a mutable set.
+     * This function attempts to deserialize the data into a list of elements of type [T],
+     * then transforms the list into a mutable set (MSet).
      *
-     * @return A `Result` wrapping a mutable set of type T, containing the parsed and distinct elements from the YAML content.
-     *         If parsing or type casting fails, a `Failure` with the corresponding exception is returned.
-     * @since 3.0.0
+     * @return Either a [DeserializationError.MappingError] if deserialization fails, or a [MSet] of type [T]
+     *         if the conversion is successful.
+     * @since 6.1.0
      */
-    fun <T> toMSet() = runCatching { SNAKE_YAML.load<List<T>>(value).toMSet() }
+    inline fun <reified T> toMSet(): Either<DeserializationError.MappingError, MSet<T>> =
+        toList<T>().map { it.toMSet() }
     /**
-     * Converts a collection or sequence into a non-empty multiset (MSet) representation.
+     * Converts a given collection to a `NonEmptyMSet`, ensuring the resulting set is non-empty.
      *
-     * This method first transforms the elements into an intermediate multiset structure.
-     * Then, it attempts to map the result into a non-empty multiset, ensuring that the output
-     * contains at least one element. The operation returns a result wrapped in `Result`,
-     * capturing any failure that occurs during the conversion.
+     * This method first transforms the current collection into an `MSet<T>`. If the `MSet<T>` is empty,
+     * the conversion will fail, returning an error of type `IterableError.Empty`. Otherwise, it will
+     * cast the result into a `NonEmptyMSet` wrapped in an `Either<Error, MSet<T>>`, ensuring type safety
+     * and immutability.
      *
-     * @return A `Result` containing the non-empty multiset if the operation succeeds,
-     *         or an error if the conversion fails.
-     * @since 5.2.1
+     * The method uses `Either` to encapsulate the result and provides error-handling capabilities if
+     * the conversion fails. Additionally, type reification is used to retain type information of
+     * the elements at runtime.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing `Error` if the input is empty, or a successfully created `NonEmptyMSet<T>`.
+     * @throws Throwable If an unexpected exception occurs during the conversion.
+     * @since 6.1.0
      */
-    fun <T> toNonEmptyMSet() = toMSet<T>().mapCatching { it.toNonEmptyMSet() }
+    inline fun <reified T> toNonEmptyMSet() =
+        toMSet<T>() as Either<Error, MSet<T>> thenEither { catching({ it.toNonEmptyMSet() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the underlying YAML content into a map structure of key-value pairs.
+     * Deserializes the given YAML string into a map where each key is a string and the values are of the specified type.
      *
-     * The method utilizes the SnakeYAML library to parse the YAML content stored in the `value` property
-     * and transform it into a `Map<String, T>`. If the parsing process encounters an error, the result
-     * is wrapped in a `Result` instance, allowing safe handling of potential exceptions.
-     *
-     * @param V The type of values expected in the resulting map.
-     * @return A `Result<Map<String, T>>` containing the parsed map if successful or the exception if an error occurred.
-     * @since 3.0.0
+     * @return Either a successful map of string keys to values of type `V`, or an error of type `DeserializationError.MappingError`
+     *         if the deserialization process fails.
+     * @since 6.1.0
      */
-    fun <V> toMap() = runCatching { SNAKE_YAML.load<Map<String, V>>(value)!! }
+    inline fun <reified V> toMap(): Either<DeserializationError.MappingError, Map<String, V>> = either {
+        catching({
+            val raw = SNAKE_YAML.load<Map<String, *>>(value)
+            raw.mapValues { it.value as V }
+        }) { t: Throwable -> DeserializationError.MappingError(typeOf<Map<String, V>>(), t) }
+    }
     /**
-     * Converts the current collection into a non-empty map, where each element is transformed
-     * into a key-value pair. The operation wraps the conversion in a `mapCatching` block to handle
-     * potential errors during the conversion process.
+     * Converts the receiver into a `NonEmptyMap` if possible.
      *
-     * @param V The type of the values in the resulting map.
-     * @return A result containing the non-empty map if successful, or an exception if the conversion fails.
-     * @since 5.2.1
+     * This method attempts to transform the current object into a `NonEmptyMap` of type `String` as the key
+     * and a reified type `V` as the value. The result is wrapped in an `Either` type, where
+     * the left side represents an error (`Error`) and the right side contains the successfully created `NonEmptyMap`.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing either the error (`Error`) if the transformation is not possible,
+     *         or a `NonEmptyMap<String, V>` if the conversion succeeds.
+     * @since 6.1.0
      */
-    fun <V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
+    inline fun <reified V> toNonEmptyMap(): Either<Error, NonEmptyMap<String, V>> =
+        toMap<V>() as Either<Error, Map<String, V>> thenEither { catching({ it.toNonEmptyMap() }) { _: Throwable -> IterableError.Empty } }
     /**
-     * Converts a YAML string value into a mutable map (`MMap`) with string keys and values of type `T`.
+     * Transforms the current structure into an `MMap<String, V>` while handling possible deserialization errors.
      *
-     * This method utilizes SnakeYAML to parse the YAML input and transform it into the desired data structure.
-     * If the parsing process fails or the input is invalid, the result will encapsulate the error within a `Result` object.
-     *
-     * @param V The type of the values in the resulting mutable map.
-     * @return A `Result` containing the parsed `MMap<String, T>` on success, or an exception on failure.
-     * @throws NullPointerException If the YAML parsing result is null.
-     * @since 3.0.0
+     * @return An `Either` representing either a `MappingError` if the transformation fails, or a resulting `MMap<String, V>` on success.
+     * @since 6.1.0
      */
-    fun <V> toMMap() = runCatching { SNAKE_YAML.load<MMap<String, V>>(value)!! }
+    inline fun <reified V> toMMap(): Either<DeserializationError.MappingError, MMap<String, V>> = toMap<V>().map { it.toMMap() }
     /**
-     * Converts the current receiver into a `NonEmptyMMap` by first transforming it into an `MMap`
-     * and then attempting to map the result into a `NonEmptyMMap`.
+     * Converts the current object to a NonEmptyMMap instance, ensuring that the resulting structure is non-empty.
      *
-     * If the transformation to a `NonEmptyMMap` fails, the result will capture the failure as an error.
+     * The method attempts to safely transform the underlying data into a NonEmptyMMap.
+     * If the transformation fails or the structure is empty, it returns an error wrapped in an Either instance.
      *
-     * @param V The type of values in the resulting `NonEmptyMMap`.
-     * @return A result containing the transformed `NonEmptyMMap` if successful, or an error if the
-     *         transformation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An Either containing a NonEmptyMMap<String, V> if successful, or an Error instance if the transformation fails or the map is empty.
+     * @since 6.1.0
      */
-    fun <V> toNonEmptyMMap() = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
+    inline fun <reified V> toNonEmptyMMap(): Either<Error, NonEmptyMMap<String, V>> =
+        toMMap<V>() as Either<Error, MMap<String, V>> thenEither { catching({ it.toNonEmptyMMap() }) { _: Throwable -> IterableError.Empty } }
     /**
-     * Converts the stored YAML content in the `value` field into a `DataMap` object.
-     * This method uses the SnakeYAML library to parse the YAML content.
-     * If the conversion is successful, the resulting `DataMap` is returned wrapped in a `Result`.
-     * If parsing fails, the exception is caught and returned within the `Result` object.
+     * Converts the current object to a map representation where keys are strings and values
+     * can be nullable. Encodes potential errors encountered during the deserialization
+     * process as a `MappingError`.
      *
-     * @return A `Result` containing either the parsed `DataMap` object or an exception if parsing fails.
-     * @since 3.0.0
+     * @return An `Either` that contains a `MappingError` in case of failure or a map
+     * representation of the object on success.
+     * @since 6.1.0
      */
-    fun toDataMap() = runCatching { SNAKE_YAML.load<DataMap>(value)!! }
+    fun toDataMap(): Either<DeserializationError.MappingError, Map<String, Any?>> = toMap<Any?>()
     /**
-     * Converts the current instance to a [Result] containing a [NonEmptyDataMap].
-     * This method attempts to transform the instance into a [NonEmptyDataMap]
-     * using a mapping operation. If the transformation is successful, a successful
-     * [Result] wrapping the [NonEmptyDataMap] is returned; otherwise, a failure
-     * [Result] is returned.
+     * Converts the current structure into a `NonEmptyMap<String, Any?>` if possible.
      *
-     * @return A [Result] that either contains a [NonEmptyDataMap] if the transformation
-     *         succeeds, or an exception if the transformation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing an `Error` if the conversion is not possible,
+     *         or a `NonEmptyMap<String, Any?>` if the conversion succeeds.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
+    fun toNonEmptyDataMap(): Either<Error, NonEmptyMap<String, Any?>> = toNonEmptyMap<Any?>()
     /**
-     * Converts the content of the current YAML instance to a mutable map representation of `DataMMap`.
-     * The method utilizes the SNAKE_YAML library to perform the YAML parsing and returns the result
-     * wrapped in a `Result` object. Parsing errors are caught and encapsulated within the `Result`.
+     * Converts the current object to an `MMap<String, Any?>` representation, encapsulated in an `Either`.
+     * The conversion may result in a `MappingError` if deserialization fails.
      *
-     * @return A `Result` containing the parsed `DataMMap` or the exception in case of a failure.
-     * @since 3.0.0
+     * @return Either a `MappingError` encapsulating details of the deserialization failure,
+     *         or a successfully converted `MMap` containing string keys and nullable values.
+     * @since 6.1.0
      */
-    fun toDataMMap() = runCatching { SNAKE_YAML.load<DataMMap>(value)!! }
+    fun toDataMMap(): Either<DeserializationError.MappingError, MMap<String, Any?>> = toMMap<Any?>()
     /**
-     * Converts the current instance to a Result containing a NonEmptyDataMMap.
+     * Converts the current data into a NonEmptyMMap instance, ensuring that the resulting map has at least one entry.
+     * If the conversion fails or the resulting map is empty, an Error is returned.
      *
-     * The transformation is performed by first converting the instance to a DataMMap
-     * and then attempting to convert it to a NonEmptyDataMMap. If the conversion fails,
-     * the Result will contain the failure as an exception.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
      *
-     * @return a Result wrapping a NonEmptyDataMMap if the transformation succeeds,
-     * or a failure Result if the transformation cannot be performed.
-     * @since 5.2.1
+     * @return Either an Error object if the conversion fails or an instance of NonEmptyMMap containing the data.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMMap(): Result<NonEmptyDataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMMap(): Either<Error, NonEmptyMMap<String, Any?>> = toNonEmptyMMap<Any?>()
     /**
-     * Parses the YAML content stored in the `value` field and converts it into a non-nullable `DataMapNN` object.
-     * Utilizes the SnakeYAML library to perform the deserialization.
-     * @return A `Result` wrapping the successfully parsed `DataMapNN` object if the operation succeeds.
-     *         If the operation fails (e.g., due to invalid YAML structure or type mismatch),
-     *         the result will contain the exception.
-     * @since 3.0.0
+     * Converts the current object into a non-nullable data map representation.
+     *
+     * This method attempts to deserialize the current object into a map structure,
+     * where the keys are strings and the values are of type `Any`. If the deserialization
+     * process fails due to a mapping error, an instance of `DeserializationError.MappingError`
+     * will be returned as the left value of the `Either` type.
+     *
+     * @return An `Either` containing a `DeserializationError.MappingError` on failure or
+     *         a `Map<String, Any>` representing the deserialized object on success.
+     * @since 6.1.0
      */
-    fun toDataMapNN() = runCatching { SNAKE_YAML.load<DataMapNN>(value)!! }
+    fun toDataMapNN(): Either<DeserializationError.MappingError, Map<String, Any>> = toMap<Any>()
     /**
-     * Converts the existing DataMapNN structure to a NonEmptyDataMapNN.
-     * Ensures that the resulting map is non-empty by transforming it using `toNonEmptyMap`.
+     * Converts the current object into an `Either` that contains a `NonEmptyMap` of key-value pairs.
+     * The method ensures that the resulting map is not empty and associates `String` keys with `Any`-typed values.
      *
-     * @return A [Result] containing the transformed [NonEmptyDataMapNN] if successful, or an exception if the operation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing an `Error` if the operation fails or a `NonEmptyMap` with one or more elements if successful.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMapNN(): Result<NonEmptyDataMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMap() }
+    fun toNonEmptyDataMapNN(): Either<Error, NonEmptyMap<String, Any>> = toNonEmptyMap<Any>()
     /**
-     * Attempts to parse the current YAML value into a non-nullable [DataMMapNN] object.
+     * Converts the current instance into a memory-mapped representation of type `MMap<String, Any>`
+     * while ensuring non-nullable keys and values.
      *
-     * This method uses the SnakeYAML library to deserialize the value into
-     * an instance of [DataMMapNN]. If the value cannot be parsed or is null,
-     * an exception is captured and returned as a failed [Result].
-     *
-     * @return [Result] containing either the successfully parsed [DataMMapNN] object or an exception.
-     * @throws NullPointerException if the YAML value is parsed as `null`.
-     * @since 3.0.0
+     * @return An `Either` containing a `MappingError` if deserialization fails, or a successfully
+     *         deserialized `MMap<String, Any>`.
+     * @since 6.1.0
      */
-    fun toDataMMapNN() = runCatching { SNAKE_YAML.load<DataMMapNN>(value)!! }
+    fun toDataMMapNN(): Either<DeserializationError.MappingError, MMap<String, Any>> = toMMap<Any>()
     /**
-     * Converts the current object to a `NonEmptyDataMMapNN` wrapped in a `Result`.
-     * The operation first attempts to transform the object using `toDataMMapNN` and then maps
-     * the result to a non-empty mutable map using `toNonEmptyMMap`.
+     * Converts the current object to a `NonEmptyMMap` containing `String` keys and `Any` values,
+     * ensuring that the resulting map is non-empty. If the conversion fails, an `Error` is returned
+     * wrapped in an `Either`.
      *
-     * @return A `Result` containing a `NonEmptyDataMMapNN` if the transformation is successful,
-     * or a failure if any step of the transformation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return Either an `Error` if the conversion fails, or a non-empty `NonEmptyMMap` with `String`
+     * keys and `Any` values if the conversion succeeds.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMMapNN(): Either<Error, NonEmptyMMap<String, Any>> = toNonEmptyMMap<Any>()
 
     /**
      * Retrieves the element at the specified index from the value.
@@ -759,60 +809,90 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
     }
 
     /**
-     * Applies a merge patch to the current YAML object, transforming it based on the provided patch YAML.
+     * Merges the current YAML content with the provided patch following the merge-patch algorithm.
+     * The patch is applied to the JSON representation of the YAML content and then converted back to YAML.
      *
-     * The method attempts to convert the YAML content to JSON, applies the JSON merge patch algorithm,
-     * and converts the resulting JSON back to YAML.
-     *
-     * @param patch the YAML object containing the patch to apply to the current YAML object
-     * @return a Result containing the patched YAML object, or an exception wrapped in the Result if an error occurs
-     * @since 3.2.0
+     * @param patch the YAML content to be merged as a patch.
+     * @return a new YAML object resulting from the merge-patch operation.
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Yaml) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().mergePatch(patch.toJson())().toYaml()
-        }
+    infix fun mergePatch(patch: Yaml): Yaml = toJson().mergePatch(patch.toJson()).toYaml()
+    /**
+     * Applies a JSON Merge Patch operation on the current YAML instance with the provided patch.
+     *
+     * This method converts the current YAML instance to JSON, applies the specified patch using JSON
+     * Merge Patch semantics, and then converts the result back to YAML.
+     *
+     * @param patch the JSON patch to be applied to the current object
+     * @return the resulting YAML instance after applying the merge patch
+     * @since 6.1.0
+     */
+    infix fun mergePatch(patch: Json): Yaml = toJson().mergePatch(patch).toYaml()
+    /**
+     * Applies a YAML patch to the current object and converts the result to TOML format.
+     *
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [YamlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
+     * @param patch The YAML content representing the patch to be applied.
+     * @return Either an `Error` if the operation fails, or a `Yaml` object if successful.
+     * @since 6.1.0
+     */
+    infix fun yamlPatch(patch: Yaml): Either<Error, Yaml> = toJson().jsonPatch(patch.toJson()).map { it.toYaml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { YamlError.PathNotFound(e.path) }
     }
     /**
-     * Applies a merge patch to the current YAML object, transforming it based on the provided patch JSON.
+     * Applies a JSON patch to the current YAML structure, transforming it into a YAML structure.
      *
-     * The method attempts to convert the YAML content to JSON, applies the JSON merge patch algorithm,
-     * and converts the resulting JSON back to YAML.
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [YamlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
      *
-     * @param patch the JSON object containing the patch to apply to the current YAML object
-     * @return a Result containing the patched YAML object, or an exception wrapped in the Result if an error occurs
-     * @since 3.2.0
+     * @param patch the JSON patch to apply to the current YAML structure.
+     * @return either an error if the operation fails, or a YAML structure resulting from the patch operation.
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().mergePatch(patch)().toYaml()
-        }
+    infix fun yamlPatch(patch: Json): Either<Error, Yaml> = toJson().jsonPatch(patch.toJson()).map { it.toYaml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { YamlError.PathNotFound(e.path) }
+    }
+
+    /**
+     * Validates the current object against a provided JSON schema using a JSON serialization of the object.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [YamlError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema to validate the object against.
+     * @return A result indicating whether validation was successful or a failure containing schema validation errors.
+     * @since 6.1.0
+     */
+    infix fun validateWithSchema(jsonSchema: JsonSchema) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        YamlError.SchemaValidationFailed(e.errors)
     }
     /**
-     * Applies a YAML patch operation to modify the current YAML content and returns the result.
+     * Validates the current object against the provided JSON schema.
      *
-     * @param patch the YAML patch to be applied. It represents the set of operations
-     * to modify the original YAML content.
-     * @return a [Result] encapsulating the modified YAML or an exception if the operation fails.
-     * @since 3.2.0
-     */
-    infix fun yamlPatch(patch: Yaml) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2), e.cause) }, includeCause = false, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().jsonPatch(patch.toJson())().toYaml()
-        }
-    }
-    /**
-     * Applies a YAML patch operation to modify the current YAML content and returns the result.
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [YamlError.SchemaValidationFailed] - if the validation fails.
      *
-     * @param patch the YAML patch to be applied. It represents the set of operations
-     * to modify the original YAML content.
-     * @return a [Result] encapsulating the modified YAML or an exception if the operation fails.
-     * @since 3.2.0
+     * @param jsonSchema The JSON schema to validate against.
+     * @param version The version of the JSON schema to be used during validation.
+     * @return A result mapping any validation errors, if present.
+     * @since 6.1.0
      */
-    infix fun yamlPatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchYamlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().jsonPatch(patch)().toYaml()
-        }
+    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        YamlError.SchemaValidationFailed(e.errors)
     }
 }
 
@@ -1120,11 +1200,11 @@ class YamlNode(val rawValue: Any?) {
     fun asBoolean() = asString().toBoolean()
     /**
      * Converts the current raw value of the YAML node into a list of YAMLNode objects,
-     * if the raw value is iterable. 
-     * If the raw value is null or not iterable, returns an empty list.
+     * if the raw value is iterables.
+     * If the raw value is null or not iterables, returns an empty list.
      *
-     * @return a list containing YAMLNode objects constructed from elements of the underlying iterable raw value,
-     *         or an empty list if the raw value is not iterable.
+     * @return a list containing YAMLNode objects constructed from elements of the underlying iterables raw value,
+     *         or an empty list if the raw value is not iterables.
      * @since 3.0.0
      */
     fun <T> asList(): List<T>? = (rawValue as? Iterable<*>)?.map { it as T }
@@ -1132,7 +1212,7 @@ class YamlNode(val rawValue: Any?) {
      * Converts the current object to a [NonEmptyList] if possible.
      *
      * @return A [NonEmptyList] containing elements of type `T` if the object can be cast to an `Iterable` and is non-empty,
-     * or `null` if the conversion is not possible or the iterable is empty.
+     * or `null` if the conversion is not possible or the iterables is empty.
      * @since 5.2.1
      */
     fun <T> asNonEmptyList(): NonEmptyList<T>? = (rawValue as? Iterable<*>)?.map { it as T }?.toNonEmptyList()
@@ -1300,7 +1380,7 @@ class YamlNode(val rawValue: Any?) {
      * @return the LocalDate representation of the node's value.
      * @since 3.0.0
      */
-    fun asDate() = asString()?.let(::LocalDate)?.getOrThrow()
+    fun asDate() = asString()?.let(::LocalDate)
     /**
      * Converts the current YAMLNode to an OffsetDateTime representation.
      *
@@ -1311,7 +1391,7 @@ class YamlNode(val rawValue: Any?) {
      * @return an OffsetDateTime object parsed from the node's value.
      * @since 3.0.0
      */
-    fun asDateTime(): OffsetDateTime? = asString()?.let(::OffsetDateTime)?.getOrThrow()
+    fun asDateTime(): OffsetDateTime? = asString()?.let(::OffsetDateTime)
     /**
      * Converts the current node to an [Instant] if possible.
      *
@@ -1322,7 +1402,7 @@ class YamlNode(val rawValue: Any?) {
      * @return The parsed [Instant] instance representing the node's value.
      * @since 3.0.0
      */
-    fun asInstant(): Instant? = asString()?.let(::Instant)?.getOrThrow()
+    fun asInstant(): Instant? = asString()?.let(::Instant)
 
     /**
      * Returns a string representation of the YAMLNode object.

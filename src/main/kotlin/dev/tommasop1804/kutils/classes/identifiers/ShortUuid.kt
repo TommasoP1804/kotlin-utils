@@ -13,7 +13,6 @@ import dev.tommasop1804.kutils.BigInt
 import dev.tommasop1804.kutils.EMPTY
 import dev.tommasop1804.kutils.Transformer
 import dev.tommasop1804.kutils.Uuid
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.toJavaUuid
 import dev.tommasop1804.kutils.toUuid
 import jakarta.persistence.AttributeConverter
@@ -247,7 +246,7 @@ value class ShortUuid(private val value: String) : Serializable, CharSequence {
 
         @jakarta.persistence.Converter(autoApply = true)
         class Converter : AttributeConverter<ShortUuid?, UUID?> {
-            override fun convertToDatabaseColumn(attribute: ShortUuid?): UUID? = attribute?.value?.toJavaUuid()?.getOrThrow()
+            override fun convertToDatabaseColumn(attribute: ShortUuid?): UUID? = attribute?.value?.toJavaUuid()?.invoke()
             override fun convertToEntityAttribute(dbData: UUID?): ShortUuid? = dbData?.toShortUuid()
         }
 

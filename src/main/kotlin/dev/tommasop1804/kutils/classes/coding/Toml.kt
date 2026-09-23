@@ -24,8 +24,10 @@ import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonE
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNonEmptyMList
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
 import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import org.tomlj.TomlArray
@@ -37,6 +39,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.io.File
 import java.nio.file.Path
 import java.time.*
+import kotlin.reflect.typeOf
 import org.intellij.lang.annotations.Language as IJLanguage
 import org.tomlj.Toml as TomlJ
 
@@ -143,27 +146,57 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * @return `true` if the String is valid TOML; `false` otherwise.
          * @since 3.11.0
          */
-        fun String.isValidToml() = runCatching { Toml(this) }
+        fun String.isValidToml() = runCatching { Toml(this) }.isSuccess
 
         /**
-         * Converts the current file to a `Toml` instance encapsulated within a `Result`.
+         * Converts the current File instance to a Toml representation.
          *
-         * This method parses the content of the file on which it is called and attempts to create an instance
-         * of the `Toml` class with the file as input. The operation is performed within a `Result` context,
-         * meaning it captures any exception that occurs during the parsing process.
+         * This method attempts to parse the content of the file into a Toml object.
+         * If the conversion fails, it wraps the exception into an InvalidConversion error,
+         * specifying the source type File, the target type Toml, and the underlying throwable.
          *
-         * @return A `Result` wrapping the `Toml` instance if the parsing succeeds, or an exception if it fails.
-         * @since 3.13.0
+         * @return Either a successfully parsed Toml instance or an InvalidConversion error encapsulated in a catching block.
+         * @since 6.1.0
          */
-        fun File.toToml() = runCatching { Toml(this) }
+        fun File.toToml() = either {
+            catching({ Toml(this@toToml) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toToml, typeOf<File>(), typeOf<Toml>(), t)
+            }
+        }
         /**
-         * Converts the current `String` into a TOML representation and wraps the operation in a `Result`.
+         * Converts the current Path instance to a Toml representation.
          *
-         * @receiver The `String` to be converted to TOML.
-         * @return A `Result` that either contains the parsed TOML object or an exception if parsing fails.
-         * @since 3.11.0
+         * This method attempts to parse the content of the file into a Toml object.
+         * If the conversion fails, it wraps the exception into an InvalidConversion error,
+         * specifying the source type Path, the target type Toml, and the underlying throwable.
+         *
+         * @return Either a successfully parsed Toml instance or an InvalidConversion error encapsulated in a catching block.
+         * @since 6.1.0
          */
-        fun @receiver:IJLanguage("toml") String.toToml() = runCatching { Toml(this) }
+        fun Path.toToml() = either {
+            catching({ Toml(this@toToml) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toToml, typeOf<Path>(), typeOf<Toml>(), t)
+            }
+        }
+        /**
+         * Parses the current string into a Toml object.
+         *
+         * The method attempts to parse the receiver string as TOML content.
+         * If parsing is successful, it returns a validated result either containing
+         * the parsed Toml object or a failure encapsulating an exception
+         * caused by invalid formatting.
+         *
+         * @receiver The string to be parsed as TOML.
+         * @return A validated result containing either the parsed Toml object if successful,
+         *         or an InvalidFormat error if the parsing fails.
+         *
+         * @since 6.1.0
+         */
+        fun @receiver:IJLanguage("toml") String.toToml() = either {
+            catching({ Toml(this@toToml) }) { t: Throwable ->
+                InvalidFormatOfType(this@toToml, typeOf<Toml>(), t)
+            }
+        }
         /**
          * Converts the current `JSON` instance into its equivalent `TOML` representation.
          *
@@ -224,6 +257,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         fun Any?.toToml(): Toml {
             val rootMap: Map<String, Any?> = when (this) {
                 null -> mapOf("value" to null)
+                is Collection<*> -> mapOf("value" to this)
                 is Map<*, *> -> this.entries.associate { it.key.toString() to it.value }
                 is TomlNode -> when {
                     this.rawValue is Map<*, *> -> (this.rawValue).entries.associate { it.key.toString() to it.value }
@@ -239,54 +273,87 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
         }
 
         /**
-         * Reads the content of the specified file and parses it into a TOML object.
+         * Reads and deserializes the content of a given file into an object of type [T].
          *
-         * @param file the file to be read and parsed as TOML
-         * @return a Result containing the parsed object if the operation is successful,
-         * or an exception if an error occurs
-         * @since 3.11.0
+         * Possible erorrs:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file to read and deserialize.
+         * @return An [Either] containing a [DeserializationError.MappingError] on failure
+         *         or an object of type [T] on success.
+         * @since 6.1.0
          */
-        inline fun <reified T> readFromFile(file: File): Result<T> = runCatching { Toml(file.readText()).toObject<T>()() }
+        inline fun <reified T> readFromFile(file: File): Either<Error, T> = (either {
+            catching({ Toml(file.readText()) }) { e: MalformedInputException ->
+                InvalidFormatOfType(file, typeOf<Toml>(), e)
+            }
+        } thenEither { it.toObject<T>() }).flatten()
         /**
-         * Reads an array of the specified type from the given file.
+         * Reads an array of type [T] from the specified file.
          *
-         * @param T The type of elements to be read and stored in the resulting array.
-         * @param file The file from which the array is read.
-         * @return A `Result` containing the array of type `T` if the operation succeeds,
-         * or the encapsulated exception if the operation fails.
-         * @since 3.11.0
+         * This method attempts to read a list from the given file and convert it to an array of the specified type [T].
+         *
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file from which the array will be read.
+         * @return An [Either] containing an [Error] if the operation fails, or an array of type [T] if successful.
+         * @since 6.1.0
          */
-        inline fun <reified T> readArrayFromFile(file: File): Result<Array<T>> = runCatching { readListFromFile<T>(file)().toTypedArray() }
+        inline fun <reified T> readArrayFromFile(file: File): Either<Error, Array<T>> = readListFromFile<T>(file).map { it.toTypedArray() }
         /**
-         * Reads and parses a list of objects from the specified file.
+         * Reads and parses a list of objects of type `T` from the specified file.
+         * The file is expected to contain a TOML representation of the data.
          *
-         * Since TOML cannot have a root array, the file must define a single key that holds the array
-         * (the first array-typed top-level key is returned).
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
          *
-         * @param file The file to read from. It should contain TOML-formatted data.
-         * @return A [Result] containing the parsed list of objects of type [T],
-         * or an exception if the operation fails.
-         * @since 3.11.0
+         * @param T The type of the objects to read from the file.
+         * @param file The file from which the list of objects will be read.
+         * @return Either an [Error] if the operation fails, or a [List] of objects of type `T` if the operation succeeds.
+         * @since 6.1.0
          */
-        fun <T> readListFromFile(file: File): Result<List<T>> = runCatching { Toml(file.readText()).toList<T>()() }
+        inline fun <reified T> readListFromFile(file: File): Either<Error, List<T>> = (either {
+            catching({ Toml(file.readText()) }) { e: MalformedInputException ->
+                InvalidFormatOfType(file, typeOf<Toml>(), e)
+            }
+        } thenEither { it.toList<T>() }).flatten()
         /**
-         * Reads the content of a given file, parses it as TOML, and converts it to a set of type `T`.
+         * Reads a file and parses its contents into a set of elements of type [T].
          *
-         * @param file The file to be read, whose content is expected to be in TOML format.
-         * @return A [Result] containing a [Set] of elements of type `T` if the operation is successful.
-         * In case of failure, the [Result] will encapsulate the exception.
-         * @since 3.11.0
+         * The file is expected to contain serialized data that can be deserialized into objects of type [T].
+         * This method relies on the reified type [T] for deserialization and any parsing failures will be represented
+         * as an error in the resulting `Either` type.
+         *
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file to be read and parsed.
+         * @return An [Either] containing a parsed [Set] of elements of type [T] if successful, or an [Error] instance representing the problem encountered.
+         * @since 6.1.0
          */
-        fun <T> readSetFromFile(file: File): Result<Set<T>> = runCatching { Toml(file.readText()).toSet<T>()() }
+        inline fun <reified T> readSetFromFile(file: File): Either<Error, Set<T>> = readListFromFile<T>(file).map { it.toSet() }
         /**
-         * Reads the contents of a specified file and parses it into a map structure from TOML format.
+         * Reads a TOML file and parses its content into a map.
          *
-         * @param file The file containing the TOML data to be parsed.
-         * @return A [Result] containing the parsed map with keys as `String` and values of type `T`
-         *         on success, or an exception on failure.
-         * @since 3.11.0
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [DeserializationError.MappingError] - if conversion failed
+         *
+         * @param file The file to be read and parsed.
+         * @return An [Either] containing an error if the parsing fails, or a map with keys as strings
+         *         and values of type [T] if the parsing succeeds.
+         * @since 6.1.0
          */
-        fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching { Toml(file.readText()).toMap<T>()() }
+        inline fun <reified T> readMapFromFile(file: File): Either<Error, Map<String, T>> = (either {
+            catching({ Toml(file.readText()) }) { e: MalformedInputException ->
+                InvalidFormatOfType(file, typeOf<Toml>(), e)
+            }
+        } thenEither { it.toMap<T>() }).flatten()
 
         class Serializer : ValueSerializer<Toml>() {
             override fun serialize(value: Toml, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {
@@ -329,6 +396,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         fun Table.toml(name: String) = jsonb<Toml>(name)
 
+        @PublishedApi
         internal fun convertTomlValue(value: Any?): Any? = when (value) {
             null -> null
             is TomlTable -> value.keySet().associateWith { convertTomlValue(value.get(it)) }
@@ -338,241 +406,338 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
     }
 
     /**
-     * Converts the TOML content represented by this instance into an object of type [T].
+     * Converts the current object to an instance of the specified type [T].
+     * This utility function utilizes a safe conversion approach, attempting to parse the object
+     * first through JSON deserialization and then falling back to TOML deserialization if necessary.
      *
-     * @param T The target type to which the TOML content will be converted.
-     * @return A [Result] containing an instance of type [T] if the conversion succeeds,
-     *         or an exception if the conversion fails.
-     * @throws IllegalArgumentException if the value cannot be converted to the specified type.
-     * @since 3.11.0
+     * The function ensures that the returned result is wrapped in an `Either` type, where:
+     * - An instance of `Either.Right` contains the successfully converted object of type [T].
+     * - Any errors encountered during the deserialization will be handled by the fallback mechanism.
+     *
+     * @param T The target type to which the object will be converted. It must be specified explicitly or inferred.
+     * @return An `Either` containing the object of type [T] on success, or an error representation otherwise.
+     * @since 6.1.0
      */
-    inline fun <reified T> toObject() = runCatching {
-        tryOr({ toJson().toObject<T>()() }) {
-            TOML_MAPPER.readValue<T>(value)!!
+    inline fun <reified T> toObject() = tryOr({ toJson().toObject<T>() }) {
+        TOML_MAPPER.readValue<T>(value)!!.let { Either.Right(it) }
+    }
+
+    /**
+     * Converts the elements of the receiver to an array of the specified type, wrapping the result in an `Either`.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return An `Either` containing a `DeserializationError.MappingError` if the conversion fails,
+     *         or an array of type `T` on success.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toArray(): Either<DeserializationError.MappingError, Array<T>> = toList<T>().map { it.toTypedArray() }
+
+    /**
+     * Converts the underlying TOML data into a list of the specified type [T].
+     *
+     * This function attempts to extract a list of values from the provided TOML structure or
+     * a single key-value map, converting each item to the specified type [T]. If no array
+     * structure is present or the conversion fails, it returns an empty list.
+     *
+     * The function employs a reified type parameter [T] to ensure the expected type is preserved
+     * during runtime and uses error handling to capture and wrap any deserialization errors
+     * into a [DeserializationError.MappingError] for downstream processing.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return A list of elements of type [T], or an empty list if no data could be parsed.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toList() = either {
+        catching({
+            val parsed = TomlJ.parse(value)
+            val firstArrayKey = parsed.keySet().firstOrNull { parsed.isArray(it) }
+            val raw: Any? = if (firstArrayKey != null) parsed.getArray(firstArrayKey)
+            else convertTomlValue(parsed) as? Map<*, *>
+            when (raw) {
+                is TomlArray -> (convertTomlValue(raw) as List<*>).map { it as T }
+                is Map<*, *> -> raw.values.map { it as T }
+                else -> emptyList()
+            }
+        }) { t: Throwable -> DeserializationError.MappingError(typeOf<T>(), t) }
+    }
+    /**
+     * Converts the receiver to a non-empty list wrapped in an Either type.
+     * If the conversion is successful, the result will be a `Right` containing the non-empty list.
+     * In case the conversion fails or the list is empty, it will return a `Left` containing the error.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @param T The type of elements in the list.
+     * @return An `Either` holding a non-empty list of type `T` on success, or an error if conversion fails.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toNonEmptyList() =
+        toList<T>() as Either<Error, List<T>> thenEither { catching({ it.toNonEmptyList() }) { _: Throwable -> IterableError.Empty } }
+    /**
+     * Converts a list of type `T` into an `MList` of the same type, handling potential mapping errors.
+     * The method uses the `toList` function to retrieve the initial list and maps it into an `MList`.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return Either a `DeserializationError.MappingError` in case of a failure during the mapping process,
+     * or an `MList<T>` containing the successfully mapped items.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toMList() = toList<T>().map { it.toMList() }
+    /**
+     * Converts a collection to a non-empty mutable list wrapped in an `Either` type.
+     *
+     * This method first attempts to convert the collection to a mutable list of the specified type.
+     * If successful, it wraps the mutable list in a right-side `Either`. If the conversion fails
+     * or the collection is empty, an error of type `IterableError.Empty` is returned instead.
+     *
+     * The reified type parameter allows this method to be used generically without requiring explicit type information at the call site.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing either an `Error` or a non-empty mutable list (`MList<T>`).
+     * @since 6.1.0
+     */
+    inline fun <reified T> toNonEmptyMList() =
+        toMList<T>() as Either<Error, MList<T>> thenEither { catching({ it.toNonEmptyMList() }) { _: Throwable -> IterableError.Empty } }
+
+    /**
+     * Transforms the result of deserialization into a set of type [T].
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return Either a [DeserializationError.MappingError] if deserialization fails,
+     *         or a [Set] containing the deserialized elements of type [T].
+     * @since 6.1.0
+     */
+    inline fun <reified T> toSet(): Either<DeserializationError.MappingError, Set<T>> = toList<T>().map { it.toSet() }
+    /**
+     * Converts a collection of elements into a non-empty set wrapped in an `Either`.
+     *
+     * This method attempts to create a `NonEmptySet` from the collection. If the collection is empty,
+     * it will produce an `Either.Left` containing an `IterableError.Empty` error.
+     * If the conversion is successful, it will return an `Either.Right` containing the resulting `NonEmptySet`.
+     *
+     * The method ensures type safety through reified type parameters and handles potential exceptions
+     * that might occur during the conversion.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` representing either the successful conversion to a `NonEmptySet`
+     *         (in `Right`) or an error (in `Left`).
+     * @throws Throwable if unexpected errors occur during the conversion process.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toNonEmptySet() =
+        toSet<T>() as Either<Error, Set<T>> thenEither { catching({ it.toNonEmptySet() }) { _: Throwable -> IterableError.Empty } }
+    /**
+     * Converts a deserialized list of type T into a mutable set (MSet).
+     *
+     * This method attempts to deserialize and transform the list into a mutable set.
+     * If the deserialization fails, it returns a `DeserializationError.MappingError`.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return Either a `DeserializationError.MappingError` on failure or a `MSet<T>` on success.
+     * @since 6.1.0
+     */
+    inline fun <reified T> toMSet(): Either<DeserializationError.MappingError, MSet<T>> = toList<T>().map { it.toMSet() }
+    /**
+     * Converts the current iterable to a non-empty mutable set wrapped in an `Either`.
+     *
+     * If the iterable is empty, the result will be a left value containing `IterableError.Empty`.
+     * Otherwise, the result will be a right value containing the non-empty mutable set.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing `IterableError.Empty` on the left if the iterable is empty,
+     *         or a non-empty `MSet` on the right if the iterable is non-empty.
+     *
+     * @since 6.1.0
+     */
+    inline fun <reified T> toNonEmptyMSet() =
+        toMSet<T>() as Either<Error, MSet<T>> thenEither { catching({ it.toNonEmptyMSet() }) { _: Throwable -> IterableError.Empty } }
+
+    /**
+     * Converts a TOML value into a map with keys as `String` and values of type `V`.
+     *
+     * This function uses the `convertTomlValue` method to transform the input TOML data into a map structure.
+     * If the conversion process fails, it wraps the error in a `DeserializationError.MappingError` instance
+     * containing the expected type and the caught exception.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return A result that either contains the successfully converted map of type `Map<String, V>` or an error.
+     * @since 6.1.0
+     */
+    inline fun <reified V> toMap() = either {
+        catching({ convertTomlValue(TomlJ.parse(value)) as Map<String, V> }) { t: Throwable ->
+            DeserializationError.MappingError(typeOf<Map<String, V>>(), t)
         }
     }
+    /**
+     * Converts the underlying collection to a non-empty map, where the keys are of type `String` and the values are
+     * of the specified type `V`. This method ensures the resulting map is non-empty, wrapping it in an `Either` to
+     * handle potential errors.
+     *
+     * If the transformation is successful, the result is a `Right` containing the non-empty map. In case of errors
+     * during the transformation process, an `IterableError.Empty` is returned wrapped in `Left`.
+     *
+     * The function leverages the `toMap` method for conversion and includes error handling to catch any exceptions
+     * that may occur, ensuring robust execution.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An `Either` containing an `Error` on the left or a non-empty map of type `<String, V>` on the right.
+     * @since 6.1.0
+     */
+    inline fun <reified V> toNonEmptyMap() =
+        toMap<V>() as Either<Error, Map<String, V>> thenEither { catching({ it.toNonEmptyMap() }) { _: Throwable -> IterableError.Empty } }
+    /**
+     * Converts a map to an `MMap` while performing type-safe deserialization of its values.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return An `Either` instance containing a `MappingError` if the deserialization fails,
+     *         or an `MMap` of type `<String, V>` upon successful conversion.
+     * @since 6.1.0
+     */
+    inline fun <reified V> toMMap(): Either<DeserializationError.MappingError, MMap<String, V>> = toMap<V>().map { it.toMMap() }
+    /**
+     * Converts the current object into a non-empty `MMap` structure wrapped in an `Either`.
+     * If the conversion fails or the resulting map is empty, an `IterableError.Empty` error is returned.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @param V The type of values associated with the keys in the resulting `MMap`.
+     * @return An `Either` containing the successfully converted non-empty `MMap` or an `IterableError.Empty` in case of failure.
+     * @since 6.1.0
+     */
+    inline fun <reified V> toNonEmptyMMap() =
+        toMMap<V>() as Either<Error, MMap<String, V>> thenEither { catching({ it.toNonEmptyMMap() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the TOML content into an array of type `T`.
+     * Converts the current object into a `DataMap` structure, encapsulating the result
+     * in an `Either` type for error handling.
      *
-     * Since the TOML root is always a table, this returns the first top-level array as an array.
+     * The method returns a successful `DataMap` upon successful conversion or
+     * a `DeserializationError.MappingError` if the mapping process encounters an issue.
      *
-     * @param T The type to which the TOML elements should be cast.
-     * @return A `Result` containing an array of type `T` if the conversion is successful, or the exception if it fails.
-     * @since 3.11.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return An `Either` type that contains either a `DeserializationError.MappingError`
+     *         on failure or a successfully constructed `DataMap`.
+     * @since 6.1.0
      */
-    inline fun <reified T> toArray() = runCatching { toList<T>()().toTypedArray() }
+    fun toDataMap(): Either<DeserializationError.MappingError, DataMap> = toMap<Any?>()
+    /**
+     * Converts the current instance to a NonEmptyDataMap if possible.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return An Either object containing an Error if the conversion fails,
+     *         or a NonEmptyDataMap if the conversion succeeds.
+     * @since 6.1.0
+     */
+    fun toNonEmptyDataMap(): Either<Error, NonEmptyDataMap> = toNonEmptyMap<Any?>()
+    /**
+     * Converts the current instance into a `DataMMap` representation.
+     * The conversion is performed using a deserialization operation that may result
+     * in either a successfully mapped `DataMMap` or a `MappingError` if the process fails.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     *
+     * @return An `Either` containing a `MappingError` on failure or a `DataMMap` on success.
+     * @since 6.1.0
+     */
+    fun toDataMMap(): Either<DeserializationError.MappingError, DataMMap> = toMMap<Any?>()
+    /**
+     * Converts the current data structure into a `NonEmptyDataMMap` if it contains non-empty data.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return Either an `Error` if the conversion is not possible or a `NonEmptyDataMMap` if the data is valid and non-empty.
+     * @since 6.1.0
+     */
+    fun toNonEmptyDataMMap(): Either<Error, NonEmptyDataMMap> = toNonEmptyMMap<Any?>()
 
     /**
-     * Converts the TOML content stored in the `value` property into a list of objects of type `T`.
+     * Converts the current data representation into a non-nullable DataMapNN format.
+     * The method performs the transformation while ensuring that deserialization errors
+     * are appropriately handled and encapsulated in the result type.
      *
-     * Since TOML's root is a table, the first top-level array value is returned. If no array is present,
-     * the values of the root table are returned as a list.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
      *
-     * @param T The type to which each element in the resulting list will be cast.
-     * @return A `Result` wrapping either the successfully parsed list of objects or any exception encountered during parsing.
-     * @since 3.11.0
+     * @return Either a MappingError upon deserialization failure, or a successfully
+     *         transformed non-nullable DataMapNN instance.
+     * @since 6.1.0
      */
-    fun <T> toList() = runCatching {
-        val parsed = TomlJ.parse(value)
-        val firstArrayKey = parsed.keySet().firstOrNull { parsed.isArray(it) }
-        val raw: Any? = if (firstArrayKey != null) parsed.getArray(firstArrayKey)
-        else convertTomlValue(parsed) as? Map<*, *>
-        when (raw) {
-            is TomlArray -> (convertTomlValue(raw) as List<*>).map { it as T }
-            is Map<*, *> -> raw.values.map { it as T }
-            else -> emptyList()
-        }
-    }
-    fun <T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
+    fun toDataMapNN(): Either<DeserializationError.MappingError, DataMapNN> = toMap<Any>()
     /**
-     * Parses the TOML content stored in the current object and converts it into a mutable list of type [T].
+     * Converts the current instance into a non-empty data map encapsulated in an `Either`.
+     * The resulting `Either` will contain a `NonEmptyDataMapNN` if the conversion is successful,
+     * or an `Error` if the conversion fails.
      *
-     * @param T The type of elements in the resulting mutable list.
-     * @return A [Result] containing the mutable list of type [T], or an exception if the operation fails.
-     * @since 3.11.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return an `Either` instance containing either an `Error` or a `NonEmptyDataMapNN`.
+     * @since 6.1.0
      */
-    fun <T> toMList() = runCatching { toList<T>()().toMList() }
+    fun toNonEmptyDataMapNN(): Either<Error, NonEmptyDataMapNN> = toNonEmptyMap<Any>()
     /**
-     * Converts the invoking collection or iterable to a `NonEmptyMList`.
+     * Transforms the current object into a DataMMapNN representation. This method attempts to map
+     * the data and return the resulting structure, or an error if the mapping fails.
      *
-     * This function attempts to generate a `NonEmptyMList` from the current context
-     * by first converting it to a regular list and wrapping it in a `NonEmptyMList` type.
-     * The operation is encapsulated in a `Result` to handle cases where the conversion fails.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
      *
-     * @param T The type of elements contained in the collection or iterable.
-     * @return A `Result` containing the `NonEmptyMList` if the conversion is successful,
-     *         or an exception if the conversion cannot be completed.
-     * @since 5.2.1
+     * @return An Either containing a DeserializationError.MappingError if the mapping fails,
+     *         or a successfully mapped DataMMapNN object.
+     * @since 6.1.0
      */
-    fun <T> toNonEmptyMList() = runCatching { toList<T>()().toNonEmptyMList() }
-
+    fun toDataMMapNN(): Either<DeserializationError.MappingError, DataMMapNN> = toMMap<Any>()
     /**
-     * Converts the TOML content represented by `value` into a set of objects of type `T`.
+     * Converts the current object to an instance of Either containing a NonEmptyDataMMapNN.
+     * This transformation ensures that the resulting map is non-empty and meets the defined constraints.
      *
-     * @param T The type of the elements in the resulting set.
-     * @return A `Result` containing the set of objects of type `T` or an exception if an error occurs.
-     * @since 3.11.0
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
+     *
+     * @return Either an Error if the conversion fails or a NonEmptyDataMMapNN if the operation succeeds.
+     * @since 6.1.0
      */
-    fun <T> toSet() = runCatching { toList<T>()().toSet() }
-    /**
-     * Converts the current collection or sequence into a non-empty set within a `Result` context.
-     *
-     * This method attempts to transform the collection or sequence into a `NonEmptySet`.
-     * If the transformation is successful, the resulting `NonEmptySet` is wrapped in a `Result`.
-     * If the collection is empty or the transformation fails, the `Result` will contain the exception.
-     *
-     * @param T The type of elements in the collection or sequence.
-     * @return A `Result` containing either the resulting `NonEmptySet` or an exception if the operation fails.
-     * @since 5.2.1
-     */
-    fun <T> toNonEmptySet() = runCatching { toList<T>()().toNonEmptySet() }
-    /**
-     * Parses the TOML content stored in the `value` field and converts it into a mutable set of elements of type T.
-     *
-     * @return A `Result` wrapping a mutable set of type T, containing the parsed and distinct elements from the TOML content.
-     * @since 3.11.0
-     */
-    fun <T> toMSet() = runCatching { toList<T>()().toMSet() }
-    /**
-     * Converts the calling collection or sequence into a `NonEmptyMSet`.
-     * The operation is wrapped in a `Result` to handle possible errors during the conversion.
-     *
-     * @param T The type of elements in the collection or sequence.
-     * @return A `Result` containing the `NonEmptyMSet` if the conversion succeeds,
-     *         or an exception if the operation fails.
-     * @since 5.2.1
-     */
-    fun <T> toNonEmptyMSet() = runCatching { toList<T>()().toNonEmptyMSet() }
-
-    /**
-     * Converts the underlying TOML content into a map structure of key-value pairs.
-     *
-     * @param V The type of values expected in the resulting map.
-     * @return A `Result<Map<String, T>>` containing the parsed map if successful or the exception if an error occurred.
-     * @since 3.11.0
-     */
-    fun <V> toMap() = runCatching {
-        @Suppress("UNCHECKED_CAST")
-        (convertTomlValue(TomlJ.parse(value)) as Map<String, V>)
-    }
-    /**
-     * Transforms the current collection into a non-empty map of the specified type.
-     *
-     * This function first converts the collection into a map by calling `toMap`.
-     * It then wraps the resulting map in a result handler (`mapCatching`) and
-     * attempts to transform it into a non-empty map using the `toNonEmptyMap` operation.
-     *
-     * @param V The type of values in the resulting map.
-     * @return A result wrapping the non-empty map or an error if the transformation fails.
-     * @since 5.2.1
-     */
-    fun <V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
-    /**
-     * Converts a TOML string value into a mutable map (`MMap`) with string keys and values of type `V`.
-     *
-     * @param V The type of the values in the resulting mutable map.
-     * @return A `Result` containing the parsed `MMap<String, V>` on success, or an exception on failure.
-     * @since 3.11.0
-     */
-    fun <V> toMMap(): Result<MMap<String, V>> = runCatching {
-        @Suppress("UNCHECKED_CAST")
-        (toMap<V>()().toMutableMap())
-    }
-    /**
-     * Converts a map-like collection to a non-empty map structure of type `NonEmptyMMap`.
-     *
-     * This function first converts the original collection into an intermediate map structure
-     * using `toMMap`. It then attempts to transform the resulting map into a `NonEmptyMMap`
-     * using the `mapCatching` operation, which safely handles cases where the conversion
-     * might fail, such as when the resulting map is empty.
-     *
-     * @param V The type of values contained in the map-like collection.
-     * @return A result containing the `NonEmptyMMap` if the conversion is successful,
-     *         or an error if the map is empty or an issue arises during transformation.
-     * @since 5.2.1
-     */
-    fun <V> toNonEmptyMMap() = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
-    /**
-     * Converts the stored TOML content in the `value` field into a `DataMap` object.
-     *
-     * @return A `Result` containing either the parsed `DataMap` object or an exception if parsing fails.
-     * @since 3.11.0
-     */
-    fun toDataMap() = runCatching {
-        @Suppress("UNCHECKED_CAST")
-        (convertTomlValue(TomlJ.parse(value)) as DataMap)
-    }
-    /**
-     * Converts a data structure into a non-empty data map while maintaining its structure.
-     * This method processes the map, ensuring that all elements conform to the requirements
-     * of a non-empty data map transformation. Each element is mapped and validated
-     * through a safe `mapCatching` operation.
-     *
-     * @return A result containing the transformed non-empty data map if successful,
-     * or an error if the transformation fails for any element.
-     * @since 5.2.1
-     */
-    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
-    /**
-     * Converts the content of the current TOML instance to a mutable map representation of `DataMMap`.
-     *
-     * @return A `Result` containing the parsed `DataMMap` or the exception in case of a failure.
-     * @since 3.11.0
-     */
-    fun toDataMMap() = runCatching {
-        @Suppress("UNCHECKED_CAST")
-        (toDataMap()().toMutableMap())
-    }
-    /**
-     * Converts the current instance to a `Result` containing a `NonEmptyDataMMap`.
-     * If the resulting `DataMMap` is empty or an error occurs, the operation will fail.
-     *
-     * @return a `Result` that encapsulates either a non-empty `NonEmptyDataMMap` or an exception if the conversion fails.
-     * @since 5.2.1
-     */
-    fun toNonEmptyDataMMap(): Result<NonEmptyDataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
-
-    /**
-     * Parses the TOML content stored in the `value` field and converts it into a non-nullable `DataMapNN` object.
-     *
-     * @return A `Result` wrapping the successfully parsed `DataMapNN` object if the operation succeeds.
-     * @since 3.11.0
-     */
-    fun toDataMapNN() = runCatching {
-        @Suppress("UNCHECKED_CAST")
-        (toDataMap()() as DataMapNN)
-    }
-    /**
-     * Converts the current object to a non-empty data map of type NonEmptyDataMMapNN.
-     * This method first transforms the object into a data map using `toDataMapNN`.
-     * It then attempts to ensure that the resulting map is non-empty by calling `toNonEmptyMMap`.
-     *
-     * @return A Result wrapping a NonEmptyDataMMapNN, where the operation may succeed with the transformed map
-     *         or fail with an exception if the map cannot be guaranteed to be non-empty.
-     * @since 5.2.1
-     */
-    fun toNonEmptyDataMapNN(): Result<NonEmptyDataMMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMMap() }
-    /**
-     * Attempts to parse the current TOML value into a non-nullable [DataMMapNN] object.
-     *
-     * @return [Result] containing either the successfully parsed [DataMMapNN] object or an exception.
-     * @since 3.11.0
-     */
-    fun toDataMMapNN() = runCatching {
-        @Suppress("UNCHECKED_CAST")
-        (toDataMMap()() as DataMMapNN)
-    }
-    /**
-     * Converts the current data structure into a `Result` containing a `NonEmptyDataMMapNN` instance.
-     * This method attempts to perform the conversion by first invoking `toDataMMapNN`
-     * and then mapping its result to ensure the data meets the non-empty requirements.
-     *
-     * @return A `Result` containing a successfully converted `NonEmptyDataMMapNN` if the data is valid
-     *         and non-empty, or a failure if the conversion or validation fails.
-     * @since 5.2.1
-     */
-    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMMapNN(): Either<Error, NonEmptyDataMMapNN> = toNonEmptyMMap<Any>()
 
     /**
      * Retrieves the element at the specified index from the value.
@@ -651,55 +816,93 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
     }
 
     /**
-     * Applies a merge patch to the current TOML object, transforming it based on the provided patch TOML.
+     * Applies a JSON Merge Patch operation using the provided TOML patch.
+     * Converts the current object to JSON, applies the patch,
+     * and then converts the result back to TOML.
      *
-     * The method converts the TOML content to JSON, applies the JSON merge patch algorithm,
-     * and converts the resulting JSON back to TOML.
-     *
-     * @param patch the TOML object containing the patch to apply
-     * @return a Result containing the patched TOML object, or an exception if an error occurs
-     * @since 3.11.0
+     * @param patch the TOML object to be used as the source of the merge patch
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Toml) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().mergePatch(patch.toJson())().toToml()
-        }
+    infix fun mergePatch(patch: Toml) = toJson().mergePatch(patch.toJson()).toToml()
+    /**
+     * Merges the given JSON patch with the current TOML document, applying changes
+     * defined by the patch. The operation adheres to the JSON Merge Patch standard (RFC 7396).
+     *
+     * @param patch the JSON object containing the patch data to be merged into the current TOML
+     * representation.
+     * @since 6.1.0
+     */
+    infix fun mergePatch(patch: Json) = toJson().mergePatch(patch).toToml()
+    /**
+     * Applies a TOML patch to the current TOML object and returns the resulting patched TOML.
+     *
+     * This method converts the current TOML object to JSON, applies the given patch
+     * (also converted to JSON), and then maps the result back to a patched TOML object.
+     *
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [TomlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
+     * @param patch the TOML object representing the patch to apply.
+     * @since 6.1.0
+     */
+    infix fun tomlPatch(patch: Toml) = toJson().jsonPatch(patch.toJson()).map { it.toToml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { TomlError.PathNotFound(e.path) }
     }
     /**
-     * Applies a merge patch to the current TOML object, transforming it based on the provided patch JSON.
+     * Applies a JSON patch to the current object converted to JSON and converts the result back to TOML.
      *
-     * @param patch the JSON object containing the patch to apply
-     * @return a Result containing the patched TOML object, or an exception if an error occurs
-     * @since 3.11.0
+     * This function first converts the current object to a JSON representation,
+     * applies the specified JSON patch, and then converts the resulting JSON
+     * back to a TOML-compatible format.
+     *
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [TomlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
+     * @param patch the JSON patch to apply to the current object
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().mergePatch(patch)().toToml()
-        }
+    infix fun tomlPatch(patch: Json) = toJson().jsonPatch(patch).map { it.toToml() }.mapLeft { e ->
+        e.letIf(e is JsonError.PathNotFound) { TomlError.PathNotFound(e.path) }
+    }
+
+    /**
+     * Validates the current object against a provided JSON schema using a JSON serialization of the object.
+     *
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [TomlError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema to validate the object against.
+     * @return A result indicating whether validation was successful or a failure containing schema validation errors.
+     * @since 6.1.0
+     */
+    infix fun validateWithSchema(jsonSchema: JsonSchema) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        TomlError.SchemaValidationFailed(e.errors)
     }
     /**
-     * Applies a TOML patch (RFC 6902 style, executed via JSON Patch) to modify the current TOML content.
+     * Validates the current object against the provided JSON schema.
      *
-     * @param patch the TOML patch to be applied.
-     * @return a [Result] encapsulating the modified TOML or an exception if the operation fails.
-     * @since 3.11.0
-     */
-    infix fun tomlPatch(patch: Toml) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2), e.cause) }, includeCause = false, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().jsonPatch(patch.toJson())().toToml()
-        }
-    }
-    /**
-     * Applies a TOML patch (executed via JSON Patch) to modify the current TOML content.
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [TomlError.SchemaValidationFailed] - if the validation fails.
      *
-     * @param patch the JSON patch to be applied.
-     * @return a [Result] encapsulating the modified TOML or an exception if the operation fails.
-     * @since 3.11.0
+     * @param jsonSchema The JSON schema to validate against.
+     * @param version The version of the JSON schema to be used during validation.
+     * @return A result mapping any validation errors, if present.
+     * @since 6.1.0
      */
-    infix fun tomlPatch(patch: Json) = runCatching {
-        tryOrThrow({ e -> NoSuchTomlPathException(e.message.orEmpty().drop(e.message.orEmpty().indexOf(Char.COLON) + 2)) }, overwriteOnly = NoSuchJsonPathException::class) {
-            toJson().jsonPatch(patch)().toToml()
-        }
+    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version) = toJson().validateWithSchema(jsonSchema).mapLeft { e ->
+        TomlError.SchemaValidationFailed(e.errors)
     }
 }
 
@@ -932,7 +1135,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asBoolean() = asString().toBoolean()
     /**
-     * Converts the current raw value of the TOML node into a list, if iterable.
+     * Converts the current raw value of the TOML node into a list, if iterables.
      *
      * @since 3.11.0
      */
@@ -950,7 +1153,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asDate(): LocalDate? = when (rawValue) {
         is LocalDate -> rawValue
-        else -> asString()?.let(::LocalDate)?.getOrThrow()
+        else -> asString()?.let(::LocalDate)
     }
     /**
      * Converts the current TomlNode to an OffsetDateTime representation.
@@ -959,7 +1162,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asDateTime(): OffsetDateTime? = when (rawValue) {
         is OffsetDateTime -> rawValue
-        else -> asString()?.let(::OffsetDateTime)?.getOrThrow()
+        else -> asString()?.let(::OffsetDateTime)
     }
     /**
      * Converts the current node to an [Instant] if possible.
@@ -968,7 +1171,7 @@ class TomlNode(val rawValue: Any?) {
      */
     fun asInstant(): Instant? = when (rawValue) {
         is Instant -> rawValue
-        else -> asString()?.let(::Instant)?.getOrThrow()
+        else -> asString()?.let(::Instant)
     }
 
     /**

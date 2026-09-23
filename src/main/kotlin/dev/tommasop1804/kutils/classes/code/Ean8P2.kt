@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -18,6 +20,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents an EAN-8 barcode with a 2-digit add-on (EAN-8 P2 format). This barcode is a 10-digit string
@@ -81,16 +84,27 @@ value class Ean8P2 private constructor(override val value: String) : CharSequenc
         fun CharSequence.isValidEan8P2() = matches(Regex("[0-9]{8}[ -]?[0-9]{2}")) && filter { it.isDigit() }.run { Ean8.computeCheckDigit(toString() - 3) == this[7] }
 
         /**
-         * Converts the current string into an instance of `EAN8P2` while handling potential exceptions.
+         * Converts the calling `CharSequence` into an `Ean8P2` instance while applying input validation and error handling.
          *
-         * Uses a safe execution block (`runCatching`) to create an `EAN8P2` object from the string.
-         * If an exception occurs during the creation process, it will be caught and handled as part of the result.
+         * The method filters the `CharSequence` to retain only numeric digits, spaces, and hyphens.
+         * It attempts to construct an `Ean8P2` instance from the filtered input:
+         * - If the construction is successful, the resulting `Ean8P2` object is returned wrapped in a `Right`.
+         * - If an error occurs (e.g., the input does not conform to the expected EAN-8 P2 format), a `ParsingError`
+         *   containing the invalid value and the target class (`Ean8P2`) is returned wrapped in a `Left`.
          *
-         * @receiver The string to be converted into an `EAN8P2` object.
-         * @return A `Result<EAN8P2>` containing the converted `EAN8P2` instance if successful, or the exception if an error occurred.
-         * @since 3.0.0
+         * The result is wrapped in an `Either`, allowing functional-style error handling.
+         *
+         * @receiver The `CharSequence` to convert to an `Ean8P2` instance.
+         * @return An `Either`:
+         *         - `Right<Ean8P2>` if the conversion succeeds.
+         *         - `Left<ParsingError>` if the conversion fails due to input validation issues.
+         * @since 6.1.0
          */
-        fun CharSequence.toEan8P2() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { runCatching { Ean8P2(this) } }
+        fun CharSequence.toEan8P2() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { either {
+            catching({ Ean8P2(this@toEan8P2) }) { t: Throwable ->
+                InvalidFormatOfType(this@toEan8P2, typeOf<Ean8P2>(), t)
+            }
+        } }
 
         class Serializer : ValueSerializer<Ean8P2>() {
             override fun serialize(value: Ean8P2, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

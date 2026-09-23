@@ -10,8 +10,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -22,6 +24,7 @@ import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 
 /**
  * Represents an International Bank Account Number (IBAN).
@@ -225,7 +228,7 @@ value class Iban private constructor(val value: String) : CharSequence {
                 98 - (bban + value.take(2) + "00")
                     .map { EUROPEAN_CHECK_DIGITS_CONVERSION[it]!! }
                     .joinToString(String.EMPTY)
-                    .toBigInt()()
+                    .toBigInt()
                     .mod(97.toBigInt()).toInt()
                 ).toString()
         if (checkDigits.length == 1) checkDigits = "0$checkDigits"
@@ -387,18 +390,21 @@ value class Iban private constructor(val value: String) : CharSequence {
         fun CharSequence.isValidIban() = runCatching { Iban(this) }.isSuccess
 
         /**
-         * Attempts to convert the current string into an IBAN instance.
+         * Converts the receiver `CharSequence` into an `Iban` instance if the format is valid.
          *
-         * This method uses the `IBAN` class constructor to validate and transform the string
-         * into an IBAN object. Any exceptions during the process are handled,
-         * and the result is wrapped within a `Result` object.
+         * The method attempts to parse the given `CharSequence` as an `Iban`. If the parsing succeeds,
+         * a valid `Iban` instance is returned. If the parsing fails due to an invalid format or other errors,
+         * it returns an instance of `InvalidFormatOfType` containing details about the failure.
          *
-         * @receiver The string to be converted into an IBAN.
-         * @return A `Result` containing the successfully created IBAN instance or an exception
-         *         if the conversion fails.
-         * @since 3.0.0
+         * @return An `Either` instance that contains an `Iban` object on success, or an `InvalidFormatOfType`
+         * object on failure.
+         * @since 6.1.0
          */
-        fun CharSequence.toIban() = runCatching { Iban(this) }
+        fun CharSequence.toIban(): Either<InvalidFormatOfType, Iban> = either {
+            catching({ Iban(this@toIban) }) { t: Throwable ->
+                InvalidFormatOfType(this@toIban, typeOf<Iban>(), t)
+            }
+        }
 
         class Serializer : ValueSerializer<Iban>() {
             override fun serialize(value: Iban, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

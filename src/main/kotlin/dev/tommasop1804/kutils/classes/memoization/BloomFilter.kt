@@ -426,12 +426,12 @@ class BloomFilter<T> private constructor(
      *
      * @param other The Bloom filter to merge with. This filter must have the same number of hash functions and
      *              the same size (number of bits) as the current filter, otherwise an exception is thrown.
-     * @throws dev.tommasop1804.kutils.exceptions.ValidationFailedException If the number of hash functions or size of the Bloom filters differ.
+     * @throws dev.tommasop1804.kutils.exceptions.ExpectationMismatchException If the number of hash functions or size of the Bloom filters differ.
      * @since 3.5.0
      */
     infix fun mergeWith(other: BloomFilter<T>) {
-        validate(other.numHashFunctions == numHashFunctions) { "Number of hash functions must match" }
-        validate(other.numBits == numBits) { "Number of bits must match" }
+        expect(other.numHashFunctions, numHashFunctions) { "Number of hash functions must match" }
+        expect(other.numBits, numBits) { "Number of bits must match" }
 
         for (i in 0 until bits.length()) {
             val otherWord = other.bits.get(i)

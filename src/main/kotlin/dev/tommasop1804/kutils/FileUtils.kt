@@ -14,18 +14,6 @@ import dev.tommasop1804.kutils.classes.web.*
 import java.io.File
 
 /**
- * Retrieves the MIME type associated with the file based on its extension.
- *
- * This property is useful for determining the content type of a file,
- * which can be used in various scenarios such as HTTP requests or file compatibility checks.
- *
- * @receiver The file for which the MIME type is being determined.
- * @return The MIME type corresponding to the file's extension, or `null` if the MIME type cannot be resolved.
- * @since 3.0.0
- */
-val File.mimeType: MimeType?
-    get() = MimeType.fromExtension(extension)
-/**
  * Represents the media type of a file, derived from its MIME type.
  *
  * This property retrieves the MIME type of the file, if available, and converts it to a `MediaType` object.
@@ -39,7 +27,7 @@ val File.mimeType: MimeType?
  * @since 3.0.0
  */
 val File.mediaType: MediaType?
-    get() = mimeType?.toMediaType()
+    get() = MediaType.fromExtension(extension)
 
 /**
  * Converts a [File] object to a [Uri].

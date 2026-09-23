@@ -52,51 +52,51 @@ import tools.jackson.databind.node.ObjectNode
 @MustUseReturnValues
 value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T> {
     /**
-     * Retrieves the first element of the list if it is not empty; otherwise, throws an `IndexOutOfBoundsException`.
+     * Retrieves the first element of the list if it is not empty; otherwise, throws an `NoSuchElementException`.
      *
      * This property provides access to the head of the list, represented by the first element of the `pair` field.
      * If the list is empty (`pair` is `null`), accessing this property will result in an exception.
      *
-     * @throws IndexOutOfBoundsException if the list is empty.
+     * @throws NoSuchElementException if the list is empty.
      * @return The first element of the list if available.
      * @since 1.0.0
      */
-    val head: T get() = (pair ?: throw IndexOutOfBoundsException("List is empty")).first
+    val head: T get() = (pair ?: throw NoSuchElementException("List is empty")).first
     /**
      * Retrieves the tail of the current list, which is the remaining part
      * of the list excluding the first element. If the list is empty, attempting
-     * to access the tail will result in an IndexOutOfBoundsException.
+     * to access the tail will result in an NoSuchElementException.
      *
-     * @throws IndexOutOfBoundsException if the list is empty.
+     * @throws NoSuchElementException if the list is empty.
      * @return the tail of the list as a `ConsList` or `null` if the tail is not present.
      * @since 1.0.0
      */
-    val tail: ConsList<T>? get() = (pair ?: throw IndexOutOfBoundsException("List is empty")).second
+    val tail: ConsList<T>? get() = (pair ?: throw NoSuchElementException("List is empty")).second
 
     /**
      * Returns the current instance if the `pair` property is non-null, otherwise throws an
-     * `IndexOutOfBoundsException` with the message "List is empty".
+     * `NoSuchElementException` with the message "List is empty".
      *
      * This property is designed to provide safe access to the `pair` inside the `ConsList` class,
      * ensuring that nullability checks are enforced at runtime.
      * @since 1.0.0
      */
-    val first get() = apply { pair != null || throw IndexOutOfBoundsException("List is empty") }
+    val first get() = apply { pair != null || throw NoSuchElementException("List is empty") }
     /**
      * Provides the first element of the `ConsList` if it exists, or throws an
-     * `IndexOutOfBoundsException` if the list is empty.
+     * `NoSuchElementException` if the list is empty.
      *
      * This property retrieves the first component of the `pair` field, which represents
      * the underlying data structure of the `ConsList`. It ensures that the list is not
      * empty before accessing the first element.
      * @since 1.0.0
      **/
-    val firstValue get() = (pair ?: throw IndexOutOfBoundsException("List is empty")).first
+    val firstValue get() = (pair ?: throw NoSuchElementException("List is empty")).first
     /**
      * Retrieves the last element in the list.
      *
      * This property traverses the list from the head to find the last element.
-     * If the list is empty, an `IndexOutOfBoundsException` is thrown. Otherwise,
+     * If the list is empty, an `NoSuchElementException` is thrown. Otherwise,
      * it iterates through the list until the last non-null element is reached and returns it.
      *
      * @throws IndexOutOfBoundsException if the list is empty.
@@ -105,7 +105,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
      */
     val last: ConsList<T> get() = compute {
         if (pair == null)
-            throw IndexOutOfBoundsException("List is empty")
+            throw NoSuchElementException("List is empty")
         var list = this
         while (list.tail != null)
             list = list.tail!!
@@ -199,37 +199,37 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
         infix fun <T> T.cons(value: T): ConsList<T> = ConsList(this to ConsList(value to null))
 
         private tailrec fun <T> containsRecursive(list: ConsList<T>?, element: T): Boolean {
-            if (list == null || list.isEmpty()) return false
+            if (list.isNullOrEmpty()) return false
             if (list.head == element) return true
             return containsRecursive(list.tail, element)
         }
 
         private tailrec fun <T> forEachRecursive(list: ConsList<T>?, action: Consumer<T>) {
-            if (list != null && !list.isEmpty()) {
+            if (!list.isNullOrEmpty()) {
                 action(list.head)
                 forEachRecursive(list.tail, action)
             }
         }
 
         private tailrec fun <T> reverseRecursive(current: ConsList<T>?, acc: ConsList<T>): ConsList<T> {
-            return if (current == null || current.isEmpty()) acc
+            return if (current.isNullOrEmpty()) acc
             else reverseRecursive(current.tail, current.head cons acc)
         }
 
         private tailrec fun <T, R> mapRecursive(current: ConsList<T>?, acc: ConsList<R>, transform: Transformer<T, R>): ConsList<R> {
-            return if (current == null || current.isEmpty()) acc
+            return if (current.isNullOrEmpty()) acc
             else mapRecursive(current.tail, transform(current.head) cons acc, transform)
         }
 
         private tailrec fun <T> filterRecursive(current: ConsList<T>?, acc: ConsList<T>, predicate: Predicate<T>): ConsList<T> {
-            if (current == null || current.isEmpty()) return acc
+            if (current.isNullOrEmpty()) return acc
 
             val newAcc = if (predicate(current.head)) (current.head cons acc) else acc
             return filterRecursive(current.tail, newAcc, predicate)
         }
 
         private tailrec fun <T, R> foldRecursive(list: ConsList<T>?, acc: R, operation: BiTransformer<R, T, R>): R {
-            if (list == null || list.isEmpty()) return acc
+            if (list.isNullOrEmpty()) return acc
             val nextAcc = operation(acc, list.head)
             return foldRecursive(list.tail, nextAcc, operation)
         }
@@ -246,7 +246,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): ConsList<*> {
                 val node = p.objectReadContext().readTree<ObjectNode>(p)
                 @Suppress("kutils_collection_declaration")
-                return ConsList(node.asList<Any>()())
+                return ConsList(node.asList<Any>())
             }
         }
 
@@ -502,7 +502,7 @@ value class ConsList<T>(private val pair: Pair<T, ConsList<T>?>?) : Collection<T
     private fun computeSize(): Int {
         var count = 0
         var current: ConsList<T>? = this
-        while (current != null && !current.isEmpty()) {
+        while (!current.isNullOrEmpty()) {
             count++
             current = current.tail
         }

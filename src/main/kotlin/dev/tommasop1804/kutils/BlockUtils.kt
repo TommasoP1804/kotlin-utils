@@ -47,6 +47,24 @@ val NULL = { null }
 val <T> T.itself: MonoTransformer<T> get() = { this }
 
 /**
+ * Returns a MonoTransformer that represents the identity function.
+ * It applies no transformations to the input value, returning the value as-is.
+ *
+ * @return A MonoTransformer that returns its input unchanged.
+ * @since 6.1.0
+ */
+fun <T> identity(): MonoTransformer<T> = { it }
+/**
+ * Returns the input value as is, without any modifications.
+ *
+ * @param T the type of the input and return value
+ * @param value the input value to be returned
+ * @return the input value
+ * @since 6.1.0
+ */
+fun <T> identity(value: T) = value
+
+/**
  * Repeats the execution of the Action a specified number of times.
  *
  * @param n The number of times the Action should be executed. Must be a non-negative integer.

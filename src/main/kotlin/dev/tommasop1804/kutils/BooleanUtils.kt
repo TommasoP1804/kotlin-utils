@@ -11,10 +11,13 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.typeOf
 
 /**
  * A higher-order constant representing a lambda function that always evaluates to `true`.
@@ -43,9 +46,9 @@ val FALSE = { false }
  */
 fun anyTrue(vararg values: Boolean?) = values.any { it == true }
 /**
- * Checks if any element in the given iterable of nullable Booleans is `true`.
+ * Checks if any element in the given iterables of nullable Booleans is `true`.
  *
- * @param values an iterable of nullable Boolean values to check.
+ * @param values an iterables of nullable Boolean values to check.
  * @since 1.0.0
  */
 fun anyTrue(values: Iterable<Boolean?>) = values.any { it == true }
@@ -62,11 +65,11 @@ fun anyTrue(values: Iterable<Boolean?>) = values.any { it == true }
 fun allTrue(vararg values: Boolean?) = values.isNotEmpty() && values.all { it == true }
 /**
  * Checks if all elements in the provided iterables of nullable booleans are `true`.
- * This function returns `true` if all iterable instances contain only `true` values
+ * This function returns `true` if all iterables instances contain only `true` values
  * and the provided varargs are not empty.
  *
- * @param values Vararg parameter consisting of iterable collections of nullable Boolean values.
- *               Each iterable is checked to ensure all elements are `true`.
+ * @param values Vararg parameter consisting of iterables collections of nullable Boolean values.
+ *               Each iterables is checked to ensure all elements are `true`.
  * @return `true` if all elements in all provided iterables are `true` and the vararg is not empty, otherwise `false`.
  * @since 1.0.0
  */
@@ -84,11 +87,11 @@ fun allTrue(values: Iterable<Boolean?>) = values.toList().isNotEmpty() && values
  */
 fun allFalse(vararg values: Boolean?) = values.isNotEmpty() && values.all { it == false }
 /**
- * Determines whether all elements in the given iterable are `false`.
- * This method returns `true` if all elements are explicitly `false` and the iterable is not empty.
- * If the iterable contains `null` values, they are ignored in the evaluation.
+ * Determines whether all elements in the given iterables are `false`.
+ * This method returns `true` if all elements are explicitly `false` and the iterables is not empty.
+ * If the iterables contains `null` values, they are ignored in the evaluation.
  *
- * @param values an iterable collection of nullable boolean values to evaluate
+ * @param values an iterables collection of nullable boolean values to evaluate
  * @since 1.0.0
  */
 fun allFalse(values: Iterable<Boolean?>) = values.toList().isNotEmpty() && values.all { it == false }
@@ -102,10 +105,10 @@ fun allFalse(values: Iterable<Boolean?>) = values.toList().isNotEmpty() && value
  */
 fun anyFalse(vararg values: Boolean?) = values.any { it == false }
 /**
- * Checks if any of the elements in the given iterable are explicitly `false`.
+ * Checks if any of the elements in the given iterables are explicitly `false`.
  *
- * @param values an iterable collection of nullable Boolean values to be checked
- * @return `true` if at least one element in the iterable is `false`, otherwise `false`
+ * @param values an iterables collection of nullable Boolean values to be checked
+ * @return `true` if at least one element in the iterables is `false`, otherwise `false`
  * @since 1.0.0
  */
 fun anyFalse(values: Iterable<Boolean?>) = values.any { it == false }
@@ -119,9 +122,9 @@ fun anyFalse(values: Iterable<Boolean?>) = values.any { it == false }
  */
 fun countTrue(vararg values: Boolean?) = values.count { it == true }
 /**
- * Counts the number of `true` values in the given iterable of nullable booleans.
+ * Counts the number of `true` values in the given iterables of nullable booleans.
  *
- * @param values An iterable collection of nullable Boolean values to be evaluated.
+ * @param values An iterables collection of nullable Boolean values to be evaluated.
  * @return The count of values that are `true`.
  * @since 1.0.0
  */
@@ -136,10 +139,10 @@ fun countTrue(values: Iterable<Boolean?>) = values.count { it == true }
  */
 fun countFalse(vararg values: Boolean?) = values.count { it == false }
 /**
- * Counts the number of false values in the given iterable of nullable Booleans.
+ * Counts the number of false values in the given iterables of nullable Booleans.
  *
- * @param values an iterable collection of nullable Boolean values
- * @return the count of false values within the provided iterable
+ * @param values an iterables collection of nullable Boolean values
+ * @return the count of false values within the provided iterables
  * @since 1.0.0
  */
 fun countFalse(values: Iterable<Boolean?>) = values.count { it == false }
@@ -225,6 +228,31 @@ val Boolean?.isNullOrFalse: Boolean get() {
         returns(false) implies (this@isNullOrFalse != null)
     }
     return this == null || !this
+}
+
+/**
+ * Attempts to convert the string receiver to a Boolean using strict rules, and captures any
+ * parsing error raised during conversion as a custom error of type [InvalidFormatOfType].
+ *
+ * This method utilizes a functional approach to error handling via the `either` scope, ensuring
+ * errors are encapsulated without terminating execution. If the conversion is successful, the
+ * resulting value is wrapped in a `Right`, otherwise, a `Left` containing a [InvalidFormatOfType]
+ * is returned.
+ *
+ * Uses the following:
+ * - `toBooleanStrict`: Parses the string to a Boolean or throws an exception if the string
+ *   is not "true" or "false" (case sensitive).
+ * - `catching`: Catches exceptions thrown by `toBooleanStrict` and transforms them into a
+ *   [InvalidFormatOfType] containing the invalid value.
+ *
+ * @receiver The string to be parsed to a Boolean.
+ * @return An `Either` where:
+ * - `Right<Boolean>`: Indicates successful parsing as a Boolean.
+ * - `Left<BooleanParsingError>`: Indicates an error resulted from parsing an invalid string.
+ * @since 6.1.0
+ */
+fun String.toBooleanStrictOrError() = either {
+    catching({ toBooleanStrict() }) { _: Exception -> InvalidFormatOfType(this@toBooleanStrictOrError, typeOf<Boolean>()) }
 }
 
 /**

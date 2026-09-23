@@ -9,8 +9,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.splitAndTrim
 import dev.tommasop1804.kutils.validateInputFormat
 import jakarta.persistence.AttributeConverter
@@ -25,6 +26,7 @@ import java.io.Serial
 import java.io.Serializable
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalUnit
+import kotlin.reflect.typeOf
 import kotlin.text.startsWith
 
 /**
@@ -184,21 +186,20 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
             TemporalIntervalOfDuration(duration, repetition)
 
         /**
-         * Creates a new instance of `RepeatedTemporalInterval` based on the provided `TemporalInterval` and repetition count.
-         * The method processes specific types of `TemporalInterval` and applies the given repetition count to generate the new instance.
+         * Creates a `RepeatedTemporalInterval` from the given `TemporalInterval` by applying a specified number of repetitions.
          *
-         * @param interval The temporal interval used to create the repeated temporal interval instance.
-         *                 Must be one of the following types: TemporalIntervalOfDuration, TemporalIntervalOfDurationTemporal,
-         *                 or TemporalIntervalOfTemporalDuration.
-         * @param repetition The number of repetitions to apply to the interval. Defaults to `0` if not explicitly provided.
-         *                   Must be a non-negative integer.
-         * @return A new instance of `RepeatedTemporalInterval` using the provided interval and repetition.
-         * @throws UnsupportedOperationException If the provided interval type is not supported.
-         * @since 1.0.0
+         * This method attempts to apply the repetition to the provided temporal interval. If the interval type does not
+         * support repetition, an error is returned.
+         *
+         * @param interval the temporal interval to which the repetition will be applied
+         * @param repetition the number of times the interval should be repeated. Defaults to 1 if not specified
+         * @return an `Either` containing either a `TemporalIntervalError.UnsupportedForRepeatedInterval` if the operation fails,
+         * or a `RepeatedTemporalInterval` with the applied repetition
+         * @since 6.1.0
          */
-        fun from(interval: TemporalInterval, repetition: Int = 1) = runCatching { when(interval) {
+        fun from(interval: TemporalInterval, repetition: Int = 1): Either<TemporalIntervalError.UnsupportedForRepeatedInterval, RepeatedTemporalInterval> = either { when (interval) {
             is TemporalIntervalOfDuration, is TemporalIntervalOfDurationTemporal, is TemporalIntervalOfTemporalDuration -> interval.withRepetition(repetition)
-            else -> throw TemporalException("The interval is not supported")
+            else -> raise(TemporalIntervalError.UnsupportedForRepeatedInterval(interval))
         } }
 
         /**
@@ -279,8 +280,10 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
         infix fun RepeatedTemporalInterval.forOtherTimes(repetition: Int) = withRepetition(repetition + 1)
 
         /**
-         * Parses the given string representation of a repeated temporal interval and returns a [Result] containing
-         * a [RepeatedTemporalInterval] instance or an exception if the input is invalid.
+         * Parses a string representation of a repeated temporal interval and converts it into a `RepeatedTemporalInterval` object.
+         *
+         * The input string can represent repeated or non-repeated temporal intervals and will be validated based on format rules.
+         * Common inputs include durations and temporal intervals in ISO-8601-like formats.
          *
          * The method supports parsing repeated and non-repeated temporal intervals with specific formatting rules:
          * - -1 means that the interval is repeated indefinitely.
@@ -288,11 +291,12 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
          * - 1 means that the interval is repeated once (standard).
          * - ...
          *
-         * @param s the string representation of the repeated temporal interval to parse
-         * @return a [Result] containing the parsed [RepeatedTemporalInterval] object or an exception if the input is invalid
-         * @since 1.0.0
+         * @param s the string to parse, expected to represent a repeated temporal interval
+         * @return an `Either` containing either an `InvalidFormatOfType` in case of parsing failure,
+         *         or a successfully parsed `RepeatedTemporalInterval` instance
+         * @since 6.1.0
          */
-        fun parse(s: String): Result<RepeatedTemporalInterval> = runCatching {
+        fun parse(s: String): Either<InvalidFormatOfType, RepeatedTemporalInterval> = either { catching({
             val repeated = "R" in s
             val parts = s.splitAndTrim("/")
             validateInputFormat(!(repeated && (parts.size !in 2..3))) { "Invalid repeated time interval: $s" }
@@ -318,7 +322,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
                     if (!repeated) 0 else if (parts[0].length == 1) -1 else parts[0].drop(1).toInt()
                 )
             } else throw MalformedInputException("Invalid time interval: $s")
-        }
+        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<RepeatedTemporalInterval>(), t) } }
 
         class Serializer : ValueSerializer<RepeatedTemporalInterval>() {
             override fun serialize(

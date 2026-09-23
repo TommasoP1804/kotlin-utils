@@ -10,9 +10,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.LocalMonthDayTime
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.toLocalMonthDayTime
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.get
-import dev.tommasop1804.kutils.invoke
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -29,13 +30,8 @@ import java.util.*
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.Long.Companion.MIN_VALUE
 import kotlin.reflect.KProperty
-import kotlin.text.contains
-import kotlin.text.indexOf
-import kotlin.text.isBlank
-import kotlin.text.lastIndexOf
+import kotlin.reflect.typeOf
 import kotlin.text.startsWith
-import kotlin.text.take
-import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 
 /**
@@ -56,6 +52,15 @@ import kotlin.time.toJavaInstant
 @Suppress("unused", "kutils_getorthrow_as_invoke", "kutils_temporal_now_as_temporal", "kutils_temporal_of_as_temporal", "kutils_temporal_parse_as_temporal", "kutils_take_as_int_invoke")
 @MustUseReturnValues
 class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime, val timeZone: ZoneId) : Temporal, TemporalAccessor, TemporalAdjuster, Comparable<ZonedMonthDayTime>, Serializable {
+    /**
+     * The `offset` represents the time-zone offset for a given date-time combination.
+     * This value is determined based on the rules applied to the specified time zone.
+     *
+     * It is computed by obtaining the offset from the `timeZone` rules,
+     * using the local date-time resulting from the `monthDayTime` value.
+     *
+     * @since 6.1.0
+     */
     val offset: ZoneOffset = timeZone.rules.getOffset(monthDayTime.toLocalDateTime())
 
     /**
@@ -248,7 +253,6 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
      * @param zoneId The time zone used to interpret the instant into a local date-time.
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zoneId: ZoneId) : this(from(LocalDateTime.ofInstant(instant.toJavaInstant(), zoneId)))
     /**
      * Constructs an instance using the given [instant] and [zoneId].
@@ -262,7 +266,6 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
      *
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zoneId: ZoneIdent) : this(from(LocalDateTime.ofInstant(instant.toJavaInstant(), zoneId.zoneId)))
 
     /**
@@ -606,16 +609,21 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
         )
 
         /**
-         * Parses the given char sequence into a [ZonedMonthDayTime] instance. The input can include timezone
-         * or offset information. If the char sequence is blank, the current date and time (based on the current
-         * timezone) are returned.
+         * Parses the given [CharSequence] into a [ZonedMonthDayTime] object.
          *
-         * @param cs the char sequence to be parsed; it can include a timezone in square brackets or an offset.
-         * @return a [Result] containing the parsed [ZonedMonthDayTime] on success, or an exception on failure.
-         * @since 1.0.0
+         * This method attempts to interpret the input [CharSequence] as a representation of a
+         * zoned month-day-time. If the input contains a zone identifier in square brackets, it
+         * extracts and uses it for creating the result. Otherwise, the result is based on the
+         * offset information provided in the input or the default zone offset.
+         *
+         * @param cs The input character sequence representing the zoned month-day-time.
+         *           Must not be blank and should conform to the expected format.
+         * @return An [Either] that contains a [ZonedMonthDayTime] if parsing succeeds, or an
+         *         [InvalidFormatOfType] in case of an error.
+         * @since 6.1.0
          */
         @JvmStatic
-        fun parse(cs: CharSequence): Result<ZonedMonthDayTime> = runCatching {
+        fun parse(cs: CharSequence): Either<InvalidFormatOfType, ZonedMonthDayTime> = either { catching({
             val s = cs.toString()
             if (s.isBlank()) now()
             else {
@@ -629,7 +637,7 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
                         ?: throw IllegalArgumentException("Invalid zone identifier: $zonePart")
                 )
             }
-        }
+        }) { t: Throwable -> InvalidFormatOfType(cs, typeOf<ZonedMonthDayTime>(), t) } }
 
         /**
          * Converts a given [Temporal] instance to a [ZonedMonthDayTime] by extracting the respective
@@ -718,7 +726,7 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
      * @param timeZone the `ZoneIdent` to be used in the new instance. Defaults to this instance's `timeZone`.
      * @since 1.0.0
      */
-    fun copy(monthDayTime: LocalMonthDayTime = this.monthDayTime, timeZone: ZoneIdent = ZoneIdent.of(this.timeZone.id)) = ZonedMonthDayTime(monthDayTime, timeZone.zoneId)
+    fun copy(monthDayTime: LocalMonthDayTime = this.monthDayTime, timeZone: ZoneIdent) = ZonedMonthDayTime(monthDayTime, timeZone.zoneId)
 
     /**
      * Determines if the current `ZonedMonthDayTime` is chronologically earlier than the specified `other`

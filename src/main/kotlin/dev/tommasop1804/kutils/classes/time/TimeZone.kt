@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.classes.time
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import java.time.Instant
 import java.time.ZoneId
@@ -284,19 +285,19 @@ enum class TimeZone(
      * following order of precedence:
      * 1. The `zoneIdByAbbreviation` field, if available.
      * 2. The `zoneIdByOffset` field, if available.
-     * 3. Throws an `IllegalStateException` if neither of the above are defined for the instance.
+     * 3. Throws an `NoSuchEntryException` if neither of the above are defined for the instance.
      *
      * This property provides a platform-specific representation of the time zone and is integral to
      * conversions and operations requiring time zone adjustments.
      *
      * 
      * @return A `ZoneId` representing the time zone.
-     * @throws IllegalStateException if the `id` is not recognized as a valid Zone ID and neither of the
+     * @throws NoSuchEntryException if the `id` is not recognized as a valid Zone ID and neither of the
      * `zoneIdByAbbreviation` or `zoneIdByOffset` fields are defined for the current instance.
      * @since 1.0.0
      */
     override val zoneId: ZoneId
-        get() = zoneIdByAbbreviation ?: zoneIdByOffset ?: throw IllegalStateException("ZoneId not found for $this")
+        get() = zoneIdByAbbreviation ?: zoneIdByOffset ?: throw NoSuchEntryException("ZoneId not found for $this")
 
     /**
      * Represents the UTC offset as a string for the current `MilitaryTimeZone` instance.

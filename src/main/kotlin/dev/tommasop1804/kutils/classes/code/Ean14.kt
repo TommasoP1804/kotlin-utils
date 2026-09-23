@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -19,6 +21,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents an EAN-14 (European Article Number) code as a value class.
@@ -83,19 +86,25 @@ value class Ean14 private constructor(override val value: String) : CharSequence
         fun CharSequence.isValidEan14() = matches(Regex("(\\(01\\))?[0-9]{14}")) && computeCheckDigit(toString() - 1) == last()
 
         /**
-         * Converts the current string to an instance of `EAN14` by attempting to create a valid object
-         * from the string value.
+         * Converts the current `CharSequence` into an `EAN14` instance, encapsulating the value as an EAN-14 compliant string.
+         * This method uses functional error handling to validate the input and either returns the validated `EAN14` object or
+         * captures a parsing error in an `Either`.
          *
-         * The conversion is done using `runCatching`, which encapsulates the operation and returns
-         * the result as a `Result<EAN14>`. If the string is not valid for the creation of an `EAN14`
-         * instance, the resulting object will contain the corresponding failure exception.
+         * If the input cannot be successfully converted, a `ParsingError` indicating the invalid value and target class (EAN14)
+         * is returned.
          *
-         * @receiver The string representation of a potential EAN14 value.
-         * @return A `Result` containing the successfully created `EAN14` object, or a failure with
-         * the exception that occurred during the conversion.
-         * @since 1.0.0
+         * Utilizes the `either` and `catching` constructs for functional error handling.
+         *
+         * @return An `Either` containing:
+         *         - A `Right` with the `EAN14` instance if the conversion is successful.
+         *         - A `Left` with a `ParsingError` if the input is invalid.
+         * @since 6.1.0
          */
-        fun CharSequence.toEan14() = run { runCatching { Ean14(this) } }
+        fun CharSequence.toEan14() = run { either {
+            catching({ Ean14(this@toEan14) }) { t: Throwable ->
+                InvalidFormatOfType(this@toEan14, typeOf<Ean14>(), t)
+            }
+        } }
 
         /**
          * Computes the check digit for a given string code based on the EAN checksum algorithm.

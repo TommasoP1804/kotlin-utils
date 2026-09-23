@@ -11,12 +11,14 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isOdd
+import dev.tommasop1804.kutils.sign
 import dev.tommasop1804.kutils.toMList
 import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.unaryPlus
-import dev.tommasop1804.kutils.validate
 import dev.tommasop1804.kutils.validateNotEmpty
 import dev.tommasop1804.kutils.validatePositive
 import jakarta.persistence.AttributeConverter
@@ -28,6 +30,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 import kotlin.text.startsWith
 
 /**
@@ -80,53 +83,42 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
      * @since 1.0.0
      */
     constructor(number: Number) : this(+number.toLong().toString(16)) {
-        validate(number.toLong() >= 0) { "The number must be greater than zero" }
+        number.toLong() >= 0 || throw NumberSignException("Negative numbers are not allowed")
+        number is Double && number.isNaN() && throw NumberSignException("NaN is not allowed")
     }
     /**
      * Secondary constructor that initializes the object with a hexadecimal string representation of the provided unsigned byte.
      *
      * @param number The unsigned byte value to be converted to hexadecimal and used for initialization.
      * Must be non-negative; otherwise, a validation error will be thrown.
-     * @throws IllegalArgumentException if the number is less than zero.
      * @since 5.5.0
      */
-    constructor(number: UByte) : this(+number.toString(16)) {
-        validate(number.toLong() >= 0) { "The number must be greater than zero" }
-    }
+    constructor(number: UByte) : this(+number.toString(16))
     /**
      * Constructs an instance by converting the given unsigned short number
      * to its hexadecimal string representation and validates that the number
      * is non-negative.
      *
      * @param number The unsigned short number to be converted and validated.
-     * @throws IllegalArgumentException If the given number is negative.
      * @since 5.5.0
      */
-    constructor(number: UShort) : this(+number.toString(16)) {
-        validate(number.toLong() >= 0) { "The number must be greater than zero" }
-    }
+    constructor(number: UShort) : this(+number.toString(16))
     /**
      * Initializes a new instance of the class using the given unsigned integer.
      * Converts the provided number to its hexadecimal string representation
      * and invokes the primary constructor with it as a parameter.
      *
      * @param number The unsigned integer to be converted into a hexadecimal string for initialization.
-     * @throws IllegalArgumentException If the provided number is less than zero.
      * @since 5.5.0
      */
-    constructor(number: UInt) : this(+number.toString(16)) {
-        validate(number.toLong() >= 0) { "The number must be greater than zero" }
-    }
+    constructor(number: UInt) : this(+number.toString(16))
     /**
      * Secondary constructor that creates an instance using an unsigned long number.
      *
      * @param number An unsigned long value that will be used to initialize the instance.
-     * @throws IllegalArgumentException If the provided number is not greater than zero.
      * @since 5.5.0
      */
-    constructor(number: ULong) : this(+number.toString(16)) {
-        validate(number.toLong() >= 0) { "The number must be greater than zero" }
-    }
+    constructor(number: ULong) : this(+number.toString(16))
 
     /**
      * Constructs an instance using the provided byte array, starting at the beginning of the array,
@@ -180,17 +172,22 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
          * @return An instance of [Hex] representing the hexadecimal equivalent of the numeric value.
          * @since 1.0.0
          */
-        fun Number.toHex() = Hex(this)
+        fun Number.toHex() = either {
+            catching({ Hex(this@toHex) }) { t: Throwable ->
+                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+            }
+        }
         /**
-         * Converts a [CharSequence] to its equivalent hexadecimal string representation by wrapping it
-         * in a [Hex] instance.
+         * Converts the CharSequence into a Hex object if the format is valid.
          *
-         * @receiver The [CharSequence] to be converted into a hexadecimal string.
-         * @return A [Hex] instance representing the hexadecimal string equivalent of the input,
-         * wrapped in a [Result].
-         * @since 1.0.0
+         * @return Either an InvalidFormatOfType if the conversion fails, or a Hex object if successful.
+         * @since 6.1.0
          */
-        fun CharSequence.toHex() = runCatching { Hex(toString()) }
+        fun CharSequence.toHex(): Either<InvalidFormatOfType, Hex> = either {
+            catching({ Hex(this@toHex.toString()) }) { t: Throwable ->
+                InvalidFormatOfType(this@toHex, typeOf<Hex>(), t)
+            }
+        }
         /**
          * Converts the ByteArray into its hexadecimal string representation.
          *

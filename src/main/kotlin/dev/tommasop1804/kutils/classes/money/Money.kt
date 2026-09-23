@@ -11,8 +11,11 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.time.TimeZone
+import dev.tommasop1804.kutils.classes.web.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -31,6 +34,7 @@ import java.net.http.HttpResponse
 import java.time.OffsetDateTime
 import java.util.*
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 
 /**
  * Represents a monetary value associated with a specific currency.
@@ -97,12 +101,10 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * This property retrieves the `Currency` by its currency code from the `Currency` class. If the
      * specified currency code cannot be found, an `IllegalStateException` will be thrown.
      *
-     * 
-     * @throws IllegalStateException if the currency code cannot be resolved into a `Currency` instance.
      * @since 1.0.0
      */
-    val constCurrency: Currency
-        get() = Currency.of(currency.currencyCode) ?: throw ConversionException("Unable to find currency code: ${currency.currencyCode}")
+    val constCurrency: Currency?
+        get() = Currency.of(currency.currencyCode)
 
     /**
      * Indicates whether the monetary amount is positive.
@@ -135,6 +137,45 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      */
     val isZero: Boolean
         get() = amount.signum() == 0
+
+    /**
+     * A computed property that rounds the monetary amount up to the nearest whole number
+     * based on the CEILING rounding mode. This operation does not modify the original
+     * amount but returns a new Money instance with the adjusted value and the same currency.
+     *
+     * Useful for scenarios where upward rounding is required, such as calculating
+     * payment totals or financial thresholds where fractional values are not allowed.
+     *
+     * @return A new Money instance with the rounded amount and the same currency.
+     * @since 6.1.0
+     */
+    val ceil get() = Money(amount.setScale(0, RoundingMode.CEILING), currency)
+    /**
+     * Rounds the monetary value down to the nearest whole number using floor rounding mode.
+     * The resulting value adjusts the scale of the amount to zero without exceeding the original value.
+     * Typically used for scenarios requiring truncation of fractional monetary values.
+     *
+     * @return A new Money instance with the rounded amount and original currency preserved.
+     * @since 6.1.0
+     */
+    val floor get() = Money(amount.setScale(0, RoundingMode.FLOOR), currency)
+    /**
+     * A read-only property that represents the monetary value rounded to the nearest whole number
+     * using the HALF_EVEN rounding mode, which minimizes cumulative rounding errors.
+     * The rounding is performed based on the current amount and currency.
+     *
+     * @see java.math.RoundingMode.HALF_EVEN
+     * @since 6.1.0
+     */
+    val rounded get() = Money(amount.setScale(0, RoundingMode.HALF_EVEN), currency)
+    /**
+     * A property that returns the absolute value of the monetary amount, preserving its currency.
+     * Useful for ensuring all monetary calculations are non-negative without altering the currency type.
+     *
+     * @return A `Money` instance with the absolute value of the amount.
+     * @since 6.1.0
+     */
+    val abs get() = Money(amount.abs(), currency)
 
     companion object {
         /**
@@ -249,24 +290,34 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
         infix fun BigDecimal.ofCurrency(currency: Currency) = Money(toDouble(), currency)
 
         /**
-         * Parses a string representation of a monetary value and returns a [Money] object.
-         * The input string should contain a currency code and an amount separated by a space.
-         * The order of currency and amount can be specified through the `currencyBefore` parameter.
+         * Parses a string representation of a monetary value and returns it as a [Money] object wrapped in an [Either].
+         * The string can represent a value with the currency placed either before or after the monetary amount,
+         * depending on the value of the [currencyBefore] parameter.
          *
-         * @param s the input string to be parsed, expected to contain a currency code and an amount separated by a space
-         * @param currencyBefore a boolean flag indicating whether the currency code comes before the amount
-         * (default is true, where the format should be "currency amount"; if false, the format should be "amount currency")
-         * @return a [Result] wrapping the parsing operation, which contains the [Money] object if successful
-         * @since 1.0.0
+         * @param s the input string representing the monetary value. It should be formatted as "<currency> <amount>"
+         *          if [currencyBefore] is true, or "<amount> <currency>" if [currencyBefore] is false.
+         * @param currencyBefore a boolean flag indicating if the currency symbol precedes the amount in [s].
+         *                       Defaults to `true`.
+         * @return an [Either] containing a [Money] object on successful parsing, or an [Error] if the input string
+         *         is malformed or contains invalid values.
+         * @since 6.1.0
          */
-        fun parse(s: String, currencyBefore: Boolean = true) = runCatching {
-            if (currencyBefore) {
-                val [currency, amount] = s.split(" ", limit = 2)
-                Money(BigDecimal(amount), java.util.Currency.getInstance(currency))
-            } else {
-                val [amount, currency] = s.split(" ", limit = 2)
-                Money(BigDecimal(amount), java.util.Currency.getInstance(currency))
-            }
+        fun parse(s: String, currencyBefore: Boolean = true): Either<Error, Money> = either {
+            var curr: String? = null
+            catching({
+                if (currencyBefore) {
+                    val [currency, amount] = s.split(" ", limit = 2)
+                    curr = currency
+                    Money(BigDecimal(amount), java.util.Currency.getInstance(currency))
+                } else {
+                    val [amount, currency] = s.split(" ", limit = 2)
+                    curr = currency
+                    Money(BigDecimal(amount), java.util.Currency.getInstance(currency))
+                }
+            }) { e: Exception -> when (e) {
+                is IllegalArgumentException -> NotFound(curr)
+                else -> InvalidFormatOfType(s, typeOf<Money>(), e.message)
+            } }
         }
 
         class Serializer : ValueSerializer<Money>() {
@@ -318,7 +369,7 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * @param currency the currency of the new instance. Defaults to `constCurrency`.
      * @since 1.0.0
      */
-    fun copy(amount: BigDecimal = this.amount, currency: Currency = constCurrency) = Money(amount, currency)
+    fun copy(amount: BigDecimal = this.amount, currency: Currency) = Money(amount, currency)
     
     /**
      * Provides the first component of a data class, typically used for destructuring declarations.
@@ -348,30 +399,48 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
     operator fun component3() = constCurrency
     
     /**
-     * Converts the current monetary value to a specified currency using exchange rates.
+     * Converts the current monetary value into a different currency using the specified conversion target.
      *
-     * The currency conversion values update daily at 16:00 CET.
+     * Retrieves the most recent exchange rate data from the Frankfurter API for the specified currency,
+     * calculates the converted monetary value, and associates it with an offset date-time indicating
+     * when the exchange rate data is valid.
      *
-     * @param currency The target currency to which the monetary value needs to be converted.
-     * @return A [Pair] consisting of the converted monetary value as [Money] and
-     *         the last update of currency conversion values as [OffsetDateTime].
-     * @throws CurrencyConversionException if the conversion fails due to an error in the exchange rate API.
-     * @since 1.0.0
+     * Possible errors:
+     * - [NotFound] - Indicates that the specified currency is not found in the exchange rate data.
+     * - [HttpError.ResponseError] - Indicates an error occurred while fetching the exchange rate data.
+     *
+     * @param currency The target currency to which the current monetary value should be converted.
+     * @return Either an error indicating failure or a pair containing the converted monetary value
+     *         and the offset date-time of the conversion rate.
+     * @since 6.1.0
      */
-    infix fun convert(currency: java.util.Currency): Pair<Money, OffsetDateTime> {
+    infix fun convert(currency: java.util.Currency): Either<Error, Pair<Money, OffsetDateTime>> = either {
+        val uri = "https://api.frankfurter.dev/v1/latest?base=${this.currency.currencyCode}&symbols=${currency.currencyCode}&amount=${amount}".toUri()()
         val response = HttpClient
             .newHttpClient()
             .send(
                 HttpRequest.newBuilder()
-                    .uri("https://api.frankfurter.dev/v1/latest?base=${this.currency.currencyCode}&symbols=${currency.currencyCode}&amount=${amount}".toUri()())
+                    .uri(uri)
                     .build(),
                 HttpResponse.BodyHandlers.ofString()
-            ).requireOrThrow({ CurrencyConversionException("Unable to convert money to currency ${currency.currencyCode}") }) { it.statusCode() in 200..299 }
-            .body()
+            ).also { when {
+                it.status == HttpStatus.NotFound -> raise(NotFound(currency.currencyCode))
+                it.status!!.isError -> raise(HttpError.ResponseError(
+                    serviceName = "Frankfurter",
+                    statusCode = it.status!!,
+                    uri = uri,
+                    method = HttpMethod.Get,
+                    requestBody = null,
+                    responseBody = it.body(),
+                    requestHeaders = null,
+                    responseHeaders = it.headers,
+                    errorMessage = it.body()
+                ))
+            } }.body()
             .let(::Json)
 
-        return Pair(
-            Money(response.getAsNode("rates")!![currency.currencyCode].asDecimal().toBigDecimal(), currency),
+        Pair(
+            Money(response.getAsNode("rates")!![currency.currencyCode].asDecimal(), currency),
             TimeZoneDesignator.Z.convert(
                 if (OffsetTime().isAfter(OffsetTime(16, 0, zoneOffset = TimeZone.CET)))
                     OffsetDateTime(TimeZone.CET).withHour(16).withMinute(0).withSecond(0).withNano(0)
@@ -381,16 +450,16 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
     }
 
     /**
-     * Converts the current monetary value to a specified currency using exchange rates.
+     * Converts the given currency to its equivalent representation, returning either an error
+     * or a pair containing the converted money and the associated timestamp.
      *
-     * The currency conversion values update daily at 16:00 CET.
-     *
-     * @param currency The target currency to which the monetary value needs to be converted.
-     * @return A [Pair] consisting of the converted monetary value as [Money] and
-     *         the last update of currency conversion values as [OffsetDateTime].
-     * @since 1.0.0
+     * @param currency The target currency to be converted.
+     * @return An instance of Either containing an error if the conversion fails,
+     *         or a pair consisting of the resulting money and the timestamp upon success.
+     * @since 6.1.0
      */
-    infix fun convert(currency: Currency) = convert(currency.toJavaCurrency() ?: throw IllegalArgumentException("Invalid currency code"))
+    infix fun convert(currency: Currency): Either<Error, Pair<Money, OffsetDateTime>> =
+        currency.toJavaCurrency().orEither { NotFound(it) } thenMergeWith { convert(it) }
 
     /**
      * Adds the given [Money] instance to the current [Money] instance.
@@ -399,12 +468,15 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      *
      * @param other The [Money] instance to be added.
      * @return A new [Money] instance representing the sum of the two [Money] amounts.
-     * @throws UnsupportedOperationException if the currencies of the two [Money] instances do not match.
+     * @throws IllegalOperationException if the currencies of the two [Money] instances do not match.
      * @since 1.0.0
      */
     operator fun plus(other: Money): Money {
+        var other = other
         if (currency != other.currency) {
-            throw UnsupportedOperationException("The currencies must be the same")
+            other = other.convert(currency)() {
+                IllegalOperationException("The currencies must be the same")
+            }.first
         }
         return Money(amount.add(other.amount), currency)
     }
@@ -439,8 +511,11 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * @since 1.0.0
      */
     operator fun minus(other: Money): Money {
+        var other = other
         if (currency != other.currency) {
-            throw IllegalOperationException("The currencies must be the same")
+           other = other.convert(currency)() {
+               IllegalOperationException("The currencies must be the same")
+           }.first
         }
         return Money(amount.subtract(other.amount), currency)
     }
@@ -517,7 +592,7 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * @return The absolute value of the operand.
      * @since 1.0.0
      */
-    operator fun unaryPlus() = abs()
+    operator fun unaryPlus() = abs
 
     /**
      * Increments the amount represented by this Money instance by one unit.
@@ -541,51 +616,6 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
      * @since 1.0.0
      */
     operator fun dec() = this - BigDecimal.ONE
-
-    /**
-     * Rounds the monetary amount upward to the nearest integer value, preserving the currency.
-     * If the value is already an integer, no rounding is performed. This operation ensures
-     * that the result is always greater than or equal to the original amount unless the original value
-     * is an integer.
-     *
-     * 
-     * @return A new [Money] instance with the rounded monetary amount and the same currency.
-     * @since 1.0.0
-     */
-    fun ceil() = Money(amount.setScale(0, RoundingMode.CEILING), currency)
-
-    /**
-     * Adjusts the value of this Money instance by rounding down to the nearest whole number
-     * in the context of its currency and precision.
-     *
-     * This method uses the `RoundingMode.FLOOR` strategy for rounding, meaning it will always
-     * round towards the smaller value. Negative values will be rounded down to the next lower
-     * absolute integer.
-     *
-     * 
-     * @return A new Money instance with the adjusted value.
-     * @since 1.0.0
-     */
-    fun floor() = Money(amount.setScale(0, RoundingMode.FLOOR), currency)
-
-    /**
-     * Rounds the monetary value to the nearest whole unit using the `HALF_EVEN` rounding mode,
-     * typically used for financial calculations to minimize cumulative rounding errors.
-     *
-     * 
-     * @return A new `Money` instance with the rounded monetary value and the same currency.
-     * @since 1.0.0
-     */
-    fun round() = Money(amount.setScale(0, RoundingMode.HALF_EVEN), currency)
-
-    /**
-     * Computes the absolute value of the monetary amount while preserving the currency.
-     *
-     * 
-     * @return A new Money instance with the absolute value of the amount, retaining the same currency.
-     * @since 1.0.0
-     */
-    fun abs() = Money(amount.abs(), currency)
 
     /**
      * Compares this Money object with the specified Money object for order.

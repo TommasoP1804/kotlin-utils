@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.toLocalMonthDayTime
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.MICROS_PER_SECOND
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.NANOS_PER_SECOND
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.SECONDS_PER_DAY
 import dev.tommasop1804.kutils.classes.time.OffsetMonthDayTime.Companion.SECONDS_PER_MINUTE
-import dev.tommasop1804.kutils.invoke
-import dev.tommasop1804.kutils.isNull
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -32,7 +32,7 @@ import java.util.*
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.Long.Companion.MIN_VALUE
 import kotlin.reflect.KProperty
-import kotlin.time.ExperimentalTime
+import kotlin.reflect.typeOf
 import kotlin.time.toJavaInstant
 
 /**
@@ -221,7 +221,6 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
      * @return an instance of `OffsetMonthDayTime` based on the provided instant and zone
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zoneId: ZoneId) : this(from(LocalDateTime.ofInstant(instant.toJavaInstant(), zoneId)))
     /**
      * Constructs an instance by converting the given `Instant` and `ZoneIdent`
@@ -233,7 +232,6 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
      *                  interpret the instant into a LocalDateTime
      * @since 1.0.0
      */
-    @OptIn(ExperimentalTime::class)
     constructor(instant: kotlin.time.Instant, zoneIdent: ZoneIdent) : this(from(LocalDateTime.ofInstant(instant.toJavaInstant(), zoneIdent.offset)))
 
     /**
@@ -566,18 +564,17 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
         )
 
         /**
-         * Parses the given string to create an instance of [OffsetMonthDayTime].
+         * Parses the given character sequence into an `OffsetMonthDayTime` object, handling potential invalid formats
+         * with an `InvalidFormatOfType` error. The method supports parsing an offset value ('Z', '+' or '-')
+         * and combines it with a `LocalMonthDayTime`.
          *
-         * The string input should represent a local month-day-time and an offset,
-         * separated into distinct parts. If the string ends with 'Z', it is treated as
-         * having a UTC offset. If the input is blank, the current instance is returned.
-         *
-         * @param cs the string to parse, representing a local month-day-time with an offset
-         * @return an [OffsetMonthDayTime] instance parsed from the given string
-         * @since 1.0.0
+         * @param cs the character sequence to be parsed, which may represent a date-time with an offset.
+         * @return either an `OffsetMonthDayTime` instance if parsing succeeds, or an `InvalidFormatOfType`
+         *         error if the input is invalid or if an exception occurs during parsing.
+         * @since 6.1.0
          */
         @JvmStatic
-        fun parse(cs: CharSequence) = runCatching {
+        fun parse(cs: CharSequence): Either<InvalidFormatOfType, OffsetMonthDayTime> = either { catching({
             if (cs.isBlank()) now()
             else {
                 val symbol = if (cs.endsWith("Z")) 'Z' else if (cs.lastIndexOf('+') > cs.lastIndexOf('-')) '+' else '-'
@@ -586,7 +583,7 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
                 val localMonthDayTime = LocalMonthDayTime.parse(cs.take(cs.lastIndexOf(symbol))).getOrThrow()
                 OffsetMonthDayTime(localMonthDayTime, offset)
             }
-        }
+        }) { t: Throwable -> InvalidFormatOfType(cs, typeOf<OffsetMonthDayTime>(), t) } }
 
         /**
          * Converts a [Temporal] object into an instance of [OffsetMonthDayTime].

@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -21,6 +24,7 @@ import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
 import java.math.BigInteger
 import kotlin.math.pow
+import kotlin.reflect.typeOf
 
 /**
  * Represents a binary data structure that supports various numerical and arithmetic operations.
@@ -137,27 +141,32 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
         fun CharSequence.isValidBinary() = runCatching { Binary(toString()) }.isSuccess
 
         /**
-         * Converts the given string to its binary representation encapsulated
-         * within a `Binary` object. The conversion is performed safely, and
-         * any errors during the process will result in a failed `Result`.
+         * Converts the current string to a binary representation.
          *
-         * @receiver The string to be converted to a binary representation.
-         * @return A `Result` containing the `Binary` object if the conversion
-         *         succeeds, or failure if an exception occurs.
-         * @since 1.0.0
+         * If the conversion fails, an `InvalidFormatOfType` error is returned encapsulating
+         * the invalid input string, the target type, and the underlying throwable.
+         *
+         * @return Either a valid `Binary` object on success or an `InvalidFormatOfType` error on failure.
+         * @since 6.1.0
          */
-        fun String.toBinary() = runCatching { Binary(this) }
+        fun String.toBinary(): Either<InvalidFormatOfType, Binary> = either {
+            catching({ Binary(this@toBinary) }) { t: Throwable ->
+                InvalidFormatOfType(this@toBinary, typeOf<Binary>(), t)
+            }
+        }
         /**
-         * Converts the current numeric value into its binary representation.
+         * Converts the current number to its binary representation. The method will attempt to perform the conversion
+         * and return the result wrapped in an `Either` type.
          *
-         * This extension function constructs a `Binary` representation for the invoking `Number` instance.
-         * It is typically used when a binary format of the number is required for further operations or display purposes.
-         *
-         * @receiver Number instance to be converted to binary representation.
-         * @return A `Binary` instance representing the binary equivalent of the invoking number.
-         * @since 1.0.0
+         * @return `Either<NumberError.InvalidSign, Binary>` where the right value contains the binary representation if successful,
+         *         and the left value contains `NumberError.InvalidSign` if the number's sign is invalid for this conversion.
+         * @since 6.1.0
          */
-        fun Number.toBinary() = Binary(this)
+        fun Number.toBinary(): Either<NumberError.InvalidSign, Binary> = either {
+            catching({ Binary(this@toBinary) }) { t: Throwable ->
+                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+            }
+        }
 
         /**
          * Adds the value of the specified binary object to this Byte and returns the result.
@@ -398,6 +407,11 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
          * @since 1.0.0
          */
         private fun fromNumber(n: Number, precision: Int = 10): String {
+            if (n.isNegative)
+                throw NumberSignException("Negative numbers are not supported")
+            if (n is Double && n.isNaN())
+                throw NumberSignException("NaN is not supported")
+
             val integerPart = n.toLong()
             val fractionalPart = n.toDouble() - integerPart
 

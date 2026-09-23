@@ -13,10 +13,12 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.time.Duration.Companion.durationTo
 import dev.tommasop1804.kutils.classes.time.RTemporalInterval.Companion.intervalTo
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalToUnrestricted
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.parseTemporal
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.Table
@@ -27,6 +29,7 @@ import tools.jackson.databind.annotation.JsonSerialize
 import java.time.*
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalUnit
+import kotlin.reflect.typeOf
 
 /**
  * Represents a temporal interval between two points in time, defined by a start and an end.
@@ -315,20 +318,16 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
         /**
          * Parses a string representation of a temporal interval into an `RTemporalInterval` instance.
          *
-         * This function supports intervals defined with temporal start and end values,
-         * or duration-based definitions. Repeated intervals that start with "R" are not supported.
+         * The method supports parsing intervals that are formatted as two temporals separated by
+         * a forward slash (e.g., "start/end"), or a mix of temporal and duration values.
+         * Repeated intervals starting with "R" are not supported.
          *
-         * @param s The string representation of the temporal interval to parse.
-         *          It should be formatted as "start/duration", "duration/end", or "start/end".
-         *          Repeated intervals, starting with "R", are not supported.
-         * @throws UnsupportedOperationException If the input string indicates a repeated interval
-         *                                       or contains only a duration.
-         * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException If the format of the input string is invalid.
-         * @return A result of type `Result<RTemporalInterval>` containing the parsed interval,
-         *         or an exception if errors occur during parsing.
-         * @return 3.4.1
+         * @param s the string representation of the temporal interval to parse
+         * @return an `Either` containing either an `InvalidFormatOfType` instance if the parsing fails,
+         *         or a successfully parsed `RTemporalInterval` instance of type `<T1, T2>`
+         * @since 6.1.0
          */
-        infix fun <T1 : Temporal, T2 : Temporal> parse(s: String): Result<RTemporalInterval<T1, T2>> = runCatching {
+        infix fun <T1 : Temporal, T2 : Temporal> parse(s: String): Either<InvalidFormatOfType, RTemporalInterval<T1, T2>> = either { catching({
             if (s.startsWith("R")) throw UnsupportedOperationException("Repeated intervals are not supported. Use RepeatedTemporalInterval.parse(s).")
             else {
                 val parts = s.splitAndTrim("/")
@@ -351,7 +350,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
                     )
                 }
             }
-        }
+        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<RTemporalInterval<T1, T2>>(), t) } }
 
         class Serializer : ValueSerializer<TemporalInterval>() {
             override fun serialize(

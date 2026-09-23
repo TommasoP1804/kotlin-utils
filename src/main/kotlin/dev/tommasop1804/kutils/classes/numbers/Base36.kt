@@ -4,7 +4,7 @@
 
 @file:Suppress("unused", "kutils_drop_as_int_invoke")
 
-package dev.tommasop1804.kutils.classes.base
+package dev.tommasop1804.kutils.classes.numbers
 
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.constants.TextCase.Companion.convertCase
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.bouncycastle.util.Strings
@@ -26,6 +28,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * A class that represents a Base36-encoded value. The Base36 encoding consists of alphanumeric
@@ -115,17 +118,18 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
         fun CharSequence.isValidBase36() = runCatching { Base36(toString()) }.isSuccess
 
         /**
-         * Converts the current `Number` instance to its Base36 representation.
+         * Converts the number to its Base36 representation.
+         * The method ensures that the number conforms to the expected sign constraints
+         * and catches any runtime exceptions that occur during the conversion process.
          *
-         * The method creates a `Base36` instance based on the numeric value of the receiver. 
-         * Base36 encoding is commonly used to represent numbers compactly using digits (0-9) 
-         * and letters (A-Z or a-z) as symbols.
-         *
-         * @receiver The number to be converted to Base36. It must be a non-negative value.
-         * @return A `Base36` instance representing the Base36-encoded form of the number.
-         * @since 1.0.0
+         * @return Either an InvalidSign error if the number has an unexpected sign, or the Base36 representation of the number.
+         * @since 6.1.0
          */
-        fun Number.toBase36() = Base36(this)
+        fun Number.toBase36(): Either<NumberError.InvalidSign, Base36> = either {
+            catching({ Base36(this@toBase36) }) { t: Throwable ->
+                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+            }
+        }
         /**
          * Converts the current [CharSequence] to an instance of `Base36`.
          *
@@ -140,7 +144,11 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
          * or an error if a failure occurs.
          * @since 1.0.0
          */
-        fun CharSequence.toBase36() = runCatching { Base36(toString()) }
+        fun CharSequence.toBase36() = either {
+            catching({ Base36(this@toBase36.toString()) }) { t: Throwable ->
+                InvalidFormatOfType(this@toBase36, typeOf<Base36>(), t)
+            }
+        }
 
         /**
          * Adds a Base36 number to a Byte and returns the result as an Int.
@@ -453,7 +461,7 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
      * formatted in the specified text case.
      *
      * @param textCase the desired text case format to apply to the resulting string.
-     *                 Defaults to [dev.tommasop1804.kutils.classes.constants.TextCase.UpperCase] if not specified.
+     *                 Defaults to [TextCase.UpperCase] if not specified.
      * @return the string representation of the current instance formatted in the specified text case.
      * @since 1.0.0
      */
@@ -737,7 +745,7 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
      * If the result of the decrement is negative, a NumberSignException will be thrown.
      *
      * @return a new Base36 instance with a decremented value.
-     * @throws dev.tommasop1804.kutils.exceptions.NumberSignException if the result of the decrement operation is negative.
+     * @throws NumberSignException if the result of the decrement operation is negative.
      * @since 1.0.0
      */
     operator fun dec(): Base36 {

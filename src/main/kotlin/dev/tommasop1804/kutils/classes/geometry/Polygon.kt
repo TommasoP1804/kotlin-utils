@@ -345,7 +345,7 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
      * @param vertices The collection of vertices to be removed.
      * @since 1.0.0
      */
-    fun removeVertices(vertices: Iterable<Point>) = this.vertices.removeAll(vertices)
+    fun removeVertices(vertices: Iterable<Point>) = this.vertices.removeAll(vertices.toSet())
 
     /**
      * Removes a specified number of vertices from the polygon starting at the given index.
@@ -408,7 +408,7 @@ class Polygon(vertices: MList<Point> = emptyMList()): Serializable, Comparable<P
      * with the combined vertices from the current polygon and the provided vertices.
      *
      * 
-     * @param vertices The iterable collection of [Point] objects to be added as vertices.
+     * @param vertices The iterables collection of [Point] objects to be added as vertices.
      * @since 1.0.0
      */
     operator fun plus(vertices: Iterable<Point>) = Polygon((this.vertices + vertices).toMutableList())

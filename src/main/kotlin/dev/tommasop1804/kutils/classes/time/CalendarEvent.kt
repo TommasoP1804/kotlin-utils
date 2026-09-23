@@ -16,7 +16,6 @@ import dev.tommasop1804.kutils.classes.colors.*
 import dev.tommasop1804.kutils.classes.registry.*
 import dev.tommasop1804.kutils.classes.time.TemporalInterval.Companion.intervalToUnrestricted
 import dev.tommasop1804.kutils.expectClass
-import dev.tommasop1804.kutils.invoke
 import dev.tommasop1804.kutils.isNotDecimal
 import dev.tommasop1804.kutils.jsonb
 import dev.tommasop1804.kutils.memberPropertiesMap
@@ -213,8 +212,8 @@ data class CalendarEvent(
 
     init {
         validate(name.isNotBlank()) { "The name of the event cannot be blank." }
-        period.start.expectClass(OffsetDateTime::class, lazyMessage = { "The end date of the event must be OffsetDateTime instance." })
-        period.end.expectClass(OffsetDateTime::class, lazyMessage = { "The start date of the event must be OffsetDateTime instance." })
+        period.start.expectClass<OffsetDateTime>(lazyMessage = { "The end date of the event must be OffsetDateTime instance." })
+        period.end.expectClass<OffsetDateTime>(lazyMessage = { "The start date of the event must be OffsetDateTime instance." })
         validate((period.start as OffsetDateTime).isBefore(period.end as OffsetDateTime)) { "The start date of the event must be before the end date." }
         reminders.forEach { validate(it > Duration()) { "The reminder duration must be greater than zero." } }
     }
@@ -254,13 +253,13 @@ data class CalendarEvent(
                     name = node["name"].asString(),
                     period = TemporalInterval.parse(node["period"].asString()).getOrThrow(),
                     repeat = node["repeat"]?.let { ctxt.readValue(it.traverse(p.objectReadContext()), Repeat::class.java) },
-                    partecipants = node["partecipants"]?.asSet<EventPartecipation>()?.getOrNull() ?: emptySet(),
+                    partecipants = node["partecipants"]?.asSet<EventPartecipation>() ?: emptySet(),
                     conferencing = node["conferencing"]?.let { URI(it.asString()) },
                     description = node["description"]?.asString(),
                     location = node["location"]?.asString(),
                     busy = node["busy"].asBoolean(),
                     private = node["private"].asBoolean(),
-                    reminders = node["reminders"]?.asSet<Duration>()?.getOrNull() ?: emptySet()
+                    reminders = node["reminders"]?.asSet<Duration>() ?: emptySet()
                 )
             }
         }
@@ -403,7 +402,7 @@ data class CalendarEvent(
                     }
                     return Repeat(
                         every = Duration.parse(node["every"].asString()).getOrThrow(),
-                        weekDays = node["weekDays"]?.asSet<String>()?.getOrNull()
+                        weekDays = node["weekDays"]?.asSet<String>()
                                 ?.map(DayOfWeek::valueOf)
                                 ?.toSet()
                             ?: emptySet(),
@@ -514,7 +513,7 @@ data class CalendarEvent(
 
                     class Deserializer : ValueDeserializer<ByDate>() {
                         override fun deserialize(p: tools.jackson.core.JsonParser, ctxt: DeserializationContext): ByDate =
-                            ByDate(dev.tommasop1804.kutils.LocalDate(p.objectReadContext().readValue(p, String::class.java))())
+                            ByDate(dev.tommasop1804.kutils.LocalDate(p.objectReadContext().readValue(p, String::class.java)))
                     }
 
                     class OldSerializer : JsonSerializer<ByDate>() {

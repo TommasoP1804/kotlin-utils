@@ -24,14 +24,6 @@ annotation class CannotCheckExcludedElements
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.PROPERTY_GETTER)
-@Suppress("unused")
-annotation class OnlyForSpecificType(
-    val type: String = ""
-)
-
-@RequiresOptIn(level = RequiresOptIn.Level.WARNING)
-@Retention(AnnotationRetention.RUNTIME)
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.CLASS,

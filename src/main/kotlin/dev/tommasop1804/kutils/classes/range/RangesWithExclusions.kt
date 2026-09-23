@@ -72,7 +72,7 @@ class ClosedRangeWithExclusions<T : Comparable<T>>(
          * The resulting range retains the original boundaries but excludes the specified elements, which will not be
          * members of the range when checking using the `contains` operator.
          *
-         * @param elements An iterable collection of elements to be excluded from the range.
+         * @param elements An iterables collection of elements to be excluded from the range.
          * @since 1.0.0
          */
         infix fun <T: Comparable<T>> ClosedRange<T>.exclude(elements: Iterable<T>) =
@@ -319,9 +319,9 @@ class ClosedRangeWithConditions<T : Comparable<T>>(
         this.conditions.addAll(conditions)
     }
     /**
-     * Adds the given iterable of conditions to the existing set of conditions.
+     * Adds the given iterables of conditions to the existing set of conditions.
      *
-     * @param conditions An iterable collection of conditions represented as `Predicate<T>`
+     * @param conditions An iterables collection of conditions represented as `Predicate<T>`
      * that will be added to the current list of conditions.
      * @since 1.0.0
      */
@@ -338,9 +338,9 @@ class ClosedRangeWithConditions<T : Comparable<T>>(
         conditions.add(condition)
     }
     /**
-     * Removes the specified iterable collection of conditions from the current set of conditions.
+     * Removes the specified iterables collection of conditions from the current set of conditions.
      *
-     * @param condition an iterable collection of predicates to be removed from the conditions.
+     * @param condition an iterables collection of predicates to be removed from the conditions.
      * @since 1.0.0
      */
     operator fun minus(condition: Iterable<Predicate<T>>) {
@@ -371,7 +371,7 @@ class ClosedRangeWithConditions<T : Comparable<T>>(
     /**
      * Removes the specified conditions from the current set of conditions.
      *
-     * @param conditions An iterable collection of predicates to be removed from the current set of conditions.
+     * @param conditions An iterables collection of predicates to be removed from the current set of conditions.
      * @since 1.0.0
      */
     infix fun removeConditions(conditions: Iterable<Predicate<T>>) {
@@ -531,11 +531,11 @@ class OpenEndRangeWithExclusions<T : Comparable<T>>(
         excluded.addAll(elements)
     }
     /**
-     * Adds the elements from the given iterable collection to the list of excluded elements
+     * Adds the elements from the given iterables collection to the list of excluded elements
      * within the range. Once added, these elements will be considered excluded and
      * will not be included in the range checks or other operations.
      *
-     * @param elements The iterable collection of elements to add to the exclusion list.
+     * @param elements The iterables collection of elements to add to the exclusion list.
      * @since 1.0.0
      */
     infix fun exlude(elements: Iterable<T>) {
@@ -551,9 +551,9 @@ class OpenEndRangeWithExclusions<T : Comparable<T>>(
         excluded.add(element)
     }
     /**
-     * Removes the specified iterable collection of elements from the exclusion list of the range.
+     * Removes the specified iterables collection of elements from the exclusion list of the range.
      *
-     * @param elements The iterable collection of elements to be excluded from the range.
+     * @param elements The iterables collection of elements to be excluded from the range.
      * @since 1.0.0
      */
     operator fun minus(elements: Iterable<T>) {
@@ -582,7 +582,7 @@ class OpenEndRangeWithExclusions<T : Comparable<T>>(
      * Removes the specified elements from the exclusion list.
      *
      * This method modifies the current exclusion list by removing all elements
-     * provided in the input iterable. Any element in the input collection that
+     * provided in the input iterables. Any element in the input collection that
      * is present in the exclusion list will be removed.
      *
      * @param elements The collection of elements to be removed from the exclusion list.
@@ -685,7 +685,7 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
          * Creates a new `OpenEndRangeWithConditions` instance that represents the current range
          * excluding elements that satisfy the specified conditions.
          *
-         * @param conditions An iterable collection of predicates representing the conditions to exclude
+         * @param conditions An iterables collection of predicates representing the conditions to exclude
          * elements from the range. Each predicate is evaluated to determine if a value should be excluded.
          * @since 1.0.0
          */
@@ -729,7 +729,7 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
     /**
      * Adds all the provided conditions to the existing conditions of the range.
      *
-     * @param conditions An iterable of predicates to be added as conditions to the range.
+     * @param conditions An iterables of predicates to be added as conditions to the range.
      * @since 1.0.0
      */
     infix fun conditions(conditions: Iterable<Predicate<T>>) {
@@ -750,7 +750,7 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
      * This operator function allows the removal of multiple predicates
      * from the range's conditions in a single operation.
      *
-     * @param condition An iterable collection of predicates to be removed
+     * @param condition An iterables collection of predicates to be removed
      *                  from the range's conditions.
      * @since 1.0.0
      */
@@ -779,7 +779,7 @@ class OpenEndRangeWithConditions<T : Comparable<T>>(
     /**
      * Removes all specified conditions from the existing set of conditions.
      *
-     * @param conditions an iterable collection of predicates to be removed
+     * @param conditions an iterables collection of predicates to be removed
      * @since 1.0.0
      */
     infix fun removeConditions(conditions: Iterable<Predicate<T>>) {
@@ -921,7 +921,7 @@ class IntRangeWithExclusions(
          * Creates a new `IntClosedRangeWithExclusions` from the current `IntRange` by
          * excluding a specified collection of integer elements.
          *
-         * @param elements An iterable collection of integers to exclude from the range.
+         * @param elements An iterables collection of integers to exclude from the range.
          * @since 1.0.0
          */
         infix fun IntRange.exclude(elements: Iterable<Int>) =
@@ -945,7 +945,7 @@ class IntRangeWithExclusions(
                 return IntRangeWithExclusions(
                     node.get("start").asInt(),
                     node.get("endInclusive").asInt(),
-                    node.get("excluded").asList<Int>()().toMList()
+                    node.get("excluded").asList<Int>().toMList()
                 )
             }
         }
@@ -968,7 +968,7 @@ class IntRangeWithExclusions(
                 return IntRangeWithExclusions(
                     node.get("start").asInt(),
                     node.get("endInclusive").asInt(),
-                    node.get("excluded").asList<Int>()().toMList()
+                    node.get("excluded").asList<Int>().toMList()
                 )
             }
         }
@@ -1090,12 +1090,12 @@ class IntRangeWithExclusions(
         excluded.addAll(elements.toList())
     }
     /**
-     * Adds the specified iterable of integers to the excluded range.
+     * Adds the specified iterables of integers to the excluded range.
      *
-     * This method appends all the elements in the provided iterable to the exclusions
+     * This method appends all the elements in the provided iterables to the exclusions
      * of the current range, effectively marking them as excluded from the range.
      *
-     * @param elements An iterable collection of integers to be excluded from the range.
+     * @param elements An iterables collection of integers to be excluded from the range.
      * @since 1.0.0
      */
     infix fun exlude(elements: Iterable<Int>) {
@@ -1146,7 +1146,7 @@ class IntRangeWithExclusions(
     /**
      * Removes the specified elements from the exclusions list of the range.
      *
-     * @param elements An iterable collection of integers to be removed from the exclusions.
+     * @param elements An iterables collection of integers to be removed from the exclusions.
      * @since 1.0.0
      */
     infix fun removeExclusions(elements: Iterable<Int>) {
@@ -1310,7 +1310,7 @@ class UIntRangeWithExclusions(
                 return UIntRangeWithExclusions(
                     node.get("start").asString().toUInt(),
                     node.get("endInclusive").asString().toUInt(),
-                    node.get("excluded").asList<String>()().map(String::toUInt).toMList()
+                    node.get("excluded").asList<String>().map(String::toUInt).toMList()
                 )
             }
         }
@@ -1333,7 +1333,7 @@ class UIntRangeWithExclusions(
                 return UIntRangeWithExclusions(
                     node.get("start").asText().toUInt(),
                     node.get("endInclusive").asText().toUInt(),
-                    node.get("excluded").asList<String>()().map(String::toUInt).toMList()
+                    node.get("excluded").asList<String>().map(String::toUInt).toMList()
                 )
             }
         }
@@ -1447,12 +1447,12 @@ class UIntRangeWithExclusions(
         excluded.addAll(elements.toList())
     }
     /**
-     * Adds the specified iterable collection of `UInt` elements to the exclusion list.
+     * Adds the specified iterables collection of `UInt` elements to the exclusion list.
      *
-     * The elements from the provided iterable will be included in the internal
+     * The elements from the provided iterables will be included in the internal
      * exclusion collection, effectively marking them as excluded.
      *
-     * @param elements The iterable collection of `UInt` elements to be added to the exclusion list.
+     * @param elements The iterables collection of `UInt` elements to be added to the exclusion list.
      * @since 5.0.0
      */
     infix fun exlude(elements: Iterable<UInt>) {
@@ -1471,7 +1471,7 @@ class UIntRangeWithExclusions(
     /**
      * Subtracts the specified elements from the current collection.
      *
-     * @param elements an iterable collection of unsigned integers to be removed
+     * @param elements an iterables collection of unsigned integers to be removed
      * @since 5.0.0
      */
     operator fun minus(elements: Iterable<UInt>) {
@@ -1499,7 +1499,7 @@ class UIntRangeWithExclusions(
     /**
      * Removes the specified elements from the set of excluded values.
      *
-     * This function takes an iterable collection of `UInt` and removes all the provided elements
+     * This function takes an iterables collection of `UInt` and removes all the provided elements
      * from the `excluded` set. It ensures that the exclusions are updated by eliminating these elements.
      *
      * @param elements The collection of unsigned integers to be removed from the exclusions.
@@ -1645,7 +1645,7 @@ class IntRangeWithConditions(
          * The resulting range retains the original start and end bounds but applies the provided exclusion
          * conditions to filter out specific integers during its usage.
          *
-         * @param elements An iterable collection of predicates that define the exclusion conditions.
+         * @param elements An iterables collection of predicates that define the exclusion conditions.
          *                 Each predicate represents a condition for excluding integers from the range.
          * @since 1.0.0
          */
@@ -1756,13 +1756,13 @@ class IntRangeWithConditions(
         this.conditions.addAll(conditions)
     }
     /**
-     * Adds the specified iterable of conditions to the current list of conditions.
+     * Adds the specified iterables of conditions to the current list of conditions.
      *
-     * This function appends all predicates from the given iterable to the `conditions` collection
+     * This function appends all predicates from the given iterables to the `conditions` collection
      * of the current instance. The conditions are used to specify constraints or filters
      * for the range of integers represented by this class.
      *
-     * @param conditions An iterable collection of predicates, where each predicate is a condition
+     * @param conditions An iterables collection of predicates, where each predicate is a condition
      *                   to be applied to the range.
      * @since 1.0.0
      */
@@ -1779,9 +1779,9 @@ class IntRangeWithConditions(
         conditions.add(condition)
     }
     /**
-     * Removes an iterable collection of predicates from the range's current conditions.
+     * Removes an iterables collection of predicates from the range's current conditions.
      *
-     * @param condition the iterable collection of predicates to be removed from the conditions.
+     * @param condition the iterables collection of predicates to be removed from the conditions.
      * @since 1.0.0
      */
     operator fun minus(condition: Iterable<Predicate<Int>>) {
@@ -1810,7 +1810,7 @@ class IntRangeWithConditions(
     /**
      * Removes a collection of conditions from the current list of conditions.
      *
-     * @param conditions an iterable collection of conditions to be removed, where each condition is represented as a predicate of type `Predicate<Int>`.
+     * @param conditions an iterables collection of conditions to be removed, where each condition is represented as a predicate of type `Predicate<Int>`.
      * @since 1.0.0
      */
     infix fun removeConditions(conditions: Iterable<Predicate<Int>>) {
@@ -1917,10 +1917,10 @@ class UIntRangeWithConditions(
      * Retrieves the last element of a collection or sequence.
      *
      * This property provides a shorthand access to the `last()` function,
-     * which returns the last element of the iterable. If the iterable is empty,
+     * which returns the last element of the iterables. If the iterables is empty,
      * an exception will be thrown.
      *
-     * @throws NoSuchElementException if the iterable is empty.
+     * @throws NoSuchElementException if the iterables is empty.
      * @since 5.0.0
      */
     val last get() = last()
@@ -2062,7 +2062,7 @@ class UIntRangeWithConditions(
     /**
      * Adds the specified collection of conditions to the current list of conditions.
      *
-     * @param conditions An iterable collection of predicates defining conditions to be added.
+     * @param conditions An iterables collection of predicates defining conditions to be added.
      * @since 5.0.0
      */
     infix fun conditions(conditions: Iterable<Predicate<UInt>>) {
@@ -2080,7 +2080,7 @@ class UIntRangeWithConditions(
     /**
      * Subtracts a collection of predicates from the current condition set by adding them to the existing conditions.
      *
-     * @param condition An iterable collection of predicates of type `UInt` to be added to the conditions.
+     * @param condition An iterables collection of predicates of type `UInt` to be added to the conditions.
      * @since 5.0.0
      */
     operator fun minus(condition: Iterable<Predicate<UInt>>) {
@@ -2110,7 +2110,7 @@ class UIntRangeWithConditions(
     /**
      * Removes a collection of conditions from the current set of conditions.
      *
-     * @param conditions An iterable collection of conditions (predicates) to be removed.
+     * @param conditions An iterables collection of conditions (predicates) to be removed.
      * @since 5.0.0
      */
     infix fun removeConditions(conditions: Iterable<Predicate<UInt>>) {
@@ -2260,10 +2260,10 @@ class LongRangeWithExclusions(
         /**
          * Creates a new `LongRangeWithExclusions` by excluding the specified elements from this range.
          *
-         * This function takes an iterable collection of long values and excludes them from the current range,
+         * This function takes an iterables collection of long values and excludes them from the current range,
          * resulting in a modified representation of the range that accounts for the exclusions.
          *
-         * @param elements An iterable collection of `Long` values to be excluded from the range.
+         * @param elements An iterables collection of `Long` values to be excluded from the range.
          * @since 3.1.0
          */
         infix fun LongRange.exclude(elements: Iterable<Long>) =
@@ -2287,7 +2287,7 @@ class LongRangeWithExclusions(
                 return LongRangeWithExclusions(
                     node.get("start").asLong(),
                     node.get("endInclusive").asLong(),
-                    node.get("excluded").asList<Long>()().toMList()
+                    node.get("excluded").asList<Long>().toMList()
                 )
             }
         }
@@ -2310,7 +2310,7 @@ class LongRangeWithExclusions(
                 return LongRangeWithExclusions(
                     node.get("start").asLong(),
                     node.get("endInclusive").asLong(),
-                    node.get("excluded").asList<Long>()().toMList()
+                    node.get("excluded").asList<Long>().toMList()
                 )
             }
         }
@@ -2435,12 +2435,12 @@ class LongRangeWithExclusions(
         excluded.addAll(elements.toList())
     }
     /**
-     * Adds the specified iterable of `Long` elements to the exclusions.
+     * Adds the specified iterables of `Long` elements to the exclusions.
      *
      * This function allows the exclusion of multiple `Long` values from the range by adding
-     * all elements in the provided iterable to the excluded set.
+     * all elements in the provided iterables to the excluded set.
      *
-     * @param elements an iterable collection of `Long` values to be excluded.
+     * @param elements an iterables collection of `Long` values to be excluded.
      * @since 3.1.0
      */
     infix fun exlude(elements: Iterable<Long>) {
@@ -2461,7 +2461,7 @@ class LongRangeWithExclusions(
     /**
      * Removes the specified elements from the existing collection by adding them to the exclusion list.
      *
-     * @param elements An iterable collection of Long values to be excluded.
+     * @param elements An iterables collection of Long values to be excluded.
      * @since 3.1.0
      */
     operator fun minus(elements: Iterable<Long>) {
@@ -2495,11 +2495,11 @@ class LongRangeWithExclusions(
     /**
      * Removes the specified elements from the excluded set of this range.
      *
-     * This function takes an iterable of `Long` elements and ensures that each element
+     * This function takes an iterables of `Long` elements and ensures that each element
      * is removed from the exclusions in the current range. If the elements are not present
      * in the excluded set, no changes are made for those elements.
      *
-     * @param elements the iterable collection of `Long` values to be removed from the excluded set.
+     * @param elements the iterables collection of `Long` values to be removed from the excluded set.
      * @since 3.1.0
      */
     infix fun removeExclusions(elements: Iterable<Long>) {
@@ -2634,7 +2634,7 @@ class ULongRangeWithExclusions(
         /**
          * Creates a new `ULongRangeWithExclusions` by excluding a set of elements from the current `ULongRange`.
          *
-         * @param elements An iterable collection of `ULong` values that should be excluded from the range.
+         * @param elements An iterables collection of `ULong` values that should be excluded from the range.
          * @since 5.0.0
          */
         infix fun ULongRange.exclude(elements: Iterable<ULong>) =
@@ -2658,7 +2658,7 @@ class ULongRangeWithExclusions(
                 return ULongRangeWithExclusions(
                     node.get("start").asString().toULong(),
                     node.get("endInclusive").asString().toULong(),
-                    node.get("excluded").asList<String>()().map(String::toULong).toMList()
+                    node.get("excluded").asList<String>().map(String::toULong).toMList()
                 )
             }
         }
@@ -2681,7 +2681,7 @@ class ULongRangeWithExclusions(
                 return ULongRangeWithExclusions(
                     node.get("start").asText().toULong(),
                     node.get("endInclusive").asText().toULong(),
-                    node.get("excluded").asList<String>()().map(String::toULong).toMList()
+                    node.get("excluded").asList<String>().map(String::toULong).toMList()
                 )
             }
         }
@@ -2817,7 +2817,7 @@ class ULongRangeWithExclusions(
     /**
      * Subtracts the specified elements from the collection by adding them to the excluded list.
      *
-     * @param elements The iterable collection of unsigned long integers to be subtracted.
+     * @param elements The iterables collection of unsigned long integers to be subtracted.
      * @since 5.0.0
      */
     operator fun minus(elements: Iterable<ULong>) {
@@ -2995,7 +2995,7 @@ class LongRangeWithConditions(
          * This function creates a new `LongRangeWithConditions` instance with conditions applied based on the provided predicates.
          * The resulting range excludes elements that satisfy one or more of the given conditions.
          *
-         * @param elements An iterable collection of predicates of type `Predicate<Long>`. Each predicate defines a condition
+         * @param elements An iterables collection of predicates of type `Predicate<Long>`. Each predicate defines a condition
          *                 for excluding elements from the range.
          * @return A new instance of `LongRangeWithConditions` with the specified exclusion conditions applied.
          * @since 3.1.0
@@ -3107,13 +3107,13 @@ class LongRangeWithConditions(
         this.conditions.addAll(conditions)
     }
     /**
-     * Adds the provided iterable of conditions to the current set of conditions.
+     * Adds the provided iterables of conditions to the current set of conditions.
      *
-     * This method appends all the predicates from the given iterable to the internal
+     * This method appends all the predicates from the given iterables to the internal
      * list of conditions. These conditions are used to evaluate and filter elements
      * in the context of this object.
      *
-     * @param conditions An iterable collection of predicates, where each predicate
+     * @param conditions An iterables collection of predicates, where each predicate
      * evaluates a `Long` value and returns a boolean result. Each predicate defines
      * a specific condition to be applied.
      * @since 3.1.0
@@ -3131,11 +3131,11 @@ class LongRangeWithConditions(
         conditions.add(condition)
     }
     /**
-     * Subtracts the given iterable of predicates from the existing collection of conditions.
+     * Subtracts the given iterables of predicates from the existing collection of conditions.
      *
      * The method adds the specified predicates to the current list of conditions.
      *
-     * @param condition an iterable collection of predicates to be added to the conditions list.
+     * @param condition an iterables collection of predicates to be added to the conditions list.
      * @since 3.1.0
      */
     operator fun minus(condition: Iterable<Predicate<Long>>) {
@@ -3169,7 +3169,7 @@ class LongRangeWithConditions(
      * This function takes an `Iterable` of predicates and removes all matching predicates
      * from the existing conditions within the class.
      *
-     * @param conditions the iterable collection of predicates to be removed. Each predicate is a function
+     * @param conditions the iterables collection of predicates to be removed. Each predicate is a function
      * that evaluates a `Long` value and returns a boolean result.
      * @since 3.1.0
      */
@@ -3319,7 +3319,7 @@ class ULongRangeWithConditions(
          * Excludes the specified conditions from the current `ULongRange`, returning a new
          * `ULongRangeWithConditions` containing the original range with the specified conditions applied.
          *
-         * @param elements An iterable collection of predicates, where each predicate defines a condition
+         * @param elements An iterables collection of predicates, where each predicate defines a condition
          *                 for excluding an element from the range.
          * @since 5.0.0
          */
@@ -3429,7 +3429,7 @@ class ULongRangeWithConditions(
     /**
      * Adds a collection of conditions to the current set of conditions.
      *
-     * @param conditions An iterable collection of predicates that evaluate ULong values.
+     * @param conditions An iterables collection of predicates that evaluate ULong values.
      *                   Each predicate represents a condition to be added.
      * @since 5.0.0
      */
@@ -3448,9 +3448,9 @@ class ULongRangeWithConditions(
         conditions.add(condition)
     }
     /**
-     * Subtracts the specified iterable of predicates from the existing conditions.
+     * Subtracts the specified iterables of predicates from the existing conditions.
      *
-     * @param condition An iterable containing the predicates to be removed from the current conditions.
+     * @param condition An iterables containing the predicates to be removed from the current conditions.
      * @since 5.0.0
      */
     operator fun minus(condition: Iterable<Predicate<ULong>>) {
@@ -3478,7 +3478,7 @@ class ULongRangeWithConditions(
     /**
      * Removes the specified conditions from the current set of conditions.
      *
-     * @param conditions An iterable collection of predicates of type `Predicate<ULong>` to be removed.
+     * @param conditions An iterables collection of predicates of type `Predicate<ULong>` to be removed.
      * @since 5.0.0
      */
     infix fun removeConditions(conditions: Iterable<Predicate<ULong>>) {

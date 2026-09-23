@@ -32,7 +32,7 @@ import kotlin.toString
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The map is empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is empty.", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException("The map is empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The map is empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -55,7 +55,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -73,7 +73,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(causeOf: Transformer<T, Throwable>? = nul
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -90,7 +90,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(property: KProperty<*>?, variableName: St
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -108,7 +108,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(property: KProperty<*>?, variable: KPrope
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -125,7 +125,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(callable: KFunction<*>?, parameterName: S
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -142,7 +142,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(callable: KFunction<*>?, parameter: KPara
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -159,7 +159,7 @@ fun <T : Map<*, *>> T.validateNotEmpty(callableName: String?, parameterName: Str
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateNotEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
+    if (isEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -180,7 +180,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The map is null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is null or empty.", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException("The map is null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The map is null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -199,7 +199,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(causeOf: Transformer<T, Throwable>
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -223,7 +223,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(property: KProperty<*>?, variableN
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -244,7 +244,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(property: KProperty<*>?, variable:
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -266,7 +266,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -287,7 +287,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callable: KFunction<*>?, parameter
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -308,7 +308,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callableName: String?, parameterNa
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -332,7 +332,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callableName: String?, parameter: 
         (this@validateNotNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNotNullOrEmpty != null)
     }
-    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
+    if (isNullOrEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -354,7 +354,7 @@ fun <T : Map<*, *>?> T.validateNotNullOrEmpty(callableName: String?, parameter: 
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The map is not empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is not empty.", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException("The map is not empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The map is not empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -370,7 +370,7 @@ fun <T : Map<*, *>> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, 
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -387,7 +387,7 @@ fun <T : Map<*, *>> T.validateEmpty(causeOf: Transformer<T, Throwable>? = null, 
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -404,7 +404,7 @@ fun <T : Map<*, *>> T.validateEmpty(property: KProperty<*>?, variableName: Strin
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -421,7 +421,7 @@ fun <T : Map<*, *>> T.validateEmpty(property: KProperty<*>?, variable: KProperty
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -438,7 +438,7 @@ fun <T : Map<*, *>> T.validateEmpty(callable: KFunction<*>?, parameterName: Stri
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -455,7 +455,7 @@ fun <T : Map<*, *>> T.validateEmpty(callable: KFunction<*>?, parameter: KParamet
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -472,7 +472,7 @@ fun <T : Map<*, *>> T.validateEmpty(callableName: String?, parameterName: String
  */
 @IgnorableReturnValue
 fun <T : Map<*, *>> T.validateEmpty(callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
+    if (isNotEmpty()) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -494,7 +494,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? =
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The map is not null or empty.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("The map is not null or empty.", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException("The map is not null or empty.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("The map is not null or empty.", cause?.invoke(this)))
     return this
 }
 /**
@@ -513,7 +513,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(causeOf: Transformer<T, Throwable>? =
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -539,7 +539,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(property: KProperty<*>?, variableName
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -559,7 +559,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(property: KProperty<*>?, variable: KP
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -588,7 +588,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(callable: KFunction<*>?, parameterNam
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -610,7 +610,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(callable: KFunction<*>?, parameter: K
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -635,7 +635,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(callableName: String?, parameterName:
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 /**
@@ -658,7 +658,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(callableName: String?, parameter: KPa
         (this@validateNullOrEmpty != null) implies returnsNotNull()
         returnsNotNull() implies (this@validateNullOrEmpty != null)
     }
-    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
+    if (isNotNullOrEmpty) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "is not null or empty", cause?.invoke(this)))
     return this
 }
 
@@ -677,7 +677,7 @@ fun <T : Map<*, *>?> T.validateNullOrEmpty(callableName: String?, parameter: KPa
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException("$pair is not in the map.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$pair is not in the map.", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException("$pair is not in the map.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$pair is not in the map.", cause?.invoke(this)))
     return this
 }
 /**
@@ -696,7 +696,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null, lazyMessage: Transformer<M, Any>): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -715,7 +715,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn'M contain $pair", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn'M contain $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -734,7 +734,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, property: KProper
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn'M contain $pair", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn'M contain $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -751,7 +751,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, property: KProper
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -769,7 +769,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -788,7 +788,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -809,7 +809,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callableName: Str
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)))
+    if (pair !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -827,7 +827,7 @@ fun <M : Map<K, V>, K, V> M.validateContains(pair: Pair<K, V>, callableName: Str
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException("$pair is in the map.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$pair is in the map.", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException("$pair is in the map.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$pair is in the map.", cause?.invoke(this)))
     return this
 }
 /**
@@ -843,7 +843,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, causeOf: Trans
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null, lazyMessage: Transformer<M, Any>): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -861,7 +861,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, causeOf: Trans
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $pair", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -879,7 +879,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, property: KPro
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $pair", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -897,7 +897,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, property: KPro
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $pair", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -916,7 +916,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callable: KFun
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $pair", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -936,7 +936,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callable: KFun
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $pair", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -955,7 +955,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callableName: 
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (pair in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $pair", cause?.invoke(this)))
+    if (pair in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $pair", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $pair", cause?.invoke(this)))
     return this
 }
 /**
@@ -973,7 +973,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContains(pair: Pair<K, V>, callableName: 
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException("$key is not in the map.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$key is not in the map.", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException("$key is not in the map.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$key is not in the map.", cause?.invoke(this)))
     return this
 }
 /**
@@ -993,7 +993,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, causeOf: Transformer<M, 
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null, lazyMessage: Transformer<M, Any>): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1011,7 +1011,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, causeOf: Transformer<M, 
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn'M contain $key", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn'M contain $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1030,7 +1030,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn'M contain $key", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn'M contain $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1048,7 +1048,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, property: KProperty<*>?,
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1066,7 +1066,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1085,7 +1085,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callable: KFunction<*>?,
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1103,7 +1103,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)))
+    if (key !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1119,7 +1119,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsKey(key: K, callableName: String?, p
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException("$key is in the map.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$key is in the map.", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException("$key is in the map.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$key is in the map.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1136,7 +1136,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null, lazyMessage: Transformer<M, Any>): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1155,7 +1155,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $key", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1173,7 +1173,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $key", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1196,7 +1196,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, property: KProperty<*
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $key", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1214,7 +1214,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $key", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1232,7 +1232,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $key", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1250,7 +1250,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callableName: String?
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (key in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $key", cause?.invoke(this)))
+    if (key in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $key", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $key", cause?.invoke(this)))
     return this
 }
 /**
@@ -1269,7 +1269,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsKey(key: K, callableName: String?
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException("$value is not in the map.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$value is not in the map.", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException("$value is not in the map.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$value is not in the map.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1285,7 +1285,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null, lazyMessage: Transformer<M, Any>): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1303,7 +1303,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn'M contain $value", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn'M contain $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1321,7 +1321,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, property: KProperty<
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn'M contain $value", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn'M contain $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1340,7 +1340,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, property: KProperty<
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1358,7 +1358,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callable: KFunction<
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1376,7 +1376,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callable: KFunction<
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn'M contain $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1398,7 +1398,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callableName: String
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)))
+    if (!containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn'M contain $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1414,7 +1414,7 @@ fun <M : Map<K, V>, K, V> M.validateContainsValue(value: V, callableName: String
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException("$value is in the map.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$value is in the map.", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException("$value is in the map.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$value is in the map.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1431,7 +1431,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null, lazyMessage: Transformer<M, Any>): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1450,7 +1450,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, causeOf: Transfor
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $value", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1468,7 +1468,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, property: KProper
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $value", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1487,7 +1487,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, property: KProper
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $value", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1505,7 +1505,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $value", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1524,7 +1524,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callable: KFuncti
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $value", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $value", cause?.invoke(this)))
     return this
 }
 /**
@@ -1543,7 +1543,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callableName: Str
  */
 @IgnorableReturnValue
 fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<M, Throwable>? = null, cause: Transformer<M, Throwable>? = null): M {
-    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $value", cause?.invoke(this)))
+    if (containsValue(value)) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $value", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $value", cause?.invoke(this)))
     return this
 }
 
@@ -1560,7 +1560,7 @@ fun <M : Map<K, V>, K, V> M.validateNotContainsValue(value: V, callableName: Str
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException("The map is not of size $size.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("The map is not of size $size.", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException("The map is not of size $size.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("The map is not of size $size.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1577,7 +1577,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, causeOf: Transformer<T, Throwa
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1595,7 +1595,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, causeOf: Transformer<T, Throwa
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1613,7 +1613,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1632,7 +1632,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1652,7 +1652,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1673,7 +1673,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1692,7 +1692,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)))
+    if (this.size != size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is not of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1711,7 +1711,7 @@ fun <T : Map<K, V>, K, V> T.expectSize(size: Int, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException("The map is of size $size.", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException("The map is of size $size.", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException("The map is of size $size.", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException("The map is of size $size.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1728,7 +1728,7 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, causeOf: Transformer<T, Thr
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null, lazyMessage: Transformer<T, Any>): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1747,7 +1747,7 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, causeOf: Transformer<T, Thr
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variableName, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1766,7 +1766,7 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, property: KProperty<*>?, va
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(property, variable, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1784,7 +1784,7 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, property: KProperty<*>?, va
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameterName, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1803,7 +1803,7 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callable: KFunction<*>?, pa
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callable: KFunction<*>?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callable, parameter, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1821,7 +1821,7 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callable: KFunction<*>?, pa
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameterName, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }
 /**
@@ -1840,6 +1840,6 @@ fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callableName: String?, para
  */
 @IgnorableReturnValue
 fun <T : Map<K, V>, K, V> T.expectNotSize(size: Int, callableName: String?, parameter: KParameter?, message: String? = null, causeOf: Transformer<T, Throwable>? = null, cause: Transformer<T, Throwable>? = null): T {
-    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).initCause(ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)))
+    if (this.size == size) throw if (causeOf == null) ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)) else causeOf(this).withRootCause(ExpectationMismatchException(callableName, parameter, message ?: "is of size $size", cause?.invoke(this)))
     return this
 }

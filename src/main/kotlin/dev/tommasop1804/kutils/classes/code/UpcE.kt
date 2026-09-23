@@ -16,6 +16,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.computeCheckDigit
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -28,6 +30,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents a UPC-E formatted barcode.
@@ -92,17 +95,20 @@ value class UpcE private constructor(override val value: String) : CharSequence,
         fun CharSequence.isValidUpcE() = matches(Regex("[0-9]{8}")) && computeCheckDigit(toString() - 1) == this[7]
 
         /**
-         * Converts the current string into a UPC_E-compatible object by filtering out non-digit characters and
-         * attempting to parse the result as a UPC_A instance.
+         * Converts the current character sequence to a UPC-E format by filtering only the digit characters
+         * and attempting to construct a `UpcE` instance. If the conversion fails, an `InvalidFormat`
+         * error is returned.
          *
-         * The function processes the string by retaining only numeric characters, then creates a `UPC_A` instance
-         * if the filtered content is valid for a UPC_A barcode.
-         *
-         * @receiver The string to be converted to a UPC_E-compatible format.
-         * @return A `Result` wrapping a `UPC_A` instance if the conversion is successful, or an exception otherwise.
-         * @since 3.0.0
+         * @receiver The original character sequence to be transformed into a UPC-E representation.
+         * @return An `Either` object containing either a successful `UpcE` instance if the conversion is
+         *         valid, or an `InvalidFormat` error if the input is invalid.
+         * @since 6.1.0
          */
-        fun CharSequence.toUpcE() = filter { it.isDigit() }.run { runCatching { UpcA(this) } }
+        fun CharSequence.toUpcE() = filter { it.isDigit() }.run { either {
+            catching({ UpcE(this@toUpcE) }) { t: Throwable ->
+                InvalidFormatOfType(this@toUpcE, typeOf<UpcE>(), t)
+            }
+        } }
 
         class Serializer : ValueSerializer<UpcE>() {
             override fun serialize(value: UpcE, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

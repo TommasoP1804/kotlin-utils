@@ -9,11 +9,13 @@
 package dev.tommasop1804.kutils
 
 import dev.tommasop1804.kutils.annotations.*
-import dev.tommasop1804.kutils.exceptions.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import kotlin.reflect.KClass
+import kotlin.reflect.typeOf
 
 /**
  * Represents different levels of logging severity.
@@ -115,29 +117,34 @@ enum class LogLevel(val levelInt: Int) {
     override fun toString() = levelName
 
     /**
-     * Converts the current `LogLevel` instance to its corresponding SLF4J `Level`.
+     * Converts the current `LogLevel` instance into the corresponding SLF4J logging level.
      *
-     * Uses the `levelName` property of the `LogLevel` enum to match and retrieve
-     * the associated SLF4J logging level.
+     * This method attempts to match the `levelName` property of the `LogLevel` instance
+     * to a valid SLF4J `Level` value. If the conversion is successful, the appropriate
+     * `Level` is returned wrapped in a `Right`. If the conversion fails, an instance
+     * of `InvalidConversionBetweenTypes` is returned wrapped in a `Left`.
      *
-     * @return The corresponding `Level` from SLF4J for the current `LogLevel` instance.
-     * @throws NoSuchEntryException If the `levelName` does not correspond to a valid SLF4J `Level`.
-     * @since 1.0.0
+     * @return An `Either` containing the corresponding SLF4J `Level` on success,
+     *         or an `InvalidConversionBetweenTypes` error if the conversion fails.
+     * @since 6.1.0
      */
-    fun toSlf4jLevel() = tryOrThrow({ -> NoSuchEntryException(Level::class, this) }) {
-        Level.valueOf(levelName)
-    }
+    fun toSlf4jLevel(): Either<InvalidConversionBetweenTypes, Level> = tryOrError({
+        InvalidConversionBetweenTypes(this, typeOf<LogLevel>(), typeOf<Level>(), it)
+    }) { Level.valueOf(levelName) }
     /**
-     * Converts the current `LogLevel` instance to its corresponding `java.util.logging.Level`.
+     * Converts the current `LogLevel` instance to its corresponding Java `java.util.logging.Level`.
      *
-     * Utilizes the `levelName` property of the `LogLevel` instance to match and retrieve
-     * the associated Java logging level. The method parses the `levelName` and maps it to
-     * an equivalent `Level` from the `java.util.logging` package.
+     * This method attempts to map the `levelName` property of the `LogLevel` instance
+     * to a valid Java logging level using `java.util.logging.Level.parse`. In case of
+     * an invalid mapping, an `InvalidConversionBetweenTypes` error is returned.
      *
-     * @return The corresponding `Level` from `java.util.logging` for the current `LogLevel` instance.
-     * @since 1.0.0
+     * @return An `Either` containing the corresponding `java.util.logging.Level` on success,
+     *         or an `InvalidConversionBetweenTypes` error if the conversion fails.
+     * @since 6.1.0
      */
-    fun toJavaLogLevel(): java.util.logging.Level = java.util.logging.Level.parse(levelName)
+    fun toJavaLogLevel(): Either<InvalidConversionBetweenTypes, java.util.logging.Level> = tryOrError({
+        InvalidConversionBetweenTypes(this, typeOf<LogLevel>(), typeOf<java.util.logging.Level>(), it)
+    }) { java.util.logging.Level.parse(levelName) }
 }
 
 /**

@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
+import jakarta.activation.MimeType
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -17,7 +20,11 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import java.net.URLConnection
 import java.nio.charset.Charset
+import java.nio.file.Files
+import kotlin.io.path.Path
+import kotlin.reflect.typeOf
 
 /**
  * Represents a media type, which consists of a MIME type and optional parameters.
@@ -34,25 +41,10 @@ import java.nio.charset.Charset
 @Suppress("unused")
 @MustUseReturnValues
 data class MediaType(
-    val mimeType: MimeType,
+    val type: String,
+    val subType: String,
     val parameters: StringMap = emptyMap(),
 ) : CharSequence {
-    /**
-     * Provides the type component of the MIME media type.
-     * The type represents the primary classification of the media type
-     * (e.g., "text", "image", "application").
-     *
-     * This property is derived from the `mimeType` field of the containing class.
-     * @since 2.0.0
-     */
-    val type: String get() = mimeType.type
-    /**
-     * The subtype component of the MIME type associated with this media type.
-     * Represents the secondary identifier in a MIME type, which follows the primary type and is separated by a forward slash.
-     * For example, in the MIME type "text/plain", "plain" is the subtype.
-     * @since 2.0.0
-     */
-    val subtype: String get() = mimeType.subtype
     /**
      * Retrieves the value of the "charset" parameter from the media type's parameter map.
      *
@@ -63,6 +55,16 @@ data class MediaType(
      */
     val charset: String? get() = parameters["charset"]
     /**
+     * A computed property that retrieves the suffix of the `subType` component of this `MediaType` instance.
+     *
+     * The suffix is defined as the portion of the `subType` that appears after the last occurrence
+     * of the `+` character. If no `+` character is present, the suffix will be an empty string.
+     *
+     * @return The subtype suffix extracted from the `subType` property.
+     * @since 6.1.0
+     */
+    val subTypeSuffix: String get() = subType.substringAfterLast(Char.PLUS)
+    /**
      * Computes the length of the string representation of the MediaType instance.
      *
      * The length is derived from the `toString` method, which formats the media type
@@ -71,15 +73,7 @@ data class MediaType(
      */
     override val length get() = toString().length
 
-    /**
-     * Constructs a new MediaType instance using the provided type, subtype, and optional parameters.
-     *
-     * @param type The primary type of the media type (e.g., "application", "text").
-     * @param subtype The specific subtype of the media type (e.g., "json", "plain").
-     * @param parameters An optional map of parameter key-value pairs associated with the media type.
-     * @since 2.0.0
-     */
-    constructor(type: String, subtype: String, parameters: StringMap = emptyMap()) : this(MimeType(type, subtype), parameters)
+
     /**
      * Constructs a new MediaType instance by parsing a string representation of a media type.
      *
@@ -92,7 +86,8 @@ data class MediaType(
      * @since 2.0.0
      */
     constructor(string: String) : this(parse(string)())
-    private constructor(mediaType: MediaType) : this(mediaType.mimeType, mediaType.parameters)
+
+    private constructor(mediaType: MediaType) : this(mediaType.type, mediaType.subType, mediaType.parameters)
 
     companion object {
         /**
@@ -107,7 +102,7 @@ data class MediaType(
          * from the `MimeType` enumeration or constants.
          * @since 2.0.0
          */
-        val APPLICATION_CBOR = MediaType(MimeType.APPLICATION_CBOR)
+        val APPLICATION_CBOR = MediaType("application", "cbor")
         /**
          * Represents a predefined `MediaType` instance for the `application/json` MIME type.
          *
@@ -119,7 +114,7 @@ data class MediaType(
          * which encapsulates the type and subtype (both set to `application` and `json`, respectively).
          * @since 2.0.0
          */
-        val APPLICATION_JSON = MediaType(MimeType.APPLICATION_JSON)
+        val APPLICATION_JSON = MediaType("application", "json")
         /**
          * Represents the media type `application/json` with the charset parameter explicitly set to `UTF-8`.
          * This ensures that JSON content is encoded and interpreted using the UTF-8 character encoding.
@@ -137,7 +132,7 @@ data class MediaType(
          * human-readable explanations.
          * @since 2.0.0
          */
-        val APPLICATION_PROBLEM_JSON = MediaType(MimeType.APPLICATION_PROBLEM_JSON)
+        val APPLICATION_PROBLEM_JSON = MediaType("application", "problem+json")
         /**
          * Represents the MIME type `application/merge-patch+json`.
          *
@@ -148,7 +143,7 @@ data class MediaType(
          * original and the desired state.
          * @since 3.2.0
          */
-        val APPLICATION_MERGE_PATCH_JSON = MediaType(MimeType.APPLICATION_MERGE_PATCH_JSON)
+        val APPLICATION_MERGE_PATCH_JSON = MediaType("application", "merge-patch+json")
         /**
          * Represents the MIME type `application/json-patch+json`.
          *
@@ -157,13 +152,13 @@ data class MediaType(
          * It conforms to the standard defined in RFC 6902.
          * @since 3.2.0
          */
-        val APPLICATION_JSON_PATCH_JSON = MediaType(MimeType.APPLICATION_JSON_PATCH_JSON)
+        val APPLICATION_JSON_PATCH_JSON = MediaType("application", "json-patch+json")
         /**
          * Represents the `application/x-ndjson` media type, commonly used for streaming newline-delimited JSON (NDJSON) data.
          * NDJSON is a format where each line contains a single JSON object, enabling efficient transmission of structured data.
          * @since 2.0.0
          */
-        val APPLICATION_NDJSON = MediaType(MimeType.APPLICATION_NDJSON)
+        val APPLICATION_NDJSON = MediaType("application", "x-ndjson")
         /**
          * Represents the `application/xml` media type.
          *
@@ -173,7 +168,7 @@ data class MediaType(
          * which is commonly used for structured data representation and transmission.
          * @since 2.0.0
          */
-        val APPLICATION_XML = MediaType(MimeType.APPLICATION_XML)
+        val APPLICATION_XML = MediaType("application", "xml")
         /**
          * Represents the media type for Atom XML documents.
          *
@@ -184,7 +179,7 @@ data class MediaType(
          * HTTP headers or APIs that require media type specification for Atom feeds.
          * @since 2.0.0
          */
-        val APPLICATION_ATOM_XML = MediaType(MimeType.APPLICATION_XML)
+        val APPLICATION_ATOM_XML = MediaType("application", "atom+xml")
         /**
          * Represents a media type for problems formatted as XML according to the "application/problem+xml" MIME type.
          *
@@ -192,7 +187,7 @@ data class MediaType(
          * that adhere to the RFC 7807 "Problem Details for HTTP APIs" standard using XML representation.
          * @since 2.0.0
          */
-        val APPLICATION_PROBLEM_XML = MediaType(MimeType.APPLICATION_PROBLEM_XML)
+        val APPLICATION_PROBLEM_XML = MediaType("application", "problem+xml")
         /**
          * Represents the media type for RSS XML content.
          *
@@ -201,7 +196,7 @@ data class MediaType(
          * and accuracy in specifying the associated MIME type.
          * @since 2.0.0
          */
-        val APPLICATION_RSS_XML = MediaType(MimeType.APPLICATION_RSS_XML)
+        val APPLICATION_RSS_XML = MediaType("application", "rss+xml")
         /**
          * Constant representing the media type for XHTML documents.
          *
@@ -214,7 +209,7 @@ data class MediaType(
          * with the semantic structure of HTML.
          * @since 2.0.0
          */
-        val APPLICATION_XHTML_XML = MediaType(MimeType.APPLICATION_XHTML_XML)
+        val APPLICATION_XHTML_XML = MediaType("application", "xhtml+xml")
         /**
          * A predefined `MediaType` instance representing the MIME type `application/pdf`.
          *
@@ -223,7 +218,7 @@ data class MediaType(
          * the desired format for request or response payloads in web applications.
          * @since 2.0.0
          */
-        val APPLICATION_PDF = MediaType(MimeType.APPLICATION_PDF)
+        val APPLICATION_PDF = MediaType("application", "pdf")
         /**
          * Represents the media type for arbitrary binary data.
          *
@@ -232,7 +227,7 @@ data class MediaType(
          * media type is `application/octet-stream`.
          * @since 2.0.0
          */
-        val APPLICATION_OCTET_STREAM = MediaType(MimeType.APPLICATION_OCTET_STREAM)
+        val APPLICATION_OCTET_STREAM = MediaType("application", "octet-stream")
         /**
          * Represents the media type `application/x-www-form-urlencoded`.
          *
@@ -243,7 +238,7 @@ data class MediaType(
          * and encapsulated in an instance of the `MediaType` class.
          * @since 2.0.0
          */
-        val APPLICATION_FORM_URLENCODED = MediaType(MimeType.APPLICATION_FORM_URLENCODED)
+        val APPLICATION_FORM_URLENCODED = MediaType("application", "x-www-form-urlencoded")
         /**
          * Represents the media type associated with `application/yaml`.
          *
@@ -258,7 +253,7 @@ data class MediaType(
          * the expected format for parsing or serializing YAML data.
          * @since 2.0.0
          */
-        val APPLICATION_YAML = MediaType(MimeType.APPLICATION_YAML)
+        val APPLICATION_YAML = MediaType("application", "yaml")
         /**
          * Represents the media type for a GraphQL response.
          *
@@ -267,13 +262,13 @@ data class MediaType(
          * of GraphQL-specific content in HTTP transactions.
          * @since 2.0.0
          */
-        val APPLICATION_GRAPHQL_RESPONSE = MediaType(MimeType.APPLICATION_GRAPHQL_RESPONSE)
+        val APPLICATION_GRAPHQL_RESPONSE = MediaType("application", "graphql-response+json")
         /**
          * A constant representing the media type for Protocol Buffers, defined as `application/protobuf`.
          * This is commonly used for specifying the MIME type of data serialized using Protocol Buffers.
          * @since 2.0.0
          */
-        val APPLICATION_PROTOBUF = MediaType(MimeType.APPLICATION_PROTOBUF)
+        val APPLICATION_PROTOBUF = MediaType("application", "protobuf")
         /**
          * Represents the MIME type for ZIP file content.
          *
@@ -281,7 +276,7 @@ data class MediaType(
          * `application/zip`, commonly used for compressed archive files in the ZIP format.
          * @since 2.0.0
          */
-        val APPLICATION_ZIP = MediaType(MimeType.APPLICATION_ZIP)
+        val APPLICATION_ZIP = MediaType("application", "zip")
 
         /**
          * Represents the plain text media type MIME type `text/plain`.
@@ -291,7 +286,7 @@ data class MediaType(
          * used to specify or indicate content that contains unformatted human-readable text.
          * @since 2.0.0
          */
-        val TEXT_PLAIN = MediaType(MimeType.TEXT_PLAIN)
+        val TEXT_PLAIN = MediaType("text", "plain")
         /**
          * Represents a `MediaType` instance for the "text/plain" MIME type with the character set explicitly
          * set to UTF-8. This is commonly used to specify plain text data encoded in UTF-8.
@@ -305,7 +300,7 @@ data class MediaType(
          * for representing HTML content in HTTP responses or other data exchanges.
          * @since 2.0.0
          */
-        val TEXT_HTML = MediaType(MimeType.TEXT_HTML)
+        val TEXT_HTML = MediaType("text", "html")
         /**
          * Represents a MediaType for HTML content with a UTF-8 character encoding.
          *
@@ -315,6 +310,17 @@ data class MediaType(
          */
         val TEXT_HTML_UTF8 = TEXT_HTML.withCharset("UTF-8")
         /**
+         * Represents the MIME type `text/css`.
+         *
+         * This constant is a predefined instance of the `MediaType` class, specifically for the `text/css` media type.
+         * It is commonly used to identify Cascading Style Sheets (CSS) resources in HTTP requests and responses.
+         *
+         * Use this constant to avoid directly creating a new `MediaType` instance for `text/css`.
+         *
+         * @since 6.1.0
+         */
+        val TEXT_CSS = MediaType("text", "css")
+        /**
          * Represents the `text/csv` media type as a predefined instance of [MediaType].
          *
          * This instance corresponds to the MIME type `text/csv`, commonly used for CSV
@@ -322,7 +328,20 @@ data class MediaType(
          *
          * @since 2.0.0
          */
-        val TEXT_CSV = MediaType(MimeType.TEXT_CSV)
+        val TEXT_CSV = MediaType("text", "csv")
+        /**
+         * Represents the MIME type for JavaScript resources, defined as `text/javascript`.
+         *
+         * This predefined constant simplifies the usage of the `MediaType` class for operations involving
+         * JavaScript-related content types within applications such as HTTP request or response handling,
+         * content negotiation, or MIME type matching.
+         *
+         * The `type` is set to `text` and the `subtype` is set to `javascript`, adhering to the standard
+         * MIME type format.
+         *
+         * @since 6.1.0
+         */
+        val TEXT_JAVASCRIPT = MediaType("text", "javascript")
         /**
          * Represents the `text/event-stream` media type.
          *
@@ -331,7 +350,7 @@ data class MediaType(
          * applications for sending event-driven data updates.
          * @since 2.0.0
          */
-        val TEXT_EVENT_STREAM = MediaType(MimeType.TEXT_EVENT_STREAM)
+        val TEXT_EVENT_STREAM = MediaType("text", "event-stream")
         /**
          * Represents a MediaType for textual content formatted in Markdown.
          *
@@ -340,7 +359,7 @@ data class MediaType(
          * typically used to indicate that the content is written in Markdown format.
          * @since 2.0.0
          */
-        val TEXT_MARKDOWN = MediaType(MimeType.TEXT_MARKDOWN)
+        val TEXT_MARKDOWN = MediaType("text", "markdown")
         /**
          * Represents the media type for XML content with a MIME type of "text/xml".
          *
@@ -348,7 +367,7 @@ data class MediaType(
          * in situations where the "text/xml" MIME type is applicable.
          * @since 2.0.0
          */
-        val TEXT_XML = MediaType(MimeType.TEXT_XML)
+        val TEXT_XML = MediaType("text", "xml")
 
         /**
          * Represents the media type for PNG images. This constant is a predefined `MediaType`
@@ -358,7 +377,7 @@ data class MediaType(
          * the application or APIs requiring standardized MIME type definitions.
          * @since 2.0.0
          */
-        val IMAGE_PNG = MediaType(MimeType.IMAGE_PNG)
+        val IMAGE_PNG = MediaType("image", "png")
         /**
          * Predefined `MediaType` instance representing the MIME type for JPEG image files.
          *
@@ -369,7 +388,37 @@ data class MediaType(
          * The instance encapsulates the `image/jpeg` MIME type using the `MediaType` class.
          * @since 2.0.0
          */
-        val IMAGE_JPEG = MediaType(MimeType.IMAGE_JPEG)
+        val IMAGE_JPEG = MediaType("image", "jpeg")
+        /**
+         * Represents the media type for the GIF image format.
+         *
+         * This constant encapsulates the MIME type `image/gif`, which is used to denote
+         * files encoded in the Graphics Interchange Format (GIF). It is commonly used for
+         * animated or static image content in web and multimedia applications.
+         *
+         * @since 6.1.0
+         */
+        val IMAGE_GIF = MediaType("image", "gif")
+        /**
+         * Represents the `image/svg+xml` media type, commonly used for Scalable Vector Graphics (SVG) files.
+         *
+         * This constant defines a specific instance of the `MediaType` class with the type `image`
+         * and the subtype `svg`. It is utilized to clearly denote the SVG file format in contexts
+         * where media type identification is required.
+         *
+         * @since 6.1.0
+         */
+        val IMAGE_SVG = MediaType("image", "svg")
+        /**
+         * Represents the "image/webp" media type.
+         *
+         * This constant is an instance of the `MediaType` class, with "image" as the primary type
+         * and "webp" as the subtype. It is commonly used to specify WebP image formats in HTTP
+         * headers or other data processing contexts.
+         *
+         * @since 6.1.0
+         */
+        val IMAGE_WEBP = MediaType("image", "webp")
 
         /**
          * Represents the MIME type for `multipart/form-data`, commonly used in HTTP
@@ -384,7 +433,7 @@ data class MediaType(
          * with the `MimeType.MULTIPART_FORM_DATA` value.
          * @since 2.0.0
          */
-        val MULTIPART_FORM_DATA = MediaType(MimeType.MULTIPART_FORM_DATA)
+        val MULTIPART_FORM_DATA = MediaType("multipart", "form-data")
         /**
          * Represents the MIME type `multipart/related`.
          *
@@ -395,7 +444,7 @@ data class MediaType(
          * Commonly applied in contexts like email attachments or SOAP with attachments.
          * @since 2.0.0
          */
-        val MULTIPART_RELATED = MediaType(MimeType.MULTIPART_RELATED)
+        val MULTIPART_RELATED = MediaType("multipart", "related")
         /**
          * Represents the `multipart/mixed` media type, commonly used to encapsulate multiple body parts
          * within a single request or response, where each part can have its own content type.
@@ -404,7 +453,7 @@ data class MediaType(
          * This instance is defined as a constant for convenience and denotes the MIME type `multipart/mixed`.
          * @since 2.0.0
          */
-        val MULTIPART_MIXED = MediaType(MimeType.MULTIPART_MIXED)
+        val MULTIPART_MIXED = MediaType("multipart", "mixed")
 
         /**
          * Represents a media type with a MIME type that matches any type and subtype.
@@ -414,27 +463,93 @@ data class MediaType(
          * where no specific MIME type is required.
          * @since 2.0.0
          */
-        val ANY = MediaType(MimeType.ANY)
+        val ANY = MediaType("*", "*")
+
+        private val KNOWN_EXTENSIONS: Map<String, MediaType> by lazy {
+            buildMap {
+                put("json", APPLICATION_JSON)
+                put("yaml", APPLICATION_YAML)
+                put("yml", APPLICATION_YAML)
+                put("xml", APPLICATION_XML)
+                put("pdf", APPLICATION_PDF)
+                put("zip", APPLICATION_ZIP)
+                put("cbor", APPLICATION_CBOR)
+                put("pb", APPLICATION_PROTOBUF)
+                put("proto", APPLICATION_PROTOBUF)
+                put("atom", APPLICATION_ATOM_XML)
+                put("rss", APPLICATION_RSS_XML)
+                put("txt", TEXT_PLAIN)
+                put("html", TEXT_HTML)
+                put("htm", TEXT_HTML)
+                put("css", TEXT_CSS)
+                put("csv", TEXT_CSV)
+                put("js", TEXT_JAVASCRIPT)
+                put("mjs", TEXT_JAVASCRIPT)
+                put("md", TEXT_MARKDOWN)
+                put("markdown", TEXT_MARKDOWN)
+                put("png", IMAGE_PNG)
+                put("jpg", IMAGE_JPEG)
+                put("jpeg", IMAGE_JPEG)
+                put("gif", IMAGE_GIF)
+                put("svg", IMAGE_SVG)
+                put("webp", IMAGE_WEBP)
+            }
+        }
 
         /**
-         * Parses a string representation of a media type into a MediaType instance.
+         * Parses a given string value into a `MediaType` instance or returns an `InvalidFormatOfType`
+         * if the input format is invalid.
          *
-         * The input string should consist of a MIME type followed by optional parameters
-         * separated by semicolons. Parameters should be in key-value format, with each key
-         * and value separated by an equals sign (`=`).
+         * The parsing process splits the input string by semicolons (`;`) to extract the MIME type
+         * and optional parameters. The first part of the string represents the MIME type, while
+         * subsequent parts are treated as key-value parameter pairs, separated by an equals sign (`=`).
          *
-         * @param value The string to be parsed, representing the media type and its parameters.
-         * @return A Result containing the MediaType instance if parsing succeeds, or an exception if parsing fails.
-         * @since 2.0.0
+         * @param value The input string to be parsed, expected to represent a media type and optional
+         *              parameters in the format "type/subtype; key1=value1; key2=value2".
+         * @return An `Either` containing:
+         *         - A `MediaType` instance if the input string is correctly formatted.
+         *         - An `InvalidFormatOfType` error if the input string is not in a valid media type format.
+         * @since 6.1.0
          */
-        fun parse(value: String) = runCatching {
+        infix fun parse(value: String): Either<InvalidFormatOfType, MediaType> = either { catching({
             val parts = value.split(';').map { it.trim() }
-            val mimeType = MimeType(parts.first())
             val params = parts.drop(1).associate { param ->
                 val [k, v] = param.split('=', limit = 2)
                 k.trim() to v.trim()
             }
-            MediaType(mimeType, params)
+            parts.first().splitAndTrim("/").let { MediaType(
+                it.first().validateNotEmpty(),
+                it.second().validateNotEmpty(),
+                params
+            ) }
+        }) { t: Throwable -> InvalidFormatOfType(value, typeOf<MediaType>(), t) } }
+
+        /**
+         * Attempts to resolve the MIME type from a given file extension.
+         *
+         * This method takes a file extension as input and performs several checks:
+         * - It first looks up the extension in a pre-defined map of known extensions.
+         * - If not found, it falls back to using the `URLConnection` API to determine the MIME type.
+         * - Finally, it leverages `Files.probeContentType` to probe the file type based on the extension.
+         *
+         * @param extension The file extension (e.g., "txt", "jpg", "pdf"). The extension may include or exclude a leading dot.
+         * @return An instance of [MimeType] representing the resolved MIME type if successful, or `null` if the type could not be determined.
+         * @since 6.1.0
+         */
+        infix fun fromExtension(extension: String): MediaType? {
+            val ext = (-extension).trimStart('.')
+            KNOWN_EXTENSIONS[ext]?.let { return it }
+
+            URLConnection.getFileNameMap().getContentTypeFor("file.$ext")
+                ?.let { runCatching { MediaType(it) }.getOrNull() }
+                ?.let { return it }
+
+            runCatching {
+                Files.probeContentType(Path("file.$ext"))
+                    ?.let { MediaType(it) }
+            }.getOrNull()?.let { return it }
+
+            return null
         }
 
         class Serializer : ValueSerializer<MediaType>() {
@@ -516,7 +631,9 @@ data class MediaType(
      * @return `true` if the MediaType instances match, `false` otherwise.
      * @since 2.0.0
      */
-    infix fun matches(other: MediaType): Boolean = mimeType.matches(other.mimeType)
+    infix fun matches(other: MediaType): Boolean =
+        (type == "*" || other.type == "*" || type == other.type) &&
+            (subType == "*" || other.subType == "*" || subType == other.subType)
 
     /**
      * Converts the media type to its string representation.
@@ -529,7 +646,7 @@ data class MediaType(
      * @since 2.0.0
      */
     override fun toString(): String = buildString {
-        append(mimeType)
+        append("$type/$subType")
         parameters.forEach { [k, v] -> append("; $k=$v") }
     }
 
@@ -540,7 +657,7 @@ data class MediaType(
      * @return The character at the specified index.
      * @since 2.0.0
      */
-    override fun get(index: Int): Char = this[index]
+    override fun get(index: Int): Char = toString()[index]
 
     /**
      * Returns a new character sequence that is a subsequence of this sequence.
@@ -550,7 +667,7 @@ data class MediaType(
      * @return A new character sequence that contains the characters from the specified range.
      * @since 2.0.0
      */
-    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = this.substring(startIndex, endIndex)
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = toString().subSequence(startIndex, endIndex)
 
     /**
      * Compares this MediaType instance with another object for equality.
@@ -566,9 +683,27 @@ data class MediaType(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MediaType) return false
-        if (mimeType != other.mimeType) return false
+        if (type != other.type) return false
+        if (subType != other.subType) return false
         if (!equalsParameters(other)) return false
         return true
+    }
+
+    /**
+     * Computes a hash code for this MediaType instance.
+     *
+     * The hash code is calculated based on the `type`, `subType`, and `parameters` properties of the MediaType.
+     * This ensures that two MediaType instances with the same `type`, `subType`, and `parameters` will produce
+     * the same hash code.
+     *
+     * @return The hash code value for the MediaType instance.
+     * @since 6.1.0
+     */
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + subType.hashCode()
+        result = 31 * result + parameters.hashCode()
+        return result
     }
 
     /**
@@ -588,63 +723,22 @@ data class MediaType(
     }
 
     /**
-     * Compares this instance's MIME type with another MIME type for equality.
+     * Compares the `type` and `subType` of this `MediaType` instance with another `MediaType` instance
+     * to determine if they are equal.
      *
-     * This method determines if the MIME type of this instance matches
-     * the MIME type of the provided `MimeType` object.
-     *
-     * @param other The MIME type to compare against.
-     * @return `true` if the MIME types are equal, `false` otherwise.
-     * @since 3.2.0
+     * @param other The `MediaType` instance to compare against.
+     * @return `true` if both the `type` and `subType` of the two `MediaType` instances are equal, `false` otherwise.
+     * @since 6.1.0
      */
-    infix fun equalsMimeType(other: MimeType): Boolean = mimeType == other
-    /**
-     * Compares the MIME type of this MediaType instance with another MediaType instance for equality.
-     *
-     * @param other The MediaType instance to compare with this MediaType instance.
-     * @return `true` if the MIME types of both MediaType instances are equal, `false` otherwise.
-     * @since 3.2.0
-     */
-    infix fun equalsMimeType(other: MediaType): Boolean = mimeType == other.mimeType
+    infix fun equalTypesAndSubTypes(other: MediaType): Boolean = type == other.type && subType == other.subType
 
     /**
-     * Compares the MIME type suffixes of this MediaType instance with another `MimeType` instance.
+     * Compares the `type` and `subTypeSuffix` of this `MediaType` instance with another `MediaType`
+     * instance to determine if they are equal.
      *
-     * This method evaluates whether the suffixes of the MIME types of the two instances are equal.
-     *
-     * @param other The `MimeType` instance to compare suffixes with.
-     * @return `true` if the MIME type suffixes are equal, `false` otherwise.
-     * @since 3.2.0
+     * @param other The `MediaType` instance to compare against.
+     * @return `true` if both the `type` and `subTypeSuffix` of the two `MediaType` instances are equal, `false` otherwise.
+     * @since 6.1.0
      */
-    infix fun equalsMimeTypeSuffixes(other: MimeType): Boolean = mimeType equalsSuffixes other
-    /**
-     * Compares the MIME type suffixes of this MediaType instance with another MediaType instance for equality.
-     *
-     * This method compares the suffixes of the `subtype` components of the MIME types. The comparison
-     * focuses on the portion of the `subtype` after the "+" character, ensuring that both the `type` values
-     * and the suffixes of the `subtype` values are equal.
-     *
-     * @param other The MediaType instance to compare with this MediaType instance.
-     * @return `true` if the `type` values are equal and the suffixes of the `subtype` values are also equal, `false` otherwise.
-     * @since 3.2.0
-     */
-    infix fun equalsMimeTypeSuffixes(other: MediaType): Boolean = mimeType equalsSuffixes other.mimeType
-
-    /**
-     * Computes the hash code for this MediaType instance.
-     *
-     * The hash code is calculated based on the `mimeType`, `parameters`, `type`, `subtype`, `charset`, and `length` properties.
-     * It ensures that equal instances of MediaType generate the same hash code, conforming to the contract of `hashCode` in Kotlin.
-     *
-     * @return The computed hash code as an integer.
-     */
-    override fun hashCode(): Int {
-        var result = mimeType.hashCode()
-        result = 31 * result + parameters.hashCode()
-        result = 31 * result + length
-        result = 31 * result + type.hashCode()
-        result = 31 * result + subtype.hashCode()
-        result = 31 * result + charset.hashCode()
-        return result
-    }
+    infix fun equalsTypeAndSubTypeSuffixes(other: MediaType): Boolean = type == other.type && subTypeSuffix == other.subTypeSuffix
 }

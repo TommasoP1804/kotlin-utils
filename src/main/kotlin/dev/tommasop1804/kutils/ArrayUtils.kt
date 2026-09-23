@@ -17,7 +17,9 @@ import Break
 import Continue
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
@@ -33,62 +35,6 @@ import kotlin.contracts.contract
  */
 val <E> Array<E>.isEmpty get() = isEmpty()
 /**
- * Extension property to check if the byte array is empty.
- *
- * @receiver The byte array being checked.
- * @return `true` if the byte array has no elements, otherwise `false`.
- * @since 5.0.0
- */
-val ByteArray.isEmpty get() = isEmpty()
-/**
- * Extension property that checks if the ShortArray is empty.
- *
- * @return `true` if the array has no elements, otherwise `false`.
- * @since 5.0.0
- */
-val ShortArray.isEmpty get() = isEmpty()
-/**
- * Extension property for IntArray that indicates whether the array is empty.
- * Returns `true` if the array contains no elements, otherwise `false`.
- * @since 5.0.0
- */
-val IntArray.isEmpty get() = isEmpty()
-/**
- * Checks if the `LongArray` is empty.
- *
- * @return `true` if the array contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-val LongArray.isEmpty get() = isEmpty()
-/**
- * Extension property to determine if a FloatArray is empty.
- *
- * @return `true` if the array has no elements, otherwise `false`.
- * @since 5.0.0
- */
-val FloatArray.isEmpty get() = isEmpty()
-/**
- * Extension property that checks if a [DoubleArray] is empty.
- *
- * @return `true` if the array contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-val DoubleArray.isEmpty get() = isEmpty()
-/**
- * Indicates whether the BooleanArray is empty.
- *
- * @return `true` if the array contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-val BooleanArray.isEmpty get() = isEmpty()
-/**
- * Extension property for [CharArray] that checks if the array is empty.
- *
- * @return `true` if the array contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-val CharArray.isEmpty get() = isEmpty()
-/**
  * Checks if the array is not empty.
  *
  * This property returns `true` if the array contains one or more elements,
@@ -96,62 +42,6 @@ val CharArray.isEmpty get() = isEmpty()
  * @since 5.0.0
  */
 val <E> Array<E>.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property for `ByteArray` that checks if the array is not empty.
- *
- * Returns `true` if the `ByteArray` contains one or more elements.
- * Returns `false` if the `ByteArray` is empty.
- * @since 5.0.0
- */
-val ByteArray.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property that returns `true` if the `ShortArray` is not empty, otherwise `false`.
- * @since 5.0.0
- */
-val ShortArray.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property to check if an IntArray is not empty.
- *
- * @receiver IntArray on which the property is accessed.
- * @return `true` if the array contains one or more elements, otherwise `false`.
- * @since 5.0.0
- */
-val IntArray.isNotEmpty get() = isNotEmpty()
-/**
- * A property that checks if the LongArray is not empty.
- *
- * Returns `true` if the array contains one or more elements, otherwise `false`.
- * @since 5.0.0
- */
-val LongArray.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property to check if a FloatArray is not empty.
- *
- * Returns `true` if the array contains one or more elements, otherwise `false`.
- * @since 5.0.0
- */
-val FloatArray.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property for `DoubleArray` that checks if the array is not empty.
- *
- * @return `true` if the array contains at least one element, otherwise `false`.
- * @since 5.0.0
- */
-val DoubleArray.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property that checks if the BooleanArray is not empty.
- *
- * @return `true` if the BooleanArray contains one or more elements, `false` otherwise.
- * @since 5.0.0
- */
-val BooleanArray.isNotEmpty get() = isNotEmpty()
-/**
- * Extension property for the CharArray class that checks if the array is not empty.
- *
- * @return True if the character array contains one or more elements, false otherwise.
- * @since 5.0.0
- */
-val CharArray.isNotEmpty get() = isNotEmpty()
 /**
  * Extension property for nullable arrays that checks whether the array is either null or empty.
  *
@@ -164,107 +54,7 @@ val <E> Array<E>?.isNullOrEmpty: Boolean get() {
     }
     return isNullOrEmpty()
 }
-/**
- * Extension property to check if a nullable [ByteArray] is either null or empty.
- *
- * @return `true` if the [ByteArray] is null or has no elements, `false` otherwise.
- * @since 5.0.0
- */
-val ByteArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Checks if the nullable ShortArray is either null or empty.
- *
- * @return `true` if the ShortArray is null or contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-val ShortArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Checks if the array is null or empty.
- *
- * This property provides a convenient way to validate whether an array is either null or contains no elements.
- *
- * @return `true` if the array is null or has no elements, `false` otherwise.
- * @since 5.0.0
- */
-val IntArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Extension property for nullable `LongArray` to check if the array is either null or empty.
- *
- * @return `true` if the array is null or has no elements, otherwise `false`.
- * @since 5.0.0
- */
-val LongArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Extension property to check whether a nullable FloatArray is either null or empty.
- *
- * This property evaluates to `true` if the FloatArray is null or contains no elements.
- * Otherwise, it evaluates to `false`. The contract ensures that if the result is `false`,
- * the receiver is not null.
- * @since 5.0.0
- */
-val FloatArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Extension property that determines if the nullable DoubleArray is either null or empty.
- *
- * @return `true` if the array is null or contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-val DoubleArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Checks if the BooleanArray is either null or empty.
- *
- * @return `true` if the BooleanArray is null or contains no elements, otherwise `false`.
- * @since 5.0.0
- */
-val BooleanArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
-/**
- * Extension property for nullable `CharArray` to check if it is `null` or empty.
- *
- * Returns `true` if the `CharArray` is `null` or contains no elements.
- * Returns `false` if the `CharArray` is not `null` and contains one or more elements.
- * @since 5.0.0
- */
-val CharArray?.isNullOrEmpty: Boolean get() {
-    contract {
-        returns(false) implies (this@isNullOrEmpty != null)
-    }
-    return this == null || isEmpty()
-}
+
 /**
  * Extension property for nullable arrays that checks whether the array is neither null nor empty.
  *
@@ -276,110 +66,6 @@ val <E> Array<E>?.isNotNullOrEmpty: Boolean get() {
         returns(true) implies (this@isNotNullOrEmpty != null)
     }
     return !isNullOrEmpty()
-}
-/**
- * Extension property for nullable ByteArray that checks if the array is not null and not empty.
- *
- * @receiver Nullable ByteArray to be checked.
- * @return `true` if the array is not null and contains elements, `false` otherwise.
- * @since 5.0.0
- */
-val ByteArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Checks if the nullable [ShortArray] is not null and not empty.
- *
- * @return `true` if the array is non-null and contains at least one element, otherwise `false`.
- * @since 5.0.0
- */
-val ShortArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Checks if the nullable `IntArray` is not null and not empty.
- *
- * @receiver The nullable `IntArray` to be evaluated.
- * @return `true` if the array is not null and contains at least one element, otherwise `false`.
- * @since 5.0.0
- */
-val IntArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Extension property for a nullable `LongArray` to check if it is neither null nor empty.
- *
- * This property returns `true` if the array is not null and contains at least one element.
- * Otherwise, it returns `false`.
- *
- * A contract is specified to indicate that if this property returns `true`,
- * the receiver is guaranteed to be non-null.
- * @since 5.0.0
- */
-val LongArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Checks if the nullable [FloatArray] is not null and not empty.
- *
- * @return `true` if the [FloatArray] is neither null nor empty, `false` otherwise.
- * @since 5.0.0
- */
-val FloatArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Extension property for nullable `DoubleArray` that checks if the array is not null
- * and contains at least one element.
- *
- * @return `true` if the array is not null and not empty, `false` otherwise.
- * @since 5.0.0
- */
-val DoubleArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Extension property to determine whether a nullable [BooleanArray] is not null and not empty.
- *
- * Evaluates to `true` if the array is both non-null and contains at least one element.
- * Utilizes the Kotlin contract to provide additional information about nullability.
- * @since 5.0.0
- */
-val BooleanArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
-}
-/**
- * Extension property for nullable `CharArray` that checks whether the array is not null and not empty.
- *
- * @return `true` if the `CharArray` is not null and contains at least one character, otherwise `false`.
- * @since 5.0.0
- */
-val CharArray?.isNotNullOrEmpty: Boolean get() {
-    contract {
-        returns(true) implies (this@isNotNullOrEmpty != null)
-    }
-    return this != null && isNotEmpty()
 }
 
 /**
@@ -431,83 +117,6 @@ val Array<*>.isNotSingleElement get() = size != 1
  */
 val <E : Comparable<E>> Array<E>.isSorted get() = isSorted()
 /**
- * Extension property that evaluates whether the ByteArray is sorted in ascending order.
- * It checks each element sequentially to determine if the current element is less than
- * or equal to the next one.
- *
- * This property is read-only and computes the result dynamically whenever accessed.
- * @since 5.0.0
- */
-val ByteArray.isSorted get() = isSorted()
-/**
- * Extension property for a ShortArray that checks if the array is sorted in ascending order.
- *
- * This property utilizes the `isSorted` function to determine whether the current array elements
- * are sorted. It evaluates the array without modifying its contents.
- *
- * @receiver ShortArray The array to check for sorted order.
- * @return Boolean `true` if the array is sorted in ascending order, otherwise `false`.
- * @since 5.0.0
- */
-val ShortArray.isSorted get() = isSorted()
-/**
- * Extension property to determine if an integer array is sorted in ascending order.
- *
- * This property evaluates whether all elements in the array are in non-decreasing order.
- * An empty array or an array with a single element is considered sorted.
- *
- * @receiver IntArray The integer array to check.
- * @return Boolean `true` if the array is sorted in ascending order, `false` otherwise.
- * @since 5.0.0
- */
-val IntArray.isSorted get() = isSorted()
-/**
- * Indicates whether the elements in the LongArray are sorted in ascending order.
- *
- * This property evaluates to `true` if all elements in the array are in non-decreasing order,
- * meaning each element is less than or equal to the next element. If the array is empty or
- * contains only one element, it is considered sorted.
- * @since 5.0.0
- */
-val LongArray.isSorted get() = isSorted()
-/**
- * An extension property for `FloatArray` that checks if the array is sorted in ascending order.
- *
- * This property evaluates whether the elements of the array are in non-decreasing order.
- * It returns `true` if the array is empty, contains a single element,
- * or if each element is less than or equal to the next element.
- *
- * @return `true` if the array is sorted in ascending order, otherwise `false`.
- * @since 5.0.0
- */
-val FloatArray.isSorted get() = isSorted()
-/**
- * Extension property that checks whether the elements of a [DoubleArray] are sorted
- * in ascending order.
- *
- * @return `true` if the array elements are in ascending order, otherwise `false`.
- * @since 5.0.0
- */
-val DoubleArray.isSorted get() = isSorted()
-/**
- * Extension property for `BooleanArray` that evaluates whether the array is sorted in non-decreasing order.
- *
- * The property returns `true` if all elements in the `BooleanArray` are arranged such that each element
- * is less than or equal to the one following it. In the context of a `BooleanArray`, the values are
- * treated as `false < true`.
- *
- * The computation is performed lazily when accessed.
- * @since 5.0.0
- */
-val BooleanArray.isSorted get() = isSorted()
-/**
- * Extension property for CharArray that checks if the array is sorted in ascending order.
- *
- * @return `true` if the characters in the array are sorted in ascending order, `false` otherwise.
- * @since 5.0.0
- */
-val CharArray.isSorted get() = isSorted()
-/**
  * Extension property for an array of comparable elements that checks
  * if the array is not sorted in ascending order.
  *
@@ -515,68 +124,6 @@ val CharArray.isSorted get() = isSorted()
  * @since 5.0.0
  */
 val <E : Comparable<E>> Array<E>.isNotSorted get() = !isSorted()
-/**
- * Extension property for ByteArray that indicates whether the array is not sorted in ascending order.
- *
- * This property returns `true` if the byte array is not sorted in ascending order, and `false` otherwise.
- * It internally utilizes the `isSorted()` function to determine the sorting state of the array.
- * @since 5.0.0
- */
-val ByteArray.isNotSorted get() = !isSorted()
-/**
- * Extension property for `ShortArray` that determines if the array is not sorted in ascending order.
- *
- * This property evaluates to `true` if the array is not sorted, and `false` if the array is sorted
- * in ascending order. Sorting is determined based on the natural order of the elements.
- *
- * Note: This property calls the `isSorted` function to perform the sorting check.
- * @since 5.0.0
- */
-val ShortArray.isNotSorted get() = !isSorted()
-/**
- * Extension property for `IntArray` that indicates whether the array is not sorted.
- *
- * Returns `true` if the array is not sorted in ascending order, otherwise `false`.
- * Utilizes the `isSorted()` function to determine the sorting status.
- * @since 5.0.0
- */
-val IntArray.isNotSorted get() = !isSorted()
-/**
- * Extension property for `LongArray` that indicates whether the array is not sorted.
- * Returns `true` if the array is not sorted in ascending order, otherwise `false`.
- * @since 5.0.0
- */
-val LongArray.isNotSorted get() = !isSorted()
-/**
- * Extension property for `FloatArray` that indicates whether the array
- * is not sorted in ascending order.
- *
- * @return `true` if the array is not sorted, otherwise `false`.
- * @since 5.0.0
- */
-val FloatArray.isNotSorted get() = !isSorted()
-/**
- * A read-only property that returns `true` if the elements in the `DoubleArray` are not sorted in ascending order,
- * and `false` otherwise.
- *
- * This property internally uses the `isSorted()` function to determine if the array is sorted and negates its result.
- * @since 5.0.0
- */
-val DoubleArray.isNotSorted get() = !isSorted()
-/**
- * Extension property that returns `true` if the `BooleanArray` is not sorted in ascending order,
- * and `false` otherwise. Sorting is determined based on the natural order of boolean values,
- * where `false` precedes `true`.
- * @since 5.0.0
- */
-val BooleanArray.isNotSorted get() = !isSorted()
-/**
- * Extension property for a CharArray that determines whether the array is not sorted in ascending order.
- * The property evaluates to `true` if the array is not sorted and `false` if it is sorted.
- * It relies on the `isSorted()` function to perform the check.
- * @since 5.0.0
- */
-val CharArray.isNotSorted get() = !isSorted()
 /**
  * Extension property for determining if an array is sorted in descending order.
  *
@@ -590,73 +137,6 @@ val CharArray.isNotSorted get() = !isSorted()
  */
 val <E : Comparable<E>> Array<E>.isSortedDescending get() = isSortedDescending()
 /**
- * An extension property for the `ByteArray` class that checks if the array's elements are sorted
- * in descending order. The comparison is based on the natural order of the elements.
- *
- * @return `true` if the array is sorted in descending order, or `false` otherwise.
- * @since 5.0.0
- */
-val ByteArray.isSortedDescending get() = isSortedDescending()
-/**
- * Extension property indicating whether the elements in the [ShortArray] are sorted in descending order.
- * Returns `true` if the array is sorted in strictly decreasing order, or `false` otherwise.
- * @since 5.0.0
- */
-val ShortArray.isSortedDescending get() = isSortedDescending()
-/**
- * Extension property that checks if the elements in the array are sorted in descending order.
- * Returns `true` if the array is sorted in non-increasing order, otherwise `false`.
- * @since 5.0.0
- */
-val IntArray.isSortedDescending get() = isSortedDescending()
-/**
- * Extension property for LongArray to determine if the array is sorted
- * in descending order.
- *
- * @return `true` if the elements in the array are in non-increasing order,
- *         otherwise `false`. An empty array or an array with a single element
- *         is considered sorted in descending order.
- * @since 5.0.0
- */
-val LongArray.isSortedDescending get() = isSortedDescending()
-/**
- * Checks if the elements in the FloatArray are sorted in descending order.
- *
- * @return `true` if the FloatArray is sorted in descending order or is empty,
- *         `false` otherwise.
- * @since 5.0.0
- */
-val FloatArray.isSortedDescending get() = isSortedDescending()
-/**
- * Extension property that checks if a DoubleArray is sorted in descending order.
- *
- * Returns `true` if the elements in the array are arranged from largest to smallest,
- * and `false` otherwise.
- * @since 5.0.0
- */
-val DoubleArray.isSortedDescending get() = isSortedDescending()
-/**
- * Extension property for `BooleanArray` that determines whether the elements
- * in the array are sorted in descending order.
- *
- * The property evaluates to `true` if each element in the array is greater than
- * or equal to the element that follows it, and `false` otherwise. Returns `true`
- * for an empty or single-element array, as they are considered trivially sorted.
- * @since 5.0.0
- */
-val BooleanArray.isSortedDescending get() = isSortedDescending()
-/**
- * Extension property for `CharArray` that checks if the array is sorted in descending order.
- *
- * This property evaluates whether the characters in the array are arranged in
- * non-increasing order, meaning each character is greater than or equal to
- * the character following it.
- *
- * @return `true` if the array is sorted in descending order, otherwise `false`.
- * @since 5.0.0
- */
-val CharArray.isSortedDescending get() = isSortedDescending()
-/**
  * Extension property that evaluates whether the elements in the array are not sorted
  * in descending order. This is determined by checking if the array is not sorted
  * in the reverse of natural order for the elements.
@@ -666,88 +146,6 @@ val CharArray.isSortedDescending get() = isSortedDescending()
  * @since 5.0.0
  */
 val <E : Comparable<E>> Array<E>.isNotSortedDescending get() = !isSortedDescending()
-/**
- * Extension property for `ByteArray` that determines whether
- * the array is not sorted in descending order.
- *
- * @return `true` if the byte array is not sorted in strictly descending order, `false` otherwise.
- * @since 5.0.0
- */
-val ByteArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * Checks if the elements in the [ShortArray] are not sorted in a strictly descending order.
- *
- * This property evaluates to `true` if the array is not in descending order,
- * including cases where the array is sorted in ascending order, unsorted,
- * or has repeated elements. If the array is strictly sorted in descending
- * order, the property evaluates to `false`.
- * @since 5.0.0
- */
-val ShortArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * Extension property for IntArray that checks whether the array
- * is not sorted in descending order.
- *
- * Returns `true` if the array is not sorted in descending order,
- * otherwise returns `false`.
- *
- * This property internally utilizes the `isSortedDescending` function
- * to perform the descending order check and negates its result.
- * @since 5.0.0
- */
-val IntArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * Extension property to check if a [LongArray] is not sorted in descending order.
- *
- * This property evaluates to `true` if the array is not sorted in descending order,
- * and `false` otherwise. It internally utilizes the `isSortedDescending` method
- * to determine the sorting order of the array.
- * @since 5.0.0
- */
-val LongArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * Extension property for `FloatArray` that checks if the array is not sorted in descending order.
- *
- * This property returns `true` if the array is not sorted in strictly descending order.
- * Otherwise, it returns `false`.
- * @since 5.0.0
- */
-val FloatArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * A read-only property extension for `DoubleArray` that determines if the array is not
- * sorted in strictly descending order.
- *
- * This property evaluates to `true` if the array elements are not in descending order
- * and `false` otherwise. The check is determined by negating the result of the
- * `isSortedDescending()` function applied to the array.
- * @since 5.0.0
- */
-val DoubleArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * A read-only extension property for `BooleanArray` that checks whether the array is not sorted
- * in descending order.
- *
- * This property evaluates to `true` if the array is not sorted in strictly descending order,
- * and `false` otherwise.
- *
- * It uses the `isSortedDescending()` function to determine the descending order of the array,
- * and negates the result.
- * @since 5.0.0
- */
-val BooleanArray.isNotDescendingSorted get() = !isSortedDescending()
-/**
- * Extension property for `CharArray` which checks whether the array is
- * not sorted in descending order.
- *
- * This property returns `true` if the character array is not sorted
- * in strictly descending order, and `false` otherwise.
- *
- * The check is performed by negating the result of the `isSortedDescending`
- * function. If the array is empty or contains a single element, it is
- * considered as not descending sorted.
- * @since 5.0.0
- */
-val CharArray.isNotDescendingSorted get() = !isSortedDescending()
 
 /**
  * Returns the array itself if it is not empty, or `null` if the array is empty.
@@ -758,86 +156,18 @@ val CharArray.isNotDescendingSorted get() = !isSortedDescending()
  */
 fun <E> Array<E>.orNullIfEmpty() = ifEmpty { null }
 /**
- * Returns `null` if the byte array is empty; otherwise, returns the byte array itself.
+ * Returns an `Either` instance based on whether is empty or not.
  *
- * This method provides a way to convert an empty byte array into a `null` value, which can
- * be useful in scenarios where `null` is used to represent the absence of a value.
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
  *
- * @receiver The byte array to evaluate.
- * @return The original byte array if it is not empty, or `null` if it is empty.
- * @since 5.4.0
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
  */
-fun ByteArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns `null` if the array is empty, otherwise returns the array itself.
- *
- * This function can be used to simplify null checks and provide a null result
- * when an empty array is not a valid or meaningful value in the context of usage.
- *
- * @receiver The ShortArray to be checked.
- * @return The same ShortArray if it is not empty, or `null` if the array is empty.
- * @since 5.4.0
- */
-fun ShortArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns null if the array is empty; otherwise, returns the array itself.
- *
- * This function is useful for distinguishing between an empty array and a null value,
- * providing a semantic way to handle cases where an empty array might carry a different meaning than null.
- *
- * @receiver An integer array.
- * @return The original array if it is not empty, or null if the array is empty.
- * @since 5.4.0
- */
-fun IntArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns `null` if the array is empty, otherwise returns the array itself.
- *
- * This function is useful for avoiding unnecessary processing or representing
- * an empty array as `null` in scenarios where `null` indicates the absence of a value.
- *
- * @receiver The array to evaluate.
- * @return `null` if the array is empty, otherwise the original array.
- * @since 5.4.0
- */
-fun LongArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns the current FloatArray if it is not empty; otherwise, returns null.
- *
- * @receiver The FloatArray on which the function is called.
- * @return The original FloatArray if it contains elements, or null if it is empty.
- * @since 5.4.0
- */
-fun FloatArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns `null` if the array is empty, otherwise returns the array itself.
- *
- * This function can be used to handle cases where an empty array is considered
- * equivalent to a null value.
- *
- * @receiver The array to check for emptiness.
- * @return `null` if the array is empty, otherwise the original array.
- * @since 5.4.0
- */
-fun DoubleArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns `null` if the boolean array is empty; otherwise, returns the array itself.
- *
- * @return The original array if it is not empty, or `null` if the array is empty.
- * @since 5.4.0
- */
-fun BooleanArray.orNullIfEmpty() = if (isEmpty) null else this
-/**
- * Returns `null` if the character array is empty; otherwise, returns the array itself.
- *
- * This function provides a convenient way to handle empty character arrays,
- * allowing you to return a `null` value instead of an empty array when needed.
- *
- * @receiver The character array to check.
- * @return `null` if the array is empty, or the original array if it is not empty.
- * @since 5.4.0
- */
-fun CharArray.orNullIfEmpty() = if (isEmpty) null else this
+fun <E> Array<E>.orErrorIfEmpty(): Either<Empty, Array<E>> =
+    either { if (isEmpty()) raise(Empty) else this }
 
 /**
  * Negates the state of the array by returning `true` if the array is either `null` or empty.
@@ -854,118 +184,6 @@ operator fun Array<*>?.not(): Boolean {
     }
     return isNullOrEmpty()
 }
-/**
- * Performs a logical NOT operation on the nullable [ByteArray].
- * This operator checks whether the [ByteArray] is null or empty.
- *
- * @return `true` if the [ByteArray] is null or empty, otherwise `false`.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun ByteArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Checks if the nullable ShortArray is either null or empty.
- *
- * @return `false` if the array is not null and contains elements, `true` otherwise.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun ShortArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Checks whether the nullable [IntArray] is null or empty.
- *
- * @return `false` if the [IntArray] is not null and contains elements, otherwise `true`.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun IntArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Checks whether the long array is either `null` or empty.
- *
- * @return `true` if the array is `null` or contains no elements, `false` otherwise.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun LongArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Checks whether the nullable FloatArray is null or empty.
- *
- * This operator function allows using the logical NOT operator (`!`) on a nullable FloatArray to determine
- * if it is either null or contains no elements.
- *
- * @return `false` if the FloatArray is not null and contains one or more elements, otherwise `true`.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun FloatArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Checks if the DoubleArray is null or empty.
- *
- * This operator function returns `false` if the DoubleArray is not null and contains elements.
- * Otherwise, it returns `true` if the DoubleArray is either null or has no elements.
- *
- * @return `true` if the DoubleArray is null or empty, `false` otherwise.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun DoubleArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Performs a logical NOT operation on the provided BooleanArray.
- *
- * @receiver The nullable BooleanArray on which the operation is performed.
- * @return `false` if the BooleanArray is not null and not empty; `true` otherwise.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun BooleanArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
-/**
- * Checks if the `CharArray` is null or empty.
- *
- * @return `true` if the `CharArray` is null or empty, `false` otherwise.
- * @since 5.0.0
- */
-@JvmName("nullableNot")
-operator fun CharArray?.not(): Boolean {
-    contract {
-        returns(false) implies (this@not != null)
-    }
-    return isNullOrEmpty
-}
 
 /**
  * Returns `true` if the array is empty, otherwise `false`.
@@ -977,75 +195,6 @@ operator fun CharArray?.not(): Boolean {
  * @since 5.0.0
  */
 operator fun Array<*>.not(): Boolean = isEmpty()
-/**
- * Operator function that checks whether the ByteArray is empty.
- *
- * @return true if the ByteArray is empty, false otherwise.
- * @since 5.0.0
- */
-operator fun ByteArray.not(): Boolean = isEmpty
-/**
- * Checks if the ShortArray is empty.
- *
- * This operator function is used to determine whether the array contains no elements.
- *
- * @return `true` if the array is empty, `false` otherwise.
- * @since 5.0.0
- */
-operator fun ShortArray.not(): Boolean = isEmpty
-/**
- * Checks if the IntArray is empty.
- *
- * This operator function negates the array by returning true if the array is empty
- * and false otherwise.
- *
- * @return true if the array is empty, false otherwise.
- * @since 5.0.0
- */
-operator fun IntArray.not(): Boolean = isEmpty
-/**
- * Checks if the LongArray is empty, providing a negation-like operation.
- *
- * @return true if the array is empty, false otherwise.
- */
-operator fun LongArray.not(): Boolean = isEmpty
-/**
- * Checks whether the FloatArray is empty.
- *
- * This operator function allows the use of the `not` operator to determine
- * if the FloatArray contains no elements.
- *
- * @return `true` if the FloatArray is empty, `false` otherwise.
- * @since 5.0.0
- */
-operator fun FloatArray.not(): Boolean = isEmpty
-/**
- * Returns `true` if the DoubleArray is empty, otherwise returns `false`.
- *
- * @return `true` if the array has no elements, `false` otherwise.
- * @since 5.0.0
- */
-operator fun DoubleArray.not(): Boolean = isEmpty
-/**
- * Returns `true` if the Boolean array is empty, otherwise returns `false`.
- *
- * This operator function is a Kotlin extension that negates the Boolean state
- * of the array based on its emptiness.
- *
- * @return `true` if the array is empty, `false` otherwise.
- * @since 5.0.0
- */
-operator fun BooleanArray.not(): Boolean = isEmpty
-/**
- * Checks if the character array is empty.
- *
- * This operator function returns true if the character array has no elements,
- * and false otherwise.
- *
- * @return true if the character array is empty, false otherwise.
- * @since 5.0.0
- */
-operator fun CharArray.not(): Boolean = isEmpty
 
 /**
  * Merges the current array with one or more additional collections into a new array of the same type.
@@ -1111,144 +260,277 @@ fun <E> Array<E>.containsNone(vararg elements: E) = none { it in elements }
 operator fun <E> Array<E>.contains(predicate: Predicate<E>) = any { predicate(it) }
 
 /**
- * Returns the first element of the array if it exists, or throws an exception provided by the given supplier.
+ * Returns the first element of the array if it exists, or the result of the provided default supplier if the array is empty.
  *
- * @param lazyException A supplier that provides the exception to be thrown if the array is empty.
- * @return The first element of the array.
- * @throws Throwable The exception provided by the supplier if the array is empty.
- * @since 2.1.0
+ * @param default A supplier function that provides a default value to return if the array is empty.
+ * @return The first element of the array, or the result of the default supplier if the array is empty.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.firstOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { first() } catch (e: NoSuchElementException) { default() }
+}
+/**
+ * Returns the first element of the array if it exists; otherwise, throws an exception provided
+ * by the given lazy exception supplier.
+ *
+ * @param lazyException A supplier function that provides the exception to be thrown if the array is empty.
+ *                       This supplier is invoked only when the array does not contain any elements.
+ * @return The first element of the array if the array is not empty.
+ * @throws Throwable The exception provided by the `lazyException` supplier function if the array is empty.
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-infix fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
+fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
-    return firstOrNull() ?: throw lazyException()
+    return try { first() } catch (e: NoSuchElementException) { throw lazyException() }
 }
 /**
- * Returns the first element in the array that matches the given [predicate]. 
- * If no such element is found, throws an exception provided by the [lazyException] supplier.
+ * Returns the first element of the array wrapped in an `Either` context if it exists,
+ * or raises an `Empty` error if the array is empty.
+ *
+ * This function enables safe access to the first element of an array by using
+ * the functional error-handling mechanisms provided by the `either` and `catching`
+ * constructs. If the array is empty, a `NoSuchElementException` is caught and
+ * transformed into an `Empty` error.
+ *
+ * @receiver The array whose first element is to be retrieved.
+ * @return An `Either` value where:
+ *         - `Right<E>` contains the first element of the array.
+ *         - `Left<Empty>` represents an error indicating that the array is empty.
+ * @throws Throwable If any exception other than `NoSuchElementException` occurs during execution.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.firstOrError() = either {
+    catching({ first() }) { _: NoSuchElementException -> Empty }
+}
+/**
+ * Finds the first element in the array that satisfies the given predicate.
+ *
+ * If the array is empty, a `NoSuchElementException` is thrown. If no elements
+ * in the array match the predicate, a `NoResultsException` is thrown.
+ *
+ * @param E The type of elements in the array.
+ * @param predicate A predicate function used to test each element for a condition.
+ * @return The first element that satisfies the predicate.
+ * @throws NoSuchElementException If the array is empty.
+ * @throws NoResultsException If no elements satisfy the predicate.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Array<E>.findFirst(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    return filtered.first()
+}
+/**
+ * Returns the first element in the array that matches the given [predicate].
+ * If no such element is found, the value provided by the [default] supplier is returned.
+ *
+ * @param default A supplier function that provides a fallback value if no element satisfies the [predicate].
+ * @param predicate A condition that each element is tested against.
+ * @return The first element matching the [predicate], or the value produced by [default] if no match is found.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findFirstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { first(predicate) } catch (e: NoSuchElementException) { default() }
+}
+/**
+ * Finds the first element in the array that matches the given predicate. If no such element is found, the provided exception is thrown.
  *
  * @param lazyException A supplier that provides the exception to be thrown if no element matches the predicate.
- * @param predicate A condition that determines whether an element matches.
- * @return The first element that matches the [predicate].
- * @since 2.1.0
+ * @param predicate A function that defines the condition to filter elements in the array.
+ * @return The first element that matches the predicate.
+ * @throws Throwable The exception returned by the lazyException supplier if no matching element is found.
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+fun <E> Array<E>.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
-    return firstOrNull(predicate) ?: throw lazyException()
+    return try { first(predicate) } catch (e: NoSuchElementException) { throw lazyException() }
 }
 /**
- * Returns the first element of the array if it exists, or the provided default value
- * if the array is empty.
+ * Searches for the first element in the array that matches the provided predicate and returns it as a success result.
+ * If no element matches, returns an appropriate error wrapped in an `Either`.
  *
- * This is an infix function that allows clean and readable syntax when used.
- *
- * @param default A supplier function that provides the default value to return
- *                if the array is empty.
- * @return The first element of the array or the value provided by the `default` supplier.
- * @since 2.1.0
+ * @param predicate A function that evaluates each element and returns `true` if the element satisfies the condition.
+ * @return `Either.Left` containing a `NotFirstResultErrors` object if no matching element is found,
+ * or `Either.Right` containing the first element that matches the predicate.
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.firstOr(default: Supplier<E>): E {
+fun <E> Array<E>.findFirstOrError(predicate: Predicate<E>): Either<NotFirstResultError, E> = either {
+    catching({ findFirst(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        else -> throw IllegalStateException()
+    } }
+}
+
+/**
+ * Returns the last element of the array if it exists; otherwise, returns the result provided by the default supplier.
+ *
+ * @param default A supplier that provides a default value when the array is empty.
+ * @return The last element of the array, or the default value supplied by the given supplier if the array is empty.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.lastOr(default: Supplier<E>): E {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
-    return firstOrNull() ?: default()
+    return try { last() } catch (_: NoSuchElementException) { default() }
 }
 /**
- * Returns the first element of the array that matches the given [predicate].
- * If no such element is found, returns the result of the [default] supplier.
+ * Returns the last element in the array, or throws an exception provided by the specified supplier if the array is empty.
  *
- * @param default A supplier that provides a default value when no element satisfies the [predicate].
- * @param predicate A predicate used to test elements of the array.
- * @since 2.1.0
+ * The `lazyException` supplier is invoked at most once if the array is empty.
+ *
+ * @param lazyException A supplier function that provides the exception to be thrown if the array is empty.
+ * @return The last element in the array.
+ * @throws Throwable The exception provided by the `lazyException` supplier if the array is empty.
+ * @since 6.1.0
  */
-fun <E> Array<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+@IgnorableReturnValue
+fun <E> Array<E>.lastOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { last() } catch (_: NoSuchElementException) { throw lazyException() }
+}
+/**
+ * Returns the last element of the array wrapped in an `Either`, or raises an error if the array is empty.
+ *
+ * This method attempts to retrieve the last element of an array. If the array is empty, a `NoSuchElementException`
+ * is caught and transformed into a predefined `Empty` error type within the `Raise` context.
+ *
+ * @receiver Array<E> The array from which the last element is to be retrieved.
+ * @return An `Either` where:
+ *         - `Right<E>` contains the last element of the array if it exists.
+ *         - `Left<Empty>` represents an error raised when the array is empty.
+ * @throws RaiseSignal If the underlying `either` or `catching` functions raise a signal during execution.
+ * @see either
+ * @see catching
+ * @since 6.1.0
+ */
+fun <E> Array<E>.lastOrError() = either {
+    catching({ last() }) { _: NoSuchElementException -> Empty }
+}
+/**
+ * Finds the last element in the array that matches the given predicate.
+ *
+ * This method searches through the array and returns the last element that satisfies
+ * the condition defined by the provided predicate. If the array is empty, a
+ * `NoSuchElementException` is thrown. If no elements match the predicate, a
+ * `NoResultsException` is thrown.
+ *
+ * @param E The type of elements in the array.
+ * @param predicate A predicate function used to filter elements in the array.
+ *                  The function takes an element of type `E` as an input and
+ *                  returns a boolean indicating whether the element matches
+ *                  the condition.
+ * @return The last element in the array that satisfies the predicate.
+ * @throws NoSuchElementException If the array is empty.
+ * @throws NoResultsException If no elements match the predicate.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Array<E>.findLast(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    return filtered.last()
+}
+/**
+ * Returns the last element of the array that matches the given [predicate].
+ * If no such element is found, returns the result of calling the [default] supplier.
+ *
+ * @param default A supplier function that provides a default value when no matching element is found.
+ *                It is invoked at most once if needed.
+ * @param predicate A predicate function that tests each element for a matching condition.
+ * @return The last element matching the [predicate], or the result of [default] if no match is found.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findLastOr(default: Supplier<E>, predicate: Predicate<E>): E {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
-    return firstOrNull(predicate) ?: default()
+    return try { last(predicate) } catch (_: NoSuchElementException) { default() }
+
+}
+/**
+ * Finds the last element in the array that matches the given predicate or throws an exception if no element matches.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if no element matches the predicate.
+ * @param predicate A predicate function to evaluate the elements of the array.
+ * @return The last element in the array that matches the predicate.
+ * @throws Throwable The exception supplied by the lazyException if no element matches the predicate.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Array<E>.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { last(predicate) } catch (_: NoSuchElementException) { throw lazyException() }
+}
+/**
+ * Attempts to find the last element in the array that satisfies the given predicate.
+ * If no such element exists, it returns an error wrapped in an `Either` type.
+ *
+ * @param E The type of elements in the array.
+ * @param predicate A function that determines whether an element satisfies the condition.
+ * @return An `Either` containing the last matching element, or an error of type `NotLastResultsErrors` if no match is found.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findLastOrError(predicate: Predicate<E>): Either<NotLastResultsError, E> = either {
+    catching({ findLast(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        else -> throw IllegalStateException()
+    } }
 }
 
 /**
  * Returns the second element of the array.
  *
- * This function retrieves the second element from the array it is called on.
- * If the array has fewer than two elements, a `NoSuchElementException` is thrown.
+ * Throws [NoSuchElementException] if the size of the array is less than 2.
  *
- * @throws NoSuchElementException if the size of the array is less than 2.
- * @return the second element of the array.
- * @since 2.1.0
+ * @receiver The array from which the second element will be retrieved.
+ * @return The second element of the array.
+ * @throws NoSuchElementException If the array contains less than two elements.
+ * @since 6.1.0
  */
 fun <E> Array<E>.second() = if (size < 2) throw NoSuchElementException("List size $size doesn't allow to get second element.") else this[1]
 /**
- * Returns the second element of the array that matches the given [predicate].
- * If no such element exists or there are fewer than two matching elements, this function typically throws an exception.
+ * Returns the second element of the array if the array contains at least two elements,
+ * or `null` if the array contains fewer than two elements.
  *
- * @param predicate A condition applied to each element to filter the array.
- * @return The second element that satisfies the [predicate].
- * @throws NoSuchElementException if fewer than two elements match the [predicate].
- * @since 2.1.0
- */
-fun <E> Array<E>.second(predicate: Predicate<E>) = filter(predicate).second()
-/**
- * Returns the second element of the array, or `null` if the array size is less than 2.
+ * This function does not modify the original array and returns a nullable result.
  *
- * @receiver The array from which to retrieve the second element.
+ * @receiver The array from which the second element is to be retrieved.
  * @return The second element of the array, or `null` if the array has fewer than two elements.
- * @since 2.1.0
+ *
+ * @since 6.1.0
  */
 fun <E> Array<E>.secondOrNull() = if (size < 2) null else this[1]
 /**
- * Returns the second element of the array that matches the given predicate, or `null`
- * if no such element exists or the filtered result contains fewer than two elements.
+ * Returns the second element of the array if it exists, or the result
+ * of the [default] supplier if the array has fewer than two elements.
  *
- * This function filters the array based on the specified predicate and attempts to 
- * retrieve the second element from the filtered results. It safely returns `null` 
- * if the filtered result does not have enough elements, avoiding potential exceptions.
- *
- * @param predicate A condition used to filter the elements of the array.
- * @return The second element that matches the predicate, or `null` if fewer than 
- * two elements match the predicate.
- * @since 2.1.0
- */
-fun <E> Array<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
-/**
- * Returns the second element of the array if it exists, otherwise throws an exception provided by the given supplier.
- *
- * @param lazyException A supplier that provides the exception to be thrown if the array has fewer than two elements.
- * @throws Throwable If the array contains fewer than two elements.
- * @return The second element of the array.
- * @since 2.1.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return if (size < 2) throw lazyException() else this[1]
-}
-/**
- * Returns the second element of the array that matches the given predicate, or throws the exception
- * provided by the given `lazyException` supplier if fewer than two elements match.
- *
- * @param lazyException A supplier function that produces the exception to be thrown if fewer than two elements match the predicate.
- * @param predicate A predicate used to filter elements in the array before retrieving the second matching element.
- * @since 2.1.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
-/**
- * Returns the second element of the array if it exists; otherwise, returns the value provided
- * by the given default supplier.
- *
- * @param E the type of elements in the array
- * @param default a supplier function that provides a default value if the array has less than two elements
- * @return the second element of the array or the default value provided by the supplier
- * @since 2.1.0
+ * @param default A supplier function that provides the default value if the array has fewer than two elements.
+ * @return The second element of the array, or the result of the [default] supplier.
+ * @since 6.1.0
  */
 fun <E> Array<E>.secondOr(default: Supplier<E>): E {
     contract {
@@ -1257,104 +539,136 @@ fun <E> Array<E>.secondOr(default: Supplier<E>): E {
     return if (size < 2) default() else this[1]
 }
 /**
- * Returns the second element of the array that matches the given predicate, if such an element exists.
- * If no such element exists, the value provided by the given default supplier is returned.
+ * Returns the second element of the array or throws an exception provided by the given supplier
+ * if the array contains fewer than two elements.
  *
- * @param default A supplier function that provides a default value when the array does not contain at least two elements
- *                matching the predicate.
- * @param predicate A predicate function used to filter the elements of the array.
- * @return The second element of the filtered array that matches the predicate, or the result of invoking the default 
- *         supplier if the filtered array has less than two matching elements.
- * @since 2.1.0
+ * @param lazyException a function that supplies the exception to throw if the array has fewer than two elements.
+ * @return the second element of the array.
+ * @throws Throwable if the array contains fewer than two elements.
+ * @since 6.1.0
  */
-fun <E> Array<E>.secondOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+@IgnorableReturnValue
+fun <E> Array<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    if (size < 2) throw lazyException()
+    return this[1]
+}
+/**
+ * Returns the second element of the array wrapped in an `Either` if it exists, or an error if the array does not contain a second element.
+ *
+ * The method checks if the array has a second element and wraps it in a successful `Either`. If the array is empty, an `Empty` error is returned.
+ * If there is no second element but the array is not empty, a `NoSuchElement` error is returned with the index `1`.
+ *
+ * @return An `Either` containing the second element of the array on success or a `NotInnerElementErrors` error on failure.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.secondOrError(): Either<NotInnerElementError, E> = either {
+    catching({ second() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(1) }
+}
+/**
+ * Finds and returns the second element in the array that matches the specified predicate.
+ *
+ * @param predicate A condition to determine whether an element in the array matches.
+ * @return The second element in the array that satisfies the given predicate.
+ * @throws NoSuchElementException If the array is empty.
+ * @throws NoResultsException If no elements match the specified predicate.
+ * @throws TooFewResultsException If less than two elements match the specified predicate.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Array<E>.findSecond(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    if (filtered.size < 2) throw TooFewResultsException(filtered.size)
+    return filtered.second()
+}
+/**
+ * Finds the second element in the array that matches the given predicate or returns `null` if no such element exists.
+ *
+ * The function filters the array by applying the provided predicate and then retrieves the second element
+ * from the resulting collection, if available. If the filtered collection contains fewer than two elements,
+ * the function returns `null`.
+ *
+ * @param predicate A function that defines the condition to match elements in the array. Only elements that pass
+ * this condition are considered for finding the second match.
+ * @return The second element matching the predicate, or `null` if fewer than two elements match.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findSecondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+/**
+ * Filters the array using the provided predicate and returns the second element that matches the predicate.
+ * If there are fewer than two matching elements, the default value provided by the supplier is returned.
+ *
+ * @param default A supplier function that provides a default value when the filtered array does not contain at least two matching elements.
+ * @param predicate A predicate to filter the elements of the array.
+ * @return The second element that matches the predicate, or the result of invoking the default supplier if fewer than two elements match.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findSecondOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+/**
+ * Filters the elements of the array based on the given predicate and returns the second matching
+ * element if it exists, or throws an exception provided by the given `lazyException` supplier if
+ * there are fewer than two matching elements.
+ *
+ * @param lazyException A supplier function that produces the exception to be thrown if fewer
+ *                      than two elements match the given predicate.
+ * @param predicate A condition to filter elements of the array.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Array<E>.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+/**
+ * Searches for the second element in the array that matches the given predicate.
+ * If a second matching element is found, it is returned wrapped in `Either.Right`.
+ * If an error occurs or the condition is not met, an appropriate error is returned
+ * wrapped in `Either.Left`.
+ *
+ * @param predicate A condition used to search for the second element in the array.
+ * @return Either a matching element wrapped in `Either.Right` if found, or an error
+ * wrapped in `Either.Left` if no matching element or insufficient results are found.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findSecondOrError(predicate: Predicate<E>): Either<NotInnerResultError, E> = either {
+    catching({ findSecond(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        is TooFewResultsException -> TooFewResults
+        else -> throw IllegalStateException()
+    } }
+}
 
 /**
  * Returns the third element of the array.
  *
- * Throws a [NoSuchElementException] if the array size is less than three.
+ * This function retrieves the element at index 2 in the array.
+ * If the array size is less than 3, a [NoSuchElementException] is thrown.
  *
- * @receiver The array instance from which the third element is to be retrieved.
- * @return The third element in the array.
- * @throws NoSuchElementException If the size of the array is less than three.
- * @since 2.1.0
+ * @receiver The array from which the third element is to be retrieved.
+ * @return The third element of the array at index 2.
+ * @throws NoSuchElementException if the array size is less than 3.
+ * @since 6.1.0
  */
 fun <E> Array<E>.third() = if (size < 3) throw NoSuchElementException("List size $size doesn't allow to get third element.") else this[2]
-/**
- * Returns the third element from the array that matches the given predicate.
- *
- * This method filters the array using the provided predicate and then retrieves the third element
- * from the resulting filtered collection. If the array does not contain at least three elements
- * matching the predicate, an exception may be thrown.
- *
- * @param E the type of elements in the array.
- * @param predicate the predicate used to filter elements in the array.
- * @return the third element that matches the predicate after filtering.
- * @throws NoSuchElementException if there are fewer than three matching elements.
- * @since 2.1.0
- */
-fun <E> Array<E>.third(predicate: Predicate<E>) = filter(predicate).third()
 /**
  * Returns the third element of the array if the array contains at least three elements,
  * or `null` if the array has fewer than three elements.
  *
- * This function provides a safe way to access the third element of an array
- * without causing an `IndexOutOfBoundsException`.
- *
- * @receiver The array to retrieve the third element from.
- * @return The third element of the array, or `null` if the array size is less than three.
- * @since 2.1.0
+ * @receiver Array of elements of type E.
+ * @return The third element of the array, or `null` if the array size is less than 3.
+ * @since 6.1.0
  */
 fun <E> Array<E>.thirdOrNull() = if (size < 3) null else this[2]
 /**
- * Returns the third element in the array that matches the specified [predicate], or `null` if no such element exists.
+ * Returns the third element of the array if it exists; otherwise, returns the value
+ * provided by the given default supplier.
  *
- * This function filters the elements of the array based on the provided [predicate], 
- * then retrieves the third element from the filtered results using a safe access method.
- * If the filtered list has fewer than three elements, it will return `null`.
- *
- * @param predicate A predicate to filter elements of the array.
- * @return The third element that matches the [predicate] or `null` if there are fewer than three matches.
- * @since 2.1.0
- */
-fun <E> Array<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
-/**
- * Returns the third element of the array if it exists; otherwise, throws an exception
- * provided by the supplied `lazyException`.
- *
- * @param lazyException A supplier that generates the exception to be thrown if the array 
- * does not contain at least three elements.
- * @return The third element of the array.
- * @throws Throwable The exception provided by `lazyException` if the array size is less 
- * than three.
- * @since 2.1.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return if (size < 3) throw lazyException() else this[2]
-}
-/**
- * Returns the third element of the array that matches the given predicate, or throws the exception
- * provided by the given `lazyException` supplier if there are fewer than three matching elements.
- *
- * @param lazyException A supplier function that produces the exception to be thrown if the array has fewer than three matching elements.
- * @param predicate A predicate used to filter the elements of the array.
- * @since 2.1.0
- */
-@IgnorableReturnValue
-fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
-
-/**
- * Returns the third element of the array if it exists, otherwise returns the value
- * supplied by the given default supplier.
- *
- * @param default A supplier function that provides a default value to return
- * if the array has fewer than three elements.
- * @return The third element of the array or the value returned by the default supplier.
- * @since 2.1.0
+ * @param default A supplier function that provides a default value if the array size is less than three.
+ * @return The third element of the array or the value provided by the default supplier.
+ * @since 6.1.0
  */
 fun <E> Array<E>.thirdOr(default: Supplier<E>): E {
     contract {
@@ -1363,69 +677,102 @@ fun <E> Array<E>.thirdOr(default: Supplier<E>): E {
     return if (size < 3) default() else this[2]
 }
 /**
- * Returns the third element of the array that satisfies the given predicate if it exists; 
- * otherwise, returns the value supplied by the given default supplier.
+ * Returns the third element of the array if it exists; otherwise, throws an exception
+ * provided by the given `lazyException` supplier.
  *
- * @param default A supplier function that provides a default value when the filtered elements do not 
- *        contain at least three elements.
- * @param predicate A predicate used to filter the elements of the array.
- * @return The third element of the filtered array, or the result of invoking the default supplier 
- *         if the filtered array has less than three elements.
- * @since 2.1.0
+ * @param lazyException A supplier that provides the exception to be thrown if the array
+ * does not contain at least three elements.
+ * @return The third element of the array.
+ * @throws Throwable The exception provided by the `lazyException` supplier if the array
+ * has fewer than three elements.
+ * @since 6.1.0
  */
-fun <E> Array<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
-
-/**
- * Splits the array into chunks based on a predicate condition. Each chunk will end
- * immediately before an element that satisfies the given predicate, and a new chunk
- * will start after that element.
- *
- * @param E the type of elements contained in the array.
- * @param predicate a function that evaluates each element to determine chunk boundaries.
- * @return a list of lists, where each sublist represents a chunk of the original array 
- *         split according to the predicate.
- * @since 2.1.0
- */
-infix fun <E> Array<E>.chunkedWhile(predicate: Predicate<E>): List<List<E>> = toList().run {
-    if (isEmpty()) return@run emptyList()
-    val result = mutableListOf<MutableList<E>>()
-    var current = mutableListOf<E>()
-    for (i in indices) {
-        current.add(this[i])
-        if (predicate(this[i])) {
-            result.add(current)
-            current = mutableListOf()
-        }
+@IgnorableReturnValue
+fun <E> Array<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
-    result.add(current)
-    if (result.last().isEmpty()) result.dropLast(1) else result
+    if (size < 3) throw lazyException()
+    return this[2]
 }
-
 /**
- * Creates a new list where each element in the original array is repeated a specified number of times.
+ * Returns the third element of the array wrapped in an `Either` type, or an error if the element
+ * does not exist. If the array is empty, it will return an `Empty` error. If the array does not
+ * have a third element but is not empty, it will return a `NoSuchElement` error with the requested index of 2.
  *
- * @param n The number of times each element in the array should be repeated. Must be a non-negative integer.
- * @return A list containing the elements of the original array repeated the specified number of times.
- * @since 2.1.0
+ * @return An `Either` containing the third element of the array or a `NotInnerElementErrors`.
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.repeatEach(n: Int): List<E> {
-    val resultList = mutableListOf<E>()
-    forEach {
-        { resultList += it } * n
-    }
-
-    return resultList
+fun <E> Array<E>.thirdOrError(): Either<NotInnerElementError, E> = either {
+    catching({ third() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(2) }
 }
-
 /**
- * Finds the mode (most frequently occurring element) in the array. 
- * If there are multiple elements with the same frequency, 
- * the first one encountered is returned.
+ * Finds the third element in the array that matches the given predicate.
  *
- * @return The mode of the array, or `null` if the array is empty.
- * @since 2.1.0
+ * @param predicate a condition used to filter the elements of the array.
+ * @return the third element that satisfies the given predicate.
+ * @throws NoSuchElementException if the array is empty.
+ * @throws NoResultsException if no elements satisfy the predicate.
+ * @throws TooFewResultsException if fewer than three elements satisfy the predicate.
+ * @since 6.1.0
  */
-fun <E> Array<E>.mode(): E? = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+fun <E> Array<E>.findThird(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    if (filtered.size < 3) throw TooFewResultsException(filtered.size)
+    return filtered.third()
+}
+/**
+ * Finds the third element in the array that matches the given predicate or returns `null` if no such element exists.
+ *
+ * The filtering is done using the provided predicate, and the resulting elements are checked for their third presence.
+ *
+ * @param predicate The condition used to filter elements in the array.
+ * @return The third element that matches the predicate, or `null` if no such element exists.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findThirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
+/**
+ * Filters the array based on the provided predicate and returns the third element if it exists;
+ * otherwise, evaluates and returns the result of the provided default supplier.
+ *
+ * @param default A supplier function that provides a default value to return if the filtered
+ * array contains fewer than three elements.
+ * @param predicate A predicate function used to filter the elements of the array.
+ * @return The third element of the filtered array if present, or the default value provided
+ * by the supplier.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findThirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
+/**
+ * Finds the third element in the array that matches the specified predicate and returns it.
+ * If no such element is found, the provided exception supplier is used to throw an exception.
+ *
+ * @param lazyException a supplier that provides the exception to be thrown if no third element is found
+ * @param predicate a condition that elements in the array must satisfy
+ * @throws Throwable if no third element matching the predicate is found
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Array<E>.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
+/**
+ * Searches for the third element in the array that matches the given predicate.
+ * Returns the element wrapped in an `Either` if found, or an error if no such element or too few elements exist.
+ *
+ * @param predicate A condition used to filter elements in the array.
+ * @return An `Either` containing the third matching element if it exists, or an error of type `NotInnerResultErrors`.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findThirdOrError(predicate: Predicate<E>): Either<NotInnerResultError, E> = either {
+    catching({ findThird(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        is TooFewResultsException -> TooFewResults
+        else -> throw IllegalStateException()
+    } }
+}
 
 /**
  * Returns the single element in the array if the array contains exactly one element.
@@ -1484,60 +831,272 @@ infix fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
     return toList().run { if (size == 1) first() else throw lazyException() }
 }
 /**
- * Returns the single element in the array that matches the given predicate.
- * Throws an exception if no elements match the predicate or if more than one element matches.
+ * Returns the single element of the array wrapped inside an `Either` if the array contains exactly one element,
+ * or returns an appropriate error wrapped in an `Either` if the array is empty or has more than one element.
  *
- * @param predicate A condition that each element in the array will be tested against.
- * @return The single element that matches the predicate.
- * @throws NoSuchElementException If no elements match the predicate.
- * @throws TooManyResultsException If more than one element matches the predicate.
- * @throws TooFewResultsException If the number of matching elements is fewer than expected.
- * @since 2.1.0
+ * @return `Either<NotOnlyElementErrors, E>` where the right value is the single element of the array if present,
+ * or the left value contains a `NotOnlyElementErrors` indicating the error condition:
+ * - `Empty` if the array is empty.
+ * - `TooManyElement` if the array contains more than one element.
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.onlyElement(predicate: Predicate<E>) = toList()
+fun <E> Array<E>.onlyElementOrError(): Either<NotOnlyElementError, E> = either {
+    catching({ onlyElement() }) { e: Exception -> when (e) {
+        is NoSuchElementException -> Empty
+        is TooManyElementsException -> TooManyElements
+        else -> throw IllegalStateException()
+    } }
+}
+
+/**
+ * Finds the only element in the array that matches the given predicate.
+ * Throws an exception if no elements match, or if more than one element matches.
+ *
+ * @param predicate A condition to evaluate each element in the array.
+ * @return The single element that matches the predicate.
+ * @throws NoSuchElementException if the array is empty.
+ * @throws NoResultsException if no elements match the predicate.
+ * @throws TooManyResultsException if more than one element matches the predicate.
+ * @since 6.1.0
+ */
+infix fun <E> Array<E>.findOnlyElement(predicate: Predicate<E>) = toList()
     .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
     .filter(predicate).run {
+        if (isEmpty()) throw NoResultsException()
         if (size == 1) first()
-        else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
+        else throw TooManyResultsException(size)
     }
 /**
- * Returns the only element in the array that matches the given [predicate], or `null` if no such element
- * exists or if more than one element matches the [predicate].
+ * Finds the only element in the array that matches the given predicate or returns null if no such
+ * element exists or if there is more than one matching element.
  *
- * @param predicate the condition used to filter elements in the array.
- * @since 2.1.0
+ * @param predicate The condition used to filter the elements of the array.
+ * @return The single element matching the predicate or null if none or more than one match is found.
+ * @since 6.1.0
  */
-infix fun <E> Array<E>.onlyElementOrNull(predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else null }
+infix fun <E> Array<E>.findOnlyElementOrNull(predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else null }
 /**
- * Returns the single element of the array that matches the given predicate, or the value provided
- * by the default supplier if no such element exists or if more than one element matches the predicate.
+ * Finds the only element in the array that matches the given predicate. If no such element exists or
+ * if more than one element matches, the provided default value is returned.
  *
- * @param default The supplier that provides a default value if there isn't exactly one matching element.
- * @param predicate The condition to evaluate each element of the array.
- * @return The single matching element or the value provided by the default supplier.
- * @since 2.1.0
+ * @param default A supplier providing the default value to return when the condition is not met.
+ * @param predicate A predicate used to evaluate which elements match the condition.
+ * @return The single element that matches the predicate or the default value if no such element
+ *         exists or multiple elements match.
+ * @since 6.1.0
  */
-fun <E> Array<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
+fun <E> Array<E>.findOnlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
     return filter(predicate).run { if (size == 1) first() else default() }
 }
 /**
- * Returns the only element of the array that matches the given predicate or throws the exception provided
- * by the given `lazyException` supplier if the matching element count is not exactly one.
+ * Finds the only element in the array that matches the given predicate, or throws an exception
+ * provided by the `lazyException` supplier if there is not exactly one matching element.
  *
- * @param lazyException A supplier function that provides the exception to be thrown if the condition is not met.
- * @param predicate A predicate used to filter elements in the array.
- * @throws Throwable When the array does not contain exactly one element that matches the predicate.
- * @since 2.1.0
+ * @param lazyException A supplier for the exception to be thrown if the conditions are not met.
+ * This supplier will only be invoked at most once.
+ * @param predicate A condition used to filter elements in the array. The method will evaluate this
+ * predicate for each element in the array.
+ * @return The single element that matches the predicate if precisely one element satisfies the condition.
+ * @throws Throwable The exception provided by the `lazyException` supplier if no matching element
+ * is found or if more than one element matches the predicate.
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Array<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+fun <E> Array<E>.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
     return filter(predicate).run { if (size == 1) first() else throw lazyException() }
+}
+/**
+ * Finds the only element in the array that matches the given predicate or returns an error if the conditions are not met.
+ *
+ * @param predicate A function that tests whether an element satisfies the desired condition.
+ * @return Either an error encapsulated in a [NotOnlyResultError] object if the array has no matching element,
+ *         too many matching elements, or another exception occurs, or the single matching element if exactly one exists.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.findOnlyElementOrError(predicate: Predicate<E>): Either<NotOnlyResultError, E> = either {
+    catching({ findOnlyElement(predicate) }) { e: Exception ->
+        when (e) {
+            is NoResultsException -> NoResults
+            is NoSuchElementException -> Empty
+            is TooManyResultsException -> TooManyResults
+            else -> throw IllegalStateException()
+        }
+    }
+}
+
+/**
+ * Splits the array into chunks based on a predicate condition. Each chunk will end
+ * immediately before an element that satisfies the given predicate, and a new chunk
+ * will start after that element.
+ *
+ * @param E the type of elements contained in the array.
+ * @param predicate a function that evaluates each element to determine chunk boundaries.
+ * @return a list of lists, where each sublist represents a chunk of the original array
+ *         split according to the predicate.
+ * @since 2.1.0
+ */
+infix fun <E> Array<E>.chunkedWhile(predicate: Predicate<E>): List<List<E>> = toList().run {
+    if (isEmpty()) return@run emptyList()
+    val result = mutableListOf<MutableList<E>>()
+    var current = mutableListOf<E>()
+    for (i in indices) {
+        current.add(this[i])
+        if (predicate(this[i])) {
+            result.add(current)
+            current = mutableListOf()
+        }
+    }
+    result.add(current)
+    if (result.last().isEmpty()) result.dropLast(1) else result
+}
+
+/**
+ * Creates a new list where each element in the original array is repeated a specified number of times.
+ *
+ * @param n The number of times each element in the array should be repeated. Must be a non-negative integer.
+ * @return A list containing the elements of the original array repeated the specified number of times.
+ * @since 2.1.0
+ */
+infix fun <E> Array<E>.repeatEach(n: Int): List<E> {
+    val resultList = mutableListOf<E>()
+    forEach {
+        { resultList += it } * n
+    }
+
+    return resultList
+}
+
+/**
+ * Finds the mode (most frequently occurring element) in the array.
+ * If there are multiple elements with the same frequency,
+ * the first one encountered is returned.
+ *
+ * @return The mode of the array, or `null` if the array is empty.
+ * @since 2.1.0
+ */
+fun <E> Array<E>.mode(): E? = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+
+/**
+ * Searches for the specified element in the array and returns its index. If the element is not found,
+ * the specified exception is lazily created and thrown.
+ *
+ * @param element The element to locate in the array.
+ * @param lazyException A supplier function that provides the exception to be thrown when the element is not found.
+ * @throws Throwable The exception returned by the [lazyException] supplier if the element is not found.
+ * @return The index of the element in the array if it exists.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.indexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
+    indexOf(element).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Searches for the last occurrence of the specified element within the array and
+ * throws a custom exception if the element is not found.
+ *
+ * @param element The element to search for within the array.
+ * @param lazyException A supplier that provides the exception to be thrown if the element is not found.
+ * @throws Throwable The exception supplied by [lazyException] if the element is not found.
+ * @return The index of the last occurrence of the specified element if it exists in the array.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.lastIndexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
+    lastIndexOf(element).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Finds the index of the first element in the array that matches the given predicate.
+ * Throws an exception provided by the `lazyException` supplier if no element satisfies the predicate.
+ *
+ * @param lazyException A supplier that provides the throwable to be thrown if no elements match the predicate.
+ * @param predicate A predicate that determines whether an element satisfies a condition.
+ * @return The index of the first element matching the predicate.
+ * @throws Throwable The exception provided by `lazyException` if no element matches the predicate.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.indexOfFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) =
+    indexOfFirst(predicate).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Returns the index of the last element in the array that matches the given [predicate].
+ * Throws an exception provided by [lazyException] if no matching element is found.
+ *
+ * @param lazyException A supplier for the exception to be thrown if no matching element is found.
+ * @param predicate A condition to evaluate each element of the array.
+ * @throws Throwable The exception provided by [lazyException] if no element satisfies the [predicate].
+ * @return The index of the last element that matches the [predicate].
+ * @since 6.1.0
+ */
+fun <E> Array<E>.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) =
+    indexOfLast(predicate).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Searches the array for the specified element and returns its index, or raises a `NotFound` error
+ * if the element is not present.
+ *
+ * The method uses the `either` scope to handle potential errors functionally. If the element is found,
+ * its index is returned; otherwise, a `NotFound` error is raised.
+ *
+ * @param E The type of the elements in the array.
+ * @param element The element to search for within the array.
+ * @return The index of the given element in the array if it is found.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.indexOfOrError(element: E) = either {
+    val index = indexOf(element)
+    ensure(index != INDEX_NOT_FOUND) { NotFound(element) }
+    index
+}
+/**
+ * Returns the last index of the specified element in the array, or raises a [NotFound] error
+ * if the element is not present.
+ *
+ * This method ensures safe operations by leveraging the `either` scope to handle errors functionally.
+ *
+ * @param element The element to search for in the array.
+ * @return The last index of the specified element in the array if it exists.
+ * @since 6.1.0
+ */
+fun <E> Array<E>.lastIndexOfOrError(element: E) = either {
+    val index = lastIndexOf(element)
+    ensure(index != INDEX_NOT_FOUND) { NotFound(element) }
+    index
+}
+/**
+ * Returns the index of the first element in the array that matches the given [predicate].
+ * If no such element is found, raises an error of type `NoResults`.
+ *
+ * This function utilizes the `either` scope for functional-style error handling,
+ * ensuring short-circuiting if no match is found.
+ *
+ * @param E The type of elements contained in the array.
+ * @param predicate A predicate function used to evaluate each element in the array.
+ *                  The function should return `true` for the desired element.
+ * @return The index of the first element that matches the [predicate].
+ * @since 6.1.0
+ */
+fun <E> Array<E>.indexOfFirstOrError(predicate: Predicate<E>) = either {
+    val index = indexOfFirst(predicate)
+    ensure(index != INDEX_NOT_FOUND) { NoResults }
+    index
+}
+/**
+ * Returns the index of the last element matching the given [predicate] in the array.
+ * If no such element is found, raises an error.
+ *
+ * This function uses the `either` scope to handle the case where no matching element is found
+ * by raising an error of type `NoResults`.
+ *
+ * @param E The type of elements in the array.
+ * @param predicate A lambda function that takes an element of type [E] and returns `true`
+ *                  if the element matches the condition, or `false` otherwise.
+ * @return The index of the last element in the array that matches the given [predicate].
+ * @since 6.1.0
+ */
+fun <E> Array<E>.indexOfLastOrError(predicate: Predicate<E>) = either {
+    val index = indexOfLast(predicate)
+    ensure(index != INDEX_NOT_FOUND) { NoResults }
+    index
 }
 
 /**
@@ -1793,23 +1352,9 @@ inline operator fun <E> Array<E>.get(find: Predicate<E>): E? {
  * @throws Throwable The exception provided by `lazyException` if no matching element is found.
  * @since 2.1.0
  */
-operator fun <E> Array<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier) =
-    find(find) ?: throw lazyException()
-
-/**
- * Searches for an element in the array that matches the given predicate. 
- * If no such element is found, throws an exception provided by the lazyException supplier.
- *
- * @param lazyException A supplier that provides the exception to be thrown if no matching element is found.
- *                       Defaults to throwing a NoSuchElementException with a default message.
- * @param find A predicate used to evaluate each element in the array.
- * @since 2.1.0
- */
-fun <E> Array<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>): E & Any {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return find(find) ?: throw lazyException()
+operator fun <E> Array<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier): E {
+    for (element in this) if (find(element)) return element
+    throw lazyException()
 }
 
 /**
@@ -1844,8 +1389,8 @@ inline operator fun <reified E> Array<E>.get(range: IntProgression) = toList().s
  * @throws Throwable The exception supplied by [lazyException] if the index is out of bounds.
  * @since 2.1.0
  */
-operator fun <E> Array<E>.get(index: Int, lazyException: ThrowableSupplier = { NoSuchElementException("Index $index not present") }): E =
-    getOrNull(index) ?: throw lazyException()
+operator fun <E> Array<E>.get(index: Int, lazyException: ThrowableSupplier = { IndexOutOfBoundsException("Index $index not present") }): E =
+    try { this[index] } catch (_: Exception) { throw lazyException() }
 /**
  * Returns the element at the position corresponding to the given percentage
  * within the array. The percentage is calculated relative to the size of the array.
@@ -1985,6 +1530,23 @@ infix fun <E> Array<E>.percent(p: Percentage): E {
     validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()
     return this[index]
+}
+/**
+ * Retrieves an element from the list based on the given percentage.
+ * The percentage is used to calculate the index of the element to retrieve.
+ * Returns the element wrapped in an `Either` structure or an error if the operation fails.
+ *
+ * @param p The percentage value used to determine the element's position. It must be between 0 and 100.
+ * @return Either an `IndexOutOfBoundsErrors` if the index is invalid or the element at the calculated position.
+ * @since 6.1.0
+ */
+infix fun <E> Array<E>.percentOrError(p: Percentage): Either<IndexOutOfBoundsError, E> = either {
+    ensure(isNotEmpty()) { Empty }
+    validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
+    val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()
+    catching({ this@percentOrError[index] }) { e: IndexOutOfBoundsException ->
+        IndexOutOfBounds(tryOrNull { e.message.orEmpty().let { (it / Char.SPACE).second().toInt() } })
+    }
 }
 
 /**

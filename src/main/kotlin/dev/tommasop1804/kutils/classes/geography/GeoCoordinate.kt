@@ -11,8 +11,10 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geometry.*
 import dev.tommasop1804.kutils.classes.measure.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.geolatte.geom.G2D
@@ -33,6 +35,7 @@ import java.io.Serializable
 import java.util.*
 import kotlin.math.*
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 
 /**
  * Represents a geographical coordinate with latitude and longitude.
@@ -184,86 +187,87 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
         fun isValidLongitude(longitude: Double): Boolean = longitude >= -180 && longitude <= 180
 
         /**
-         * Parses a string representation of a geo-coordinate and converts it into a [GeoCoordinate] object.
+         * Parses a string representation of a coordinate and converts it into a `GeoCoordinate`.
+         * The format of the input string can either be in the SRID-prefixed PostGIS representation
+         * or a delimiter-separated representation (e.g., ";" or ",").
          *
-         * @param coordinate The string representation of the geo-coordinate. The format can either be a PostGIS SRID format
-         * or a delimited string with latitude and longitude values (separated by ";" or ",").
-         * @return A [Result] containing a [GeoCoordinate] object if parsing is successful, or an exception if parsing fails.
-         * @since 1.0.0
+         * Possible errors:
+         * - [InvalidFormatOfType] - The input string does not match the expected format.
+         * - [ValidationError.ExpectationMismatch] - if in case of postgis format SRID is not 4326.
+         *
+         * @param coordinate the string representation of the coordinate to be parsed
+         * @return an `Either` containing a `ValidationError` if parsing fails, or a `GeoCoordinate` if successful
+         * @since 6.1.0
          */
-        fun parse(coordinate: String) = runCatching {
+        fun parse(coordinate: String): Either<ValidationError, GeoCoordinate> = either {
             if (coordinate.startsWith("SRID"))
-                parsePostGis(coordinate)()
+                parsePostGis(coordinate).bind()
             else {
                 val parts = coordinate.split(
                     (if (";" in coordinate) ";" else (if ("," in coordinate) "," else "")).toRegex()
                 ).dropLastWhile { it.isEmpty() }.toTypedArray()
-                GeoCoordinate(parts[0].trim().toDouble(), parts[1].trim().toDouble())
+                GeoCoordinate(parts[0].trim().toDoubleOrError().bind(), parts[1].trim().toDoubleOrError().bind())
             }
         }
 
         /**
-         * Parses a coordinate string in Degree-Minute-Second (DMS) format to a GeoCoordinate object.
-         * The format should include degrees, minutes, seconds, and an identifier (N, S, E, W) for direction.
+         * Parses a coordinate string in Degree-Minute-Second (DMS) format and converts it into a GeoCoordinate object.
          *
-         * @param coordinate A string representing the coordinate in DMS format. Examples include
-         *                   "40°44'55\" N, 73°59'11\" W" or "40°44'55\" N;73°59'11\" W".
-         *                   The input is expected to contain valid latitude and longitude parts.
-         *                   Latitude must use 'N' or 'S', and longitude must use 'E' or 'W'.
-         * @return A GeoCoordinate object representing the parsed latitude and longitude values wrapped in a Result.
-         *         On error, the result will contain an exception indicating invalid input format or parsing failure.
-         * @since 1.0.0
+         * The method expects a string representation of the latitude and longitude in DMS format with the format:
+         * `#°#'#" N|S; #°#'#" E|W` or `#°#'#" N|S, #°#'#" E|W`.
+         * It also supports a format where latitude and longitude are separated by the presence of 'N', 'S', 'E', and 'W'.
+         *
+         * @param coordinate The coordinate string in DMS format to be parsed. It must include both latitude and longitude
+         *                   separated by `;`, `,`, or implicitly by the cardinal directions.
+         * @return An `either` container containing a `GeoCoordinate` object if the parsing and conversion succeed,
+         *         or an error if the format is invalid or parsing fails.
+         * @since 6.1.0
          */
-        fun parseDMS(coordinate: String) = runCatching {
+        fun parseDMS(coordinate: String) = either {
             val s = coordinate.trim()
             var parts = s.split((if (";" in s) ";" else ",").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (parts.size == 1) {
                 val index = if ("N" in s) s.indexOf("N") + 1 else s.indexOf("S") + 1
                 parts = arrayOf(s.take(index), s.drop(index))
             }
-            parts.size == 2 || throw MalformedInputException("Invalid format")
+            ensure(parts.size == 2) { InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Not 2 parts.") }
             val lat = parts[0].trim()
             val lon = parts[1].trim()
 
-            !("°" !in lat || "'" !in lat || "\"" !in lat || ("N" !in lat && "S" !in lat)) || throw MalformedInputException(
-                "Invalid latitude format (#°#'#\" N|S)"
-            )
-            !((("°" !in lon) || ("'" !in lon) || ("\"" !in lon) || ("E" !in lon && "W" !in lon))) || throw MalformedInputException(
-                "Invalid longitude format (#°#'#\" E|W)"
-            )
+            ensure(!("°" !in lat || "'" !in lat || "\"" !in lat || ("N" !in lat && "S" !in lat))) {
+                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid latitude format (#°#'#\" N|S)")
+            }
+            ensure(!((("°" !in lon) || ("'" !in lon) || ("\"" !in lon) || ("E" !in lon && "W" !in lon)))) {
+                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid longitude format (#°#'#\" E|W)")
+            }
 
-            val latDegrees: Double = parseDegree(lat, 'S')
-            val latMinutes: Double = parseMinutes(lat)
-            val latSeconds: Double = parseSeconds(lat)
-            val latitude = latDegrees + latMinutes / 60 + latSeconds / 3600
+            catching({
+                val latDegrees: Double = parseDegree(lat, 'S')
+                val latMinutes: Double = parseMinutes(lat)
+                val latSeconds: Double = parseSeconds(lat)
+                val latitude = latDegrees + latMinutes / 60 + latSeconds / 3600
 
-            val lonDegrees: Double = parseDegree(lon, 'W')
-            val lonMinutes: Double = parseMinutes(lon)
-            val lonSeconds: Double = parseSeconds(lon)
-            val longitude = lonDegrees + lonMinutes / 60 + lonSeconds / 3600
+                val lonDegrees: Double = parseDegree(lon, 'W')
+                val lonMinutes: Double = parseMinutes(lon)
+                val lonSeconds: Double = parseSeconds(lon)
+                val longitude = lonDegrees + lonMinutes / 60 + lonSeconds / 3600
 
-            GeoCoordinate(latitude, longitude)
+                GeoCoordinate(latitude, longitude)
+            }) { e: NumberFormatException -> InvalidFormatOfType(coordinate, typeOf<Double>()) }
         }
 
         /**
-         * Parses a coordinate string in Degree-Decimal Minutes (DM) format into a GeoCoordinate object.
-         * The input string should specify latitude and longitude in the DM format, with the latitude
-         * followed by the longitude separated by a semicolon or comma.
+         * Parses a coordinate string in Degree-Minute (DM) format and converts it into a GeoCoordinate object.
          *
-         * Example formats:
-         * - "45°30.0' N, 9°30.0' E"
-         * - "45°30.0' N; 9°30.0' E"
-         * - "45°30.0' N9°30.0' E" (no delimiter)
+         * The coordinate string should include latitude and longitude parts separated by a delimiter (`,` or `;`).
+         * Latitude should be in the format `#°#'#` followed by `N` or `S`, and longitude should be in the format
+         * `#°#'#` followed by `E` or `W`. Example formats include `12°34'N,56°78'E` or `12°34'S;56°78'W`.
          *
-         * The latitude must contain "°", "'", and either "N" or "S". The longitude must contain "°", "'", and
-         * either "E" or "W". If the format is invalid, the method will throw an exception.
-         *
-         * @param coordinate the coordinate string in Degree-Decimal Minutes (DM) format to be parsed
-         * @return a Result containing the parsed GeoCoordinate object if successful, or an exception if the parsing fails
-         * @throws MalformedInputException if the input coordinate string is invalid
-         * @since 1.0.0
+         * @param coordinate The coordinate string to be parsed. It must be in valid DM format.
+         * @return The parsed GeoCoordinate object containing the latitude and longitude.
+         * @since 6.1.0
          */
-        fun parseDM(coordinate: String) = runCatching {
+        fun parseDM(coordinate: String) = either {
             val s = coordinate.trim()
             var parts = s.split((if (";" in s) ";" else ",").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (parts.size == 1) {
@@ -273,14 +277,15 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
                     s.drop(index)
                 )
             }
-            parts.size == 2 || throw MalformedInputException("Invalid format")
+            ensure(parts.size == 2) { InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Not 2 parts.") }
             val lat = parts[0].trim()
             val lon = parts[1].trim()
 
-            !("°" !in lat || "'" !in lat || ("N" !in lat && "S" !in lat)) || throw MalformedInputException("Invalid latitude format (example: #°#.#' N|S)")
-
-            validateInputFormat(!("°" !in lon || "'" !in lon || ("E" !in lon && "W" !in lon))) {
-                "Invalid longitude format (example: #°#.#' E|W)"
+            ensure(!("°" !in lat || "'" !in lat || ("N" !in lat && "S" !in lat))) {
+                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid latitude format (#°#'#\" N|S)")
+            }
+            ensure(!((("°" !in lon) || ("'" !in lon) ||("E" !in lon && "W" !in lon)))) {
+                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid longitude format (#°#'#\" E|W)")
             }
 
             val latDegrees: Double = parseDegree(lat, 'S')
@@ -440,84 +445,88 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
         fun ofUtm(zone: Int, latitudeBand: Char, easting: Double, northing: Double) = ofUtm("$zone$latitudeBand", easting, northing)
 
         /**
-         * Parses a UTM (Universal Transverse Mercator) coordinate string and converts it into a structured representation.
-         * The input string should consist of three components: the zone, easting, and northing values, separated by spaces.
+         * Parses a UTM (Universal Transverse Mercator) string into a GeoCoordinate object.
          *
-         * @param utm The UTM coordinate string to parse. Expected to be in the format "zone easting northing".
-         * @return A Result wrapping the parsed UTM object if successful, or an exception if the input format is invalid.
-         * @since 3.0.0
+         * The input string is expected to consist of three parts separated by spaces:
+         * zone, easting, and northing. If the format is invalid, an error will be returned.
+         *
+         * @param utm The UTM string to parse, consisting of zone, easting, and northing.
+         * @return Either an error of type InvalidFormatOfType if the input format is invalid,
+         * or a GeoCoordinate object representing the parsed UTM coordinates.
+         * @since 6.1.0
          */
-        fun parseUtm(utm: String) = runCatching {
+        fun parseUtm(utm: String): Either<InvalidFormatOfType, GeoCoordinate> = either {
             val parts = utm.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            parts.size == 3 || throw MalformedInputException("Invalid UTM format: $utm")
+            ensure(parts.size == 3) { InvalidFormatOfType(utm, typeOf<GeoCoordinate>(), "Not 3 parts.") }
 
-            ofUtm(parts[0], parts[1].toDouble(), parts[2].toDouble())
+            ofUtm(parts[0], parts[1].toDoubleOrError().bind(), parts[2].toDoubleOrError().bind())
         }
 
         /**
-         * Parses a WKT (Well-Known Text) representation of a POINT geometry
-         * and converts it into a [GeoCoordinate] object.
+         * Parses a WKT (Well-Known Text) representation of a coordinate in the form `POINT(x y)`
+         * and converts it into a `GeoCoordinate` object.
          *
-         * @param wkt The input Well-Known Text (WKT) representation of a POINT.
-         *            It should follow the format "POINT(x y)" where x and y
-         *            are the coordinates.
-         * @return A [GeoCoordinate] object representing the parsed coordinate.
-         * @since 3.0.0
+         * @param wkt The WKT string representation of the coordinate.
+         * @return Either an `InvalidFormatOfType` if the WKT string is malformed or does not
+         *         match the expected format, or a valid `GeoCoordinate` object if parsing succeeds.
+         * @since 6.1.0
          */
-        fun parseWkt(wkt: String) = runCatching {
-            wkt.contains("POINT(", true) || throw MalformedInputException("Invalid WKT format: $wkt")
+        fun parseWkt(wkt: String): Either<InvalidFormatOfType, GeoCoordinate> = either {
+            ensure(wkt.contains("POINT(", true)) {
+                InvalidFormatOfType(wkt, typeOf<GeoCoordinate>(), "No `POINT(` present.")
+            }
             val parts = wkt.replace("POINT(", "").replace(")", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()
-            GeoCoordinate(parts[0].toDouble(), parts[1].toDouble())
+            GeoCoordinate(parts[0].toDoubleOrError().bind(), parts[1].toDoubleOrError().bind())
         }
 
         /**
-         * Parses a GeoJSON string representing a Point and converts it into a [GeoCoordinate] instance.
-         * This function ensures the input string is in the correct GeoJSON format and extracts the latitude
-         * and longitude values.
+         * Parses a GeoJSON string to extract geographical coordinates.
          *
-         * @param geoJson The GeoJSON string that must start with '{"type":"Point"}' and contain valid coordinates.
-         * @return A [Result] containing a [GeoCoordinate] if parsing and validation are successful; otherwise, an error.
-         * @since 3.0.0
+         * @param geoJson the GeoJSON string representing a geographical point,
+         *                expected to include a `"type":"Point"` description and coordinates.
+         * @return an [Either] containing a [GeoCoordinate] object if the parsing is successful,
+         *         or an [InvalidFormatOfType] if the input format is invalid.
+         * @since 6.1.0
          */
-        fun parseGeoJson(geoJson: CharSequence) = runCatching {
-            geoJson.startsWith("{\"type\":\"Point\"") || throw MalformedInputException("Invalid GeoJSON format: $geoJson")
+        fun parseGeoJson(geoJson: CharSequence): Either<InvalidFormatOfType, GeoCoordinate> = either {
+            ensure(geoJson.startsWith("{\"type\":\"Point\"")) {
+                InvalidFormatOfType(geoJson, typeOf<GeoCoordinate>(), "No `\"type\":\"Point\"` present.")
+            }
             val parts =
                 geoJson.toString().replace("{\"type\":\"Point\",\"coordinates\":[", "").replace("]}", "").split(",".toRegex())
                     .dropLastWhile { it.isEmpty() }.toTypedArray()
-            GeoCoordinate(parts[1].toDouble(), parts[0].toDouble())
+            GeoCoordinate(parts[1].toDoubleOrError().bind(), parts[0].toDoubleOrError().bind())
         }
 
         /**
-         * Parses a PostGIS string into a [GeoCoordinate] object.
+         * Parses a PostGIS string representation of a geographic coordinate into a GeoCoordinate object.
+         * Validates the format of the input string, ensuring it follows the required structure and contains
+         * the expected SRID and coordinate information.
          *
-         * The input string must follow the PostGIS format including SRID and POINT definition,
-         * otherwise an [MalformedInputException] will be thrown. It extracts the SRID, latitude,
-         * and longitude values from the input string and constructs a [GeoCoordinate] object.
+         * Possible errors:
+         * - [InvalidFormatOfType] - if the input string does not follow the required format.
+         * - [ValidationError.ExpectationMismatch] - if the SRID is not equal to 4326.
          *
-         * @param postgis The PostGIS formatted string containing SRID and POINT coordinates.
-         * @return A [Result] wrapping a [GeoCoordinate] object if parsing is successful, or an exception if parsing fails.
-         * @throws MalformedInputException if the input string does not follow the PostGIS format.
-         * @throws ExpectationMismatchException if the SRID is not 4326.
-         * @since 3.0.0
+         * @param postgis A string representation of a PostGIS coordinate with SRID and POINT data.
+         * Must follow the format: "SRID=4326;POINT(longitude latitude)".
+         * @return An Either type containing validation errors on failure or the parsed GeoCoordinate on success.
+         * @since 6.1.0
          */
-        fun parsePostGis(postgis: String) = runCatching {
-            if (postgis.startsWith("SRID") && ";POINT(" in postgis) {
-                val srid = postgis[5..<postgis.indexOf(';'.code.toChar())].toInt()
-                srid == 4326 || throw ExpectationMismatchException("SRID must be 4326")
-                val coordinates = postgis[16..<postgis.length - 1]
+        fun parsePostGis(postgis: String): Either<ValidationError, GeoCoordinate> = either {
+            ensure(postgis.startsWith("SRID") && ";POINT(" in postgis) {
+                InvalidFormatOfType(postgis, typeOf<GeoCoordinate>(), "No `SRID` and/or `;POINT(` present.")
+            }
+            val srid = postgis[5..<postgis.indexOf(';'.code.toChar())].toInt()
+            ensure(srid == 4326) { ValidationError.ExpectationMismatch("SRID", srid, 4326) }
+            val coordinates = postgis[16..<postgis.length - 1]
 
-                val parts = coordinates.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                if (parts.size == 2) {
-                    try {
-                        val longitude = parts[0].toDouble()
-                        val latitude = parts[1].toDouble()
-                        GeoCoordinate(latitude, longitude)
-                    } catch (e: NumberFormatException) {
-                        throw MalformedInputException("Invalid coordinate format")
-                    }
-                } else throw MalformedInputException("Invalid coordinates format in PostGIS string")
-            } else throw MalformedInputException("Invalid PostGIS string format")
+            val parts = coordinates.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            ensure(parts.size == 2) { InvalidFormatOfType(postgis, typeOf<GeoCoordinate>(), "Not 2 parts.") }
+
+            val longitude = parts[0].toDoubleOrError().bind()
+            val latitude = parts[1].toDoubleOrError().bind()
+            GeoCoordinate(latitude, longitude)
         }
 
         class Serializer : ValueSerializer<GeoCoordinate>() {

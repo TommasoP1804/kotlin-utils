@@ -16,16 +16,17 @@ import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.coding.*
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.MAPPER
 import dev.tommasop1804.kutils.classes.coding.Json.Companion.toJson
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.registry.Contact.Email.Companion.toEmail
 import dev.tommasop1804.kutils.classes.time.*
 import dev.tommasop1804.kutils.classes.web.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
-import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -37,6 +38,7 @@ import java.security.interfaces.RSAPublicKey
 import java.security.spec.RSAPublicKeySpec
 import java.time.Instant
 import java.util.*
+import kotlin.reflect.typeOf
 import com.auth0.jwt.algorithms.Algorithm as Auth0JwtAlgorithm
 
 /**
@@ -316,41 +318,58 @@ class Jwt private constructor(private val value: String) : CharSequence {
     val pl_kc_email get() = (payload["email"] as? String)?.toEmail()?.invoke()
 
     /**
-     * Provides access to an RSA public key for a specified key ID (`hd_keyId`) from a remote OpenID Connect discovery
-     * document and JWKS endpoint. This variable fetches and parses the required data over HTTP to generate an RSA public key.
+     * Provides an RSA public key retrieved from a remote OpenID Connect issuer's JSON Web Key Set (JWKS).
      *
-     * The operation involves:
-     * - Fetching the `.well-known/openid-configuration` document from the issuer's URL (`pl_issuer`).
-     * - Retrieving the `jwks_uri` from the discovery document.
-     * - Fetching the JSON Web Key Set (JWKS) from the provided URI.
-     * - Locating the specified key using the `kid` field.
-     * - Constructing the RSA public key using the modulus (`n`) and exponent (`e`) values from the key data.
+     * This property executes a series of network requests and parsing operations:
+     * - It fetches the OpenID Connect discovery document from the issuer's `.well-known/openid-configuration` endpoint.
+     * - It retrieves the JWKS URI from the discovery document.
+     * - It fetches the JWKS, searching for a specific key with a matching key ID (kid).
+     * - If a matching key is found, it constructs an `RSAPublicKey` instance using the modulus (n) and exponent (e)
+     *   provided in the JWKS.
      *
-     * The process uses lazy evaluation and handles exceptions to return a result encapsulated in a Kotlin `Result`.
+     * If any of the required properties, such as the issuer or key ID, are not provided, or if the key retrieval fails,
+     * the result will contain an error encapsulated as `Either<Error, RSAPublicKey>`.
      *
-     * Exceptions that may be raised during evaluation include:
-     * - **RequiredFieldException**: Thrown if the `pl_issuer` field is null or blank.
-     * - **HttpResponseException**: Thrown if a non-200 HTTP response is returned while fetching remote resources.
-     * - **NoSuchElementException**: Thrown if no key matching the specified key ID (`hd_keyId`) is found in the JWKS.
+     * Key details:
+     * - The `pl_issuer` property is the base URL of the OpenID Connect server.
+     * - The `hd_keyId` property specifies the identifier of the key to retrieve.
+     * - Errors during network requests, response parsing, or cryptographic key generation are properly raised and handled.
      *
-     * @return A `Result` containing the generated RSA public key or an exception if the operation fails.
-     * @since 3.0.0
+     * This property ensures robust handling of errors and invalid formats, returning an `Either` type to represent
+     * either a successful result or an error state.
+     *
+     * Possible errors:
+     * - [RequiredProperty] - if `pl_issuer` and/or `hd_keyId` are null
+     * - [HttpError.ResponseError] - if the HTTP request fails
+     * - [InvalidFormatOfType] - if the HTTP request is not a valid JSON response
+     * - [InvalidFormatOfType] - if the kid `n` & `e` are not valid base64 strings
+     * - [NotFound] - if the RSA algorithm is not found
+     * - [Uncomputable] - if the RSA public key cannot be computed
+     *
+     * @since 6.1.0
      */
-    @Suppress("RedundantLabeledReturnOnLastExpressionInLambda")
-    val rsaPublicKey: Result<RSAPublicKey>
-        get() = runCatching {
-            if (pl_issuer.isNullOrBlank()) throw RequiredPropertyException("issuer")
+    val rsaPublicKey: Either<Error, RSAPublicKey>
+        get() = either {
+            if (pl_issuer.isNullOrBlank()) raise(RequiredProperty(::pl_issuer))
             val client = HttpClient.newHttpClient()
 
             fun fetchJson(url: String): JsonNode {
-                val uri = URI.create(url)
+                val uri = url.toUri().bind()
                 val request = HttpRequest.newBuilder()
                     .uri(uri)
                     .GET()
                     .build()
                 val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-                if (response.statusCode() != 200) throw HttpResponseException(response.statusCode(), uri, HttpMethod.Get)
-                return MAPPER.readTree(response.body())
+                if (!response.status!!.isSuccessful) raise(HttpError.ResponseError(
+                    statusCode = response.statusCode(),
+                    uri = uri,
+                    method = HttpMethod.Get,
+                    responseBody = response.body(),
+                    responseHeaders = response.headers
+                ))
+                return response.body().let { tryOrRaise({ t ->
+                    InvalidFormatOfType(it, typeOf<JsonNode>(), t)
+                }) { MAPPER.readTree(it) } }
             }
 
             val discoveryURL = (if (pl_issuer!!.endsWith(Char.SLASH)) pl_issuer else ("$pl_issuer/"))
@@ -362,20 +381,24 @@ class Jwt private constructor(private val value: String) : CharSequence {
             val keys = jwks["keys"]
             if (keys.isArray) {
                 for (key in keys) {
-                    if (key.has("kid") && key.get("kid").asString() == hd_keyId) {
+                    if (key.has("kid") && key.get("kid").asString() == (hd_keyId ?: raise (RequiredProperty(::hd_keyId)))) {
                         val n = key["n"].asString()
                         val e = key["e"].asString()
-                        val nBytes = Base64.getUrlDecoder().decode(n)
-                        val eBytes = Base64.getUrlDecoder().decode(e)
+                        val nBytes = n.let { tryOrRaise({ t ->
+                            InvalidFormatOfType(it, typeOf<ByteArray>(), t)
+                        }) { Base64.getUrlDecoder().decode(it) } }
+                        val eBytes = e.let { tryOrRaise({ t ->
+                            InvalidFormatOfType(it, typeOf<ByteArray>(), t)
+                        }) { Base64.getUrlDecoder().decode(it) } }
                         val nBigInt = BigInt(1, nBytes)
                         val eBigInt = BigInt(1, eBytes)
                         val spec = RSAPublicKeySpec(nBigInt, eBigInt)
-                        val keyFactory = KeyFactory.getInstance("RSA")
-                        return@runCatching keyFactory.generatePublic(spec) as RSAPublicKey
+                        val keyFactory = tryOrRaise({ NotFound("RSA") }) { KeyFactory.getInstance("RSA") }
+                        return@either keyFactory.generatePublic(spec) as RSAPublicKey
                     }
                 }
             }
-            throw NoSuchElementException("No corrispondent key found.")
+            raise(Uncomputable())
         }
 
     /**
@@ -415,20 +438,23 @@ class Jwt private constructor(private val value: String) : CharSequence {
         fun CharSequence.isValidJwt() = runCatching { Jwt(this) }.isSuccess
 
         /**
-         * Converts the current [CharSequence] into a JWT object by attempting to parse it.
+         * Converts the current [CharSequence] into a JWT object, while handling potential errors during
+         * conversion.
          *
-         * This method uses the provided string representation of a JSON Web Token (JWT)
-         * to create an instance of the `JWT` class.
-         * 
-         * The process wraps the creation of the `JWT` object in a `Result` to capture any 
-         * potential parsing or initialization errors without throwing an exception.
+         * This function attempts to create an instance of the `Jwt` class from the current [CharSequence].
+         * If the conversion fails due to invalid formatting or any other exception, it returns an
+         * `InvalidFormatOfType` error wrapped in an `Either`.
          *
-         * @receiver The [CharSequence] to be converted into a JWT object.
-         * @return A [Result] containing the initialized `JWT` object if successful, or
-         *         an error if the input is invalid or the parsing fails.
-         * @since 3.0.0
+         * @receiver The [CharSequence] to be converted into a JWT.
+         * @return An `Either` representation of the operation, containing either the successfully
+         * created `Jwt` object or an error of type `InvalidFormatOfType` with additional context.
+         * @since 6.1.0
          */
-        fun CharSequence.toJwt() = runCatching { Jwt(this) }
+        fun CharSequence.toJwt() = either {
+            catching({ Jwt(this@toJwt) }) { t: Throwable ->
+                InvalidFormatOfType(this@toJwt, typeOf<Jwt>(), t)
+            }
+        }
 
         /**
          * Generates a JWT (JSON Web Token) using a given payload and an optional expiration time.
@@ -456,7 +482,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
                     is String -> builder.withClaim(key, value)
                     is Date -> builder.withClaim(key, value)
                     is Instant -> builder.withClaim(key, value)
-                    is Map<*, *> -> tryOrThrow({ -> IllegalArgumentException("Not a valid claim format.") }, includeCause = false) {
+                    is Map<*, *> -> tryOrThrow({ IllegalArgumentException("Not a valid claim format.") }, includeCause = false) {
                         builder.withClaim(key, value as DataMap)
                     }
                     is List<*> -> builder.withClaim(key, value)

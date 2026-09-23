@@ -5,7 +5,8 @@
 package dev.tommasop1804.kutils.classes.maps
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import kotlin.reflect.KProperty1
 import kotlin.collections.filter as kFilter
 
@@ -133,9 +134,9 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
      * Filters the current map to include only the specified properties.
      *
      * This function creates a new `PropertiesMap` instance containing only the key-value
-     * pairs where the keys are included in the provided iterable of properties.
+     * pairs where the keys are included in the provided iterables of properties.
      *
-     * @param properties An iterable collection of property references (`KProperty1`)
+     * @param properties An iterables collection of property references (`KProperty1`)
      *                   that determine which key-value pairs to include in the result.
      * @return A `PropertiesMap` instance containing only the specified properties.
      * @since 3.10.0
@@ -155,7 +156,7 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
     /**
      * Filters the current `PropertiesMap` to retain only the entries whose keys match the specified property names.
      *
-     * @param properties An iterable of property names to retain within the resulting `PropertiesMap`.
+     * @param properties An iterables of property names to retain within the resulting `PropertiesMap`.
      *                   Only entries with keys matching these names will be included in the final map.
      * @return A new `PropertiesMap` instance containing only the filtered entries.
      * @since 3.10.0
@@ -177,19 +178,18 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
      */
     fun with(property: KProperty1<out T, *>, value: Any?) = PropertiesMap(map + (property to value))
     /**
-     * Updates the properties map by setting a value for the specified property.
+     * Updates the properties map with the specified property and value. If the property does not exist in the current map,
+     * an error is raised.
      *
-     * This method searches for a property in the existing map by matching its name.
-     * If the property is found, its value is replaced with the provided value.
-     * If the property is not found, a `PropertyNotFoundException` is thrown.
-     *
-     * @param property The name of the property to update in the map.
-     * @param value The new value to associate with the specified property.
-     * @return A new `PropertiesMap` instance with the updated key-value pair.
-     * @throws PropertyNotFoundException if the property with the specified name does not exist in the map.
-     * @since 3.10.0
+     * @param property The name of the property to update.
+     * @param value The value to associate with the specified property.
+     * @return An [Either] result containing either a [IterableError.NotFound] if the property is not found,
+     *         or a new [PropertiesMap] with the updated property and value.
+     * @since 6.1.0
      */
-    fun with(property: String, value: Any?) = PropertiesMap(map + ((map.find { it.key.name == property }?.key ?: throw PropertyNotFoundException(property)) to value))
+    fun with(property: String, value: Any?): Either<IterableError.NotFound, PropertiesMap<T>> = either {
+        PropertiesMap(map + ((map.find { it.key.name == property }?.key ?: raise(IterableError.NotFound(property))) to value))
+    }
     /**
      * Creates a new `PropertiesMap` instance by adding or replacing an entry in the current map.
      *
@@ -204,20 +204,16 @@ class PropertiesMap<T : Any>(private val map: Map<KProperty1<out T, *>, Any?>) :
      */
     infix fun with(property: Pair<KProperty1<out T, *>, Any?>) = PropertiesMap(map + (property.first to property.second))
     /**
-     * Creates a new `PropertiesMap` instance with an updated key-value pair.
+     * Adds a property to the existing map. If the key is not found in the current map, it raises a `NotFound` error.
      *
-     * This function searches the current map for a key matching the provided property name.
-     * If a match is found, the corresponding key is updated with the new value.
-     * If no matching key can be found, a `PropertyNotFoundException` is thrown.
-     *
-     * @param property A pair consisting of a property name as a `String` (key)
-     *                 and the associated value to be updated or added to the map.
-     * @throws PropertyNotFoundException If the key specified in the property pair is not found in the map.
-     * @return A new `PropertiesMap` instance containing the updated key-value pair.
-     * @since 3.10.0
+     * @param property A pair consisting of a string key and a nullable value. The key is used to find the corresponding property in the map.
+     * @return An `Either` containing a `NotFound` error if the key is not found, or a new `PropertiesMap` instance with the updated properties.
+     * @since 6.1.0
      */
     @JvmName("withPairOfStringNullableAny")
-    infix fun with(property: Pair<String, Any?>) = PropertiesMap(map + ((map.find { it.key.name == property.first }?.key ?: throw PropertyNotFoundException(property.first)) to property.second))
+    infix fun with(property: Pair<String, Any?>): Either<IterableError.NotFound, PropertiesMap<T>> = either {
+        PropertiesMap(map + ((map.find { it.key.name == property.first }?.key ?: raise(IterableError.NotFound(property))) to property.second))
+    }
 
     /**
      * Determines whether the specified object is equal to this instance.

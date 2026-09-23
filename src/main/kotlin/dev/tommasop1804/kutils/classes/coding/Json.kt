@@ -18,14 +18,18 @@ import dev.tommasop1804.kutils.classes.collections.NonEmptyMList.Companion.toNon
 import dev.tommasop1804.kutils.classes.collections.NonEmptyMSet.Companion.toNonEmptyMSet
 import dev.tommasop1804.kutils.classes.collections.NonEmptySet.Companion.toNonEmptySet
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.maps.*
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMMap.Companion.toNonEmptyMMap
 import dev.tommasop1804.kutils.classes.maps.NonEmptyMap.Companion.toNonEmptyMap
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.v1.core.Table
+import tools.jackson.core.JacksonException
 import tools.jackson.core.JsonGenerator
 import tools.jackson.core.JsonParser
+import tools.jackson.core.exc.StreamReadException
 import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.*
 import tools.jackson.databind.annotation.JsonDeserialize
@@ -38,6 +42,7 @@ import tools.jackson.module.kotlin.KotlinModule
 import tools.jackson.module.kotlin.readValue
 import java.io.File
 import java.nio.file.Path
+import kotlin.reflect.typeOf
 
 
 /**
@@ -150,6 +155,63 @@ open class Json private constructor(@param:Language("json") override val value: 
         get() = toMap<Any?>().getOrThrow().removeNullsRecursively().toJson()
 
     /**
+     * Checks whether a JSON structure is considered empty.
+     *
+     * This property evaluates to true if the JSON structure is empty, either
+     * as an object (`isEmptyObject`) or as an array (`isEmptyArray`).
+     *
+     * @return true if the JSON structure is empty, false otherwise.
+     * @since 6.1.0
+     */
+    val isEmptyJson get() = isEmptyObject || isEmptyArray
+    /**
+     * Indicates whether the JSON object or structure is not empty.
+     *
+     * This property derives its value by negating the `isEmptyJson` condition.
+     * It is useful for performing quick checks to ensure that
+     * the JSON is not empty before processing.
+     *
+     * @see isEmptyJson
+     * @since 6.1.0
+     */
+    val isNotEmptyJson get() = !isEmptyJson
+    /**
+     * Checks if the given JSON object is empty after removing all whitespace,
+     * including spaces, newlines, carriage returns, and tabs. This property
+     * applies transformations to the JSON object value and compares it to a
+     * pre-defined empty JSON representation.
+     *
+     * @return true if the JSON object is considered empty, otherwise false.
+     * @since 6.1.0
+     */
+    val isEmptyObject get() = value.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", "") == EMPTY_JSON.value
+    /**
+     * A computed property that evaluates to `true` if the current object is not empty,
+     * and `false` otherwise. This is determined by checking the negation of `isEmptyObject`.
+     *
+     * @return `true` if the object is not empty, `false` otherwise.
+     * @since 6.1.0
+     */
+    val isNotEmptyObject get() = !isEmptyObject
+    /**
+     * A computed property that checks if the `value` string corresponds to an empty JSON array after
+     * removing all whitespace characters, including spaces, newlines, carriage returns, and tabs.
+     * Returns `true` if the processed string matches the representation of an empty JSON array.
+     *
+     * @since 6.1.0
+     */
+    val isEmptyArray get() = value.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "") == EMPTY_JSON_ARRAY.value
+    /**
+     * A read-only property indicating whether an array is not empty.
+     * Returns `true` if the associated `isEmptyArray` property evaluates to `false`,
+     * meaning the array contains one or more elements.
+     *
+     * @return Boolean value indicating the non-empty state of the array.
+     * @since 6.1.0
+     */
+    val isNotEmptyArray get() = !isEmptyArray
+
+    /**
      * Secondary constructor that initializes an instance using a `Code` object.
      * It internally delegates to the primary constructor with the code's value.
      *
@@ -175,7 +237,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     constructor(@Language("json") json: CharSequence) : this(
-        tryOrThrow({ -> MalformedInputException("Input is not a valid JSON") }) {
+        tryOrThrow({ MalformedInputException("Input is not a valid JSON") }) {
             MAPPER.writeValueAsString(MAPPER.readTree(json.toString()))
     })
 
@@ -202,7 +264,7 @@ open class Json private constructor(@param:Language("json") override val value: 
     constructor(path: Path) : this(path.toFile())
 
     init {
-        tryOrThrow({ -> MalformedInputException(Json::class) }) {
+        tryOrThrow({ MalformedInputException(Json::class) }) {
             MAPPER.readTree(value)
         }
     }
@@ -278,42 +340,54 @@ open class Json private constructor(@param:Language("json") override val value: 
         fun prettify(@Language("json") json: String) = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(MAPPER.readTree(json))!!
 
         /**
-         * Converts the current File instance to a JSON representation.
+         * Attempts to convert a File instance into a Json representation.
          *
-         * This method attempts to parse the file content into a JSON object.
-         * If the operation is successful, the result is wrapped in a `Result` object.
-         * In case of any failure during parsing, the exception is captured and also wrapped
-         * in the `Result` object.
+         * This method encapsulates the conversion process within a functional "either" context,
+         * allowing for safe error handling during the transformation. If the conversion fails,
+         * an InvalidConversion instance is returned, containing details about the source and
+         * target types, as well as the underlying exception.
          *
-         * @return A `Result` containing the parsed JSON object if successful, or an exception
-         * if parsing fails.
-         * @since 3.13.0
+         * @return Either a successfully converted Json instance or an InvalidConversion error.
+         * @since 6.1.0
          */
-        fun File.toJson() = runCatching { Json(this) }
+        fun File.toJson() = either {
+            catching({ Json(this@toJson) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toJson, typeOf<File>(), typeOf<Json>(), t)
+            }
+        }
         /**
-         * Converts the current Path object to a JSON representation.
+         * Converts the invoking `Path` instance to a `Json` representation.
+         * This method attempts to create a `Json` object using the `Path` as input.
+         * If the conversion fails, an `InvalidConversion` error is returned, capturing
+         * the source path, the target type (`Json::class`), and the exception that caused the failure.
          *
-         * The method attempts to create a JSON object from the Path and returns the
-         * result as a `Result` object. If the conversion fails, the error details
-         * are captured in the `Result` for further processing.
-         *
-         * @receiver Path instance to be converted to JSON.
-         * @return A `Result` wrapping the JSON representation of the Path, or
-         * an error if the operation fails.
-         * @since 3.13.0
+         * @return An `Either` containing the resulting `Json` object or an `InvalidConversion` error in case of failure.
+         * @receiver The `Path` object to be converted to `Json`.
+         * @since 6.1.0
          */
-        fun Path.toJson() = runCatching { Json(this) }
+        fun Path.toJson() = either {
+            catching({ Json(this@toJson) }) { t: Throwable ->
+                InvalidConversionBetweenTypes(this@toJson, typeOf<Path>(), typeOf<Json>(), t)
+            }
+        }
         /**
-         * Converts the string into a JSON object representation.
-         * The method attempts to parse the string as JSON and returns the result
-         * encapsulated within a `Result` object. If the parsing fails, the exception
-         * is captured in the `Result` object.
+         * Converts the receiver String into a JSON representation.
          *
-         * @receiver The string to be converted into a JSON object.
-         * @return A `Result` containing the parsed JSON object or an exception if parsing fails.
-         * @since 3.0.0
+         * Attempts to parse the receiver string as JSON and returns the result
+         * encapsulated in an Either type. If the parsing is successful, it provides
+         * the JSON object; otherwise, it supplies an error representation indicating
+         * the invalid format.
+         *
+         * @receiver The String to be parsed into JSON.
+         * @return An Either containing the parsed JSON object on success, or an
+         *         InvalidFormat error if parsing fails.
+         * @since 6.1.0
          */
-        fun @receiver:Language("json") String.toJson() = runCatching { Json(this) }
+        fun @receiver:Language("json") String.toJson() = either {
+            catching({ Json(this@toJson) }) { t: Throwable ->
+                InvalidFormatOfType(this@toJson, typeOf<Json>(), t)
+            }
+        }
         /**
          * Converts a YAML object to its JSON representation.
          *
@@ -386,7 +460,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          * or the exception if an error occurs during processing.
          * @since 3.13.0
          */
-        fun File.toPrettyJson() = runCatching { Json(this).pretty }
+        fun File.toPrettyJson() = toJson().map(Json::pretty)
         /**
          * Converts the content of the specified file path to a formatted JSON string.
          *
@@ -399,7 +473,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          *         Otherwise, the function captures and handles any exceptions internally.
          * @since 3.13.0
          */
-        fun Path.toPrettyJson() = runCatching { Json(this).pretty }
+        fun Path.toPrettyJson() = toJson().map(Json::pretty)
         /**
          * Converts a JSON string into a formatted, pretty-printed JSON string.
          * This method parses the input string as JSON and ensures that the output
@@ -413,7 +487,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          * if the input string is not a valid JSON.
          * @since 3.0.0
          */
-        fun @receiver:Language("json") String.toPrettyJson() = runCatching { Json(this).pretty }
+        fun @receiver:Language("json") String.toPrettyJson() = toJson().map(Json::pretty)
         /**
          * Converts a YAML object to its JSON representation.
          *
@@ -481,66 +555,86 @@ open class Json private constructor(@param:Language("json") override val value: 
          * @return An object of type [T] representing the deserialized JSON data, wrapped in a [Result].
          * @since 3.0.0
          */
-        inline fun <reified T> readFromFile(file: File): Result<T> =
-            runCatching { MAPPER.readValue(file, T::class.java) }
-
-        /**
-         * Reads a JSON file from the specified file path and deserializes its contents
-         * into a list of objects of the specified type.
-         *
-         * @param file The JSON file to be read.
-         * @return A list of objects of the specified type deserialized from the JSON file, wrapped in a [Result].
-         * @since 3.0.0
-         */
-        inline fun <reified T> readArrayFromFile(file: File): Result<Array<T>> = runCatching {
-            readListFromFile<T>(file).getOrThrow().toTypedArray()
+        inline fun <reified T> readFromFile(file: File): Either<DeserializationError, T> = either {
+            catching({ MAPPER.readValue(file, T::class.java) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<T>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<T>(), e)
+                is JacksonException -> DeserializationError(typeOf<T>(), e)
+                else -> throw e
+            } }
         }
 
         /**
-         * Reads a JSON file from the specified file path and deserializes its contents
-         * into a list of objects of the specified type.
+         * Reads a file and transforms its content into an array of the specified type.
          *
-         * @param file The JSON file to be read.
-         * @return A list of objects of the specified type deserialized from the JSON file, wrapped in a [Result].
-         * @since 3.0.0
+         * @param T The type of elements in the resulting array.
+         * @param file The file to read from.
+         * @return A list of arrays, where each array corresponds to the transformed data from the file.
+         * @since 6.1.0
          */
-        inline fun <reified T> readListFromFile(file: File): Result<List<T>> = runCatching {
-            MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java))
+        inline fun <reified T> readArrayFromFile(file: File) = readListFromFile<T>(file).map { it.toTypedArray() }
+
+        /**
+         * Reads a list of objects of type [T] from the specified file and attempts to deserialize it using a preconfigured mapper.
+         *
+         * @param file The file from which the list of objects will be read.
+         * @return An [Either] instance, containing either a [DeserializationError] in case of failure or a successfully deserialized list of type [T].
+         * @since 6.1.0
+         */
+        inline fun <reified T> readListFromFile(file: File): Either<DeserializationError, List<T>> = either {
+            catching({ MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(List::class.java, T::class.java)) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<List<T>>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<List<T>>(), e)
+                is JacksonException -> DeserializationError(typeOf<List<T>>(), e)
+                else -> throw e
+            } }
         }
 
         /**
-         * Reads a JSON file from the specified file path and deserializes its contents
-         * into a set of objects of the specified type.
+         * Reads and deserializes a set of objects from the specified file.
          *
-         * @param file The JSON file to be read.
-         * @return A set of objects of the specified type deserialized from the JSON file, wrapped in a [Result].
-         * @since 3.0.0
+         * @param file The file from which the set will be read and deserialized.
+         * @return An [Either] containing the deserialized set of type [T] if successful, or a [DeserializationError] in case of failure.
+         * @since 6.1.0
          */
-        inline fun <reified T> readSetFromFile(file: File): Result<Set<T>> = runCatching {
-            MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java))
+        inline fun <reified T> readSetFromFile(file: File): Either<DeserializationError, Set<T>> = either {
+            catching({ MAPPER.readValue(file, MAPPER.typeFactory.constructCollectionType(Set::class.java, T::class.java)) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<Set<T>>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<Set<T>>(), e)
+                is JacksonException -> DeserializationError(typeOf<Set<T>>(), e)
+                else -> throw e
+            } }
         }
 
         /**
-         * Reads a JSON file and deserializes its content into a `Map` with `String` keys and values of a generic type.
+         * Reads a map from the provided file and attempts to deserialize it.
          *
-         * @param file The JSON file to be read
-         * @return a map containing keys as `String` and values as the generic type `T` parsed from the JSON file, wrapped in a [Result]
-         * @since 3.0.0
+         * @param file The file to be read and deserialized into a map.
+         * @return An [Either] containing either a [DeserializationError] in case of a failure
+         *         or a [Map] with keys as strings and values of type [T] on success.
+         * @since 6.1.0
          */
-        fun <T> readMapFromFile(file: File): Result<Map<String, T>> = runCatching {
-            MAPPER.readValue(file, object : TypeReference<Map<String, T>>() {})
+        fun <T> readMapFromFile(file: File): Either<DeserializationError, Map<String, T>> = either {
+            catching({ MAPPER.readValue(file, object : TypeReference<Map<String, T>>() {}) }) { e: Exception -> when (e) {
+                is StreamReadException -> DeserializationError.ReadError(typeOf<Map<String, T>>(), e)
+                is DatabindException -> DeserializationError.MappingError(typeOf<Map<String, T>>(), e)
+                is JacksonException -> DeserializationError(typeOf<Map<String, T>>(), e)
+                else -> throw e
+            } }
         }
 
         /**
-         * Converts a [JsonNode] to a list of elements of type [T].
-         * The conversion is performed based on the specified type [T].
+         * Converts a JsonNode to a List of the specified type [T]. The method
+         * supports primitive types (Int, Long, Double, Boolean, String), JsonNode,
+         * and other data types that can be mapped using a registered ObjectMapper.
+         * This operation works only if the JsonNode is an array; otherwise, it throws
+         * an UnsupportedJsonTypeException.
          *
-         * @param T the type of elements to be extracted from the [JsonNode].
-         * @return a [Result] containing the list of elements of type [T] if conversion is successful,
-         *         or a failure if an error occurs.
-         * @since 3.0.0
+         * @return a List of elements of type [T] converted from the current JsonNode.
+         * @throws UnsupportedJsonTypeException if the current JsonNode is not an array.
+         * @since 6.1.0
          */
-        inline fun <reified T> JsonNode.asList(): Result<List<T>> = runCatching {
+        inline fun <reified T> JsonNode.asList(): List<T> {
             val list = emptyMList<T>()
             if (isArray) {
                 for (node in this) {
@@ -555,18 +649,20 @@ open class Json private constructor(@param:Language("json") override val value: 
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
-            list.toList()
+            return list.toList()
         }
         /**
-         * Converts the current `JsonNode` into a list of elements of the specified type.
-         * If the node is not an array, an exception is thrown.
-         * Supports common primitive types and `JsonNode`. For unsupported types, fallback serialization is used.
+         * Converts a [JsonNode] into a list of the specified type [T].
+         * The method attempts to map each element in a JSON array to the specified type.
+         * Supported types include Int, Long, Double, Boolean, String, and JsonNode.
+         * For unsupported types, it uses a custom mapper to perform the conversion.
+         * Throws an exception if the node is not an array.
          *
-         * @return A `Result` containing the list of elements of type `T` if conversion is successful,
-         *         or an exception if the node is not an array or if the conversion fails.
-         * @since 5.5.0
+         * @return A list of elements of type [T] extracted from the JSON array.
+         * @throws UnsupportedJsonTypeException if the JSON node type is not an array or is incompatible with [T].
+         * @since 6.1.0
          */
-        inline fun <reified T> com.fasterxml.jackson.databind.JsonNode.asList(): Result<List<T>> = runCatching {
+        inline fun <reified T> com.fasterxml.jackson.databind.JsonNode.asList(): List<T> {
             val list = emptyMList<T>()
             if (isArray) {
                 for (node in this) {
@@ -581,19 +677,20 @@ open class Json private constructor(@param:Language("json") override val value: 
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
-            list.toList()
+            return list.toList()
         }
         /**
-         * Converts a JsonNode to a Result containing a Set of the specified type.
+         * Converts a JsonNode representation of an array into a Set of the specified type.
          *
-         * If the JsonNode represents an array, each element is converted to the specified type using
-         * appropriate deserialization. The conversion may fail for incompatible or invalid elements.
+         * This function traverses the elements of the JsonNode and maps each element to the
+         * specified type [T] using reflection. If the JsonNode is not an array, an
+         * UnsupportedJsonTypeException will be thrown.
          *
-         * @return a Result containing a Set of elements of type T if the conversion is successful.
-         *         If an error occurs during the conversion process, the Result contains the exception.
-         * @since 3.0.0
+         * @return A Set containing the elements from the JsonNode converted to the specified type [T].
+         * @throws UnsupportedJsonTypeException If the JsonNode is not an array or cannot be converted to the specified type.
+         * @since 6.1.0
          */
-        inline fun <reified T> JsonNode.asSet(): Result<Set<T>> = runCatching {
+        inline fun <reified T> JsonNode.asSet(): Set<T> {
             val set = emptyMSet<T>()
             if (isArray) {
                 for (node in this) {
@@ -607,21 +704,27 @@ open class Json private constructor(@param:Language("json") override val value: 
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
-            set.toSet()
+            return set.toSet()
         }
         /**
-         * Converts a JsonNode to a Set of the specified type.
+         * Converts a [JsonNode] to a [Set] of the specified type [T]. This method identifies the elements
+         * within a JSON array and maps them to the corresponding Kotlin type based on the provided type parameter.
+         * If the [JsonNode] is not an array, an exception is thrown.
          *
-         * The method attempts to map the elements of a JsonNode array to the given type [T].
-         * Supports conversion to common types such as Int, Long, Double, Boolean, and String.
-         * For other types, it utilizes a custom object mapping mechanism.
-         * If the JsonNode is not an array, an UnsupportedJsonTypeException is thrown.
+         * The following mappings are supported for primitive types:
+         * - [Int]: Elements are retrieved using `node.asInt()`.
+         * - [Long]: Elements are retrieved using `node.asLong()`.
+         * - [Double]: Elements are retrieved using `node.asDouble()`.
+         * - [Boolean]: Elements are retrieved using `node.asBoolean()`.
+         * - [String]: Elements are retrieved using `node.asText()`.
          *
-         * @return Result wrapping a Set of elements of type [T] if the conversion succeeds,
-         * or an exception if the operation fails.
-         * @since 5.5.0
+         * For other types, the elements are deserialized using Jackson's `treeToValue` method.
+         *
+         * @return A [Set] of elements cast to the specified type [T].
+         * @throws UnsupportedJsonTypeException if the [JsonNode] is not a JSON array or if the type cannot be resolved.
+         * @since 6.1.0
          */
-        inline fun <reified T> com.fasterxml.jackson.databind.JsonNode.asSet(): Result<Set<T>> = runCatching {
+        inline fun <reified T> com.fasterxml.jackson.databind.JsonNode.asSet(): Set<T> {
             val set = emptyMSet<T>()
             if (isArray) {
                 for (node in this) {
@@ -635,49 +738,51 @@ open class Json private constructor(@param:Language("json") override val value: 
                     }
                 }
             } else throw UnsupportedJsonTypeException(T::class.simpleName)
-            set.toSet()
+            return set.toSet()
         }
 
         /**
-         * Converts the current JsonNode into a JSON object by serializing it
-         * into its string representation.
+         * Converts a JsonNode instance into a Json object by serializing it to a JSON string.
          *
-         * @return a Result wrapping the JSON object, or an exception if the conversion fails.
-         * @since 3.0.0
+         * @receiver The JsonNode to be serialized.
+         * @return A Json object containing the serialized representation of the JsonNode.
+         * @throws JacksonException If an error occurs during the serialization process.
+         * @since 6.1.0
          */
-        fun JsonNode.asJson(): Result<Json> = runCatching {
-            Json(MAPPER.writeValueAsString(this))
-        }
+        fun JsonNode.asJson() = Json(MAPPER.writeValueAsString(this))
         /**
-         * Converts the current JsonNode into a JSON object by serializing it
-         * into its string representation.
+         * Converts the current JsonNode instance into a Json representation.
          *
-         * @return a Result wrapping the JSON object, or an exception if the conversion fails.
-         * @since 3.8.1
+         * This method serializes the JsonNode's content into a JSON-formatted string
+         * and wraps it in a Json object for further processing or use.
+         *
+         * @receiver The JsonNode instance to be converted into a Json representation.
+         * @return A Json object containing the serialized JSON string of the JsonNode.
+         * @throws com.fasterxml.jackson.core.JsonProcessingException If an error occurs during the serialization process.
+         * @since 6.1.0
          */
-        fun com.fasterxml.jackson.databind.JsonNode.asJson(): Result<Json> = runCatching {
-            Json(OLD_MAPPER.writeValueAsString(this))
-        }
+        fun com.fasterxml.jackson.databind.JsonNode.asJson() = Json(OLD_MAPPER.writeValueAsString(this))
         /**
-         * Converts the current JsonNode into a JSON object by serializing it
-         * into its string representation.
+         * Converts the current `JsonNode` to a formatted, human-readable JSON string.
+         * This method serializes the `JsonNode` into a JSON string and applies
+         * pretty-printing to enhance readability.
          *
-         * @return a Result wrapping the JSON object, or an exception if the conversion fails.
-         * @since 3.0.0
+         * @receiver The `JsonNode` to be converted into a pretty JSON string.
+         * @return A formatted JSON string representation of the `JsonNode`.
+         * @throws JacksonException If the JSON serialization process fails.
+         * @since 6.1.0
          */
-        fun JsonNode.asPrettyJson(): Result<Json> = runCatching {
-            Json(MAPPER.writeValueAsString(this)).pretty
-        }
+        fun JsonNode.asPrettyJson() = Json(MAPPER.writeValueAsString(this)).pretty
         /**
-         * Converts the current JsonNode into a JSON object by serializing it
-         * into its string representation.
+         * Converts the current JsonNode into a prettified JSON string representation.
+         * This method utilizes a predefined object mapper to serialize the JsonNode
+         * into a JSON string and formats it for improved readability.
          *
-         * @return a Result wrapping the JSON object, or an exception if the conversion fails.
-         * @since 3.8.1
+         * @return A formatted, human-readable JSON string representation of the JsonNode.
+         * @throws com.fasterxml.jackson.core.JsonProcessingException If an error occurs during the serialization process.
+         * @since 6.1.0
          */
-        fun com.fasterxml.jackson.databind.JsonNode.asPrettyJson(): Result<Json> = runCatching {
-            Json(OLD_MAPPER.writeValueAsString(this)).pretty
-        }
+        fun com.fasterxml.jackson.databind.JsonNode.asPrettyJson() = Json(OLD_MAPPER.writeValueAsString(this)).pretty
 
         /**
          * Copies a field from the current JsonNode to the target ObjectNode, creating intermediate
@@ -729,6 +834,23 @@ open class Json private constructor(@param:Language("json") override val value: 
             }
             return true
         }
+
+        /**
+         * Reads and deserializes the given JSON content into an object of the specified type.
+         *
+         * @param T The type of the object to be deserialized.
+         * @param json The JSON content to be deserialized.
+         * @since 6.1.0
+         */
+        inline fun <reified  T> JsonMapper.readValue(json: Json) = readValue<T>(json.value)
+        /**
+         * Reads the given JSON content and deserializes it into an object of the specified type.
+         *
+         * @param json The JSON content to deserialize, provided as a `Json` wrapper.
+         * @return The deserialized object of type `T`.
+         * @since 6.1.0
+         */
+        inline fun <reified  T> ObjectMapper.readValue(json: Json): T = readValue(json.value, object : com.fasterxml.jackson.core.type.TypeReference<T>() {})
 
         class Serializer : ValueSerializer<Json>() {
             override fun serialize(value: Json, gen: JsonGenerator, ctxt: SerializationContext) {
@@ -814,289 +936,353 @@ open class Json private constructor(@param:Language("json") override val value: 
     override fun toString() = value
 
     /**
-     * Converts the stored JSON string into an object of the specified type [T].
+     * Parses a value into an object of the specified type using a mapper.
      *
-     * This method uses the Jackson ObjectMapper to deserialize the JSON string
-     * into a strongly-typed object of the given type [T]. It wraps the operation
-     * in a [Result] to safely handle any exceptions that may occur during the
-     * deserialization process.
+     * This function attempts to deserialize the given input into the generic type T.
+     * It uses an `either` block to safely handle any exceptions that may occur during deserialization,
+     * such as a `DatabindException`. The function returns an appropriate error (`DeserializationError.MappingError`)
+     * if deserialization fails.
      *
-     * @return a [Result] containing the deserialized object of type [T] if
-     * successful, or an exception if an error occurs.
-     * @since 3.0.0
+     * @param T The target type to which the value will be deserialized.
+     * @return Either the deserialized object of type T or a `DeserializationError.MappingError`
+     *         containing the error details in case of failure.
+     * @since 6.1.0
      */
-    inline fun <reified T> toObject() = runCatching { MAPPER.readValue<T>(value) as T }
+    inline fun <reified T> toObject() = either {
+        catching({ MAPPER.readValue<T>(value) as T }) { e: DatabindException ->
+            DeserializationError.MappingError(typeOf<T>(), e.message)
+        }
+    }
 
     /**
-     * Converts the content represented by the current instance into a typed array of the specified type [T].
+     * Converts the deserialized data into an array of the specified type.
      *
-     * This method uses the `toTypedList` method to first construct a `List` of type [T],
-     * and then converts it to a typed array. If any exception occurs during this process,
-     * it is wrapped and returned as a `Result` object.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
      *
-     * @return a `Result` containing the typed array of type [T], or the exception if an error occurs.
-     * @since 3.0.0
+     * @return An `Either` containing a `DeserializationError.MappingError` if deserialization fails,
+     *         or an array of type `T` if successful.
+     * @since 6.1.0
      */
-    inline fun <reified T> toArray() = runCatching { toList<T>().getOrThrow().toTypedArray() }
+    inline fun <reified T> toArray() = toList<T>().map { it.toTypedArray() }
 
     /**
-     * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
+     * Converts the current value to a list of the specified type [T].
+     * Utilizes a JSON mapper to perform the deserialization into a list.
+     * If an error occurs during deserialization, wraps it in a `MappingError`.
      *
-     * This function utilizes the Jackson ObjectMapper to deserialize the JSON representation into a Kotlin list.
-     * It uses a reified generic parameter to resolve the type information at runtime.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
      *
-     * The result of the function is wrapped in a [Result], allowing for safe execution and error handling.
-     * If the deserialization is successful, the resulting [List] is returned inside a successful [Result].
-     * If any exception occurs, it is captured and returned as a failure [Result].
+     * @param T The type of elements in the resulting list.
+     * @return Either a successfully deserialized list of type [T] or a `MappingError` detailing the issue.
      *
-     * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
-     * @param T the type of objects contained in the resulting list.
-     * @since 3.0.0
+     * @since 6.1.0
      */
-    inline fun <reified T> toList() = runCatching {
-        MAPPER.readValue<List<T>>(value)
+    inline fun <reified T> toList() = either {
+        catching({ MAPPER.readValue<List<T>>(value) }) { e: DatabindException ->
+            DeserializationError.MappingError(typeOf<T>(), e.message)
+        }
     }
     /**
-     * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
+     * Converts the current context to a non-empty list of the specified type [T].
+     * This method ensures that the resulting list is not empty by wrapping
+     * the operation in a safe transformation, preserving the type information.
      *
-     * This function utilizes the Jackson ObjectMapper to deserialize the JSON representation into a Kotlin list.
-     * It uses a reified generic parameter to resolve the type information at runtime.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the list is empty
      *
-     * The result of the function is wrapped in a [Result], allowing for safe execution and error handling.
-     * If the deserialization is successful, the resulting [List] is returned inside a successful [Result].
-     * If any exception occurs, it is captured and returned as a failure [Result].
-     *
-     * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
-     * @param T the type of objects contained in the resulting list.
-     * @since 5.2.1
+     * @param T The type of elements within the resulting non-empty list.
+     * @return A non-empty list containing elements of type [T].
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyList() = toList<T>().mapCatching { it.toNonEmptyList() }
+    inline fun <reified T> toNonEmptyList(): Either<Error, NonEmptyList<T>> =
+        toList<T>() as Either<Error, List<T>> thenEither { catching({ it.toNonEmptyList() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
+     * Converts a generic list into an MList, wrapping the result in an Either type to handle potential mapping errors.
      *
-     * This function utilizes the Jackson ObjectMapper to deserialize the JSON representation into a Kotlin list.
-     * It uses a reified generic parameter to resolve the type information at runtime.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
      *
-     * The result of the function is wrapped in a [Result], allowing for safe execution and error handling.
-     * If the deserialization is successful, the resulting [List] is returned inside a successful [Result].
-     * If any exception occurs, it is captured and returned as a failure [Result].
-     *
-     * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
-     * @param T the type of objects contained in the resulting list.
-     * @since 3.0.0
+     * @return An [Either] containing either a [DeserializationError.MappingError] if the mapping fails,
+     *         or an [MList] of type [T] if the conversion is successful.
+     * @since 6.1.0
      */
-    inline fun <reified T> toMList() = runCatching { toList<T>().getOrThrow().toMList() }
+    inline fun <reified T> toMList() = toList<T>().map(List<T>::toMList)
     /**
-     * Converts the underlying JSON string value into a strongly-typed list of objects of type [T].
+     * Converts the current receiver into a mutable non-empty list of the specified type [T].
      *
-     * This function utilizes the Jackson ObjectMapper to deserialize the JSON representation into a Kotlin list.
-     * It uses a reified generic parameter to resolve the type information at runtime.
+     * This operation leverages `toMList` for initial conversion, followed by verifying
+     * and ensuring the result is a non-empty mutable list. If the transformation does not
+     * produce a valid non-empty mutable list, the function will signal an error encapsulated
+     * in an `Either` construct.
      *
-     * The result of the function is wrapped in a [Result], allowing for safe execution and error handling.
-     * If the deserialization is successful, the resulting [List] is returned inside a successful [Result].
-     * If any exception occurs, it is captured and returned as a failure [Result].
+     * This method is particularly useful when enforcing non-empty constraints on lists
+     * while still retaining mutability.
      *
-     * @return a [Result] containing either the deserialized list of type [T] or an exception if deserialization fails.
-     * @param T the type of objects contained in the resulting list.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if the resulting list is empty
+     *
+     * @param T The type of elements in the resulting list.
+     * @return An `Either` containing the successfully transformed non-empty mutable list
+     *         or an error indicating the conversion was unsuccessful.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyMList() = toMList<T>().mapCatching { it.toNonEmptyMList() }
+    inline fun <reified T> toNonEmptyMList() =
+        toMList<T>() as Either<Error, MList<T>> thenEither { catching({ it.toNonEmptyMList() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
+     * Converts the receiver to a Set of type T if possible, returning either a MappingError
+     * in case of a deserialization issue or the resulting Set.
      *
-     * This function attempts to deserialize the JSON representation stored in the `value` property
-     * of the containing object into a [Set] of elements of type [T]. The operation is executed
-     * using Jackson's `ObjectMapper` and its type construction utilities to ensure type safety.
-     *
-     * The result is wrapped in a [Result] object, providing a safe way to handle potential exceptions
-     * that might occur during the deserialization process, such as malformed JSON or type mismatches.
-     *
-     * @param T The type of elements expected in the resulting [Set].
-     * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
-     * @since 3.0.0
+     * @return An [Either] containing a [DeserializationError.MappingError] on failure
+     * or the resulting [Set] of type [T] on success.
+     * @since 6.1.0
      */
-    inline fun <reified T> toSet() = runCatching { toList<T>().getOrThrow().toSet() }
+    inline fun <reified T> toSet(): Either<DeserializationError.MappingError, Set<T>> =
+        toList<T>().map { it.toSet() }
     /**
-     * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
+     * Converts the receiving collection into a non-empty set.
+     * Requires the collection to contain at least one element; otherwise, the operation will fail.
+     * Utilizes the `toSet` function to transform the collection into a standard set
+     * and subsequently ensures the resulting set is non-empty.
      *
-     * This function attempts to deserialize the JSON representation stored in the `value` property
-     * of the containing object into a [Set] of elements of type [T]. The operation is executed
-     * using Jackson's `ObjectMapper` and its type construction utilities to ensure type safety.
+     * This function is inlined and uses reified generics to preserve the type information of the elements
+     * during the transformation process.
      *
-     * The result is wrapped in a [Result] object, providing a safe way to handle potential exceptions
-     * that might occur during the deserialization process, such as malformed JSON or type mismatches.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
      *
-     * @param T The type of elements expected in the resulting [Set].
-     * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
-     * @since 5.2.1
+     * @param T The type of elements contained in the collection.
+     * @return A non-empty set containing the elements from the original collection.
+     *
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptySet() = toSet<T>().mapCatching { it.toNonEmptySet() }
+    inline fun <reified T> toNonEmptySet() =
+        toSet<T>() as Either<Error, Set<T>> thenEither { catching({ it.toNonEmptySet() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
+     * Converts a deserialized set of type T into an MSet (mutable set) if deserialization is successful.
      *
-     * This function attempts to deserialize the JSON representation stored in the `value` property
-     * of the containing object into a [Set] of elements of type [T]. The operation is executed
-     * using Jackson's `ObjectMapper` and its type construction utilities to ensure type safety.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
      *
-     * The result is wrapped in a [Result] object, providing a safe way to handle potential exceptions
-     * that might occur during the deserialization process, such as malformed JSON or type mismatches.
-     *
-     * @param T The type of elements expected in the resulting [Set].
-     * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
-     * @since 3.0.0
+     * @return Either a MappingError if deserialization fails, or an MSet<T> containing elements of type T.
+     * @since 6.1.0
      */
-    inline fun <reified T> toMSet() = runCatching { toSet<T>().getOrThrow().toMSet() }
+    inline fun <reified T> toMSet(): Either<DeserializationError.MappingError, MSet<T>> =
+        toSet<T>().map(Set<T>::toMSet)
     /**
-     * Converts a JSON-formatted string into a typed [Set] of the specified type [T].
+     * Converts the invoking collection or sequence into a `NonEmptyMSet`.
      *
-     * This function attempts to deserialize the JSON representation stored in the `value` property
-     * of the containing object into a [Set] of elements of type [T]. The operation is executed
-     * using Jackson's `ObjectMapper` and its type construction utilities to ensure type safety.
+     * This function first attempts to convert the collection into an `MSet`.
+     * If the resulting set is empty, an `IterableError.Empty` is returned as a failure.
+     * Otherwise, the result is wrapped in a successful `Either` containing a `NonEmptyMSet`.
      *
-     * The result is wrapped in a [Result] object, providing a safe way to handle potential exceptions
-     * that might occur during the deserialization process, such as malformed JSON or type mismatches.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
      *
-     * @param T The type of elements expected in the resulting [Set].
-     * @return A [Result] containing the deserialized [Set] of [T] if successful, or an error if deserialization fails.
-     * @since 5.2.1
+     * @return An `Either` where the left represents an `Error` and the right represents a `NonEmptyMSet`.
+     * @since 6.1.0
      */
-    inline fun <reified T> toNonEmptyMSet() = toMSet<T>().mapCatching { it.toNonEmptyMSet() }
+    inline fun <reified T> toNonEmptyMSet() =
+        toMSet<T>() as Either<Error, MSet<T>> thenEither { catching({ it.toNonEmptyMSet() }) { _: Throwable -> IterableError.Empty } }
 
     /**
-     * Converts the JSON representation of the current value into a strongly-typed [Map] with [String] keys
-     * and values of type [V].
+     * Converts the current value to a `Map<String, V>` type using Jackson ObjectMapper.
      *
-     * The function leverages the Jackson library to deserialize the JSON content into a Kotlin [Map], where
-     * the value's type is determined at runtime using reified type parameters.
+     * This function attempts to deserialize the provided value into a map where the keys are strings
+     * and the values are of type `V`. It uses Jackson's `ObjectMapper` for the deserialization process
+     * and captures any exceptions that may occur during this operation.
      *
-     * The operation is encapsulated in a [Result], allowing callers to handle potential exceptions,
-     * such as deserialization errors or type mismatches.
-     *
-     * @param V The type of the values in the resulting [Map].
-     * @return A [Result] containing the deserialized [Map] on success, or an exception on failure.
-     * @since 3.0.0
+     * @param V The type of the values in the resulting map.
+     * @return A result type indicating either a successful `Map<String, V>` conversion
+     *         or a deserialization error. The possible errors include:
+     *         - [DeserializationError.ReadError] for issues during stream reading.
+     *         - [DeserializationError.MappingError] for issues during data mapping.
+     *         - [DeserializationError] for general Jackson-related exceptions.
+     * @since 6.1.0
      */
-    inline fun <reified V> toMap(): Result<Map<String, V>> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V>
+    inline fun <reified V> toMap() = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<Map<String, V>>() {}) as Map<String, V> }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<Map<String, V>>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<Map<String, V>>(), e)
+            is JacksonException -> DeserializationError(typeOf<Map<String, V>>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Converts the JSON representation of the current value into a strongly-typed [Map] with [String] keys
-     * and values of type [V].
+     * Converts the current structure into a non-empty map of type [Map<String, V>].
+     * If the conversion is successful, it returns a `Right` containing the map.
+     * If any exception is thrown during conversion or the resulting map is empty, it returns a `Left` with an appropriate error.
      *
-     * The function leverages the Jackson library to deserialize the JSON content into a Kotlin [Map], where
-     * the value's type is determined at runtime using reified type parameters.
+     * Uses `toMap<V>()` for the conversion and ensures the resulting map is non-empty by wrapping it in an `Either` structure
+     * with error handling for possible exceptions or empty results.
      *
-     * The operation is encapsulated in a [Result], allowing callers to handle potential exceptions,
-     * such as deserialization errors or type mismatches.
-     *
-     * @param V The type of the values in the resulting [Map].
-     * @return A [Result] containing the deserialized [Map] on success, or an exception on failure.
-     * @since 5.2.1
+     * @return An `Either` where the right value is a non-empty map and the left value represents an error.
+     * @since 6.1.0
      */
-    inline fun <reified V> toNonEmptyMap() = toMap<V>().mapCatching { it.toNonEmptyMap() }
+    inline fun <reified V> toNonEmptyMap() =
+        toMap<V>() as Either<Error, Map<String, V>> thenEither { catching({ it.toNonEmptyMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
-     * Converts the current value to a DataMap instance using a JSON mapper.
+     * Converts the current value into a DataMap representation. This method utilizes the Jackson ObjectMapper
+     * for deserialization and wraps the result in an Either type to handle potential errors.
      *
-     * @return a [Result] containing the [DataMap] if the conversion is successful, or an error if it fails.
-     * @since 3.0.0
+     * @return Either a successfully deserialized [DataMap] or a [DeserializationError] in case of a failure.
+     * @since 6.1.0
      */
-    fun toDataMap(): Result<DataMap> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap
+    fun toDataMap(): Either<DeserializationError, DataMap> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMap>() {}) as DataMap }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMap>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMap>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMap>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Converts the current instance into a Result wrapping a NonEmptyDataMap.
-     * This operation ensures that the returned map contains non-empty data.
+     * Converts the current instance to a [NonEmptyDataMap] wrapped in an [Either].
      *
-     * @return A Result containing a NonEmptyDataMap if the transformation is successful.
-     * @since 5.2.1
+     * This method attempts to transform the existing DataMap into a [NonEmptyDataMap].
+     * If the conversion fails or the resulting map is empty, an [Error] is returned.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return [Either] an [Error] if the conversion fails or the result is empty,
+     *         or a successfully created [NonEmptyDataMap] instance.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMap(): Result<NonEmptyDataMap> = toDataMap().mapCatching { it.toNonEmptyMap() }
+    fun toNonEmptyDataMap(): Either<Error, NonEmptyDataMap> =
+        toDataMap() as Either<Error, DataMap> thenEither { catching({ it.toNonEmptyMap() }) { _: Exception -> IterableError.Empty } }
     /**
-     * Converts the current value to a DataMapNN instance using a JSON mapper.
+     * Converts the current value into a `DataMapNN` instance, handling potential deserialization errors.
      *
-     * @return a [Result] containing the [DataMapNN] if the conversion is successful, or an error if it fails.
-     * @since 3.0.0
+     * This method attempts to deserialize the value into a `DataMapNN` object using a pre-configured
+     * Jackson object mapper. If the deserialization succeeds, it returns the resulting `DataMapNN`
+     * instance wrapped in an `Either.Right`. If deserialization fails, an appropriate `DeserializationError`
+     * is returned wrapped in an `Either.Left`.
+     *
+     * @return `Either.Left` containing a `DeserializationError` if deserialization fails, or
+     *         `Either.Right` containing a `DataMapNN` instance if deserialization is successful.
+     * @since 6.1.0
      */
-    fun toDataMapNN(): Result<DataMapNN> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN
+    fun toDataMapNN(): Either<DeserializationError, DataMapNN> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMapNN>() {}) as DataMapNN }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMapNN>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMapNN>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMapNN>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Transforms the current object into a {@code Result} containing a non-empty data map.
+     * Converts the current object into a `NonEmptyDataMapNN` wrapped in an `Either` type.
+     * The method ensures that the resulting map is non-empty, and returns an appropriate error if this condition is not met.
      *
-     * This method internally calls `toDataMapNN()` to retrieve a nullable map,
-     * and then maps it to a non-empty equivalent using `toNonEmptyMap()`.
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
      *
-     * @return A result containing a non-empty data map representation of the object.
-     * @since 5.2.1
+     * @return An instance of `Either` holding either an `Error` or a non-empty `NonEmptyDataMapNN`.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMapNN(): Result<NonEmptyDataMapNN> = toDataMapNN().mapCatching { it.toNonEmptyMap() }
+    fun toNonEmptyDataMapNN(): Either<Error, NonEmptyDataMapNN> =
+        toDataMapNN() as Either<Error, DataMapNN> thenEither { catching({ it.toNonEmptyMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
-     * Converts the JSON representation of the current value into a strongly-typed [Map] with [String] keys
-     * and values of type [V].
+     * Converts the current map structure into a mutable map of type `Map<String, V>`.
+     * The function is inline and reified, preserving the type `V` at runtime.
+     * This transformation allows for further operations on the map in a mutable context.
      *
-     * The function leverages the Jackson library to deserialize the JSON content into a Kotlin [Map], where
-     * the value's type is determined at runtime using reified type parameters.
-     *
-     * The operation is encapsulated in a [Result], allowing callers to handle potential exceptions,
-     * such as deserialization errors or type mismatches.
-     *
-     * @param V The type of the values in the resulting [Map].
-     * @return A [Result] containing the deserialized [Map] on success, or an exception on failure.
-     * @since 3.0.0
+     * @param V The type of the values in the resulting map.
+     * @return A mutable map transformed into the desired structure.
+     * @since 6.1.0
      */
-    inline fun <reified V> toMMap(): Result<MMap<String, V>> = runCatching { toMap<V>().getOrThrow().toMMap() }
+    inline fun <reified V> toMMap() = toMap<V>().map(Map<String, V>::toMMap)
     /**
-     * Converts the current instance to a `NonEmptyMMap` wrapped in a `Result`.
-     * The operation involves transforming the underlying map and ensuring it meets the criteria
-     * for a non-empty map. If the conversion fails, the resulting `Result` will indicate the failure.
+     * Converts the current structure into a `NonEmptyMMap<String, V>`, wrapped in an `Either` type for error handling.
      *
-     * @return A `Result` containing a `NonEmptyMMap` of type `<String, V>` if the conversion is successful,
-     *         or an error result if the conversion fails.
-     * @since 5.2.1
+     * This method attempts to transform the current structure into a non-empty multimap.
+     * If the structure is empty or an error occurs during transformation, it returns an `Error` encapsulated in the `Either` type.
+     *
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return An `Either` containing either an `Error` in case of failure or a successfully created `NonEmptyMMap<String, V>`.
+     * @since 6.1.0
      */
-    inline fun <reified V> toNonEmptyMMap(): Result<NonEmptyMMap<String, V>> = toMMap<V>().mapCatching { it.toNonEmptyMMap() }
+    inline fun <reified V> toNonEmptyMMap(): Either<Error, NonEmptyMMap<String, V>> =
+        toMMap<V>() as Either<Error, MMap<String, V>> thenEither { catching({ it.toNonEmptyMMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
-     * Converts the current value to a DataMMap instance using a JSON mapper.
+     * Converts a given value to a `DataMMap` instance by attempting to deserialize it
+     * using the predefined object mapper. In case of a failure during deserialization,
+     * an appropriate `DeserializationError` is returned.
      *
-     * @return a [Result] containing the [DataMMap] if the conversion is successful, or an error if it fails.
-     * @since 3.0.0
+     * @return An `Either` instance containing `DataMMap` on successful deserialization
+     * or `DeserializationError` on failure.
+     * @since 6.1.0
      */
-    fun toDataMMap(): Result<DataMMap> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap
+    fun toDataMMap(): Either<DeserializationError, DataMMap> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMMap>() {}) as DataMMap }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMMap>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMMap>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMMap>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Converts the current data map to a `NonEmptyDataMMap` wrapped in a `Result`.
-     * Ensures that the resulting data map is non-empty.
+     * Converts the current instance into a `NonEmptyDataMMap`.
+     * This method attempts to transform the data structure, ensuring it is non-empty.
+     * If the transformation is unsuccessful, an error is returned.
      *
-     * @return A `Result` containing a `NonEmptyDataMMap` if the conversion is successful,
-     * or an error if the data map is empty or the operation fails.
-     * @since 5.2.1
+     * Possible errors:
+     * - [DeserializationError.MappingError] - if conversion failed
+     * - [IterableError.Empty] - if set is empty
+     *
+     * @return An `Either` containing an `Error` if the conversion fails, or a `NonEmptyDataMMap` if it succeeds.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMMap(): Result<NonEmptyDataMMap> = toDataMMap().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMMap(): Either<Error, NonEmptyDataMMap> =
+        toDataMMap() as Either<Error, DataMMap> thenEither { catching({ it.toNonEmptyMMap() }) { _: Exception -> IterableError.Empty } }
     /**
-     * Converts the current value to a DataMMapNN instance using a JSON mapper.
+     * Converts the current object into a `DataMMapNN` instance.
      *
-     * @return a [Result] containing the [DataMMapNN] if the conversion is successful, or an error if it fails.
-     * @since 3.0.0
+     * This method attempts to deserialize the current object into a `DataMMapNN` type
+     * using the Jackson library. If the deserialization process encounters an error,
+     * the method will return a `DeserializationError` indicating the specific issue.
+     *
+     * @return An `Either` containing either a successfully deserialized `DataMMapNN` instance
+     * or a `DeserializationError` describing the failure encountered during the deserialization process.
+     * @since 6.1.0
      */
-    fun toDataMMapNN(): Result<DataMMapNN> = runCatching {
-        MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN
+    fun toDataMMapNN(): Either<DeserializationError, DataMMapNN> = either {
+        catching({ MAPPER.readValue(value, object : TypeReference<DataMMapNN>() {}) as DataMMapNN }) { e: Exception -> when (e) {
+            is StreamReadException -> DeserializationError.ReadError(typeOf<DataMMapNN>(), e)
+            is DatabindException -> DeserializationError.MappingError(typeOf<DataMMapNN>(), e)
+            is JacksonException -> DeserializationError(typeOf<DataMMapNN>(), e)
+            else -> throw e
+        } }
     }
     /**
-     * Converts the current instance into a `Result` containing a `NonEmptyDataMMapNN`.
-     * This operation attempts to transform the result of `toDataMMapNN` into a non-empty map.
+     * Converts the current object into a `NonEmptyDataMMapNN` wrapped in an `Either` type.
+     * This method attempts to transform the object into a `DataMMapNN`, then ensures
+     * that the resulting map is non-empty.
      *
-     * @return A `Result` wrapping a `NonEmptyDataMMapNN` if the transformation is successful,
-     * or a failure if the operation fails or the map is empty.
-     * @since 5.2.1
+     *
+     * @return An `Either` containing an `Error` in case of failure, or a `NonEmptyDataMMapNN` upon successful transformation.
+     * @since 6.1.0
      */
-    fun toNonEmptyDataMMapNN(): Result<NonEmptyDataMMapNN> = toDataMMapNN().mapCatching { it.toNonEmptyMMap() }
+    fun toNonEmptyDataMMapNN(): Either<Error, NonEmptyDataMMapNN> =
+        toDataMMapNN() as Either<Error, DataMMapNN> thenEither { catching({ it.toNonEmptyMMap() }) { _: Exception -> IterableError.Empty } }
 
     /**
      * Converts the provided value to a JsonNode representation using the predefined object mapper.
@@ -1167,8 +1353,8 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @return a [Result] containing a list of matched JSON nodes if successful, or an exception if an error occurs.
      * @since 3.0.0
      */
-    fun findByPropertyValue(key: String, value: Any?) = runCatching {
-        val node = MAPPER.readTree(this.value)
+    fun findByPropertyValue(key: String, value: Any?): List<JsonNode> {
+        val node = toJsonNode()
         val result = mutableListOf<JsonNode>()
         node.forEach {
             if (it.has(key)) when {
@@ -1179,29 +1365,25 @@ open class Json private constructor(@param:Language("json") override val value: 
                 it.get(key).isArray && (value is List<*> || value is Array<*>) -> if (it.get(key).toList() == value) result.add(it)
             }
         }
-        result.toList()
+        return result.toList()
     }
 
     /**
-     * Searches for and retrieves all JSON elements that match the given property path and value
-     * in a nested JSON structure. The function traverses the JSON hierarchy based on the provided
-     * path and performs value comparisons to locate matching elements.
+     * Finds and retrieves all JSON nodes containing a specific property value within a nested JSON structure.
      *
-     * @param keyPath The path to the desired property in the JSON structure. The path segments
-     *                are separated using the defined delimiter in `regexSeparator`.
-     * @param regexSeparator A regular expression used to split the `keyPath` into segments
-     *                       representing the traversal hierarchy. Defaults to `DEFAULT_SEPARATOR`.
-     * @param value The value to match against in the JSON property. The type of the provided value
-     *              determines the comparison logic applied.
-     * @since 3.0.0
+     * @param keyPath The path of keys separated by a specified regex that leads to the target JSON property.
+     * @param regexSeparator A regex pattern used to split the key path into individual keys. Defaults to `DEFAULT_SEPARATOR`.
+     * @param value The value to match against the target property value in the nested JSON. Supports types such as String, Number, Boolean, null, or arrays.
+     * @return A list of JSON nodes where the property value matches the specified `value`. Returns an empty list if no matches are found.
+     * @since 6.1.0
      */
-    fun findByPropertyValueFromNestedJson(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR, value: Any?) = runCatching {
+    fun findByPropertyValueFromNestedJson(keyPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR, value: Any?): List<JsonNode> {
         val result = mutableListOf<JsonNode>()
-        var node = MAPPER.readTree(this.value)
+        var node = toJsonNode()
         var last = ""
 
         for (key in keyPath.split(regexSeparator)) {
-            if (node.has(key)) node = node.get(key) else return@runCatching emptyList()
+            if (node.has(key)) node = node.get(key) else return emptyList()
             last = key
         }
         node.forEach {
@@ -1213,7 +1395,7 @@ open class Json private constructor(@param:Language("json") override val value: 
                 it.get(last).isArray && (value is List<*> || value is Array<*>) -> if (it.get(last).toList() == value) result.add(it)
             }
         }
-        result.toList()
+        return result.toList()
     }
     
     /**
@@ -1235,7 +1417,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Combines the current JSON object with the given Iterable of JSON objects,
      * merging their contents.
      *
-     * @param others An iterable collection of JSON objects to merge with this JSON.
+     * @param others An iterables collection of JSON objects to merge with this JSON.
      * @return A new JSON object representing the merged contents of the initial JSON and the provided JSON objects.
      * @since 3.0.0
      */
@@ -1323,13 +1505,13 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Filters the JSON object to only include the specified fields.
      *
      * @param fieldsToKeep The fields to retain in the filtered JSON object.
-     * @since 3.0.0
+     * @since 6.1.0
      */
-    fun filterFields(vararg fieldsToKeep: String) = runCatching {
-        val node = MAPPER.readTree(value)
+    fun filterFields(vararg fieldsToKeep: String): Json {
+        val node = toJsonNode()
         val result = MAPPER.createObjectNode()
         fieldsToKeep.forEach { if (node.has(it)) result.set(it, node.get(it)) }
-        Json(MAPPER.writeValueAsString(result))
+        return Json(MAPPER.writeValueAsString(result))
     }
 
     /**
@@ -1337,16 +1519,16 @@ open class Json private constructor(@param:Language("json") override val value: 
      *
      * @param regexSeparator the delimiter used to split field paths into nested levels, defaulting to DEFAULT_SEPARATOR.
      * @param fieldsToKeep the list of field paths to retain in the filtered JSON object. Field paths should be specified as strings.
-     * @since 3.0.0
+     * @since 3.1.0
      */
-    fun filterNestedFields(regexSeparator: Regex = DEFAULT_SEPARATOR, vararg fieldsToKeep: String) = runCatching {
-        val rootNode = MAPPER.readTree(value)
+    fun filterNestedFields(regexSeparator: Regex = DEFAULT_SEPARATOR, vararg fieldsToKeep: String): Json {
+        val rootNode = toJsonNode()
         val filteredNode = MAPPER.createObjectNode()
 
         for (fieldPath in fieldsToKeep)
             rootNode.copyField(filteredNode, fieldPath.split(regexSeparator).toTypedArray(), 0)
 
-        MAPPER.writeValueAsString(filteredNode)
+        return Json(MAPPER.writeValueAsString(filteredNode))
     }
 
 
@@ -1360,7 +1542,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     operator fun invoke(fieldPath: String, regexSeparator: Regex = DEFAULT_SEPARATOR): Boolean {
-        var node = MAPPER.readTree(value)
+        var node = toJsonNode()
         val fieldNames = fieldPath.split(regexSeparator)
 
         for (i in 0 until fieldNames.size - 1) {
@@ -1379,7 +1561,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     fun isValidStructure(vararg expectedFields: String, restrictive: Boolean = true): Boolean {
-        val node = MAPPER.readTree(value)
+        val node = toJsonNode()
         for (field in expectedFields)
             if (!node.has(field)) return false
         return !restrictive || expectedFields.size == MAPPER.readTree(value).propertyNames().toSet().size
@@ -1394,7 +1576,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @since 3.0.0
      */
     fun isValidNestedStructure(regexSeparator: Regex = DEFAULT_SEPARATOR, vararg expectedFields: String): Boolean {
-        val node = MAPPER.readTree(value)
+        val node = toJsonNode()
         for (field in expectedFields)
             if (!node(field, regexSeparator)) return false
         return true
@@ -1425,9 +1607,9 @@ open class Json private constructor(@param:Language("json") override val value: 
                 if (direction == SortDirection.Ascending) fields.sortBy { it.key }
                 else fields.sortByDescending { it.key }
 
-                for (entry in fields) {
-                    val sortedValue = sortKeysRecursively(entry.value, direction)
-                    sortedNode.set(entry.key, sortedValue)
+                for ([key, value1] in fields) {
+                    val sortedValue = sortKeysRecursively(value1, direction)
+                    sortedNode.set(key, sortedValue)
                 }
                 sortedNode
             }
@@ -1439,15 +1621,6 @@ open class Json private constructor(@param:Language("json") override val value: 
             else -> node
         }
     }
-    
-    /**
-     * Checks if a JSON entity is empty. A JSON entity is considered empty if it is
-     * either an empty object or an empty array.
-     *
-     * @return True if the JSON entity is empty, otherwise false.
-     * @since 3.0.0
-     */
-    fun isEmptyJson() = isEmptyObject() || isEmptyArray()
 
     /**
      * Negates the current state by checking if the JSON is empty.
@@ -1456,63 +1629,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * @return `true` if the JSON is empty; otherwise, `false`.
      * @since 3.0.0
      */
-    operator fun not() = isEmptyJson()
-
-    /**
-     * Checks if the object is an empty JSON object.
-     *
-     * This function compares the current value with a predefined constant `EMPTY_JSON`
-     * to determine if the object is empty.
-     *
-     * @return `true` if the object represents an empty JSON, `false` otherwise.
-     *
-     * @since 3.0.0
-     */
-    fun isEmptyObject() =
-        value.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", "") == EMPTY_JSON.value
-
-    /**
-     * Checks if the given value is an empty JSON array.
-     *
-     * This method evaluates whether the `value` matches the constant `EMPTY_JSON_ARRAY`.
-     * Returns `true` if the value represents an empty JSON array, otherwise returns `false`.
-     *
-     * @return `true` if the value is an empty JSON array, otherwise `false`
-     * @since 3.0.0
-     */
-    fun isEmptyArray() =
-        value.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "") == EMPTY_JSON_ARRAY.value
-
-    /**
-     * Checks if the current collection, string, or other applicable type is not empty.
-     *
-     * This function evaluates whether the invoking instance contains at least one element
-     * or character, returning true if it does, otherwise false.
-     *
-     * @return true if the instance is not empty, false otherwise.
-     * @since 3.0.0
-     */
-    fun isNotEmpty() = !isEmptyObject() && !isEmptyArray()
-    
-    /**
-     * Determines whether the object is not empty.
-     *
-     * This method serves as a negation of the `isEmptyObject` method,
-     * returning `true` if the object is not empty and `false` otherwise.
-     *
-     * @return `true` if the object is not empty, `false` otherwise.
-     * @since 3.0.0
-     */
-    fun isNotEmptyObject() = !isEmptyObject()
-    
-    /**
-     * Checks if the array is not empty. This function acts as the negation of `isEmptyArray`,
-     * returning true if the array contains at least one element and false otherwise.
-     *
-     * @return `true` if the array is not empty, `false` otherwise.
-     * @since 3.0.0
-     */
-    fun isNotEmptyArray() = !isEmptyArray()
+    operator fun not() = isEmptyJson
 
     /**
      * Recursively removes all null values from a map structure, including nested objects and arrays.
@@ -1601,18 +1718,15 @@ open class Json private constructor(@param:Language("json") override val value: 
     // JSON MERGE PATCH (RFC 7396)
 
     /**
-     * Applies a JSON Merge Patch as per RFC 7386 to the current JSON object. The function takes a patch as input
-     * and merges it with the existing JSON content, producing a new JSON object that represents the result.
+     * Applies a JSON Merge Patch to the current JSON object and returns the resulting JSON.
      *
-     * @param patch The JSON object representing the patch to apply to the current JSON content.
-     * @return A Result containing the patched JSON object wrapped in a Json class, or an error if the operation fails.
-     * @since 3.2.0
+     * The merge patch informs how to modify the current JSON structure to produce a new JSON structure.
+     * It is a partial update where unwanted fields are removed, and specified fields are updated or added.
+     *
+     * @param patch The JSON Merge Patch object that defines the modifications to apply to the current JSON object.
+     * @since 6.1.0
      */
-    infix fun mergePatch(patch: Json) = runCatching {
-        val targetNode = MAPPER.readTree(value)
-        val patchNode = MAPPER.readTree(patch.value)
-        Json(MAPPER.writeValueAsString(applyMergePatch(targetNode, patchNode)))
-    }
+    infix fun mergePatch(patch: Json) = Json(MAPPER.writeValueAsString(applyMergePatch(toJsonNode(), patch.toJsonNode())))
     /**
      * Applies a JSON Merge Patch to the current object using the provided YAML patch.
      *
@@ -1649,29 +1763,41 @@ open class Json private constructor(@param:Language("json") override val value: 
      * of JSON Patch (RFC 6902) to modify the JSON structure according to the provided patch definition.
      * This implementation supports operations such as "add", "replace", and "remove".
      *
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
      * @param patch The JSON Patch to apply. The patch must be a JSON array containing the operations to perform.
      * @return The modified JSON object wrapped in a `Result` object, which will contain the result of the `runCatching` block.
-     * @since 3.2.0
+     * @since 6.1.0
      */
-    infix fun jsonPatch(patch: Json) = runCatching {
-        val targetNode = MAPPER.readTree(value).deepCopy()
-        val patchNode = MAPPER.readTree(patch.value)
+    infix fun jsonPatch(patch: Json) = either {
+        val targetNode = toJsonNode().deepCopy()
+        val patchNode = patch.toJsonNode()
 
-        if (!patchNode.isArray) {
-            throw MalformedInputException("Patch must be an array of operations")
-        }
+        ensure(patchNode.isArray) { InvalidFormatOfType(patchNode, typeOf<List<*>>(), reason = "Patch must be an array of operations") }
 
         for (operation in patchNode) {
-            val op = operation.get("op")?.asString() ?: throw RequiredPropertyException("Operation 'op' is required")
-            val pathStr = operation.get("path")?.asString() ?: throw RequiredPropertyException("Operation 'path' is required")
+            val op = operation.get("op")?.asString()
+                ?: raise(RequiredProperty("op", typeOf<String>()))
+            val pathStr = operation.get("path")?.asString()
+                ?: raise(RequiredProperty("path", typeOf<String>()))
 
             when (op) {
                 "add" -> {
-                    val value = operation.get("value") ?: throw RequiredPropertyException("Operation 'value' is required for operation: $op")
+                    val value = operation.get("value") ?: raise(
+                        RequiredProperty("value", typeOf<Any>())
+                    )
                     applyAdd(targetNode, pathStr, value)
                 }
                 "replace" -> {
-                    val value = operation.get("value") ?: throw RequiredPropertyException("Operation 'value' is required for operation: $op")
+                    val value = operation.get("value") ?: raise(
+                        RequiredProperty("value", typeOf<Any>())
+                    )
                     val [parent, leaf] = resolvePointer(targetNode, pathStr)
                     if (parent.isObject) {
                         (parent as ObjectNode).set(leaf, value)
@@ -1683,33 +1809,36 @@ open class Json private constructor(@param:Language("json") override val value: 
                     applyRemove(targetNode, pathStr)
                 }
                 "copy" -> {
-                    val fromStr = operation.get("from")?.asString() ?: throw RequiredPropertyException("`from` is required for 'copy'")
+                    val fromStr = operation.get("from")?.asString()
+                        ?: raise(RequiredProperty("from", typeOf<String>()))
                     val valueToCopy = getPointerValue(targetNode, fromStr)?.deepCopy()
-                        ?: throw NoSuchJsonPathException(fromStr)
+                        ?: raise(JsonError.PathNotFound(fromStr))
 
                     applyAdd(targetNode, pathStr, valueToCopy)
                 }
                 "move" -> {
-                    val fromStr = operation.get("from")?.asString() ?: throw RequiredPropertyException("`from` is required for 'move'")
-                    if (pathStr.startsWith("$fromStr/")) {
-                        throw IllegalOperationException("Cannot move a node into its own children: from $fromStr to $pathStr")
+                    val fromStr = operation.get("from")?.asString()
+                        ?: raise(RequiredProperty("from", typeOf<String>()))
+                    ensure(!pathStr.startsWith("$fromStr/")) {
+                        IllegalOperation("Cannot move a node into its own children: from $fromStr to $pathStr")
                     }
 
                     val valueToMove = getPointerValue(targetNode, fromStr)?.deepCopy()
-                        ?: throw NoSuchJsonPathException(fromStr)
+                        ?: raise(JsonError.PathNotFound(fromStr))
 
                     applyRemove(targetNode, fromStr)
                     applyAdd(targetNode, pathStr, valueToMove)
                 }
                 "test" -> {
-                    val expectedValue = operation.get("value") ?: throw RequiredPropertyException("`value` is required for 'test'")
+                    val expectedValue = operation.get("value")
+                        ?: raise(RequiredProperty("value", typeOf<Any>()))
                     val actualValue = getPointerValue(targetNode, pathStr)
 
                     if (actualValue == null || actualValue != expectedValue) {
-                        throw ExpectationMismatchException("$pathStr was expected as $expectedValue, but is $actualValue")
+                        raise(ValidationError.ExpectationMismatch(pathStr, expectedValue, actualValue))
                     }
                 }
-                else -> throw UnsupportedOperationException("Operation '$op' is not supported.")
+                else -> raise(UnsupportedOperation("Operation '$op' is not supported."))
             }
         }
 
@@ -1720,12 +1849,21 @@ open class Json private constructor(@param:Language("json") override val value: 
      * of JSON Patch (RFC 6902) to modify the JSON structure according to the provided patch definition.
      * This implementation supports operations such as "add", "replace", and "remove".
      *
+     * Possible erros:
+     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [RequiredProperty] - if a required property is missing in the patch.
+     * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
+     * - [IllegalOperation] - if you're trying to move a node into its own children.
+     * - [ValidationError.ExpectationMismatch] - if the path specified in the patch does not match the expected value.
+     * - [UnsupportedOperation] - if an unsupported operation is encountered in the patch.
+     *
      * @param patch The JSON Patch to apply. The patch must be a JSON array containing the operations to perform.
      * @return The modified JSON object wrapped in a `Result` object, which will contain the result of the `runCatching` block.
-     * @since 3.2.0
+     * @since 6.1.0
      */
     infix fun jsonPatch(patch: Yaml) = jsonPatch(patch.toJson())
 
+    context(_: Raise<Error>)
     private fun applyAdd(root: JsonNode, pathStr: String, value: JsonNode) {
         val [parent, leaf] = resolvePointer(root, pathStr)
         if (parent.isObject) {
@@ -1737,6 +1875,7 @@ open class Json private constructor(@param:Language("json") override val value: 
         }
     }
 
+    context(_: Raise<Error>)
     private fun applyRemove(root: JsonNode, pathStr: String) {
         val [parent, leaf] = resolvePointer(root, pathStr)
         if (parent.isObject) {
@@ -1746,6 +1885,7 @@ open class Json private constructor(@param:Language("json") override val value: 
         }
     }
 
+    context(_: Raise<Error>)
     private fun getPointerValue(root: JsonNode, pathStr: String): JsonNode? {
         val [parent, leaf] = resolvePointer(root, pathStr)
         return if (parent.isObject) {
@@ -1755,9 +1895,10 @@ open class Json private constructor(@param:Language("json") override val value: 
         } else null
     }
 
+    context(_: Raise<Error>)
     private fun resolvePointer(root: JsonNode, pathStr: String): Pair<JsonNode, String> {
         if (pathStr.isEmpty() || !pathStr.startsWith("/")) {
-            throw MalformedParameterException("Invalid path: $pathStr")
+            raise(InvalidFormatOfType(pathStr, typeOf<String>()))
         }
 
         val tokens = pathStr.split(Char.SLASH).drop(1).map {
@@ -1768,55 +1909,55 @@ open class Json private constructor(@param:Language("json") override val value: 
         for (i in 0 until tokens.size - 1) {
             val token = tokens[i]
             current = (if (current.isArray) current.get(token.toInt())
-            else current.get(token)) ?: throw NoSuchJsonPathException(pathStr)
+            else current.get(token)) ?: raise(JsonError.PathNotFound(pathStr))
         }
 
         return current to tokens.last()
     }
 
     /**
-     * Validates a JSON object against a given JSON schema and schema version.
-     * Returns the validated JSON object wrapped in a `Result` if it passes validation, or a
-     * failure containing validation errors if the schema validation fails.
+     * Validates the current JSON value against the given JSON schema and version.
      *
-     * @param jsonSchema The JSON representation of the schema to validate against.
-     * @return A `Result` containing the validated JSON object if validation is successful,
-     *         or a failure with the validation errors if validation fails.
-     * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
-     * @since 3.8.0
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [JsonError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema instance used for validation.
+     * @return Either the validated value or a validation error containing schema validation failures.
+     * @since 6.1.0
      */
     infix fun validateWithSchema(jsonSchema: JsonSchema) = validateWithSchema(jsonSchema, JsonSchema.Version.V2020_12)
     /**
-     * Validates a JSON object against a given JSON schema and schema version.
-     * Returns the validated JSON object wrapped in a `Result` if it passes validation, or a
-     * failure containing validation errors if the schema validation fails.
+     * Validates the current JSON value against the given JSON schema and version.
      *
-     * @param jsonSchema The JSON representation of the schema to validate against.
-     * @param version The version of the JSON Schema standard to use for validation.
-     * @return A `Result` containing the validated JSON object if validation is successful,
-     *         or a failure with the validation errors if validation fails.
-     * @throws MalformedInputException If there is an issue with parsing the input JSON schema.
-     * @since 3.8.0
+     * Possible errors:
+     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [JsonError.SchemaValidationFailed] - if the validation fails.
+     *
+     * @param jsonSchema The JSON schema instance used for validation.
+     * @param version The version of the JSON schema to be applied during validation.
+     * @return Either the validated value or a validation error containing schema validation failures.
+     * @since 6.1.0
      */
-    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version): Result<Json> {
+    fun validateWithSchema(jsonSchema: JsonSchema, version: JsonSchema.Version) = either {
         try {
             val schema = JsonSchemaFactory
                 .getInstance(version.toVersionFlag())
                 .getSchema(OLD_MAPPER.readTree(jsonSchema.value))
 
             val validationMessages = schema.validate(OLD_MAPPER.readTree(value))
-            if (validationMessages.isEmpty()) return Result.success(this)
+            if (validationMessages.isEmpty()) return@either this
 
             val errors = validationMessages.map {
-                JsonSchemaValidationException.SchemaError(
+                JsonSchema.SchemaError(
                     it.evaluationPath?.toString() ?: "$",
                     it.message,
                     it.details
                 )
             }
-            return Result.failure(JsonSchemaValidationException(errors))
+            raise(JsonError.SchemaValidationFailed(errors))
         } catch (e: Exception) {
-            throw MalformedInputException("Malformed JSON schema", e)
+            InvalidFormatOfType(jsonSchema, typeOf<JsonSchema>())
         }
     }
 }

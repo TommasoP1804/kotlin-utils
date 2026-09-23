@@ -20,7 +20,6 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.net.URLConnection
-import java.util.*
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KMutableProperty1
@@ -138,7 +137,7 @@ typealias MCollection<E> = MutableCollection<E>
 /**
  * A typealias for `MutableIterable<T>` that simplifies the usage of its type declaration.
  *
- * @param T the type of elements contained within the iterable.
+ * @param T the type of elements contained within the iterables.
  * @since 3.0.0
  */
 
@@ -1115,6 +1114,33 @@ typealias ContextTriSupplier<C, R1, R2, R3> = context(C) () -> Triple<R1, R2, R3
  *
  * This can be used in scenarios where deferred creation of a Throwable is required.
  *
+ * @since 6.1.0
+ */
+typealias ExceptionSupplier = () -> Exception
+/**
+ * A typealias representing a function that takes an object as input
+ * and returns a transformed `Exception` as output. Commonly used for
+ * modifying or wrapping exceptions before rethrowing or handling them.
+ *
+ * @since 6.1.0
+ */
+typealias ExceptionTransformer = (Exception) -> Exception
+
+/**
+ * A type alias for a function that returns a nullable [Exception].
+ *
+ * This type alias is typically used when a function needs to supply
+ * an exception or indicate the absence of one by returning null.
+ *
+ * @since 6.1.0
+ */
+typealias NullableExceptionSupplier = () -> Exception?
+
+/**
+ * A type alias representing a supplier function that provides a Throwable instance.
+ *
+ * This can be used in scenarios where deferred creation of a Throwable is required.
+ *
  * @since 1.0.0
  */
 typealias ThrowableSupplier = () -> Throwable
@@ -1136,6 +1162,39 @@ typealias ThrowableTransformer = (Throwable) -> Throwable
  * @since 1.0.0
  */
 typealias NullableThrowableSupplier = () -> Throwable?
+
+/**
+ * A type alias representing a supplier function that produces an instance of the `Error` interface.
+ * This supplier can be used for deferred or lazy error construction,
+ * facilitating dynamic error generation scenarios.
+ *
+ * @since 6.1.0
+ */
+typealias ErrorSupplier = () -> dev.tommasop1804.kutils.errors.Error
+/**
+ * A typealias representing a function that transforms one `Error` into another.
+ *
+ * This alias simplifies the declaration of functions or properties where
+ * error transformation logic needs to be encapsulated. The transformation
+ * can be used to map, modify, or adapt errors within the system to fit
+ * different contexts or requirements.
+ *
+ * @since 6.1.0
+ */
+typealias ErrorTransformer = (dev.tommasop1804.kutils.errors.Error) -> dev.tommasop1804.kutils.errors.Error
+
+/**
+ * A type alias representing a supplier that returns an optional instance of `Error`.
+ *
+ * This lambda-based supplier can be used in scenarios where an `Error` instance
+ * needs to be generated or fetched dynamically, with the possibility of being null.
+ *
+ * It provides a flexible mechanism for handling optional error objects, allowing
+ * for deferred execution and lazy evaluation.
+ *
+ * @since 6.1.0
+ */
+typealias NullableErrorSupplier = () -> dev.tommasop1804.kutils.errors.Error?
 
 /**
  * A typealias representing an action that is a function with no parameters and no return value.
@@ -1839,16 +1898,6 @@ typealias KDuration = Duration
  * @see BigInteger
  */
 typealias BigInt = BigInteger
-
-/**
- * A typealias for the `UUID` class, representing a universally unique identifier.
- *
- * This typealias provides a more concise and readable way to refer to `UUID` in the codebase.
- *
- * @since 3.0.0
- */
-@Deprecated("Prefer use of kotlin.uuid.Uuid instead", ReplaceWith("Uuid", "kotlin.uuid.Uuid"))
-typealias Uuid = UUID
 
 /**
  * Type alias for the `URI` class from the `java.net` package. This allows the `URI` class to be referenced

@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geometry.Line.Companion.TOLERANCE
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.*
@@ -116,77 +118,81 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
             return Point(dx, dy, dz)
         }
     /**
-     * Calculates the slope of a 2D line segment defined by the [start] and [end] points.
+     * Represents the slope of a 2D line segment defined by its start and end points.
+     * The slope is calculated as the difference in the y-coordinates divided by the difference
+     * in the x-coordinates of the start and end points, provided the line is not vertical.
+     * If the line is vertical, the slope is represented as NaN.
      *
-     * The slope is computed as the change in y-coordinates divided by the change in x-coordinates.
-     * For vertical lines, the slope is considered undefined and represented by `Double.NaN`.
+     * Throws `GeometryError` if the z-coordinates of the start and end points are not zero,
+     * ensuring the functionality is only for 2D lines.
      *
-     * Throws a [GeometryException] if the line is not a 2D line,
-     * i.e., if the z-coordinates of the [start] or [end] points are non-zero.
+     * This property is read-only and computed lazily.
      *
-     * 
-     * @return The slope of the line as a [Double].
-     *         Returns `Double.NaN` if the line is vertical.
-     * @since 1.0.0
+     * @since 6.1.0
      */
-    val slope: Double
-        get() {
-            if (start.z != 0.0 || end.z != 0.0) throw GeometryException("Only for 2D lines")
-            if (isVertical) return Double.NaN
-            return (end.y - start.y) / (end.x - start.x)
+    val slope
+        get() = either {
+            ensure(start.z == 0.0 && end.z == 0.0) { GeometryError("Only for 2D lines.") }
+            if (isVertical) Double.NaN
+            else (end.y - start.y) / (end.x - start.x)
         }
     /**
-     * Represents the y-intercept of a two-dimensional line. The y-intercept is the point at which the
-     * line crosses the y-axis (x = 0). For vertical lines, this value is not defined and will return NaN.
+     * Represents the y-intercept of a 2D line defined by its start and end points.
      *
-     * Accessing this property will throw an exception if the line is not in a two-dimensional space
-     * (i.e., if either the `z` coordinate of the `start` or `end` point is non-zero).
+     * The y-intercept is the point where the line crosses the y-axis. It is calculated
+     * using the coordinates of the start point and the slope of the line.
      *
-     * The value is calculated using the formula `yIntercept = start.y - slope * start.x`.
+     * If the line is vertical, its y-intercept is undefined and will return `Double.NaN`.
      *
-     * 
-     * @throws GeometryException if the line is not confined to a 2D plane
-     * @since 1.0.0
+     * Throws a `GeometryError` if the line is not 2D (i.e., either the start or end
+     * point has a non-zero z-coordinate).
+     *
+     * @return the y-intercept of the line or `Double.NaN` if the line is vertical.
+     * @since 6.1.0
      */
-    val yIntercept: Double
-        get() {
-            if (start.z != 0.0 || end.z != 0.0) throw GeometryException("Only for 2D lines")
-            if (isVertical) return Double.NaN
-            return start.y - slope * start.x
+    val yIntercept
+        get() = either {
+            ensure(start.z == 0.0 && end.z == 0.0) { GeometryError("Only for 2D lines.") }
+            if (isVertical) Double.NaN
+            else start.y - slope.bind() * start.x
         }
     /**
-     * The x-intercept of the line, representing the x-coordinate where the line crosses the x-axis.
-     * This property is intended for 2-dimensional lines only and will throw an exception if applied to a 3-dimensional line.
-     * If the line is horizontal, the x-intercept is undefined, represented by `Double.NaN`.
+     * The X-intercept of a 2D line segment, calculated based on its start and end points.
+     * Returns `Double.NaN` if the line is horizontal, as it does not intersect the x-axis.
+     * Throws an exception if the segment is not strictly 2D (z-coordinates differing from zero).
+     * Provides a mechanism to detect and handle invalid or unsupported line configurations.
      *
-     * 
-     * @throws GeometryException if the line is not strictly two-dimensional.
-     * @since 1.0.0
+     * @return the X-coordinate where the line segment intersects the x-axis, or `Double.NaN` for horizontal lines.
+     * @since 6.1.0
      */
-    val xIntercept: Double
-        get() {
-            if (start.z != 0.0 || end.z != 0.0) throw GeometryException("Only for 2D lines")
-            if (isHorizontal) return Double.NaN
-            return start.x - slope * start.y
+    val xIntercept
+        get() = either {
+            ensure(start.z == 0.0 && end.z == 0.0) { GeometryError("Only for 2D lines.") }
+            if (isHorizontal) Double.NaN
+            else start.x - slope.bind() * start.y
         }
     /**
-     * Calculates the intercept of the line with the axes for 2D lines.
+     * Represents the point of interception for a 2D line, ensuring that the line lies
+     * entirely within a 2D plane (z-coordinates must be 0). Calculates the intercept
+     * based on the orientation of the line, whether it's vertical, horizontal, or neither.
      *
-     * 
-     * @throws GeometryException if the line is not 2D (z-coordinates for start or end are non-zero).
-     * @return A [Point] instance representing the intercept of the line.
-     *         If the line is vertical, the intercept is with the x-axis.
-     *         If the line is horizontal, the intercept is with the y-axis.
-     *         For other lines, this represents the intersection of the line with the axes.
-     * @since 1.0.0
+     * The intercept is a calculated result:
+     * - For a vertical line, it resolves to the point based on the x-coordinate and
+     *   the `yIntercept`.
+     * - For a horizontal line, it resolves to the point based on the y-coordinate and
+     *   the `xIntercept`.
+     * - For other lines, it resolves to the point based on both `xIntercept` and `yIntercept`.
+     *
+     * @return The 2D point of interception as a `Point` object.
+     * @since 6.1.0
      */
-    val intercept: Point
-        get() {
-            if (start.z != 0.0 || end.z != 0.0) throw GeometryException("Only for 2D lines")
+    val intercept
+        get() = either {
+            ensure(start.z == 0.0 && end.z == 0.0) { GeometryError("Only for 2D lines.") }
 
-            if (isVertical) return Point(start.x, yIntercept)
-            if (isHorizontal) return Point(xIntercept, start.y)
-            return Point(xIntercept, yIntercept)
+            if (isVertical) Point(start.x, yIntercept.bind())
+            else if (isHorizontal) Point(xIntercept.bind(), start.y)
+            else Point(xIntercept.bind(), yIntercept.bind())
         }
 
     companion object {
@@ -371,7 +377,7 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
     /**
      * Determines if the current line is perpendicular to the given line.
      *
-     * 
+     *
      * @param other The other line to check for perpendicularity.
      * @return True if the current line is perpendicular to the given line, false otherwise.
      * @since 1.0.3
@@ -380,7 +386,7 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
         if (start.z == 0.0 && end.z == 0.0) {
             if (isVertical && other.isHorizontal) return true
             if (isHorizontal && other.isVertical) return true
-            return slope == -other.slope
+            return slope() == -other.slope()
         }
 
         val dir1: Point = directionVector
@@ -430,28 +436,28 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
     private fun direction(p1: Point, p2: Point, p3: Point) = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
 
     /**
-     * Determines the intersection point of the current line with another line.
-     * If the lines are parallel, horizontal, or vertical, the result is null.
-     * This function supports only 2D lines. If any of the involved lines has a non-zero z-coordinate,
-     * the operation will throw an exception.
+     * Calculates the intersection point between this line and another line in 2D space.
+     * This method operates only on lines confined to the 2D plane (z=0 for all points).
+     * If the lines are parallel or do not intersect, the result will be `null`.
      *
-     * 
-     * @param other The other line to intersect with.
-     * @return The intersection point as a [Point], or null if the lines do not intersect.
-     * @throws GeometryException If any of the lines are not 2D.
-     * @since 1.0.0
+     * @param other The other line to calculate the intersection with.
+     * @return Either a [GeometryError] if the lines are not 2D or a [Point] representing
+     *         the intersection point, or `null` if the lines are parallel or do not intersect.
+     * @since 6.1.0
      */
-    infix fun intersection(other: Line): Point? {
+    infix fun intersection(other: Line): Either<GeometryError, Point?> = either {
         if (start.z != 0.0 || end.z != 0.0 || other.start.z != 0.0 || other.end.z != 0.0)
-            throw GeometryException("Only for 2D lines")
+            raise(GeometryError("Only for 2D lines."))
 
-        if (isVertical || other.isVertical) return null
-        if (isHorizontal && other.isHorizontal) return null
-        if (isHorizontal) return Point(other.xIntercept, start.y)
-        if (other.isHorizontal) return Point(start.x, other.yIntercept)
-        val x: Double = (other.yIntercept - yIntercept) / (slope - other.slope)
-        val y: Double = slope * x + yIntercept
-        return Point(x, y)
+        if (isVertical || other.isVertical) null
+        else if (isHorizontal && other.isHorizontal) null
+        else if (isHorizontal) Point(other.xIntercept(), start.y)
+        else if (other.isHorizontal) Point(start.x, other.yIntercept())
+        else {
+            val x: Double = (other.yIntercept() - yIntercept()) / (slope() - other.slope())
+            val y: Double = slope() * x + yIntercept()
+            Point(x, y)
+        }
     }
 
     /**
@@ -550,7 +556,7 @@ class Line (var start: Point = Point(), var end: Point = Point()) : Serializable
      * has non-zero z-coordinates for either the start or the end point,
      * the operation is not supported and an exception is thrown.
      *
-     * 
+     *
      * @param angle The angle in radians by which the line should be rotated.
      * @throws GeometryException If either the start or end point has a non-zero z-coordinate.
      * @since 1.0.0

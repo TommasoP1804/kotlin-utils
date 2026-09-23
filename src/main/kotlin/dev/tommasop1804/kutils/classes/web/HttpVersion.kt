@@ -5,7 +5,6 @@
 package dev.tommasop1804.kutils.classes.web
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.exceptions.*
 import org.jetbrains.exposed.v1.core.Table
 import java.net.http.HttpClient
 
@@ -139,13 +138,12 @@ enum class HttpVersion(val notation: String, val version: Double) {
      * This method provides a conversion from the `HttpVersion` enumeration, which represents HTTP protocol versions
      * defined within the application, to the `HttpClient.Version` enumeration used by the Java HTTP client API.
      *
-     * @return The `HttpClient.Version` corresponding to the current `HttpVersion` instance.
-     * @throws NoSuchEntryException If the current `HttpVersion` instance cannot be mapped to a valid `HttpClient.Version`.
-     * @since 4.7.0
+     * @return The `HttpClient.Version` corresponding to the current `HttpVersion` instance, or `null`.
+     * @since 6.1.0
      */
     fun toJavaHttpVersion() = when(this) {
         HTTP_1_1 -> HttpClient.Version.HTTP_1_1
         HTTP_2 -> HttpClient.Version.HTTP_2
-        else -> throw NoSuchEntryException(HttpClient.Version::class)
+        else -> null
     }
 }

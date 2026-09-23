@@ -2,9 +2,19 @@
  * Copyright © 2026 Tommaso Pastorelli (TommasoP1804) | Kotlin-Utils
  */
 
+@file:Suppress("unused")
+
 package dev.tommasop1804.kutils.classes.functional
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.collections.*
+import dev.tommasop1804.kutils.classes.functional.Either.*
+import dev.tommasop1804.kutils.errors.*
+import dev.tommasop1804.kutils.exceptions.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.reflect.KClass
 
 /**
  * Represents a value of one of two possible types, commonly referred to as a disjoint union.
@@ -17,8 +27,17 @@ import dev.tommasop1804.kutils.*
  * @since 5.2.0
  * @author Tommaso Pastorelli
  */
-@Suppress("unused")
-sealed class Either<out L, out R> {
+sealed interface Either<out L, out R> {
+    /**
+     * Holds the encapsulated value of this `Either` instance.
+     *
+     * This property may represent the value contained within the `Left` or `Right` type,
+     * depending on the current state of the instance.
+     *
+     * @since 6.1.0
+     */
+    val value: Any?
+
     /**
      * Returns `true` if this instance is of type `Right`, otherwise `false`.
      * This property allows determining if the `Either` holds a right value.
@@ -32,76 +51,77 @@ sealed class Either<out L, out R> {
      */
     val isLeft get() = this is Left
 
-    operator fun invoke() = when (this) {
-        is Left -> this.value
+    /**
+     * Invokes the instance to retrieve the encapsulated value based on its type.
+     *
+     * This operator function determines whether the current instance is of type `Left` or `Right`
+     * and returns the value associated with the respective type.
+     *
+     * @return The value contained in the `Left` or `Right` instance.
+     * @since 6.1.0
+     */
+    operator fun invoke(): R = when (this) {
+        is Left -> throw ErrorInvokedException(this)
+        is Right -> this.value
+    }
+    /**
+     * Invokes the current `Either` instance, either throwing an exception or returning a value
+     * based on whether it is a `Left` or a `Right`.
+     *
+     * If the instance is of type `Left`, the provided `lazyException` transformer is used to
+     * generate a `Throwable` based on the encapsulated `Left` value, which is then thrown.
+     * If the instance is of type `Right`, the encapsulated value is returned.
+     *
+     * @param lazyException A transformer function that takes the `Left` value (of type `L`) and
+     *                      produces a `Throwable` to be thrown when the instance is `Left`.
+     * @return The value of type `R` if the instance is a `Right`.
+     * @since 6.1.0
+     */
+    operator fun invoke(lazyException: Transformer<L, Throwable>): R = when (this) {
+        is Left -> throw lazyException(this.value)
         is Right -> this.value
     }
 
     /**
-     * Applies one of the provided functions to the value contained in an instance of either `Left` or `Right`.
+     * Retrieves the encapsulated value or throws an exception if the instance is of type `Left`.
      *
-     * @param onLeft the function to be applied if the instance is `Left`
-     * @param onRight the function to be applied if the instance is `Right`
-     * @return the result of applying the appropriate function to the value
-     * @since 5.2.0
+     * This method delegates to the `invoke` operator function of the `Either` class
+     * to determine the type of instance (`Left` or `Right`) and either
+     * return the value or throw an exception accordingly.
+     *
+     * @throws ErrorInvokedException If the instance is of type `Left`.
+     * @return The value contained in the `Right` instance.
+     * @since 6.1.0
      */
-    inline operator fun <T> invoke(
-        onLeft: Transformer<L, T>,
-        onRight: Transformer<R, T>
-    ) = fold(onLeft, onRight)
-
+    fun getOrThrow() = invoke()
     /**
-     * Applies one of the provided functions to the value contained in an instance of either `Left` or `Right`.
+     * Retrieves the encapsulated value of the current instance or throws a lazily provided exception
+     * if the instance is of type `Left`.
      *
-     * @param onLeft the function to be applied if the instance is `Left`
-     * @param onRight the function to be applied if the instance is `Right`
-     * @return the result of applying the appropriate function to the value
-     * @since 5.2.0
+     * This method attempts to invoke the current instance to retrieve its value. If the invocation
+     * results in an `ErrorInvokedException`, it uses the provided `lazyException` transformer to
+     * generate and throw a corresponding exception based on the `Left` value.
+     *
+     * @param lazyException A transformer function that takes the `Left` value and produces a
+     *                       `Throwable` to be thrown if the invocation fails.
+     * @throws Throwable The exception generated by the `lazyException` transformer if the
+     *                   current instance is of type `Left`.
+     * @since 6.1.0
      */
-    inline fun <T> fold(onLeft: Transformer<L, T>, onRight: Transformer<R, T>): T = when (this) {
-        is Left -> onLeft(value)
-        is Right -> onRight(value)
-    }
-
+    fun getOrThrow(lazyException: Transformer<L, Throwable>) = invoke(lazyException)
     /**
-     * Transforms the value contained in a `Right` instance using the provided mapping function.
-     * If the instance is `Left`, it remains unchanged.
+     * Retrieves the value contained in the `Right` instance or `null` if the current instance is `Left`.
      *
-     * @param f A function that takes the value of type `R` from a `Right` instance and maps it to a value of type `T`.
-     * @return An `Either` instance: if this is `Right`, it returns a new `Right` with the mapped value; if this is `Left`, it returns the same `Left`.
-     * @since 5.2.0
-     */
-    inline fun <T> map(f: Transformer<R, T>): Either<L, T> = when (this) {
-        is Left -> this
-        is Right -> Right(f(value))
-    }
-
-    /**
-     * Transforms the left component of this `Either` using the provided function, if it is a `Left`.
-     * If this is a `Right`, the function is not applied and this instance is returned as is.
+     * This method enables safe access to the encapsulated value of an `Either` instance without the risk
+     * of throwing an exception. If the `Either` instance is of type `Left`, the method returns `null`.
+     * If the instance is of type `Right`, it returns the associated value.
      *
-     * @param f The transformation function to apply to the left value if this is a `Left`.
-     * @return A new `Either` instance with the transformed left value if this is a `Left`,
-     *         or the same instance if this is a `Right`.
-     * @since 5.2.0
+     * @return The value of type `R` if this instance is a `Right`, or `null` if it is a `Left`.
+     * @since 6.1.0
      */
-    inline fun <T> mapLeft(f: Transformer<L, T>): Either<T, R> = when (this) {
-        is Left -> Left(f(value))
-        is Right -> this
-    }
-
-    /**
-     * Performs a transformation on the value contained within the `Right` instance of this `Either`
-     * and flattens the result into a single `Either`. If this instance is a `Left`, it is returned as is.
-     *
-     * @param f A function that takes the value of type `R` from the `Right` instance and returns an `Either<L, T>`.
-     * @return An `Either` resulting from applying the transformation function to the value of the `Right` instance,
-     *         or the same `Left` instance if this is a `Left`.
-     * @since 5.2.0
-     */
-    inline fun <T> flatMap(f: Transformer<R, Either<@UnsafeVariance L, T>>): Either<L, T> = when (this) {
-        is Left -> this
-        is Right -> f(value)
+    fun getOrNull() = when (this) {
+        is Left -> null
+        is Right -> this.value
     }
 
     /**
@@ -129,7 +149,7 @@ sealed class Either<out L, out R> {
      * @since 5.2.0
      * @author Tommaso Pastorelli
      */
-    data class Left<out L>(val value: L) : Either<L, Nothing>()
+    data class Left<out L>(override val value: L) : Either<L, Nothing>
     /**
      * Represents the successful or "right" value in the context of the `Either` type.
      *
@@ -141,5 +161,432 @@ sealed class Either<out L, out R> {
      * @since 5.2.0
      * @author Tommaso Pastorelli
      */
-    data class Right<out R>(val value: R) : Either<Nothing, R>()
+    data class Right<out R>(override val value: R) : Either<Nothing, R>
+}
+
+/**
+ * Converts the nullable instance of type `T` into an `Either` type. If the instance is not null,
+ * it wraps the value in a `Right`. If the instance is null, it creates a `Left` using the provided supplier.
+ *
+ * @param supplier A function that supplies the value to be used in the `Left` if the instance is null.
+ * @return An `Either` containing `Right` with the value of type `T` if not null,
+ * or `Left` with the value supplied by the `supplier` if null.
+ * @since 6.1.0
+ */
+fun <L, T> T?.rightIfNotNull(supplier: Supplier<L>): Either<L, T> = this?.let { Right(it) } ?: Left(supplier())
+
+/**
+ * Performs a transformation on the value contained within the `Right` instance of this `Either`
+ * and flattens the result into a single `Either`. If this instance is a `Left`, it is returned as is.
+ *
+ * @param f A function that takes the value of type `R` from the `Right` instance and returns an `Either<L, T>`.
+ * @return An `Either` resulting from applying the transformation function to the value of the `Right` instance,
+ *         or the same `Left` instance if this is a `Left`.
+ * @since 5.2.0
+ */
+inline fun <L, R, T> Either<L, R>.flatMap(f: Transformer<R, Either<@UnsafeVariance L, T>>): Either<L, T> = when (this) {
+    is Left -> this
+    is Right -> f(value)
+}
+
+/**
+ * Transforms the left component of this `Either` using the provided function, if it is a `Left`.
+ * If this is a `Right`, the function is not applied and this instance is returned as is.
+ *
+ * @param f The transformation function to apply to the left value if this is a `Left`.
+ * @return A new `Either` instance with the transformed left value if this is a `Left`,
+ *         or the same instance if this is a `Right`.
+ * @since 5.2.0
+ */
+inline fun <L, R, T> Either<L, R>.mapLeft(f: Transformer<L, T>): Either<T, R> = when (this) {
+    is Left -> Left(f(value))
+    is Right -> this
+}
+
+/**
+ * Transforms the value contained in a `Right` instance using the provided mapping function.
+ * If the instance is `Left`, it remains unchanged.
+ *
+ * @param f A function that takes the value of type `R` from a `Right` instance and maps it to a value of type `T`.
+ * @return An `Either` instance: if this is `Right`, it returns a new `Right` with the mapped value; if this is `Left`, it returns the same `Left`.
+ * @since 5.2.0
+ */
+inline fun <L, R, T> Either<L, R>.map(f: Transformer<R, T>): Either<L, T> = when (this) {
+    is Left -> this
+    is Right -> Right(f(value))
+}
+
+/**
+ * Applies one of the provided functions to the value contained in an instance of either `Left` or `Right`.
+ *
+ * @param onLeft the function to be applied if the instance is `Left`
+ * @param onRight the function to be applied if the instance is `Right`
+ * @return the result of applying the appropriate function to the value
+ * @since 5.2.0
+ */
+inline fun <L, R, T> Either<L, R>.fold(onLeft: Transformer<L, T>, onRight: Transformer<R, T>): T = when (this) {
+    is Left -> onLeft(value)
+    is Right -> onRight(value)
+}
+
+/**
+ * Applies one of the provided functions to the value contained in an instance of either `Left` or `Right`.
+ *
+ * @param onLeft the function to be applied if the instance is `Left`
+ * @param onRight the function to be applied if the instance is `Right`
+ * @return the result of applying the appropriate function to the value
+ * @since 5.2.0
+ */
+inline operator fun <L, R, T> Either<L, R>.invoke(
+    onLeft: Transformer<L, T>,
+    onRight: Transformer<R, T>
+) = fold(onLeft, onRight)
+/**
+ * Invokes the given default computation if this instance is of type `Left`,
+ * otherwise returns the value contained in the `Right` side.
+ *
+ * This operator function provides a convenient way to handle the disjoint union
+ * nature of the `Either` by supplying a fallback mechanism via the `default` parameter
+ * when the value is not present on the `Right` side.
+ *
+ * @param default a supplier function that provides the default value to be used
+ * if this instance is of type `Left`.
+ * @since 6.1.0
+ */
+operator fun <L, R> Either<L, R>.invoke(default: Transformer<L, R>) = when (this) {
+    is Left -> default(value)
+    is Right -> value
+}
+/**
+ * Invokes the `Either` instance and, based on its type, either throws an exception created
+ * by the provided transformer or returns the contained value.
+ *
+ * If this instance is of type `Left`, it applies the `lazyException` function to transform
+ * the left value into a `Throwable` and throws it. If this instance is of type `Right`,
+ * it directly returns the contained value.
+ *
+ * @param lazyException A transformer function that converts a value of type `L`
+ * to a `Throwable` in case the `Either` instance is of type `Left`.
+ * @since 6.1.0
+ */
+@JvmName("invokeWithException")
+operator fun <L, R> Either<L, R>.invoke(lazyException: Transformer<L, Throwable>) = when (this) {
+    is Left -> throw lazyException(value)
+    is Right -> value
+}
+
+/**
+ * Executes the given block of code if this `Either` instance is of type `Left`.
+ *
+ * The provided `block` will be invoked with the value contained in the `Left` instance,
+ * allowing side effects to be executed based on the `Left` value.
+ *
+ * @param block A function to be executed if this instance is of type `Left`. It consumes the value of type `L`.
+ * @return The same `Either` instance on which this function was called.
+ * @since 6.1.0
+ */
+@OptIn(ExperimentalContracts::class)
+inline fun <L, R> Either<L, R>.onLeft(block: Consumer<L>): Either<L, R> {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this is Left) block(value)
+    return this
+}
+/**
+ * Executes the given block if the current instance of `Either` is of type `Right`.
+ *
+ * This method allows you to perform an operation on the encapsulated value in `Right`
+ * without altering the `Either` instance. If the instance is of type `Right`, the specified
+ * block is invoked with the value of `Right`. If the instance is of type `Left`, the block is not executed.
+ *
+ * @param block A consumer function to be executed with the value of `Right` when this instance is of type `Right`.
+ * @return The same `Either` instance that the method was called on.
+ * @since 6.1.0
+ */
+@OptIn(ExperimentalContracts::class)
+inline fun <L, R> Either<L, R>.onRight(block: Consumer<R>): Either<L, R> {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this is Right) block(value)
+    return this
+}
+
+/**
+ * Converts the current value into an `Either` by evaluating if the value is `null`.
+ * If the value is not `null`, it is returned as `Right` in the resulting `Either`.
+ * If the value is `null`, the provided supplier function is invoked to produce a `Left` value.
+ *
+ * @param T The type of the value being evaluated.
+ * @param L The type of the `Left` value to be produced when the original value is `null`.
+ * @param left A supplier function that provides the `Left` value when the original value is `null`.
+ * @return An `Either` instance where:
+ *         - `Right<T>` represents the original value if it is non-`null`.
+ *         - `Left<L>` is produced by the `left` supplier if the original value is `null`.
+ * @since 6.1.0
+ */
+infix fun <T, L> T.orEither(left: Transformer<T, L>) = either { this ?: raise(left(this)) }
+
+/**
+ * Executes a block of code in the context of a `Raise` scope, capturing any raised error
+ * as a `Left` in the resulting `Either`, or returning the result of the block as a `Right`.
+ *
+ * This function allows for a functional style of handling errors by short-circuiting
+ * computations using the `Raise` interface.
+ *
+ * @param E The type of the error that can be raised within the scope.
+ * @param A The type of the result produced if no error is raised.
+ * @param block A lambda function with a receiver of type `Raise<E>`, which can raise errors
+ *              or return a value.
+ * @return An `Either` value where:
+ *         - `Left<E>` represents an error raised within the block.
+ *         - `Right<A>` represents the successful result returned by the block.
+ * @since 6.1.0
+ */
+@OptIn(ExperimentalContracts::class)
+@Suppress("UNCHECKED_CAST")
+inline fun <E, A> either(block: context(Raise<E>) () -> A): Either<E, A> {
+    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+    val scope = DefaultRaise<E>()
+    return try {
+        Right(context(scope) { block() })
+    } catch (s: RaiseSignal) {
+        if (s.scope === scope) Left(s.error as E) else throw s
+    }
+}
+
+/**
+ * Continues a computation on the `Right` value of this [Either] inside a new [Raise] scope,
+ * allowing further errors of type [E2] to be raised. If this is a `Left`, it is returned
+ * as is (widened to [E2]) and [block] is not executed.
+ * @since 6.1.0
+ */
+inline infix fun <E1 : E2, E2, A, B> Either<E1, A>.thenEither(block: ContextTransformer<Raise<E2>, A, B>): Either<E2, B> =
+    when (this) {
+        is Left -> this
+        is Right -> either { block(value) }
+    }
+
+/**
+ * Executes a transformation block on the right value of the `Either` instance and returns the result,
+ * merging the result into a new `Either` while maintaining the compatibility between error types.
+ * The transformation allows composition with a potential raise for the error type.
+ *
+ * @param block A transformation function that accepts a receiver of type `Raise<E2>` and the right value of the current `Either`,
+ *              and returns a new value of type `B`. This block is used for mapping the success value while allowing error handling.
+ * @return A new `Either` instance resulting from the applied transformation using the specified block.
+ * @since 6.1.0
+ */
+inline infix fun <E1 : E2, E2 : BE, A, BE, BR> Either<E1, A>.thenMergeWith(block: ContextTransformer<Raise<E2>, A, Either<BE, BR>>) =
+    thenEither(block).flatten()
+
+/**
+ * Combines the current `Either` instance with another `Either` instance, producing a new `Either`
+ * containing a pair of values if both are successful (`Right`).
+ *
+ * If either `Either` instance is a failure (`Left`), the result will also be a failure
+ * containing the error from the first encountered `Left`.
+ *
+ * @param other The `Either` instance to combine with the current instance.
+ * @return An `Either` of type `Either<E, Pair<A, B>>`, where:
+ *         - `Right<Pair<A, B>>` contains a pair of the two successful values if both instances are `Right`.
+ *         - `Left<E>` contains the error if either instance is `Left`.
+ * @since 6.1.0
+ */
+infix fun <E, A, B> Either<E, A>.mergeWith(other: Either<E, B>): Either<E, Pair<A, B>> =
+    either {
+        val a = bind()
+        val b = other.bind()
+        a to b
+    }
+/**
+ * Combines the values of two `Either` instances, if both are `Right`, using a provided combining function.
+ *
+ * If either of the `Either` instances is `Left`, the result will be `Left` with the error value from one
+ * of the `Left` instances.
+ *
+ * @param other The second `Either` instance to combine with this one.
+ * @param combine A function that takes the values of type `A` and `B` from the two `Right` instances
+ *                and combines them into a value of type `C`.
+ * @return An `Either` containing the combination of the values:
+ *         - `Right<C>` if both instances are `Right`.
+ *         - `Left<E>` if either instance is `Left`.
+ * @since 6.1.0
+ */
+inline fun <E, A, B, C> Either<E, A>.mergeWith(
+    other: Either<E, B>,
+    combine: (A, B) -> C
+): Either<E, C> =
+    either {
+        combine(bind(), other.bind())
+    }
+
+/**
+ * Flattens a nested `Either` structure into a single `Either` instance.
+ *
+ * This method is useful when dealing with an `Either` containing another `Either` as its right-side
+ * value. If the outer instance is a `Left`, it is returned as-is. If it is a `Right`, the
+ * encapsulated `Either` value is returned directly.
+ *
+ * @return A single-layered `Either` instance, preserving the left value if the outer instance
+ *         is `Left`, or flattening the inner `Either` if the outer instance is `Right`.
+ * @since 6.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+fun <E1 : E2, E2 : E, E, A> Either<E1, Either<E2, A>>.flatten(): Either<E, A> =
+    when (this) {
+        is Left -> this as Left<E>
+        is Right -> value
+    }
+
+/**
+ * Returns the list contained within the `Right` instance of this `Either`, or an empty list if the instance is `Left`.
+ *
+ * This method is a convenience function to handle scenarios where the `Either` type
+ * contains a `List<T>` in the `Right` side and ensures a consistent return type of `List<T>`,
+ * eliminating the need to manually handle the `Left` case.
+ *
+ * @return The list of type `T` if this instance is `Right`, or an empty list if it is `Left`.
+ * @since 6.1.0
+ */
+fun <E, T> Either<E, List<T>>.orEmpty(): List<T> =
+    when (this) {
+        is Left -> emptyList()
+        is Right -> value
+    }
+/**
+ * Returns the set contained in the `Right` instance if this `Either` is of type `Right`,
+ * or an empty set if this `Either` is of type `Left`.
+ *
+ * This function provides a convenient way to retrieve the encapsulated set from an `Either`
+ * without explicitly handling the `Left` and `Right` cases. It ensures that a `Set` is always returned,
+ * defaulting to an empty set in case of failure (`Left`).
+ *
+ * @return The set contained in the `Right` instance, or an empty set if this `Either` is a `Left`.
+ * @since 6.1.0
+ */
+fun <E, T> Either<E, Set<T>>.orEmpty(): Set<T> =
+    when (this) {
+        is Left -> emptySet()
+        is Right -> value
+    }
+/**
+ * Returns the map value contained in this `Either` instance if it is of type `Right`,
+ * or an empty map if it is of type `Left`.
+ *
+ * This extension function provides a convenient way to safely retrieve the
+ * value of type `Map<K, V>` from an `Either` instance without needing to
+ * explicitly check its type. When the instance is `Left`, an empty map
+ * is returned as a fallback.
+ *
+ * @return The map value if the instance is `Right`, or an empty map if the instance is `Left`.
+ * @since 6.1.0
+ */
+fun <E, K, V> Either<E, Map<K, V>>.orEmpty(): Map<K, V> =
+    when (this) {
+        is Left -> emptyMap()
+        is Right -> value
+    }
+/**
+ * Returns the contained table value if this instance is a `Right`, or an empty table if this instance is a `Left`.
+ *
+ * This function provides a convenient way to handle the `Either` type, ensuring that a valid table is always returned,
+ * either based on the encapsulated `Right` value or as an empty table in case of `Left`.
+ *
+ * @return A `Table<R, C, V?>` containing the value wrapped by the `Right` instance, or an empty table if the instance is a `Left`.
+ * @since 6.1.0
+ */
+fun <E, R, C, V> Either<E, Table<R, C, V?>>.orEmpty(): Table<R, C, V?> =
+    when (this) {
+        is Left -> emptyTable()
+        is Right -> value
+    }
+/**
+ * Returns the `TypedTable` instance encapsulated within the `Either`, or an empty `TypedTable`
+ * if the current instance is `Left`.
+ *
+ * This function ensures that a non-null `TypedTable` is returned regardless of whether the `Either`
+ * is `Left` or `Right`. If the instance is `Left`, the function calls `emptyTypedTable()` to
+ * provide a default empty result. Otherwise, the `TypedTable` in the `Right` instance is returned.
+ *
+ * @return A `TypedTable` instance, either the value encapsulated by `Right`, or an empty one if `Left`.
+ * @since 6.1.0
+ */
+fun <E, R> Either<E, TypedTable<R>>.orEmpty(): TypedTable<R> =
+    when (this) {
+        is Left -> emptyTypedTable()
+        is Right -> value
+    }
+
+/**
+ * Transforms a [Result] into an `Either` type, using the provided transformers for successful
+ * and failed outcomes. If the [Result] is successful, the [right] transformer is applied
+ * to the value. If the [Result] contains an exception, the [left] transformer is applied
+ * to convert the exception into a desired type.
+ *
+ * @param T The type of the value contained in the [Result] when it is successful.
+ * @param L The type of the left value in the resulting `Either`.
+ * @param right A transformer applied to the successful value of the [Result].
+ *              Defaults to an identity transformation.
+ * @param left A transformer applied to the exception within the failed [Result].
+ * @return An `Either` where:
+ *         - `Right` contains the transformed successful value.
+ *         - `Left` contains the transformed exception.
+ * @since 6.1.0
+ */
+fun <T, L> Result<T>.toEither(right: MonoTransformer<T> = identity(), left: Transformer<Throwable, L>) = either {
+    catching({ right(this@toEither.getOrThrow()) }) { t: Throwable -> left(t) }
+}
+/**
+ * Converts a `Result` instance into an `Either` type.
+ *
+ * This method maps a successful result of type `T` contained in the `Result` object to the `Right` type
+ * of the `Either`, while mapping a failed result (an exception) to the `Left` type of the `Either`
+ * based on the provided mapping of exception types to transformation functions.
+ *
+ * @param cases A map where the keys are the `KClass` of throwable types that should be handled,
+ * and the values are transformation functions (`Transformer`) that convert the throwable into
+ * a value of type `L`. The first matching throwable based on type hierarchy is applied.
+ * @return An `Either` instance where the success value of the `Result` is wrapped in `Right`,
+ * or the transformed value of the throwable is wrapped in `Left` if an exception occurs.
+ * @since 6.1.0
+ */
+@Suppress("UNCHECKED_CAST")
+fun <T, L> Result<T>.toEither(cases: Map<KClass<out Throwable>, Transformer<Throwable, L>>): Either<L, T> = either { catching({ this@toEither.getOrThrow() }) { t: Throwable ->
+    (cases.entries
+        .filter { [type, _] -> type.isInstance(t) }
+        .minWithOrNull { a, b ->
+            when {
+                a.key == b.key -> 0
+                a.key.java.isAssignableFrom(b.key.java) -> 1
+                else -> -1
+            }
+        }?.value ?: { GenericError as L })(t)
+} }
+
+/**
+ * Applies a transformation function to each element in the iterable and accumulates the results
+ * if all transformations succeed, or returns the first encountered failure.
+ *
+ * The `traverse` function iterates over each element in the collection, applies the provided
+ * transformation function, and collects the successful results into a list. If any transformation
+ * produces a `Left` instance, the function immediately returns that `Left`, short-circuiting further
+ * processing.
+ *
+ * @param f A transformation function that maps each element of type `A` in the iterable to an `Either<E, B>`,
+ *          where `E` represents a failure type and `B` represents a success type.
+ * @return An `Either` instance containing a `List<B>` if all transformations succeed, or the first
+ *         `Left<E>` encountered if any transformation fails.
+ * @since 6.1.0
+ */
+inline fun <E, A, B> Iterable<A>.traverse(f: Transformer<A, Either<E, B>>): Either<E, List<B>> {
+    val results = mutableListOf<B>()
+    for (item in this) {
+        when (val result = f(item)) {
+            is Left -> return result
+            is Right -> results.add(result.value)
+        }
+    }
+    return Right(results)
 }

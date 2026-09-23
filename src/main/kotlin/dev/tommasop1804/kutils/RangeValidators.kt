@@ -29,7 +29,7 @@ import kotlin.reflect.KProperty
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -46,7 +46,7 @@ fun IntRange.validateContains(number: Int, causeOf: Transformer<IntRange, Throwa
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null, lazyMessage: Transformer<IntRange, Any>): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -65,7 +65,7 @@ fun IntRange.validateContains(number: Int, causeOf: Transformer<IntRange, Throwa
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -84,7 +84,7 @@ fun IntRange.validateContains(number: Int, property: KProperty<*>?, variableName
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -104,7 +104,7 @@ fun IntRange.validateContains(number: Int, property: KProperty<*>?, variable: KP
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -122,7 +122,7 @@ fun IntRange.validateContains(number: Int, callable: KFunction<*>?, parameterNam
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -142,7 +142,7 @@ fun IntRange.validateContains(number: Int, callable: KFunction<*>?, parameter: K
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -161,7 +161,7 @@ fun IntRange.validateContains(number: Int, callableName: String?, parameterName:
  */
 @IgnorableReturnValue
 fun IntRange.validateContains(number: Int, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -176,7 +176,7 @@ fun IntRange.validateContains(number: Int, callableName: String?, parameter: KPa
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -193,7 +193,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, causeOf: Transformer<In
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<IntRangeWithExclusions, Any>): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -211,7 +211,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, causeOf: Transformer<In
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -229,7 +229,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -247,7 +247,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -266,7 +266,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -284,7 +284,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -302,7 +302,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, callableName: String?, 
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateContains(number: Int, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -317,7 +317,7 @@ fun IntRangeWithExclusions.validateContains(number: Int, callableName: String?, 
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -333,7 +333,7 @@ fun IntRangeWithConditions.validateContains(number: Int, causeOf: Transformer<In
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<IntRangeWithConditions, Any>): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -351,7 +351,7 @@ fun IntRangeWithConditions.validateContains(number: Int, causeOf: Transformer<In
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -369,7 +369,7 @@ fun IntRangeWithConditions.validateContains(number: Int, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -387,7 +387,7 @@ fun IntRangeWithConditions.validateContains(number: Int, property: KProperty<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -405,7 +405,7 @@ fun IntRangeWithConditions.validateContains(number: Int, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -423,7 +423,7 @@ fun IntRangeWithConditions.validateContains(number: Int, callable: KFunction<*>?
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -442,7 +442,7 @@ fun IntRangeWithConditions.validateContains(number: Int, callableName: String?, 
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateContains(number: Int, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -457,7 +457,7 @@ fun IntRangeWithConditions.validateContains(number: Int, callableName: String?, 
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -473,7 +473,7 @@ fun UIntRange.validateContains(number: UInt, causeOf: Transformer<UIntRange, Thr
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null, lazyMessage: Transformer<UIntRange, Any>): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -492,7 +492,7 @@ fun UIntRange.validateContains(number: UInt, causeOf: Transformer<UIntRange, Thr
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -511,7 +511,7 @@ fun UIntRange.validateContains(number: UInt, property: KProperty<*>?, variableNa
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -530,7 +530,7 @@ fun UIntRange.validateContains(number: UInt, property: KProperty<*>?, variable: 
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -549,7 +549,7 @@ fun UIntRange.validateContains(number: UInt, callable: KFunction<*>?, parameterN
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -568,7 +568,7 @@ fun UIntRange.validateContains(number: UInt, callable: KFunction<*>?, parameter:
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -590,7 +590,7 @@ fun UIntRange.validateContains(number: UInt, callableName: String?, parameterNam
  */
 @IgnorableReturnValue
 fun UIntRange.validateContains(number: UInt, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -609,7 +609,7 @@ fun UIntRange.validateContains(number: UInt, callableName: String?, parameter: K
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -627,7 +627,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<UIntRangeWithExclusions, Any>): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -645,7 +645,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -663,7 +663,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, property: KProperty<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -682,7 +682,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, property: KProperty<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -700,7 +700,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -718,7 +718,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -736,7 +736,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, callableName: String?
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateContains(number: UInt, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -752,7 +752,7 @@ fun UIntRangeWithExclusions.validateContains(number: UInt, callableName: String?
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -768,7 +768,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<UIntRangeWithConditions, Any>): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -787,7 +787,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -805,7 +805,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, property: KProperty<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -823,7 +823,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, property: KProperty<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -841,7 +841,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -859,7 +859,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -877,7 +877,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, callableName: String?
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateContains(number: UInt, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -895,7 +895,7 @@ fun UIntRangeWithConditions.validateContains(number: UInt, callableName: String?
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -912,7 +912,7 @@ fun LongRange.validateContains(number: Long, causeOf: Transformer<LongRange, Thr
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null, lazyMessage: Transformer<LongRange, Any>): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -932,7 +932,7 @@ fun LongRange.validateContains(number: Long, causeOf: Transformer<LongRange, Thr
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -951,7 +951,7 @@ fun LongRange.validateContains(number: Long, property: KProperty<*>?, variableNa
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -970,7 +970,7 @@ fun LongRange.validateContains(number: Long, property: KProperty<*>?, variable: 
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -989,7 +989,7 @@ fun LongRange.validateContains(number: Long, callable: KFunction<*>?, parameterN
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1008,7 +1008,7 @@ fun LongRange.validateContains(number: Long, callable: KFunction<*>?, parameter:
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1027,7 +1027,7 @@ fun LongRange.validateContains(number: Long, callableName: String?, parameterNam
  */
 @IgnorableReturnValue
 fun LongRange.validateContains(number: Long, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1044,7 +1044,7 @@ fun LongRange.validateContains(number: Long, callableName: String?, parameter: K
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1061,7 +1061,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<LongRangeWithExclusions, Any>): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1079,7 +1079,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1096,7 +1096,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, property: KProperty<*
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1115,7 +1115,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, property: KProperty<*
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1133,7 +1133,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1151,7 +1151,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1169,7 +1169,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, callableName: String?
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateContains(number: Long, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1186,7 +1186,7 @@ fun LongRangeWithExclusions.validateContains(number: Long, callableName: String?
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1202,7 +1202,7 @@ fun LongRangeWithConditions.validateContains(number: Long, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<LongRangeWithConditions, Any>): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1220,7 +1220,7 @@ fun LongRangeWithConditions.validateContains(number: Long, causeOf: Transformer<
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1239,7 +1239,7 @@ fun LongRangeWithConditions.validateContains(number: Long, property: KProperty<*
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1257,7 +1257,7 @@ fun LongRangeWithConditions.validateContains(number: Long, property: KProperty<*
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1275,7 +1275,7 @@ fun LongRangeWithConditions.validateContains(number: Long, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1294,7 +1294,7 @@ fun LongRangeWithConditions.validateContains(number: Long, callable: KFunction<*
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1312,7 +1312,7 @@ fun LongRangeWithConditions.validateContains(number: Long, callableName: String?
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateContains(number: Long, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1331,7 +1331,7 @@ fun LongRangeWithConditions.validateContains(number: Long, callableName: String?
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1352,7 +1352,7 @@ fun ULongRange.validateContains(number: ULong, causeOf: Transformer<ULongRange, 
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null, lazyMessage: Transformer<ULongRange, Any>): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1371,7 +1371,7 @@ fun ULongRange.validateContains(number: ULong, causeOf: Transformer<ULongRange, 
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1390,7 +1390,7 @@ fun ULongRange.validateContains(number: ULong, property: KProperty<*>?, variable
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1409,7 +1409,7 @@ fun ULongRange.validateContains(number: ULong, property: KProperty<*>?, variable
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1428,7 +1428,7 @@ fun ULongRange.validateContains(number: ULong, callable: KFunction<*>?, paramete
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1447,7 +1447,7 @@ fun ULongRange.validateContains(number: ULong, callable: KFunction<*>?, paramete
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1466,7 +1466,7 @@ fun ULongRange.validateContains(number: ULong, callableName: String?, parameterN
  */
 @IgnorableReturnValue
 fun ULongRange.validateContains(number: ULong, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1482,7 +1482,7 @@ fun ULongRange.validateContains(number: ULong, callableName: String?, parameter:
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1498,7 +1498,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, causeOf: Transforme
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<ULongRangeWithExclusions, Any>): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1516,7 +1516,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, causeOf: Transforme
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1534,7 +1534,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, property: KProperty
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1552,7 +1552,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, property: KProperty
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1570,7 +1570,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, callable: KFunction
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1589,7 +1589,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, callable: KFunction
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1608,7 +1608,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, callableName: Strin
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateContains(number: ULong, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1624,7 +1624,7 @@ fun ULongRangeWithExclusions.validateContains(number: ULong, callableName: Strin
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException("$number is not in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is not in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1641,7 +1641,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, causeOf: Transforme
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<ULongRangeWithConditions, Any>): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1660,7 +1660,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, causeOf: Transforme
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1678,7 +1678,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, property: KProperty
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1697,7 +1697,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, property: KProperty
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1715,7 +1715,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, callable: KFunction
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1733,7 +1733,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, callable: KFunction
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1751,7 +1751,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, callableName: Strin
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateContains(number: ULong, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
+    if (number !in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "doesn't contain $number", cause?.invoke(this)))
     return this
 }
 
@@ -1770,7 +1770,7 @@ fun ULongRangeWithConditions.validateContains(number: ULong, callableName: Strin
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1787,7 +1787,7 @@ fun IntRange.validateNotContains(number: Int, causeOf: Transformer<IntRange, Thr
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null, lazyMessage: Transformer<IntRange, Any>): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1808,7 +1808,7 @@ fun IntRange.validateNotContains(number: Int, causeOf: Transformer<IntRange, Thr
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1829,7 +1829,7 @@ fun IntRange.validateNotContains(number: Int, property: KProperty<*>?, variableN
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1849,7 +1849,7 @@ fun IntRange.validateNotContains(number: Int, property: KProperty<*>?, variable:
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1868,7 +1868,7 @@ fun IntRange.validateNotContains(number: Int, callable: KFunction<*>?, parameter
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1892,7 +1892,7 @@ fun IntRange.validateNotContains(number: Int, callable: KFunction<*>?, parameter
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1912,7 +1912,7 @@ fun IntRange.validateNotContains(number: Int, callableName: String?, parameterNa
  */
 @IgnorableReturnValue
 fun IntRange.validateNotContains(number: Int, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRange, Throwable>? = null, cause: Transformer<IntRange, Throwable>? = null): IntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1928,7 +1928,7 @@ fun IntRange.validateNotContains(number: Int, callableName: String?, parameter: 
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -1944,7 +1944,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<IntRangeWithExclusions, Any>): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -1963,7 +1963,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1981,7 +1981,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, property: KProperty<
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -1999,7 +1999,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, property: KProperty<
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2017,7 +2017,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, callable: KFunction<
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2035,7 +2035,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, callable: KFunction<
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2053,7 +2053,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, callableName: String
  */
 @IgnorableReturnValue
 fun IntRangeWithExclusions.validateNotContains(number: Int, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithExclusions, Throwable>? = null, cause: Transformer<IntRangeWithExclusions, Throwable>? = null): IntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2069,7 +2069,7 @@ fun IntRangeWithExclusions.validateNotContains(number: Int, callableName: String
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2086,7 +2086,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<IntRangeWithConditions, Any>): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2104,7 +2104,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, causeOf: Transformer
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2123,7 +2123,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, property: KProperty<
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2141,7 +2141,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, property: KProperty<
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2159,7 +2159,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, callable: KFunction<
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2177,7 +2177,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, callable: KFunction<
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2198,7 +2198,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, callableName: String
  */
 @IgnorableReturnValue
 fun IntRangeWithConditions.validateNotContains(number: Int, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<IntRangeWithConditions, Throwable>? = null, cause: Transformer<IntRangeWithConditions, Throwable>? = null): IntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2214,7 +2214,7 @@ fun IntRangeWithConditions.validateNotContains(number: Int, callableName: String
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2230,7 +2230,7 @@ fun UIntRange.validateNotContains(number: UInt, causeOf: Transformer<UIntRange, 
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null, lazyMessage: Transformer<UIntRange, Any>): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2249,7 +2249,7 @@ fun UIntRange.validateNotContains(number: UInt, causeOf: Transformer<UIntRange, 
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2268,7 +2268,7 @@ fun UIntRange.validateNotContains(number: UInt, property: KProperty<*>?, variabl
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2286,7 +2286,7 @@ fun UIntRange.validateNotContains(number: UInt, property: KProperty<*>?, variabl
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2305,7 +2305,7 @@ fun UIntRange.validateNotContains(number: UInt, callable: KFunction<*>?, paramet
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2324,7 +2324,7 @@ fun UIntRange.validateNotContains(number: UInt, callable: KFunction<*>?, paramet
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2346,7 +2346,7 @@ fun UIntRange.validateNotContains(number: UInt, callableName: String?, parameter
  */
 @IgnorableReturnValue
 fun UIntRange.validateNotContains(number: UInt, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRange, Throwable>? = null, cause: Transformer<UIntRange, Throwable>? = null): UIntRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2361,7 +2361,7 @@ fun UIntRange.validateNotContains(number: UInt, callableName: String?, parameter
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2381,7 +2381,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, causeOf: Transform
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<UIntRangeWithExclusions, Any>): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2398,7 +2398,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, causeOf: Transform
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2416,7 +2416,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, property: KPropert
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2434,7 +2434,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, property: KPropert
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2452,7 +2452,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, callable: KFunctio
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2470,7 +2470,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, callable: KFunctio
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2488,7 +2488,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, callableName: Stri
  */
 @IgnorableReturnValue
 fun UIntRangeWithExclusions.validateNotContains(number: UInt, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithExclusions, Throwable>? = null, cause: Transformer<UIntRangeWithExclusions, Throwable>? = null): UIntRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2504,7 +2504,7 @@ fun UIntRangeWithExclusions.validateNotContains(number: UInt, callableName: Stri
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2520,7 +2520,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, causeOf: Transform
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<UIntRangeWithConditions, Any>): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2538,7 +2538,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, causeOf: Transform
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2556,7 +2556,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, property: KPropert
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2574,7 +2574,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, property: KPropert
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2592,7 +2592,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, callable: KFunctio
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2610,7 +2610,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, callable: KFunctio
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2628,7 +2628,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, callableName: Stri
  */
 @IgnorableReturnValue
 fun UIntRangeWithConditions.validateNotContains(number: UInt, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<UIntRangeWithConditions, Throwable>? = null, cause: Transformer<UIntRangeWithConditions, Throwable>? = null): UIntRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2644,7 +2644,7 @@ fun UIntRangeWithConditions.validateNotContains(number: UInt, callableName: Stri
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2664,7 +2664,7 @@ fun LongRange.validateNotContains(number: Long, causeOf: Transformer<LongRange, 
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null, lazyMessage: Transformer<LongRange, Any>): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2685,7 +2685,7 @@ fun LongRange.validateNotContains(number: Long, causeOf: Transformer<LongRange, 
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2704,7 +2704,7 @@ fun LongRange.validateNotContains(number: Long, property: KProperty<*>?, variabl
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2723,7 +2723,7 @@ fun LongRange.validateNotContains(number: Long, property: KProperty<*>?, variabl
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2742,7 +2742,7 @@ fun LongRange.validateNotContains(number: Long, callable: KFunction<*>?, paramet
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2765,7 +2765,7 @@ fun LongRange.validateNotContains(number: Long, callable: KFunction<*>?, paramet
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2784,7 +2784,7 @@ fun LongRange.validateNotContains(number: Long, callableName: String?, parameter
  */
 @IgnorableReturnValue
 fun LongRange.validateNotContains(number: Long, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRange, Throwable>? = null, cause: Transformer<LongRange, Throwable>? = null): LongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2798,7 +2798,7 @@ fun LongRange.validateNotContains(number: Long, callableName: String?, parameter
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2815,7 +2815,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, causeOf: Transform
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<LongRangeWithExclusions, Any>): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2833,7 +2833,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, causeOf: Transform
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2850,7 +2850,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, property: KPropert
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2868,7 +2868,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, property: KPropert
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2886,7 +2886,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, callable: KFunctio
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2905,7 +2905,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, callable: KFunctio
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2923,7 +2923,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, callableName: Stri
  */
 @IgnorableReturnValue
 fun LongRangeWithExclusions.validateNotContains(number: Long, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithExclusions, Throwable>? = null, cause: Transformer<LongRangeWithExclusions, Throwable>? = null): LongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2938,7 +2938,7 @@ fun LongRangeWithExclusions.validateNotContains(number: Long, callableName: Stri
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -2954,7 +2954,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, causeOf: Transform
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<LongRangeWithConditions, Any>): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -2973,7 +2973,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, causeOf: Transform
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -2991,7 +2991,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, property: KPropert
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3010,7 +3010,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, property: KPropert
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3028,7 +3028,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, callable: KFunctio
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3046,7 +3046,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, callable: KFunctio
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3065,7 +3065,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, callableName: Stri
  */
 @IgnorableReturnValue
 fun LongRangeWithConditions.validateNotContains(number: Long, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<LongRangeWithConditions, Throwable>? = null, cause: Transformer<LongRangeWithConditions, Throwable>? = null): LongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3086,7 +3086,7 @@ fun LongRangeWithConditions.validateNotContains(number: Long, callableName: Stri
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3103,7 +3103,7 @@ fun ULongRange.validateNotContains(number: ULong, causeOf: Transformer<ULongRang
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null, lazyMessage: Transformer<ULongRange, Any>): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3123,7 +3123,7 @@ fun ULongRange.validateNotContains(number: ULong, causeOf: Transformer<ULongRang
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3142,7 +3142,7 @@ fun ULongRange.validateNotContains(number: ULong, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3161,7 +3161,7 @@ fun ULongRange.validateNotContains(number: ULong, property: KProperty<*>?, varia
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3179,7 +3179,7 @@ fun ULongRange.validateNotContains(number: ULong, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3198,7 +3198,7 @@ fun ULongRange.validateNotContains(number: ULong, callable: KFunction<*>?, param
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3217,7 +3217,7 @@ fun ULongRange.validateNotContains(number: ULong, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun ULongRange.validateNotContains(number: ULong, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRange, Throwable>? = null, cause: Transformer<ULongRange, Throwable>? = null): ULongRange {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3233,7 +3233,7 @@ fun ULongRange.validateNotContains(number: ULong, callableName: String?, paramet
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3249,7 +3249,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null, lazyMessage: Transformer<ULongRangeWithExclusions, Any>): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3268,7 +3268,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3286,7 +3286,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, property: KPrope
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3304,7 +3304,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, property: KPrope
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3322,7 +3322,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, callable: KFunct
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3340,7 +3340,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, callable: KFunct
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3358,7 +3358,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, callableName: St
  */
 @IgnorableReturnValue
 fun ULongRangeWithExclusions.validateNotContains(number: ULong, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithExclusions, Throwable>? = null, cause: Transformer<ULongRangeWithExclusions, Throwable>? = null): ULongRangeWithExclusions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3374,7 +3374,7 @@ fun ULongRangeWithExclusions.validateNotContains(number: ULong, callableName: St
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException("$number is in the range.", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException("$number is in the range.", cause?.invoke(this)))
     return this
 }
 /**
@@ -3390,7 +3390,7 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null, lazyMessage: Transformer<ULongRangeWithConditions, Any>): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(lazyMessage(this).toString(), cause?.invoke(this)))
     return this
 }
 /**
@@ -3409,7 +3409,7 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, causeOf: Transfo
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, property: KProperty<*>?, variableName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variableName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3427,7 +3427,7 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, property: KPrope
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, property: KProperty<*>?, variable: KProperty<*>?, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(property, variable, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3445,7 +3445,7 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, property: KPrope
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, callable: KFunction<*>?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3463,7 +3463,7 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, callable: KFunct
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, callable: KFunction<*>?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callable, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3481,7 +3481,7 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, callable: KFunct
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, callableName: String?, parameterName: String? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameterName, message ?: "contains $number", cause?.invoke(this)))
     return this
 }
 /**
@@ -3499,6 +3499,6 @@ fun ULongRangeWithConditions.validateNotContains(number: ULong, callableName: St
  */
 @IgnorableReturnValue
 fun ULongRangeWithConditions.validateNotContains(number: ULong, callableName: String?, parameter: KParameter? = null, message: String? = null, causeOf: Transformer<ULongRangeWithConditions, Throwable>? = null, cause: Transformer<ULongRangeWithConditions, Throwable>? = null): ULongRangeWithConditions {
-    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).initCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
+    if (number in this) throw if (causeOf == null) ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)) else causeOf(this).withRootCause(ValidationFailedException(callableName, parameter, message ?: "contains $number", cause?.invoke(this)))
     return this
 }

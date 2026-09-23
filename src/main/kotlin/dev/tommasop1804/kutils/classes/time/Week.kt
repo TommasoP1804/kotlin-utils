@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.collections.*
 import dev.tommasop1804.kutils.classes.collections.NonEmptyList.Companion.toNonEmptyList
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -21,6 +23,7 @@ import tools.jackson.databind.ValueSerializer
 import java.time.*
 import java.time.temporal.*
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 import kotlin.time.toJavaInstant
 
 @Suppress("unused", "kutils_temporal_now_as_temporal", "kutils_temporal_of_as_temporal")
@@ -333,21 +336,17 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
         }
 
         /**
-         * Parses a given CharSequence to create a Week instance.
+         * Parses the given CharSequence as a Week object if it matches the expected format.
          *
-         * The input CharSequence must adhere to the format "YYYY-Www",
-         * where "YYYY" represents the 4-digit year, and "ww" represents the 2-digit week number.
-         * Any leading and trailing whitespace in the input will be trimmed before processing.
-         *
-         * @param cs the character sequence to parse; must match the format "YYYY-Www".
-         * @return a Result wrapping the Week instance if parsing succeeds, or an exception if parsing fails.
-         * @since 5.5.0
+         * @param cs The input character sequence representing the week in the format "YYYY-Www".
+         * @return An [Either] containing a [Week] object if parsing is successful, or an [InvalidFormatOfType] error if the input format is invalid.
+         * @since 6.1.0
          */
-        fun parse(cs: CharSequence) = runCatching {
+        fun parse(cs: CharSequence): Either<InvalidFormatOfType, Week> = either { catching({
             val s = cs.toString().trim()
             s.validateInputFormat(Regex("[0-9]{4}-W[0-9]{2}"), Week::class)
             Week._of(s.take(4).toInt(), s.after('W').toInt())
-        }
+        }) { t: Throwable -> InvalidFormatOfType(cs, typeOf<Week>(), t) } }
 
         /**
          * Creates an instance of the object using the current date

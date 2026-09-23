@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -23,6 +25,7 @@ import java.io.Serializable
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalUnit
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 
 /**
  * Represents a temporal interval, defined by a start and an end temporal value.
@@ -169,17 +172,17 @@ interface TemporalInterval : Serializable {
             of(start, endInclusive)
 
         /**
-         * Parses a string representation of a temporal interval and returns a `Result` containing a `TemporalInterval`.
+         * Parses a string representation of a temporal interval and converts it into a `TemporalInterval` object.
          *
-         * The method analyzes the input string to create a valid `TemporalInterval` or `RepeatedTemporalInterval`.
-         * It supports various formats, including durations and combinations of temporal values and durations.
+         * The method supports parsing various formats of temporal intervals, including repeated intervals,
+         * single duration intervals, and intervals defined by a start temporal and end temporal or duration.
          *
-         * @param s the string representation of the temporal interval to be parsed
-         * @return a `Result` containing the parsed `TemporalInterval` if successful, or an exception if parsing fails
-         * @throws dev.tommasop1804.kutils.exceptions.MalformedInputException if the input string does not conform to the expected format
-         * @since 1.0.0
+         * @param s The string value representing the temporal interval to be parsed. It must adhere to the expected format.
+         * @return An `Either` containing the successfully parsed `TemporalInterval` if the string is valid, or an `InvalidFormatOfType` instance if the input is invalid or an error
+         *  occurs during parsing.
+         * @since 6.1.0
          */
-        infix fun parse(s: String): Result<TemporalInterval> = runCatching {
+        infix fun parse(s: String): Either<InvalidFormatOfType, TemporalInterval> = either { catching({
             if (s.startsWith("R")) RepeatedTemporalInterval.parse(s).getOrThrow()
             else {
                 val parts = s.splitAndTrim("/")
@@ -202,7 +205,7 @@ interface TemporalInterval : Serializable {
                     )
                 }
             }
-        }
+        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<TemporalInterval>(), t) } }
 
         /**
          * Parses a string representation of a temporal value and returns a specific type of Temporal object.
@@ -219,21 +222,21 @@ interface TemporalInterval : Serializable {
         internal fun <T: Temporal> parseTemporal(input: String): T {
             if ("T" in input) {
                 return if ("Z" in input || "+" in input || "-" in input.drop(10)) {
-                    (input.parseToOffsetDateTime()).getOrThrow() as T
+                    input._parseToOffsetDateTime() as T
                 } else {
-                    (input.parseToLocalDateTime()).getOrThrow() as T
+                    input._parseToLocalDateTime() as T
                 }
             } else if ("Z" in input || "+" in input || "-" in input) {
                 return try {
-                    (input.parseToOffsetTime()).getOrThrow() as T
+                    input._parseToOffsetTime() as T
                 } catch (_: Exception) {
-                    (input.parseToLocalDate()).getOrThrow() as T
+                    input._parseToLocalDate() as T
                 }
             }
             return try {
-                (input.parseToLocalTime()).getOrThrow() as T
+                input._parseToLocalTime() as T
             } catch (_: Exception) {
-                (input.parseToLocalDate()).getOrThrow() as T
+                input._parseToLocalDate() as T
             }
         }
 

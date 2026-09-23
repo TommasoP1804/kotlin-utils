@@ -133,7 +133,7 @@ class NullableValidated<T>(private var value: T? = null, private val predicates:
  *
  * @param T the type of the value being handled.
  * @param value the initial value of the property, which can be null.
- * @param default an iterable collection of suppliers providing potential default values.
+ * @param default an iterables collection of suppliers providing potential default values.
  * @author Tommaso Pastorelli
  * @since 3.7.0
  */
@@ -166,7 +166,7 @@ class WithDefault<T : Any>(private var value: T?, private val default: Iterable<
 
     /**
      * Gets the value associated with the property. If the current value is null, attempts to resolve a value from
-     * the provided suppliers in the default iterable. Throws an exception if no valid value can be resolved.
+     * the provided suppliers in the default iterables. Throws an exception if no valid value can be resolved.
      *
      * @param thisRef The reference to the object for which the value is being retrieved.
      * @param property The metadata for the property being accessed.

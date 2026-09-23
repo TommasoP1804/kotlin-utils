@@ -2288,7 +2288,7 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      * column key, and the associated value. If a cell with the same row and column key already
      * exists, its value will be updated.
      *
-     * @param cells an iterable collection of cells to be added, where each cell contains
+     * @param cells an iterables collection of cells to be added, where each cell contains
      * row key, column key, and a nullable value
      * @since 1.0.0
      */
@@ -2336,12 +2336,12 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      */
     operator fun plusAssign(table: Table<R, C, V?>) = putAll(table)
     /**
-     * Adds all the elements from the given iterable to the current collection.
+     * Adds all the elements from the given iterables to the current collection.
      *
      * This operator function provides a convenient way to combine the elements of the current
-     * collection with the provided iterable by invoking the `putAll` method.
+     * collection with the provided iterables by invoking the `putAll` method.
      *
-     * @param cells an iterable collection of `CellInterface` instances to be added to the current collection.
+     * @param cells an iterables collection of `CellInterface` instances to be added to the current collection.
      * @since 1.0.0
      */
     operator fun plusAssign(cells: Iterable<CellInterface<R, C, V?>>) = putAll(cells)
@@ -2451,9 +2451,9 @@ open class MTable<R, C, V> internal constructor(entries: List<MCell<R, C, V?>>) 
      */
     operator fun minusAssign(table: MTable<R, C, V?>) = removeAll(table)
     /**
-     * Removes all elements in the given iterable from the collection.
+     * Removes all elements in the given iterables from the collection.
      *
-     * @param cells An iterable collection of elements to be removed.
+     * @param cells An iterables collection of elements to be removed.
      * @since 1.0.0
      */
     operator fun minusAssign(cells: Iterable<CellInterface<R, C, V?>>) = removeAll(cells)
@@ -2502,12 +2502,12 @@ fun <R, C, V> tableOf(): Table<R, C, V?> = Table(emptyList<Cell<R, C, V?>>())
  */
 fun <R, C, V> tableOf(vararg entries: CellInterface<R, C, V?>): Table<R, C, V?> = Table(entries.toList().map { it.toCell() })
 /**
- * Creates a table from the provided iterable of CellInterface instances.
+ * Creates a table from the provided iterables of CellInterface instances.
  *
  * @param R the type of the row keys in the table.
  * @param C the type of the column keys in the table.
  * @param V the type of the values in the table, can be nullable.
- * @param entries an iterable collection of CellInterface objects representing the rows, columns, and values for the table.
+ * @param entries an iterables collection of CellInterface objects representing the rows, columns, and values for the table.
  * @return a Table object constructed from the given entries.
  * @since 1.0.0
  */
@@ -2534,12 +2534,12 @@ fun <R, C, V> mTableOf(): MTable<R, C, V?> = MTable(emptyList<MCell<R, C, V?>>()
  */
 fun <R, C, V> mTableOf(vararg entries: CellInterface<R, C, V?>): MTable<R, C, V?> = MTable(entries.toList().map { it.toMCell() })
 /**
- * Creates a new instance of a mutable table using the specified iterable collection of cell entries.
+ * Creates a new instance of a mutable table using the specified iterables collection of cell entries.
  *
  * This method constructs a `MutableTable` by converting provided cell entries into their mutable counterparts.
  * It can be used to initialize a mutable table with predefined cells.
  *
- * @param entries an iterable collection of cell entries represented by instances of `CellInterface`,
+ * @param entries an iterables collection of cell entries represented by instances of `CellInterface`,
  * where each cell contains a row key, column key, and a nullable value.
  * @return a mutable table (`MutableTable`) containing the provided cells as mutable entries.
  * @since 1.0.0

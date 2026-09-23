@@ -157,12 +157,12 @@ data class Chunked<T>(
                             when (it.operator.category)  {
                                 Category.String, Equality -> "'${it.value?.toString()?.lowercase()}'"
                                 Comparison if it.property in dateFields -> {
-                                    if (YearMonth(it.value!!.toString()).isSuccess)
+                                    if (tryTrueOrFalse { val _ = YearMonth(it.value!!.toString()) })
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()}' AS DATE)"
                                 }
                                 Comparison if it.property in dateTimeFields -> {
-                                    if (YearMonth(it.value!!.toString()).isSuccess)
+                                    if (tryTrueOrFalse { val _ = YearMonth(it.value!!.toString()) })
                                         "TO_DATE('${it.value.toString()}', 'YYYY-MM')"
                                     else "CAST('${it.value.toString()} ${if (it.operator in setOf(GreaterThan, GreaterThanOrEquals)) "00:00:00" else "23:59:59"}' AS TIMESTAMP)"
                                 }
@@ -281,9 +281,9 @@ data class Chunked<T>(
                 var comparator = if (sorting.first().direction == SortDirection.Descending)
                     compareByDescending<T> { property.call(it) as Comparable<*>? }
                 else compareBy { property.call(it) as Comparable<*>? }
-                for (sortOption in sorting.drop(1)) {
-                    val property = baseCollection.first()::class.memberProperties[{ it.name == sortOption.property }] ?: throw NoSuchPropertyException()
-                    comparator = if (sortOption.direction == SortDirection.Descending)
+                for ([property1, direction] in sorting.drop(1)) {
+                    val property = baseCollection.first()::class.memberProperties[{ it.name == property1 }] ?: throw NoSuchPropertyException()
+                    comparator = if (direction == SortDirection.Descending)
                         comparator.thenByDescending { property.call(it) as Comparable<*>? }
                     else comparator.thenBy { property.call(it) as Comparable<*>? }
                 }
@@ -316,7 +316,7 @@ data class Chunked<T>(
                 goodCollection += element
             }
             val totalElements = goodCollection.size
-            goodCollection = tryOr({ emptyMList() }, overwriteOnly = IndexOutOfBoundsException::class) {
+            goodCollection = tryOr({ emptyMList() }, only = setOf(IndexOutOfBoundsException::class)) {
                 if (limit == -1) goodCollection else (goodCollection.toList() % limit)[offset].toMList()
             }
 

@@ -25,8 +25,10 @@ import dev.tommasop1804.kutils.classes.code.ProductCode.Ean.Companion.toEan
 import dev.tommasop1804.kutils.classes.code.ProductCode.Upc.Companion.toUpc
 import dev.tommasop1804.kutils.classes.code.UpcA.Companion.isValidUpcA
 import dev.tommasop1804.kutils.classes.code.UpcE.Companion.isValidUpcE
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geography.*
 import dev.tommasop1804.kutils.classes.geography.Country.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -36,6 +38,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 
 /**
  * Represents a product code entity with support for different formats like EAN and UPC.
@@ -285,30 +288,49 @@ interface ProductCode {
                     isValidEan14()
 
             /**
-             * Converts the string into an `EAN` object by validating its format and determining the appropriate EAN standard.
+             * Attempts to parse the current `CharSequence` as an EAN (International Article Number)
+             * and returns the corresponding type of `Ean` if successful.
              *
-             * The method validates the input string to ensure it matches supported EAN formats
-             * (e.g., EAN-13, EAN-8, EAN-13+5, etc.) and computes the corresponding EAN object.
-             * Throws a `NoMatchingFormatException` if the input does not match any recognized EAN format.
+             * The method validates the input format, ensuring that:
+             * - The input consists only of digits, spaces, or dashes.
+             * - The input length is within the permissible range [8, 27].
              *
-             * @receiver The string to be converted to an EAN object.
-             * @return A `Result` containing the corresponding `EAN` object if the conversion is successful,
-             *         or an exception if the string does not match a valid EAN format.
-             * @since 3.0.0
+             * If the validation is successful, the method evaluates the input against known EAN standards
+             * and returns the appropriate subtype of `Ean`:
+             * - `Ean13`: For valid EAN-13 codes.
+             * - `Ean8`: For valid EAN-8 codes.
+             * - `Ean13P5`: For valid EAN-13 codes with an additional 5-digit extension.
+             * - `Ean13P2`: For valid EAN-13 codes with an additional 2-digit extension.
+             * - `Ean8P2`: For valid EAN-8 codes with an additional 2-digit extension.
+             * - `Ean8P5`: For valid EAN-8 codes with an additional 5-digit extension.
+             * - `Ean14`: For valid EAN-14 codes.
+             * - `Isbn`: For valid ISBN codes.
+             *
+             * If the input fails validation or does not match any known EAN formats, an error is raised:
+             * - `InvalidFormat` if the basic validation fails.
+             * - `NoMatchingFormat` if no EAN subtype matches.
+             *
+             * @receiver The input `CharSequence` to parse.
+             * @return A result encapsulated in an `Either` where:
+             *         - `Right` contains the parsed `Ean`.
+             *         - `Left` contains the raised error such as `InvalidFormat` or `NoMatchingFormat`.
+             * @since 6.1.0
              */
-            fun CharSequence.toEan(): Result<Ean> = runCatching {
-                validateInputFormat(Ean::class) { matches(Regex("[0-9 -]+")) && length in 8..27 }
+            fun CharSequence.toEan(): Either<ParsingError, Ean> = either {
+                ensure(this@toEan.matches(Regex("[0-9 -]+")) && this@toEan.length in 8..27) {
+                    InvalidFormatOfType(this@toEan, typeOf<Ean>())
+                }
 
                 when {
-                    isValidEan13() -> Ean13(this)
-                    isValidEan8() -> Ean8(this)
-                    isValidEan13P5() -> Ean13P5(this)
-                    isValidEan13P2() -> Ean13P2(this)
-                    isValidEan8P2() -> Ean8P2(this)
-                    isValidEan8P5() -> Ean8P5(this)
-                    isValidEan14() -> Ean14(this)
-                    isValidIsbn() -> Isbn(this)
-                    else -> throw NoMatchingFormatException("No valid EAN format found.")
+                    isValidEan13() -> Ean13(this@toEan)
+                    isValidEan8() -> Ean8(this@toEan)
+                    isValidEan13P5() -> Ean13P5(this@toEan)
+                    isValidEan13P2() -> Ean13P2(this@toEan)
+                    isValidEan8P2() -> Ean8P2(this@toEan)
+                    isValidEan8P5() -> Ean8P5(this@toEan)
+                    isValidEan14() -> Ean14(this@toEan)
+                    isValidIsbn() -> Isbn(this@toEan)
+                    else -> raise(NoMatchingFormatOfType(this@toEan, typeOf<Ean>()))
                 }
             }
 
@@ -377,25 +399,34 @@ interface ProductCode {
             fun CharSequence.isValidUpc() = isValidUpcA() || isValidUpcE()
 
             /**
-             * Converts the current string into a `UPC` instance, representing either `UPC_A` or `UPC_E` formats,
-             * based on input format validation and matching criteria.
+             * Converts the current [CharSequence] into a Universal Product Code (UPC) representation,
+             * encapsulated in an [Either] type.
              *
-             * The function first validates the input format, ensuring it consists only of numeric digits
-             * and contains either 7 or 12 characters. If the format is valid, it further determines
-             * if the string matches the criteria for either `UPC_A` or `UPC_E` and constructs the appropriate instance.
-             * If no format matches, a `NoMatchingFormatException` is thrown.
+             * This method validates that the input sequence:
+             * - Contains only numeric characters.
+             * - Has a length of 8 or 12, which are valid lengths for UPC-E and UPC-A formats respectively.
              *
-             * @receiver The string to be converted into a `UPC` instance.
-             * @return A `Result` wrapping a `UPC` instance if conversion is successful, or an error if validation or format matching fails.
-             * @since 3.0.0
+             * If the input does not meet these criteria, a [ParsingError] is returned wrapped as a `Left` in the `Either`.
+             * Otherwise, the method attempts to identify the valid UPC format:
+             * - If the input is valid for the UPC-A format, a [UpcA] instance is returned as a `Right`.
+             * - If the input is valid for the UPC-E format, a [UpcE] instance is returned as a `Right`.
+             * - If no matching format is found, raises a [NoMatchingFormatOfType] error as a `Left`.
+             *
+             * @receiver The input [CharSequence] to be parsed and validated as a valid UPC.
+             * @return An [Either] encapsulating the result:
+             *         - `Left<ParsingError>` if the input is invalid or no matching format is found.
+             *         - `Right<Upc>` if the input is successfully parsed into a valid UPC.
+             * @since 6.1.0
              */
-            fun CharSequence.toUpc(): Result<Upc> = runCatching {
-                validateInputFormat(Upc::class) { matches(Regex("[0-9]+")) && length in setOf(8, 12) }
+            fun CharSequence.toUpc(): Either<ParsingError, Upc> = either {
+                ensure(this@toUpc.matches(Regex("[0-9]+")) && this@toUpc.length in setOf(8, 12)) {
+                    InvalidFormatOfType(this@toUpc, typeOf<Upc>())
+                }
 
                 when {
-                    isValidUpcA() -> UpcA(this)
-                    isValidUpcE() -> UpcE(this)
-                    else -> throw NoMatchingFormatException("No valid UPC format found.")
+                    isValidUpcA() -> UpcA(this@toUpc)
+                    isValidUpcE() -> UpcE(this@toUpc)
+                    else -> raise(NoMatchingFormatOfType(this@toUpc, typeOf<Upc>()))
                 }
             }
 
@@ -476,4 +507,6 @@ interface ProductCode {
  *         Throws an exception if the input string does not conform to any valid format.
  * @since 1.0.0
  */
-fun ProductCode(code: String) = if (code.isValidEan()) code.toEan()() else code.toUpc()()
+fun ProductCode(code: String) = tryOrThrow({ MalformedInputException(ProductCode::class) }) {
+    if (code.isValidEan()) code.toEan()() else code.toUpc()()
+}

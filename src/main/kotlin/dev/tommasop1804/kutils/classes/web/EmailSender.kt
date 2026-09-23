@@ -133,7 +133,7 @@ class SMTPEmailSender(
      * @since 1.0.0
      */
     override fun send(emailMessage: EmailMessage) = with(emailMessage) {
-        tryOrThrow({ -> EmailSendingException(this@with) }, overwriteOnly = MessagingException::class) {
+        tryOrThrow({ EmailSendingException(this@with) }, only = setOf(MessagingException::class)) {
             val mimeMessage = MimeMessage(session)
             mimeMessage.setFrom(InternetAddress(from.value))
 

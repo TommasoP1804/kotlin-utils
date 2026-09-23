@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
@@ -19,6 +22,7 @@ import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.annotation.JsonSerialize
+import kotlin.reflect.typeOf
 import kotlin.text.startsWith
 
 
@@ -136,27 +140,32 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
         fun CharSequence.isValidOctal() = runCatching { Octal(toString()) }.isSuccess
 
         /**
-         * Converts the current string to an instance of the `Octal` class if possible.
-         * Returns the result as a `Result<Octal>` object, allowing safe handling of
-         * any potential exceptions during the conversion process.
+         * Converts the character sequence to its octal representation.
          *
-         * @receiver The string to be converted into an `Octal` instance.
-         * @return A `Result` wrapping an `Octal` instance if the string represents
-         *         a valid octal value, or an exception otherwise.
-         * @since 1.0.0
+         * The method attempts to parse the character sequence and convert it into an instance of the `Octal` type.
+         * If the conversion fails, an `InvalidFormatOfType` instance is returned, which contains the input, the expected type,
+         * and the underlying error that caused the failure.
+         *
+         * @return An `Either` instance representing either the successful conversion to an `Octal` type or an `InvalidFormatOfType` error.
+         * @since 6.1.0
          */
-        fun String.toOctal() = runCatching { Octal(this) }
+        fun CharSequence.toOctal(): Either<InvalidFormatOfType, Octal> = either {
+            catching({ Octal(this@toOctal.toString()) }) { t: Throwable ->
+                InvalidFormatOfType(this@toOctal, typeOf<Octal>(), t)
+            }
+        }
         /**
-         * Converts the receiver DECIMAL [Number] into an octal representation encapsulated in an [Octal] instance.
+         * Converts the given number to its octal representation.
          *
-         * The [Octal] class provides a structured way to represent and operate on octal numbers,
-         * supporting conversions, arithmetic operations, and comparisons.
-         *
-         * @receiver The [Number] to be converted into octal form.
-         * @return An instance of [Octal] representing the octal representation of the receiver.
-         * @since 1.0.0
+         * @return Either a valid Octal representation wrapped in `Octal` if the conversion is successful,
+         * or a `NumberError.InvalidSign` error in case of an invalid number sign.
+         * @since 6.1.0
          */
-        fun Number.toOctal() = Octal(this)
+        fun Number.toOctal(): Either<NumberError.InvalidSign, Octal> = either {
+            catching({ Octal(this@toOctal) }) { t: Throwable ->
+                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+            }
+        }
 
         /**
          * Adds an Octal value to the Byte value and returns the result as an Int.
@@ -389,16 +398,11 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
          */
         operator fun Double.rem(octal: Octal) = rem(octal.toDouble())
 
-        /**
-         * Converts the given number into its octal string representation.
-         *
-         * @param n The number to be converted to an octal string. The number can
-         *          be of any type that implements the `Number` interface.
-         * @return The octal string representation of the given number.
-         * @since 1.0.0
-         */
-        private fun fromNumber(n: Number): String =
-            n.toLong().toString(8)
+        private fun fromNumber(n: Number): String {
+            n.toDouble() >= 0 || throw NumberSignException("Negative numbers are not allowed")
+            n is Double && n.isNaN() && throw NumberSignException("NaN is not allowed")
+            return n.toLong().toString(8)
+        }
 
         class Serializer : ValueSerializer<Octal>() {
             override fun serialize(value: Octal, gen: tools.jackson.core.JsonGenerator, ctxt: SerializationContext) {

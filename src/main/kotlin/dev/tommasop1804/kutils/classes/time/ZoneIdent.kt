@@ -9,9 +9,8 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.time.LocalMonthDayTime.Companion.toLocalMonthDayTime
-import dev.tommasop1804.kutils.exceptions.NoSuchEntryException
+import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Table
 import tools.jackson.databind.DeserializationContext
@@ -110,39 +109,36 @@ interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
         @Serial private const val serialVersionUID = 1L
 
         /**
-         * Retrieves a `ZoneIdent` based on the given identifier string.
+         * Retrieves a ZoneIdent instance based on the provided identifier string.
          *
-         * The identifier can represent either a military time zone or a standard time zone.
-         * If the identifier has a length of 1 or 2, it is interpreted as a potential military time zone.
-         * Otherwise, it is treated as a standard time zone.
+         * This method attempts to find a match for the given `id` in the TimeZoneDesignator first.
+         * If no match is found, it searches within the TimeZone and returns the first matching instance, if any.
          *
-         * @param id The string identifier of the zone to be resolved.
-         * @return The corresponding `ZoneIdent` for the provided identifier.
-         * @throws NoSuchEntryException if the identifier cannot be resolved into a valid time zone.
-         * @since 1.0.0
+         * @param id The identifier string used to look up the ZoneIdent instance.
+         * @return The ZoneIdent corresponding to the provided identifier, or null if no match is found.
+         * @since 6.1.0
          */
-        infix fun of(id: String): ZoneIdent = TimeZoneDesignator.of(id) ?: TimeZone.of(id).firstOrThrow { NoSuchEntryException("Invalid ZoneIdent: $id") }
-
+        infix fun of(id: String): ZoneIdent? = TimeZoneDesignator.of(id) ?: TimeZone.of(id).firstOrNull()
         /**
-         * Converts the provided name of a time zone or military time zone into a `ZoneIdent` instance.
+         * Attempts to resolve a `ZoneIdent` instance using the provided enum name.
          *
-         * The method first attempts to match the provided name with a time zone in the `TimeZone` enum.
-         * If no match is found, it then attempts to match it with a military time zone in the `TimeZoneDesignator` enum.
-         * If the name cannot be matched to either, an `NoSuchEntryException` is thrown.
+         * This method first tries to find a matching instance in the `TimeZone` enum using the given name.
+         * If no match is found, it then attempts to find a match in the `TimeZoneDesignator` enum.
+         * If both attempts fail, the method returns `null`.
          *
-         * @param name The name of the time zone or military time zone to convert.
-         * @return A `ZoneIdent` instance corresponding to the provided name.
-         * @since 1.0.0
-         * @throws NoSuchEntryException If the name does not correspond to any valid `TimeZone` or `TimeZoneDesignator`.
+         * @param name The name of the enum value to be resolved.
+         * @return A `ZoneIdent` instance if a match is found in either `TimeZone` or `TimeZoneDesignator`,
+         *         or `null` if no match is found.
+         * @since 6.1.0
          */
-        infix fun ofEnumName(name: String): ZoneIdent {
+        infix fun ofEnumName(name: String): ZoneIdent? {
             return try {
                 TimeZone.valueOf(name)
             } catch (_: Exception) {
                 try {
                     TimeZoneDesignator.valueOf(name)
                 } catch(_: Exception) {
-                    throw NoSuchEntryException("Invalid ZoneIdent name: $name")
+                    null
                 }
             }
         }
@@ -208,7 +204,7 @@ interface ZoneIdent : TemporalAccessor, TemporalAdjuster, Serializable {
          * @since 5.5.0
          */
         fun Table.zoneIdent(name: String) = varchar(name, 15)
-            .transform(::of, ZoneIdent::toString)
+            .transform({ of(it) ?: throw NoSuchEntryException() }, ZoneIdent::toString)
     }
 
     /**

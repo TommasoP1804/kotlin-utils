@@ -16,7 +16,9 @@ import Break
 import Continue
 import dev.tommasop1804.kutils.annotations.*
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.numbers.*
+import dev.tommasop1804.kutils.errors.IterableError.*
 import dev.tommasop1804.kutils.exceptions.*
 import java.util.stream.Collector
 import kotlin.contracts.ExperimentalContracts
@@ -88,7 +90,7 @@ val <E : Comparable<E>> Iterable<E>.isSorted get() = isSorted()
 /**
  * Extension property for `Iterable` that determines if the collection is not sorted.
  *
- * Checks whether the elements of the iterable are not in natural order.
+ * Checks whether the elements of the iterables are not in natural order.
  *
  * @receiver Iterable of elements implementing `Comparable`.
  * @return `true` if the elements are not sorted, otherwise `false`.
@@ -98,18 +100,18 @@ val <E : Comparable<E>> Iterable<E>.isNotSorted get() = !isSorted()
 /**
  * Extension property for [Iterable] that checks if the elements are sorted in descending order.
  *
- * This property evaluates whether the elements in the iterable are arranged in strictly
+ * This property evaluates whether the elements in the iterables are arranged in strictly
  * non-increasing order based on their natural ordering, as defined by the [Comparable] interface.
  *
  * @receiver Iterable of elements implementing [Comparable].
- * @return `true` if the elements are sorted in descending order or if the iterable is empty; `false` otherwise.
+ * @return `true` if the elements are sorted in descending order or if the iterables is empty; `false` otherwise.
  * @since 5.0.0
  */
 val <E : Comparable<E>> Iterable<E>.isSortedDescending get() = isSortedDescending()
 /**
  * Extension property for `Iterable<E>` that checks whether the collection is not sorted in descending order.
  *
- * This property returns `true` if the elements of the iterable are not in strictly descending order
+ * This property returns `true` if the elements of the iterables are not in strictly descending order
  * based on their natural ordering as defined by `Comparable`. If the elements are sorted in
  * descending order, the property will return `false`.
  * @since 5.0.0
@@ -117,14 +119,14 @@ val <E : Comparable<E>> Iterable<E>.isSortedDescending get() = isSortedDescendin
 val <E : Comparable<E>> Iterable<E>.isNotSortedDescending get() = !isSortedDescending()
 
 /**
- * Generates a map that represents the cardinality (frequency) of elements in the given iterable.
- * Each key in the resultant map corresponds to a unique element from the iterable,
- * and its value represents the number of times that element appears in the iterable.
+ * Generates a map that represents the cardinality (frequency) of elements in the given iterables.
+ * Each key in the resultant map corresponds to a unique element from the iterables,
+ * and its value represents the number of times that element appears in the iterables.
  *
- * If the iterable is null, an empty map is returned.
+ * If the iterables is null, an empty map is returned.
  *
- * @receiver the iterable of elements to be processed; nullable.
- * @return a map where keys are the elements from the iterable and values are their respective frequencies.
+ * @receiver the iterables of elements to be processed; nullable.
+ * @return a map where keys are the elements from the iterables and values are their respective frequencies.
  * @since 1.0.0
  */
 val <E> Iterable<E>?.cardinalityMap: CountMap<E>
@@ -137,10 +139,10 @@ val <E> Iterable<E>?.cardinalityMap: CountMap<E>
     }
 
 /**
- * Extension property for iterable collections that evaluates whether all elements
+ * Extension property for iterables collections that evaluates whether all elements
  * in the collection are equal to each other.
  *
- * @receiver The iterable collection whose elements are to be compared.
+ * @receiver The iterables collection whose elements are to be compared.
  * @return `true` if all elements in the collection are equal or if the collection
  * is empty. Returns `false` if at least one pair of elements in the collection
  * are not equal.
@@ -175,12 +177,12 @@ val <E> Iterable<E>.allDistinct: Boolean get() {
 }
 
 /**
- * Checks if the iterable contains duplicate elements.
+ * Checks if the iterables contains duplicate elements.
  *
- * This function returns `true` if any element in the iterable appears more than once,
+ * This function returns `true` if any element in the iterables appears more than once,
  * otherwise, it returns `false`.
  *
- * @return `true` if the iterable contains duplicate elements, `false` otherwise.
+ * @return `true` if the iterables contains duplicate elements, `false` otherwise.
  * @since 1.0.0
  */
 val <E> Iterable<E>.containsDuplicates
@@ -215,55 +217,19 @@ val Collection<*>.isNotSingleElement get() = size != 1
  * @since 5.4.0
  */
 fun <C : Collection<E>, E> C.orNullIfEmpty() = ifEmpty { null }
-
 /**
- * Checks if all elements in the iterable produce the same key when transformed by the given selector function.
+ * Returns an `Either` instance based on whether is empty or not.
  *
- * @param E The type of elements in the iterable.
- * @param K The type of key produced by the selector function.
- * @param selector A function that transforms an element of type E into a key of type K.
- * @return `true` if all elements produce the same key, or if the iterable is empty; `false` otherwise.
- * @since 4.8.0
- */
-fun <E, K> Iterable<E>.allEqualBy(selector: Transformer<E, K>): Boolean {
-    val iterator = iterator()
-    iterator.hasNext().ifFalse { return true }
-    var element = iterator.next()
-    iterator.hasNext().ifFalse { return true }
-    var firstKey: K? = null
-    var isFirst = true
-    loop {
-        val key = selector(element)
-        if (isFirst) {
-            firstKey = key
-            isFirst = false
-        } else if (firstKey != key) return false
-        iterator.hasNext().ifFalse { breakLoop() }
-        element = iterator.next()
-    }
-    return true
-}
-
-/**
- * Checks if all elements in the iterable are distinct based on the key selected by the given selector.
+ * If is empty, the method returns a `Left` containing an `IterableError.Empty` value.
+ * Otherwise, it returns a `Right` containing the original object.
  *
- * @param selector A function that selects a key of type [K] from an element of type [E].
- * @return `true` if all elements are distinct by the selected key or the iterable is empty; otherwise, `false`.
- * @since 4.8.0
+ * @return An `Either` instance where:
+ *         - `Left` indicates that the array is empty.
+ *         - `Right` contains the array when it is not empty.
+ * @since 6.1.0
  */
-fun <E, K> Iterable<E>.allDistinctBy(selector: Transformer<E, K>): Boolean {
-    val iterator = iterator()
-    iterator.hasNext().ifFalse { return true }
-    var element = iterator.next()
-    iterator.hasNext().ifFalse { return true }
-    val seen = HashSet<K>()
-    loop {
-        seen.add(selector(element)).ifFalse { return false }
-        iterator.hasNext().ifFalse { breakLoop() }
-        element = iterator.next()
-    }
-    return true
-}
+fun <C : Collection<E>, E> C.orErrorIfEmpty(): Either<Empty, C> =
+    either { ifEmpty { raise(Empty) } }
 
 /**
  * Merges the current collection with one or more additional collections.
@@ -316,9 +282,9 @@ fun <E> MutableList<E?>.addIfAbsent(element: E?) {
 }
 
 /**
- * Checks if there is any intersection between the current iterable and another iterable.
+ * Checks if there is any intersection between the current iterables and another iterables.
  *
- * @param other The iterable to check for intersection with the current iterable.
+ * @param other The iterables to check for intersection with the current iterables.
  * @return True if there is at least one common element between the two iterables, false otherwise.
  * @since 1.1.0
  */
@@ -343,32 +309,32 @@ infix fun <E> List<E>.intersperseWith(separator: E): List<E> =
     }
 
 /**
- * Checks if the iterable contains any of the specified elements.
+ * Checks if the iterables contains any of the specified elements.
  *
- * This function returns `true` if at least one element from the `iterable` array
- * is present in the iterable.
+ * This function returns `true` if at least one element from the `iterables` array
+ * is present in the iterables.
  *
- * @receiver the iterable of elements to be processed; nullable.
- * @param elements The elements to check for in the iterable.
- * @return `true` if the iterable contains any of the specified elements, `false` otherwise.
+ * @receiver the iterables of elements to be processed; nullable.
+ * @param elements The elements to check for in the iterables.
+ * @return `true` if the iterables contains any of the specified elements, `false` otherwise.
  * @since 1.0.0
  */
 fun <E> Iterable<E>.containsAny(vararg elements: E) = any { it in elements }
 
 /**
- * Checks if the specified iterable does not contain any of the given elements.
+ * Checks if the specified iterables does not contain any of the given elements.
  * Returns `true` if none of its elements are present
  * in the provided elements. Otherwise, returns `false`.
  *
- * @receiver the iterable of elements to be processed; nullable.
- * @param elements The elements to check against the iterable.
- * @return `true` if the iterable does not contain any of the specified elements, `false` otherwise.
+ * @receiver the iterables of elements to be processed; nullable.
+ * @param elements The elements to check against the iterables.
+ * @return `true` if the iterables does not contain any of the specified elements, `false` otherwise.
  * @since 1.0.0
  */
 fun <E> Iterable<E>.containsNone(vararg elements: E) = none { it in elements }
 
 /**
- * Checks if any element in the iterable satisfies the given predicate.
+ * Checks if any element in the iterables satisfies the given predicate.
  *
  * @param predicate A condition that each element will be tested against.
  * @return `true` if at least one element satisfies the predicate, otherwise `false`.
@@ -377,13 +343,27 @@ fun <E> Iterable<E>.containsNone(vararg elements: E) = none { it in elements }
 operator fun <E> Iterable<E>.contains(predicate: Predicate<E>) = any { predicate(it) }
 
 /**
- * Returns the first element of the iterable if it exists, or throws an exception created
- * by the provided lambda function if the iterable is null or empty.
+ * Returns the first element of the iterables if it exists, otherwise returns the value produced by the provided [default] function.
  *
- * @receiver the iterable on which the operation is applied
+ * @receiver the iterables to retrieve the first element from
+ * @param default a lambda function that produces a default value if the iterables is empty
+ * @return the first element of the iterables or the value produced by the [default] function
+ * @since 1.0.0
+ */
+fun <E> Iterable<E>.firstOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { first() } catch (e: NoSuchElementException) { default() }
+}
+/**
+ * Returns the first element of the iterables if it exists, or throws an exception created
+ * by the provided lambda function if the iterables is null or empty.
+ *
+ * @receiver the iterables on which the operation is applied
  * @param lazyException a lambda function that provides the exception to be thrown
- * if the iterable is null or empty
- * @return the first element of the iterable
+ * if the iterables is null or empty
+ * @return the first element of the iterables
  * @since 1.0.0
  */
 @IgnorableReturnValue
@@ -391,62 +371,127 @@ fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
-    return firstOrNull() ?: throw lazyException()
+    return try { first() } catch (e: NoSuchElementException) { throw lazyException() }
 }
 /**
- * Returns the first element in the iterable that matches the given [predicate].
- * If no such element is found, throws an exception provided by [lazyException].
+ * Extension function for `Iterable` that returns the first element of the collection
+ * wrapped in an `Either` context, or raises a `NoSuchElement` error if the collection is empty.
  *
- * @receiver the iterable to search for the element
- * @param lazyException a lambda providing the exception to be thrown if no element matches the predicate
- * @param predicate a function that defines the condition to match the element
- * @return the first element that matches the predicate
- * @since 1.0.0
+ * The function utilizes the `either` construct to handle errors functionally. It calls the
+ * `catching` function to attempt fetching the first element of the iterables. If a
+ * `NoSuchElementException` is thrown due to the collection being empty,
+ * it transforms the exception into a `NoSuchElement` error with an `index` of 0.
+ *
+ * @receiver An instance of `Iterable<E>`.
+ * @param E The type of elements contained in the iterables.
+ * @return An `Either` value:
+ *         - A `Right` containing the first element of the iterables if it is non-empty.
+ *         - A `Left` containing a `Empty` error if the iterables is empty.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.firstOrError() = either {
+    catching({ first() }) { _: NoSuchElementException -> Empty }
+}
+/**
+ * Returns the first element of the iterables that matches the given predicate.
+ *
+ * The function evaluates all elements in the iterables to find the first one
+ * that satisfies the provided predicate condition. If the iterables is empty,
+ * a `NoSuchElementException` is thrown. If no element matches the predicate,
+ * a `NoResultsException` is thrown.
+ *
+ * @param E the type of elements in the iterables.
+ * @param predicate a function that takes an element of type `E` and returns a boolean
+ * indicating whether the condition is satisfied.
+ * @return the first element in the iterables that matches the predicate.
+ * @throws NoSuchElementException if the iterables is empty.
+ * @throws NoResultsException if no element satisfies the predicate condition.
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Iterable<E>.firstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return firstOrNull(predicate) ?: throw lazyException()
-}
-/**
- * Returns the first element of the iterable if it exists, otherwise returns the value produced by the provided [default] function.
- *
- * @receiver the iterable to retrieve the first element from
- * @param default a lambda function that produces a default value if the iterable is empty
- * @return the first element of the iterable or the value produced by the [default] function
- * @since 1.0.0
- */
-fun <E> Iterable<E>.firstOr(default: Supplier<E>): E {
-    contract {
-        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
-    }
-    return firstOrNull() ?: default()
+fun <E> Iterable<E>.findFirst(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    return filtered.first()
 }
 /**
  * Returns the first element matching the given [predicate], or the result of the [default] function
  * if no such element is found.
  *
- * @receiver the iterable to search for the element.
+ * @receiver the iterables to search for the element.
  * @param default a function that provides a fallback value if no element matches the [predicate].
  * @param predicate a function that determines whether an element matches the given condition.
  * @return the first matching element if found, otherwise the result of the [default] function.
  * @since 1.0.0
  */
-fun <E> Iterable<E>.firstOr(default: Supplier<E>, predicate: Predicate<E>): E {
+fun <E> Iterable<E>.findFirstOr(default: Supplier<E>, predicate: Predicate<E>): E {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
-    return firstOrNull(predicate) ?: default()
+    return try { first(predicate) } catch (e: NoSuchElementException) { default() }
+}
+/**
+ * Returns the first element in the iterables that matches the given [predicate].
+ * If no such element is found, throws an exception provided by [lazyException].
+ *
+ * @receiver the iterables to search for the element
+ * @param lazyException a lambda providing the exception to be thrown if no element matches the predicate
+ * @param predicate a function that defines the condition to match the element
+ * @return the first element that matches the predicate
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Iterable<E>.findFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { first(predicate) } catch (e: NoSuchElementException) { throw lazyException() }
+}
+/**
+ * Returns the first element in the iterables that matches the given [predicate], or raises a [NoSuchElement]
+ * error if no such element is found.
+ *
+ * The method leverages the `either` context to safely handle the absence of matching elements by raising
+ * a domain-specific error rather than throwing an exception.
+ *
+ * @param E The type of elements in the iterables.
+ * @param predicate A function that evaluates whether an element matches a specific condition.
+ *                  It returns `true` if the element satisfies the condition, otherwise `false`.
+ * @return An `Either` containing:
+ *         - The first element matching the [predicate], wrapped in `Right`, if found.
+ *         - A `NoResult` error, wrapped in `Left`, if no matching element is found.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.findFirstOrError(predicate: Predicate<E>): Either<NotFirstResultError, E> = either {
+    catching({ findFirst(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        else -> throw IllegalStateException()
+    } }
 }
 
 /**
- * Returns the last element of the iterable if it exists, or throws an exception provided by the given supplier.
+ * Returns the last element of the iterables or the result of invoking the specified default supplier
+ * if the iterables is empty.
  *
- * @param lazyException A supplier that provides the exception to be thrown if the iterable is empty.
- * @return The last element of the iterable.
- * @throws Throwable If the iterable is empty, the exception provided by the supplier is thrown.
+ * @param default A supplier function that is invoked to provide a default value if the iterables is empty.
+ * @return The last element of the iterables or the result of the default supplier if the iterables is empty.
+ * @since 5.3.0
+ */
+fun <E> Iterable<E>.lastOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { last() } catch (_: NoSuchElementException) { default() }
+}
+/**
+ * Returns the last element of the iterables if it exists, or throws an exception provided by the given supplier.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if the iterables is empty.
+ * @return The last element of the iterables.
+ * @throws Throwable If the iterables is empty, the exception provided by the supplier is thrown.
  * @since 5.3.0
  */
 @IgnorableReturnValue
@@ -454,38 +499,44 @@ fun <E> Iterable<E>.lastOrThrow(lazyException: ThrowableSupplier): E {
     contract {
         callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
     }
-    return lastOrNull() ?: throw lazyException()
+    return try { last() } catch (_: NoSuchElementException) { throw lazyException() }
 }
 /**
- * Returns the last element matching the given [predicate] from the iterable, or throws an exception
- * provided by the [lazyException] supplier if no such element is found.
+ * Returns the last element of the iterables or raises a `NoSuchElement` error if the iterables is empty.
  *
- * @param lazyException A supplier function that provides the exception to be thrown if no matching element is found.
- * @param predicate A condition to determine which element to find as the last match.
- * @return The last element that matches the given predicate.
- * @throws Throwable The exception provided by [lazyException] if no matching element is found.
- * @since 5.3.0
+ * The method operates within an `either` context and uses `catching` to handle the
+ * `NoSuchElementException` that is thrown when attempting to retrieve the last element of an empty collection.
+ * If the exception occurs, it is mapped to a `NoSuchElement` error with an index of 0.
+ *
+ * @receiver The iterables from which the last element is retrieved.
+ * @return An `Either` instance where:
+ *         - `Right` contains the last element of the iterables if it exists.
+ *         - `Left` contains a `Empty` error if the iterables is empty.
+ * @param E The type of elements in the iterables.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.lastOrError() = either {
+    catching({ last() }) { _: NoSuchElementException -> Empty }
+}
+/**
+ * Returns the last element in the iterables that matches the specified predicate.
+ *
+ * If the iterables is empty, a [NoSuchElementException] is thrown. If no elements match the predicate,
+ * a [NoResultsException] is thrown.
+ *
+ * @param predicate The condition to evaluate each element against.
+ * @return The last element that satisfies the predicate.
+ * @throws NoSuchElementException If the iterables is empty.
+ * @throws NoResultsException If no elements match the predicate.
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> Iterable<E>.lastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return lastOrNull(predicate) ?: throw lazyException()
-}
-/**
- * Returns the last element of the iterable or the result of invoking the specified default supplier
- * if the iterable is empty.
- *
- * @param default A supplier function that is invoked to provide a default value if the iterable is empty.
- * @return The last element of the iterable or the result of the default supplier if the iterable is empty.
- * @since 5.3.0
- */
-fun <E> Iterable<E>.lastOr(default: Supplier<E>): E {
-    contract {
-        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
-    }
-    return lastOrNull() ?: default()
+fun <E> Iterable<E>.findLast(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    return filtered.last()
 }
 /**
  * Returns the last element in the collection that matches the specified [predicate].
@@ -494,13 +545,47 @@ fun <E> Iterable<E>.lastOr(default: Supplier<E>): E {
  * @param default A supplier function that provides a default value if no element matches the [predicate].
  * @param predicate A predicate function to test elements of the collection.
  * @return The last element matching the [predicate], or the result of the [default] supplier if none match.
- * @since 5.3.0
+ * @since 6.1.0
  */
-fun <E> Iterable<E>.lastOr(default: Supplier<E>, predicate: Predicate<E>): E {
+fun <E> Iterable<E>.findLastOr(default: Supplier<E>, predicate: Predicate<E>): E {
     contract {
         callsInPlace(default, InvocationKind.AT_MOST_ONCE)
     }
-    return lastOrNull(predicate) ?: default()
+    return try { last(predicate) } catch (_: NoSuchElementException) { default() }
+
+}
+/**
+ * Returns the last element matching the given [predicate] from the iterables, or throws an exception
+ * provided by the [lazyException] supplier if no such element is found.
+ *
+ * @param lazyException A supplier function that provides the exception to be thrown if no matching element is found.
+ * @param predicate A condition to determine which element to find as the last match.
+ * @return The last element that matches the given predicate.
+ * @throws Throwable The exception provided by [lazyException] if no matching element is found.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Iterable<E>.findLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return try { last(predicate) } catch (_: NoSuchElementException) { throw lazyException() }
+}
+/**
+ * Retrieves the last element in the iterables that matches the given [predicate].
+ * If no such element is found, raises a [NotLastResultsError] error.
+ *
+ * @param E The type of the elements in the iterables.
+ * @param predicate A predicate function to test elements.
+ * @return Either the last matching element, or a [NotLastResultsError] error if no element matches.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.findLastOrError(predicate: Predicate<E>): Either<NotLastResultsError, E> = either {
+    catching({ findLast(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        else -> throw IllegalStateException()
+    } }
 }
 
 /**
@@ -512,20 +597,6 @@ fun <E> Iterable<E>.lastOr(default: Supplier<E>, predicate: Predicate<E>): E {
  * @since 2.1.0
  */
 fun <E> List<E>.second() = if (size < 2) throw NoSuchElementException("List size $size doesn't allow to get second element.") else this[1]
-/**
- * Returns the second element of a list that matches the given predicate.
- *
- * Filters the list based on the provided predicate and retrieves the second element
- * from the filtered list. If there are fewer than two elements matching the predicate,
- * this function will throw an exception or result in a runtime error depending on
- * underlying implementations.
- *
- * @param predicate a condition to filter the elements in the list.
- * @return the second element that matches the predicate.
- * @throws NoSuchElementException if there are fewer than two elements matching the predicate.
- * @since 2.1.0
- */
-fun <E> List<E>.second(predicate: Predicate<E>) = filter(predicate).second()
 /**
  * Returns the second element of the list or `null` if the list contains
  * fewer than two elements.
@@ -541,14 +612,18 @@ fun <E> List<E>.second(predicate: Predicate<E>) = filter(predicate).second()
  */
 fun <E> List<E>.secondOrNull() = if (size < 2) null else this[1]
 /**
- * Returns the second element in the list that matches the specified [predicate],
- * or `null` if no such element is found or if there are fewer than two matching elements.
+ * Returns the second element of the list if it exists; otherwise, returns the value supplied by the given default supplier.
  *
- * @param predicate a function that defines the condition to filter the elements of the list.
- * @return the second element satisfying the given predicate, or `null` if no such element exists.
+ * @param default A supplier function that provides a default value when the list does not contain at least two elements.
+ * @return The second element of the list, or the result of invoking the default supplier if the list has less than two elements.
  * @since 2.1.0
  */
-fun <E> List<E>.secondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
+fun <E> List<E>.secondOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (size < 2) default() else this[1]
+}
 /**
  * Returns the second element of the list if it exists, or throws the exception provided by the
  * given `lazyException` supplier if the list contains fewer than two elements.
@@ -565,28 +640,55 @@ fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier): E {
     return this[1]
 }
 /**
- * Returns the second element in the list that matches the given predicate or throws an exception
- * provided by the given `lazyException` supplier if no such element exists.
+ * Returns the second element of the iterables as an `Either` value. If the iterables does not contain
+ * at least two elements, raises a [NoSuchElement] error wrapped in a `Left`.
  *
- * @param lazyException a supplier for the exception to throw if there are not enough matching elements
- * @param predicate a condition to filter elements of the list
- * @since 2.1.0
+ * This function uses `either` to handle errors in a functional style, capturing any exception raised
+ * when attempting to retrieve the second element of the iterables, specifically a [NoSuchElementException].
+ *
+ * @receiver The iterables collection to retrieve the second element from.
+ * @param E The type of elements in the iterables.
+ * @return An `Either` where:
+ *         - `Right<E>` contains the second element of the iterables if it exists.
+ *         - `Left<NotInnerElementErrors>` represents an error if the second element cannot be retrieved.
+ * @since 6.1.0
+ */
+fun <E> List<E>.secondOrError(): Either<NotInnerElementError, E> = either {
+    catching({ second() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(1) }
+}
+/**
+ * Returns the second element of a list that matches the given predicate.
+ *
+ * Filters the list based on the provided predicate and retrieves the second element
+ * from the filtered list. If there are fewer than two elements matching the predicate,
+ * this function will throw an exception or result in a runtime error depending on
+ * underlying implementations.
+ *
+ * @param predicate a condition to filter the elements in the list.
+ * @return the second element that matches the predicate.
+ * @throws NoSuchElementException if list is empty.
+ * @throws NoResultsException if there are no elements matching the predicate.
+ * @throws TooFewResultsException if there are fewer than two elements matching the predicate.
+ * @since 6.1.0
  */
 @IgnorableReturnValue
-fun <E> List<E>.secondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
-/**
- * Returns the second element of the list if it exists; otherwise, returns the value supplied by the given default supplier.
- *
- * @param default A supplier function that provides a default value when the list does not contain at least two elements.
- * @return The second element of the list, or the result of invoking the default supplier if the list has less than two elements.
- * @since 2.1.0
- */
-fun <E> List<E>.secondOr(default: Supplier<E>): E {
-    contract {
-        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
-    }
-    return if (size < 2) default() else this[1]
+fun <E> List<E>.findSecond(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    if (filtered.size < 2) throw TooFewResultsException(filtered.size)
+    return filtered.second()
 }
+/**
+ * Returns the second element in the list that matches the specified [predicate],
+ * or `null` if no such element is found or if there are fewer than two matching elements.
+ *
+ * @param predicate a function that defines the condition to filter the elements of the list.
+ * @return the second element satisfying the given predicate, or `null` if no such element exists.
+ * @since 6.1.0
+ */
+fun <E> List<E>.findSecondOrNull(predicate: Predicate<E>) = filter(predicate).secondOrNull()
 /**
  * Returns the second element in the list that matches the given predicate, or the value provided by
  * the default supplier if no such element exists or there are less than two elements.
@@ -594,9 +696,45 @@ fun <E> List<E>.secondOr(default: Supplier<E>): E {
  * @param default A supplier function that provides a default value if the list does not contain
  *                a valid second element matching the predicate.
  * @param predicate A function that determines whether a given element in the list matches the criteria.
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> List<E>.secondOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+fun <E> List<E>.findSecondOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).secondOr(default)
+/**
+ * Returns the second element in the list that matches the given predicate or throws an exception
+ * provided by the given `lazyException` supplier if no such element exists.
+ *
+ * @param lazyException a supplier for the exception to throw if there are not enough matching elements
+ * @param predicate a condition to filter elements of the list
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> List<E>.findSecondOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).secondOrThrow(lazyException)
+/**
+ * Returns the second element of the iterables matching the given [predicate], wrapped in an
+ * `Either` context.
+ *
+ * This method attempts to find the second element in the iterables that satisfies the specified
+ * [predicate]. If no such element is found, or if the iterables does not have at least
+ * two elements that match, a `NoSuchElement` error is raised with the index `1` (indicating the
+ * failure to find the second element).
+ *
+ * @param E The type of the elements in the iterables.
+ * @param predicate A function that evaluates each element of the iterables to determine
+ *                  whether it satisfies the condition.
+ * @return An `Either` value where:
+ *         - `Right<E>` contains the second element matching the predicate.
+ *         - `Left<NoSuchResult>` contains the error information if the second matching element
+ *           does not exist.
+ * @since 6.1.0
+ */
+fun <E> List<E>.findSecondOrError(predicate: Predicate<E>): Either<NotInnerResultError, E> = either {
+    catching({ findSecond(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        is TooFewResultsException -> TooFewResults
+        else -> throw IllegalStateException()
+    } }
+}
 
 /**
  * Returns the third element of the list.
@@ -611,17 +749,6 @@ fun <E> List<E>.secondOr(default: Supplier<E>, predicate: Predicate<E>) = filter
  */
 fun <E> List<E>.third() = if (size < 3) throw NoSuchElementException("List size $size doesn't allow to get third element.") else this[2]
 /**
- * Returns the third element in the list matching the given predicate after filtering.
- *
- * The method first filters the elements of the list using the provided predicate and
- * then attempts to retrieve the third element from the filtered result. If the filtered
- * list has less than three elements, this method will result in an exception.
- *
- * @param predicate A predicate to filter the elements of the list.
- * @since 2.1.0
- */
-fun <E> List<E>.third(predicate: Predicate<E>) = filter(predicate).third()
-/**
  * Returns the third element of the list if the list contains at least three elements, or `null` otherwise.
  *
  * This function is a safe way to access the third element without risking an `IndexOutOfBoundsException`.
@@ -631,42 +758,6 @@ fun <E> List<E>.third(predicate: Predicate<E>) = filter(predicate).third()
  * @since 2.1.0
  */
 fun <E> List<E>.thirdOrNull() = if (size < 3) null else this[2]
-/**
- * Returns the third element that matches the given [predicate], or `null` if no such element exists.
- *
- * The search for the matching element is performed by filtering the list based on the given [predicate].
- *
- * @param predicate the condition used to filter the elements of the list.
- * @return the third element matching the [predicate], or `null` if there are less than three matching elements.
- * @since 2.1.0
- */
-fun <E> List<E>.thirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
-/**
- * Returns the third element of the list if it exists, otherwise throws an exception provided by the given supplier.
- *
- * @param lazyException A supplier that provides the exception to be thrown if the list has fewer than three elements.
- * @throws Throwable The exception provided by the supplier if the list size is less than three.
- * @return The third element of the list.
- * @since 2.1.0
- */
-@IgnorableReturnValue
-fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    if (size < 3) throw lazyException()
-    return this[2]
-}
-/**
- * Returns the third element in the list that matches the given predicate or throws an exception
- * provided by the lazyException supplier if there are less than three matching elements.
- *
- * @param lazyException a supplier that provides the exception to be thrown if the conditions are not met
- * @param predicate a condition to filter elements in the list
- * @since 2.1.0
- */
-@IgnorableReturnValue
-fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
 /**
  * Returns the third element of the list if it exists; otherwise, evaluates and returns the
  * result of the provided default supplier.
@@ -684,15 +775,269 @@ fun <E> List<E>.thirdOr(default: Supplier<E>): E {
     return if (size < 3) default() else this[2]
 }
 /**
+ * Returns the third element of the list if it exists, otherwise throws an exception provided by the given supplier.
+ *
+ * @param lazyException A supplier that provides the exception to be thrown if the list has fewer than three elements.
+ * @throws Throwable The exception provided by the supplier if the list size is less than three.
+ * @return The third element of the list.
+ * @since 2.1.0
+ */
+@IgnorableReturnValue
+fun <E> List<E>.thirdOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    if (size < 3) throw lazyException()
+    return this[2]
+}
+/**
+ * Safely retrieves the third element of the list as an `Either`.
+ *
+ * This function attempts to retrieve the third element of the list using the `third` extension function.
+ * If the list contains fewer than three elements, a `NoSuchElement` error is returned instead of throwing an exception.
+ *
+ * @receiver The list from which the third element is to be retrieved.
+ * @param E The type of elements in the list.
+ * @return An `Either` where:
+ *         - `Right` contains the third element of the list if it exists.
+ *         - `Left` contains a `NoSuchElement` error if the list contains fewer than three elements.
+ * @since 6.1.0
+ */
+fun <E> List<E>.thirdOrError(): Either<NotInnerElementError, E> = either {
+    catching({ third() }) { _: NoSuchElementException -> if (isEmpty()) Empty else NoSuchElement(2) }
+}
+/**
+ * Returns the third element in the list matching the given predicate after filtering.
+ *
+ * The method first filters the elements of the list using the provided predicate and
+ * then attempts to retrieve the third element from the filtered result. If the filtered
+ * list has less than three elements, this method will result in an exception.
+ *
+ * @param predicate A predicate to filter the elements of the list.
+ * @since 6.1.0
+ */
+fun <E> List<E>.findThird(predicate: Predicate<E>): E {
+    val list = toList()
+    if (list.isEmpty()) throw NoSuchElementException()
+    val filtered = list.filter(predicate)
+    if (filtered.isEmpty()) throw NoResultsException()
+    if (filtered.size < 3) throw TooFewResultsException(filtered.size)
+    return filtered.third()
+}
+/**
+ * Returns the third element that matches the given [predicate], or `null` if no such element exists.
+ *
+ * The search for the matching element is performed by filtering the list based on the given [predicate].
+ *
+ * @param predicate the condition used to filter the elements of the list.
+ * @return the third element matching the [predicate], or `null` if there are less than three matching elements.
+ * @since 6.1.0
+ */
+fun <E> List<E>.findThirdOrNull(predicate: Predicate<E>) = filter(predicate).thirdOrNull()
+/**
  * Returns the third element of the list that matches the given predicate if it exists; otherwise, returns the value supplied by the provided default supplier.
  * The matching elements are determined by filtering the list based on the given predicate.
  *
  * @param default A supplier function that provides a default value when the list does not contain at least three elements
  *                matching the given predicate.
  * @param predicate A predicate function used to filter the list.
- * @since 2.1.0
+ * @since 6.1.0
  */
-fun <E> List<E>.thirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
+fun <E> List<E>.findThirdOr(default: Supplier<E>, predicate: Predicate<E>) = filter(predicate).thirdOr(default)
+/**
+ * Returns the third element in the list that matches the given predicate or throws an exception
+ * provided by the lazyException supplier if there are less than three matching elements.
+ *
+ * @param lazyException a supplier that provides the exception to be thrown if the conditions are not met
+ * @param predicate a condition to filter elements in the list
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> List<E>.findThirdOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) = filter(predicate).thirdOrThrow(lazyException)
+/**
+ * Attempts to retrieve the third element of the list that matches the given predicate.
+ * If the third matching element is not found, raises a `NoSuchElement` error with the index set
+ * to `2`.
+ *
+ * @param predicate A predicate used to filter and identify matching elements from the list.
+ * @return An `Either` result where:
+ *         - `Right` represents the successfully retrieved third matching element.
+ *         - `Left` represents a `NoSuchResult` error if the third matching element is not found.
+ * @since 6.1.0
+ */
+fun <E> List<E>.findThirdOrError(predicate: Predicate<E>): Either<NotInnerResultError, E> = either {
+    catching({ findThird(predicate) }) { e: Exception -> when (e) {
+        is NoResultsException -> NoResults
+        is NoSuchElementException -> Empty
+        is TooFewResultsException -> TooFewResults
+        else -> throw IllegalStateException()
+    } }
+}
+
+/**
+ * Returns the single element in the iterables if it contains exactly one element.
+ * Throws an exception otherwise:
+ * - [NoSuchElementException] if the iterables is empty.
+ * - [TooManyElementsException] if the iterables contains more than one element.
+ *
+ * @receiver An iterables collection of type [E].
+ * @return The single element in the iterables.
+ * @throws NoSuchElementException if the iterables is empty.
+ * @throws TooManyElementsException if the iterables contains more than one element.
+ * @since 1.0.0
+ */
+fun <E> Iterable<E>.onlyElement() = toList().run {
+    if (isEmpty()) throw NoSuchElementException() 
+    else if (size == 1) first() else throw TooManyElementsException(size)
+}
+/**
+ * Returns the single element in the iterables if it contains exactly one element,
+ * or `null` if the iterables is empty or contains more than one element.
+ *
+ * @receiver an iterables of elements
+ * @return the single element in the iterables or `null` if the conditions are not met
+ * @since 1.0.0
+ */
+fun <E> Iterable<E>.onlyElementOrNull() = toList().run { if (size == 1) first() else null }
+/**
+ * Returns the single element in the iterables if it contains only one element; otherwise,
+ * it returns the value supplied by the provided [default] supplier.
+ *
+ * @param E the type of elements in the iterables
+ * @param default a supplier that provides a default value if the iterables does not contain exactly one element
+ * @return the single element in the iterables if there is exactly one, or the value supplied by [default]
+ * @since 1.0.0
+ */
+infix fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else default() }
+}
+/**
+ * Returns the single element of the iterables if it contains exactly one element; otherwise, throws an exception provided by the given supplier.
+ *
+ * @param lazyException a supplier function that provides the exception to be thrown when the iterables does not contain exactly one element
+ * @return the single element of the iterables if there is exactly one element
+ * @throws Throwable the exception supplied by the `lazyException` if the iterables does not contain exactly one element
+ * @since 1.0.0
+ */
+@IgnorableReturnValue
+infix fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return toList().run { if (size == 1) first() else throw lazyException() }
+}
+/**
+ * Returns an `Either` containing the single element of the iterables if it contains exactly one element,
+ * or an error if the iterables is empty or contains more than one element.
+ *
+ * The method internally uses the `onlyElement` function to retrieve the single element.
+ * It captures exceptions raised by `onlyElement` and transforms them into domain-specific error types:
+ * - If the iterables is empty, a `NoSuchElement` error is returned.
+ * - If the iterables contains multiple elements, a `TooManyElement` error is returned,
+ *   with the size of the iterables included in the error.
+ *
+ * This method facilitates more functional error handling through the use of the `either` API,
+ * allowing consumers to handle errors separately from normal results.
+ *
+ * @receiver An iterables collection of type [E].
+ * @param E The type of elements in the iterables.
+ * @return An `Either` containing:
+ *         - The single element as `Right<E>` if the iterables contains only one element.
+ *         - An error as `Left<NotOnlyElementErrors>` if the iterables is empty or contains more than one element.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.onlyElementOrError(): Either<NotOnlyElementError, E> = either {
+    catching({ onlyElement() }) { e: Exception -> when (e) {
+        is NoSuchElementException -> Empty
+        is TooManyElementsException -> TooManyElements
+        else -> throw IllegalStateException()
+    } }
+}
+
+/**
+ * Filters the elements of an iterables based on a predicate and ensures that exactly one element
+ * satisfies the predicate. If no elements or more than one element satisfy the predicate, an exception is thrown.
+ *
+ * @param predicate a predicate to filter the elements of the iterables
+ * @return the single element that satisfies the predicate
+ * @throws NoSuchElementException if list is empty
+ * @throws NoResultsException if no elements satisfy the predicate
+ * @throws TooManyResultsException if more than one element satisfies the predicate
+ * @since 6.1.0
+ */
+infix fun <E> Iterable<E>.findOnlyElement(predicate: Predicate<E>) = toList()
+    .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
+    .filter(predicate).run {
+        if (isEmpty()) throw NoResultsException()
+        if (size == 1) first()
+        else throw TooManyResultsException(size)
+    }
+/**
+ * Returns the single element matching the given [predicate], or `null` if no such element exists
+ * or if there is more than one matching element in the iterables.
+ *
+ * @param predicate A lambda function used to filter elements in the iterables. The function should
+ * return `true` for elements you want to include in the operation.
+ * @since 6.1.0
+ */
+infix fun <E> Iterable<E>.findOnlyElementOrNull(predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else null }
+/**
+ * Returns the single element that matches the given predicate if exactly one element matches,
+ * otherwise returns the result from the default supplier.
+ *
+ * @param default A supplier function that provides a default value when no element
+ * or more than one element matches the predicate.
+ * @param predicate A predicate to filter the elements in the iterables.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.findOnlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).run { if (size == 1) first() else default() }
+}
+/**
+ * Returns the single element matching the given [predicate] from the iterables or throws an exception
+ * provided by [lazyException] if the condition is not met. The method ensures that exactly one element
+ * matches the predicate.
+ *
+ * @param lazyException a supplier for the exception to be thrown if the number of matching elements
+ * is not exactly one.
+ * @param predicate a condition to be checked for each element in the iterables.
+ * @return the single element that matches the [predicate].
+ * @throws Throwable the exception supplied by [lazyException] if no element or more than one element matches.
+ * @since 6.1.0
+ */
+@IgnorableReturnValue
+fun <E> Iterable<E>.findOnlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
+    contract {
+        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
+    }
+    return filter(predicate).run { if (size == 1) first() else throw lazyException() }
+}
+/**
+ * Retrieves the only element from the iterables that satisfies the specified predicate, or returns an error
+ * encapsulated in an `Either` type if there are zero or multiple elements that match the predicate.
+ *
+ * @param predicate The predicate function used to filter the elements of the iterables.
+ * @return An `Either` instance:
+ *         - `Either.Right` wrapping the element that satisfies the predicate if there is exactly one match.
+ *         - `Either.Left` wrapping a `NotOnlyElementErrors` instance if there are zero or multiple matches.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.findOnlyElementOrError(predicate: Predicate<E>): Either<NotOnlyResultError, E> = either {
+    catching({ findOnlyElement(predicate) }) { e: Exception ->
+        when (e) {
+            is NoResultsException -> NoResults
+            is NoSuchElementException -> Empty
+            is TooManyResultsException -> TooManyResults
+            else -> throw IllegalStateException()
+        }
+    }
+}
 
 /**
  * Splits the elements of this list into chunks where the consecutive elements in each chunk satisfy the given predicate.
@@ -734,131 +1079,127 @@ infix fun <E> Iterable<E>.repeatEach(n: Int): List<E> {
 }
 
 /**
- * Finds the mode (the most frequently occurring element) in the given iterable.
+ * Finds the mode (the most frequently occurring element) in the given iterables.
  *
  * If there are multiple elements with the same frequency, the result will be the first one
- * encountered in the iteration. If the iterable is empty, null is returned.
+ * encountered in the iteration. If the iterables is empty, null is returned.
  *
- * @return The most frequent element in the iterable or null if the iterable is empty.
+ * @return The most frequent element in the iterables or null if the iterables is empty.
  * @since 1.0.0
  */
 fun <E> Iterable<E>.mode(): E? = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
 
 /**
- * Returns the single element in the iterable if it contains exactly one element.
- * Throws an exception otherwise:
- * - [NoSuchElementException] if the iterable is empty.
- * - [TooManyElementsException] if the iterable contains more than one element.
+ * Returns the index of the given element in the iterables or throws an exception if the element is not found.
  *
- * @receiver An iterable collection of type [E].
- * @return The single element in the iterable.
- * @throws NoSuchElementException if the iterable is empty.
- * @throws TooManyElementsException if the iterable contains more than one element.
- * @since 1.0.0
+ * @param element The element whose index is to be determined.
+ * @param lazyException A supplier that provides the exception to be thrown if the element is not found.
+ * @throws Throwable The exception provided by [lazyException] if the element is not found in the iterables.
+ * @return The index of the specified element in the iterables if it exists.
+ * @since 6.1.0
  */
-fun <E> Iterable<E>.onlyElement() = toList().run {
-    if (isEmpty()) throw NoSuchElementException() 
-    else if (size == 1) first() else throw TooManyElementsException(size)
+fun <E> Iterable<E>.indexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
+    indexOf(element).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Finds the last index of the specified element in the iterables, or throws an exception if the element is not found.
+ *
+ * @param element The element whose last index is to be located in the iterables.
+ * @param lazyException A supplier function that provides a throwable to be thrown if the element is not found.
+ * This supplier function is invoked only if the element is not found.
+ * @throws Throwable The exception returned by [lazyException] if the element is not found.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.lastIndexOfOrThrow(element: E, lazyException: ThrowableSupplier) =
+    lastIndexOf(element).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Returns the index of the first element in the iterables that matches the given [predicate].
+ * If no such element is found, an exception provided by [lazyException] is thrown.
+ *
+ * @param E The type of elements in the iterables.
+ * @param lazyException A supplier function that provides the exception to be thrown when no matching element is found.
+ * @param predicate A predicate function to test elements of the iterables.
+ * @return The index of the first element that matches the [predicate], or throws the exception provided by [lazyException] if none is found.
+ * @throws Throwable The exception generated by [lazyException] if no element matches the [predicate].
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.indexOfFirstOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) =
+    indexOfFirst(predicate).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Finds the index of the last element in the iterables that matches the given predicate.
+ * If no such element is found, the method throws an exception provided by the given throwable supplier.
+ *
+ * @param lazyException A supplier function that provides the exception to be thrown if no matching element is found.
+ * @param predicate A predicate function used to determine whether an element satisfies the condition.
+ * @return The index of the last element that matches the predicate.
+ * @throws Throwable The exception provided by the lazyException supplier if no matching element is found.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.indexOfLastOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>) =
+    indexOfLast(predicate).expectNot(INDEX_NOT_FOUND, causeOf = { lazyException() })
+/**
+ * Finds the index of a given element in the iterables or raises a `NotFound` error if the element is not found.
+ *
+ * This function uses the `either` block to handle the result:
+ * - Returns the index if the element is found.
+ * - Raises an error of type `NotFound` if the element is not present in the iterables.
+ *
+ * @param E The type of the elements in the iterables.
+ * @param element The element to be searched for in the iterables.
+ * @return The index of the element if found.
+ * @since 6.1.0
+ */
+fun <E> Iterable<E>.indexOfOrError(element: E) = either {
+    val index = indexOf(element)
+    ensure(index != INDEX_NOT_FOUND) { NotFound(element) }
+    index
 }
 /**
- * Returns the single element in the iterable if it contains exactly one element,
- * or `null` if the iterable is empty or contains more than one element.
+ * Returns the last index of the specified element in the iterables or raises an error if the element
+ * is not found. This function short-circuits errors using the `either` context.
  *
- * @receiver an iterable of elements
- * @return the single element in the iterable or `null` if the conditions are not met
- * @since 1.0.0
+ * @param E The type of elements in the iterables.
+ * @param element The element whose last occurrence index is to be found.
+ * @return The last index of the specified element.
+ * @since 6.1.0
  */
-fun <E> Iterable<E>.onlyElementOrNull() = toList().run { if (size == 1) first() else null }
-/**
- * Returns the single element in the iterable if it contains only one element; otherwise,
- * it returns the value supplied by the provided [default] supplier.
- *
- * @param E the type of elements in the iterable
- * @param default a supplier that provides a default value if the iterable does not contain exactly one element
- * @return the single element in the iterable if there is exactly one, or the value supplied by [default]
- * @since 1.0.0
- */
-infix fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>): E {
-    contract {
-        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
-    }
-    return toList().run { if (size == 1) first() else default() }
+fun <E> Iterable<E>.lastIndexOfOrError(element: E) = either {
+    val index = lastIndexOf(element)
+    ensure(index != INDEX_NOT_FOUND) { NotFound(element) }
+    index
 }
 /**
- * Returns the single element of the iterable if it contains exactly one element; otherwise, throws an exception provided by the given supplier.
+ * Returns the index of the first element matching the given [predicate] in the iterables.
+ * If no element matches, raises an error with the specified [NoResults] error type.
  *
- * @param lazyException a supplier function that provides the exception to be thrown when the iterable does not contain exactly one element
- * @return the single element of the iterable if there is exactly one element
- * @throws Throwable the exception supplied by the `lazyException` if the iterable does not contain exactly one element
- * @since 1.0.0
- */
-@IgnorableReturnValue
-infix fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return toList().run { if (size == 1) first() else throw lazyException() }
-}
-
-/**
- * Filters the elements of an iterable based on a predicate and ensures that exactly one element
- * satisfies the predicate. If no elements or more than one element satisfy the predicate, an exception is thrown.
+ * This function uses the `either` construct to handle the result or raise an error in a functional style.
+ * It ensures that the computation short-circuits when no match is found.
  *
- * @param predicate a predicate to filter the elements of the iterable
- * @return the single element that satisfies the predicate
- * @throws NoSuchElementException if no elements satisfy the predicate
- * @throws TooFewResultsException if the resulting size from filtering is less than the expected minimum (1)
- * @throws TooManyResultsException if more than one element satisfies the predicate
- * @since 1.0.0
+ * @param E The type of elements in the iterables.
+ * @param predicate A functional interface `Predicate<E>` that is used to test the elements.
+ *                  The predicate returns `true` for the desired match and `false` otherwise.
+ * @return An `Either` containing the index of the matching element as `Right`, or an error as `Left`.
+ *         Specifically, raises the [NoResults] error if no element satisfies the predicate.
+ * @since 6.1.0
  */
-infix fun <E> Iterable<E>.onlyElement(predicate: Predicate<E>) = toList()
-    .requireOrThrow({ NoSuchElementException() }, { it.isNotEmpty() })
-    .filter(predicate).run {
-        if (size == 1) first()
-        else throw if (size > 1) TooManyResultsException(size) else TooFewResultsException(size)
-    }
-/**
- * Returns the single element matching the given [predicate], or `null` if no such element exists
- * or if there is more than one matching element in the iterable.
- *
- * @param predicate A lambda function used to filter elements in the iterable. The function should
- * return `true` for elements you want to include in the operation.
- * @since 1.0.0
- */
-infix fun <E> Iterable<E>.onlyElementOrNull(predicate: Predicate<E>) = filter(predicate).run { if (size == 1) first() else null }
-/**
- * Returns the single element that matches the given predicate if exactly one element matches,
- * otherwise returns the result from the default supplier.
- *
- * @param default A supplier function that provides a default value when no element
- * or more than one element matches the predicate.
- * @param predicate A predicate to filter the elements in the iterable.
- * @since 1.0.0
- */
-fun <E> Iterable<E>.onlyElementOr(default: Supplier<E>, predicate: Predicate<E>): E {
-    contract {
-        callsInPlace(default, InvocationKind.AT_MOST_ONCE)
-    }
-    return filter(predicate).run { if (size == 1) first() else default() }
+fun <E> Iterable<E>.indexOfFirstOrError(predicate: Predicate<E>) = either {
+    val index = indexOfFirst(predicate)
+    ensure(index != INDEX_NOT_FOUND) { NoResults }
+    index
 }
 /**
- * Returns the single element matching the given [predicate] from the iterable or throws an exception
- * provided by [lazyException] if the condition is not met. The method ensures that exactly one element
- * matches the predicate.
+ * Finds the index of the last element in the iterables that matches the given predicate.
+ * If no element matches the predicate, raises an error encapsulated in an `Either`.
  *
- * @param lazyException a supplier for the exception to be thrown if the number of matching elements
- * is not exactly one.
- * @param predicate a condition to be checked for each element in the iterable.
- * @return the single element that matches the [predicate].
- * @throws Throwable the exception supplied by [lazyException] if no element or more than one element matches.
- * @since 1.0.0
+ * @param E The type of elements in the iterables.
+ * @param predicate A condition to evaluate for each element. The function will return the index
+ *                  of the last element for which this predicate evaluates to `true`.
+ * @return The index of the last matching element if found; otherwise, raises an error.
+ * @since 6.1.0
  */
-@IgnorableReturnValue
-fun <E> Iterable<E>.onlyElementOrThrow(lazyException: ThrowableSupplier, predicate: Predicate<E>): E {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return filter(predicate).run { if (size == 1) first() else throw lazyException() }
+fun <E> Iterable<E>.indexOfLastOrError(predicate: Predicate<E>) = either {
+    val index = indexOfLast(predicate)
+    ensure(index != INDEX_NOT_FOUND) { NoResults }
+    index
 }
 
 /**
@@ -917,11 +1258,11 @@ inline fun <C : Collection<E>, E> C?.ifNotNullOrEmpty(block: Consumer<C>): C? {
 }
 
 /**
- * Executes the given action on the iterable if it contains the specified element.
+ * Executes the given action on the iterables if it contains the specified element.
  *
- * @param element The element to check for in the iterable.
+ * @param element The element to check for in the iterables.
  * @param action The action to be performed if the element is found.
- * @return The original iterable.
+ * @return The original iterables.
  * @since 5.0.0
  */
 @IgnorableReturnValue
@@ -998,11 +1339,11 @@ inline fun <C : Collection<E>, E> C.ifSingleElement(action: Consumer<C>): C {
 }
 
 /**
- * Filters elements in the iterable based on their index, keeping only those at positions
+ * Filters elements in the iterables based on their index, keeping only those at positions
  * that are multiples of the specified step value.
  *
  * @param step The interval between indices to consider for filtering. Must be greater than 0.
- * @return A list of elements from the original iterable, selected at the specified step interval.
+ * @return A list of elements from the original iterables, selected at the specified step interval.
  * @since 1.0.0
  */
 infix fun <E> Iterable<E>.step(step: Int) =  filterIndexed { index, c -> index % step == 0 }
@@ -1288,11 +1629,11 @@ operator fun <E> List<E>.invoke(circularIndex: Int): E {
 }
 
 /**
- * Filters the elements of the iterable based on the provided predicate.
+ * Filters the elements of the iterables based on the provided predicate.
  *
- * This operator function allows the use of the `invoke` function to apply a filter directly to an iterable collection. 
+ * This operator function allows the use of the `invoke` function to apply a filter directly to an iterables collection.
  *
- * @param filter the predicate used to test each element in the iterable. Only elements that satisfy the predicate will be included in the resulting collection.
+ * @param filter the predicate used to test each element in the iterables. Only elements that satisfy the predicate will be included in the resulting collection.
  * @since 1.0.0
  */
 inline operator fun <E> Iterable<E>.invoke(filter: Predicate<E>): List<E> {
@@ -1302,9 +1643,9 @@ inline operator fun <E> Iterable<E>.invoke(filter: Predicate<E>): List<E> {
 }
 
 /**
- * Retrieves the first element in the iterable that matches the given predicate.
+ * Retrieves the first element in the iterables that matches the given predicate.
  *
- * @param E The type of elements in the iterable.
+ * @param E The type of elements in the iterables.
  * @param find A predicate used to determine the matching element.
  * @return The first element that satisfies the predicate.
  * @since 1.0.0
@@ -1314,30 +1655,17 @@ inline operator fun <E> Iterable<E>.get(find: Predicate<E>): E? {
     return null
 }
 /**
- * Retrieves the first element in the iterable that matches the given predicate.
+ * Retrieves the first element in the iterables that matches the given predicate.
  *
- * @param E The type of elements in the iterable.
+ * @param E The type of elements in the iterables.
  * @param find A predicate used to determine the matching element.
  * @param lazyException A supplier for the exception to be thrown if no element is found.
  * @return The first element that satisfies the predicate.
  * @since 1.0.0
  */
-operator fun <E> Iterable<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier) = find(find) ?: throw lazyException()
-
-/**
- * Searches for the first element in the iterable that matches the specified predicate and returns it.
- * If no element is found, a specified exception is thrown.
- *
- * @param lazyException a supplier that provides the exception to be thrown if no element is found
- * @param find the predicate to apply to elements of the iterable
- * @throws Throwable if no element in the iterable matches the predicate
- * @since 1.0.0
- */
-fun <E> Iterable<E>.findOrThrow(lazyException: ThrowableSupplier = { NoSuchElementException("No element found") }, find: Predicate<E>): E & Any {
-    contract {
-        callsInPlace(lazyException, InvocationKind.AT_MOST_ONCE)
-    }
-    return find(find) ?: throw lazyException()
+operator fun <E> Iterable<E>.get(find: Predicate<E>, lazyException: ThrowableSupplier): E {
+    for (element in this) if (find(element)) return element
+    throw lazyException()
 }
 
 /**
@@ -1393,8 +1721,8 @@ operator fun <E> List<E>.get(percentage: Percentage) = percent(percentage)
  * @return the element at the specified index if it exists and is not null.
  * @since 1.0.0
  */
-operator fun <E> List<E>.get(index: Int, lazyException: ThrowableSupplier = { NoSuchElementException("Index $index not present") }): E =
-    getOrNull(index) ?: throw lazyException()
+operator fun <E> List<E>.get(index: Int, lazyException: ThrowableSupplier = { IndexOutOfBoundsException("Index $index not present") }): E =
+    try { this[index] } catch (_: Exception) { throw lazyException() }
 
 /**
  * Sorts the list based on the specified sorting direction and a selector function.
@@ -1467,7 +1795,7 @@ inline fun <E, R : Comparable<R>> Iterable<E>.sortedBy(direction: SortDirection,
  * @since 1.0.0
  */
 @Deprecated("Use this[range] instead", ReplaceWith("this.get(range)", "dev.tommasop1804.kutils.get"))
-infix fun <E> List<E>.subList(range: IntProgression): List<E> {
+fun <E> List<E>.subList(range: IntProgression): List<E> {
     val list = mutableListOf<E>()
     for (i in range) list.add(this[i])
     return list
@@ -1487,10 +1815,45 @@ infix fun <E> List<E>.subList(range: IntProgression): List<E> {
  */
 @Deprecated("Use this[range] instead", ReplaceWith("this.get(range)", "dev.tommasop1804.kutils.get"))
 @JvmName("mutableListSubList")
-infix fun <E> MutableList<E>.subList(range: IntProgression): List<E> {
+fun <E> MutableList<E>.subList(range: IntProgression): List<E> {
     val list = mutableListOf<E>()
     for (i in range) list.add(this[i])
     return list
+}
+
+/**
+ * Creates a sublist from the current list or returns an error if the specified indices
+ * are out of bounds.
+ *
+ * @param E The type of elements in the list.
+ * @param fromIndex The starting index (inclusive) for the sublist.
+ *                   Must be greater than or equal to 0 and less than or equal to the size of the list.
+ * @param toIndex The ending index (exclusive) for the sublist.
+ *                 Defaults to the size of the list if not provided.
+ *                 Must be greater than or equal to `fromIndex` and less than or equal to the size of the list.
+ * @return An `Either` object containing the resulting sublist if valid indices are provided,
+ *         or an `IndexOutOfBounds` error if the indices are invalid.
+ * @since 6.1.0
+ */
+fun <E> List<E>.subListOrError(fromIndex: Int, toIndex: Int = size) = either {
+    catching({ this@subListOrError.subList(fromIndex, toIndex) }) { e: IndexOutOfBoundsException ->
+        IndexOutOfBounds(tryOrNull { e.message.orEmpty().let { (it / Char.SPACE).second().toInt() } })
+    }
+}
+/**
+ * Extracts a sublist of elements from a list using the given range or raises an error if the indices are out of bounds.
+ * The retrieved sublist is determined by the specified range of indices, and any `IndexOutOfBoundsException`
+ * is transformed into a custom `IndexOutOfBounds` error.
+ *
+ * @param range The progression of indices specifying the range of elements to extract from the list.
+ *              If the range is out of bounds for the list, an `IndexOutOfBounds` error is raised.
+ * @return Either a successful sublist (`Right`) or an error (`Left`) in case of an invalid range.
+ * @since 6.1.0
+ */
+fun <E> List<E>.subListOrError(range: IntProgression) = either {
+    catching({ this@subListOrError[range] }) { e: IndexOutOfBoundsException ->
+        IndexOutOfBounds(tryOrNull { e.message.orEmpty().let { (it / Char.SPACE).second().toInt() } })
+    }
 }
 
 /**
@@ -1595,6 +1958,23 @@ infix fun <E> List<E>.percent(p: Percentage): E {
     val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()
     return this[index]
 }
+/**
+ * Retrieves an element from the list based on the given percentage.
+ * The percentage is used to calculate the index of the element to retrieve.
+ * Returns the element wrapped in an `Either` structure or an error if the operation fails.
+ *
+ * @param p The percentage value used to determine the element's position. It must be between 0 and 100.
+ * @return Either an `IndexOutOfBoundsErrors` if the index is invalid or the element at the calculated position.
+ * @since 6.1.0
+ */
+infix fun <E> List<E>.percentOrError(p: Percentage): Either<IndexOutOfBoundsError, E> = either {
+    ensure(isNotEmpty()) { Empty }
+    validate(p.isNotOverflowing) { "Percentage must be between 0 and 100." }
+    val index = if (p.isFull) size - 1 else (p.toDouble() / 100 * size).toInt()
+    catching({ this@percentOrError[index] }) { e: IndexOutOfBoundsException ->
+        IndexOutOfBounds(tryOrNull { e.message.orEmpty().let { (it / Char.SPACE).second().toInt() } })
+    }
+}
 
 /**
  * Returns a Map containing key-value pairs provided by transforming
@@ -1632,7 +2012,7 @@ inline fun <E, K, V, M : MutableMap<in K, in V>> Iterable<E>.associateTo(
 ) = associateTo(destination) { key(it) to value(it) }
 
 /**
- * Filters the elements of the given iterable where the value of the specified property is not null.
+ * Filters the elements of the given iterables where the value of the specified property is not null.
  *
  * @param element The property accessor used to evaluate each element's property for null-checking.
  * @return A list containing only the elements where the specified property is not null.
@@ -1642,7 +2022,7 @@ inline infix fun <E, R> Iterable<E>.filterNotNull(element: Transformer<E, R>) =
     filter { element(it) != null }
 
 /**
- * Filters the elements of the given iterable where the value of the specified property is null.
+ * Filters the elements of the given iterables where the value of the specified property is null.
  *
  * @param element The property accessor used to evaluate each element's property for null-checking.
  * @return A list containing only the elements where the specified property is null.
@@ -1662,7 +2042,7 @@ operator fun <E> MCollection<E>.minusAssign(removeIf: Predicate<E>) {
 }
 
 /**
- * Returns a list containing elements of the original iterable excluding those that match the given predicate.
+ * Returns a list containing elements of the original iterables excluding those that match the given predicate.
  *
  * @param filterNot The predicate used to test whether an element should be excluded.
  * @return A list of elements excluding those that match the predicate.
@@ -1673,12 +2053,12 @@ operator fun <E> Iterable<E>.minus(filterNot: Predicate<E>) = filterNot(filterNo
 /**
  * Stands for `controlledEach`. You can use [continueLoop] and [breakLoop].
  *
- * Iterates through each element in the iterable collection and applies the given block of code to it.
- * Returns the original iterable collection after the operation.
+ * Iterates through each element in the iterables collection and applies the given block of code to it.
+ * Returns the original iterables collection after the operation.
  *
- * @param E the type of elements in the iterable collection.
+ * @param E the type of elements in the iterables collection.
  * @param block the action to be performed on each element.
- * @return the original iterable collection after applying the block to each element.
+ * @return the original iterables collection after applying the block to each element.
  * @since 2.0.0
  */
 inline fun <T : Iterable<E>, E> T.cForEach(block: ReceiverBiConsumer<LoopContext, E>) = apply {
@@ -1697,14 +2077,14 @@ inline fun <T : Iterable<E>, E> T.cForEach(block: ReceiverBiConsumer<LoopContext
 /**
  * Stands for `controlledEachIndexed`. You can use [continueLoop] and [breakLoop].
  *
- * Iterates over each element in the iterable along with its index, allowing processing within a loop context.
+ * Iterates over each element in the iterables along with its index, allowing processing within a loop context.
  *
  * This method provides a custom loop control mechanism using `LoopContext`. It supports breaking or continuing
  * the loop execution through the utilization of `Break` and `Continue` exceptions respectively.
  *
- * @param E the type of elements in the iterable.
+ * @param E the type of elements in the iterables.
  * @param block a lambda function that accepts the `LoopContext`, the index of the current element, and the current element itself.
- *              The `block` is executed for each element in the iterable.
+ *              The `block` is executed for each element in the iterables.
  * @since 2.0.0
  */
 inline fun <T : Iterable<E>, E> T.cForEachIndexed(block: ReceiverTriConsumer<LoopContext, Int, E>) = apply {
@@ -1724,14 +2104,14 @@ inline fun <T : Iterable<E>, E> T.cForEachIndexed(block: ReceiverTriConsumer<Loo
 /**
  * Stands for `eachWithReturn`. You can use [continueLoop] and [breakLoop] to return a value.
  *
- * Performs the given [action] on each element of the iterable. If a `Break` exception is thrown during
+ * Performs the given [action] on each element of the iterables. If a `Break` exception is thrown during
  * the iteration, the result encapsulated within the `Break` is returned. If no `Break` is thrown,
  * the method returns `null`.
  *
- * @param action The action to be performed on each element in the iterable. The action can throw a
+ * @param action The action to be performed on each element in the iterables. The action can throw a
  * `Break` to provide a custom result and terminate the iteration early.
  * @return The result enclosed in the `Break` exception if thrown during the iteration, or `null`
- * if the entire iterable is processed without interruption.
+ * if the entire iterables is processed without interruption.
  * @since 2.0.0
  */
 @Suppress("UNCHECKED_CAST")
@@ -1778,7 +2158,7 @@ inline fun <T : Iterable<E>, E, R> T.rForEachIndexed(action: ReceiverTriConsumer
 }
 
 /**
- * Converts the elements in the iterable into a string, separated by the specified separator,
+ * Converts the elements in the iterables into a string, separated by the specified separator,
  * starting with the given prefix and ending with the given postfix.
  *
  * This method allows customization of how elements are represented through a transform function
@@ -1789,35 +2169,35 @@ inline fun <T : Iterable<E>, E, R> T.rForEachIndexed(action: ReceiverTriConsumer
  * @param postfix The character sequence added to the end of the resulting string. Default is an empty string.
  * @param limit The maximum number of elements to include in the resulting string. A negative value means no limit. Default is -1.
  * @param truncated The character sequence that replaces omitted elements if the limit is applied. Default is "...".
- * @param transform An optional lambda function for transforming each element in the iterable to a CharSequence. If null, default string conversion is used.
+ * @param transform An optional lambda function for transforming each element in the iterables to a CharSequence. If null, default string conversion is used.
  * @since 1.0.0
  */
 fun <E> Iterable<E>.joinToString(separator: Char, prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: Transformer<E, CharSequence>? = null) =
     joinTo(StringBuilder(), separator.toString(), prefix, postfix, limit, truncated, transform).toString()
 
 /**
- * Processes the elements of the iterable using the provided collector,
+ * Processes the elements of the iterables using the provided collector,
  * combining elements into a single result as defined by the collector implementation.
  *
- * @param E the type of elements in the iterable
+ * @param E the type of elements in the iterables
  * @param A an intermediate accumulation type used by the collector
  * @param R the final result type produced by the collector
  * @param collector the collector that defines the logic for accumulation and final result construction
- * @return the result generated by the collector after processing all elements of the iterable
+ * @return the result generated by the collector after processing all elements of the iterables
  * @since 1.0.0
  */
 fun <E, A, R> Iterable<E>.legacyCollect(collector: Collector<E, A, R>): R = toList().stream().collect(collector)
 /**
- * Processes the elements of the iterable using a mutable result container. Elements are supplied,
+ * Processes the elements of the iterables using a mutable result container. Elements are supplied,
  * accumulated, and combined using the provided functions.
  *
  * @param supplier a function that provides a new result container. This is responsible for creating
  *                 the result object where elements will be accumulated.
  * @param accumulator a function that incorporates an element into a result container. This function
- *                    defines how each item of the iterable should modify the result container.
+ *                    defines how each item of the iterables should modify the result container.
  * @param combiner a function that combines two result containers into one. This is used to merge results
  *                 when parallel processing or splitting of tasks occurs.
- * @return the final result obtained by accumulating all elements of the iterable, potentially combining
+ * @return the final result obtained by accumulating all elements of the iterables, potentially combining
  *         multiple intermediate results into one.
  * @since 1.0.0
  */

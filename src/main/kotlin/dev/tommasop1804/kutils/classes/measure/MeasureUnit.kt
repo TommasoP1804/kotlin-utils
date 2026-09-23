@@ -153,6 +153,7 @@ open class MeasureUnit internal constructor(override val measure: String, overri
          */
         val knownUnitsConsts: Set<ScalarUnit>
             get() = TimeUnit.KNOWN_SYMBOLS
+                .asSequence()
                 .plus(LengthUnit.KNOWN_SYMBOLS)
                 .plus(MassUnit.KNOWN_SYMBOLS)
                 .plus(TemperatureUnit.KNOWN_SYMBOLS)
@@ -166,6 +167,7 @@ open class MeasureUnit internal constructor(override val measure: String, overri
                 .plus(AccelerationUnit.KNOWN_SYMBOLS)
                 .plus(DensityUnit.KNOWN_SYMBOLS)
                 .plus(DataSizeUnit.KNOWN_SYMBOLS)
+                .toSet()
 
         /**
          * A computed property that provides a unique set of all known `MeasureUnit` instances.
@@ -400,7 +402,7 @@ open class MeasureUnit internal constructor(override val measure: String, overri
         result = 31 * result + isAcceptedBySI.hashCode()
         result = 31 * result + measure.hashCode()
         result = 31 * result + unitName.hashCode()
-        result = 31 * result + (symbol?.hashCode() ?: 0)
+        result = 31 * result + symbol.hashCode()
         return result
     }
 

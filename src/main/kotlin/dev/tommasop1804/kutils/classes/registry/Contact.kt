@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.classes.geography.*
+import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import jakarta.persistence.AttributeConverter
 import org.jetbrains.exposed.v1.core.Column
@@ -29,6 +31,7 @@ import java.time.OffsetDateTime
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjuster
 import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 
 /**
  * Represents a contact entity with various details such as name, jobs, communication methods,
@@ -778,18 +781,25 @@ data class Contact(
             fun CharSequence.isValidEmail() = runCatching { Email(toString()) }.isSuccess
 
             /**
-             * Converts the current [CharSequence] into an instance of the [Email] class.
+             * Converts the current character sequence into an `Email` instance, validating its correctness.
              *
-             * The resulting [Email] object encapsulates the string representation of the email address.
-             * This method can be used to create a strongly-typed representation of an email address
-             * from a general text-based [CharSequence].
+             * This function attempts to create an `Email` object from the current character sequence. If the conversion
+             * is successful, the result is returned as a `Right` containing the `Email` instance. If an error occurs
+             * during the conversion due to an invalid format, the error is captured as a `Left` containing an
+             * `InvalidFormatOfType` object, which provides details about the invalid value, the expected type,
+             * and the reason for failure.
              *
-             * @receiver [CharSequence] to be converted to an [Email].
-             * @return an [Email] instance representing the same email address as the [CharSequence],
-             * wrapped in a [Result].
-             * @since 1.0.0
+             * @receiver The character sequence that is to be converted into an `Email` instance.
+             * @return An `Either` value:
+             *         - `Right<Email>` representing the successfully created `Email` instance.
+             *         - `Left<InvalidFormatOfType>` representing the error encountered during the conversion.
+             * @since 6.1.0
              */
-            fun CharSequence.toEmail() = runCatching { Email(toString()) }
+            fun CharSequence.toEmail() = either {
+                catching({ Email(this@toEmail.toString()) }) { t: Throwable ->
+                    InvalidFormatOfType(this@toEmail, typeOf<Email>(), t)
+                }
+            }
 
             class Serializer : ValueSerializer<Email>() {
                 override fun serialize(
@@ -1319,20 +1329,28 @@ data class Contact(
             fun CharSequence.isValidPhoneNumber() = runCatching { PhoneNumber(toString()) }.isSuccess
 
             /**
-             * Converts the current [CharSequence] into an instance of the [PhoneNumber] class.
+             * Converts the given [CharSequence] into a `PhoneNumber` instance.
              *
-             * This method creates a strongly-typed representation of a phone number
-             * from a general text-based [CharSequence].
+             * This method attempts to parse the input [CharSequence] as a `PhoneNumber`. It returns an
+             * `Either` result where:
+             * - `Right<PhoneNumber>` represents a successfully parsed phone number.
+             * - `Left<InvalidFormatOfType>` represents a failure to parse the input, containing details about the invalid value,
+             *   the expected target type, and the underlying exception that caused the failure.
              *
-             * The resulting [PhoneNumber] object encapsulates the string representation
-             * of the phone number.
+             * The parsing process is designed to handle errors gracefully using a functional error-handling approach.
+             * If an exception occurs during the parsing logic, it is caught and transformed into an `InvalidFormatOfType`
+             * instance containing metadata about the failure.
              *
-             * @receiver [CharSequence] to be converted to a [PhoneNumber].
-             * @return a [Result] wrapping the [PhoneNumber] instance created from the [CharSequence].
-             * If the conversion fails, the [Result] will contain the corresponding exception.
-             * @since 1.0.0
+             * @receiver The [CharSequence] to be converted into a `PhoneNumber` instance.
+             * @return An `Either` type that contains either the successfully parsed `PhoneNumber` or an `InvalidFormatOfType`
+             *         error in case of failure.
+             * @since 6.1.0
              */
-            fun CharSequence.toPhoneNumber() = runCatching { PhoneNumber(toString()) }
+            fun CharSequence.toPhoneNumber() = either {
+                catching({ PhoneNumber(this@toPhoneNumber.toString()) }) { t: Throwable ->
+                    InvalidFormatOfType(this@toPhoneNumber, typeOf<PhoneNumber>(), t)
+                }
+            }
 
             class Serializer : ValueSerializer<PhoneNumber>() {
                 override fun serialize(
