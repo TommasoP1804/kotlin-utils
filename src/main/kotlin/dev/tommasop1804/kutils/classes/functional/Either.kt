@@ -314,6 +314,19 @@ inline fun <L, R> Either<L, R>.onRight(block: Consumer<R>): Either<L, R> {
 }
 
 /**
+ * Returns the value encapsulated in the `Right` instance of this `Either`, or the result
+ * of the provided `default` supplier if this `Either` is a `Left`.
+ *
+ * @param default A supplier function that provides a default value in case this `Either` is a `Left`.
+ * @return The value of type `R` if this is a `Right`, or the result of the `default` supplier if this is a `Left`.
+ * @since 6.1.2
+ */
+fun <E, R> Either<E, R>.getOrElse(default: Supplier<R>) = when (this) {
+    is Left -> default()
+    is Right -> this.value
+}
+
+/**
  * Converts the current value into an `Either` by evaluating if the value is `null`.
  * If the value is not `null`, it is returned as `Right` in the resulting `Either`.
  * If the value is `null`, the provided supplier function is invoked to produce a `Left` value.
