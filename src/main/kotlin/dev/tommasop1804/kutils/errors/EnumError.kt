@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.errors
 
+import kotlin.reflect.KClass
+
 /**
  * Represents an error associated with an enumeration value (`enum`).
  * This class serves as the base for describing problems related to specific
@@ -15,7 +17,7 @@ package dev.tommasop1804.kutils.errors
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-open class EnumError(open val enum: Enum<*>) {
+open class EnumError(open val enum: KClass<out Enum<*>>) {
     /**
      * Represents an error that occurs when a specific entry is not found within an enumeration.
      *
@@ -30,5 +32,5 @@ open class EnumError(open val enum: Enum<*>) {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class NoSuchEntry(override val enum: Enum<*>, val entry: String) : EnumError(enum), ParsingError
+    data class NoSuchEntry(override val enum: KClass<out Enum<*>>, val entry: String) : EnumError(enum), ParsingError
 }

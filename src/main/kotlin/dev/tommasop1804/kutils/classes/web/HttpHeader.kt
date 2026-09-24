@@ -27,12 +27,14 @@ import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCEPT
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCEPT_CHARSET
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCEPT_LANGUAGE
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCEPT_PATCH
+import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCEPT_RANGES
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCESS_CONTROL_ALLOW_CREDENTIALS
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCESS_CONTROL_ALLOW_METHODS
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCESS_CONTROL_MAX_AGE
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ACCESS_CONTROL_REQUEST_METHOD
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ALLOW
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.AUTHORIZATION
+import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.CONNECTION
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.CONTENT_LANGUAGE
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.CONTENT_LENGTH
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.CONTENT_TYPE
@@ -43,6 +45,9 @@ import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.IF_MODIFIED_SINC
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.IF_UNMODIFIED_SINCE
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LAST_MODIFIED
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.LOCATION
+import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.ORIGIN
+import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.PRIORITY
+import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.REFERER
 import dev.tommasop1804.kutils.classes.web.HttpHeader.Companion.headerDateToInstant
 import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
@@ -65,6 +70,7 @@ import java.util.*
 import java.util.Locale.LanguageRange
 import kotlin.reflect.typeOf
 import kotlin.text.Charsets.ISO_8859_1
+import kotlin.toString
 
 /**
  * Represents an HTTP header consisting of a name and associated values, implemented as a key-value pair
@@ -134,13 +140,13 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
      * context of the HTTP request, such as client preferences or origin details. 
      * This property will return `true` if the header name matches one of the 
      * predefined headers: `ACCEPT`, `ACCEPT_CHARSET`, `ACCEPT_ENCODING`,
-     * `ACCEPT_LANGUAGE`, `ACCEPT_RANGES`, `HOST`, `REFERER`, `ORIGIN`, or 
+     * `ACCEPT_LANGUAGE`, `ACCEPT_RANGES`, `HOST`, `REFERER`, `ORIGIN`, `PRIORITY` or
      * `USER_AGENT`.
      *
      * @since 2.1.0
      */
     val isRequestContextHeader
-        get() = name in setOf(ACCEPT, ACCEPT_CHARSET, ACCEPT_ENCODING, ACCEPT_LANGUAGE, ACCEPT_RANGES, HOST, REFERER, ORIGIN, USER_AGENT)
+        get() = name in setOf(ACCEPT, ACCEPT_CHARSET, ACCEPT_ENCODING, ACCEPT_LANGUAGE, ACCEPT_RANGES, HOST, REFERER, ORIGIN, USER_AGENT, PRIORITY)
     /**
      * Indicates whether the HTTP header name corresponds to a CORS (Cross-Origin Resource Sharing) header.
      *
@@ -282,6 +288,7 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
         const val HOST = "Host"
         const val REFERER = "Referer"
         const val ORIGIN = "Origin"
+        const val PRIORITY = "Priority"
         const val USER_AGENT = "User-Agent"
 
         // CORS
@@ -1776,21 +1783,23 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * - [IterableError.NotFound] - The header was not found in the request.
      * - [InvalidFormatOfType] - The header value is malformed.
      *
+     * @param key The header key to retrieve the Bearer authentication token from. Defaults to "Authorization".
      * @return An `Either` instance where the left side represents an `Error` in case of failure, and
      *         the right side represents a `Jwt` object if the operation is successful.
      * @since 6.1.0
      */
-    fun getBearerAuth(): Either<Error, Jwt> = getOrError(AUTHORIZATION)
+    fun getBearerAuth(key: String = AUTHORIZATION): Either<Error, Jwt> = getOrError(key)
         .thenMergeWith { it.firstOrError() }
         .mapLeft { IterableError.NotFound(AUTHORIZATION) }
         .thenMergeWith { it.toJwt() }
     /**
      * Sets the Bearer Authorization header with the provided JWT token.
      *
+     * @param key The header key to retrieve the Bearer authentication token from. Defaults to "Authorization".
      * @param token The JWT token to use in the Authorization header.
-     * @since 3.0.0
+     * @since 6.1.0
      */
-    fun setBearerAuth(token: Jwt) = set(AUTHORIZATION, token.toString(true))
+    fun setBearerAuth(key: String = AUTHORIZATION, token: Jwt) = set(key, token.toString(true))
     /**
      * Sets the Authorization header to use Basic Authentication with the provided encoded credentials.
      *
@@ -2106,4 +2115,142 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      * @since 3.0.0
      */
     fun setLocation(value: Uri) = set(LOCATION, value.toString())
+
+    /**
+     * Retrieves a connection behavior wrapped in an Either structure, providing error handling for
+     * various possible failure scenarios during the retrieval process.
+     *
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [EnumError.NoSuchEntry] - The header value is malformed.
+     *
+     * @return Either an error indicating the failure reason or the successfully retrieved ConnectionBehaviour.
+     * @since 6.1.1
+     */
+    fun getConnection(): Either<Error, ConnectionBehaviour> = getOrError(CONNECTION)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(CONNECTION) }
+        .thenMergeWith { ConnectionBehaviour.of(it) orError { EnumError.NoSuchEntry(ConnectionBehaviour::class, it) } }
+    /**
+     * Sets the connection behavior for the current operation.
+     *
+     * @param value An instance of ConnectionBehaviour that defines
+     * the behavior to be applied.
+     * @since 6.1.1
+     */
+    fun setConnection(value: ConnectionBehaviour) = set(CONNECTION, value.value)
+
+    /**
+     * Determines if the "Accept-Ranges" header indicates support for byte-range requests.
+     *
+     * @return Either an error indicating a failure in retrieving or processing the "Accept-Ranges" header,
+     *         or a Boolean where true indicates support for byte-range requests and false otherwise.
+     * @since 6.1.1
+     */
+    fun getAcceptRanges(): Either<Error, Boolean> = getOrError(ACCEPT_RANGES)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(ACCEPT_RANGES) }
+        .map { it == "bytes" }
+    /**
+     * Sets the "Accept-Ranges" header value to indicate whether the server supports range requests.
+     *
+     * @param value A Boolean indicating support for range requests.
+     *              Pass `true` to set the header to "bytes", indicating support for range requests.
+     *              Pass `false` to set the header to "none", indicating that range requests are not supported.
+     * @since 6.1.1
+     */
+    fun setAcceptRanges(value: Boolean) = set(ACCEPT_RANGES, if (value) "bytes" else "none")
+
+    /**
+     * Retrieves the "Origin" header.
+     *
+     * Possible errors:
+     * - [IterableError.NotFound] - The header was not found in the request.
+     * - [InvalidFormatOfType] - The header value is malformed.
+     *
+     * @return An `Either` containing the origin as a `Uri` if retrieval and processing are successful,
+     *         or an `Error` if any step in the process fails.
+     * @since 6.1.1
+     */
+    fun getOrigin(): Either<Error, Uri> = getOrError(ORIGIN)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(ORIGIN) }
+        .thenMergeWith { it.toUri() }
+    /**
+     * Sets the origin value as a string representation of the given Uri.
+     *
+     * @param value The Uri to be set as the origin.
+     * @since 6.1.1
+     */
+    fun setOrigin(value: Uri) = set(ORIGIN, value.toString())
+
+    /**
+     * Retrieves the priority from a predefined configuration or input.
+     *
+     * This method parses the priority value and determines its associated attributes.
+     * It employs error handling to account for missing or malformed data within the
+     * priority configuration. The priority value is expected to follow a specific
+     * pattern, supporting cases where the value begins with "u=" and may include an
+     * optional additional flag (e.g., "i").
+     *
+     * @return An `Either` type containing an `Error` or a `Pair` where the first
+     *         element is an integer priority value and the second element is a
+     *         Boolean flag indicating additional characteristics.
+     * @since 6.1.1
+     */
+    fun getPriority() = (getOrError(PRIORITY)
+        .map { it.joinToString() }
+        .mapLeft { IterableError.NotFound(PRIORITY) } as Either<Error, String>)
+        .thenEither { if (it startsWith "u=") {
+            if (Char.COMMA in it) it.split(Char.COMMA).run { first().after("u=").toIntOrError().bind() to (second() == "i") }
+            else (it after "u=").toIntOrError().bind() to false
+        } else 3 to (it startsWith "i") }
+    /**
+     * Sets the priority value based on the given parameters.
+     *
+     * @param pair A pair where the first element is an integer representing the priority level,
+     *             coerced to a range of 0 to 7, and the second element is a boolean indicating
+     *             whether an additional property ('i') should be appended.
+     * @since 6.1.1
+     */
+    fun setPriority(pair: Pair<Int, Boolean>) =
+        set(PRIORITY, "u=${pair.first.coerceIn(0, 7)}".asSingleList().letIf(pair.second) { it + "i" })
+    /**
+     * Sets the priority level for a specific operation. The priority value
+     * determines the importance of the operation, influencing how it is handled
+     * or executed. The priority is clamped to a range between 0 and 7.
+     *
+     * @param priority The priority level to be assigned, where 0 represents
+     * the lowest priority and 7 represents the highest priority. Defaults to 3
+     * if not specified.
+     * @param incremental A flag indicating whether the priority should be
+     * treated incrementally. If true, an additional incremental marker is applied.
+     * @since 6.1.1
+     */
+    fun setPriority(priority: Int = 3, incremental: Boolean) =
+        set(PRIORITY, "u=${priority.coerceIn(0, 7)}".asSingleList().letIf(incremental) { it + "i" })
+
+    /**
+     * Retrieves the referer value through a series of transformations and error handling.
+     *
+     * This method performs the following operations sequentially:
+     * - Attempts to retrieve the referer using `getOrError` with the specified `REFERER` key.
+     * - Merges the result with the first element of the resolved referer, converting it into a single value or error.
+     * - Maps left-side errors to an instance of `IterableError.NotFound` with the `REFERER` key for context.
+     * - Converts the resulting referer into a URI representation.
+     *
+     * @return The transformed referer, or an appropriate error if any step fails.
+     * @since 6.1.1
+     */
+    fun getReferer() = getOrError(REFERER)
+        .thenMergeWith { it.firstOrError() }
+        .mapLeft { IterableError.NotFound(REFERER) }
+        .thenMergeWith { it.toUri() }
+    /**
+     * Sets the referer header for a request.
+     *
+     * @param uri The URI to be set as the referer.
+     * @since 6.1.1
+     */
+    fun setReferer(uri: Uri) = set(REFERER, uri.toString())
 }
