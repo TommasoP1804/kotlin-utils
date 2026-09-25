@@ -6,57 +6,33 @@
 
 package dev.tommasop1804.kutils.errors
 
+import dev.tommasop1804.kutils.exceptions.*
 import java.io.File
-import java.nio.file.Path
+import java.io.FileNotFoundException
 
 /**
  * Represents an error related to file operations or file handling.
  *
- * This class serves as a base for defining structured errors that occur
+ * This interface serves as a base for defining structured errors that occur
  * in the context of file-related operations. It provides information about
  * the file involved and an optional reason to describe the specific error scenario.
- *
- * @property file The file associated with the error.
- * @property reason An optional message detailing the specific reason or context of the error.
- *
- * @constructor Creates a new instance of `FileError` using a `File` object and an optional reason.
- * @constructor Creates a new instance of `FileError` using a `Path` object and an optional reason.
  *
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-open class FileError(open val file: File, open val reason : String? = null) : Error {
+interface FileError : Error {
     /**
-     * Secondary constructor for the FileError class, allowing initialization using a Path instance
-     * instead of a File instance. Converts the given Path to a File and delegates to the primary constructor.
+     * Represents the file associated with a file-related error.
      *
-     * @param path The file path object to be converted to a File.
-     * @param reason An optional string providing additional information about the error.
-     * Defaults to null if not specified.
-     * @since 6.1.0
+     * This property provides access to the file involved in the error scenario,
+     * allowing for detailed inspection or further processing related to the file.
+     *
+     * Typical use cases include identifying the file that caused the error, retrieving
+     * metadata about the file, or performing operations to resolve the error condition.
+     *
+     * @since 6.1.3
      */
-    constructor(path: Path, reason: String? = null) : this(path.toFile(), reason)
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as FileError
-
-        if (file != other.file) return false
-        if (reason != other.reason) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = file.hashCode()
-        result = 31 * result + reason.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "FileError(file=$file, reason=$reason)"
-    }
+    val file: File
 
     /**
      * Represents an error caused by a file not being found.
@@ -70,7 +46,9 @@ open class FileError(open val file: File, open val reason : String? = null) : Er
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class FileNotFound(override val file: File) : FileError(file)
+    data class FileNotFound(override val file: File) : FileError {
+        override val linkedException = FileNotFoundException(file.path)
+    }
     /**
      * Represents an error caused by an invalid file extension.
      *
@@ -83,5 +61,7 @@ open class FileError(open val file: File, open val reason : String? = null) : Er
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class InvalidExtension(override val file: File) : FileError(file, "Invalid ${file.extension} extension")
+    data class InvalidExtension(override val file: File) : FileError {
+        override val linkedException = InvalidFileExtensionException(file)
+    }
 }

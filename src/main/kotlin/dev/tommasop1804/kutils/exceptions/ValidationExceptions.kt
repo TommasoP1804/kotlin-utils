@@ -5,7 +5,8 @@
 package dev.tommasop1804.kutils.exceptions
 
 import dev.tommasop1804.kutils.*
-import dev.tommasop1804.kutils.classes.coding.JsonSchema
+import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.classes.constants.*
 import dev.tommasop1804.kutils.classes.range.*
 import kotlin.reflect.*
 
@@ -1224,6 +1225,24 @@ open class NumberSignException : ValidationFailedException {
      */
     constructor() : super()
     /**
+     * Constructs a `NumberSignException` with a detailed error message that includes the invalid sign,
+     * the associated number, and a list of valid signs if provided.
+     *
+     * @param number the numeric value whose sign is invalid in the given context, or `null` if no number is specified.
+     * @param valid a set of valid `NumberSign` states applicable to the current context, or `null` if not applicable.
+     *
+     * This exception message dynamically constructs details based on the provided arguments:
+     * - If `number` is non-null, it specifies the sign and the value that caused the exception.
+     * - If the `valid` set is non-null or non-empty, it lists the allowable signs for this context.
+     *
+     * The exception extends another class (potentially a custom base exception class),
+     * providing a formatted message to indicate why the provided sign is not valid.
+     *
+     * @since 6.1.3
+     */
+    constructor(number: Number?, valid: Set<NumberSign>? = null) : super("Number sign ${if (number != null) "${number.sign} for number $number " else String.EMPTY}" +
+            "is not valid in this context${if (valid.isNotNullOrEmpty) ". Valids: $valid" else String.EMPTY}")
+    /**
      * Constructs a new NumberSignException with the specified detail message.
      *
      * @param message The detail message that provides additional information about the exception.
@@ -1416,21 +1435,28 @@ open class ValueOutOfRangeException : ValidationFailedException {
      */
     constructor() : super()
     /**
-     * Constructs a `ValueOutOfRangeException` with a message indicating
-     * the provided range within which the value is not included.
+     * Constructs a `ValueOutOfRangeException` with a detailed message indicating
+     * the provided value and the range it was compared against.
      *
-     * @param range The range that the value is not within.
-     * @since 5.0.0
+     * @param value The value that was evaluated. If null, it is represented as an empty string in the message.
+     * @param range The range against which the value was checked. If null, it is omitted from the message.
+     * @since 6.1.3
      */
-    constructor(range: ClosedRange<*>) : super("Value is not in range $range")
+    constructor(value: Any?, range: ClosedRange<*>?) : super("Value ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null ) " $range" else String.EMPTY}")
     /**
-     * Constructs a ValueOutOfRangeException with a detailed message indicating the specified
-     * range that was violated.
+     * Constructs a new ValueOutOfRangeException.
      *
-     * @param range The range object which the value was expected to fall within.
-     * @since 5.0.0
+     * @param value The value that caused the exception. This may be null.
+     * @param range The range that the value was expected to fall within. This may be null.
+     * Combines the provided value and range information into a message indicating that the value
+     * is not within the specified range.
+     *
+     * Inherits from a base exception and formats the exception message dynamically based on the
+     * provided `value` or `range`.
+     *
+     * @since 6.1.3
      */
-    constructor(range: OpenEndRange<*>) : super("Value is not in range $range")
+    constructor(value: Any?, range: OpenEndRange<*>?) : super("Value ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null ) " $range" else String.EMPTY}")
     /**
      * Constructs a new ValueOutOfRangeException with the specified detail message.
      *
@@ -1625,115 +1651,138 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      */
     constructor() : super()
     /**
-     * Constructs a `NumberOutOfRangeException` with a predefined error message indicating
-     * that a number is not within the specified range.
+     * Constructs a `NumberOutOfRangeException` with a customized error message indicating
+     * whether the given number is out of the specified range.
      *
-     * @param range The range of integers that is considered valid.
-     * @since 5.0.0
+     * @param value The number being validated, which can be null.
+     * @param range The valid range the number is expected to fall within.
+     * @since 6.1.3
      */
-    constructor(range: IntRange) : super("Number is not in range $range")
+    constructor(value: Int?, range: IntRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
-     * Constructs a NumberOutOfRangeException with a message indicating that a
-     * number is not within the specified range.
+     * Constructs a new `NumberOutOfRangeException` with a detailed message indicating
+     * that a specified number is not within the given range, considering exclusions.
      *
-     * @param range The range that the number is expected to fall within, where
-     * exclusions may be specified.
-     * @since 5.0.0
+     * @param value The number being validated. Can be null, in which case it is represented as an empty string.
+     * @param range The range with exclusions against which the value is checked.
+     * @since 6.1.3
      */
-    constructor(range: IntRangeWithExclusions) : super("Number is not in range $range")
+    constructor(value: Int?, range: IntRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
-     * Constructs a `NumberOutOfRangeException` with a message indicating that
-     * a number is not within the specified range.
+     * Constructs a `NumberOutOfRangeException` with a detailed error message indicating
+     * that the provided number is not within the specified range.
      *
-     * @param range The range of integers with specific conditions that the number has not met.
-     * @since 5.0.0
+     * @param value The integer value to validate, which can be nullable.
+     * @param range The range within which the provided value is expected to exist,
+     * including any additional conditions encapsulated in `IntRangeWithConditions`.
+     * @since 6.1.3
      */
-    constructor(range: IntRangeWithConditions) : super("Number is not in range $range")
+    constructor(value: Int?, range: IntRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
-     * Constructs a `NumberOutOfRangeException` with a message indicating that
-     * the number is not within the specified range.
-     *
-     * @param range The range of valid numbers that was violated.
-     * @since 5.0.0
-     */
-    constructor(range: UIntRange) : super("Number is not in range $range")
-    /**
-     * Constructs a NumberOutOfRangeException with a message indicating that the number is not within the specified range.
-     *
-     * @param range The range with exclusions that the number is checked against.
-     * @since 5.0.0
-     */
-    constructor(range: UIntRangeWithExclusions) : super("Number is not in range $range")
-    /**
-     * Constructs a NumberOutOfRangeException with a message indicating that
-     * the number is not within the specified range.
-     *
-     * @param range The range against which the number was validated.
-     * @since 5.0.0
-     */
-    constructor(range: UIntRangeWithConditions) : super("Number is not in range $range")
-    /**
-     * Constructs a new instance of NumberOutOfRangeException with a message indicating the range.
-     *
-     * @param range The range that the number is expected to be within.
-     * @since 5.0.0
-     */
-    constructor(range: LongRange) : super("Number is not in range $range")
-    /**
-     * Constructs a NumberOutOfRangeException with a message indicating that
-     * a number is not within the specified range.
-     *
-     * @param range The range with exclusions against which the number is being compared.
-     * @since 5.0.0
-     */
-    constructor(range: LongRangeWithExclusions) : super("Number is not in range $range")
-    /**
-     * Constructs a `NumberOutOfRangeException` with a detailed message indicating that a number is
-     * not within the specified range.
-     *
-     * @param range the range of numbers with conditions that is used to construct the exception message.
-     * @since 5.0.0
-     */
-    constructor(range: LongRangeWithConditions) : super("Number is not in range $range")
-    /**
-     * Constructs a [NumberOutOfRangeException] with a message indicating that a number
+     * Constructs a `NumberOutOfRangeException` with a message indicating that the provided number
      * is not within the specified range.
      *
-     * @param range The range of unsigned long values that the number is expected to be in.
-     * @since 5.0.0
+     * @param value The unsigned integer value being validated. If null, it indicates no specific number.
+     * @param range The valid range for the number.
+     * @since 6.1.3
      */
-    constructor(range: ULongRange) : super("Number is not in range $range")
+    constructor(value: UInt?, range: UIntRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
-     * Constructs a `NumberOutOfRangeException` with an error message indicating that a number
-     * is not within the provided range, including its exclusions.
+     * Constructs a new NumberOutOfRangeException with a message indicating
+     * the given unsigned integer value and the range it is not within.
      *
-     * @param range The range, including any exclusions, that the number is expected to be within.
-     * @since 5.0.0
+     * @param value The unsigned integer value that is not in the specified range.
+     *              If null, indicates an unspecified value.
+     * @param range The range against which the value was checked for validity,
+     *              potentially including exclusions.
+     * @since 6.1.3
      */
-    constructor(range: ULongRangeWithExclusions) : super("Number is not in range $range")
+    constructor(value: UInt?, range: UIntRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
-     * Constructs a NumberOutOfRangeException with a message indicating that the number
+     * Constructs a new `NumberOutOfRangeException` instance with a custom error message
+     * indicating that the given number is not within the specified range.
+     *
+     * @param value The unsigned integer value being validated. If null, it is represented as an empty string in the error message.
+     * @param range The range with conditions against which the value is validated.
+     * @since 6.1.3
+     */
+    constructor(value: UInt?, range: UIntRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message specifying
+     * that a number is not within a given range.
+     *
+     * @param value the numeric value being validated; can be null.
+     * @param range the valid range of numbers.
+     * @since 6.1.3
+     */
+    constructor(value: Long?, range: LongRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a specified number and a range that includes
+     * exclusions, providing a detailed message.
+     *
+     * @param value The number that is being checked. Can be null.
+     * @param range The defined range with exclusions to check against.
+     * @since 6.1.3
+     */
+    constructor(value: Long?, range: LongRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message indicating
+     * that the given number is not within the specified range.
+     *
+     * @param value The number being validated, which may be null.
+     * @param range The range against which the number is checked.
+     * @since 6.1.3
+     */
+    constructor(value: Long?, range: LongRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructor for creating an exception when a provided number is out of the specified range.
+     *
+     * @param value The number causing the exception, which may be null.
+     * @param range The range against which the number is being validated.
+     * The exception message will include the provided number, if not null, and the range.
+     * This class does not handle null checks or further range validations.
+     *
+     * @since 6.1.3
+     */
+    constructor(value: ULong?, range: ULongRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructs a NumberOutOfRangeException with a detailed message indicating
+     * whether the given unsigned long value falls outside the specified range.
+     *
+     * @param value The unsigned long value being checked, or null if no value is provided.
+     * @param range The range of unsigned long values, including specified exclusions,
+     * against which the provided value is validated.
+     * @since 6.1.3
+     */
+    constructor(value: ULong?, range: ULongRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message indicating
+     * that the given unsigned long value is not within the specified range.
+     *
+     * @param value The unsigned long value that caused the exception, or `null` if not applicable.
+     * @param range The range with conditions that the value is expected to conform to.
+     * @since 6.1.3
+     */
+    constructor(value: ULong?, range: ULongRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
+    /**
+     * Constructs a `NumberOutOfRangeException` with a detailed message indicating that a specific value
      * is not within the specified range.
      *
-     * @param range The range object specifying the allowable numeric bounds.
-     * @since 5.0.0
-     */
-    constructor(range: ULongRangeWithConditions) : super("Number is not in range $range")
-    /**
-     * Constructs a new exception indicating that a number is not within the specified range.
+     * @param value The value that lies outside the specified range, which may be null.
+     * @param range The range against which the value is being validated.
      *
-     * @param range The range that the number is expected to be within.
-     * @since 5.0.0
+     * @since 6.1.3
      */
-    constructor(range: ClosedRange<*>) : super("Number is not in range $range")
+    constructor(value: Any?, range: ClosedRange<*>?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
-     * Constructs a NumberOutOfRangeException with a specific message indicating
-     * that a number is not within the specified open-ended range.
+     * Constructs a `NumberOutOfRangeException` with a message indicating that the provided number
+     * is not within the specified open-ended range.
      *
-     * @param range The open-ended range that does not contain the number.
-     * @since 5.0.0
+     * @param value The number that was checked and found to be out of range. Can be null.
+     * @param range The open-ended range against which the number was validated.
+     * @since 6.1.3
      */
-    constructor(range: OpenEndRange<*>) : super("Number is not in range $range")
+    constructor(value: Any?, range: OpenEndRange<*>?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
      * Constructs a new NumberOutOfRangeException with the specified detail message.
      *
@@ -1932,6 +1981,66 @@ open class JsonSchemaValidationException(errors: Iterable<JsonSchema.SchemaError
 }
 
 /**
+ * Exception representing a failure in validating a TOML document against a defined JSON schema.
+ *
+ * This exception is thrown when one or more schema validation errors are encountered while
+ * processing a TOML-based configuration. It encapsulates the list of errors and optionally
+ * an internal error code to provide more context about the specific validation issue.
+ *
+ * @constructor
+ * Constructs a [TomlSchemaValidationException] with the provided schema errors, optional
+ * cause, and an optional internal error code for additional context.
+ *
+ * @param errors The collection of schema validation errors encountered during validation.
+ * @param cause The underlying exception causing this exception to be thrown, if any.
+ * @param internalErrorCode Optional internal error code to provide additional debugging information.
+ *
+ * @property errors A set containing the schema validation errors that resulted in this exception.
+ * @property internalErrorCode Retrieves the optional internal error code embedded within the exception message, if available.
+ *
+ * @since 6.1.3
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class TomlSchemaValidationException(errors: Iterable<JsonSchema.SchemaError>, cause: Throwable? = null, internalErrorCode: String? = null) :
+    ValidationFailedException("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Invalid JSON Schema (for TOML):\n${errors.joinToString(";\n")}", cause = cause) {
+
+    val errors: Set<JsonSchema.SchemaError> = errors.toSet()
+    val internalErrorCode: String?
+        get() = message?.before(" @@@ ")?.ifBlank { null }
+}
+
+/**
+ * Exception representing a failure in validating a YAML document against a defined JSON schema.
+ *
+ * This exception is thrown when one or more schema validation errors are encountered while
+ * processing a TOML-based configuration. It encapsulates the list of errors and optionally
+ * an internal error code to provide more context about the specific validation issue.
+ *
+ * @constructor
+ * Constructs a [YamlSchemaValidationException] with the provided schema errors, optional
+ * cause, and an optional internal error code for additional context.
+ *
+ * @param errors The collection of schema validation errors encountered during validation.
+ * @param cause The underlying exception causing this exception to be thrown, if any.
+ * @param internalErrorCode Optional internal error code to provide additional debugging information.
+ *
+ * @property errors A set containing the schema validation errors that resulted in this exception.
+ * @property internalErrorCode Retrieves the optional internal error code embedded within the exception message, if available.
+ *
+ * @since 6.1.3
+ * @author Tommaso Pastorelli
+ */
+@Suppress("unused")
+open class YamlSchemaValidationException(errors: Iterable<JsonSchema.SchemaError>, cause: Throwable? = null, internalErrorCode: String? = null) :
+    ValidationFailedException("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}Invalid JSON Schema (for YAML):\n${errors.joinToString(";\n")}", cause = cause) {
+
+    val errors: Set<JsonSchema.SchemaError> = errors.toSet()
+    val internalErrorCode: String?
+        get() = message?.before(" @@@ ")?.ifBlank { null }
+}
+
+/**
  * Exception thrown to indicate that XML schema validation has failed.
  *
  * This exception extends the `ValidationFailedException` to provide additional context
@@ -1958,7 +2067,7 @@ open class XmlSchemaValidationException : ValidationFailedException {
      * @param internalErrorCode An optional code representing the internal error context. Defaults to null.
      * @since 3.9.0
      */
-    constructor(message: String, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message")
+    constructor(message: String?, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message")
     /**
      * Constructs a new `XmlSchemaValidationException` with the specified message and an optional cause
      * and/or internal error code.
@@ -1968,7 +2077,7 @@ open class XmlSchemaValidationException : ValidationFailedException {
      * @param internalErrorCode An optional internal error code providing additional context about the failure (defaults to `null`).
      * @since 3.9.0
      */
-    constructor(message: String, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
+    constructor(message: String?, cause: Throwable? = null, internalErrorCode: String? = null) : super("${if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY}$message", cause)
     /**
      * Constructs an instance of `XmlSchemaValidationException` with an optional cause and an optional internal error code.
      *
@@ -1980,5 +2089,5 @@ open class XmlSchemaValidationException : ValidationFailedException {
      * @param internalErrorCode An optional error code string to provide additional context about the error, or null if not applicable.
      * @since 3.9.0
      */
-    constructor(cause: Throwable? = null, internalErrorCode: String? = null) : super(if (internalErrorCode != null) "$internalErrorCode @@@ " else null, cause)
+    constructor(cause: Throwable? = null, internalErrorCode: String? = null) : super(if (internalErrorCode != null) "$internalErrorCode @@@ " else String.EMPTY, cause)
 }

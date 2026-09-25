@@ -7,6 +7,7 @@
 package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.classes.measure.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KType
 
 /**
@@ -27,7 +28,9 @@ import kotlin.reflect.KType
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-interface ConversionError : Error
+interface ConversionError : Error {
+    override val linkedException: ConversionException
+}
 
 /**
  * Represents an error occurring during a type conversion process where the conversion is deemed invalid.
@@ -43,6 +46,8 @@ interface ConversionError : Error
  * @author Tommaso Pastorelli
  */
 open class InvalidConversion(open val invalidValue: Any?, val from: String, val to: String, open val reason: String? = null) : ConversionError {
+    override val linkedException = ConversionException("Conversion of `${invalidValue}` from $from to $to failed because: $reason.")
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -129,6 +134,8 @@ data class InvalidConversionBetweenTypes(override val invalidValue: Any?, val fr
  * @since 6.1.0
  */
 open class IllegalConversion(open val invalidValue: Any?, val from: String, val to: String, open val reason: String? = null) : ConversionError {
+    override val linkedException = ConversionException("Conversion of `${invalidValue}` from $from to $to is illegal because: $reason.")
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

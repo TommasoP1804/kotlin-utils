@@ -732,10 +732,10 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
          */
         fun Number.toRomanNumber(): Either<NumberError.InvalidSign, RomanNumber> = either {
             catching({ RomanNumber(this@toRomanNumber) }) { t: Throwable ->
-                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+                NumberError.InvalidSign(this@toRomanNumber, setOf(NumberSign.Positive, NumberSign.Zero))
             }
         }
-        /***
+        /**
          * Parses the given string value and interprets it as a Roman numeral.
          * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidFormatOfType]
          * if an error occurs, such as an invalid input format.

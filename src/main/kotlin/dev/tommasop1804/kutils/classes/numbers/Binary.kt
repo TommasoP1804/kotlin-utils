@@ -164,7 +164,7 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
          */
         fun Number.toBinary(): Either<NumberError.InvalidSign, Binary> = either {
             catching({ Binary(this@toBinary) }) { t: Throwable ->
-                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+                NumberError.InvalidSign(this@toBinary, setOf(NumberSign.Positive, NumberSign.Zero))
             }
         }
 

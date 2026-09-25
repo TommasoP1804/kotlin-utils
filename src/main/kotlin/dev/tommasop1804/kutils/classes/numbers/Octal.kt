@@ -163,7 +163,7 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
          */
         fun Number.toOctal(): Either<NumberError.InvalidSign, Octal> = either {
             catching({ Octal(this@toOctal) }) { t: Throwable ->
-                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+                NumberError.InvalidSign(this@toOctal, setOf(NumberSign.Positive, NumberSign.Zero))
             }
         }
 

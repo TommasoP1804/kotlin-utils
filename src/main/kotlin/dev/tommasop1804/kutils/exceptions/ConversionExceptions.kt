@@ -6,9 +6,10 @@
 
 package dev.tommasop1804.kutils.exceptions
 
-import dev.tommasop1804.kutils.classes.measure.ScalarUnit
+import dev.tommasop1804.kutils.classes.measure.*
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * Represents an exception that is thrown when a conversion operation fails.
@@ -42,6 +43,41 @@ open class ConversionException : RuntimeException {
      */
     constructor(fromClass: KClass<*>, toClass: KClass<*>) : super(
         "Conversion from ${fromClass.simpleName} to ${toClass.simpleName} failed."
+    )
+    /**
+     * Constructs a `ConversionException` with a detailed error message indicating
+     * the failure to convert a given value from one type to another.
+     *
+     * @param value The value that could not be converted.
+     * @param fromClass The source type of the value.
+     * @param toClass The target type to which the value could not be converted.
+     * @since 6.1.3
+     */
+    constructor(value: Any?, fromClass: KClass<*>, toClass: KClass<*>) : super(
+        "Conversion of `$value` from ${fromClass.simpleName} to ${toClass.simpleName} failed."
+    )
+    /**
+     * Constructs a ConversionException with a message indicating
+     * that a conversion between the specified types has failed.
+     *
+     * @param fromType The source type involved in the conversion.
+     * @param toType The target type involved in the conversion.
+     * @since 6.1.3
+     */
+    constructor(fromType: KType, toType: KType) : super(
+        "Conversion from $fromType to $toType failed."
+    )
+    /**
+     * Constructs a `ConversionException` with a detailed message indicating
+     * the failure to convert a value from one type to another.
+     *
+     * @param value The value that was attempted to be converted.
+     * @param fromType The source type of the conversion.
+     * @param toType The target type of the conversion.
+     * @since 6.1.3
+     */
+    constructor(value: Any?, fromType: KType, toType: KType) : super(
+        "Conversion of `$value` from $fromType to $toType failed."
     )
     /**
      * Constructs a `ConversionException` with the specified detail message.

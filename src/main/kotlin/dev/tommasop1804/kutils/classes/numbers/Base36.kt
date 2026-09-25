@@ -127,7 +127,7 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
          */
         fun Number.toBase36(): Either<NumberError.InvalidSign, Base36> = either {
             catching({ Base36(this@toBase36) }) { t: Throwable ->
-                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+                NumberError.InvalidSign(this@toBase36, setOf(NumberSign.Positive, NumberSign.Zero))
             }
         }
         /**

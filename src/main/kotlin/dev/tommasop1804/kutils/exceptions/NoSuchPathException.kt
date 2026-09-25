@@ -166,3 +166,60 @@ open class NoSuchTomlPathException : NoSuchPathException {
      */
     constructor(cause: Throwable?) : super(cause)
 }
+
+/**
+ * Exception thrown when a specified XML path cannot be found.
+ *
+ * This exception is a specific case of `NoSuchPathException` and typically
+ * indicates that an attempt to access or resolve a particular XML path has failed,
+ * often due to its absence or invalid structure within an XML document.
+ * It supports constructors for providing details such as the missing XML path
+ * and an optional cause for more contextual information.
+ *
+ * This exception can be useful in scenarios where XML path resolution
+ * or validation operations are being performed and strict compliance or
+ * availability of specific paths is required.
+ *
+ * @since 6.1.3
+ * @author Tommaso Pastorelli
+ */
+open class NoSuchXmlPathException : NoSuchPathException {
+    /**
+     * Constructs a new `NoSuchXmlPathException` with no specified path or cause.
+     * Delegates to the primary constructor of its superclass, `NoSuchPathException`.
+     *
+     * Commonly used when the specific XML path causing the exception is unknown,
+     * and there is no additional context provided.
+     *
+     * @since 6.1.3
+     */
+    constructor() : super()
+    /**
+     * Constructs a new instance of NoSuchXmlPathException with the specified path.
+     * This constructor allows specifying the path that caused the exception.
+     *
+     * @param path The path associated with the exception.
+     * @since 6.1.3
+     */
+    constructor(path: Any) : super(path)
+    /**
+     * Constructs a NoSuchXmlPathException with the specified path and cause.
+     *
+     * @param path The invalid or non-existent path that caused this exception to be thrown.
+     * @param cause The underlying cause of the exception, or null if no cause is provided.
+     *
+     * This constructor allows specifying both the problematic path and the root cause,
+     * providing more context about the exception.
+     *
+     * @since 6.1.3
+     */
+    constructor(path: Any, cause: Throwable?) : super(path, cause)
+    /**
+     * Constructs a new NoSuchXmlPathException with the specified cause.
+     *
+     * @param cause the cause of this exception, which can be retrieved later using [Throwable.cause].
+     *              A null value is permitted and indicates that the cause is nonexistent or unknown.
+     * @since 6.1.3
+     */
+    constructor(cause: Throwable?) : super(cause)
+}

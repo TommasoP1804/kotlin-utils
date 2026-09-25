@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Represents an error related to YAML parsing or validation.
@@ -30,7 +31,9 @@ interface YamlError : Error {
      * @author Tommaso Pastorelli
      * @since 6.1.0
      */
-    data class PathNotFound(val path: String) : YamlError
+    data class PathNotFound(val path: String) : YamlError {
+        override val linkedException = NoSuchYamlPathException(path)
+    }
     /**
      * Represents an error that occurs when schema validation fails.
      * This error provides a list of schema-specific errors encountered during validation.
@@ -39,5 +42,7 @@ interface YamlError : Error {
      * @author Tommaso Pastorelli
      * @since 6.1.0
      */
-    data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : YamlError, ValidationError
+    data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : YamlError, ValidationError {
+        override val linkedException = YamlSchemaValidationException(errors)
+    }
 }

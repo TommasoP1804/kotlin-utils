@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.errors
 
+import dev.tommasop1804.kutils.exceptions.*
+
 /**
  * Represents errors related to XML processing and transformations.
  * This interface serves as the base for defining various types of XML-specific errors,
@@ -34,6 +36,8 @@ interface XmlError : Error {
      * @author Tommaso Pastorelli
      */
     data class InvalidXsltConfig(val reason: String? = null) : XmlError {
+        override val linkedException = IllegalStateException("Invalid XSLT config: $reason")
+
         /**
          * Secondary constructor for the InvalidXsltConfig class, allowing initialization using a Throwable instance.
          * Extracts the throwable message and delegates to the primary constructor that accepts a reason string.
@@ -62,6 +66,8 @@ interface XmlError : Error {
      * @author Tommaso Pastorelli
      */
     data class XsltTransfomationFailed(val reason: String? = null) : XmlError {
+        override val linkedException = IllegalStateException("XSLT transformation failed: $reason")
+
         /**
          * Secondary constructor for the `XsltTransfomationFailed` class, allowing initialization using a `Throwable` instance.
          * This constructor extracts the message from the provided throwable and passes it to the primary constructor.
@@ -87,7 +93,9 @@ interface XmlError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class SchemaValidationFailed(val reason: String? = null) : XmlError, ValidationError
+    data class SchemaValidationFailed(val reason: String? = null) : XmlError, ValidationError {
+        override val linkedException = XmlSchemaValidationException(reason)
+    }
     /**
      * Represents an error occurring when a specific XML path is not found.
      *
@@ -99,5 +107,7 @@ interface XmlError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class PathNotFound(val path: String) : XmlError
+    data class PathNotFound(val path: String) : XmlError {
+        override val linkedException = NoSuchYamlPathException(path)
+    }
 }

@@ -4,6 +4,7 @@
 
 package dev.tommasop1804.kutils.errors
 
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KClass
 
 /**
@@ -12,12 +13,22 @@ import kotlin.reflect.KClass
  * enumerations, providing a structured way to handle cases where enumeration
  * values are involved.
  *
- * @property enum The enumeration instance that is the source or context of the error.
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
-open class EnumError(open val enum: KClass<out Enum<*>>) {
+interface EnumError : Error {
+    /**
+     * Represents the class of an enumeration type associated with the error.
+     *
+     * This variable holds a reference to a Kotlin class (`KClass`) representing an enumeration
+     * type (`Enum<*>`). It is used to associate an error with a specific enumeration for
+     * structured error handling.
+     *
+     * @since 6.1.0
+     */
+    val enum: KClass<out Enum<*>>
+
     /**
      * Represents an error that occurs when a specific entry is not found within an enumeration.
      *
@@ -32,5 +43,7 @@ open class EnumError(open val enum: KClass<out Enum<*>>) {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class NoSuchEntry(override val enum: KClass<out Enum<*>>, val entry: String) : EnumError(enum), ParsingError
+    data class NoSuchEntry(override val enum: KClass<out Enum<*>>, val entry: String) : EnumError, ParsingError {
+        override val linkedException = NoSuchEntryException(enum, entry)
+    }
 }

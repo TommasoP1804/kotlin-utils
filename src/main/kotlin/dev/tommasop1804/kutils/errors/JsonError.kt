@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Represents errors that occur during JSON processing within the system.
@@ -27,7 +28,9 @@ interface JsonError : Error {
      * @author Tommaso Pastorelli
      * @since 6.1.0
      */
-    data class PathNotFound(val path: String) : JsonError
+    data class PathNotFound(val path: String) : JsonError {
+        override val linkedException = NoSuchJsonPathException(path)
+    }
     /**
      * Represents an error that indicates schema validation has failed.
      *
@@ -42,5 +45,7 @@ interface JsonError : Error {
      * @author Tommaso Pastorelli
      * @since 6.1.0
      */
-    data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : JsonError, ValidationError
+    data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : JsonError, ValidationError {
+        override val linkedException = JsonSchemaValidationException(errors)
+    }
 }

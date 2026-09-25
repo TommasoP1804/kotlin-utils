@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.classes.constants.*
+import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Represents errors related to numeric operations or interpretations.
@@ -19,18 +20,22 @@ import dev.tommasop1804.kutils.classes.constants.*
  */
 @Suppress("unused")
 interface NumberError : Error {
+    val number: Number
+
     /**
      * Represents an error condition where a numeric value has an invalid sign.
      *
      * This data class is used to capture scenarios in numerical operations
      * where a specific sign is expected but an invalid sign is encountered.
      *
-     * @property invalidSign The sign of the numeric value that is deemed invalid.
-     * @property validSignes A list of valid signs that were expected in the given context.
+     * @property number The numeric value whose sign is invalid in the given context, or `null` if no number is specified.
+     * @property validSignes A set of valid `NumberSign` states applicable to the current context, or `null` if not applicable.
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class InvalidSign(val invalidSign: NumberSign, val validSignes: Set<NumberSign>) : NumberError, ValidationError
+    data class InvalidSign(override val number: Number, val validSignes: Set<NumberSign> = emptySet()) : NumberError, ValidationError {
+        override val linkedException = NumberSignException(number, validSignes)
+    }
 
     /**
      * Represents an error that occurs when an invalid radix is provided for operations
@@ -42,7 +47,10 @@ interface NumberError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class InvalidRadix(val invalidRadix: Int, val validRange: IntRange? = null) : NumberError, ValidationError
+    data class InvalidRadix(val invalidRadix: Int, val validRange: IntRange? = null) : NumberError, ValidationError {
+        override val linkedException = NumberOutOfRangeException(invalidRadix, validRange)
+        override val number = invalidRadix
+    }
 
     /**
      * Represents an error condition where a percentage value exceeds expected bounds.
@@ -84,7 +92,10 @@ interface NumberError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class PositivePercentageOverflow(override val percentage: Double) : PercentageOverflow
+    data class PositivePercentageOverflow(override val percentage: Double) : PercentageOverflow {
+        override val linkedException = MalformedInputException("The percentage must be lower than or equal to 100")
+        override val number = percentage
+    }
     /**
      * Represents an error condition where a negative percentage exceeds an acceptable limit.
      *
@@ -96,5 +107,8 @@ interface NumberError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class NegativePercentageOverflow(override val percentage: Double) : PercentageOverflow
+    data class NegativePercentageOverflow(override val percentage: Double) : PercentageOverflow {
+        override val linkedException = MalformedInputException("The percentage must be greater than or equal to 0")
+        override val number = percentage
+    }
 }

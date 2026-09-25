@@ -174,7 +174,7 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
          */
         fun Number.toHex() = either {
             catching({ Hex(this@toHex) }) { t: Throwable ->
-                NumberError.InvalidSign(this.sign, setOf(NumberSign.Positive, NumberSign.Zero))
+                NumberError.InvalidSign(this@toHex, setOf(NumberSign.Positive, NumberSign.Zero))
             }
         }
         /**

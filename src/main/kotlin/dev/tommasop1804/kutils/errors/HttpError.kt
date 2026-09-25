@@ -8,6 +8,7 @@ package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.web.*
+import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Represents a base contract for HTTP errors that may occur during request or response execution.
@@ -77,6 +78,13 @@ interface HttpError : Error {
         override val responseHeaders: HttpHeaders?,
         override val errorMessage: String? = null
     ) : HttpError {
+        override val linkedException = HttpRequestException(
+            statusCode,
+            uri,
+            method?.toEnumConst(),
+            errorMessage
+        )
+
         constructor(
             serviceName: String? = null,
             statusCode: HttpStatus,
@@ -171,6 +179,13 @@ interface HttpError : Error {
         override val responseHeaders: HttpHeaders? = null,
         override val errorMessage: String? = null
     ) : HttpError {
+        override val linkedException = HttpResponseException(
+            statusCode,
+            uri,
+            method?.toEnumConst(),
+            errorMessage
+        )
+
         constructor(
             serviceName: String? = null,
             statusCode: HttpStatus,
@@ -265,6 +280,14 @@ interface HttpError : Error {
         override val responseHeaders: HttpHeaders? = null,
         override val errorMessage: String? = null
     ) : HttpError {
+        override val linkedException = ExternalServiceHttpException(
+            serviceName,
+            statusCode,
+            uri,
+            method?.toEnumConst(),
+            errorMessage
+        )
+
         constructor(
             serviceName: String? = null,
             statusCode: HttpStatus,

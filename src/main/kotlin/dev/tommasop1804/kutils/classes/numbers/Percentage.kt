@@ -593,7 +593,7 @@ value class Percentage private constructor(internal val value: Double) : Compara
         ): Either<ValidationError, Percentage> = either {
             val value = if (from0to1) toDouble() * 100.0 else toDouble()
 
-            if (this is Double && isNaN()) raise(NumberError.InvalidSign(NumberSign.NaN, setOf(NumberSign.Zero, NumberSign.Positive, NumberSign.Negative)))
+            if (this is Double && isNaN()) raise(NumberError.InvalidSign(this, setOf(NumberSign.Zero, NumberSign.Positive, NumberSign.Negative)))
             if (!allowPositiveOverflow) ensure(value <= 100.0) { NumberError.PositivePercentageOverflow(value) }
             if (!allowNegativeOverflow) ensure(value >= 0.0) { NumberError.NegativePercentageOverflow(value) }
             Percentage(value)

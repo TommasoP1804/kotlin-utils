@@ -5,6 +5,7 @@
 package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.classes.coding.*
+import dev.tommasop1804.kutils.exceptions.*
 
 /**
  * Represents a TOML-related error within the system.
@@ -30,7 +31,9 @@ interface TomlError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class PathNotFound(val path: String) : TomlError
+    data class PathNotFound(val path: String) : TomlError {
+        override val linkedException = NoSuchTomlPathException(path)
+    }
     /**
      * Represents an error that occurs when schema validation fails.
      *
@@ -41,5 +44,7 @@ interface TomlError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : TomlError, ValidationError
+    data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : TomlError, ValidationError {
+        override val linkedException = TomlSchemaValidationException(errors)
+    }
 }

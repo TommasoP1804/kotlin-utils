@@ -4,6 +4,7 @@
 
 package dev.tommasop1804.kutils.errors
 
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KType
 
 /**
@@ -20,6 +21,8 @@ import kotlin.reflect.KType
  */
 @Suppress("unused")
 open class DeserializationError(open val targetType: KType, open val reason: String? = null) : Error {
+    override val linkedException = RuntimeException("Deserialization to `$targetType` failed because: $reason.")
+
     /**
      * Secondary constructor for the `DeserializationError` class.
      *
@@ -42,6 +45,8 @@ open class DeserializationError(open val targetType: KType, open val reason: Str
      * @author Tommaso Pastorelli
      */
     data class ReadError(override val targetType: KType, override val reason: String? = null) : DeserializationError(targetType, reason) {
+        override val linkedException = RuntimeException("Reading during deserialization to `$targetType` failed because: $reason.")
+
         /**
          * Secondary constructor for creating a [ReadError] instance using a [Throwable].
          * The throwable's message will be used as the reason.
@@ -65,6 +70,8 @@ open class DeserializationError(open val targetType: KType, open val reason: Str
      * @author Tommaso Pastorelli
      */
     data class MappingError(override val targetType: KType, override val reason: String? = null) : DeserializationError(targetType, reason) {
+        override val linkedException = MalformedInputException("Mapping during deserialization to `$targetType` failed because: $reason.")
+
         /**
          * Secondary constructor for the MappingError class that allows creating an instance
          * using a target class and a throwable as the reason.

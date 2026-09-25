@@ -7,6 +7,7 @@
 package dev.tommasop1804.kutils.errors
 
 import dev.tommasop1804.kutils.*
+import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
@@ -22,7 +23,9 @@ import kotlin.reflect.KType
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-interface Error
+interface Error {
+    val linkedException: Exception
+}
 
 /**
  * Represents a generic error that can be used as a fallback or catch-all error type.
@@ -32,7 +35,9 @@ interface Error
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-object GenericError : Error
+object GenericError : Error {
+    override val linkedException = RuntimeException()
+}
 
 // ----------------------------------------------------------------------------------
 
@@ -58,7 +63,9 @@ interface ValidationError : Error {
      * @property message A human-readable message describing the validation error.
      * @since 6.1.0
      */
-    data class ValidationFailed(val message: String) : ValidationError
+    data class ValidationFailed(val message: String) : ValidationError {
+        override val linkedException = ValidationFailedException(message)
+    }
     /**
      * Represents a validation error that occurs when an expected value does not match the actual value.
      *
@@ -72,7 +79,9 @@ interface ValidationError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class ExpectationMismatch(val obj: Any?, val expected: Any?, val actual: Any?) : ValidationError
+    data class ExpectationMismatch(val obj: Any?, val expected: Any?, val actual: Any?) : ValidationError {
+        override val linkedException = ExpectationMismatchException("`$obj` was expected as `$expected` but was `$actual`")
+    }
 }
 
 // ----------------------------------------------------------------------------------
@@ -114,6 +123,8 @@ interface ParsingError : ValidationError
  * @since 6.1.0
  */
 open class InvalidFormat(open val invalidValue: Any?, val target: String, open val reason: String? = null) : ParsingError {
+    override val linkedException = MalformedInputException("`$invalidValue` is not settable as `$target`${if (reason != null) " because: $reason" else String.EMPTY}")
+
     /**
      * Secondary constructor for the InvalidFormat data class.
      *
@@ -127,8 +138,6 @@ open class InvalidFormat(open val invalidValue: Any?, val target: String, open v
      * @since 6.1.0
      */
     constructor(invalidValue: Any?, target: String, throwable: Throwable) : this(invalidValue, target, throwable.message)
-
-
 
     override fun toString(): String {
         return "InvalidFormat(invalidValue=$invalidValue, target=$target, reason=$reason)"
@@ -197,7 +206,9 @@ data class InvalidFormatOfType(override val invalidValue: Any?, val targetType: 
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-data class NoMatchingFormatOfType(val invalidValue: Any?, val targetType: KType) : ParsingError
+data class NoMatchingFormatOfType(val invalidValue: Any?, val targetType: KType) : ParsingError {
+    override val linkedException = NoMatchingFormatException("No matching format for input `$invalidValue` for target `$targetType`")
+}
 
 /**
  * Represents an error that arises when a computation cannot be performed.
@@ -210,7 +221,9 @@ data class NoMatchingFormatOfType(val invalidValue: Any?, val targetType: KType)
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-data class Uncomputable(val reason: String? = null) : Error
+data class Uncomputable(val reason: String? = null) : Error {
+    override val linkedException = IllegalStateException(reason)
+}
 
 // ----------------------------------------------------------------------------------
 
@@ -226,7 +239,9 @@ data class Uncomputable(val reason: String? = null) : Error
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-open class RequiredElement(val element: String) : ValidationError
+open class RequiredElement(val element: String) : ValidationError {
+    override val linkedException = ValidationFailedException("$element is required")
+}
 
 /**
  * Represents a required property with its name and type information. This data class
@@ -242,6 +257,9 @@ data class RequiredProperty(val propertyName: String? = null, val propertyType: 
     if (propertyName.isNotNullOrEmpty) "`$propertyName`${if (propertyType.isNotNull) " of type $propertyType" else String.EMPTY}"
     else propertyType.toString()
 ) {
+    override val linkedException = RequiredPropertyException("${if (propertyName != null ) "`$propertyName` " else "Property "} " +
+            "${if (propertyType != null) "of type `$propertyType` " else String.EMPTY}is required")
+
     /**
      * Secondary constructor for the `RequiredProperty` class.
      *
@@ -273,6 +291,9 @@ data class RequiredParameter(val parameterName: String? = null, val parameterTyp
     if (parameterName.isNotNullOrEmpty) "`$parameterName`${if (parameterType.isNotNull) " of type $parameterType" else String.EMPTY}"
     else parameterType.toString()
 ) {
+    override val linkedException = RequiredParameterException("${if (parameterName != null ) "`$parameterName` " else "Parameter "} " +
+            "${if (parameterType != null) "of type `$parameterType` " else String.EMPTY}is required")
+
     /**
      * Secondary constructor for creating a [RequiredParameter] instance from a [KParameter].
      * Initializes the [parameterName] with the name of the given parameter,
@@ -301,7 +322,9 @@ data class RequiredParameter(val parameterName: String? = null, val parameterTyp
  * @author Tommaso Pastorelli
  * @since 6.1.0
  */
-data class IllegalOperation(val message: String) : Error
+data class IllegalOperation(val message: String) : Error {
+    override val linkedException = IllegalOperationException(message)
+}
 /**
  * Represents an unsupported operation within the system.
  *
@@ -314,7 +337,9 @@ data class IllegalOperation(val message: String) : Error
  * @author Tommaso Pastorelli
  * @since 6.1.0
  */
-data class UnsupportedOperation(val message: String) : Error
+data class UnsupportedOperation(val message: String) : Error {
+    override val linkedException = UnsupportedOperationException(message)
+}
 
 /**
  * Represents an error specific to geometric operations or computations.
@@ -328,7 +353,9 @@ data class UnsupportedOperation(val message: String) : Error
  * @author Tommaso Pastorelli
  * @since 6.1.0
  */
-data class GeometryError(val message: String) : Error
+data class GeometryError(val message: String) : Error {
+    override val linkedException = GeometryException(message)
+}
 
 /**
  * Represents an error indicating that the specified object was not found.
@@ -340,4 +367,6 @@ data class GeometryError(val message: String) : Error
  * @author Tommaso Pastorelli
  * @since 6.1.0
  */
-data class NotFound(val obj: Any?) : Error
+data class NotFound(val obj: Any?) : Error {
+    override val linkedException = NoSuchElementException("`$obj` not found")
+}

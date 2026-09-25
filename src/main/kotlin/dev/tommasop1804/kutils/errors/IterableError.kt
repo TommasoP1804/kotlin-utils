@@ -4,6 +4,8 @@
 
 package dev.tommasop1804.kutils.errors
 
+import dev.tommasop1804.kutils.exceptions.*
+
 /**
  * Represents errors related to iterable operations.
  * This interface serves as the base for various specific iterable error types,
@@ -149,7 +151,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class NotFound(val element: Any?) : IterableError
+    data class NotFound(val element: Any?) : IterableError {
+        override val linkedException = NoSuchElementException("Element $element not found")
+    }
     /**
      * Represents an object that acts as a marker for error conditions in cases where a container
      * or collection is expected to be non-empty but is found empty.
@@ -169,7 +173,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    object Empty : IterableError, NotOnlyElementError, NotOnlyResultError, NotFirstResultError, NotInnerElementError, NotInnerResultError, IndexOutOfBoundsError
+    object Empty : IterableError, NotOnlyElementError, NotOnlyResultError, NotFirstResultError, NotInnerElementError, NotInnerResultError, IndexOutOfBoundsError {
+        override val linkedException = NoSuchElementException()
+    }
     /**
      * Represents an error indicating that a requested element does not exist.
      *
@@ -181,7 +187,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class NoSuchElement(val index: Int) : IterableError, NotInnerElementError
+    data class NoSuchElement(val index: Int) : IterableError, NotInnerElementError {
+        override val linkedException = IndexOutOfBoundsException("Index $index is out of bounds")
+    }
     /**
      * Represents an error case where no results are returned from an operation or query.
      * This object is used as an indication of the absence of any results matching the expected criteria.
@@ -197,7 +205,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    object NoResults : IterableError, NotOnlyResultError, NotFirstResultError, NotInnerResultError
+    object NoResults : IterableError, NotOnlyResultError, NotFirstResultError, NotInnerResultError {
+        override val linkedException = NoResultsException()
+    }
     /**
      * This object represents an error that occurs when there are more elements
      * present in a collection or sequence than expected. It is used to indicate
@@ -211,7 +221,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    object TooManyElements : IterableError, NotOnlyElementError
+    object TooManyElements : IterableError, NotOnlyElementError {
+        override val linkedException = TooManyElementsException()
+    }
     /**
      * Represents an error scenario where an operation yields too many results
      * instead of the expected single or a limited number of results.
@@ -225,7 +237,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    object TooManyResults : IterableError, NotOnlyResultError
+    object TooManyResults : IterableError, NotOnlyResultError {
+        override val linkedException = TooManyResultsException()
+    }
     /**
      * Represents an error condition where there are too few results in a collection or sequence.
      *
@@ -244,7 +258,9 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    object TooFewResults : IterableError, NotOnlyResultError, NotInnerResultError
+    object TooFewResults : IterableError, NotOnlyResultError, NotInnerResultError {
+        override val linkedException = TooFewResultsException()
+    }
     /**
      * Represents an error that occurs when an operation attempts to access an index
      * that is outside the valid bounds of a collection or array.
@@ -258,5 +274,7 @@ interface IterableError : Error {
      * @since 6.1.0
      * @author Tommaso Pastorelli
      */
-    data class IndexOutOfBounds(val index: Int? = null) : IterableError, IndexOutOfBoundsError
+    data class IndexOutOfBounds(val index: Int? = null) : IterableError, IndexOutOfBoundsError {
+        override val linkedException = IndexOutOfBoundsException("Index $index is out of bounds")
+    }
 }
