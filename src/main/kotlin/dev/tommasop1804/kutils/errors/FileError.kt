@@ -30,7 +30,7 @@ interface FileError : Error {
      * Typical use cases include identifying the file that caused the error, retrieving
      * metadata about the file, or performing operations to resolve the error condition.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     val file: File
 
@@ -47,7 +47,7 @@ interface FileError : Error {
      * @author Tommaso Pastorelli
      */
     data class FileNotFound(override val file: File) : FileError {
-        override val linkedException = FileNotFoundException(file.path)
+        override val linkedException get() = FileNotFoundException(file.path)
     }
     /**
      * Represents an error caused by an invalid file extension.
@@ -62,6 +62,6 @@ interface FileError : Error {
      * @author Tommaso Pastorelli
      */
     data class InvalidExtension(override val file: File) : FileError {
-        override val linkedException = InvalidFileExtensionException(file)
+        override val linkedException get() = InvalidFileExtensionException(file)
     }
 }

@@ -36,7 +36,7 @@ interface Error {
  * @author Tommaso Pastorelli
  */
 object GenericError : Error {
-    override val linkedException = RuntimeException()
+    override val linkedException get() = RuntimeException()
 }
 
 // ----------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ interface ValidationError : Error {
      * @since 6.1.0
      */
     data class ValidationFailed(val message: String) : ValidationError {
-        override val linkedException = ValidationFailedException(message)
+        override val linkedException get() = ValidationFailedException(message)
     }
     /**
      * Represents a validation error that occurs when an expected value does not match the actual value.
@@ -80,7 +80,7 @@ interface ValidationError : Error {
      * @author Tommaso Pastorelli
      */
     data class ExpectationMismatch(val obj: Any?, val expected: Any?, val actual: Any?) : ValidationError {
-        override val linkedException = ExpectationMismatchException("`$obj` was expected as `$expected` but was `$actual`")
+        override val linkedException get() = ExpectationMismatchException("`$obj` was expected as `$expected` but was `$actual`")
     }
 }
 
@@ -123,7 +123,7 @@ interface ParsingError : ValidationError
  * @since 6.1.0
  */
 open class InvalidFormat(open val invalidValue: Any?, val target: String, open val reason: String? = null) : ParsingError {
-    override val linkedException = MalformedInputException("`$invalidValue` is not settable as `$target`${if (reason != null) " because: $reason" else String.EMPTY}")
+    override val linkedException get() = MalformedInputException("`$invalidValue` is not settable as `$target`${if (reason != null) " because: $reason" else String.EMPTY}")
 
     /**
      * Secondary constructor for the InvalidFormat data class.
@@ -207,7 +207,7 @@ data class InvalidFormatOfType(override val invalidValue: Any?, val targetType: 
  * @author Tommaso Pastorelli
  */
 data class NoMatchingFormatOfType(val invalidValue: Any?, val targetType: KType) : ParsingError {
-    override val linkedException = NoMatchingFormatException("No matching format for input `$invalidValue` for target `$targetType`")
+    override val linkedException get() = NoMatchingFormatException("No matching format for input `$invalidValue` for target `$targetType`")
 }
 
 /**
@@ -222,7 +222,7 @@ data class NoMatchingFormatOfType(val invalidValue: Any?, val targetType: KType)
  * @author Tommaso Pastorelli
  */
 data class Uncomputable(val reason: String? = null) : Error {
-    override val linkedException = IllegalStateException(reason)
+    override val linkedException get() = IllegalStateException(reason)
 }
 
 // ----------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ data class Uncomputable(val reason: String? = null) : Error {
  * @author Tommaso Pastorelli
  */
 open class RequiredElement(val element: String) : ValidationError {
-    override val linkedException = ValidationFailedException("$element is required")
+    override val linkedException get() = ValidationFailedException("$element is required")
 }
 
 /**
@@ -257,7 +257,7 @@ data class RequiredProperty(val propertyName: String? = null, val propertyType: 
     if (propertyName.isNotNullOrEmpty) "`$propertyName`${if (propertyType.isNotNull) " of type $propertyType" else String.EMPTY}"
     else propertyType.toString()
 ) {
-    override val linkedException = RequiredPropertyException("${if (propertyName != null ) "`$propertyName` " else "Property "} " +
+    override val linkedException get() = RequiredPropertyException("${if (propertyName != null ) "`$propertyName` " else "Property "} " +
             "${if (propertyType != null) "of type `$propertyType` " else String.EMPTY}is required")
 
     /**
@@ -291,7 +291,7 @@ data class RequiredParameter(val parameterName: String? = null, val parameterTyp
     if (parameterName.isNotNullOrEmpty) "`$parameterName`${if (parameterType.isNotNull) " of type $parameterType" else String.EMPTY}"
     else parameterType.toString()
 ) {
-    override val linkedException = RequiredParameterException("${if (parameterName != null ) "`$parameterName` " else "Parameter "} " +
+    override val linkedException get() = RequiredParameterException("${if (parameterName != null ) "`$parameterName` " else "Parameter "} " +
             "${if (parameterType != null) "of type `$parameterType` " else String.EMPTY}is required")
 
     /**
@@ -323,7 +323,7 @@ data class RequiredParameter(val parameterName: String? = null, val parameterTyp
  * @since 6.1.0
  */
 data class IllegalOperation(val message: String) : Error {
-    override val linkedException = IllegalOperationException(message)
+    override val linkedException get() = IllegalOperationException(message)
 }
 /**
  * Represents an unsupported operation within the system.
@@ -338,7 +338,7 @@ data class IllegalOperation(val message: String) : Error {
  * @since 6.1.0
  */
 data class UnsupportedOperation(val message: String) : Error {
-    override val linkedException = UnsupportedOperationException(message)
+    override val linkedException get() = UnsupportedOperationException(message)
 }
 
 /**
@@ -354,7 +354,7 @@ data class UnsupportedOperation(val message: String) : Error {
  * @since 6.1.0
  */
 data class GeometryError(val message: String) : Error {
-    override val linkedException = GeometryException(message)
+    override val linkedException get() = GeometryException(message)
 }
 
 /**
@@ -368,5 +368,5 @@ data class GeometryError(val message: String) : Error {
  * @since 6.1.0
  */
 data class NotFound(val obj: Any?) : Error {
-    override val linkedException = NoSuchElementException("`$obj` not found")
+    override val linkedException get() = NoSuchElementException("`$obj` not found")
 }

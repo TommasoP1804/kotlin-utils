@@ -1238,7 +1238,7 @@ open class NumberSignException : ValidationFailedException {
      * The exception extends another class (potentially a custom base exception class),
      * providing a formatted message to indicate why the provided sign is not valid.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(number: Number?, valid: Set<NumberSign>? = null) : super("Number sign ${if (number != null) "${number.sign} for number $number " else String.EMPTY}" +
             "is not valid in this context${if (valid.isNotNullOrEmpty) ". Valids: $valid" else String.EMPTY}")
@@ -1440,7 +1440,7 @@ open class ValueOutOfRangeException : ValidationFailedException {
      *
      * @param value The value that was evaluated. If null, it is represented as an empty string in the message.
      * @param range The range against which the value was checked. If null, it is omitted from the message.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Any?, range: ClosedRange<*>?) : super("Value ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null ) " $range" else String.EMPTY}")
     /**
@@ -1454,7 +1454,7 @@ open class ValueOutOfRangeException : ValidationFailedException {
      * Inherits from a base exception and formats the exception message dynamically based on the
      * provided `value` or `range`.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Any?, range: OpenEndRange<*>?) : super("Value ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null ) " $range" else String.EMPTY}")
     /**
@@ -1656,7 +1656,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The number being validated, which can be null.
      * @param range The valid range the number is expected to fall within.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Int?, range: IntRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1665,7 +1665,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The number being validated. Can be null, in which case it is represented as an empty string.
      * @param range The range with exclusions against which the value is checked.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Int?, range: IntRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1675,7 +1675,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      * @param value The integer value to validate, which can be nullable.
      * @param range The range within which the provided value is expected to exist,
      * including any additional conditions encapsulated in `IntRangeWithConditions`.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Int?, range: IntRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1684,7 +1684,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The unsigned integer value being validated. If null, it indicates no specific number.
      * @param range The valid range for the number.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: UInt?, range: UIntRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1695,7 +1695,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *              If null, indicates an unspecified value.
      * @param range The range against which the value was checked for validity,
      *              potentially including exclusions.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: UInt?, range: UIntRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1704,7 +1704,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The unsigned integer value being validated. If null, it is represented as an empty string in the error message.
      * @param range The range with conditions against which the value is validated.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: UInt?, range: UIntRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1713,7 +1713,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value the numeric value being validated; can be null.
      * @param range the valid range of numbers.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Long?, range: LongRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1722,7 +1722,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The number that is being checked. Can be null.
      * @param range The defined range with exclusions to check against.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Long?, range: LongRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1731,7 +1731,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The number being validated, which may be null.
      * @param range The range against which the number is checked.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Long?, range: LongRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1742,7 +1742,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      * The exception message will include the provided number, if not null, and the range.
      * This class does not handle null checks or further range validations.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: ULong?, range: ULongRange?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1752,7 +1752,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      * @param value The unsigned long value being checked, or null if no value is provided.
      * @param range The range of unsigned long values, including specified exclusions,
      * against which the provided value is validated.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: ULong?, range: ULongRangeWithExclusions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1761,7 +1761,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The unsigned long value that caused the exception, or `null` if not applicable.
      * @param range The range with conditions that the value is expected to conform to.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: ULong?, range: ULongRangeWithConditions?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1771,7 +1771,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      * @param value The value that lies outside the specified range, which may be null.
      * @param range The range against which the value is being validated.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Any?, range: ClosedRange<*>?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1780,7 +1780,7 @@ open class NumberOutOfRangeException : ValueOutOfRangeException {
      *
      * @param value The number that was checked and found to be out of range. Can be null.
      * @param range The open-ended range against which the number was validated.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Any?, range: OpenEndRange<*>?) : super("Number ${if (value != null) "`$value`" else String.EMPTY} is not in range${if (range != null) " $range" else String.EMPTY}")
     /**
@@ -1998,7 +1998,7 @@ open class JsonSchemaValidationException(errors: Iterable<JsonSchema.SchemaError
  * @property errors A set containing the schema validation errors that resulted in this exception.
  * @property internalErrorCode Retrieves the optional internal error code embedded within the exception message, if available.
  *
- * @since 6.1.3
+ * @since 6.2.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")
@@ -2028,7 +2028,7 @@ open class TomlSchemaValidationException(errors: Iterable<JsonSchema.SchemaError
  * @property errors A set containing the schema validation errors that resulted in this exception.
  * @property internalErrorCode Retrieves the optional internal error code embedded within the exception message, if available.
  *
- * @since 6.1.3
+ * @since 6.2.0
  * @author Tommaso Pastorelli
  */
 @Suppress("unused")

@@ -25,7 +25,7 @@ import java.time.temporal.Temporal
  * @author Tommaso Pastorelli
  */
 open class TemporalError(open val temporal: Temporal, open val reason: String? = null) : ValidationError {
-    override val linkedException = TemporalException(reason)
+    override val linkedException get() = TemporalException(reason)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -63,7 +63,7 @@ open class TemporalError(open val temporal: Temporal, open val reason: String? =
  * @author Tommaso Pastorelli
  */
 open class TemporalIntervalError(open val interval: TemporalInterval, open val reason: String? = null) : ValidationError {
-    override val linkedException = TemporalException(reason)
+    override val linkedException get() = TemporalException(reason)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

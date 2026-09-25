@@ -1225,11 +1225,11 @@ internal inline fun <reified N : Number, T : Any> N.narrow(
     range: LongRange,
     target: KType,
     build: (Long) -> T,
-): Either<InvalidConversionBetweenTypes, T> =
+): Either<InvalidTypeConversion, T> =
     exactLongOrNull()
         ?.takeIf { it in range }
         ?.let(build)
-        .rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), target, reason = "Number out of valid range for type ${target.simpleName}") }
+        .rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), target, reason = "Number out of valid range for type ${target.simpleName}") }
 
 @PublishedApi
 internal fun <T : Any> String.parseOrError(target: KType, parse: (String) -> T): Either<InvalidFormatOfType, T> =
@@ -1302,12 +1302,12 @@ inline fun <reified N : Number> N.toIntOrError() =
  *         a `NumberConversionError` on failure.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toLongOrError(): Either<InvalidConversionBetweenTypes, Long> =
-    exactLongOrNull().rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<Long>()) }
+inline fun <reified N : Number> N.toLongOrError(): Either<InvalidTypeConversion, Long> =
+    exactLongOrNull().rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), typeOf<Long>()) }
 
 /**
  * Converts the current [Number] to a [UByte] if it falls within the valid range for [UByte],
- * otherwise returns an error of type [InvalidConversionBetweenTypes].
+ * otherwise returns an error of type [InvalidTypeConversion].
  *
  * This method utilizes the `narrow` utility function to perform the conversion. The conversion
  * process includes verifying that the numeric value can be safely represented as a [UByte],
@@ -1315,7 +1315,7 @@ inline fun <reified N : Number> N.toLongOrError(): Either<InvalidConversionBetwe
  *
  * @receiver The [Number] to be converted.
  * @return An instance of [Either], which will hold a [UByte] if the conversion is successful,
- * or a [InvalidConversionBetweenTypes] if the value is out of range or cannot be converted.
+ * or a [InvalidTypeConversion] if the value is out of range or cannot be converted.
  * @since 6.1.0
  */
 inline fun <reified N : Number> N.toUByteOrError() =
@@ -1323,7 +1323,7 @@ inline fun <reified N : Number> N.toUByteOrError() =
 
 /**
  * Converts this [Number] instance to an [UShort] if the value falls within the valid [UShort] range.
- * Throws a [InvalidConversionBetweenTypes] if the conversion is not possible due to the number being out of range
+ * Throws a [InvalidTypeConversion] if the conversion is not possible due to the number being out of range
  * or any other incompatibility.
  *
  * This function leverages the `narrow` method to ensure the value is first cast to a `Long`, validated
@@ -1342,12 +1342,12 @@ inline fun <reified N : Number> N.toUShortOrError() =
  *
  * This method relies on the internal `narrow` function to handle the conversion process.
  * The conversion validates whether the number can be represented as a [UInt] and, if valid,
- * performs the transformation. Otherwise, an instance of [InvalidConversionBetweenTypes] is returned
+ * performs the transformation. Otherwise, an instance of [InvalidTypeConversion] is returned
  * to indicate the failure.
  *
  * @receiver The number to be converted.
  * @return An [Either] containing the successfully converted [UInt] if the operation succeeds,
- *         or a [InvalidConversionBetweenTypes] if the number is out of the valid [UInt] range
+ *         or a [InvalidTypeConversion] if the number is out of the valid [UInt] range
  *         or cannot be converted.
  *
  * @throws IllegalArgumentException if the input number falls outside the acceptable range
@@ -1359,7 +1359,7 @@ inline fun <reified N : Number> N.toUIntOrError() =
     narrow(0L..UInt.MAX_VALUE.toLong(), typeOf<UInt>(), Long::toUInt)
 
 /**
- * Converts a number of type [N] to a [ULong], or returns a [InvalidConversionBetweenTypes] if the conversion is invalid.
+ * Converts a number of type [N] to a [ULong], or returns a [InvalidTypeConversion] if the conversion is invalid.
  * The conversion ensures the number is non-negative and within the range of an unsigned long integer.
  *
  * Supported input types include:
@@ -1367,16 +1367,16 @@ inline fun <reified N : Number> N.toUIntOrError() =
  * - [BigDecimal]: Conversion succeeds if it can be represented as an exact integer, is non-negative, and fits within [ULong.SIZE_BITS].
  * - Other [Number] types: Conversion succeeds if it can be exactly converted to a non-negative long integer.
  *
- * @return An [Either] containing either the successfully converted [ULong] value or a [InvalidConversionBetweenTypes] if the conversion fails.
+ * @return An [Either] containing either the successfully converted [ULong] value or a [InvalidTypeConversion] if the conversion fails.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toULongOrError(): Either<InvalidConversionBetweenTypes, ULong> =
+inline fun <reified N : Number> N.toULongOrError(): Either<InvalidTypeConversion, ULong> =
     when (this) {
         is BigInteger -> takeIf { signum() >= 0 && bitLength() <= ULong.SIZE_BITS }?.toLong()?.toULong() // wrap intenzionale
         is BigDecimal -> try { toBigIntegerExact() } catch (e: ArithmeticException) { null }
             ?.takeIf { it.signum() >= 0 && it.bitLength() <= ULong.SIZE_BITS }?.toLong()?.toULong()
         else -> exactLongOrNull()?.takeIf { it >= 0 }?.toULong()
-    }.rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<ULong>()) }
+    }.rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), typeOf<ULong>()) }
 
 /**
  * Attempts to convert a number of type `N` to a `Float`. If the conversion is successful
@@ -1388,10 +1388,10 @@ inline fun <reified N : Number> N.toULongOrError(): Either<InvalidConversionBetw
  * a non-finite value.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toFloatOrError(): Either<InvalidConversionBetweenTypes, Float> =
+inline fun <reified N : Number> N.toFloatOrError(): Either<InvalidTypeConversion, Float> =
     toFloat()
         .takeIf { it.isFinite() }
-        .rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<Float>()) }
+        .rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), typeOf<Float>()) }
 
 /**
  * Converts the current number instance to a `Double` or returns an error if the conversion fails.
@@ -1405,16 +1405,16 @@ inline fun <reified N : Number> N.toFloatOrError(): Either<InvalidConversionBetw
  * or `Left` with a `NumberConversionError` if the conversion fails.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toDoubleOrError(): Either<InvalidConversionBetweenTypes, Double> =
+inline fun <reified N : Number> N.toDoubleOrError(): Either<InvalidTypeConversion, Double> =
     toDouble()
         .takeIf { it.isFinite() }
-        .rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<Double>()) }
+        .rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), typeOf<Double>()) }
 
 /**
  * Attempts to convert a number of type [N] to a [BigInteger].
  *
  * If the conversion is successful, the resulting [BigInteger] is returned wrapped in an [Either.Right].
- * Otherwise, a [InvalidConversionBetweenTypes] is returned wrapped in an [Either.Left].
+ * Otherwise, a [InvalidTypeConversion] is returned wrapped in an [Either.Left].
  *
  * The method performs the following type checks and transformations:
  * - If the number is already a [BigInteger], it is returned directly.
@@ -1423,21 +1423,21 @@ inline fun <reified N : Number> N.toDoubleOrError(): Either<InvalidConversionBet
  *   converting it to a [BigInteger] if it satisfies these conditions.
  * - For other numeric types, it tries to convert the number to a `Long` exactly and then to a [BigInteger].
  *
- * If none of the above conversions are possible, a [InvalidConversionBetweenTypes] is created to indicate
+ * If none of the above conversions are possible, a [InvalidTypeConversion] is created to indicate
  * the failure, specifying the original number, its class type, and the target type ([BigInteger]).
  *
  * @return An [Either] containing the resulting [BigInteger] wrapped in [Either.Right]
- * if the conversion succeeds, or a [InvalidConversionBetweenTypes] wrapped in [Either.Left] if it fails.
+ * if the conversion succeeds, or a [InvalidTypeConversion] wrapped in [Either.Left] if it fails.
  *
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toBigIntOrError(): Either<InvalidConversionBetweenTypes, BigInteger> =
+inline fun <reified N : Number> N.toBigIntOrError(): Either<InvalidTypeConversion, BigInteger> =
     when (this) {
         is BigInteger -> this
         is BigDecimal -> try { toBigIntegerExact() } catch (e: ArithmeticException) { null }
         is Double, is Float -> toDouble().takeIf { it.isFinite() && it == truncate(it) }?.let { BigDecimal(it).toBigInteger() }
         else -> exactLongOrNull()?.let(BigInteger::valueOf)
-    }.rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<BigInteger>()) }
+    }.rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), typeOf<BigInteger>()) }
 
 /**
  * Converts the current number instance into a `BigDecimal`, returning the result as an `Either`.
@@ -1457,14 +1457,14 @@ inline fun <reified N : Number> N.toBigIntOrError(): Either<InvalidConversionBet
  * - `Left` contains a `NumberConversionError` if the conversion fails.
  * @since 6.1.0
  */
-inline fun <reified N : Number> N.toBigDecimalOrError(): Either<InvalidConversionBetweenTypes, BigDecimal> =
+inline fun <reified N : Number> N.toBigDecimalOrError(): Either<InvalidTypeConversion, BigDecimal> =
     when (this) {
         is BigDecimal -> this
         is BigInteger -> BigDecimal(this)
         is Byte, is Short, is Int, is Long -> BigDecimal.valueOf(toLong())
         is Double, is Float -> toDouble().takeIf { it.isFinite() }?.let(BigDecimal::valueOf)
         else -> null
-    }.rightIfNotNull { InvalidConversionBetweenTypes(this, typeOf<N>(), typeOf<BigDecimal>()) }
+    }.rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), typeOf<BigDecimal>()) }
 
 /**
  * Attempts to parse the string as a [Byte] and returns the result wrapped in an [Either].
@@ -1703,10 +1703,10 @@ private fun <T : Any> Long.narrowU(
     target: KType,
     max: Long,
     build: (Long) -> T,
-): Either<InvalidConversionBetweenTypes, T> =
+): Either<InvalidTypeConversion, T> =
     takeIf { it in 0..max }
         ?.let(build)
-        .rightIfNotNull { InvalidConversionBetweenTypes(source, from, target) }
+        .rightIfNotNull { InvalidTypeConversion(source, from, target) }
 
 /** ULong → Long esatto, `null` se > Long.MAX_VALUE (il bit di segno indica il wrap). */
 private fun ULong.exactLongOrNull(): Long? = toLong().takeIf { it >= 0 }
@@ -1715,7 +1715,7 @@ private fun ULong.exactLongOrNull(): Long? = toLong().takeIf { it >= 0 }
  * Converts this [UByte] to a [Byte], ensuring the value is within the valid range for the target type.
  *
  * @receiver The [UByte] value to be converted.
- * @return An [Either] containing a [Byte] if the conversion is successful, or a [InvalidConversionBetweenTypes]
+ * @return An [Either] containing a [Byte] if the conversion is successful, or a [InvalidTypeConversion]
  *         if the [UByte] value cannot be represented as a [Byte].
  * @since 6.1.0
  */
@@ -1727,10 +1727,10 @@ fun UByte.toByteOrError() = toLong().narrowU(this, typeOf<UByte>(), typeOf<Byte>
  *
  * The method ensures a safe and precise conversion by checking if the [UShort] value lies within the
  * valid range for a [Byte] ([0] to [127]). If the value is out of range, the conversion fails and
- * provides a [InvalidConversionBetweenTypes].
+ * provides a [InvalidTypeConversion].
  *
  * @receiver The [UShort] value to be converted to a [Byte].
- * @return An [Either] containing the successfully converted [Byte] value or a [InvalidConversionBetweenTypes]
+ * @return An [Either] containing the successfully converted [Byte] value or a [InvalidTypeConversion]
  * if the value is out of the valid range.
  * @since 6.1.0
  */
@@ -1741,11 +1741,11 @@ fun UShort.toByteOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<Byt
  *
  * This function performs a narrowing conversion from [UShort] to [Short]. If the value
  * of the [UShort] exceeds the maximum value representable by a [Short], an error of type
- * [InvalidConversionBetweenTypes] will be generated.
+ * [InvalidTypeConversion] will be generated.
  *
  * @receiver The [UShort] value to be converted.
  * @return An [Either] instance containing the successfully converted [Short] or a
- *         [InvalidConversionBetweenTypes] in case of failure.
+ *         [InvalidTypeConversion] in case of failure.
  * @since 6.1.0
  */
 fun UShort.toShortOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<Short>(), Short.MAX_VALUE.toLong(), Long::toShort)
@@ -1754,7 +1754,7 @@ fun UShort.toShortOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<Sh
  *
  * This method ensures safe narrowing of a [UShort] to a [UByte] by validating
  * that the value lies within the range of [UByte]. If the value is outside the permissible
- * range, an error of type [InvalidConversionBetweenTypes] is returned.
+ * range, an error of type [InvalidTypeConversion] is returned.
  *
  * @return An instance of `Either<NumberConversionError, UByte>` representing the result of the conversion process.
  *         The success case contains the converted [UByte] value, while the failure case contains the corresponding error.
@@ -1767,7 +1767,7 @@ fun UShort.toUByteOrError() = toLong().narrowU(this, typeOf<UShort>(), typeOf<UB
  *
  * @receiver The source [UInt] value to be converted.
  * @return [Byte] representation of this [UInt] if it is within the valid range of [Byte],
- * or a [InvalidConversionBetweenTypes] wrapped in an `Either` if the conversion cannot be performed.
+ * or a [InvalidTypeConversion] wrapped in an `Either` if the conversion cannot be performed.
  * @since 6.1.0
  */
 fun UInt.toByteOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<Byte>(), Byte.MAX_VALUE.toLong(), Long::toByte)
@@ -1808,7 +1808,7 @@ fun UInt.toIntOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<Int>(), 
  *
  * @receiver The [UInt] value to be converted.
  * @return An [Either] type that contains the resulting [UByte] if the conversion
- *         is successful, or a [InvalidConversionBetweenTypes] if the conversion fails.
+ *         is successful, or a [InvalidTypeConversion] if the conversion fails.
  * @since 6.1.0
  */
 fun UInt.toUByteOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<UByte>(), UByte.MAX_VALUE.toLong(), Long::toUByte)
@@ -1817,14 +1817,14 @@ fun UInt.toUByteOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<UByte>
  *
  * If the current value can be represented as a [UShort] (i.e., it falls within the valid
  * [UShort] range), the conversion is performed successfully. Otherwise, an error
- * of type [InvalidConversionBetweenTypes] is returned encapsulating the source value and type.
+ * of type [InvalidTypeConversion] is returned encapsulating the source value and type.
  *
  * This method internally uses the `narrowU` utility function to perform the range validation
  * and conversion safely.
  *
  * @receiver The [UInt] value being converted.
  * @return Either a [UShort] representation of the receiver if the value is within range,
- * or a [InvalidConversionBetweenTypes] if the value exceeds the valid range.
+ * or a [InvalidTypeConversion] if the value exceeds the valid range.
  * @since 6.1.0
  */
 fun UInt.toUShortOrError() = toLong().narrowU(this, typeOf<UInt>(), typeOf<UShort>(), UShort.MAX_VALUE.toLong(), Long::toUShort)
@@ -1846,11 +1846,11 @@ private fun <T : Any> ULong.narrowU(
     target: KType,
     max: Long,
     build: (Long) -> T,
-): Either<InvalidConversionBetweenTypes, T> =
+): Either<InvalidTypeConversion, T> =
     exactLongOrNull()
         ?.takeIf { it <= max }
         ?.let(build)
-        .rightIfNotNull { InvalidConversionBetweenTypes(this, from, target) }
+        .rightIfNotNull { InvalidTypeConversion(this, from, target) }
 
 /**
  * Attempts to convert this `ULong` to a `Byte`. Returns a `Right` containing the resulting value
@@ -1869,7 +1869,7 @@ fun ULong.toByteOrError() = narrowU(typeOf<ULong>(), typeOf<Byte>(), Byte.MAX_VA
  * The conversion uses a boundary check to ensure the [ULong] value is within
  * the range of a [Short], which is from `0` to `Short.MAX_VALUE` inclusive.
  *
- * @return Either a [Short] representation of the current [ULong] value or a [InvalidConversionBetweenTypes]
+ * @return Either a [Short] representation of the current [ULong] value or a [InvalidTypeConversion]
  * indicating the value is out of range for the target type.
  * @since 6.1.0
  */
@@ -1890,11 +1890,11 @@ fun ULong.toIntOrError() = narrowU(typeOf<ULong>(), typeOf<Int>(), Int.MAX_VALUE
  * This method leverages `narrowU` to check the validity of the conversion
  * and ensures the [Long.MAX_VALUE] boundary is respected. If the value
  * exceeds the maximum allowable value for [Long], an appropriate
- * [InvalidConversionBetweenTypes] is returned encapsulated in an `Either`.
+ * [InvalidTypeConversion] is returned encapsulated in an `Either`.
  *
  * @receiver The [ULong] value to be converted to [Long].
  * @return An `Either` containing the converted [Long] value if successful,
- *         or a [InvalidConversionBetweenTypes] if the conversion fails.
+ *         or a [InvalidTypeConversion] if the conversion fails.
  * @since 6.1.0
  */
 fun ULong.toLongOrError() = narrowU(typeOf<ULong>(), typeOf<Long>(), Long.MAX_VALUE) { it }
@@ -1902,9 +1902,9 @@ fun ULong.toLongOrError() = narrowU(typeOf<ULong>(), typeOf<Long>(), Long.MAX_VA
  * Attempts to convert the current [ULong] value to a [UByte].
  *
  * If the conversion succeeds, the result is returned as a [UByte].
- * If the current value exceeds the maximum value of [UByte], a [InvalidConversionBetweenTypes] is returned.
+ * If the current value exceeds the maximum value of [UByte], a [InvalidTypeConversion] is returned.
  *
- * @return Either a converted [UByte] or a [InvalidConversionBetweenTypes] if the conversion fails.
+ * @return Either a converted [UByte] or a [InvalidTypeConversion] if the conversion fails.
  * @since 6.1.0
  */
 fun ULong.toUByteOrError() = narrowU(typeOf<ULong>(), typeOf<UByte>(), UByte.MAX_VALUE.toLong(), Long::toUByte)
@@ -1918,7 +1918,7 @@ fun ULong.toUByteOrError() = narrowU(typeOf<ULong>(), typeOf<UByte>(), UByte.MAX
  * This method ensures that the conversion is safe and avoids silent overflows.
  *
  * @return An [Either] containing the successfully converted [UShort] value or a
- * [InvalidConversionBetweenTypes] if the conversion fails.
+ * [InvalidTypeConversion] if the conversion fails.
  * @since 6.1.0
  */
 fun ULong.toUShortOrError() = narrowU(typeOf<ULong>(), typeOf<UShort>(), UShort.MAX_VALUE.toLong(), Long::toUShort)

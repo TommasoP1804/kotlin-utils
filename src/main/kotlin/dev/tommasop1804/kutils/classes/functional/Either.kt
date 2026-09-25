@@ -61,7 +61,7 @@ sealed interface Either<out L, out R> {
      * @since 6.1.0
      */
     operator fun invoke(): R = when (this) {
-        is Left -> throw ErrorInvokedException(this)
+        is Left -> throw if (value is Error) value.linkedException else ErrorInvokedException(this)
         is Right -> this.value
     }
     /**

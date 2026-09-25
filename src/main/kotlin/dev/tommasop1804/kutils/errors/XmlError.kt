@@ -36,7 +36,7 @@ interface XmlError : Error {
      * @author Tommaso Pastorelli
      */
     data class InvalidXsltConfig(val reason: String? = null) : XmlError {
-        override val linkedException = IllegalStateException("Invalid XSLT config: $reason")
+        override val linkedException get() = IllegalStateException("Invalid XSLT config: $reason")
 
         /**
          * Secondary constructor for the InvalidXsltConfig class, allowing initialization using a Throwable instance.
@@ -66,7 +66,7 @@ interface XmlError : Error {
      * @author Tommaso Pastorelli
      */
     data class XsltTransfomationFailed(val reason: String? = null) : XmlError {
-        override val linkedException = IllegalStateException("XSLT transformation failed: $reason")
+        override val linkedException get() = IllegalStateException("XSLT transformation failed: $reason")
 
         /**
          * Secondary constructor for the `XsltTransfomationFailed` class, allowing initialization using a `Throwable` instance.
@@ -94,7 +94,7 @@ interface XmlError : Error {
      * @author Tommaso Pastorelli
      */
     data class SchemaValidationFailed(val reason: String? = null) : XmlError, ValidationError {
-        override val linkedException = XmlSchemaValidationException(reason)
+        override val linkedException get() = XmlSchemaValidationException(reason)
     }
     /**
      * Represents an error occurring when a specific XML path is not found.
@@ -108,6 +108,6 @@ interface XmlError : Error {
      * @author Tommaso Pastorelli
      */
     data class PathNotFound(val path: String) : XmlError {
-        override val linkedException = NoSuchYamlPathException(path)
+        override val linkedException get() = NoSuchYamlPathException(path)
     }
 }

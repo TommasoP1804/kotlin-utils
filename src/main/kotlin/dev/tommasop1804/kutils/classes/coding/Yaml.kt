@@ -220,9 +220,9 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          *         or an InvalidConversion object in case of failure.
          * @since 6.1.0
          */
-        fun File.toYaml(): Either<InvalidConversionBetweenTypes, Yaml> = either {
+        fun File.toYaml(): Either<InvalidTypeConversion, Yaml> = either {
             catching({ Yaml(this@toYaml) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toYaml, typeOf<File>(), typeOf<Yaml>(), t)
+                InvalidTypeConversion(this@toYaml, typeOf<File>(), typeOf<Yaml>(), t)
             }
         }
         /**
@@ -230,16 +230,16 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          *
          * This method attempts to interpret the [Path] as a YAML type. If the conversion
          * is successful, the resulting [Yaml] object is returned wrapped in an [Either].
-         * If the conversion fails, an [InvalidConversionBetweenTypes] error is returned containing
+         * If the conversion fails, an [InvalidTypeConversion] error is returned containing
          * details about the failed conversion.
          *
          * @return An [Either] containing either the successfully converted [Yaml] object
-         * or an [InvalidConversionBetweenTypes] error encapsulating the failure details.
+         * or an [InvalidTypeConversion] error encapsulating the failure details.
          * @since 6.1.0
          */
-        fun Path.toYaml(): Either<InvalidConversionBetweenTypes, Yaml> = either {
+        fun Path.toYaml(): Either<InvalidTypeConversion, Yaml> = either {
             catching({ Yaml(this@toYaml) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toYaml, typeOf<Path>(), typeOf<Yaml>(), t)
+                InvalidTypeConversion(this@toYaml, typeOf<Path>(), typeOf<Yaml>(), t)
             }
         }
         /**

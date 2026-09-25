@@ -160,7 +160,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         fun File.toToml() = either {
             catching({ Toml(this@toToml) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toToml, typeOf<File>(), typeOf<Toml>(), t)
+                InvalidTypeConversion(this@toToml, typeOf<File>(), typeOf<Toml>(), t)
             }
         }
         /**
@@ -175,7 +175,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         fun Path.toToml() = either {
             catching({ Toml(this@toToml) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toToml, typeOf<Path>(), typeOf<Toml>(), t)
+                InvalidTypeConversion(this@toToml, typeOf<Path>(), typeOf<Toml>(), t)
             }
         }
         /**

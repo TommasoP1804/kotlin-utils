@@ -128,8 +128,8 @@ enum class LogLevel(val levelInt: Int) {
      *         or an `InvalidConversionBetweenTypes` error if the conversion fails.
      * @since 6.1.0
      */
-    fun toSlf4jLevel(): Either<InvalidConversionBetweenTypes, Level> = tryOrError({
-        InvalidConversionBetweenTypes(this, typeOf<LogLevel>(), typeOf<Level>(), it)
+    fun toSlf4jLevel(): Either<InvalidTypeConversion, Level> = tryOrError({
+        InvalidTypeConversion(this, typeOf<LogLevel>(), typeOf<Level>(), it)
     }) { Level.valueOf(levelName) }
     /**
      * Converts the current `LogLevel` instance to its corresponding Java `java.util.logging.Level`.
@@ -142,8 +142,8 @@ enum class LogLevel(val levelInt: Int) {
      *         or an `InvalidConversionBetweenTypes` error if the conversion fails.
      * @since 6.1.0
      */
-    fun toJavaLogLevel(): Either<InvalidConversionBetweenTypes, java.util.logging.Level> = tryOrError({
-        InvalidConversionBetweenTypes(this, typeOf<LogLevel>(), typeOf<java.util.logging.Level>(), it)
+    fun toJavaLogLevel(): Either<InvalidTypeConversion, java.util.logging.Level> = tryOrError({
+        InvalidTypeConversion(this, typeOf<LogLevel>(), typeOf<java.util.logging.Level>(), it)
     }) { java.util.logging.Level.parse(levelName) }
 }
 

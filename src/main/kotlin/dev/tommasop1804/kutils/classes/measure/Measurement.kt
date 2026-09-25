@@ -183,7 +183,7 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
          * @since 6.1.0
          */
         @OptIn(Beta::class)
-        fun average(vararg measurements: Measurement): Either<IllegalConversionBetweenUnits, Measurement> = either {
+        fun average(vararg measurements: Measurement): Either<IllegalUnitConversion, Measurement> = either {
             var sum = 0.0
             for (measurement in measurements) {
                 sum += ScalarUnit.convert(measurement, measurements[0].unit).bind().value
@@ -416,7 +416,7 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
      * @since 6.1.0
      */
     @Beta
-    infix fun convertTo(to: ScalarUnit): Either<IllegalConversionBetweenUnits, Measurement> =
+    infix fun convertTo(to: ScalarUnit): Either<IllegalUnitConversion, Measurement> =
         ScalarUnit.convert(this, to)
 
     /**

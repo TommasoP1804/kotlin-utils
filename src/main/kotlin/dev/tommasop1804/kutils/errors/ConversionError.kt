@@ -6,6 +6,7 @@
 
 package dev.tommasop1804.kutils.errors
 
+import dev.tommasop1804.kutils.*
 import dev.tommasop1804.kutils.classes.measure.*
 import dev.tommasop1804.kutils.exceptions.*
 import kotlin.reflect.KType
@@ -46,7 +47,7 @@ interface ConversionError : Error {
  * @author Tommaso Pastorelli
  */
 open class InvalidConversion(open val invalidValue: Any?, val from: String, val to: String, open val reason: String? = null) : ConversionError {
-    override val linkedException = ConversionException("Conversion of `${invalidValue}` from $from to $to failed because: $reason.")
+    override val linkedException get() = ConversionException("Conversion of `${invalidValue}` from $from to $to failed${if (reason != null) " because: $reason." else String.EMPTY}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -70,9 +71,7 @@ open class InvalidConversion(open val invalidValue: Any?, val from: String, val 
         return result
     }
 
-    override fun toString(): String {
-        return "InvalidConversion(invalidValue=$invalidValue, from=$from, to=$to, reason=$reason)"
-    }
+    override fun toString(): String = "InvalidConversion(invalidValue=$invalidValue, from=$from, to=$to, reason=$reason)"
 }
 
 /**
@@ -84,10 +83,10 @@ open class InvalidConversion(open val invalidValue: Any?, val from: String, val 
  * @property toType The target class to which the conversion was attempted.
  * @property reason An optional message providing additional details about why the conversion failed.
  *
- * @since 6.1.0
+ * @since 6.3.0
  * @author Tommaso Pastorelli
  */
-data class InvalidConversionBetweenTypes(override val invalidValue: Any?, val fromType: KType, val toType: KType, override val reason: String? = null) : InvalidConversion(
+data class InvalidTypeConversion(override val invalidValue: Any?, val fromType: KType, val toType: KType, override val reason: String? = null) : InvalidConversion(
     invalidValue, fromType.toString(), toType.toString(), reason
 ) {
     /**
@@ -98,7 +97,7 @@ data class InvalidConversionBetweenTypes(override val invalidValue: Any?, val fr
      * @param fromType The source class type of the value.
      * @param toType The target class type to which conversion was attempted.
      * @param throwable The throwable whose message describes the reason for the failed conversion.
-     * @since 6.1.0
+     * @since 6.3.0
      */
     constructor(invalidValue: Any?, fromType: KType, toType: KType, throwable: Throwable) : this(invalidValue, fromType, toType, throwable.message)
 }
@@ -134,7 +133,7 @@ data class InvalidConversionBetweenTypes(override val invalidValue: Any?, val fr
  * @since 6.1.0
  */
 open class IllegalConversion(open val invalidValue: Any?, val from: String, val to: String, open val reason: String? = null) : ConversionError {
-    override val linkedException = ConversionException("Conversion of `${invalidValue}` from $from to $to is illegal because: $reason.")
+    override val linkedException get() = ConversionException("Conversion of `${invalidValue}` from $from to $to is illegal${if (reason != null) " because: $reason." else String.EMPTY}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -158,9 +157,7 @@ open class IllegalConversion(open val invalidValue: Any?, val from: String, val 
         return result
     }
 
-    override fun toString(): String {
-        return "IllegalConversion(invalidValue=$invalidValue, from=$from, to=$to, reason=$reason)"
-    }
+    override fun toString(): String = "IllegalConversion(invalidValue=$invalidValue, from=$from, to=$to, reason=$reason)"
 }
 
 /**
@@ -179,9 +176,9 @@ open class IllegalConversion(open val invalidValue: Any?, val from: String, val 
  * @constructor Creates an instance of this class using the provided details about the failed conversion.
  * @constructor Overloaded constructor that also accepts a [Throwable], utilizing its message as the reason.
  * @author Tommaso Pastorelli
- * @since 6.1.0
+ * @since 6.3.0
  */
-data class IllegalConversionBetweenTypes(override val invalidValue: Any?, val fromType: KType, val toType: KType, override val reason: String? = null) : IllegalConversion(
+data class IllegalTypeConversion(override val invalidValue: Any?, val fromType: KType, val toType: KType, override val reason: String? = null) : IllegalConversion(
     invalidValue, fromType.toString(), toType.toString(), reason
 ) {
     /**
@@ -196,7 +193,7 @@ data class IllegalConversionBetweenTypes(override val invalidValue: Any?, val fr
      * @param fromType The source type involved in the conversion.
      * @param toType The target type involved in the conversion.
      * @param throwable The throwable instance that provides context for the error, specifically its message.
-     * @since 6.1.0
+     * @since 6.3.0
      */
     constructor(invalidValue: Any?, fromType: KType, toType: KType, throwable: Throwable) : this(invalidValue, fromType, toType, throwable.message)
 }
@@ -213,8 +210,8 @@ data class IllegalConversionBetweenTypes(override val invalidValue: Any?, val fr
  * @property toUnit The target unit of the attempted conversion.
  * @constructor Creates an instance of the exception with details about the invalid conversion.
  * @author Tommaso Pastorelli
- * @since 6.1.0
+ * @since 6.3.0
  */
-data class IllegalConversionBetweenUnits(override val invalidValue: Any?, val fromUnit: ScalarUnit, val toUnit: ScalarUnit) : IllegalConversion(
-    invalidValue, fromUnit.toString(), toUnit.toString(), "Incompatible measure"
+data class IllegalUnitConversion(override val invalidValue: Any?, val fromUnit: ScalarUnit, val toUnit: ScalarUnit) : IllegalConversion(
+    invalidValue, fromUnit.unitName, toUnit.unitName, "Incompatible measure (${fromUnit.measure} -> ${toUnit.measure})"
 )

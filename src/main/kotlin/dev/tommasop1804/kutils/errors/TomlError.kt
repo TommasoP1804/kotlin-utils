@@ -32,7 +32,7 @@ interface TomlError : Error {
      * @author Tommaso Pastorelli
      */
     data class PathNotFound(val path: String) : TomlError {
-        override val linkedException = NoSuchTomlPathException(path)
+        override val linkedException get() = NoSuchTomlPathException(path)
     }
     /**
      * Represents an error that occurs when schema validation fails.
@@ -45,6 +45,6 @@ interface TomlError : Error {
      * @author Tommaso Pastorelli
      */
     data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : TomlError, ValidationError {
-        override val linkedException = TomlSchemaValidationException(errors)
+        override val linkedException get() = TomlSchemaValidationException(errors)
     }
 }

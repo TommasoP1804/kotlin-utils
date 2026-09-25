@@ -78,7 +78,7 @@ interface HttpError : Error {
         override val responseHeaders: HttpHeaders?,
         override val errorMessage: String? = null
     ) : HttpError {
-        override val linkedException = HttpRequestException(
+        override val linkedException get() = HttpRequestException(
             statusCode,
             uri,
             method?.toEnumConst(),
@@ -179,7 +179,7 @@ interface HttpError : Error {
         override val responseHeaders: HttpHeaders? = null,
         override val errorMessage: String? = null
     ) : HttpError {
-        override val linkedException = HttpResponseException(
+        override val linkedException get() = HttpResponseException(
             statusCode,
             uri,
             method?.toEnumConst(),
@@ -280,7 +280,7 @@ interface HttpError : Error {
         override val responseHeaders: HttpHeaders? = null,
         override val errorMessage: String? = null
     ) : HttpError {
-        override val linkedException = ExternalServiceHttpException(
+        override val linkedException get() = ExternalServiceHttpException(
             serviceName,
             statusCode,
             uri,

@@ -180,7 +180,7 @@ open class NoSuchTomlPathException : NoSuchPathException {
  * or validation operations are being performed and strict compliance or
  * availability of specific paths is required.
  *
- * @since 6.1.3
+ * @since 6.2.0
  * @author Tommaso Pastorelli
  */
 open class NoSuchXmlPathException : NoSuchPathException {
@@ -191,7 +191,7 @@ open class NoSuchXmlPathException : NoSuchPathException {
      * Commonly used when the specific XML path causing the exception is unknown,
      * and there is no additional context provided.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor() : super()
     /**
@@ -199,7 +199,7 @@ open class NoSuchXmlPathException : NoSuchPathException {
      * This constructor allows specifying the path that caused the exception.
      *
      * @param path The path associated with the exception.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(path: Any) : super(path)
     /**
@@ -211,7 +211,7 @@ open class NoSuchXmlPathException : NoSuchPathException {
      * This constructor allows specifying both the problematic path and the root cause,
      * providing more context about the exception.
      *
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(path: Any, cause: Throwable?) : super(path, cause)
     /**
@@ -219,7 +219,7 @@ open class NoSuchXmlPathException : NoSuchPathException {
      *
      * @param cause the cause of this exception, which can be retrieved later using [Throwable.cause].
      *              A null value is permitted and indicates that the cause is nonexistent or unknown.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(cause: Throwable?) : super(cause)
 }

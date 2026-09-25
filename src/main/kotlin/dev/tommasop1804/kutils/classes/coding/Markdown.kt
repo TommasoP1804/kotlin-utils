@@ -263,7 +263,7 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
          */
         fun File.toMarkdown() = either {
             catching({ Markdown(this@toMarkdown) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toMarkdown, typeOf<File>(), typeOf<Markdown>(), t)
+                InvalidTypeConversion(this@toMarkdown, typeOf<File>(), typeOf<Markdown>(), t)
             }
         }
         /**
@@ -287,7 +287,7 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
          */
         fun Path.toMarkdown() = either {
             catching({ Markdown(this@toMarkdown) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toMarkdown, typeOf<Path>(), typeOf<Markdown>(), t)
+                InvalidTypeConversion(this@toMarkdown, typeOf<Path>(), typeOf<Markdown>(), t)
             }
         }
         /**
@@ -339,7 +339,7 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
          */
         fun readFromFile(file: File) = either {
             catching({ Markdown(file) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(file, typeOf<File>(), typeOf<Markdown>(), t)
+                InvalidTypeConversion(file, typeOf<File>(), typeOf<Markdown>(), t)
             }
         }
 

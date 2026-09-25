@@ -352,7 +352,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          */
         fun File.toJson() = either {
             catching({ Json(this@toJson) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toJson, typeOf<File>(), typeOf<Json>(), t)
+                InvalidTypeConversion(this@toJson, typeOf<File>(), typeOf<Json>(), t)
             }
         }
         /**
@@ -367,7 +367,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          */
         fun Path.toJson() = either {
             catching({ Json(this@toJson) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toJson, typeOf<Path>(), typeOf<Json>(), t)
+                InvalidTypeConversion(this@toJson, typeOf<Path>(), typeOf<Json>(), t)
             }
         }
         /**

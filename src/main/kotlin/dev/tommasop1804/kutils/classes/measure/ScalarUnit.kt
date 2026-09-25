@@ -141,12 +141,12 @@ interface ScalarUnit : Serializable {
          * @param measurement The measurement value along with its current unit to be converted.
          * @param to The target unit to which the measurement should be converted.
          * @return Either a successful [Measurement] converted to the target unit, or an error
-         *         [IllegalConversionBetweenUnits] if the conversion is not possible.
+         *         [IllegalUnitConversion] if the conversion is not possible.
          * @since 6.1.0
          */
         @Beta
-        fun convert(measurement: Measurement, to: ScalarUnit): Either<IllegalConversionBetweenUnits, Measurement> = either {
-            val error = IllegalConversionBetweenUnits(measurement, measurement.unit, to)
+        fun convert(measurement: Measurement, to: ScalarUnit): Either<IllegalUnitConversion, Measurement> = either {
+            val error = IllegalUnitConversion(measurement, measurement.unit, to)
             if (measurement.measure != to.measure) {
                 raise(error)
             }

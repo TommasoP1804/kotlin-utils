@@ -44,6 +44,6 @@ interface EnumError : Error {
      * @author Tommaso Pastorelli
      */
     data class NoSuchEntry(override val enum: KClass<out Enum<*>>, val entry: String) : EnumError, ParsingError {
-        override val linkedException = NoSuchEntryException(enum, entry)
+        override val linkedException get() = NoSuchEntryException(enum, entry)
     }
 }

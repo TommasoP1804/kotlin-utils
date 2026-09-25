@@ -51,7 +51,7 @@ open class ConversionException : RuntimeException {
      * @param value The value that could not be converted.
      * @param fromClass The source type of the value.
      * @param toClass The target type to which the value could not be converted.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Any?, fromClass: KClass<*>, toClass: KClass<*>) : super(
         "Conversion of `$value` from ${fromClass.simpleName} to ${toClass.simpleName} failed."
@@ -62,7 +62,7 @@ open class ConversionException : RuntimeException {
      *
      * @param fromType The source type involved in the conversion.
      * @param toType The target type involved in the conversion.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(fromType: KType, toType: KType) : super(
         "Conversion from $fromType to $toType failed."
@@ -74,7 +74,7 @@ open class ConversionException : RuntimeException {
      * @param value The value that was attempted to be converted.
      * @param fromType The source type of the conversion.
      * @param toType The target type of the conversion.
-     * @since 6.1.3
+     * @since 6.2.0
      */
     constructor(value: Any?, fromType: KType, toType: KType) : super(
         "Conversion of `$value` from $fromType to $toType failed."

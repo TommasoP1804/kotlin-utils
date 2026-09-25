@@ -29,7 +29,7 @@ interface JsonError : Error {
      * @since 6.1.0
      */
     data class PathNotFound(val path: String) : JsonError {
-        override val linkedException = NoSuchJsonPathException(path)
+        override val linkedException get() = NoSuchJsonPathException(path)
     }
     /**
      * Represents an error that indicates schema validation has failed.
@@ -46,6 +46,6 @@ interface JsonError : Error {
      * @since 6.1.0
      */
     data class SchemaValidationFailed(val errors: List<JsonSchema.SchemaError>) : JsonError, ValidationError {
-        override val linkedException = JsonSchemaValidationException(errors)
+        override val linkedException get() = JsonSchemaValidationException(errors)
     }
 }

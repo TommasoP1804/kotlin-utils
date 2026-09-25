@@ -368,7 +368,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          */
         fun File.toXml() = either {
             catching({ Xml(this@toXml) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toXml, typeOf<File>(), typeOf<Xml>(), t)
+                InvalidTypeConversion(this@toXml, typeOf<File>(), typeOf<Xml>(), t)
             }
         }
         /**
@@ -384,7 +384,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          */
         fun Path.toXml() = either {
             catching({ Xml(this@toXml) }) { t: Throwable ->
-                InvalidConversionBetweenTypes(this@toXml, typeOf<Path>(), typeOf<Xml>(), t)
+                InvalidTypeConversion(this@toXml, typeOf<Path>(), typeOf<Xml>(), t)
             }
         }
         /**
@@ -499,14 +499,14 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          *         be converted to XML, or a formatted Xml instance.
          * @since 6.1.0
          */
-        fun File.toPrettyXml(): Either<InvalidConversionBetweenTypes, Xml> = toXml().map(Xml::pretty)
+        fun File.toPrettyXml(): Either<InvalidTypeConversion, Xml> = toXml().map(Xml::pretty)
         /**
          * Converts the content of the given Path to a prettified XML representation if valid.
          *
          * @return Either an InvalidConversion error if the content cannot be parsed as XML, or a prettified Xml object.
          * @since 6.1.0
          */
-        fun Path.toPrettyXml(): Either<InvalidConversionBetweenTypes, Xml> = toXml().map(Xml::pretty)
+        fun Path.toPrettyXml(): Either<InvalidTypeConversion, Xml> = toXml().map(Xml::pretty)
         /**
          * Converts the current XML string into a pretty-printed XML format.
          *

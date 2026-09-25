@@ -34,7 +34,7 @@ interface NumberError : Error {
      * @author Tommaso Pastorelli
      */
     data class InvalidSign(override val number: Number, val validSignes: Set<NumberSign> = emptySet()) : NumberError, ValidationError {
-        override val linkedException = NumberSignException(number, validSignes)
+        override val linkedException get() = NumberSignException(number, validSignes)
     }
 
     /**
@@ -48,7 +48,7 @@ interface NumberError : Error {
      * @author Tommaso Pastorelli
      */
     data class InvalidRadix(val invalidRadix: Int, val validRange: IntRange? = null) : NumberError, ValidationError {
-        override val linkedException = NumberOutOfRangeException(invalidRadix, validRange)
+        override val linkedException get() = NumberOutOfRangeException(invalidRadix, validRange)
         override val number = invalidRadix
     }
 
@@ -93,7 +93,7 @@ interface NumberError : Error {
      * @author Tommaso Pastorelli
      */
     data class PositivePercentageOverflow(override val percentage: Double) : PercentageOverflow {
-        override val linkedException = MalformedInputException("The percentage must be lower than or equal to 100")
+        override val linkedException get() = MalformedInputException("The percentage must be lower than or equal to 100")
         override val number = percentage
     }
     /**
@@ -108,7 +108,7 @@ interface NumberError : Error {
      * @author Tommaso Pastorelli
      */
     data class NegativePercentageOverflow(override val percentage: Double) : PercentageOverflow {
-        override val linkedException = MalformedInputException("The percentage must be greater than or equal to 0")
+        override val linkedException get() = MalformedInputException("The percentage must be greater than or equal to 0")
         override val number = percentage
     }
 }

@@ -1403,7 +1403,7 @@ fun ChronoLocalDateTime<*>.toInstant(offset: ZoneIdent): Instant = toInstant(off
  *         `InvalidConversionBetweenTypes` on failure (`Left`).
  * @since 6.1.0
  */
-fun Int.toYear(): Either<InvalidConversionBetweenTypes, Year> = tryOrError({ InvalidConversionBetweenTypes(
+fun Int.toYear(): Either<InvalidTypeConversion, Year> = tryOrError({ InvalidTypeConversion(
     this,
     typeOf<Int>(),
     typeOf<Year>(),
@@ -1418,7 +1418,7 @@ fun Int.toYear(): Either<InvalidConversionBetweenTypes, Year> = tryOrError({ Inv
  * - A nullable `Year` object if the conversion was successful.
  * @since 6.1.0
  */
-fun Long.toYear(): Either<InvalidConversionBetweenTypes, Year> = toIntOrError() thenMergeWith { tryOrError({ t -> InvalidConversionBetweenTypes(
+fun Long.toYear(): Either<InvalidTypeConversion, Year> = toIntOrError() thenMergeWith { tryOrError({ t -> InvalidTypeConversion(
     this,
     typeOf<Long>(),
     typeOf<Year>(),
@@ -1437,7 +1437,7 @@ fun Long.toYear(): Either<InvalidConversionBetweenTypes, Year> = toIntOrError() 
  *         `InvalidConversionBetweenTypes` error, or the `Right` contains the successfully converted `Month`.
  * @since 6.1.0
  */
-fun Int.toMonth(): Either<InvalidConversionBetweenTypes, Month> = tryOrError({ InvalidConversionBetweenTypes(
+fun Int.toMonth(): Either<InvalidTypeConversion, Month> = tryOrError({ InvalidTypeConversion(
     this,
     typeOf<Int>(),
     typeOf<Month>(),
@@ -1459,7 +1459,7 @@ fun Int.toMonth(): Either<InvalidConversionBetweenTypes, Month> = tryOrError({ I
  *         - `Either.Left<InvalidConversionBetweenTypes>`: If the conversions fails, contains details about the failure.
  * @since 6.1.0
  */
-fun Long.toMonth(): Either<InvalidConversionBetweenTypes, Month> = toIntOrError() thenMergeWith { tryOrError({ t -> InvalidConversionBetweenTypes(
+fun Long.toMonth(): Either<InvalidTypeConversion, Month> = toIntOrError() thenMergeWith { tryOrError({ t -> InvalidTypeConversion(
     this,
     typeOf<Long>(),
     typeOf<Month>(),
