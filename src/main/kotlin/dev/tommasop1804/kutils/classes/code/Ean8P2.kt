@@ -102,7 +102,7 @@ value class Ean8P2 private constructor(override val value: String) : CharSequenc
          */
         fun CharSequence.toEan8P2() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { either {
             catching({ Ean8P2(this@toEan8P2) }) { t: Throwable ->
-                InvalidFormatOfType(this@toEan8P2, typeOf<Ean8P2>(), t)
+                InvalidTypeFormat(this@toEan8P2, typeOf<Ean8P2>(), t)
             }
         } }
 

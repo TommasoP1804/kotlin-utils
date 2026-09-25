@@ -1232,8 +1232,8 @@ internal inline fun <reified N : Number, T : Any> N.narrow(
         .rightIfNotNull { InvalidTypeConversion(this, typeOf<N>(), target, reason = "Number out of valid range for type ${target.simpleName}") }
 
 @PublishedApi
-internal fun <T : Any> String.parseOrError(target: KType, parse: (String) -> T): Either<InvalidFormatOfType, T> =
-    either { catching({ parse(this@parseOrError) }) { _: NumberFormatException -> raise(InvalidFormatOfType(this@parseOrError, target)) } }
+internal fun <T : Any> String.parseOrError(target: KType, parse: (String) -> T): Either<InvalidTypeFormat, T> =
+    either { catching({ parse(this@parseOrError) }) { _: NumberFormatException -> raise(InvalidTypeFormat(this@parseOrError, target)) } }
 
 /**
  * Converts the current number to a `Byte` if it falls within the valid range for a `Byte`
@@ -1470,10 +1470,10 @@ inline fun <reified N : Number> N.toBigDecimalOrError(): Either<InvalidTypeConve
  * Attempts to parse the string as a [Byte] and returns the result wrapped in an [Either].
  *
  * If the string cannot be parsed into a [Byte] due to a [NumberFormatException],
- * an instance of [InvalidFormatOfType] containing the original string and target type
+ * an instance of [InvalidTypeFormat] containing the original string and target type
  * will be returned in the [Either] as an error.
  *
- * @return [Either] containing the successfully parsed [Byte] or a [InvalidFormatOfType].
+ * @return [Either] containing the successfully parsed [Byte] or a [InvalidTypeFormat].
  * @since 6.1.0
  */
 fun String.toByteOrError() = parseOrError(typeOf<Byte>(), String::toByte)
@@ -1481,10 +1481,10 @@ fun String.toByteOrError() = parseOrError(typeOf<Byte>(), String::toByte)
  * Parses the string as a [Short] or returns an error if the parsing fails.
  *
  * This function attempts to convert the string to a [Short].
- * If the string cannot be successfully parsed, a [InvalidFormatOfType] is returned
+ * If the string cannot be successfully parsed, a [InvalidTypeFormat] is returned
  * encapsulating details of the failure.
  *
- * @return An [Either] containing a successfully parsed [Short] or a [InvalidFormatOfType].
+ * @return An [Either] containing a successfully parsed [Short] or a [InvalidTypeFormat].
  * @since 6.1.0
  */
 fun String.toShortOrError() = parseOrError(typeOf<Short>(), String::toShort)
@@ -1549,13 +1549,13 @@ fun String.toUShortOrError() = parseOrError(typeOf<UShort>(), String::toUShort)
  */
 fun String.toUIntOrError() = parseOrError(typeOf<UInt>(), String::toUInt)
 /**
- * Parses the string as an unsigned [ULong] number or returns a [InvalidFormatOfType] if the string is not a valid representation of an unsigned long.
+ * Parses the string as an unsigned [ULong] number or returns a [InvalidTypeFormat] if the string is not a valid representation of an unsigned long.
  *
  * This method attempts to convert the string into an unsigned [ULong] using the [String.toULong] function. If the parsing fails
- * due to an invalid format or overflow, a [InvalidFormatOfType] encapsulating the erroneous input and target type is returned.
+ * due to an invalid format or overflow, a [InvalidTypeFormat] encapsulating the erroneous input and target type is returned.
  *
  * @receiver The string to be parsed as an unsigned long.
- * @return An [Either] instance containing a successful [ULong] parsing result or a [InvalidFormatOfType] in case of failure.
+ * @return An [Either] instance containing a successful [ULong] parsing result or a [InvalidTypeFormat] in case of failure.
  *
  * @since 6.1.0
  */
@@ -1565,21 +1565,21 @@ fun String.toULongOrError() = parseOrError(typeOf<ULong>(), String::toULong)
  * Converts the string to a [Float] or returns an error encapsulated in an [Either] if the string cannot be parsed.
  *
  * This method attempts to parse the current string as a floating-point number. If the parsing fails due to an
- * invalid format, a [InvalidFormatOfType] is returned, which includes details about the failure and the target type.
+ * invalid format, a [InvalidTypeFormat] is returned, which includes details about the failure and the target type.
  *
- * @return An [Either] containing the parsed [Float] if successful, or a [InvalidFormatOfType] if parsing fails.
+ * @return An [Either] containing the parsed [Float] if successful, or a [InvalidTypeFormat] if parsing fails.
  *
  * @since 6.1.0
  */
 fun String.toFloatOrError() = parseOrError(typeOf<Float>(), String::toFloat)
 /**
  * Attempts to parse the string as a [Double]. If parsing is successful, the result is returned
- * as a successful value. Otherwise, a [InvalidFormatOfType] is returned indicating the failure.
+ * as a successful value. Otherwise, a [InvalidTypeFormat] is returned indicating the failure.
  *
  * This method makes use of `parseOrError` to handle the conversion and error wrapping.
  *
  * @receiver The string to be parsed into a [Double].
- * @return An [Either] containing either a successful parsed [Double] or an instance of [InvalidFormatOfType].
+ * @return An [Either] containing either a successful parsed [Double] or an instance of [InvalidTypeFormat].
  * @since 6.1.0
  */
 fun String.toDoubleOrError() = parseOrError(typeOf<Double>(), String::toDouble)
@@ -1600,10 +1600,10 @@ fun String.toBigIntOrError() = parseOrError(typeOf<BigInt>(), String::toBigInteg
  * Parses the string as a [BigDecimal] or returns an error if parsing fails.
  *
  * This method leverages a utility function to attempt parsing the string. If the string
- * cannot be parsed into a valid [BigDecimal], an instance of [InvalidFormatOfType] is returned.
+ * cannot be parsed into a valid [BigDecimal], an instance of [InvalidTypeFormat] is returned.
  *
  * @receiver The string to be parsed.
- * @return An [Either] containing the successfully parsed [BigDecimal] or a [InvalidFormatOfType].
+ * @return An [Either] containing the successfully parsed [BigDecimal] or a [InvalidTypeFormat].
  * @since 6.1.0
  */
 fun String.toBigDecimalOrError() = parseOrError(typeOf<BigDecimal>(), ::BigDecimal)
@@ -1617,7 +1617,7 @@ fun String.toBigDecimalOrError() = parseOrError(typeOf<BigDecimal>(), ::BigDecim
  */
 fun String.toBigIntOrError(radix: Int): Either<Error, BigInteger> = either {
     ensure(radix in Character.MIN_RADIX..Character.MAX_RADIX) { NumberError.InvalidRadix(radix, Character.MIN_RADIX..Character.MAX_RADIX) }
-    catching({ toBigInteger(radix) }) { _: NumberFormatException -> raise(InvalidFormatOfType(this@toBigIntOrError, typeOf<BigInt>())) }
+    catching({ toBigInteger(radix) }) { _: NumberFormatException -> raise(InvalidTypeFormat(this@toBigIntOrError, typeOf<BigInt>())) }
 }
 /**
  * Converts the string representation of a number to a `BigInt` instance.
@@ -1949,7 +1949,7 @@ fun ULong.toUIntOrError() = narrowU(typeOf<ULong>(), typeOf<UInt>(), UInt.MAX_VA
  */
 fun CharSequence.parseNumberWords() = either {
     catching({ NumberWords.parse(this@parseNumberWords.toString()) }) { _: Exception ->
-        InvalidFormatOfType(this@parseNumberWords, typeOf<BigDecimal>())
+        InvalidTypeFormat(this@parseNumberWords, typeOf<BigDecimal>())
     }
 }
 

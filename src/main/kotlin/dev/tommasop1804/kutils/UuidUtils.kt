@@ -380,12 +380,12 @@ fun JavaUuid(shortUuid: ShortUuid) = shortUuid.toUuid()
  * Converts the current [CharSequence] into a [KUuid], wrapped in an `Either` construct for functional error handling.
  *
  * The transformation attempts to parse the string representation of the [CharSequence] into a UUID object ([KUuid]).
- * In the event of a parsing failure, an instance of [InvalidFormatOfType] is returned, encapsulating the input
+ * In the event of a parsing failure, an instance of [InvalidTypeFormat] is returned, encapsulating the input
  * that caused the failure.
  *
  * This method leverages the `either` construct to encapsulate success and failure states within an `Either` result.
  * If the conversion is successful, the result is returned as a `Right` containing the parsed [KUuid]. In case of failure,
- * the result is returned as a `Left` containing the generated [InvalidFormatOfType].
+ * the result is returned as a `Left` containing the generated [InvalidTypeFormat].
  *
  * @return An `Either` where:
  *   - `Right<KUuid>` contains the successfully parsed UUID.
@@ -394,7 +394,7 @@ fun JavaUuid(shortUuid: ShortUuid) = shortUuid.toUuid()
  * @since 6.1.0
  */
 fun CharSequence.toUuid() = either {
-    catching({ KUuid.parse(this@toUuid.toString()) }) { _: Exception -> InvalidFormatOfType(this@toUuid, typeOf<KUuid>()) }
+    catching({ KUuid.parse(this@toUuid.toString()) }) { _: Exception -> InvalidTypeFormat(this@toUuid, typeOf<KUuid>()) }
 }
 
 /**
@@ -573,7 +573,7 @@ fun Uuid(shortUuid: ShortUuid) = shortUuid.toUuid()
  * @since 6.1.0
  */
 fun CharSequence.toJavaUuid() = either {
-    catching({ UUID.fromString(this@toJavaUuid.toString())!! }) { _: Exception -> InvalidFormatOfType(this@toJavaUuid, typeOf<UUID>()) }
+    catching({ UUID.fromString(this@toJavaUuid.toString())!! }) { _: Exception -> InvalidTypeFormat(this@toJavaUuid, typeOf<UUID>()) }
 }
 
 /**
@@ -613,7 +613,7 @@ fun KUuid.toHex() = Hex(withoutHyphens)
  * @since 6.1.0
  */
 fun Hex.toUuid() = either {
-    catching({ KUuid.parseHex(toString(Hex.HexSymbol.None, TextCase.LowerCase)) }) { _: Exception -> InvalidFormatOfType(this@toUuid, typeOf<KUuid>()) }
+    catching({ KUuid.parseHex(toString(Hex.HexSymbol.None, TextCase.LowerCase)) }) { _: Exception -> InvalidTypeFormat(this@toUuid, typeOf<KUuid>()) }
 }
 /**
  * Converts a hexadecimal string to a UUID representation.

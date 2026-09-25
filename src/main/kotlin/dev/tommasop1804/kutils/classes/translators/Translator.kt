@@ -55,7 +55,7 @@ open class Translator(
          * string to its corresponding value within the file's structure.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
          * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
          * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
          *
@@ -68,13 +68,13 @@ open class Translator(
         infix fun String.translatedWith(translator: Translator): Either<Error, String> = either {
             when (translator.file.extension) {
                 "yaml", "yml" -> {
-                    val yaml = tryOrRaise({ InvalidFormatOfType(translator.file, typeOf<Yaml>(), it.message) }) {
+                    val yaml = tryOrRaise({ InvalidTypeFormat(translator.file, typeOf<Yaml>(), it.message) }) {
                         Yaml(translator.file)
                     }
                     yaml.getAsNode(this).asString().orRaise { YamlError.PathNotFound(this) }
                 }
                 "json" -> {
-                    val json = tryOrRaise({ InvalidFormatOfType(translator.file, typeOf<Json>(), it.message) }) {
+                    val json = tryOrRaise({ InvalidTypeFormat(translator.file, typeOf<Json>(), it.message) }) {
                         Json(translator.file)
                     }
                     json.getAsNode(this)?.asString().orRaise { JsonError.PathNotFound(this) }
@@ -88,7 +88,7 @@ open class Translator(
          * string to its corresponding value within the file's structure.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
          * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
          * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
          *
@@ -105,7 +105,7 @@ open class Translator(
          * or an error indicating why a key could not be translated.
          *
          * Possible errors for each:
-         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
          * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
          * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
          *
@@ -121,7 +121,7 @@ open class Translator(
          * or an error indicating why a key could not be translated.
          *
          * Possible errors for each:
-         * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+         * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
          * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
          * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
          *
@@ -139,7 +139,7 @@ open class Translator(
      * string to its corresponding value within the file's structure.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
      * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
      * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
@@ -155,7 +155,7 @@ open class Translator(
      * string to its corresponding value within the file's structure.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
      * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
      * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
@@ -171,7 +171,7 @@ open class Translator(
      * or an error indicating why a key could not be translated.
      *
      * Possible errors for each:
-     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
      * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
      * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *
@@ -187,7 +187,7 @@ open class Translator(
      * or an error indicating why a key could not be translated.
      *
      * Possible errors for each:
-     * - [InvalidFormatOfType] - the file is not matching the expected format (YAML or JSON).
+     * - [InvalidTypeFormat] - the file is not matching the expected format (YAML or JSON).
      * - [YamlError.PathNotFound] - the key specified does not exist in the file, and the file is a YAML.
      * - [JsonError.PathNotFound] - the key specified does not exist in the file, and the file is a JSON.
      *

@@ -306,7 +306,7 @@ class Markdown(@param:IJLanguage("Markdown") override var value: String) : CharS
          */
         fun @receiver:IJLanguage("Markdown") String.toMarkdown() = either {
             catching({ Markdown(this@toMarkdown) }) { t: Throwable ->
-                InvalidFormatOfType(this@toMarkdown, typeOf<Markdown>(), t)
+                InvalidTypeFormat(this@toMarkdown, typeOf<Markdown>(), t)
             }
         }
         /**

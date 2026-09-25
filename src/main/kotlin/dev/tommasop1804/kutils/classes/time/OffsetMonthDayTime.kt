@@ -574,7 +574,7 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
          * @since 6.1.0
          */
         @JvmStatic
-        fun parse(cs: CharSequence): Either<InvalidFormatOfType, OffsetMonthDayTime> = either { catching({
+        fun parse(cs: CharSequence): Either<InvalidTypeFormat, OffsetMonthDayTime> = either { catching({
             if (cs.isBlank()) now()
             else {
                 val symbol = if (cs.endsWith("Z")) 'Z' else if (cs.lastIndexOf('+') > cs.lastIndexOf('-')) '+' else '-'
@@ -583,7 +583,7 @@ class OffsetMonthDayTime(val monthDayTime: LocalMonthDayTime, val offset: ZoneOf
                 val localMonthDayTime = LocalMonthDayTime.parse(cs.take(cs.lastIndexOf(symbol))).getOrThrow()
                 OffsetMonthDayTime(localMonthDayTime, offset)
             }
-        }) { t: Throwable -> InvalidFormatOfType(cs, typeOf<OffsetMonthDayTime>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(cs, typeOf<OffsetMonthDayTime>(), t) } }
 
         /**
          * Converts a [Temporal] object into an instance of [OffsetMonthDayTime].

@@ -106,7 +106,7 @@ value class UpcE private constructor(override val value: String) : CharSequence,
          */
         fun CharSequence.toUpcE() = filter { it.isDigit() }.run { either {
             catching({ UpcE(this@toUpcE) }) { t: Throwable ->
-                InvalidFormatOfType(this@toUpcE, typeOf<UpcE>(), t)
+                InvalidTypeFormat(this@toUpcE, typeOf<UpcE>(), t)
             }
         } }
 

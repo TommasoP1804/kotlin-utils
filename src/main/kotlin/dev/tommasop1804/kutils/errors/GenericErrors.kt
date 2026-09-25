@@ -174,10 +174,10 @@ open class InvalidFormat(open val invalidValue: Any?, val target: String, open v
  * @property targetType The expected class type into which the parsing was attempted.
  * @property reason An optional description of why the parsing failed.
  *
- * @since 6.1.0
+ * @since 6.3.0
  * @author Tommaso Pastorelli
  */
-data class InvalidFormatOfType(override val invalidValue: Any?, val targetType: KType, override val reason: String? = null) : InvalidFormat(
+data class InvalidTypeFormat(override val invalidValue: Any?, val targetType: KType, override val reason: String? = null) : InvalidFormat(
     invalidValue, targetType.toString(), reason
 ) {
     /**
@@ -187,7 +187,7 @@ data class InvalidFormatOfType(override val invalidValue: Any?, val targetType: 
      * @param invalidValue The value that does not conform to the expected format.
      * @param targetType The target class that the value was expected to conform to.
      * @param throwable The throwable whose message represents the reason for the invalid format.
-     * @since 6.1.0
+     * @since 6.3.0
      */
     constructor(invalidValue: Any?, targetType: KType, throwable: Throwable) : this(invalidValue, targetType, throwable.message)
 }
@@ -206,7 +206,7 @@ data class InvalidFormatOfType(override val invalidValue: Any?, val targetType: 
  * @since 6.1.0
  * @author Tommaso Pastorelli
  */
-data class NoMatchingFormatOfType(val invalidValue: Any?, val targetType: KType) : ParsingError {
+data class NoMatchingTypeFormat(val invalidValue: Any?, val targetType: KType) : ParsingError {
     override val linkedException get() = NoMatchingFormatException("No matching format for input `$invalidValue` for target `$targetType`")
 }
 

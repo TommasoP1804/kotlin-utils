@@ -319,14 +319,14 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
         /**
          * Parses the given [CharSequence] input and attempts to convert it into a [Duration] representation.
          * The input must comply with the ISO-8601 duration format and start with a 'P' character.
-         * If parsing fails due to an invalid format, it returns an [InvalidFormatOfType] error.
+         * If parsing fails due to an invalid format, it returns an [InvalidTypeFormat] error.
          *
          * @param a The input [CharSequence] in the ISO-8601 duration format, prefixed by 'P'.
          *          It can optionally include time components separated by 'T'.
-         * @return Either a successfully parsed [Duration] object or an [InvalidFormatOfType] error describing the issue.
+         * @return Either a successfully parsed [Duration] object or an [InvalidTypeFormat] error describing the issue.
          * @since 6.1.0
          */
-        infix fun parse(a: CharSequence): Either<InvalidFormatOfType, Duration> = either { catching({
+        infix fun parse(a: CharSequence): Either<InvalidTypeFormat, Duration> = either { catching({
             var duration = Duration()
             var text = a.toString()
             if (text.isBlank()) duration
@@ -396,7 +396,7 @@ open class Duration (years: Number = 0, months: Number = 0, weeks: Number = 0, d
                 } else throw MalformedInputException("Text must start with 'P'")
                 duration
             }
-        }) { t: Throwable -> InvalidFormatOfType(a, typeOf<Duration>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(a, typeOf<Duration>(), t) } }
 
         /**
          * Calculates the duration between this temporal object and the specified end temporal object.

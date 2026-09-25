@@ -163,15 +163,15 @@ value class Bic private constructor(val value: String) : CharSequence {
          * Converts a [CharSequence] to a [Bic] instance if the input is properly formatted.
          *
          * If the input does not conform to the expected format for a BIC (Bank Identifier Code),
-         * an [InvalidFormatOfType] error is returned encapsulating the invalid input, the expected type, and the exception.
+         * an [InvalidTypeFormat] error is returned encapsulating the invalid input, the expected type, and the exception.
          *
          * @return An [Either] instance that contains a [Bic] object if the conversion is successful,
-         * or an [InvalidFormatOfType] object if the conversion fails.
+         * or an [InvalidTypeFormat] object if the conversion fails.
          * @since 6.1.0
          */
-        fun CharSequence.toBic(): Either<InvalidFormatOfType, Bic> = either {
+        fun CharSequence.toBic(): Either<InvalidTypeFormat, Bic> = either {
             catching({ Bic(this@toBic) }) { t: Throwable ->
-                InvalidFormatOfType(this@toBic, typeOf<Bic>(), t)
+                InvalidTypeFormat(this@toBic, typeOf<Bic>(), t)
             }
         }
 

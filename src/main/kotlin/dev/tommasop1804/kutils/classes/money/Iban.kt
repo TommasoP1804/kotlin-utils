@@ -400,9 +400,9 @@ value class Iban private constructor(val value: String) : CharSequence {
          * object on failure.
          * @since 6.1.0
          */
-        fun CharSequence.toIban(): Either<InvalidFormatOfType, Iban> = either {
+        fun CharSequence.toIban(): Either<InvalidTypeFormat, Iban> = either {
             catching({ Iban(this@toIban) }) { t: Throwable ->
-                InvalidFormatOfType(this@toIban, typeOf<Iban>(), t)
+                InvalidTypeFormat(this@toIban, typeOf<Iban>(), t)
             }
         }
 

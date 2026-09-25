@@ -203,7 +203,7 @@ value class Isbn private constructor(override val value: String) : CharSequence,
          */
         fun CharSequence.toIsbn() = filter { it.isDigit() || it == Char.HYPEN }.run { either {
             catching({ Isbn(this@toIsbn) }) { t: Throwable ->
-                InvalidFormatOfType(this@toIsbn, typeOf<Isbn>(), t)
+                InvalidTypeFormat(this@toIsbn, typeOf<Isbn>(), t)
             }
         } }
 

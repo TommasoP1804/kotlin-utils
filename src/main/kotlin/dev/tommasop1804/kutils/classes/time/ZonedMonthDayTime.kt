@@ -619,11 +619,11 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
          * @param cs The input character sequence representing the zoned month-day-time.
          *           Must not be blank and should conform to the expected format.
          * @return An [Either] that contains a [ZonedMonthDayTime] if parsing succeeds, or an
-         *         [InvalidFormatOfType] in case of an error.
+         *         [InvalidTypeFormat] in case of an error.
          * @since 6.1.0
          */
         @JvmStatic
-        fun parse(cs: CharSequence): Either<InvalidFormatOfType, ZonedMonthDayTime> = either { catching({
+        fun parse(cs: CharSequence): Either<InvalidTypeFormat, ZonedMonthDayTime> = either { catching({
             val s = cs.toString()
             if (s.isBlank()) now()
             else {
@@ -637,7 +637,7 @@ class ZonedMonthDayTime private constructor(val monthDayTime: LocalMonthDayTime,
                         ?: throw IllegalArgumentException("Invalid zone identifier: $zonePart")
                 )
             }
-        }) { t: Throwable -> InvalidFormatOfType(cs, typeOf<ZonedMonthDayTime>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(cs, typeOf<ZonedMonthDayTime>(), t) } }
 
         /**
          * Converts a given [Temporal] instance to a [ZonedMonthDayTime] by extracting the respective

@@ -256,7 +256,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          */
         fun @receiver:IJLanguage("yaml") String.toYaml() = either {
             catching({ Yaml(this@toYaml) }) { t: Throwable ->
-                InvalidFormatOfType(this@toYaml, typeOf<Yaml>(), t)
+                InvalidTypeFormat(this@toYaml, typeOf<Yaml>(), t)
             }
         }
         /**
@@ -319,9 +319,9 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          * @return An `Either` containing the parsed object of type `T` if successful, or an `InvalidFormat` error if parsing fails.
          * @since 6.1.0
          */
-        inline fun <reified T> readFromFile(file: File): Either<InvalidFormatOfType, T> = either {
+        inline fun <reified T> readFromFile(file: File): Either<InvalidTypeFormat, T> = either {
             catching({ SNAKE_YAML.load<T>(file.readText()) }) { t: Throwable ->
-                InvalidFormatOfType(file, typeOf<T>(), t)
+                InvalidTypeFormat(file, typeOf<T>(), t)
             }
         }
         /**
@@ -345,7 +345,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
          */
         inline fun <reified T> readListFromFile(file: File): Either<Error, List<T>> = (either {
             catching({ Yaml(file.readText()) }) { e: MalformedInputException ->
-                InvalidFormatOfType(file, typeOf<Yaml>(), e)
+                InvalidTypeFormat(file, typeOf<Yaml>(), e)
             }
         } thenEither { it.toList<T>() }).flatten()
         /**
@@ -376,7 +376,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
                 val map = SNAKE_YAML.load<Map<String, T>>(file.readText())
                 map.mapValues { it.value as T }
             }) { t: Throwable ->
-                InvalidFormatOfType(file, typeOf<Map<String, T>>(), t)
+                InvalidTypeFormat(file, typeOf<Map<String, T>>(), t)
             }
         }
 
@@ -832,7 +832,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * Applies a YAML patch to the current object and converts the result to TOML format.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [YamlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -850,7 +850,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * Applies a JSON patch to the current YAML structure, transforming it into a YAML structure.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [YamlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -869,7 +869,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * Validates the current object against a provided JSON schema using a JSON serialization of the object.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [InvalidTypeFormat] - if the input JSON schema is malformed.
      * - [YamlError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema to validate the object against.
@@ -883,7 +883,7 @@ class Yaml(@param:IJLanguage("YAML") override var value: String) : CharSequence,
      * Validates the current object against the provided JSON schema.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [InvalidTypeFormat] - if the input JSON schema is malformed.
      * - [YamlError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema to validate against.

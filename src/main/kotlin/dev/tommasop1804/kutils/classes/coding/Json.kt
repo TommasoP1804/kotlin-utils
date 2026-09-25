@@ -385,7 +385,7 @@ open class Json private constructor(@param:Language("json") override val value: 
          */
         fun @receiver:Language("json") String.toJson() = either {
             catching({ Json(this@toJson) }) { t: Throwable ->
-                InvalidFormatOfType(this@toJson, typeOf<Json>(), t)
+                InvalidTypeFormat(this@toJson, typeOf<Json>(), t)
             }
         }
         /**
@@ -1764,7 +1764,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * This implementation supports operations such as "add", "replace", and "remove".
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1779,7 +1779,7 @@ open class Json private constructor(@param:Language("json") override val value: 
         val targetNode = toJsonNode().deepCopy()
         val patchNode = patch.toJsonNode()
 
-        ensure(patchNode.isArray) { InvalidFormatOfType(patchNode, typeOf<List<*>>(), reason = "Patch must be an array of operations") }
+        ensure(patchNode.isArray) { InvalidTypeFormat(patchNode, typeOf<List<*>>(), reason = "Patch must be an array of operations") }
 
         for (operation in patchNode) {
             val op = operation.get("op")?.asString()
@@ -1850,7 +1850,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * This implementation supports operations such as "add", "replace", and "remove".
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [JsonError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1898,7 +1898,7 @@ open class Json private constructor(@param:Language("json") override val value: 
     context(_: Raise<Error>)
     private fun resolvePointer(root: JsonNode, pathStr: String): Pair<JsonNode, String> {
         if (pathStr.isEmpty() || !pathStr.startsWith("/")) {
-            raise(InvalidFormatOfType(pathStr, typeOf<String>()))
+            raise(InvalidTypeFormat(pathStr, typeOf<String>()))
         }
 
         val tokens = pathStr.split(Char.SLASH).drop(1).map {
@@ -1919,7 +1919,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Validates the current JSON value against the given JSON schema and version.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [InvalidTypeFormat] - if the input JSON schema is malformed.
      * - [JsonError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema instance used for validation.
@@ -1931,7 +1931,7 @@ open class Json private constructor(@param:Language("json") override val value: 
      * Validates the current JSON value against the given JSON schema and version.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [InvalidTypeFormat] - if the input JSON schema is malformed.
      * - [JsonError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema instance used for validation.
@@ -1957,7 +1957,7 @@ open class Json private constructor(@param:Language("json") override val value: 
             }
             raise(JsonError.SchemaValidationFailed(errors))
         } catch (e: Exception) {
-            InvalidFormatOfType(jsonSchema, typeOf<JsonSchema>())
+            InvalidTypeFormat(jsonSchema, typeOf<JsonSchema>())
         }
     }
 }

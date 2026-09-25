@@ -892,9 +892,9 @@ class Ulid(val mostSignificantBits: Long, val leastSignificantBits: Long) : Comp
          * if the conversion fails, and the right side contains a `Ulid` if the conversion succeeds.
          * @since 6.1.0
          */
-        fun CharSequence.toUlid(): Either<InvalidFormatOfType, Ulid> = either {
+        fun CharSequence.toUlid(): Either<InvalidTypeFormat, Ulid> = either {
             catching({ Ulid(this@toUlid.toString()) }) { t: Throwable ->
-                InvalidFormatOfType(this@toUlid, typeOf<Ulid>(), t)
+                InvalidTypeFormat(this@toUlid, typeOf<Ulid>(), t)
             }
         }
 

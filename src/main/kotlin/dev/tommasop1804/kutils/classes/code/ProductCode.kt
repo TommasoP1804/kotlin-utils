@@ -318,7 +318,7 @@ interface ProductCode {
              */
             fun CharSequence.toEan(): Either<ParsingError, Ean> = either {
                 ensure(this@toEan.matches(Regex("[0-9 -]+")) && this@toEan.length in 8..27) {
-                    InvalidFormatOfType(this@toEan, typeOf<Ean>())
+                    InvalidTypeFormat(this@toEan, typeOf<Ean>())
                 }
 
                 when {
@@ -330,7 +330,7 @@ interface ProductCode {
                     isValidEan8P5() -> Ean8P5(this@toEan)
                     isValidEan14() -> Ean14(this@toEan)
                     isValidIsbn() -> Isbn(this@toEan)
-                    else -> raise(NoMatchingFormatOfType(this@toEan, typeOf<Ean>()))
+                    else -> raise(NoMatchingTypeFormat(this@toEan, typeOf<Ean>()))
                 }
             }
 
@@ -410,7 +410,7 @@ interface ProductCode {
              * Otherwise, the method attempts to identify the valid UPC format:
              * - If the input is valid for the UPC-A format, a [UpcA] instance is returned as a `Right`.
              * - If the input is valid for the UPC-E format, a [UpcE] instance is returned as a `Right`.
-             * - If no matching format is found, raises a [NoMatchingFormatOfType] error as a `Left`.
+             * - If no matching format is found, raises a [NoMatchingTypeFormat] error as a `Left`.
              *
              * @receiver The input [CharSequence] to be parsed and validated as a valid UPC.
              * @return An [Either] encapsulating the result:
@@ -420,13 +420,13 @@ interface ProductCode {
              */
             fun CharSequence.toUpc(): Either<ParsingError, Upc> = either {
                 ensure(this@toUpc.matches(Regex("[0-9]+")) && this@toUpc.length in setOf(8, 12)) {
-                    InvalidFormatOfType(this@toUpc, typeOf<Upc>())
+                    InvalidTypeFormat(this@toUpc, typeOf<Upc>())
                 }
 
                 when {
                     isValidUpcA() -> UpcA(this@toUpc)
                     isValidUpcE() -> UpcE(this@toUpc)
-                    else -> raise(NoMatchingFormatOfType(this@toUpc, typeOf<Upc>()))
+                    else -> raise(NoMatchingTypeFormat(this@toUpc, typeOf<Upc>()))
                 }
             }
 

@@ -292,15 +292,15 @@ class Ksuid(timestamp: Int? = null, payload: ByteArray? = null, ksuidBytes: Byte
          *
          * This function attempts to parse the [CharSequence] as a valid KSUID format. In case the input
          * does not conform to the expected KSUID structure or an error occurs during construction,
-         * it returns an instance of [InvalidFormatOfType] encapsulating the error details and the input.
+         * it returns an instance of [InvalidTypeFormat] encapsulating the error details and the input.
          *
-         * @return An [Either] containing a successfully parsed [Ksuid], or an [InvalidFormatOfType]
+         * @return An [Either] containing a successfully parsed [Ksuid], or an [InvalidTypeFormat]
          * representing a failure with the associated error and input data.
          * @since 6.1.0
          */
-        fun CharSequence.toKsuid(): Either<InvalidFormatOfType, Ksuid> = either {
+        fun CharSequence.toKsuid(): Either<InvalidTypeFormat, Ksuid> = either {
             catching({ Ksuid(this@toKsuid) }) { t: Throwable ->
-                InvalidFormatOfType(this@toKsuid, typeOf<Ksuid>(), t)
+                InvalidTypeFormat(this@toKsuid, typeOf<Ksuid>(), t)
             }
         }
 

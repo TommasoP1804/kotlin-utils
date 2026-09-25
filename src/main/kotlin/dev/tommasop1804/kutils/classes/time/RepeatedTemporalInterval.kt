@@ -296,7 +296,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
          *         or a successfully parsed `RepeatedTemporalInterval` instance
          * @since 6.1.0
          */
-        fun parse(s: String): Either<InvalidFormatOfType, RepeatedTemporalInterval> = either { catching({
+        fun parse(s: String): Either<InvalidTypeFormat, RepeatedTemporalInterval> = either { catching({
             val repeated = "R" in s
             val parts = s.splitAndTrim("/")
             validateInputFormat(!(repeated && (parts.size !in 2..3))) { "Invalid repeated time interval: $s" }
@@ -322,7 +322,7 @@ interface RepeatedTemporalInterval : TemporalInterval, Serializable {
                     if (!repeated) 0 else if (parts[0].length == 1) -1 else parts[0].drop(1).toInt()
                 )
             } else throw MalformedInputException("Invalid time interval: $s")
-        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<RepeatedTemporalInterval>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(s, typeOf<RepeatedTemporalInterval>(), t) } }
 
         class Serializer : ValueSerializer<RepeatedTemporalInterval>() {
             override fun serialize(

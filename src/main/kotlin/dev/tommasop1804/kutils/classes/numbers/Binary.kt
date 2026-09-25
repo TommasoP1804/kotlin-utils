@@ -149,9 +149,9 @@ class Binary(value: String) : CharSequence, Number(), Comparable<Number> {
          * @return Either a valid `Binary` object on success or an `InvalidFormatOfType` error on failure.
          * @since 6.1.0
          */
-        fun String.toBinary(): Either<InvalidFormatOfType, Binary> = either {
+        fun String.toBinary(): Either<InvalidTypeFormat, Binary> = either {
             catching({ Binary(this@toBinary) }) { t: Throwable ->
-                InvalidFormatOfType(this@toBinary, typeOf<Binary>(), t)
+                InvalidTypeFormat(this@toBinary, typeOf<Binary>(), t)
             }
         }
         /**

@@ -146,7 +146,7 @@ class Base36(private val value: String) : Number(), CharSequence, Comparable<Num
          */
         fun CharSequence.toBase36() = either {
             catching({ Base36(this@toBase36.toString()) }) { t: Throwable ->
-                InvalidFormatOfType(this@toBase36, typeOf<Base36>(), t)
+                InvalidTypeFormat(this@toBase36, typeOf<Base36>(), t)
             }
         }
 

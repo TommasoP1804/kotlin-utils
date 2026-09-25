@@ -604,7 +604,7 @@ value class Percentage private constructor(internal val value: Double) : Compara
          * It also supports options to interpret values in the range 0.0 to 1.0 and control overflow behavior.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - The string does not represent a valid percentage format.
+         * - [InvalidTypeFormat] - The string does not represent a valid percentage format.
          * - [NumberError.PositivePercentageOverflow] - The percentage value exceeds 100% and overflow is not allowed.
          * - [NumberError.NegativePercentageOverflow] - The percentage value is negative and overflow is not allowed.
          * - [NumberError.InvalidSign] - The percentage value is NaN and is not allowed.
@@ -624,7 +624,7 @@ value class Percentage private constructor(internal val value: Double) : Compara
             allowNegativeOverflow: Boolean = false
         ): Either<ValidationError, Percentage> = either {
             val string = this.trim() - Char.PERCENT
-            if (string.isEmpty()) raise(InvalidFormatOfType(this, typeOf<Percentage>(), "String is empty."))
+            if (string.isEmpty()) raise(InvalidTypeFormat(this, typeOf<Percentage>(), "String is empty."))
             val value = string.toDoubleOrError().bind()
             if (from0to1) value / 100.0 else value
         } as Either<ValidationError, Double> thenMergeWith { it.toPercentage(false, allowPositiveOverflow, allowNegativeOverflow) }

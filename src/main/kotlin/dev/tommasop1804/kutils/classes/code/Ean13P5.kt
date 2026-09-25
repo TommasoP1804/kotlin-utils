@@ -101,7 +101,7 @@ value class Ean13P5 private constructor(override val value: String) : CharSequen
          */
         fun CharSequence.toEan13P5() = filter { it.isDigit() || it in setOf(Char.SPACE, Char.HYPEN) }.run { either {
             catching({ Ean13P5(this@toEan13P5) }) { t: Throwable ->
-                InvalidFormatOfType(this@toEan13P5, typeOf<Ean13P5>(), t)
+                InvalidTypeFormat(this@toEan13P5, typeOf<Ean13P5>(), t)
             }
         } }
 

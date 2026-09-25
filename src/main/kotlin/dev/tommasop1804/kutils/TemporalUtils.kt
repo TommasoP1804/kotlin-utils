@@ -335,9 +335,9 @@ internal fun CharSequence._parseToLocalDateTime(): LocalDateTime {
  *         or a `Left` with an `InvalidFormatOfType` if parsing fails.
  * @since 6.1.0
  */
-fun CharSequence.parseToLocalDateTime(): Either<InvalidFormatOfType, LocalDateTime> = either {
+fun CharSequence.parseToLocalDateTime(): Either<InvalidTypeFormat, LocalDateTime> = either {
     catching({ this@parseToLocalDateTime._parseToLocalDateTime() }) { e: DateTimeParseException ->
-        InvalidFormatOfType(e.parsedString, typeOf<LocalDateTime>(), e)
+        InvalidTypeFormat(e.parsedString, typeOf<LocalDateTime>(), e)
     }
 }
 
@@ -367,11 +367,11 @@ internal fun CharSequence._parseToOffsetDateTime(): OffsetDateTime {
     )
 }
 /**
- * Parses the [CharSequence] into an [OffsetDateTime], or returns a [InvalidFormatOfType] wrapped in an [Either].
+ * Parses the [CharSequence] into an [OffsetDateTime], or returns a [InvalidTypeFormat] wrapped in an [Either].
  *
  * This function attempts to parse the [CharSequence] using the [_parseToOffsetDateTime] function.
  * If parsing fails with a [DateTimeParseException], it catches the exception and converts it into
- * a [InvalidFormatOfType] with details about the failure (e.g., the invalid string and error index).
+ * a [InvalidTypeFormat] with details about the failure (e.g., the invalid string and error index).
  * The result is returned as an [Either], where:
  * - `Right<OffsetDateTime>` represents a successful parse.
  * - `Left<DateTimeParsingError>` represents a parsing error.
@@ -379,12 +379,12 @@ internal fun CharSequence._parseToOffsetDateTime(): OffsetDateTime {
  * @receiver The [CharSequence] to be parsed into an [OffsetDateTime].
  * @return An [Either] containing:
  *         - A [Either.Right] with the parsed [OffsetDateTime] if successful.
- *         - A [Either.Left] with a [InvalidFormatOfType] if parsing fails.
+ *         - A [Either.Left] with a [InvalidTypeFormat] if parsing fails.
  * @since 6.1.0
  */
 fun CharSequence.parseToOffsetDateTime() = either {
     catching({ this@parseToOffsetDateTime._parseToOffsetDateTime() }) { e: DateTimeParseException ->
-        InvalidFormatOfType(e.parsedString, typeOf<OffsetDateTime>(), e)
+        InvalidTypeFormat(e.parsedString, typeOf<OffsetDateTime>(), e)
     }
 }
 
@@ -421,17 +421,17 @@ internal fun CharSequence._parseToLocalDate(): LocalDate {
  *
  * The method first tries to parse the [CharSequence] to a [LocalDate] using the
  * `parseToLocalDate()` method. In case of a failure, it captures the thrown [DateTimeParseException]
- * and encapsulates the parsing error in a [InvalidFormatOfType].
+ * and encapsulates the parsing error in a [InvalidTypeFormat].
  *
  * @receiver The [CharSequence] to parse into a [LocalDate].
  * @return An [Either] containing the successfully parsed [LocalDate] on the right or a
- * [InvalidFormatOfType] describing the parsing failure on the left.
+ * [InvalidTypeFormat] describing the parsing failure on the left.
  *
  * @since 6.1.0
  */
 fun CharSequence.parseToLocalDate() = either {
     catching({ this@parseToLocalDate._parseToLocalDate() }) { e: DateTimeParseException ->
-        InvalidFormatOfType(e.parsedString, typeOf<LocalDate>(), e)
+        InvalidTypeFormat(e.parsedString, typeOf<LocalDate>(), e)
     }
 }
 
@@ -488,16 +488,16 @@ internal fun CharSequence._parseToLocalTime(): LocalTime {
     throw DateTimeParseException("Invalid ISO-8601 time format: $timeString", timeString, 0)
 }
 /**
- * Parses the current [CharSequence] into a [LocalTime] object or returns a [InvalidFormatOfType] in case of failure.
+ * Parses the current [CharSequence] into a [LocalTime] object or returns a [InvalidTypeFormat] in case of failure.
  *
  * This method attempts to parse the [CharSequence] using ISO 8601 time and date-time formats by invoking
  * the [_parseToLocalTime] method. If the parsing operation fails and throws a [DateTimeParseException],
- * it maps the exception into a [InvalidFormatOfType] containing details about the invalid input,
+ * it maps the exception into a [InvalidTypeFormat] containing details about the invalid input,
  * the index at which the parsing error occurred, and the target class ([LocalTime]).
  *
  * Internally, this function leverages the `either` block to encapsulate error handling in a functional style,
  * and uses the `catching` function to transform parsing exceptions into meaningful domain errors
- * represented by [InvalidFormatOfType].
+ * represented by [InvalidTypeFormat].
  *
  * @receiver The [CharSequence] to be parsed into a [LocalTime] object.
  * @return An `Either` value where:
@@ -507,7 +507,7 @@ internal fun CharSequence._parseToLocalTime(): LocalTime {
  */
 fun CharSequence.parseToLocalTime() = either {
     catching({ this@parseToLocalTime._parseToLocalTime() }) { e: DateTimeParseException ->
-        InvalidFormatOfType(e.parsedString, typeOf<LocalTime>(), e)
+        InvalidTypeFormat(e.parsedString, typeOf<LocalTime>(), e)
     }
 }
 
@@ -555,7 +555,7 @@ internal fun CharSequence._parseToOffsetTime(): OffsetTime {
  */
 fun CharSequence.parseToOffsetTime() = either {
     catching({ this@parseToOffsetTime._parseToOffsetTime() }) { e: DateTimeParseException ->
-        InvalidFormatOfType(e.parsedString, typeOf<OffsetTime>(), e)
+        InvalidTypeFormat(e.parsedString, typeOf<OffsetTime>(), e)
     }
 }
 

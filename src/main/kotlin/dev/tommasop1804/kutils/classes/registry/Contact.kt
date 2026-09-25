@@ -797,7 +797,7 @@ data class Contact(
              */
             fun CharSequence.toEmail() = either {
                 catching({ Email(this@toEmail.toString()) }) { t: Throwable ->
-                    InvalidFormatOfType(this@toEmail, typeOf<Email>(), t)
+                    InvalidTypeFormat(this@toEmail, typeOf<Email>(), t)
                 }
             }
 
@@ -1348,7 +1348,7 @@ data class Contact(
              */
             fun CharSequence.toPhoneNumber() = either {
                 catching({ PhoneNumber(this@toPhoneNumber.toString()) }) { t: Throwable ->
-                    InvalidFormatOfType(this@toPhoneNumber, typeOf<PhoneNumber>(), t)
+                    InvalidTypeFormat(this@toPhoneNumber, typeOf<PhoneNumber>(), t)
                 }
             }
 

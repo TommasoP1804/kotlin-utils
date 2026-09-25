@@ -15,7 +15,6 @@ import dev.tommasop1804.kutils.classes.functional.*
 import dev.tommasop1804.kutils.errors.*
 import dev.tommasop1804.kutils.exceptions.*
 import dev.tommasop1804.kutils.isOdd
-import dev.tommasop1804.kutils.sign
 import dev.tommasop1804.kutils.toMList
 import dev.tommasop1804.kutils.unaryMinus
 import dev.tommasop1804.kutils.unaryPlus
@@ -183,9 +182,9 @@ class Hex(value: String) : Number(), CharSequence, Comparable<Number> {
          * @return Either an InvalidFormatOfType if the conversion fails, or a Hex object if successful.
          * @since 6.1.0
          */
-        fun CharSequence.toHex(): Either<InvalidFormatOfType, Hex> = either {
+        fun CharSequence.toHex(): Either<InvalidTypeFormat, Hex> = either {
             catching({ Hex(this@toHex.toString()) }) { t: Throwable ->
-                InvalidFormatOfType(this@toHex, typeOf<Hex>(), t)
+                InvalidTypeFormat(this@toHex, typeOf<Hex>(), t)
             }
         }
         /**

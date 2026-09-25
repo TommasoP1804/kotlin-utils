@@ -327,7 +327,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
          *         or a successfully parsed `RTemporalInterval` instance of type `<T1, T2>`
          * @since 6.1.0
          */
-        infix fun <T1 : Temporal, T2 : Temporal> parse(s: String): Either<InvalidFormatOfType, RTemporalInterval<T1, T2>> = either { catching({
+        infix fun <T1 : Temporal, T2 : Temporal> parse(s: String): Either<InvalidTypeFormat, RTemporalInterval<T1, T2>> = either { catching({
             if (s.startsWith("R")) throw UnsupportedOperationException("Repeated intervals are not supported. Use RepeatedTemporalInterval.parse(s).")
             else {
                 val parts = s.splitAndTrim("/")
@@ -350,7 +350,7 @@ class RTemporalInterval<T1 : Temporal, T2 : Temporal> private constructor(
                     )
                 }
             }
-        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<RTemporalInterval<T1, T2>>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(s, typeOf<RTemporalInterval<T1, T2>>(), t) } }
 
         class Serializer : ValueSerializer<TemporalInterval>() {
             override fun serialize(

@@ -457,17 +457,17 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
          * Parses the given [CharSequence] into an instance of [LocalMonthDayTime].
          * The input format is expected to follow specific patterns based on whether
          * the input starts with "-", "--", or neither. Invalid formats will be captured
-         * and returned as an [InvalidFormatOfType] error.
+         * and returned as an [InvalidTypeFormat] error.
          *
          * @param s the input character sequence to parse. It may represent a date
          *        in various formats such as "MM-dd", "-MM-dd", and "--MM-dd", optionally
          *        followed by a time component.
          * @return an [Either] containing [LocalMonthDayTime] if the parsing is successful,
-         *         or an [InvalidFormatOfType] if the format is invalid or an error occurs.
+         *         or an [InvalidTypeFormat] if the format is invalid or an error occurs.
          * @since 6.1.0
          */
         @JvmStatic
-        fun parse(s: CharSequence): Either<InvalidFormatOfType, LocalMonthDayTime> = either { catching({
+        fun parse(s: CharSequence): Either<InvalidTypeFormat, LocalMonthDayTime> = either { catching({
             if (s.isBlank()) LocalMonthDayTime()
             else {
                 val finalIndex = if (s.endsWith("Z")) s.length - 1
@@ -489,7 +489,7 @@ class LocalMonthDayTime(val monthDay: MonthDay, val localTime: LocalTime) : Temp
                     LocalTime.parse(s.substring(6, finalIndex))
                 )
             }
-        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<LocalMonthDayTime>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(s, typeOf<LocalMonthDayTime>(), t) } }
 
         /**
          * Converts a [Temporal] object to a local month, day, and time representation.

@@ -192,7 +192,7 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
          * or a delimiter-separated representation (e.g., ";" or ",").
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - The input string does not match the expected format.
+         * - [InvalidTypeFormat] - The input string does not match the expected format.
          * - [ValidationError.ExpectationMismatch] - if in case of postgis format SRID is not 4326.
          *
          * @param coordinate the string representation of the coordinate to be parsed
@@ -230,15 +230,15 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
                 val index = if ("N" in s) s.indexOf("N") + 1 else s.indexOf("S") + 1
                 parts = arrayOf(s.take(index), s.drop(index))
             }
-            ensure(parts.size == 2) { InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Not 2 parts.") }
+            ensure(parts.size == 2) { InvalidTypeFormat(coordinate, typeOf<GeoCoordinate>(), "Not 2 parts.") }
             val lat = parts[0].trim()
             val lon = parts[1].trim()
 
             ensure(!("°" !in lat || "'" !in lat || "\"" !in lat || ("N" !in lat && "S" !in lat))) {
-                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid latitude format (#°#'#\" N|S)")
+                InvalidTypeFormat(coordinate, typeOf<GeoCoordinate>(), "Invalid latitude format (#°#'#\" N|S)")
             }
             ensure(!((("°" !in lon) || ("'" !in lon) || ("\"" !in lon) || ("E" !in lon && "W" !in lon)))) {
-                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid longitude format (#°#'#\" E|W)")
+                InvalidTypeFormat(coordinate, typeOf<GeoCoordinate>(), "Invalid longitude format (#°#'#\" E|W)")
             }
 
             catching({
@@ -253,7 +253,7 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
                 val longitude = lonDegrees + lonMinutes / 60 + lonSeconds / 3600
 
                 GeoCoordinate(latitude, longitude)
-            }) { e: NumberFormatException -> InvalidFormatOfType(coordinate, typeOf<Double>()) }
+            }) { e: NumberFormatException -> InvalidTypeFormat(coordinate, typeOf<Double>()) }
         }
 
         /**
@@ -277,15 +277,15 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
                     s.drop(index)
                 )
             }
-            ensure(parts.size == 2) { InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Not 2 parts.") }
+            ensure(parts.size == 2) { InvalidTypeFormat(coordinate, typeOf<GeoCoordinate>(), "Not 2 parts.") }
             val lat = parts[0].trim()
             val lon = parts[1].trim()
 
             ensure(!("°" !in lat || "'" !in lat || ("N" !in lat && "S" !in lat))) {
-                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid latitude format (#°#'#\" N|S)")
+                InvalidTypeFormat(coordinate, typeOf<GeoCoordinate>(), "Invalid latitude format (#°#'#\" N|S)")
             }
             ensure(!((("°" !in lon) || ("'" !in lon) ||("E" !in lon && "W" !in lon)))) {
-                InvalidFormatOfType(coordinate, typeOf<GeoCoordinate>(), "Invalid longitude format (#°#'#\" E|W)")
+                InvalidTypeFormat(coordinate, typeOf<GeoCoordinate>(), "Invalid longitude format (#°#'#\" E|W)")
             }
 
             val latDegrees: Double = parseDegree(lat, 'S')
@@ -455,9 +455,9 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
          * or a GeoCoordinate object representing the parsed UTM coordinates.
          * @since 6.1.0
          */
-        fun parseUtm(utm: String): Either<InvalidFormatOfType, GeoCoordinate> = either {
+        fun parseUtm(utm: String): Either<InvalidTypeFormat, GeoCoordinate> = either {
             val parts = utm.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            ensure(parts.size == 3) { InvalidFormatOfType(utm, typeOf<GeoCoordinate>(), "Not 3 parts.") }
+            ensure(parts.size == 3) { InvalidTypeFormat(utm, typeOf<GeoCoordinate>(), "Not 3 parts.") }
 
             ofUtm(parts[0], parts[1].toDoubleOrError().bind(), parts[2].toDoubleOrError().bind())
         }
@@ -471,9 +471,9 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
          *         match the expected format, or a valid `GeoCoordinate` object if parsing succeeds.
          * @since 6.1.0
          */
-        fun parseWkt(wkt: String): Either<InvalidFormatOfType, GeoCoordinate> = either {
+        fun parseWkt(wkt: String): Either<InvalidTypeFormat, GeoCoordinate> = either {
             ensure(wkt.contains("POINT(", true)) {
-                InvalidFormatOfType(wkt, typeOf<GeoCoordinate>(), "No `POINT(` present.")
+                InvalidTypeFormat(wkt, typeOf<GeoCoordinate>(), "No `POINT(` present.")
             }
             val parts = wkt.replace("POINT(", "").replace(")", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()
@@ -486,12 +486,12 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
          * @param geoJson the GeoJSON string representing a geographical point,
          *                expected to include a `"type":"Point"` description and coordinates.
          * @return an [Either] containing a [GeoCoordinate] object if the parsing is successful,
-         *         or an [InvalidFormatOfType] if the input format is invalid.
+         *         or an [InvalidTypeFormat] if the input format is invalid.
          * @since 6.1.0
          */
-        fun parseGeoJson(geoJson: CharSequence): Either<InvalidFormatOfType, GeoCoordinate> = either {
+        fun parseGeoJson(geoJson: CharSequence): Either<InvalidTypeFormat, GeoCoordinate> = either {
             ensure(geoJson.startsWith("{\"type\":\"Point\"")) {
-                InvalidFormatOfType(geoJson, typeOf<GeoCoordinate>(), "No `\"type\":\"Point\"` present.")
+                InvalidTypeFormat(geoJson, typeOf<GeoCoordinate>(), "No `\"type\":\"Point\"` present.")
             }
             val parts =
                 geoJson.toString().replace("{\"type\":\"Point\",\"coordinates\":[", "").replace("]}", "").split(",".toRegex())
@@ -505,7 +505,7 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
          * the expected SRID and coordinate information.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the input string does not follow the required format.
+         * - [InvalidTypeFormat] - if the input string does not follow the required format.
          * - [ValidationError.ExpectationMismatch] - if the SRID is not equal to 4326.
          *
          * @param postgis A string representation of a PostGIS coordinate with SRID and POINT data.
@@ -515,14 +515,14 @@ class GeoCoordinate(val latitude: Double = 0.0, val longitude: Double = 0.0): Se
          */
         fun parsePostGis(postgis: String): Either<ValidationError, GeoCoordinate> = either {
             ensure(postgis.startsWith("SRID") && ";POINT(" in postgis) {
-                InvalidFormatOfType(postgis, typeOf<GeoCoordinate>(), "No `SRID` and/or `;POINT(` present.")
+                InvalidTypeFormat(postgis, typeOf<GeoCoordinate>(), "No `SRID` and/or `;POINT(` present.")
             }
             val srid = postgis[5..<postgis.indexOf(';'.code.toChar())].toInt()
             ensure(srid == 4326) { ValidationError.ExpectationMismatch("SRID", srid, 4326) }
             val coordinates = postgis[16..<postgis.length - 1]
 
             val parts = coordinates.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            ensure(parts.size == 2) { InvalidFormatOfType(postgis, typeOf<GeoCoordinate>(), "Not 2 parts.") }
+            ensure(parts.size == 2) { InvalidTypeFormat(postgis, typeOf<GeoCoordinate>(), "Not 2 parts.") }
 
             val longitude = parts[0].toDoubleOrError().bind()
             val latitude = parts[1].toDoubleOrError().bind()

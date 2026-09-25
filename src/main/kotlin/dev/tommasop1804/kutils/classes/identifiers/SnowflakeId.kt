@@ -200,14 +200,14 @@ class SnowflakeId(val value: Long) : Number(), Comparable<SnowflakeId>, Serializ
          *
          * The method attempts to create a [SnowflakeId] instance using the current [Long] value. If the
          * operation succeeds, the resulting [SnowflakeId] is wrapped in a `Right`. Otherwise, if the
-         * conversion fails, an [InvalidFormatOfType] is generated and returned in a `Left`.
+         * conversion fails, an [InvalidTypeFormat] is generated and returned in a `Left`.
          *
-         * @return Either an [InvalidFormatOfType] representing the failure details or a successfully created [SnowflakeId].
+         * @return Either an [InvalidTypeFormat] representing the failure details or a successfully created [SnowflakeId].
          * @since 6.1.0
          */
-        fun Long.toSnowflakeId(): Either<InvalidFormatOfType, SnowflakeId> = either {
+        fun Long.toSnowflakeId(): Either<InvalidTypeFormat, SnowflakeId> = either {
             catching({ SnowflakeId(this@toSnowflakeId) }) { t: Throwable ->
-                InvalidFormatOfType(this@toSnowflakeId, typeOf<SnowflakeId>(), t)
+                InvalidTypeFormat(this@toSnowflakeId, typeOf<SnowflakeId>(), t)
             }
         }
         /**
@@ -222,9 +222,9 @@ class SnowflakeId(val value: Long) : Number(), Comparable<SnowflakeId>, Serializ
          * If there is a failure, the left-hand side will contain an `InvalidFormatOfType` object detailing the issue.
          * @since 6.1.0
          */
-        fun CharSequence.toSnowflakeId(): Either<InvalidFormatOfType, SnowflakeId> = either {
+        fun CharSequence.toSnowflakeId(): Either<InvalidTypeFormat, SnowflakeId> = either {
             catching({ SnowflakeId(this@toSnowflakeId) }) { t: Throwable ->
-                InvalidFormatOfType(this@toSnowflakeId, typeOf<SnowflakeId>(), t)
+                InvalidTypeFormat(this@toSnowflakeId, typeOf<SnowflakeId>(), t)
             }
         }
 

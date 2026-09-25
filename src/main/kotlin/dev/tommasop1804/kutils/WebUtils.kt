@@ -536,8 +536,8 @@ fun <T> HttpRequest.sendAsync(bodyHandler: HttpResponse.BodyHandler<T>, pushProm
  *         `InvalidFormatOfType` error in a `Left` instance if the conversion fails.
  * @since 6.1.0
  */
-fun String.toUri(): Either<InvalidFormatOfType, Uri> = tryOrError({
-    InvalidFormatOfType(this, typeOf<Uri>(), it)
+fun String.toUri(): Either<InvalidTypeFormat, Uri> = tryOrError({
+    InvalidTypeFormat(this, typeOf<Uri>(), it)
 }) { Uri(this) }
 /**
  * Converts the string to a `Url` object if the string is a valid URL representation,
@@ -551,8 +551,8 @@ fun String.toUri(): Either<InvalidFormatOfType, Uri> = tryOrError({
  *         or `Left<InvalidFormatOfType>` if the conversion fails.
  * @since 6.1.0
  */
-fun String.toUrl(): Either<InvalidFormatOfType, Url> = tryOrError({
-    InvalidFormatOfType(this, typeOf<Url>(), it)
+fun String.toUrl(): Either<InvalidTypeFormat, Url> = tryOrError({
+    InvalidTypeFormat(this, typeOf<Url>(), it)
 }) { Uri(this).toURL() }
 
 /**

@@ -70,7 +70,6 @@ import java.util.*
 import java.util.Locale.LanguageRange
 import kotlin.reflect.typeOf
 import kotlin.text.Charsets.ISO_8859_1
-import kotlin.toString
 
 /**
  * Represents an HTTP header consisting of a name and associated values, implemented as a key-value pair
@@ -362,13 +361,13 @@ class HttpHeader(val name: String, values: Iterable<Any>) : List<String> by valu
          * or falls back to parsing the string as per common HTTP header date formats,
          * such as RFC 7231 and other conventional formats.
          *
-         * @return Either an [InvalidFormatOfType] error indicating the string could not
+         * @return Either an [InvalidTypeFormat] error indicating the string could not
          *         be parsed into an [Instant], or the resulting [Instant] representation of the date.
          * @since 6.1.0
          */
-        fun String.headerDateToInstant(): Either<InvalidFormatOfType, Instant> = either {
+        fun String.headerDateToInstant(): Either<InvalidTypeFormat, Instant> = either {
             tryOr({
-                tryOrRaise({ InvalidFormatOfType(this, typeOf<Instant>(), it) }) {
+                tryOrRaise({ InvalidTypeFormat(this, typeOf<Instant>(), it) }) {
                     if (ISO_DATE_TIME_STANDARD_VALIDATOR(this)) return@tryOrRaise Instant(this)
                     val splitted = this / Char.SPACE
                     val day = splitted[1].toInt()
@@ -1457,7 +1456,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an error indicating failure to retrieve or parse the "Accept" header,
      *         or a list of MediaType objects representing the parsed values of the header.
@@ -1484,7 +1483,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an `Error` object in case of failure, or a list of `LanguageRange`
      *         objects parsed from the "Accept-Language" header.
@@ -1494,7 +1493,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         .thenMergeWith { it.firstOrError() }
         .mapLeft { IterableError.NotFound(ACCEPT_LANGUAGE) }
         .thenMergeWith {
-            tryOrError({ t -> InvalidFormatOfType(it, typeOf<LanguageRange>(), t) }) {
+            tryOrError({ t -> InvalidTypeFormat(it, typeOf<LanguageRange>(), t) }) {
                 LanguageRange.parse(it).toList()
             }
         }
@@ -1525,7 +1524,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an `Error` or a list of `Locale` objects based on the parsed "Accept-Language" header.
      * @since 6.1.0
@@ -1556,7 +1555,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return A list of MediaType objects parsed from the "Accept-Patch" header value.
      * @since 6.1.0
@@ -1585,7 +1584,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return A result indicating the processed boolean value of `ACCESS_CONTROL_ALLOW_CREDENTIALS`, or an error representation.
      * @since 6.1.0
@@ -1612,7 +1611,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an error of type `IterableError.NotFound` if the methods are not found,
      *         or a list of allowed HTTP methods as strings.
@@ -1651,7 +1650,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either the maximum age as a duration in seconds or an error if the value is not found
      *         or cannot be processed as a valid duration.
@@ -1712,7 +1711,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an `Error` if the acceptable charsets could not be retrieved or parsed
      *         successfully, or a `List<Charset>` containing the parsed charsets.
@@ -1723,7 +1722,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
         .map { it.joinToString(Char.COMMA) }
         .mapLeft { IterableError.NotFound(ACCEPT_CHARSET) }
         .thenMergeWith {
-            tryOrError({ t -> InvalidFormatOfType(it, typeOf<Charset>(), t) }) {
+            tryOrError({ t -> InvalidTypeFormat(it, typeOf<Charset>(), t) }) {
                 val tokens = it / Char.COMMA
                 val result = emptyMList<Charset>()
                 for (token in tokens) {
@@ -1781,7 +1780,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @param key The header key to retrieve the Bearer authentication token from. Defaults to "Authorization".
      * @return An `Either` instance where the left side represents an `Error` in case of failure, and
@@ -1867,7 +1866,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return An `Either` object containing a normalized `DataSize` on success or an `Error` on failure.
      * @since 6.1.0
@@ -1899,7 +1898,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an Error instance if there was a failure, or a MediaType object representing the content type.
      * @since 6.1.0
@@ -1924,7 +1923,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an Error object if the operation fails, or an Instant representing the date.
      * @since 6.1.0
@@ -1975,7 +1974,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return An `Either` containing the resolved `InetSocketAddress` on success or `IterableError.NotFound` on failure.
      * @since 6.1.0
@@ -1983,7 +1982,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
     fun getHost(): Either<Error, InetSocketAddress> = getOrError(HOST)
         .thenMergeWith { it.firstOrError() }
         .mapLeft { IterableError.NotFound(HOST) }
-        .thenMergeWith { tryOrError({ t -> InvalidFormatOfType(it, typeOf<InetSocketAddress>(), t) }) {
+        .thenMergeWith { tryOrError({ t -> InvalidTypeFormat(it, typeOf<InetSocketAddress>(), t) }) {
             var host: String? = null
             var port = 0
             val separator = if (it startsWith '[') it.indexOf(Char.COLON, it.indexOf(']')) else it.lastIndexOf(Char.COLON)
@@ -2015,7 +2014,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return An `Either` containing the parsed `Instant` if successful,
      *         or an `Error` if the header is missing or cannot be parsed.
@@ -2045,7 +2044,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return An `Either` containing an `Error` on failure or an `Instant` representing the parsed date if successful.
      * @since 6.1.0
@@ -2099,7 +2098,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return Either an error indicating the failure reason or a URI representing the location.
      * @since 6.1.0
@@ -2166,7 +2165,7 @@ class HttpHeaders private constructor(private val headers: MSet<HttpHeader>) : M
      *
      * Possible errors:
      * - [IterableError.NotFound] - The header was not found in the request.
-     * - [InvalidFormatOfType] - The header value is malformed.
+     * - [InvalidTypeFormat] - The header value is malformed.
      *
      * @return An `Either` containing the origin as a `Uri` if retrieval and processing are successful,
      *         or an `Error` if any step in the process fails.

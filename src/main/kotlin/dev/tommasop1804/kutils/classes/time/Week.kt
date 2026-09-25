@@ -339,14 +339,14 @@ class Week private constructor(val firstDay: LocalDate): TemporalAccessor, Compa
          * Parses the given CharSequence as a Week object if it matches the expected format.
          *
          * @param cs The input character sequence representing the week in the format "YYYY-Www".
-         * @return An [Either] containing a [Week] object if parsing is successful, or an [InvalidFormatOfType] error if the input format is invalid.
+         * @return An [Either] containing a [Week] object if parsing is successful, or an [InvalidTypeFormat] error if the input format is invalid.
          * @since 6.1.0
          */
-        fun parse(cs: CharSequence): Either<InvalidFormatOfType, Week> = either { catching({
+        fun parse(cs: CharSequence): Either<InvalidTypeFormat, Week> = either { catching({
             val s = cs.toString().trim()
             s.validateInputFormat(Regex("[0-9]{4}-W[0-9]{2}"), Week::class)
             Week._of(s.take(4).toInt(), s.after('W').toInt())
-        }) { t: Throwable -> InvalidFormatOfType(cs, typeOf<Week>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(cs, typeOf<Week>(), t) } }
 
         /**
          * Creates an instance of the object using the current date

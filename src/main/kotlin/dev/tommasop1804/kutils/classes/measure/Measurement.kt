@@ -140,7 +140,7 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
          *
          * Possible errors:
          * - [IterableError.NoResults] - if no known unit symbol is found.
-         * - [InvalidFormatOfType] - if the numeric value is not a valid double.
+         * - [InvalidTypeFormat] - if the numeric value is not a valid double.
          *
          * @param string the input string containing the numeric value and unit symbol.
          * @return an Either object containing a Measurement instance on success,
@@ -163,7 +163,7 @@ open class Measurement(open val value: Double, open val unit: ScalarUnit) : Numb
          *
          * Possible errors:
          * - [IterableError.NoResults] - if no known unit symbol is found.
-         * - [InvalidFormatOfType] - if the numeric value is not a valid double.
+         * - [InvalidTypeFormat] - if the numeric value is not a valid double.
          *
          * @return an Either object containing a Measurement instance on success,
          *         or an Error if parsing fails.

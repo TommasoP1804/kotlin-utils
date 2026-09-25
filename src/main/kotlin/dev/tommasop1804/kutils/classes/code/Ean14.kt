@@ -102,7 +102,7 @@ value class Ean14 private constructor(override val value: String) : CharSequence
          */
         fun CharSequence.toEan14() = run { either {
             catching({ Ean14(this@toEan14) }) { t: Throwable ->
-                InvalidFormatOfType(this@toEan14, typeOf<Ean14>(), t)
+                InvalidTypeFormat(this@toEan14, typeOf<Ean14>(), t)
             }
         } }
 

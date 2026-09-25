@@ -482,9 +482,9 @@ class Cuid private constructor(private val value: String, val version: CuidVersi
          * describing the issue that occurred during the conversion.
          * @since 6.1.0
          */
-        fun CharSequence.toCuid(): Either<InvalidFormatOfType, Cuid> = either {
+        fun CharSequence.toCuid(): Either<InvalidTypeFormat, Cuid> = either {
             catching({ Cuid(this@toCuid) }) { t: Throwable ->
-                InvalidFormatOfType(this@toCuid, typeOf<Cuid>(), t)
+                InvalidTypeFormat(this@toCuid, typeOf<Cuid>(), t)
             }
         }
 

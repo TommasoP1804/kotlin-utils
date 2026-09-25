@@ -400,7 +400,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          */
         fun @receiver:IJLanguage("XML") String.toXml() = either {
             catching({ Xml(this@toXml) }) { t: Throwable ->
-                InvalidFormatOfType(this@toXml, typeOf<Xml>(), t)
+                InvalidTypeFormat(this@toXml, typeOf<Xml>(), t)
             }
         }
         /**
@@ -518,7 +518,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
          *         or a pretty-printed Xml object on successful conversion.
          * @since 6.1.0
          */
-        fun @receiver:IJLanguage("XML") String.toPrettyXml(): Either<InvalidFormatOfType, Xml> = toXml().map(Xml::pretty)
+        fun @receiver:IJLanguage("XML") String.toPrettyXml(): Either<InvalidTypeFormat, Xml> = toXml().map(Xml::pretty)
         /**
          * Converts a JSON object to its XML representation.
          *
@@ -1321,7 +1321,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Applies a JSON Patch (RFC 6902) to this XML and returns the result.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [XmlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1339,7 +1339,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Applies a JSON Patch (RFC 6902) using another [Xml] as patch.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [XmlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1356,7 +1356,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Applies a JSON Patch (RFC 6902) using a [Yaml] as patch.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [XmlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -1400,7 +1400,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      * Possible erros:
      * - [XmlError.InvalidXsltConfig] - if the XSLT configuration is invalid.
      * - [XmlError.XsltTransfomationFailed] - if the transformation fails.
-     * - [InvalidFormatOfType] - if produced an invalid XML.
+     * - [InvalidTypeFormat] - if produced an invalid XML.
      *
      * @param xslt The XSLT configuration used for transformation.
      * @return Either an XmlError representing a failure during transformation, or the transformed XML string.
@@ -1420,7 +1420,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
      *
      * Possible errors:
      * - [XmlError.SchemaValidationFailed] - if the validation fails.
-     * - [InvalidFormatOfType] - if produced an invalid XML.
+     * - [InvalidTypeFormat] - if produced an invalid XML.
      * - [GenericError] - if an unexpected error occurs.
      *
      * @param xsd The XSD used to validate the current XML object.
@@ -1437,7 +1437,7 @@ open class Xml private constructor(@param:IJLanguage("XML") override val value: 
         val validator = schema.newValidator()
         catching({ validator.validate(StreamSource(StringReader(value))) }) { e: Exception -> when (e) {
             is IllegalArgumentException -> XmlError.SchemaValidationFailed(e.message)
-            is SAXException -> InvalidFormatOfType(xsd, typeOf<Xml>(), e.message)
+            is SAXException -> InvalidTypeFormat(xsd, typeOf<Xml>(), e.message)
             else -> GenericError
         } }
         this@Xml

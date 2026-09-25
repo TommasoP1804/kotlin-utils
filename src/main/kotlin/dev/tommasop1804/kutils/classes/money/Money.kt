@@ -316,7 +316,7 @@ class Money (amount: BigDecimal = BigDecimal.ZERO, var currency: java.util.Curre
                 }
             }) { e: Exception -> when (e) {
                 is IllegalArgumentException -> NotFound(curr)
-                else -> InvalidFormatOfType(s, typeOf<Money>(), e.message)
+                else -> InvalidTypeFormat(s, typeOf<Money>(), e.message)
             } }
         }
 

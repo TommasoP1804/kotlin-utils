@@ -194,7 +194,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         fun @receiver:IJLanguage("toml") String.toToml() = either {
             catching({ Toml(this@toToml) }) { t: Throwable ->
-                InvalidFormatOfType(this@toToml, typeOf<Toml>(), t)
+                InvalidTypeFormat(this@toToml, typeOf<Toml>(), t)
             }
         }
         /**
@@ -276,7 +276,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * Reads and deserializes the content of a given file into an object of type [T].
          *
          * Possible erorrs:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file to read and deserialize.
@@ -286,7 +286,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         inline fun <reified T> readFromFile(file: File): Either<Error, T> = (either {
             catching({ Toml(file.readText()) }) { e: MalformedInputException ->
-                InvalidFormatOfType(file, typeOf<Toml>(), e)
+                InvalidTypeFormat(file, typeOf<Toml>(), e)
             }
         } thenEither { it.toObject<T>() }).flatten()
         /**
@@ -295,7 +295,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * This method attempts to read a list from the given file and convert it to an array of the specified type [T].
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file from which the array will be read.
@@ -308,7 +308,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * The file is expected to contain a TOML representation of the data.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param T The type of the objects to read from the file.
@@ -318,7 +318,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         inline fun <reified T> readListFromFile(file: File): Either<Error, List<T>> = (either {
             catching({ Toml(file.readText()) }) { e: MalformedInputException ->
-                InvalidFormatOfType(file, typeOf<Toml>(), e)
+                InvalidTypeFormat(file, typeOf<Toml>(), e)
             }
         } thenEither { it.toList<T>() }).flatten()
         /**
@@ -329,7 +329,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * as an error in the resulting `Either` type.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file to be read and parsed.
@@ -341,7 +341,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          * Reads a TOML file and parses its content into a map.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file to be read and parsed.
@@ -351,7 +351,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
          */
         inline fun <reified T> readMapFromFile(file: File): Either<Error, Map<String, T>> = (either {
             catching({ Toml(file.readText()) }) { e: MalformedInputException ->
-                InvalidFormatOfType(file, typeOf<Toml>(), e)
+                InvalidTypeFormat(file, typeOf<Toml>(), e)
             }
         } thenEither { it.toMap<T>() }).flatten()
 
@@ -840,7 +840,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * (also converted to JSON), and then maps the result back to a patched TOML object.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [TomlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -861,7 +861,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * back to a TOML-compatible format.
      *
      * Possible erros:
-     * - [InvalidFormatOfType] - if the patch is not a JSON array or a path is invalid.
+     * - [InvalidTypeFormat] - if the patch is not a JSON array or a path is invalid.
      * - [RequiredProperty] - if a required property is missing in the patch.
      * - [TomlError.PathNotFound] - if the path specified in the patch does not exist in the target JSON.
      * - [IllegalOperation] - if you're trying to move a node into its own children.
@@ -879,7 +879,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * Validates the current object against a provided JSON schema using a JSON serialization of the object.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [InvalidTypeFormat] - if the input JSON schema is malformed.
      * - [TomlError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema to validate the object against.
@@ -893,7 +893,7 @@ class Toml(@param:IJLanguage("TOML") override var value: String) : CharSequence,
      * Validates the current object against the provided JSON schema.
      *
      * Possible errors:
-     * - [InvalidFormatOfType] - if the input JSON schema is malformed.
+     * - [InvalidTypeFormat] - if the input JSON schema is malformed.
      * - [TomlError.SchemaValidationFailed] - if the validation fails.
      *
      * @param jsonSchema The JSON schema to validate against.

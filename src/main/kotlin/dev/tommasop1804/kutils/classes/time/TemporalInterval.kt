@@ -182,7 +182,7 @@ interface TemporalInterval : Serializable {
          *  occurs during parsing.
          * @since 6.1.0
          */
-        infix fun parse(s: String): Either<InvalidFormatOfType, TemporalInterval> = either { catching({
+        infix fun parse(s: String): Either<InvalidTypeFormat, TemporalInterval> = either { catching({
             if (s.startsWith("R")) RepeatedTemporalInterval.parse(s).getOrThrow()
             else {
                 val parts = s.splitAndTrim("/")
@@ -205,7 +205,7 @@ interface TemporalInterval : Serializable {
                     )
                 }
             }
-        }) { t: Throwable -> InvalidFormatOfType(s, typeOf<TemporalInterval>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(s, typeOf<TemporalInterval>(), t) } }
 
         /**
          * Parses a string representation of a temporal value and returns a specific type of Temporal object.

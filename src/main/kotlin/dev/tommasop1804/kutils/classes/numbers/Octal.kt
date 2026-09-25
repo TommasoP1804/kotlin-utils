@@ -149,9 +149,9 @@ class Octal(value: String) : CharSequence, Number(), Comparable<Number> {
          * @return An `Either` instance representing either the successful conversion to an `Octal` type or an `InvalidFormatOfType` error.
          * @since 6.1.0
          */
-        fun CharSequence.toOctal(): Either<InvalidFormatOfType, Octal> = either {
+        fun CharSequence.toOctal(): Either<InvalidTypeFormat, Octal> = either {
             catching({ Octal(this@toOctal.toString()) }) { t: Throwable ->
-                InvalidFormatOfType(this@toOctal, typeOf<Octal>(), t)
+                InvalidTypeFormat(this@toOctal, typeOf<Octal>(), t)
             }
         }
         /**

@@ -208,7 +208,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          */
         fun String.toCsv(separator: Char = Char.COMMA, hasHeaders: Boolean = true) = either {
             catching({ Csv(this@toCsv, separator, hasHeaders) }) { t: Throwable ->
-                InvalidFormatOfType(this@toCsv, typeOf<Csv>(), t)
+                InvalidTypeFormat(this@toCsv, typeOf<Csv>(), t)
             }
         }
 
@@ -291,7 +291,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          * elements separated by a given character and may optionally include headers.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file to read data from.
@@ -314,7 +314,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          * to be delimited by the provided separator and may optionally include headers.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file to be read, containing delimited data in CSV format.
@@ -330,7 +330,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
             hasHeaders: Boolean = true
         ): Either<Error, List<T>> = (either {
             catching({ Csv(file.readText(), separator, hasHeaders) }) { e: MalformedInputException ->
-                InvalidFormatOfType(file, typeOf<Csv>(), e)
+                InvalidTypeFormat(file, typeOf<Csv>(), e)
             }
         } thenEither { it.toList<T>() }).flatten()
 
@@ -338,7 +338,7 @@ class Csv(override var value: String, val separator: Char = Char.COMMA, val hasH
          * Reads a file and transforms its contents into a Set of elements of the specified type.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the file does not contain a valid TOML representation
+         * - [InvalidTypeFormat] - if the file does not contain a valid TOML representation
          * - [DeserializationError.MappingError] - if conversion failed
          *
          * @param file The file to read data from.

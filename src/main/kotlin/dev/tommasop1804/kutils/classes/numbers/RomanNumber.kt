@@ -737,12 +737,12 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
         }
         /**
          * Parses the given string value and interprets it as a Roman numeral.
-         * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidFormatOfType]
+         * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidTypeFormat]
          * if an error occurs, such as an invalid input format.
          *
          * @receiver the string representing the value to be parsed. It can be either
          * a numeric string or a valid Roman numeral.
-         * @return an [Either] instance containing [RomanNumber] on success or [InvalidFormatOfType]
+         * @return an [Either] instance containing [RomanNumber] on success or [InvalidTypeFormat]
          * on failure.
          * @since 6.1.0
          */
@@ -750,16 +750,16 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
 
         /**
          * Parses the given string value and interprets it as a Roman numeral.
-         * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidFormatOfType]
+         * Returns an instance of [RomanNumber] if the parsing succeeds, or an [InvalidTypeFormat]
          * if an error occurs, such as an invalid input format.
          *
          * @param value the string representing the value to be parsed. It can be either
          * a numeric string or a valid Roman numeral.
-         * @return an [Either] instance containing [RomanNumber] on success or [InvalidFormatOfType]
+         * @return an [Either] instance containing [RomanNumber] on success or [InvalidTypeFormat]
          * on failure.
          * @since 6.1.0
          */
-        private infix fun parse(value: String): Either<InvalidFormatOfType, RomanNumber> = either {
+        private infix fun parse(value: String): Either<InvalidTypeFormat, RomanNumber> = either {
             val number = tryOrNull { RomanNumber(value.toLong()) }
             if (number != null) return@either number
 
@@ -769,7 +769,7 @@ class RomanNumber(one: Long, five: Long, ten: Long, fifty: Long, hundred: Long, 
 
             for (i in roman.length - 1 downTo 0) {
                 val value = romanCharToValue(roman[i]).orRaise {
-                    InvalidFormatOfType(value, typeOf<RomanNumber>(), "Invalid roman char: ${roman[i]}")
+                    InvalidTypeFormat(value, typeOf<RomanNumber>(), "Invalid roman char: ${roman[i]}")
                 }
                 if (value < prevValue) result -= value
                 else result += value

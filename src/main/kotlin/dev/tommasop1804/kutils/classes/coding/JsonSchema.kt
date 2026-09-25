@@ -760,7 +760,7 @@ class JsonSchema(val json: Json) : Json(json) {
          */
         fun @receiver:Language("json") String.toJsonSchema() = either {
             catching({ JsonSchema(this@toJsonSchema) }) { t: Throwable ->
-                InvalidFormatOfType(this@toJsonSchema, typeOf<JsonSchema>(), t)
+                InvalidTypeFormat(this@toJsonSchema, typeOf<JsonSchema>(), t)
             }
         }
         /**

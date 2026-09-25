@@ -117,14 +117,14 @@ value class Pan private constructor(val value: String) : CharSequence {
         /**
          * Converts the current [CharSequence] to a [Pan] object.
          * This method attempts to parse the character sequence as a [Pan], handling any exceptions
-         * that may arise during the conversion process and returning an appropriate [InvalidFormatOfType] in case of failure.
+         * that may arise during the conversion process and returning an appropriate [InvalidTypeFormat] in case of failure.
          *
-         * @return an [Either] containing a [Pan] if parsing is successful, or an [InvalidFormatOfType] if the format is invalid.
+         * @return an [Either] containing a [Pan] if parsing is successful, or an [InvalidTypeFormat] if the format is invalid.
          * @since 6.1.0
          */
-        fun CharSequence.toPan(): Either<InvalidFormatOfType, Pan> = either {
+        fun CharSequence.toPan(): Either<InvalidTypeFormat, Pan> = either {
             catching({ Pan(this@toPan) }) { t: Throwable ->
-                InvalidFormatOfType(this@toPan, typeOf<Pan>(), t)
+                InvalidTypeFormat(this@toPan, typeOf<Pan>(), t)
             }
         }
 
@@ -151,13 +151,13 @@ value class Pan private constructor(val value: String) : CharSequence {
          *
          * @param input the raw input string to be normalized.
          * @return either a valid normalized string if the input conforms to the specified format,
-         *         or an error of type [InvalidFormatOfType] if the input contains invalid characters.
+         *         or an error of type [InvalidTypeFormat] if the input contains invalid characters.
          * @since 6.1.0
          */
-        private fun normalize(input: String): Either<InvalidFormatOfType, String> = either {
+        private fun normalize(input: String): Either<InvalidTypeFormat, String> = either {
             val cleaned = input.replace("[\\s-]".toRegex(), "")
             if (cleaned.all { it.isDigit() }) cleaned else raise(
-                InvalidFormatOfType(input, typeOf<Pan>(), "Input must contain only digits, spaces, or dashes")
+                InvalidTypeFormat(input, typeOf<Pan>(), "Input must contain only digits, spaces, or dashes")
             )
         }
 
@@ -165,7 +165,7 @@ value class Pan private constructor(val value: String) : CharSequence {
          * Computes the control digit for a given number using the Luhn algorithm.
          *
          * Possible errors:
-         * - [InvalidFormatOfType] - if the input contains invalid characters.
+         * - [InvalidTypeFormat] - if the input contains invalid characters.
          * - [InvalidFormat] - if the digits are empty.
          *
          * @param numberWithoutCheck the input number as a string, which does not include the control digit.

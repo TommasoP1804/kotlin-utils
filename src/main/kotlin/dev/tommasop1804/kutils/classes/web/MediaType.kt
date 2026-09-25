@@ -511,7 +511,7 @@ data class MediaType(
          *         - An `InvalidFormatOfType` error if the input string is not in a valid media type format.
          * @since 6.1.0
          */
-        infix fun parse(value: String): Either<InvalidFormatOfType, MediaType> = either { catching({
+        infix fun parse(value: String): Either<InvalidTypeFormat, MediaType> = either { catching({
             val parts = value.split(';').map { it.trim() }
             val params = parts.drop(1).associate { param ->
                 val [k, v] = param.split('=', limit = 2)
@@ -522,7 +522,7 @@ data class MediaType(
                 it.second().validateNotEmpty(),
                 params
             ) }
-        }) { t: Throwable -> InvalidFormatOfType(value, typeOf<MediaType>(), t) } }
+        }) { t: Throwable -> InvalidTypeFormat(value, typeOf<MediaType>(), t) } }
 
         /**
          * Attempts to resolve the MIME type from a given file extension.

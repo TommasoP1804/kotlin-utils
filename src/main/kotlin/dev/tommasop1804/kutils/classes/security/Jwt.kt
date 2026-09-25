@@ -341,8 +341,8 @@ class Jwt private constructor(private val value: String) : CharSequence {
      * Possible errors:
      * - [RequiredProperty] - if `pl_issuer` and/or `hd_keyId` are null
      * - [HttpError.ResponseError] - if the HTTP request fails
-     * - [InvalidFormatOfType] - if the HTTP request is not a valid JSON response
-     * - [InvalidFormatOfType] - if the kid `n` & `e` are not valid base64 strings
+     * - [InvalidTypeFormat] - if the HTTP request is not a valid JSON response
+     * - [InvalidTypeFormat] - if the kid `n` & `e` are not valid base64 strings
      * - [NotFound] - if the RSA algorithm is not found
      * - [Uncomputable] - if the RSA public key cannot be computed
      *
@@ -368,7 +368,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
                     responseHeaders = response.headers
                 ))
                 return response.body().let { tryOrRaise({ t ->
-                    InvalidFormatOfType(it, typeOf<JsonNode>(), t)
+                    InvalidTypeFormat(it, typeOf<JsonNode>(), t)
                 }) { MAPPER.readTree(it) } }
             }
 
@@ -385,10 +385,10 @@ class Jwt private constructor(private val value: String) : CharSequence {
                         val n = key["n"].asString()
                         val e = key["e"].asString()
                         val nBytes = n.let { tryOrRaise({ t ->
-                            InvalidFormatOfType(it, typeOf<ByteArray>(), t)
+                            InvalidTypeFormat(it, typeOf<ByteArray>(), t)
                         }) { Base64.getUrlDecoder().decode(it) } }
                         val eBytes = e.let { tryOrRaise({ t ->
-                            InvalidFormatOfType(it, typeOf<ByteArray>(), t)
+                            InvalidTypeFormat(it, typeOf<ByteArray>(), t)
                         }) { Base64.getUrlDecoder().decode(it) } }
                         val nBigInt = BigInt(1, nBytes)
                         val eBigInt = BigInt(1, eBytes)
@@ -452,7 +452,7 @@ class Jwt private constructor(private val value: String) : CharSequence {
          */
         fun CharSequence.toJwt() = either {
             catching({ Jwt(this@toJwt) }) { t: Throwable ->
-                InvalidFormatOfType(this@toJwt, typeOf<Jwt>(), t)
+                InvalidTypeFormat(this@toJwt, typeOf<Jwt>(), t)
             }
         }
 

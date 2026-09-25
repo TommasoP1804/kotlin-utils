@@ -456,9 +456,9 @@ class Tsid(val number: Long) : Number(), Comparable<Tsid>, Serializable, CharSeq
          *         error in case of a conversion failure.
          * @since 6.1.0
          */
-        fun CharSequence.toTsid(base32: Boolean = true): Either<InvalidFormatOfType, Tsid> = either {
+        fun CharSequence.toTsid(base32: Boolean = true): Either<InvalidTypeFormat, Tsid> = either {
             catching({ Tsid(this@toTsid.toString(), base32) }) { t: Throwable ->
-                InvalidFormatOfType(this@toTsid, typeOf<Tsid>(), t)
+                InvalidTypeFormat(this@toTsid, typeOf<Tsid>(), t)
             }
         }
         /**

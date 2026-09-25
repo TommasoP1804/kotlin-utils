@@ -113,7 +113,7 @@ value class Ean8 private constructor(override val value: String) : CharSequence,
          */
         fun CharSequence.toEan8() = filter { it.isDigit() }.run { either {
             catching({ Ean8(this@toEan8) }) { t: Throwable ->
-                InvalidFormatOfType(this@toEan8, typeOf<Ean8>(), t)
+                InvalidTypeFormat(this@toEan8, typeOf<Ean8>(), t)
             }
         } }
 
